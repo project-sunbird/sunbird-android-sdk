@@ -1,8 +1,8 @@
 package org.ekstep.genieservices.configs.db.model;
 
-import android.content.Context;
 import android.provider.BaseColumns;
 
+import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.ContentValues;
 import org.ekstep.genieservices.commons.db.DbOperator;
 import org.ekstep.genieservices.commons.db.operations.ICleanDb;
@@ -90,7 +90,7 @@ public class Term implements IReadDb, ICleanDb, IWriteToDb {
     }
 
     @Override
-    public void beforeWrite(Context context) {
+    public void beforeWrite(AppContext context) {
 
     }
 
