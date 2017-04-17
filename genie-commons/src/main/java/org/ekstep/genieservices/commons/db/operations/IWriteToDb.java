@@ -1,15 +1,19 @@
 package org.ekstep.genieservices.commons.db.operations;
 
-import android.content.Context;
-
+import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.ContentValues;
 
+/**
+ * @author anil
+ */
 public interface IWriteToDb {
+
     ContentValues getContentValues();
 
     void updateId(long id);
 
     String getTableName();
 
-    void beforeWrite(Context context);
+    void beforeWrite(AppContext context);
+
 }
