@@ -4,11 +4,10 @@ package org.ekstep.genieservices.commons.db.operations.impl;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-import org.ekstep.genieservice.commons.exception.DbException;
-import org.ekstep.genieservice.commons.model.interfaces.IUpdateDb;
-import org.ekstep.genieservice.commons.storage.db.ServiceDbHelper;
+import org.ekstep.genieservices.commons.db.ServiceDbHelper;
 import org.ekstep.genieservices.commons.db.operations.IOperate;
 import org.ekstep.genieservices.commons.db.operations.IUpdateDb;
+import org.ekstep.genieservices.commons.exception.DbException;
 
 import java.util.Locale;
 

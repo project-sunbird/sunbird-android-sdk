@@ -24,10 +24,10 @@ import java.util.Map;
 public class ConfigService {
 
     //    private APILogger mApiLogger;
-    private DbOperator mDbOpertaor;
+    private DbOperator dbOperator;
 
     public ConfigService() {
-        mDbOpertaor = new DbOperator(GenieService.getInstance().getAppContext().getContext());
+        dbOperator = new DbOperator(GenieService.getInstance().getAppContext().getContext());
 //        this(new DbOperator(context), new APILogger(context, "ConfigService"), context);
     }
 
@@ -45,7 +45,7 @@ public class ConfigService {
 
             Term term = new Term(type.getValue());
             Reader termReader = new Reader(term);
-            mDbOpertaor.execute(termReader);
+            dbOperator.execute(termReader);
 
             Map<String, Object> result = new HashMap<>();
             Map termMap = MapUtil.toMap(term.getTermJson());
