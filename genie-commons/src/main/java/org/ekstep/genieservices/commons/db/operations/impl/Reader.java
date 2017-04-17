@@ -22,8 +22,8 @@ public class Reader implements IOperate {
     public Void perform(SQLiteDatabase database) {
         String query = String.format(Locale.US, "Select * from %s %s %s %s", model.getTableName(),
                 model.filterForRead(), model.orderBy(), model.limitBy());
-        Cursor result = database.rawQuery(query, model.selectionArgsForFilter());
-        model.read(result);
+        Cursor cursor = database.rawQuery(query, model.selectionArgsForFilter());
+        model.read(new SqliteResultSet(cursor));
         return null;
     }
 
