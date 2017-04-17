@@ -1,9 +1,10 @@
 package org.ekstep.genieservices.commons.db.core;
 
 /**
- * Created by swayangjit on 17/4/17.
+ * Created on 17/4/17.
+ *
+ * @author swayangjit
  */
-
 public interface ResultSet {
     /**
      * Returns the numbers of rows in the cursor.
@@ -66,6 +67,7 @@ public interface ResultSet {
 
     /**
      * Return total number of columns
+     *
      * @return number of columns
      */
     int getColumnCount();
@@ -97,10 +99,11 @@ public interface ResultSet {
 
     /**
      * Returns the value of the requested column as a double.
+     *
      * @param columnIndex the zero-based index of the target column.
      * @return the value of that column as a double.
      */
     double getDouble(int columnIndex);
 
 
- }
+}

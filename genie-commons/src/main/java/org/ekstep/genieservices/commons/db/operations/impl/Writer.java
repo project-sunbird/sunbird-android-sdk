@@ -1,6 +1,7 @@
 package org.ekstep.genieservices.commons.db.operations.impl;
 
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import org.ekstep.genieservices.commons.AppContext;
@@ -26,9 +27,22 @@ public class Writer implements IOperate {
     @Override
     public Void perform(SQLiteDatabase database) {
 
+        long id = database.insert(model.getTableName(), null, mapContentValues(model.getContentValues()));
+        Log.i(LOG_TAG, "Saving in db:" + model.getTableName());
+        if (id != -1) {
+            Log.i(LOG_TAG, "Saved successfully in:" + model.getTableName() + " with id:" + id);
+            model.updateId(id);
+        } else {
+            throw new DbException(String.format(Locale.US, "Failed to write to %s", model.getTableName()));
+        }
+
+        return null;
+    }
+
+    @NonNull
+    private android.content.ContentValues mapContentValues(ContentValues values) {
         android.content.ContentValues contentValues = new android.content.ContentValues();
 
-        ContentValues values = model.getContentValues();
         if (values != null) {
             for (String colName : values.keySet()) {
                 Object obj = values.get(colName);
@@ -50,16 +64,7 @@ public class Writer implements IOperate {
             }
         }
 
-        long id = database.insert(model.getTableName(), null, contentValues);
-        Log.i(LOG_TAG, "Saving in db:" + model.getTableName());
-        if (id != -1) {
-            Log.i(LOG_TAG, "Saved successfully in:" + model.getTableName() + " with id:" + id);
-            model.updateId(id);
-        } else {
-            throw new DbException(String.format(Locale.US, "Failed to write to %s", model.getTableName()));
-        }
-
-        return null;
+        return contentValues;
     }
 
     @Override

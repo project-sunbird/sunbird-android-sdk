@@ -1,7 +1,7 @@
 package org.ekstep.genieservices.commons.db.core;
 
 
-import android.content.ContentValues;
+import org.ekstep.genieservices.commons.db.core.impl.ContentValues;
 
 public interface IUpdateDb {
     ContentValues getFieldsToUpdate();
