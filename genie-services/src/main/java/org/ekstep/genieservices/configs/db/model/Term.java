@@ -1,17 +1,15 @@
 package org.ekstep.genieservices.configs.db.model;
 
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.db.DbOperator;
 import org.ekstep.genieservices.commons.db.core.ICleanDb;
 import org.ekstep.genieservices.commons.db.core.IReadDb;
 import org.ekstep.genieservices.commons.db.core.IWriteToDb;
 import org.ekstep.genieservices.commons.db.core.ResultSet;
 import org.ekstep.genieservices.commons.db.core.impl.ContentValues;
 import org.ekstep.genieservices.commons.db.core.impl.SqliteResultSet;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IOperate;
-import org.ekstep.genieservices.commons.db.operations.impl.Cleaner;
 import org.ekstep.genieservices.commons.db.operations.impl.Reader;
-import org.ekstep.genieservices.commons.db.operations.impl.Writer;
 import org.ekstep.genieservices.configs.db.contract.TermEntry;
 
 import java.util.ArrayList;
@@ -28,20 +26,28 @@ public class Term implements IReadDb, ICleanDb, IWriteToDb {
     private Long id = -1L;
     private String mIdentifier = "ekstep.domain.terms.list";
 
-
     private String mTermJson;
     private String mTermType;
+    private AppContext mAppContext;
 
-    public Term(String type, String json) {
-        this.mTermType = type;
-        this.mTermJson = json;
+    private Term(AppContext appContext, String type, String json) {
+        mAppContext = appContext;
+        mTermType = type;
+        mTermJson = json;
     }
 
-    public Term(String type) {
-        this.mTermType = type;
+    public static Term build(AppContext appContext, String type, String json) {
+        return new Term(appContext, type, json);
     }
 
-    public Term() {
+    public static Term find(AppContext appContext, String type) {
+        IDBSession session = appContext.getDBSession();
+
+        Term term = new Term(appContext, type, null);
+
+        session.execute(session.getReader(term));
+
+        return term;
     }
 
     public void readWithoutMoving(ResultSet resultSet) {
@@ -97,7 +103,6 @@ public class Term implements IReadDb, ICleanDb, IWriteToDb {
         return "";
     }
 
-
     @Override
     public String filterForRead() {
         String selectionCriteria = String.format(Locale.US, "where %s = '%s' AND %s = '%s'", TermEntry.COLUMN_NAME_IDENTIFIER, mIdentifier, TermEntry.COLUMN_NAME_TERM_TYPE, mTermType);
@@ -115,11 +120,15 @@ public class Term implements IReadDb, ICleanDb, IWriteToDb {
         return "limit 1";
     }
 
-    public void save(DbOperator dbOperator) {
+    public void save() {
+        IDBSession session = mAppContext.getDBSession();
+
         List<IOperate> tasks = new ArrayList<>();
-        tasks.add(new Cleaner(new Term(mTermType)));
-        tasks.add(new Writer(this));
-        dbOperator.executeInOneTransaction(tasks);
+        tasks.add(session.getCleaner(find(mAppContext, mTermType)));
+        tasks.add(session.getWriter(this));
+//        tasks.add(new Cleaner(new Term(mTermType)));
+//        tasks.add(new Writer(this));
+        session.executeInOneTransaction(tasks);
     }
 
 
@@ -131,10 +140,10 @@ public class Term implements IReadDb, ICleanDb, IWriteToDb {
         return mTermType;
     }
 
-    public boolean exists(DbOperator dbOperator) {
+    public boolean exists(IDBSession session) {
         Term term = new Term();
         Reader otherTermReader = new Reader(term);
-        dbOperator.execute(otherTermReader);
+        session.execute(otherTermReader);
 
         return term.id != null && term.id != -1L;
     }

@@ -2,11 +2,11 @@ package org.ekstep.genieservices.configs;
 
 import com.google.gson.internal.LinkedTreeMap;
 
-import org.ekstep.genieservices.GenieService;
-import org.ekstep.genieservices.commons.db.DbOperator;
-import org.ekstep.genieservices.commons.db.operations.impl.Reader;
+import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.CallBack;
 import org.ekstep.genieservices.commons.Response;
+import org.ekstep.genieservices.commons.db.operations.impl.Reader;
+import org.ekstep.genieservices.commons.db.operations.impl.SQLiteSession;
 import org.ekstep.genieservices.commons.utils.MapUtil;
 import org.ekstep.genieservices.configs.db.model.Term;
 import org.ekstep.genieservices.configs.model.enums.StaticDataType;
@@ -24,11 +24,11 @@ import java.util.Map;
 public class ConfigService {
 
     //    private APILogger mApiLogger;
-    private DbOperator dbOperator;
+    private SQLiteSession SQLiteSession;
 
-    public ConfigService() {
-        dbOperator = new DbOperator(GenieService.getInstance().getAppContext().getContext());
-//        this(new DbOperator(context), new APILogger(context, "ConfigService"), context);
+    public ConfigService(AppContext appContext) {
+        SQLiteSession = new SQLiteSession(appContext.getContext());
+//        this(new SQLiteSession(context), new APILogger(context, "ConfigService"), context);
     }
 
     /**
@@ -45,7 +45,7 @@ public class ConfigService {
 
             Term term = new Term(type.getValue());
             Reader termReader = new Reader(term);
-            dbOperator.execute(termReader);
+            SQLiteSession.execute(termReader);
 
             Map<String, Object> result = new HashMap<>();
             Map termMap = MapUtil.toMap(term.getTermJson());

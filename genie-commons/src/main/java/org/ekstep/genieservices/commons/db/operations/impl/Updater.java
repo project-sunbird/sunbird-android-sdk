@@ -5,7 +5,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.db.ServiceDbHelper;
 import org.ekstep.genieservices.commons.db.core.IUpdateDb;
 import org.ekstep.genieservices.commons.db.core.impl.ContentValues;
 import org.ekstep.genieservices.commons.db.operations.IOperate;
@@ -21,17 +20,14 @@ public class Updater implements IOperate {
     }
 
     @Override
-    public Void perform(SQLiteDatabase db) {
-        int rowsCount = db.update(model.getTableName(), mapContentValues(model.getFieldsToUpdate()), model.updateBy(), null);
+    public Void perform(AppContext appContext) {
+        SQLiteDatabase database = appContext.getDBSession().getDbHelper().getWritableDatabase();
+
+        int rowsCount = database.update(model.getTableName(), mapContentValues(model.getFieldsToUpdate()), model.updateBy(), null);
         if (rowsCount < 1) {
             throw new DbException(String.format(Locale.US, "Failed to update %s, for fields:%s, updated by: %s", model.getTableName(), model.getFieldsToUpdate(), model.updateBy()));
         }
         return null;
-    }
-
-    @Override
-    public SQLiteDatabase getConnection(ServiceDbHelper dbHelper) {
-        return dbHelper.getWritableDatabase();
     }
 
     @Override

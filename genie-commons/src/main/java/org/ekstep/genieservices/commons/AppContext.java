@@ -3,6 +3,10 @@ package org.ekstep.genieservices.commons;
 import android.content.Context;
 import android.text.TextUtils;
 
+import org.ekstep.genieservices.commons.db.SummarizerDBContext;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.commons.db.operations.impl.SQLiteSession;
+
 /**
  * Created by shriharsh on 14/4/17.
  */
@@ -12,6 +16,7 @@ public class AppContext {
     private Context mContext;
     private String mAppPackage;
     private String mKey;
+    private IDBSession mIdbSession;
 
     public AppContext(Context context, String appPackage, String key) {
         mContext = context;
@@ -29,6 +34,22 @@ public class AppContext {
 
     public String getKey() {
         return mKey;
+    }
+
+    public IDBSession getDBSession() {
+        if (mIdbSession == null) {
+            mIdbSession = new SQLiteSession(this);
+        }
+
+        return mIdbSession;
+    }
+
+    public IDBSession getSummarizerDBSession() {
+        if (mIdbSession == null) {
+            mIdbSession = new SQLiteSession(this, new SummarizerDBContext());
+        }
+
+        return mIdbSession;
     }
 
     public static class Builder {

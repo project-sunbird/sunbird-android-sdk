@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.db.ServiceDbHelper;
 import org.ekstep.genieservices.commons.db.core.IWriteToDb;
 import org.ekstep.genieservices.commons.db.core.impl.ContentValues;
 import org.ekstep.genieservices.commons.db.operations.IOperate;
@@ -25,7 +24,8 @@ public class Writer implements IOperate {
     }
 
     @Override
-    public Void perform(SQLiteDatabase database) {
+    public Void perform(AppContext appContext) {
+        SQLiteDatabase database = appContext.getDBSession().getDbHelper().getWritableDatabase();
 
         long id = database.insert(model.getTableName(), null, mapContentValues(model.getContentValues()));
         Log.i(LOG_TAG, "Saving in db:" + model.getTableName());
@@ -65,11 +65,6 @@ public class Writer implements IOperate {
         }
 
         return contentValues;
-    }
-
-    @Override
-    public SQLiteDatabase getConnection(ServiceDbHelper dbHelper) {
-        return dbHelper.getWritableDatabase();
     }
 
     @Override
