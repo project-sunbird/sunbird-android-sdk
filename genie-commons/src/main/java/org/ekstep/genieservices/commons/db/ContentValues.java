@@ -1,6 +1,8 @@
 package org.ekstep.genieservices.commons.db;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created on 4/17/2017.
@@ -9,7 +11,9 @@ import java.util.HashMap;
  */
 public class ContentValues {
 
-    /** Holds the actual values */
+    /**
+     * Holds the actual values
+     */
     private HashMap<String, Object> mValues;
 
     /**
@@ -24,51 +28,29 @@ public class ContentValues {
     /**
      * Adds a value to the set.
      *
-     * @param key the name of the value to put
+     * @param key   the name of the value to put
      * @param value the data for the value to put
      */
-    public void put(String key, String value) {
+    public void put(String key, Object value) {
         mValues.put(key, value);
     }
 
     /**
-     * Adds a value to the set.
+     * Returns the number of values.
      *
-     * @param key the name of the value to put
-     * @param value the data for the value to put
+     * @return the number of values
      */
-    public void put(String key, Integer value) {
-        mValues.put(key, value);
+    public int size() {
+        return mValues.size();
     }
 
     /**
-     * Adds a value to the set.
+     * Remove a single value.
      *
-     * @param key the name of the value to put
-     * @param value the data for the value to put
+     * @param key the name of the value to remove
      */
-    public void put(String key, Long value) {
-        mValues.put(key, value);
-    }
-
-    /**
-     * Adds a value to the set.
-     *
-     * @param key the name of the value to put
-     * @param value the data for the value to put
-     */
-    public void put(String key, Boolean value) {
-        mValues.put(key, value);
-    }
-
-    /**
-     * Adds a value to the set.
-     *
-     * @param key the name of the value to put
-     * @param value the data for the value to put
-     */
-    public void put(String key, byte[] value) {
-        mValues.put(key, value);
+    public void remove(String key) {
+        mValues.remove(key);
     }
 
     /**
@@ -76,5 +58,35 @@ public class ContentValues {
      */
     public void clear() {
         mValues.clear();
+    }
+
+    /**
+     * Gets a value. Valid value types are {@link String}, {@link Boolean},
+     * {@link Number}, and {@code byte[]} implementations.
+     *
+     * @param key the value to get
+     * @return the data for the value, or {@code null} if the value is missing or if {@code null}
+     * was previously added with the given {@code key}
+     */
+    public Object get(String key) {
+        return mValues.get(key);
+    }
+
+    /**
+     * Returns a set of all of the keys and values
+     *
+     * @return a set of all of the keys and values
+     */
+    public Set<Map.Entry<String, Object>> valueSet() {
+        return mValues.entrySet();
+    }
+
+    /**
+     * Returns a set of all of the keys
+     *
+     * @return a set of all of the keys
+     */
+    public Set<String> keySet() {
+        return mValues.keySet();
     }
 }
