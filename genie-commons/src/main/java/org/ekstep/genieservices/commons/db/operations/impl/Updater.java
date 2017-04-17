@@ -1,12 +1,12 @@
 package org.ekstep.genieservices.commons.db.operations.impl;
 
 
-import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
+import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.ServiceDbHelper;
+import org.ekstep.genieservices.commons.db.core.IUpdateDb;
 import org.ekstep.genieservices.commons.db.operations.IOperate;
-import org.ekstep.genieservices.commons.db.operations.IUpdateDb;
 import org.ekstep.genieservices.commons.exception.DbException;
 
 import java.util.Locale;
@@ -33,7 +33,7 @@ public class Updater implements IOperate {
     }
 
     @Override
-    public void beforePerform(Context context) {
+    public void beforePerform(AppContext context) {
 
     }
 }

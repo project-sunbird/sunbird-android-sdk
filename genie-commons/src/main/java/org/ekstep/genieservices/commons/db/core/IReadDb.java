@@ -1,6 +1,6 @@
-package org.ekstep.genieservices.commons.db.operations;
+package org.ekstep.genieservices.commons.db.core;
 
-import org.ekstep.genieservices.commons.db.operations.impl.SqliteResultSet;
+import org.ekstep.genieservices.commons.db.core.impl.SqliteResultSet;
 
 public interface IReadDb {
     IReadDb read(SqliteResultSet cursor);

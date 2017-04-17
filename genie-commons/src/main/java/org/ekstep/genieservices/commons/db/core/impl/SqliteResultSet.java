@@ -1,8 +1,8 @@
-package org.ekstep.genieservices.commons.db.operations.impl;
+package org.ekstep.genieservices.commons.db.core.impl;
 
 import android.database.Cursor;
 
-import org.ekstep.genieservices.commons.db.operations.ResultSet;
+import org.ekstep.genieservices.commons.db.core.ResultSet;
 
 /**
  * Created by swayangjit on 17/4/17.

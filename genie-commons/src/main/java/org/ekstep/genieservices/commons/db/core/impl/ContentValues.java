@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.commons.db;
+package org.ekstep.genieservices.commons.db.core.impl;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,9 +1,9 @@
 package org.ekstep.genieservices.commons.db.operations.impl;
 
 
-import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
+import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.ServiceDbHelper;
 import org.ekstep.genieservices.commons.db.operations.IOperate;
 
@@ -27,7 +27,7 @@ public class CustomQuery implements IOperate {
     }
 
     @Override
-    public void beforePerform(Context context) {
+    public void beforePerform(AppContext context) {
 
     }
 }

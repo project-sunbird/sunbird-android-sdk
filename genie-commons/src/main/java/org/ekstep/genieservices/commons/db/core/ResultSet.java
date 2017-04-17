@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.commons.db.operations;
+package org.ekstep.genieservices.commons.db.core;
 
 /**
  * Created by swayangjit on 17/4/17.

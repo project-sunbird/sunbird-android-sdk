@@ -1,12 +1,13 @@
 package org.ekstep.genieservices.commons.db.operations.impl;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.ServiceDbHelper;
+import org.ekstep.genieservices.commons.db.core.IReadDb;
+import org.ekstep.genieservices.commons.db.core.impl.SqliteResultSet;
 import org.ekstep.genieservices.commons.db.operations.IOperate;
-import org.ekstep.genieservices.commons.db.operations.IReadDb;
 
 import java.util.Locale;
 
@@ -33,7 +34,7 @@ public class Reader implements IOperate {
     }
 
     @Override
-    public void beforePerform(Context context) {
+    public void beforePerform(AppContext context) {
 
     }
 }

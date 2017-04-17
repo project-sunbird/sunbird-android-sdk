@@ -4,10 +4,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.db.ContentValues;
 import org.ekstep.genieservices.commons.db.ServiceDbHelper;
+import org.ekstep.genieservices.commons.db.core.IWriteToDb;
+import org.ekstep.genieservices.commons.db.core.impl.ContentValues;
 import org.ekstep.genieservices.commons.db.operations.IOperate;
-import org.ekstep.genieservices.commons.db.operations.IWriteToDb;
 import org.ekstep.genieservices.commons.exception.DbException;
 
 import java.util.Locale;

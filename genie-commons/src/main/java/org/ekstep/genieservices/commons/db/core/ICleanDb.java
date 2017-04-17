@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.commons.db.operations;
+package org.ekstep.genieservices.commons.db.core;
 
 public interface ICleanDb {
     String getTableName();

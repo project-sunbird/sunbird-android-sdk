@@ -1,18 +1,16 @@
 package org.ekstep.genieservices.configs.db.model;
 
-import android.provider.BaseColumns;
-
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.db.ContentValues;
 import org.ekstep.genieservices.commons.db.DbOperator;
-import org.ekstep.genieservices.commons.db.operations.ICleanDb;
+import org.ekstep.genieservices.commons.db.core.ICleanDb;
+import org.ekstep.genieservices.commons.db.core.IReadDb;
+import org.ekstep.genieservices.commons.db.core.IWriteToDb;
+import org.ekstep.genieservices.commons.db.core.ResultSet;
+import org.ekstep.genieservices.commons.db.core.impl.ContentValues;
+import org.ekstep.genieservices.commons.db.core.impl.SqliteResultSet;
 import org.ekstep.genieservices.commons.db.operations.IOperate;
-import org.ekstep.genieservices.commons.db.operations.IReadDb;
-import org.ekstep.genieservices.commons.db.operations.IWriteToDb;
-import org.ekstep.genieservices.commons.db.operations.ResultSet;
 import org.ekstep.genieservices.commons.db.operations.impl.Cleaner;
 import org.ekstep.genieservices.commons.db.operations.impl.Reader;
-import org.ekstep.genieservices.commons.db.operations.impl.SqliteResultSet;
 import org.ekstep.genieservices.commons.db.operations.impl.Writer;
 import org.ekstep.genieservices.configs.db.contract.TermEntry;
 
@@ -47,7 +45,7 @@ public class Term implements IReadDb, ICleanDb, IWriteToDb {
     }
 
     public void readWithoutMoving(ResultSet resultSet) {
-        id = resultSet.getLong(resultSet.getColumnIndex(BaseColumns._ID));
+        id = resultSet.getLong(0);
         mIdentifier = resultSet.getString(resultSet.getColumnIndex(TermEntry.COLUMN_NAME_IDENTIFIER));
         mTermType = resultSet.getString(resultSet.getColumnIndex(TermEntry.COLUMN_NAME_TERM_TYPE));
         mTermJson = resultSet.getString(resultSet.getColumnIndex(TermEntry.COLUMN_NAME_TERM_JSON));
