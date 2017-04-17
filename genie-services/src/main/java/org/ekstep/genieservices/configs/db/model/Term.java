@@ -1,18 +1,18 @@
 package org.ekstep.genieservices.configs.db.model;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.BaseColumns;
 
+import org.ekstep.genieservices.commons.db.ContentValues;
 import org.ekstep.genieservices.commons.db.DbOperator;
-import org.ekstep.genieservices.commons.db.operations.impl.Cleaner;
-import org.ekstep.genieservices.commons.db.operations.IOperate;
-import org.ekstep.genieservices.commons.db.operations.impl.Reader;
-import org.ekstep.genieservices.commons.db.operations.impl.Writer;
 import org.ekstep.genieservices.commons.db.operations.ICleanDb;
+import org.ekstep.genieservices.commons.db.operations.IOperate;
 import org.ekstep.genieservices.commons.db.operations.IReadDb;
 import org.ekstep.genieservices.commons.db.operations.IWriteToDb;
+import org.ekstep.genieservices.commons.db.operations.impl.Cleaner;
+import org.ekstep.genieservices.commons.db.operations.impl.Reader;
+import org.ekstep.genieservices.commons.db.operations.impl.Writer;
 import org.ekstep.genieservices.configs.db.contract.TermEntry;
 
 import java.util.ArrayList;
