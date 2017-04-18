@@ -86,6 +86,15 @@ public class AppContext {
             if (TextUtils.isEmpty(appPackage)) {
                 throw new IllegalArgumentException("appPackage cannot be empty.");
             }
+
+            try {
+                BuildConfigHelper.loadBuildConfigClass(appPackage);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+
+                throw new IllegalArgumentException("appPackage should be same as defined in Manifest.xml");
+            }
+
             this.appPackage = appPackage;
             return this;
         }
@@ -101,6 +110,14 @@ public class AppContext {
 
             if (TextUtils.isEmpty(appPackage)) {
                 throw new IllegalStateException("appPackage cannot be empty.");
+            }
+
+            try {
+                BuildConfigHelper.loadBuildConfigClass(appPackage);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+
+                throw new IllegalStateException("appPackage should be same as defined in Manifest.xml");
             }
 
             return new AppContext(context, appPackage, key);

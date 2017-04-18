@@ -6,8 +6,6 @@ import org.ekstep.genieservices.commons.db.core.IReadDb;
 import org.ekstep.genieservices.commons.db.core.IWriteToDb;
 import org.ekstep.genieservices.commons.db.core.ResultSet;
 import org.ekstep.genieservices.commons.db.core.impl.ContentValues;
-import org.ekstep.genieservices.commons.db.operations.IDBOperate;
-import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.configs.db.contract.TermEntry;
 
