@@ -3,8 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Genie-Sdk.iml" filepath="$PROJECT_DIR$/Genie-Sdk.iml" />
-      <module fileurl="file://$PROJECT_DIR$/genie-commons/genie-commons.iml" filepath="$PROJECT_DIR$/genie-commons/genie-commons.iml" />
+      <module fileurl="file://$PROJECT_DIR$/genie-commons-lib/genie-commons-lib.iml" filepath="$PROJECT_DIR$/genie-commons-lib/genie-commons-lib.iml" />
       <module fileurl="file://$PROJECT_DIR$/genie-services/genie-services.iml" filepath="$PROJECT_DIR$/genie-services/genie-services.iml" />
+      <module fileurl="file://$PROJECT_DIR$/genie-services-lib/genie-services-lib.iml" filepath="$PROJECT_DIR$/genie-services-lib/genie-services-lib.iml" />
     </modules>
   </component>
 </project>

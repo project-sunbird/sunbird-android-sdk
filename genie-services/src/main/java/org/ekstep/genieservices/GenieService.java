@@ -1,6 +1,11 @@
 package org.ekstep.genieservices;
 
+import android.content.Context;
+
+import org.ekstep.genieservices.commons.AndroidAppContext;
+import org.ekstep.genieservices.commons.AndroidLogger;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.config.ConfigService;
 
 /**
  * Created on 4/14/2017.
@@ -9,22 +14,19 @@ import org.ekstep.genieservices.commons.AppContext;
  */
 public class GenieService {
 
-    private static GenieService instance;
-    private static AppContext appContext;
+    private AppContext<Context, AndroidLogger>  applicationContext;
 
-    private GenieService(AppContext context) {
-        appContext = context;
-    }
-
-    public static GenieService getInstance() {
+    public static GenieService init(Context context, String packageName, String apiKey) {
+        AppContext<Context, AndroidLogger>  applicationContext = AndroidAppContext.buildAppContext(context, packageName, apiKey, new AndroidLogger());
+        GenieService instance = new GenieService(applicationContext);
         return instance;
     }
 
-    public static void init(AppContext context) {
-        instance = new GenieService(context);
+    private GenieService(AppContext<Context, AndroidLogger> applicationContext) {
+        this.applicationContext = applicationContext;
     }
 
-    public AppContext getAppContext() {
-        return appContext;
+    public ConfigService getConfigService() {
+        return null;
     }
 }

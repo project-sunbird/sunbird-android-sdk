@@ -8,8 +8,9 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/genie-commons" />
+            <option value="$PROJECT_DIR$/genie-commons-lib" />
             <option value="$PROJECT_DIR$/genie-services" />
+            <option value="$PROJECT_DIR$/genie-services-lib" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

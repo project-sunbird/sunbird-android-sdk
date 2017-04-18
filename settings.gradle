@@ -1,1 +1,1 @@
-include ':genie-services', ':genie-commons'
+include ':genie-services', ':genie-commons-lib', ':genie-services-lib'
