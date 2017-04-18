@@ -9,6 +9,7 @@ import org.ekstep.genieservices.commons.db.core.IWriteToDb;
 import org.ekstep.genieservices.commons.db.core.impl.ContentValues;
 import org.ekstep.genieservices.commons.db.operations.IDBOperate;
 import org.ekstep.genieservices.commons.exception.DbException;
+import org.ekstep.genieservices.commons.utils.Logger;
 
 import java.util.Locale;
 
@@ -27,9 +28,9 @@ public class SQLiteWriter implements IDBOperate<SQLiteDatabase> {
     public Void perform(AppContext context, SQLiteDatabase datasource) {
         beforePerform(context);
         long id = datasource.insert(model.getTableName(), null, mapContentValues(model.getContentValues()));
-        Log.i(LOG_TAG, "Saving in db:" + model.getTableName());
+        Logger.i(LOG_TAG, "Saving in db:" + model.getTableName());
         if (id != -1) {
-            Log.i(LOG_TAG, "Saved successfully in:" + model.getTableName() + " with id:" + id);
+            Logger.i(LOG_TAG, "Saved successfully in:" + model.getTableName() + " with id:" + id);
             model.updateId(id);
         } else {
             throw new DbException(String.format(Locale.US, "Failed to write to %s", model.getTableName()));

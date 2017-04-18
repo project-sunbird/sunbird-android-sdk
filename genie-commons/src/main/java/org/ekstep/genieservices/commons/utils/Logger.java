@@ -78,11 +78,4 @@ public class Logger {
         }
     }
 
-//    public static int println(int priority, String tag, String msg) {
-//        if (BuildConfig.DEBUG) {
-//            Log.e(tag, msg);
-//        }
-//        return 0;
-//    }
-
 }

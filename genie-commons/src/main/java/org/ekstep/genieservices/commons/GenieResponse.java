@@ -2,6 +2,8 @@ package org.ekstep.genieservices.commons;
 
 import android.util.Log;
 
+import org.ekstep.genieservices.commons.utils.Logger;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,7 +24,7 @@ public class GenieResponse<T> {
     public static GenieResponse getErrorResponse(String error, String errorMessage, String logMessage, String logTag) {
         GenieResponse response = new GenieResponse();
         response.setStatus(false);
-        Log.e(logTag, logMessage);
+        Logger.e(logTag, logMessage);
         response.setErrorMessages(Arrays.asList(new String[]{errorMessage}));
         response.setError(error);
         return response;
@@ -31,7 +33,7 @@ public class GenieResponse<T> {
     public static GenieResponse getSuccessResponse(String message, String logMessage, String logTag) {
         GenieResponse response = new GenieResponse();
         response.setStatus(true);
-        Log.i(logTag, logMessage);
+        Logger.i(logTag, logMessage);
         response.setMessage(message);
         return response;
     }
