@@ -26,5 +26,5 @@ public interface IDBSession {
 
     Void execute(String query);
 
-    Void executeInTransaction(IDBOperate operate);
+    Void executeInTransaction(IDBTransaction transaction);
 }

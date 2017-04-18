@@ -8,6 +8,7 @@ import org.ekstep.genieservices.commons.db.core.ResultSet;
 import org.ekstep.genieservices.commons.db.core.impl.ContentValues;
 import org.ekstep.genieservices.commons.db.operations.IDBOperate;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.configs.db.contract.TermEntry;
 
 import java.util.Locale;
@@ -110,9 +111,9 @@ public class Term implements IReadDb, ICleanDb, IWriteToDb {
     }
 
     public void save() {
-        mAppContext.getDBSession().executeInTransaction(new IDBOperate() {
+        mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
             @Override
-            public Void perform(AppContext context, Object datasouce) {
+            public Void perform(AppContext context) {
                 context.getDBSession().clean(Term.this);
                 context.getDBSession().create(Term.this);
                 return null;
