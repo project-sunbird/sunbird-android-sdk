@@ -7,7 +7,7 @@ import java.util.List;
  *
  * @author shriharsh
  */
-public class StaticData {
+public class MasterData {
 
     private List<String> age;
     private List<String> board;

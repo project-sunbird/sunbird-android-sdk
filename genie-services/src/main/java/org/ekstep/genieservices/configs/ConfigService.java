@@ -5,11 +5,9 @@ import com.google.gson.internal.LinkedTreeMap;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.CallBack;
 import org.ekstep.genieservices.commons.Response;
-import org.ekstep.genieservices.commons.db.operations.impl.SQLiteReader;
-import org.ekstep.genieservices.commons.db.operations.impl.SQLiteSession;
 import org.ekstep.genieservices.commons.utils.MapUtil;
 import org.ekstep.genieservices.configs.db.model.Term;
-import org.ekstep.genieservices.configs.model.enums.StaticDataType;
+import org.ekstep.genieservices.configs.model.enums.MasterDataType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,7 +34,7 @@ public class ConfigService {
      * @param type
      * @param callBack
      */
-    public void getStaticData(StaticDataType type, CallBack<List<String>> callBack) {
+    public void getStaticData(MasterDataType type, CallBack<List<String>> callBack) {
         Response<List<String>> response = new Response<>();
         if (type != null) {
             response.setStatus(true);

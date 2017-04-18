@@ -1,10 +1,10 @@
 package org.ekstep.genieservices.configs.model.enums;
 
 /**
- * StaticDataTypes
+ * MasterDataTypes
  *
  */
-public enum StaticDataType {
+public enum MasterDataType {
     SUBJECT("subject"),
     MEDIUM("medium"),
     BOARD("board"),
@@ -14,7 +14,7 @@ public enum StaticDataType {
 
     private final String value;
 
-    StaticDataType(final String newValue) {
+    MasterDataType(final String newValue) {
         value = newValue;
     }
 
