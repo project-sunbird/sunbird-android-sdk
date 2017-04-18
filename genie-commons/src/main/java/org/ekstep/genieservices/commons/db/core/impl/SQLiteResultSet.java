@@ -5,15 +5,16 @@ import android.database.Cursor;
 import org.ekstep.genieservices.commons.db.core.ResultSet;
 
 /**
- * Created by swayangjit on 17/4/17.
+ * Created on 17/4/17.
+ *
+ * @author swayangjit
  */
-
-public class SqliteResultSet implements ResultSet {
+public class SQLiteResultSet implements ResultSet {
 
     private Cursor cursor;
 
-    public SqliteResultSet(Cursor cursor){
-        this.cursor=cursor;
+    public SQLiteResultSet(Cursor cursor) {
+        this.cursor = cursor;
     }
 
     @Override

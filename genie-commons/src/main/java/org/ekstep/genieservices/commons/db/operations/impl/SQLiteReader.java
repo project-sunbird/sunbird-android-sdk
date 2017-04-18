@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.core.IReadDb;
-import org.ekstep.genieservices.commons.db.core.impl.SqliteResultSet;
+import org.ekstep.genieservices.commons.db.core.impl.SQLiteResultSet;
 import org.ekstep.genieservices.commons.db.operations.IOperate;
 
 import java.util.Locale;
@@ -23,7 +23,7 @@ public class SQLiteReader implements IOperate<SQLiteDatabase> {
         String query = String.format(Locale.US, "Select * from %s %s %s %s", model.getTableName(),
                 model.filterForRead(), model.orderBy(), model.limitBy());
         Cursor cursor = datasource.rawQuery(query, model.selectionArgsForFilter());
-        model.read(new SqliteResultSet(cursor));
+        model.read(new SQLiteResultSet(cursor));
         return null;
     }
 
