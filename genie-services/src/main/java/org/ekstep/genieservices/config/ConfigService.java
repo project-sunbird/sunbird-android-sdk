@@ -4,7 +4,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.GenieResponse;
 import org.ekstep.genieservices.config.db.model.Term;
-import org.ekstep.genieservices.config.model.enums.MasterDataType;
+import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
 
 /**
  * Created on 14/4/17.

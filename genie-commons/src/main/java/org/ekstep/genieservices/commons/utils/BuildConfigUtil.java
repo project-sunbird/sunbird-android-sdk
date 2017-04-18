@@ -1,13 +1,11 @@
-package org.ekstep.genieservices.commons;
-
-import org.ekstep.genieservices.commons.utils.Logger;
+package org.ekstep.genieservices.commons.utils;
 
 /**
  * Created on 4/18/2017.
  *
  * @author anil
  */
-public class BuildConfigHelper {
+public class BuildConfigUtil {
 
     public static final String VERSION_CODE = "VERSION_CODE";
     public static final String VERSION_NAME = "VERSION_NAME";
@@ -18,7 +16,7 @@ public class BuildConfigHelper {
     public static final String API_PASS = "API_PASS";
     public static final String API_USER = "API_USER";
 
-    private static final String TAG = BuildConfigHelper.class.getSimpleName();
+    private static final String TAG = BuildConfigUtil.class.getSimpleName();
 
     public static Object getBuildConfigValue(String packageName, String fieldName) {
 
