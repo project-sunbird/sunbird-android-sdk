@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import org.ekstep.genieservices.commons.db.SummarizerDBContext;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.impl.SQLiteSession;
+import org.ekstep.genieservices.commons.utils.BuildConfigUtil;
 
 /**
  * Created by shriharsh on 14/4/17.
@@ -88,7 +89,7 @@ public class AppContext {
             }
 
             try {
-                BuildConfigHelper.loadBuildConfigClass(appPackage);
+                BuildConfigUtil.loadBuildConfigClass(appPackage);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
 
@@ -113,7 +114,7 @@ public class AppContext {
             }
 
             try {
-                BuildConfigHelper.loadBuildConfigClass(appPackage);
+                BuildConfigUtil.loadBuildConfigClass(appPackage);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
 
