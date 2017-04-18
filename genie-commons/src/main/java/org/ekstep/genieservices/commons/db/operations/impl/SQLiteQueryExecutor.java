@@ -4,9 +4,9 @@ package org.ekstep.genieservices.commons.db.operations.impl;
 import android.database.sqlite.SQLiteDatabase;
 
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.db.operations.IOperate;
+import org.ekstep.genieservices.commons.db.operations.IDBOperate;
 
-public class SQLiteQueryExecutor implements IOperate<SQLiteDatabase> {
+public class SQLiteQueryExecutor implements IDBOperate<SQLiteDatabase> {
 
     private String query;
 
@@ -15,13 +15,8 @@ public class SQLiteQueryExecutor implements IOperate<SQLiteDatabase> {
     }
 
     @Override
-    public Void perform(SQLiteDatabase datasource) {
+    public Void perform(AppContext context, SQLiteDatabase datasource) {
         datasource.execSQL(query);
         return null;
-    }
-
-    @Override
-    public void beforePerform(AppContext context) {
-
     }
 }

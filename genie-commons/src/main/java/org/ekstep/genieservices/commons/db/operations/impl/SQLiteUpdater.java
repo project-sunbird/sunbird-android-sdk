@@ -7,12 +7,12 @@ import android.support.annotation.NonNull;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.core.IUpdateDb;
 import org.ekstep.genieservices.commons.db.core.impl.ContentValues;
-import org.ekstep.genieservices.commons.db.operations.IOperate;
+import org.ekstep.genieservices.commons.db.operations.IDBOperate;
 import org.ekstep.genieservices.commons.exception.DbException;
 
 import java.util.Locale;
 
-public class SQLiteUpdater implements IOperate<SQLiteDatabase> {
+public class SQLiteUpdater implements IDBOperate<SQLiteDatabase> {
     private IUpdateDb model;
 
     public SQLiteUpdater(IUpdateDb model) {
@@ -20,17 +20,12 @@ public class SQLiteUpdater implements IOperate<SQLiteDatabase> {
     }
 
     @Override
-    public Void perform(SQLiteDatabase datasource) {
+    public Void perform(AppContext context, SQLiteDatabase datasource) {
         int rowsCount = datasource.update(model.getTableName(), mapContentValues(model.getFieldsToUpdate()), model.updateBy(), null);
         if (rowsCount < 1) {
             throw new DbException(String.format(Locale.US, "Failed to update %s, for fields:%s, updated by: %s", model.getTableName(), model.getFieldsToUpdate(), model.updateBy()));
         }
         return null;
-    }
-
-    @Override
-    public void beforePerform(AppContext context) {
-
     }
 
     @NonNull

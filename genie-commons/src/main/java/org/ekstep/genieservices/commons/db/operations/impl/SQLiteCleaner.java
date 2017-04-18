@@ -4,11 +4,11 @@ import android.database.sqlite.SQLiteDatabase;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.core.ICleanDb;
-import org.ekstep.genieservices.commons.db.operations.IOperate;
+import org.ekstep.genieservices.commons.db.operations.IDBOperate;
 
 import java.util.Locale;
 
-public class SQLiteCleaner implements IOperate<SQLiteDatabase> {
+public class SQLiteCleaner implements IDBOperate<SQLiteDatabase> {
 
     private ICleanDb model;
 
@@ -17,15 +17,11 @@ public class SQLiteCleaner implements IOperate<SQLiteDatabase> {
     }
 
     @Override
-    public Void perform(SQLiteDatabase datasource) {
+    public Void perform(AppContext context, SQLiteDatabase datasource) {
         String query = String.format(Locale.US, "DELETE FROM %s %s", model.getTableName(), model.selectionToClean());
         datasource.execSQL(query);
         model.clean();
         return null;
     }
 
-    @Override
-    public void beforePerform(AppContext context) {
-
-    }
 }

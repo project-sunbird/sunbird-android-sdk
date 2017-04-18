@@ -1,12 +1,9 @@
 package org.ekstep.genieservices.commons.db.operations;
 
-import org.ekstep.genieservices.commons.db.ServiceDbHelper;
 import org.ekstep.genieservices.commons.db.core.ICleanDb;
 import org.ekstep.genieservices.commons.db.core.IReadDb;
 import org.ekstep.genieservices.commons.db.core.IUpdateDb;
 import org.ekstep.genieservices.commons.db.core.IWriteToDb;
-
-import java.util.List;
 
 /**
  * Created on 4/17/2017.
@@ -28,4 +25,6 @@ public interface IDBSession {
     Void update(IUpdateDb updateDb);
 
     Void execute(String query);
+
+    Void executeInTransaction(IDBOperate operate);
 }

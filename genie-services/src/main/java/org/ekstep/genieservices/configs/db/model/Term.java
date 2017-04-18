@@ -6,6 +6,7 @@ import org.ekstep.genieservices.commons.db.core.IReadDb;
 import org.ekstep.genieservices.commons.db.core.IWriteToDb;
 import org.ekstep.genieservices.commons.db.core.ResultSet;
 import org.ekstep.genieservices.commons.db.core.impl.ContentValues;
+import org.ekstep.genieservices.commons.db.operations.IDBOperate;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.configs.db.contract.TermEntry;
 
@@ -36,9 +37,8 @@ public class Term implements IReadDb, ICleanDb, IWriteToDb {
     }
 
     public static Term find(AppContext appContext, String type) {
-        IDBSession session = appContext.getDBSession();
         Term term = new Term(appContext, type, null);
-        session.read(term);
+        appContext.getDBSession().read(term);
         return term;
     }
 
@@ -110,14 +110,14 @@ public class Term implements IReadDb, ICleanDb, IWriteToDb {
     }
 
     public void save() {
-        IDBSession session = mAppContext.getDBSession();
-        session.beginTransaction();
-        try {
-            session.clean(this);
-            session.create(this);
-        } finally {
-            session.endTransaction();
-        }
+        mAppContext.getDBSession().executeInTransaction(new IDBOperate() {
+            @Override
+            public Void perform(AppContext context, Object datasouce) {
+                context.getDBSession().clean(Term.this);
+                context.getDBSession().create(Term.this);
+                return null;
+            }
+        });
     }
 
     public String getTermJson() {

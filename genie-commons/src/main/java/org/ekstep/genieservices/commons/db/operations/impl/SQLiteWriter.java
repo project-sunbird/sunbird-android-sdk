@@ -7,7 +7,7 @@ import android.util.Log;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.core.IWriteToDb;
 import org.ekstep.genieservices.commons.db.core.impl.ContentValues;
-import org.ekstep.genieservices.commons.db.operations.IOperate;
+import org.ekstep.genieservices.commons.db.operations.IDBOperate;
 import org.ekstep.genieservices.commons.exception.DbException;
 
 import java.util.Locale;
@@ -15,7 +15,7 @@ import java.util.Locale;
 /**
  * @author anil
  */
-public class SQLiteWriter implements IOperate<SQLiteDatabase> {
+public class SQLiteWriter implements IDBOperate<SQLiteDatabase> {
     private static final String LOG_TAG = "service-SQLiteWriter";
     private IWriteToDb model;
 
@@ -24,7 +24,8 @@ public class SQLiteWriter implements IOperate<SQLiteDatabase> {
     }
 
     @Override
-    public Void perform(SQLiteDatabase datasource) {
+    public Void perform(AppContext context, SQLiteDatabase datasource) {
+        beforePerform(context);
         long id = datasource.insert(model.getTableName(), null, mapContentValues(model.getContentValues()));
         Log.i(LOG_TAG, "Saving in db:" + model.getTableName());
         if (id != -1) {
@@ -64,8 +65,7 @@ public class SQLiteWriter implements IOperate<SQLiteDatabase> {
         return contentValues;
     }
 
-    @Override
-    public void beforePerform(AppContext context) {
+    private void beforePerform(AppContext context) {
         model.beforeWrite(context);
     }
 }

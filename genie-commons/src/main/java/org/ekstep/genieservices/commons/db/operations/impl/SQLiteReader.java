@@ -6,11 +6,11 @@ import android.database.sqlite.SQLiteDatabase;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.core.IReadDb;
 import org.ekstep.genieservices.commons.db.core.impl.SQLiteResultSet;
-import org.ekstep.genieservices.commons.db.operations.IOperate;
+import org.ekstep.genieservices.commons.db.operations.IDBOperate;
 
 import java.util.Locale;
 
-public class SQLiteReader implements IOperate<SQLiteDatabase> {
+public class SQLiteReader implements IDBOperate<SQLiteDatabase> {
 
     private IReadDb model;
 
@@ -19,7 +19,7 @@ public class SQLiteReader implements IOperate<SQLiteDatabase> {
     }
 
     @Override
-    public Void perform(SQLiteDatabase datasource) {
+    public Void perform(AppContext context, SQLiteDatabase datasource) {
         String query = String.format(Locale.US, "Select * from %s %s %s %s", model.getTableName(),
                 model.filterForRead(), model.orderBy(), model.limitBy());
         Cursor cursor = datasource.rawQuery(query, model.selectionArgsForFilter());
@@ -27,8 +27,4 @@ public class SQLiteReader implements IOperate<SQLiteDatabase> {
         return null;
     }
 
-    @Override
-    public void beforePerform(AppContext context) {
-
-    }
 }

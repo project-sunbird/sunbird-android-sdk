@@ -11,9 +11,7 @@ import org.ekstep.genieservices.commons.db.core.IReadDb;
 import org.ekstep.genieservices.commons.db.core.IUpdateDb;
 import org.ekstep.genieservices.commons.db.core.IWriteToDb;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.commons.db.operations.IOperate;
-
-import java.util.List;
+import org.ekstep.genieservices.commons.db.operations.IDBOperate;
 
 public class SQLiteSession implements IDBSession {
 
@@ -35,10 +33,9 @@ public class SQLiteSession implements IDBSession {
         this.database = serviceDbHelper.getWritableDatabase();
     }
 
-    private Void execute(IOperate<SQLiteDatabase> operate) {
+    private Void execute(IDBOperate<SQLiteDatabase> operate) {
         try {
-            operate.beforePerform(appContext);
-            operate.perform(database);
+            operate.perform(appContext, database);
         } catch (Exception e) {
             isOperationSuccessful = false;
             Log.e(LOG_TAG, "Error when performing execute. Exception: " + e, e);
@@ -86,5 +83,20 @@ public class SQLiteSession implements IDBSession {
     @Override
     public Void execute(String query) {
         return execute(new SQLiteQueryExecutor(query));
+    }
+
+    @Override
+    public Void executeInTransaction(IDBOperate operate) {
+        beginTransaction();
+        try {
+            operate.perform(appContext, database);
+            isOperationSuccessful = true;
+        } catch (Exception e) {
+            isOperationSuccessful = false;
+            Log.e(LOG_TAG, "Error when performing execute. Exception: " + e, e);
+        } finally {
+            endTransaction();
+        }
+        return null;
     }
 }
