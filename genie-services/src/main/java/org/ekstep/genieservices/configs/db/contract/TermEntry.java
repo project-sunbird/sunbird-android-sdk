@@ -1,13 +1,15 @@
 package org.ekstep.genieservices.configs.db.contract;
 
-import android.provider.BaseColumns;
-
+import org.ekstep.genieservices.commons.db.BaseColumns;
 import org.ekstep.genieservices.commons.db.DbConstants;
 
 /**
- * Created by swayangjit on 17/2/17.
+ * Created on 17/2/17.
+ *
+ * @author swayangjit
  */
 public class TermEntry implements BaseColumns {
+
     public static final String TABLE_NAME = "term";
     public static final String COLUMN_NAME_IDENTIFIER = "identifier";
     public static final String COLUMN_NAME_TERM_TYPE = "facet_type";
@@ -25,4 +27,5 @@ public class TermEntry implements BaseColumns {
     public static final String getDeleteEntry() {
         return "DROP TABLE IF EXISTS " + TABLE_NAME;
     }
+
 }
