@@ -25,7 +25,7 @@ public class ConfigService {
     private AppContext appContext;
 
     public ConfigService(AppContext appContext) {
-//        this(new SQLiteSession(context), new APILogger(context, "ConfigService"), context);
+        this.appContext = appContext;
     }
 
     /**
