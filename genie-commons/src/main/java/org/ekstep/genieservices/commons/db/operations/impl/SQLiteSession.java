@@ -36,7 +36,7 @@ public class SQLiteSession implements IDBSession {
 
     private Void execute(IDBOperate<SQLiteDatabase> operate) {
         try {
-            operate.perform(database);
+            operate.perform(appContext, database);
         } catch (Exception e) {
             isOperationSuccessful = false;
             Log.e(LOG_TAG, "Error when performing execute. Exception: " + e, e);
