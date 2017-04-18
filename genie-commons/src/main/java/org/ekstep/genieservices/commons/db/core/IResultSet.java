@@ -5,7 +5,7 @@ package org.ekstep.genieservices.commons.db.core;
  *
  * @author swayangjit
  */
-public interface ResultSet {
+public interface IResultSet {
     /**
      * Returns the numbers of rows in the cursor.
      *

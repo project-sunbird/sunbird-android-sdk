@@ -1,12 +1,10 @@
-package org.ekstep.genieservices.configs;
+package org.ekstep.genieservices.config;
 
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.CallBack;
+import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.GenieResponse;
-import org.ekstep.genieservices.configs.db.model.Term;
-import org.ekstep.genieservices.configs.model.enums.MasterDataType;
-
-import java.util.List;
+import org.ekstep.genieservices.config.db.model.Term;
+import org.ekstep.genieservices.config.model.enums.MasterDataType;
 
 /**
  * Created on 14/4/17.
@@ -26,18 +24,18 @@ public class ConfigService {
      * Get terms
      *
      * @param type
-     * @param callBack
+     * @param responseHandler
      */
-    public void getMasterData(MasterDataType type, CallBack<String> callBack) {
+    public void getMasterData(MasterDataType type, IResponseHandler<String> responseHandler) {
         GenieResponse<String> response = new GenieResponse<>();
         if (type != null) {
             response.setStatus(true);
             Term term = Term.find(appContext, type.getValue());
             response.setResult(term.getTermJson());
-            callBack.onSuccess(response);
+            responseHandler.onSuccess(response);
         } else {
             response.setStatus(false);
-            callBack.onError(response);
+            responseHandler.onError(response);
         }
     }
 

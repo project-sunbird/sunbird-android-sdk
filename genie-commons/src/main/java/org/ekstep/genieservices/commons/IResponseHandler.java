@@ -5,7 +5,7 @@ package org.ekstep.genieservices.commons;
  *
  * @author shriharsh
  */
-public interface CallBack<T> {
+public interface IResponseHandler<T> {
 
     void onSuccess(GenieResponse<T> genieResponse);
 

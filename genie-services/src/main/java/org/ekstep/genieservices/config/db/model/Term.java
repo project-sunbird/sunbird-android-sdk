@@ -1,13 +1,13 @@
-package org.ekstep.genieservices.configs.db.model;
+package org.ekstep.genieservices.config.db.model;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.core.ICleanDb;
 import org.ekstep.genieservices.commons.db.core.IReadDb;
 import org.ekstep.genieservices.commons.db.core.IWriteToDb;
-import org.ekstep.genieservices.commons.db.core.ResultSet;
+import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.impl.ContentValues;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
-import org.ekstep.genieservices.configs.db.contract.TermEntry;
+import org.ekstep.genieservices.config.db.contract.TermEntry;
 
 import java.util.Locale;
 
@@ -41,7 +41,7 @@ public class Term implements IReadDb, ICleanDb, IWriteToDb {
         return term;
     }
 
-    private void readWithoutMoving(ResultSet resultSet) {
+    private void readWithoutMoving(IResultSet resultSet) {
         id = resultSet.getLong(0);
         mIdentifier = resultSet.getString(resultSet.getColumnIndex(TermEntry.COLUMN_NAME_IDENTIFIER));
         mTermType = resultSet.getString(resultSet.getColumnIndex(TermEntry.COLUMN_NAME_TERM_TYPE));
@@ -58,7 +58,7 @@ public class Term implements IReadDb, ICleanDb, IWriteToDb {
     }
 
     @Override
-    public IReadDb read(ResultSet resultSet) {
+    public IReadDb read(IResultSet resultSet) {
         if (resultSet != null && resultSet.moveToFirst())
             readWithoutMoving(resultSet);
         return this;

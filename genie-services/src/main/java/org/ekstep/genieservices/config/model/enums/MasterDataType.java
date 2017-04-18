@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.configs.model.enums;
+package org.ekstep.genieservices.config.model.enums;
 
 /**
  * MasterDataTypes

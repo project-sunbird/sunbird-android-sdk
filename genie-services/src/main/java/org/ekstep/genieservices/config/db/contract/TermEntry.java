@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.configs.db.contract;
+package org.ekstep.genieservices.config.db.contract;
 
 import org.ekstep.genieservices.commons.db.BaseColumns;
 import org.ekstep.genieservices.commons.db.DbConstants;

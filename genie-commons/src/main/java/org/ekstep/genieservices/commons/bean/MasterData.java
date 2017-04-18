@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.configs.model;
+package org.ekstep.genieservices.commons.bean;
 
 import java.util.List;
 

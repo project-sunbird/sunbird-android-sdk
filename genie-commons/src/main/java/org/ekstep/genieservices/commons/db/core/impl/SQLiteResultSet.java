@@ -2,14 +2,14 @@ package org.ekstep.genieservices.commons.db.core.impl;
 
 import android.database.Cursor;
 
-import org.ekstep.genieservices.commons.db.core.ResultSet;
+import org.ekstep.genieservices.commons.db.core.IResultSet;
 
 /**
  * Created on 17/4/17.
  *
  * @author swayangjit
  */
-public class SQLiteResultSet implements ResultSet {
+public class SQLiteResultSet implements IResultSet {
 
     private Cursor cursor;
 
