@@ -8,20 +8,18 @@ import org.ekstep.genieservices.commons.db.operations.IOperate;
 
 import java.util.Locale;
 
-public class Cleaner implements IOperate {
+public class SQLiteCleaner implements IOperate<SQLiteDatabase> {
 
     private ICleanDb model;
 
-    public Cleaner(ICleanDb model) {
+    public SQLiteCleaner(ICleanDb model) {
         this.model = model;
     }
 
     @Override
-    public Void perform(AppContext appContext) {
-        SQLiteDatabase database = appContext.getDBSession().getDbHelper().getWritableDatabase();
-
+    public Void perform(SQLiteDatabase datasource) {
         String query = String.format(Locale.US, "DELETE FROM %s %s", model.getTableName(), model.selectionToClean());
-        database.execSQL(query);
+        datasource.execSQL(query);
         model.clean();
         return null;
     }

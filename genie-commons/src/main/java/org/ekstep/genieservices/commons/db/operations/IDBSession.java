@@ -15,19 +15,17 @@ import java.util.List;
  */
 public interface IDBSession {
 
-    Void execute(IOperate operate);
+    Void beginTransaction();
 
-    Void executeInOneTransaction(List<IOperate> dbOperators);
+    Void endTransaction();
 
-    ServiceDbHelper getDbHelper();
+    Void clean(ICleanDb cleanDb);
 
-    IOperate getCleaner(ICleanDb cleanDb);
+    Void read(IReadDb readDb);
 
-    IOperate getReader(IReadDb readDb);
+    Void create(IWriteToDb writeToDb);
 
-    IOperate getWriter(IWriteToDb writeToDb);
+    Void update(IUpdateDb updateDb);
 
-    IOperate getUpdater(IUpdateDb updateDb);
-
-    IOperate getQueryExecutor(String query);
+    Void execute(String query);
 }

@@ -6,20 +6,17 @@ import android.database.sqlite.SQLiteDatabase;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.operations.IOperate;
 
-public class QueryExecutor implements IOperate {
+public class SQLiteQueryExecutor implements IOperate<SQLiteDatabase> {
 
     private String query;
 
-    public QueryExecutor(String query) {
+    public SQLiteQueryExecutor(String query) {
         this.query = query;
     }
 
     @Override
-    public Void perform(AppContext appContext) {
-        SQLiteDatabase database = appContext.getDBSession().getDbHelper().getWritableDatabase();
-
-        database.execSQL(query);
-
+    public Void perform(SQLiteDatabase datasource) {
+        datasource.execSQL(query);
         return null;
     }
 

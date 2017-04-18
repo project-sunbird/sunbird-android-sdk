@@ -18,8 +18,9 @@ import java.util.List;
 public class SQLiteSession implements IDBSession {
 
     private static final String LOG_TAG = SQLiteSession.class.getSimpleName();
-    private ServiceDbHelper serviceDbHelper;
     private AppContext appContext;
+    private SQLiteDatabase database;
+    private boolean isOperationSuccessful;
 
     public SQLiteSession(AppContext appContext) {
         this(appContext, ServiceDbHelper.getGSDBInstance(appContext.getContext()));
@@ -29,73 +30,61 @@ public class SQLiteSession implements IDBSession {
         this(appContext, ServiceDbHelper.getSummarizerDBInstance(appContext.getContext()));
     }
 
-    public SQLiteSession(AppContext appContext, ServiceDbHelper serviceDbHelper) {
+    private SQLiteSession(AppContext appContext, ServiceDbHelper serviceDbHelper) {
         this.appContext = appContext;
-        this.serviceDbHelper = serviceDbHelper;
+        this.database = serviceDbHelper.getWritableDatabase();
     }
 
-    @Override
-    public Void execute(IOperate operate) {
-//        SQLiteDatabase database = operate.getConnection(serviceDbHelper);
+    private Void execute(IOperate<SQLiteDatabase> operate) {
         try {
             operate.beforePerform(appContext);
-            operate.perform(appContext);
+            operate.perform(database);
         } catch (Exception e) {
+            isOperationSuccessful = false;
             Log.e(LOG_TAG, "Error when performing execute. Exception: " + e, e);
-        } finally {
-//            database.close();
         }
         return null;
     }
 
     @Override
-    public Void executeInOneTransaction(List<IOperate> dbOperators) {
-        SQLiteDatabase writableDatabase = serviceDbHelper.getWritableDatabase();
-        try {
-            writableDatabase.beginTransaction();
-            for (IOperate operator : dbOperators) {
-                operator.beforePerform(appContext);
-                operator.perform(appContext);
-            }
-            writableDatabase.setTransactionSuccessful();
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "Error when performing execute in one transaction. Exception: " + e, e);
-            throw e;
-        } finally {
-            writableDatabase.endTransaction();
-//            writableDatabase.close();
-        }
+    public Void beginTransaction() {
+        isOperationSuccessful = true;
+        database.beginTransaction();
         return null;
     }
 
     @Override
-    public ServiceDbHelper getDbHelper() {
-        return serviceDbHelper;
+    public Void endTransaction() {
+        if (isOperationSuccessful) {
+            database.setTransactionSuccessful();
+        }
+        isOperationSuccessful = true;
+        database.endTransaction();
+        return null;
     }
 
     @Override
-    public IOperate getCleaner(ICleanDb cleanDb) {
-        return new Cleaner(cleanDb);
+    public Void clean(ICleanDb cleanDb) {
+        return execute(new SQLiteCleaner(cleanDb));
     }
 
     @Override
-    public IOperate getReader(IReadDb readDb) {
-        return new Reader(readDb);
+    public Void read(IReadDb readDb) {
+        return execute(new SQLiteReader(readDb));
     }
 
     @Override
-    public IOperate getWriter(IWriteToDb writeToDb) {
-        return new Writer(writeToDb);
+    public Void create(IWriteToDb writeToDb) {
+        return execute(new SQLiteWriter(writeToDb));
     }
 
     @Override
-    public IOperate getUpdater(IUpdateDb updateDb) {
-        return new Updater(updateDb);
+    public Void update(IUpdateDb updateDb) {
+        return execute(new SQLiteUpdater(updateDb));
     }
 
     @Override
-    public IOperate getQueryExecutor(String query) {
-        return new QueryExecutor(query);
+    public Void execute(String query) {
+        return execute(new SQLiteQueryExecutor(query));
     }
-
 }

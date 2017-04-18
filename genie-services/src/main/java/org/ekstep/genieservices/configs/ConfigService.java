@@ -5,7 +5,7 @@ import com.google.gson.internal.LinkedTreeMap;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.CallBack;
 import org.ekstep.genieservices.commons.Response;
-import org.ekstep.genieservices.commons.db.operations.impl.Reader;
+import org.ekstep.genieservices.commons.db.operations.impl.SQLiteReader;
 import org.ekstep.genieservices.commons.db.operations.impl.SQLiteSession;
 import org.ekstep.genieservices.commons.utils.MapUtil;
 import org.ekstep.genieservices.configs.db.model.Term;
@@ -24,10 +24,9 @@ import java.util.Map;
 public class ConfigService {
 
     //    private APILogger mApiLogger;
-    private SQLiteSession SQLiteSession;
+    private AppContext appContext;
 
     public ConfigService(AppContext appContext) {
-        SQLiteSession = new SQLiteSession(appContext.getContext());
 //        this(new SQLiteSession(context), new APILogger(context, "ConfigService"), context);
     }
 
@@ -43,10 +42,7 @@ public class ConfigService {
             response.setStatus(true);
             List<String> list = new ArrayList<>();
 
-            Term term = new Term(type.getValue());
-            Reader termReader = new Reader(term);
-            SQLiteSession.execute(termReader);
-
+            Term term = Term.find(appContext, type.getValue());
             Map<String, Object> result = new HashMap<>();
             Map termMap = MapUtil.toMap(term.getTermJson());
             List<LinkedTreeMap> termList = (List<LinkedTreeMap>) termMap.get("values");

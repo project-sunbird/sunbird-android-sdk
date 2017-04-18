@@ -1,42 +1,36 @@
 package org.ekstep.genieservices.commons.db.operations.impl;
 
+
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.db.core.IWriteToDb;
+import org.ekstep.genieservices.commons.db.core.IUpdateDb;
 import org.ekstep.genieservices.commons.db.core.impl.ContentValues;
 import org.ekstep.genieservices.commons.db.operations.IOperate;
 import org.ekstep.genieservices.commons.exception.DbException;
 
 import java.util.Locale;
 
-/**
- * @author anil
- */
-public class Writer implements IOperate {
-    private static final String LOG_TAG = "service-Writer";
-    private IWriteToDb model;
+public class SQLiteUpdater implements IOperate<SQLiteDatabase> {
+    private IUpdateDb model;
 
-    public Writer(IWriteToDb model) {
+    public SQLiteUpdater(IUpdateDb model) {
         this.model = model;
     }
 
     @Override
-    public Void perform(AppContext appContext) {
-        SQLiteDatabase database = appContext.getDBSession().getDbHelper().getWritableDatabase();
-
-        long id = database.insert(model.getTableName(), null, mapContentValues(model.getContentValues()));
-        Log.i(LOG_TAG, "Saving in db:" + model.getTableName());
-        if (id != -1) {
-            Log.i(LOG_TAG, "Saved successfully in:" + model.getTableName() + " with id:" + id);
-            model.updateId(id);
-        } else {
-            throw new DbException(String.format(Locale.US, "Failed to write to %s", model.getTableName()));
+    public Void perform(SQLiteDatabase datasource) {
+        int rowsCount = datasource.update(model.getTableName(), mapContentValues(model.getFieldsToUpdate()), model.updateBy(), null);
+        if (rowsCount < 1) {
+            throw new DbException(String.format(Locale.US, "Failed to update %s, for fields:%s, updated by: %s", model.getTableName(), model.getFieldsToUpdate(), model.updateBy()));
         }
-
         return null;
+    }
+
+    @Override
+    public void beforePerform(AppContext context) {
+
     }
 
     @NonNull
@@ -65,10 +59,5 @@ public class Writer implements IOperate {
         }
 
         return contentValues;
-    }
-
-    @Override
-    public void beforePerform(AppContext context) {
-        model.beforeWrite(context);
     }
 }

@@ -10,22 +10,19 @@ import org.ekstep.genieservices.commons.db.operations.IOperate;
 
 import java.util.Locale;
 
-public class Reader implements IOperate {
+public class SQLiteReader implements IOperate<SQLiteDatabase> {
 
     private IReadDb model;
 
-    public Reader(IReadDb model) {
+    public SQLiteReader(IReadDb model) {
         this.model = model;
     }
 
     @Override
-    public Void perform(AppContext appContext) {
+    public Void perform(SQLiteDatabase datasource) {
         String query = String.format(Locale.US, "Select * from %s %s %s %s", model.getTableName(),
                 model.filterForRead(), model.orderBy(), model.limitBy());
-
-        SQLiteDatabase database = appContext.getDBSession().getDbHelper().getReadableDatabase();
-
-        Cursor cursor = database.rawQuery(query, model.selectionArgsForFilter());
+        Cursor cursor = datasource.rawQuery(query, model.selectionArgsForFilter());
         model.read(new SqliteResultSet(cursor));
         return null;
     }

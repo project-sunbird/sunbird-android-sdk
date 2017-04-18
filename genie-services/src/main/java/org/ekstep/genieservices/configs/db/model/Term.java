@@ -6,14 +6,9 @@ import org.ekstep.genieservices.commons.db.core.IReadDb;
 import org.ekstep.genieservices.commons.db.core.IWriteToDb;
 import org.ekstep.genieservices.commons.db.core.ResultSet;
 import org.ekstep.genieservices.commons.db.core.impl.ContentValues;
-import org.ekstep.genieservices.commons.db.core.impl.SqliteResultSet;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.commons.db.operations.IOperate;
-import org.ekstep.genieservices.commons.db.operations.impl.Reader;
 import org.ekstep.genieservices.configs.db.contract.TermEntry;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 /**
@@ -42,15 +37,12 @@ public class Term implements IReadDb, ICleanDb, IWriteToDb {
 
     public static Term find(AppContext appContext, String type) {
         IDBSession session = appContext.getDBSession();
-
         Term term = new Term(appContext, type, null);
-
-        session.execute(session.getReader(term));
-
+        session.read(term);
         return term;
     }
 
-    public void readWithoutMoving(ResultSet resultSet) {
+    private void readWithoutMoving(ResultSet resultSet) {
         id = resultSet.getLong(0);
         mIdentifier = resultSet.getString(resultSet.getColumnIndex(TermEntry.COLUMN_NAME_IDENTIFIER));
         mTermType = resultSet.getString(resultSet.getColumnIndex(TermEntry.COLUMN_NAME_TERM_TYPE));
@@ -59,7 +51,6 @@ public class Term implements IReadDb, ICleanDb, IWriteToDb {
 
     @Override
     public void clean() {
-
     }
 
     @Override
@@ -68,7 +59,7 @@ public class Term implements IReadDb, ICleanDb, IWriteToDb {
     }
 
     @Override
-    public IReadDb read(SqliteResultSet resultSet) {
+    public IReadDb read(ResultSet resultSet) {
         if (resultSet != null && resultSet.moveToFirst())
             readWithoutMoving(resultSet);
         return this;
@@ -85,7 +76,6 @@ public class Term implements IReadDb, ICleanDb, IWriteToDb {
 
     @Override
     public void updateId(long id) {
-
     }
 
     @Override
@@ -95,7 +85,6 @@ public class Term implements IReadDb, ICleanDb, IWriteToDb {
 
     @Override
     public void beforeWrite(AppContext context) {
-
     }
 
     @Override
@@ -122,15 +111,14 @@ public class Term implements IReadDb, ICleanDb, IWriteToDb {
 
     public void save() {
         IDBSession session = mAppContext.getDBSession();
-
-        List<IOperate> tasks = new ArrayList<>();
-        tasks.add(session.getCleaner(find(mAppContext, mTermType)));
-        tasks.add(session.getWriter(this));
-//        tasks.add(new Cleaner(new Term(mTermType)));
-//        tasks.add(new Writer(this));
-        session.executeInOneTransaction(tasks);
+        session.beginTransaction();
+        try {
+            session.clean(this);
+            session.create(this);
+        } finally {
+            session.endTransaction();
+        }
     }
-
 
     public String getTermJson() {
         return mTermJson;
@@ -140,11 +128,7 @@ public class Term implements IReadDb, ICleanDb, IWriteToDb {
         return mTermType;
     }
 
-    public boolean exists(IDBSession session) {
-        Term term = new Term();
-        Reader otherTermReader = new Reader(term);
-        session.execute(otherTermReader);
-
-        return term.id != null && term.id != -1L;
+    public boolean exists() {
+        return this.id != null && this.id != -1L;
     }
 }
