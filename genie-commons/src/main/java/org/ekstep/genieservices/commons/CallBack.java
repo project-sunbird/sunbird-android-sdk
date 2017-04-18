@@ -7,8 +7,8 @@ package org.ekstep.genieservices.commons;
  */
 public interface CallBack<T> {
 
-    void onSuccess(Response<T> response);
+    void onSuccess(GenieResponse<T> genieResponse);
 
-    void onError(Response<T> response);
+    void onError(GenieResponse<T> genieResponse);
 
 }

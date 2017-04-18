@@ -1,18 +1,12 @@
 package org.ekstep.genieservices.configs;
 
-import com.google.gson.internal.LinkedTreeMap;
-
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.CallBack;
-import org.ekstep.genieservices.commons.Response;
-import org.ekstep.genieservices.commons.utils.MapUtil;
+import org.ekstep.genieservices.commons.GenieResponse;
 import org.ekstep.genieservices.configs.db.model.Term;
 import org.ekstep.genieservices.configs.model.enums.MasterDataType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created on 14/4/17.
@@ -34,22 +28,12 @@ public class ConfigService {
      * @param type
      * @param callBack
      */
-    public void getStaticData(MasterDataType type, CallBack<List<String>> callBack) {
-        Response<List<String>> response = new Response<>();
+    public void getMasterData(MasterDataType type, CallBack<String> callBack) {
+        GenieResponse<String> response = new GenieResponse<>();
         if (type != null) {
             response.setStatus(true);
-            List<String> list = new ArrayList<>();
-
             Term term = Term.find(appContext, type.getValue());
-            Map<String, Object> result = new HashMap<>();
-            Map termMap = MapUtil.toMap(term.getTermJson());
-            List<LinkedTreeMap> termList = (List<LinkedTreeMap>) termMap.get("values");
-
-            for (Map t : termList) {
-                list.add(t.get("label").toString());
-            }
-
-            response.setInstance(list);
+            response.setResult(term.getTermJson());
             callBack.onSuccess(response);
         } else {
             response.setStatus(false);
