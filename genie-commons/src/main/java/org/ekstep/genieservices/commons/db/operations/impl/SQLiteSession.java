@@ -12,6 +12,7 @@ import org.ekstep.genieservices.commons.db.core.IUpdateDb;
 import org.ekstep.genieservices.commons.db.core.IWriteToDb;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBOperate;
+import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 
 public class SQLiteSession implements IDBSession {
 
@@ -35,7 +36,7 @@ public class SQLiteSession implements IDBSession {
 
     private Void execute(IDBOperate<SQLiteDatabase> operate) {
         try {
-            operate.perform(appContext, database);
+            operate.perform(database);
         } catch (Exception e) {
             isOperationSuccessful = false;
             Log.e(LOG_TAG, "Error when performing execute. Exception: " + e, e);
@@ -86,10 +87,10 @@ public class SQLiteSession implements IDBSession {
     }
 
     @Override
-    public Void executeInTransaction(IDBOperate operate) {
+    public Void executeInTransaction(IDBTransaction transaction) {
         beginTransaction();
         try {
-            operate.perform(appContext, database);
+            transaction.perform(appContext);
             isOperationSuccessful = true;
         } catch (Exception e) {
             isOperationSuccessful = false;
