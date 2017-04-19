@@ -5,7 +5,6 @@ import android.database.sqlite.SQLiteDatabase;
 
 import org.ekstep.genieservices.commons.AndroidLogger;
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.ILogger;
 import org.ekstep.genieservices.commons.db.ServiceDbHelper;
 import org.ekstep.genieservices.commons.db.SummarizerDBContext;
 import org.ekstep.genieservices.commons.db.core.ICleanDb;
@@ -25,11 +24,11 @@ public class SQLiteSession implements IDBSession {
     private boolean isOperationSuccessful;
 
     public SQLiteSession(AppContext<Context, AndroidLogger> appContext) {
-        this(appContext, ServiceDbHelper.getGSDBInstance(appContext.getContext()));
+        this(appContext, ServiceDbHelper.getGSDBInstance(appContext));
     }
 
     public SQLiteSession(AppContext<Context, AndroidLogger> appContext, SummarizerDBContext dbContext) {
-        this(appContext, ServiceDbHelper.getSummarizerDBInstance(appContext.getContext()));
+        this(appContext, ServiceDbHelper.getSummarizerDBInstance(appContext));
     }
 
     private SQLiteSession(AppContext<Context, AndroidLogger> appContext, ServiceDbHelper serviceDbHelper) {
