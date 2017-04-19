@@ -3,9 +3,11 @@ package org.ekstep.genieservices.commons;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 
 /**
- * Created by shriharsh on 14/4/17.
+ * Created on 14/4/17.
+ *
+ * @author shriharsh
  */
-public abstract class AppContext<C,L extends ILogger> {
+public abstract class AppContext<C, L extends ILogger> {
 
     private C mContext;
     private L mLogger;
@@ -37,7 +39,11 @@ public abstract class AppContext<C,L extends ILogger> {
     }
 
     public abstract IDBSession getDBSession();
+
     public abstract IDBSession getSummarizerDBSession();
+
     public abstract Void setDBSession(IDBSession dbSession);
+
     public abstract Void setSummarizerDBSession(IDBSession dbSession);
- }
+
+}
