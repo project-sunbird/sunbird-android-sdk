@@ -7,7 +7,7 @@ import org.ekstep.genieservices.commons.db.core.IWriteToDb;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
-import org.ekstep.genieservices.config.db.contract.TermEntry;
+import org.ekstep.genieservices.config.db.contract.MasterDataEntry;
 
 import java.util.Locale;
 
@@ -16,36 +16,40 @@ import java.util.Locale;
  *
  * @author swayangjit
  */
-public class Term implements IReadDb, ICleanDb, IWriteToDb {
+public class MasterData implements IReadDb, ICleanDb, IWriteToDb {
 
     private Long id = -1L;
+
+    // TODO: 19/4/17 Needs to be checked if the identifier will be hardcoded
     private String mIdentifier = "ekstep.domain.terms.list";
 
-    private String mTermJson;
-    private String mTermType;
+    private String mJson;
+    private String mType;
     private AppContext mAppContext;
 
-    private Term(AppContext appContext, String type, String json) {
+    public MasterData(AppContext appContext, String type, String json) {
         mAppContext = appContext;
-        mTermType = type;
-        mTermJson = json;
+        mType = type;
+        mJson = json;
     }
 
-    public static Term build(AppContext appContext, String type, String json) {
-        return new Term(appContext, type, json);
+    public static MasterData find(AppContext appContext, String type) {
+        MasterData term = new MasterData(appContext, type, null);
+        appContext.getDBSession().read(term);
+        return term;
     }
 
-    public static Term find(AppContext appContext, String type) {
-        Term term = new Term(appContext, type, null);
+    public static MasterData findById(AppContext appContext) {
+        MasterData term = new MasterData(appContext, null, null);
         appContext.getDBSession().read(term);
         return term;
     }
 
     private void readWithoutMoving(IResultSet resultSet) {
         id = resultSet.getLong(0);
-        mIdentifier = resultSet.getString(resultSet.getColumnIndex(TermEntry.COLUMN_NAME_IDENTIFIER));
-        mTermType = resultSet.getString(resultSet.getColumnIndex(TermEntry.COLUMN_NAME_TERM_TYPE));
-        mTermJson = resultSet.getString(resultSet.getColumnIndex(TermEntry.COLUMN_NAME_TERM_JSON));
+        mIdentifier = resultSet.getString(resultSet.getColumnIndex(MasterDataEntry.COLUMN_NAME_IDENTIFIER));
+        mType = resultSet.getString(resultSet.getColumnIndex(MasterDataEntry.COLUMN_NAME_TYPE));
+        mJson = resultSet.getString(resultSet.getColumnIndex(MasterDataEntry.COLUMN_NAME_JSON));
     }
 
     @Override
@@ -54,7 +58,7 @@ public class Term implements IReadDb, ICleanDb, IWriteToDb {
 
     @Override
     public String selectionToClean() {
-        return String.format(Locale.US, "WHERE %s = '%s';", TermEntry.COLUMN_NAME_TERM_TYPE, mTermType);
+        return String.format(Locale.US, "WHERE %s = '%s';", MasterDataEntry.COLUMN_NAME_TYPE, mType);
     }
 
     @Override
@@ -67,9 +71,9 @@ public class Term implements IReadDb, ICleanDb, IWriteToDb {
     @Override
     public ContentValues getContentValues() {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(TermEntry.COLUMN_NAME_IDENTIFIER, mIdentifier);
-        contentValues.put(TermEntry.COLUMN_NAME_TERM_TYPE, mTermType);
-        contentValues.put(TermEntry.COLUMN_NAME_TERM_JSON, mTermJson);
+        contentValues.put(MasterDataEntry.COLUMN_NAME_IDENTIFIER, mIdentifier);
+        contentValues.put(MasterDataEntry.COLUMN_NAME_TYPE, mType);
+        contentValues.put(MasterDataEntry.COLUMN_NAME_JSON, mJson);
         return contentValues;
     }
 
@@ -79,7 +83,7 @@ public class Term implements IReadDb, ICleanDb, IWriteToDb {
 
     @Override
     public String getTableName() {
-        return TermEntry.TABLE_NAME;
+        return MasterDataEntry.TABLE_NAME;
     }
 
     @Override
@@ -93,9 +97,9 @@ public class Term implements IReadDb, ICleanDb, IWriteToDb {
 
     @Override
     public String filterForRead() {
-        String selectionCriteria = String.format(Locale.US, "where %s = '%s' AND %s = '%s'", TermEntry.COLUMN_NAME_IDENTIFIER, mIdentifier, TermEntry.COLUMN_NAME_TERM_TYPE, mTermType);
-        String selectionCriteriaWithoutType = String.format(Locale.US, "where %s = '%s'", TermEntry.COLUMN_NAME_IDENTIFIER, mIdentifier);
-        return mTermType != null ? selectionCriteria : selectionCriteriaWithoutType;
+        String selectionCriteria = String.format(Locale.US, "where %s = '%s' AND %s = '%s'", MasterDataEntry.COLUMN_NAME_IDENTIFIER, mIdentifier, MasterDataEntry.COLUMN_NAME_TYPE, mType);
+        String selectionCriteriaWithoutType = String.format(Locale.US, "where %s = '%s'", MasterDataEntry.COLUMN_NAME_IDENTIFIER, mIdentifier);
+        return mType != null ? selectionCriteria : selectionCriteriaWithoutType;
     }
 
     @Override
@@ -112,19 +116,19 @@ public class Term implements IReadDb, ICleanDb, IWriteToDb {
         mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
             @Override
             public Void perform(AppContext context) {
-                context.getDBSession().clean(Term.this);
-                context.getDBSession().create(Term.this);
+                context.getDBSession().clean(MasterData.this);
+                context.getDBSession().create(MasterData.this);
                 return null;
             }
         });
     }
 
     public String getTermJson() {
-        return mTermJson;
+        return mJson;
     }
 
     public String getTermType() {
-        return mTermType;
+        return mType;
     }
 
     public boolean exists() {

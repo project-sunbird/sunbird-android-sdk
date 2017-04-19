@@ -43,6 +43,8 @@ public abstract class AppContext<C,L extends ILogger> {
 
     public abstract ICacheOperation getPreferenceCache();
 
+    public abstract String getStoredResourceData();
+
     public abstract Void setDBSession(IDBSession dbSession);
 
     public abstract Void setSummarizerDBSession(IDBSession dbSession);

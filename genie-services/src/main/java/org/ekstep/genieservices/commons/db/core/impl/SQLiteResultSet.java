@@ -79,4 +79,9 @@ public class SQLiteResultSet implements IResultSet {
     public double getDouble(int columnIndex) {
         return cursor.getDouble(columnIndex);
     }
+
+    @Override
+    public byte[] getBlob(int columnIndex) {
+        return cursor.getBlob(columnIndex);
+    }
 }

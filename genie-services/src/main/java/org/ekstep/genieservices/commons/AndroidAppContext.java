@@ -3,11 +3,13 @@ package org.ekstep.genieservices.commons;
 import android.content.Context;
 
 import org.ekstep.genieservices.Constants;
+import org.ekstep.genieservices.R;
 import org.ekstep.genieservices.commons.db.SummarizerDBContext;
 import org.ekstep.genieservices.commons.db.cache.ICacheOperation;
 import org.ekstep.genieservices.commons.db.cache.PreferenceWrapper;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.impl.SQLiteSession;
+import org.ekstep.genieservices.util.RawFileUtil;
 
 /**
  * Created on 18/4/17.
@@ -19,16 +21,16 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
     private IDBSession mSummarizerDBSession;
     private ICacheOperation mCacheOperation;
 
+    private AndroidAppContext(Context context, String appPackage, String key, AndroidLogger logger) {
+        super(context, appPackage, key, logger);
+    }
+
     public static AppContext buildAppContext(Context context, String appPackage, String key, AndroidLogger logger) {
-        AppContext<Context, AndroidLogger> appContext = new AndroidAppContext(context, appPackage,key, logger);
+        AppContext<Context, AndroidLogger> appContext = new AndroidAppContext(context, appPackage, key, logger);
         appContext.setDBSession(new SQLiteSession(appContext));
         appContext.setSummarizerDBSession(new SQLiteSession(appContext, new SummarizerDBContext()));
         appContext.setPreferenceCache(new PreferenceWrapper(appContext, Constants.SHARED_PREFERENCE_NAME));
         return appContext;
-    }
-
-    private AndroidAppContext(Context context, String appPackage, String key, AndroidLogger logger) {
-        super(context, appPackage, key, logger);
     }
 
     @Override
@@ -44,6 +46,12 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
     @Override
     public ICacheOperation getPreferenceCache() {
         return mCacheOperation;
+    }
+
+    @Override
+    public String getStoredResourceData() {
+        String response = RawFileUtil.readRawResource(this.getContext(), R.raw.resource_bundle);
+        return response;
     }
 
     @Override
