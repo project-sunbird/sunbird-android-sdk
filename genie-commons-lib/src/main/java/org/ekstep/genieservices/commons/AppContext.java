@@ -1,5 +1,6 @@
 package org.ekstep.genieservices.commons;
 
+import org.ekstep.genieservices.commons.db.cache.ICacheOperation;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 
 /**
@@ -37,7 +38,15 @@ public abstract class AppContext<C,L extends ILogger> {
     }
 
     public abstract IDBSession getDBSession();
+
     public abstract IDBSession getSummarizerDBSession();
+
+    public abstract ICacheOperation getPreferenceCache();
+
     public abstract Void setDBSession(IDBSession dbSession);
+
     public abstract Void setSummarizerDBSession(IDBSession dbSession);
+
+    public abstract Void setPreferenceCache(ICacheOperation cacheOperarion);
+
  }

@@ -2,7 +2,10 @@ package org.ekstep.genieservices.commons;
 
 import android.content.Context;
 
+import org.ekstep.genieservices.Constants;
 import org.ekstep.genieservices.commons.db.SummarizerDBContext;
+import org.ekstep.genieservices.commons.db.cache.ICacheOperation;
+import org.ekstep.genieservices.commons.db.cache.PreferenceWrapper;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.impl.SQLiteSession;
 
@@ -14,11 +17,13 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
 
     private IDBSession mDBSession;
     private IDBSession mSummarizerDBSession;
+    private ICacheOperation mCacheOperation;
 
     public static AppContext buildAppContext(Context context, String appPackage, String key, AndroidLogger logger) {
         AppContext<Context, AndroidLogger> appContext = new AndroidAppContext(context, appPackage,key, logger);
         appContext.setDBSession(new SQLiteSession(appContext));
         appContext.setSummarizerDBSession(new SQLiteSession(appContext, new SummarizerDBContext()));
+        appContext.setPreferenceCache(new PreferenceWrapper(appContext, Constants.SHARED_PREFERENCE_NAME));
         return appContext;
     }
 
@@ -37,6 +42,11 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
     }
 
     @Override
+    public ICacheOperation getPreferenceCache() {
+        return mCacheOperation;
+    }
+
+    @Override
     public Void setDBSession(IDBSession dbSession) {
         this.mDBSession = dbSession;
         return null;
@@ -45,6 +55,12 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
     @Override
     public Void setSummarizerDBSession(IDBSession dbSession) {
         this.mDBSession = dbSession;
+        return null;
+    }
+
+    @Override
+    public Void setPreferenceCache(ICacheOperation cacheOperarion) {
+        this.mCacheOperation=cacheOperarion;
         return null;
     }
 
