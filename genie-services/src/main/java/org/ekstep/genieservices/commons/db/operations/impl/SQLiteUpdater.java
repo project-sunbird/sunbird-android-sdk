@@ -7,12 +7,12 @@ import android.support.annotation.NonNull;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.IUpdateDb;
-import org.ekstep.genieservices.commons.db.operations.IDBOperate;
+import org.ekstep.genieservices.commons.db.operations.IDBOperation;
 import org.ekstep.genieservices.commons.exception.DbException;
 
 import java.util.Locale;
 
-public class SQLiteUpdater implements IDBOperate<SQLiteDatabase> {
+public class SQLiteUpdater implements IDBOperation<SQLiteDatabase> {
     private IUpdateDb model;
 
     public SQLiteUpdater(IUpdateDb model) {

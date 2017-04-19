@@ -4,11 +4,11 @@ import android.database.sqlite.SQLiteDatabase;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.core.ICleanDb;
-import org.ekstep.genieservices.commons.db.operations.IDBOperate;
+import org.ekstep.genieservices.commons.db.operations.IDBOperation;
 
 import java.util.Locale;
 
-public class SQLiteCleaner implements IDBOperate<SQLiteDatabase> {
+public class SQLiteCleaner implements IDBOperation<SQLiteDatabase> {
 
     private ICleanDb model;
 

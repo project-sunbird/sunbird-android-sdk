@@ -2,7 +2,7 @@ package org.ekstep.genieservices.commons.db.operations;
 
 import org.ekstep.genieservices.commons.AppContext;
 
-public interface IDBOperate<T> {
+public interface IDBOperation<T> {
 
     Void perform(AppContext appContext, T datasouce);
 
