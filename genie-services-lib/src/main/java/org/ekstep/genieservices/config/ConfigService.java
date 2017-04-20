@@ -10,8 +10,8 @@ import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.commons.utils.TimeUtil;
-import org.ekstep.genieservices.config.db.model.ResourceBundle;
 import org.ekstep.genieservices.config.db.model.MasterData;
+import org.ekstep.genieservices.config.db.model.ResourceBundle;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import util.Constants;
+import util.ResourcesReader;
 
 /**
  * Created on 14/4/17.
@@ -28,6 +29,8 @@ import util.Constants;
 public class ConfigService {
 
     private static final String TAG = ConfigService.class.getSimpleName();
+    private static final String TERM_JSON_FILE = "terms.json";
+    private static final String RESOURCE_BUNDLE_JSON_FILE = "resource_bundle.json";
     //    private APILogger mApiLogger;
     private AppContext appContext;
 
@@ -45,7 +48,7 @@ public class ConfigService {
 
         if (!term.exists()) {
             //get the string data from the locally stored json
-            String storedData = appContext.getStoredResourceData();
+            String storedData = ResourcesReader.readFile(TERM_JSON_FILE);
 
             if (!StringUtil.isNullOrEmpty(storedData)) {
                 LinkedTreeMap map = new Gson().fromJson(storedData, LinkedTreeMap.class);
@@ -108,7 +111,7 @@ public class ConfigService {
 
         if (resourceBundle == null) {
             //get the string data from the locally stored json
-            String storedData = appContext.getStoredResourceData();
+            String storedData = ResourcesReader.readFile(RESOURCE_BUNDLE_JSON_FILE);
 
             if (!StringUtil.isNullOrEmpty(storedData)) {
                 LinkedTreeMap map = new Gson().fromJson(storedData, LinkedTreeMap.class);
