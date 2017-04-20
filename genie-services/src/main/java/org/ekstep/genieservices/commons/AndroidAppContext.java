@@ -6,15 +6,14 @@ import org.ekstep.genieservices.commons.db.SummarizerDBContext;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.impl.SQLiteSession;
 import org.ekstep.genieservices.commons.network.AndroidHttpClient;
-import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.network.AndroidNetworkConnectivity;
+import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.network.IHttpClient;
 import org.ekstep.genieservices.commons.network.auth.BasicAuthenticator;
 
 /**
  * Created on 18/4/17.
  */
-
 public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
 
     private IDBSession mDBSession;
@@ -31,7 +30,7 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
         appContext.setDBSession(new SQLiteSession(appContext));
         appContext.setSummarizerDBSession(new SQLiteSession(appContext, new SummarizerDBContext()));
         appContext.setConnectionInfo(new AndroidNetworkConnectivity(appContext));
-        appContext.setHttpClient(new AndroidHttpClient(appContext, new BasicAuthenticator()));
+        appContext.setHttpClient(new AndroidHttpClient(new BasicAuthenticator()));
         return appContext;
     }
 
@@ -40,9 +39,17 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
         return mDBSession;
     }
 
+    private void setDBSession(IDBSession dbSession) {
+        this.mDBSession = dbSession;
+    }
+
     @Override
     public IDBSession getSummarizerDBSession() {
         return mSummarizerDBSession;
+    }
+
+    private void setSummarizerDBSession(IDBSession dbSession) {
+        this.mSummarizerDBSession = dbSession;
     }
 
     @Override
@@ -50,25 +57,17 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
         return mConnectionInfo;
     }
 
+    private void setConnectionInfo(IConnectionInfo connectionInfo) {
+        this.mConnectionInfo = connectionInfo;
+    }
+
     @Override
     public IHttpClient getHttpClient() {
         return mHttpClient;
     }
 
-    public void setHttpClient(IHttpClient client) {
+    private void setHttpClient(IHttpClient client) {
         this.mHttpClient = client;
-    }
-
-    public void setDBSession(IDBSession dbSession) {
-        this.mDBSession = dbSession;
-    }
-
-    public void setSummarizerDBSession(IDBSession dbSession) {
-        this.mDBSession = dbSession;
-    }
-
-    public void setConnectionInfo(IConnectionInfo connectionInfo) {
-        this.mConnectionInfo = connectionInfo;
     }
 
 }

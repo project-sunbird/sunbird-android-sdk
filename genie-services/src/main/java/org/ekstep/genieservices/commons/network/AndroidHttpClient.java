@@ -1,17 +1,11 @@
 package org.ekstep.genieservices.commons.network;
 
-import android.content.Context;
-
 import com.squareup.okhttp.Authenticator;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
-
-import org.ekstep.genieservices.commons.AndroidLogger;
-import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.network.auth.BasicAuthenticator;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -28,6 +22,10 @@ public class AndroidHttpClient implements IHttpClient {
     private Request.Builder requestBuilder;
 
     private Authenticator authenticator;
+
+    public AndroidHttpClient(Authenticator authenticator) {
+        this.authenticator = authenticator;
+    }
 
     @Override
     public Void createRequest(String url) {
@@ -61,10 +59,6 @@ public class AndroidHttpClient implements IHttpClient {
         Request request = requestBuilder.build();
         Response response = httpClient.newCall(request).execute();
         return new ApiResponse(response.isSuccessful(), response.body() != null ? response.body().string() : "");
-    }
-
-    public AndroidHttpClient(Authenticator authenticator) {
-        this.authenticator = authenticator;
     }
 
     @Override

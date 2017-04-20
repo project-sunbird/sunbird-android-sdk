@@ -77,11 +77,13 @@ public abstract class BaseAPI {
         return null;
     }
 
-    protected abstract Map<String,String> getRequestHeaders();
+    protected abstract Map<String, String> getRequestHeaders();
+
     protected abstract String createRequestData();
+
     protected abstract void handle(LinkedTreeMap result) throws IOException;
 
-    protected LinkedTreeMap parseResult(String body) {
+    private LinkedTreeMap parseResult(String body) {
         LinkedTreeMap map = new Gson().fromJson(body, LinkedTreeMap.class);
         return (LinkedTreeMap) map.get("result");
     }
