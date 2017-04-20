@@ -65,7 +65,7 @@ public abstract class BaseAPI {
             httpClient.setHeaders(getRequestHeaders());
             ApiResponse response = null;
             if (GET.equals(requestType)) {
-                response = httpClient.doGet(createRequestData());
+                response = httpClient.doGet();
             } else if (POST.equals(requestType)) {
                 response = httpClient.doPost(createRequestData());
             }

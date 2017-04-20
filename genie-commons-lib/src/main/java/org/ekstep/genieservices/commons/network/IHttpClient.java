@@ -20,7 +20,7 @@ public interface IHttpClient extends IConnectionInfo {
 
     Void setHeaders(Map<String, String> headers);
 
-    ApiResponse doGet(String requestBody) throws IOException;
+    ApiResponse doGet() throws IOException;
 
     ApiResponse doPost(String requestBody) throws IOException;
 

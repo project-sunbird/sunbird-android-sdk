@@ -46,7 +46,7 @@ public class AndroidHttpClient extends AndroidNetworkConnectivity implements IHt
     }
 
     @Override
-    public ApiResponse doGet(String requestBody) throws IOException {
+    public ApiResponse doGet() throws IOException {
         requestBuilder.get();
         Request request = requestBuilder.build();
         Response response = httpClient.newCall(request).execute();
