@@ -2,6 +2,7 @@ package org.ekstep.genieservices.commons;
 
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
+import org.ekstep.genieservices.commons.network.IHttpClient;
 
 /**
  * Created on 14/4/17.
@@ -45,11 +46,6 @@ public abstract class AppContext<C, L extends ILogger> {
 
     public abstract IConnectionInfo getConnectionInfo();
 
-    public abstract Void setDBSession(IDBSession dbSession);
-
-    public abstract Void setSummarizerDBSession(IDBSession dbSession);
-
-    public abstract Void setConnectionInfo(IConnectionInfo connectionInfo);
-
+    public abstract IHttpClient getHttpClient();
 
 }

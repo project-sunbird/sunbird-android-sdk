@@ -12,11 +12,11 @@ import org.ekstep.genieservices.commons.AppContext;
  *
  * @author anil
  */
-public class NetworkConnectivity implements IConnectionInfo {
+public class AndroidNetworkConnectivity implements IConnectionInfo {
 
     private AppContext<Context, AndroidLogger> appContext;
 
-    public NetworkConnectivity(AppContext<Context, AndroidLogger> appContext) {
+    public AndroidNetworkConnectivity(AppContext<Context, AndroidLogger> appContext) {
         this.appContext = appContext;
     }
 
