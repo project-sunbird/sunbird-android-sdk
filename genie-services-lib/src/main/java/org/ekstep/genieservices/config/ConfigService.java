@@ -1,6 +1,5 @@
 package org.ekstep.genieservices.config;
 
-import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 
 import org.ekstep.genieservices.BaseService;
@@ -8,6 +7,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponse;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.config.db.model.MasterData;
 import org.ekstep.genieservices.config.db.model.ResourceBundle;
@@ -64,15 +64,15 @@ public class ConfigService extends BaseService {
         String storedData = ResourcesReader.readFile(TERM_JSON_FILE);
 
         if (!StringUtil.isNullOrEmpty(storedData)) {
-            LinkedTreeMap map = new Gson().fromJson(storedData, LinkedTreeMap.class);
+            LinkedTreeMap map = GsonUtil.toMap(storedData, LinkedTreeMap.class);
 
-            Map result = convertToMap((LinkedTreeMap) map.get("result"));
+            Map result = ((LinkedTreeMap) map.get("result"));
 
             //save the master data
             if (result != null) {
                 result.remove("ttl");
                 for (Object keys : result.keySet()) {
-                    MasterData eachMasterData = MasterData.create(mAppContext, (String) keys, String.valueOf(new Gson().toJson(result.get(keys))));
+                    MasterData eachMasterData = MasterData.create(mAppContext, (String) keys, GsonUtil.toJson(result.get(keys)));
                     eachMasterData.save();
                 }
             }
@@ -121,14 +121,22 @@ public class ConfigService extends BaseService {
         String storedData = ResourcesReader.readFile(RESOURCE_BUNDLE_JSON_FILE);
 
         if (!StringUtil.isNullOrEmpty(storedData)) {
-            LinkedTreeMap map = new Gson().fromJson(storedData, LinkedTreeMap.class);
+            LinkedTreeMap map = GsonUtil.toMap(storedData, LinkedTreeMap.class);
 
             //save the bundle data
-            Map result = convertToMap((LinkedTreeMap) map.get("result"));
+            Map mMapResource = (LinkedTreeMap) map.get("result");
+            Map result = null;
+
+
+            String resultDataString = null;
+            if (mMapResource.containsKey("resourcebundles")) {
+                resultDataString = GsonUtil.toString(mMapResource.get("resourcebundles"));
+                result = GsonUtil.toMap(resultDataString);
+            }
 
             if (result != null) {
                 for (Object keys : result.keySet()) {
-                    ResourceBundle eachResourceBundle = ResourceBundle.create(mAppContext, (String) keys, String.valueOf(new Gson().toJson(result.get(keys))));
+                    ResourceBundle eachResourceBundle = ResourceBundle.create(mAppContext, (String) keys, GsonUtil.toJson(result.get(keys)));
                     eachResourceBundle.save();
                 }
             }

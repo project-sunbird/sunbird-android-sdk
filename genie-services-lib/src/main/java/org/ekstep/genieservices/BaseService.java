@@ -1,19 +1,10 @@
 package org.ekstep.genieservices;
 
-import com.google.gson.Gson;
-import com.google.gson.internal.LinkedTreeMap;
-import com.google.gson.reflect.TypeToken;
-
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponse;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueOperation;
 import org.ekstep.genieservices.commons.utils.DateUtil;
-
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by swayangjit on 20/4/17.
@@ -76,25 +67,4 @@ public class BaseService {
         }
     }
 
-    /**
-     * Converts the LinkedTreeMap to Map
-     *
-     * @param result
-     * @return
-     * @throws IOException
-     */
-    protected Map convertToMap(LinkedTreeMap result) {
-        Map mapResourceBundleData;
-        Gson gson = new Gson();
-//        saveDataExpirationTime(result);
-        String resultDataString = null;
-        if (result.containsKey("resourcebundles")) {
-            resultDataString = gson.toJson(result.get("resourcebundles"));
-        }
-        Type type = new TypeToken<HashMap>() {
-        }.getType();
-        mapResourceBundleData = gson.fromJson(resultDataString, type);
-
-        return mapResourceBundleData;
-    }
 }
