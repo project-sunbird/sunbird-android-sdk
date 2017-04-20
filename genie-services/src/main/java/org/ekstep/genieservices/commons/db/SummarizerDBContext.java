@@ -1,7 +1,7 @@
 package org.ekstep.genieservices.commons.db;
 
 import org.ekstep.genieservices.commons.db.migration.Migration;
-import org.ekstep.genieservices.migration.SummarizerMigrations;
+import org.ekstep.genieservices.migration.Migrations;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ public class SummarizerDBContext implements IDBContext {
 
     @Override
     public List<Migration> getMigrations() {
-        return SummarizerMigrations.getSummarizerMigrations();
+        return Migrations.getSummarizerMigrations();
     }
 
 }

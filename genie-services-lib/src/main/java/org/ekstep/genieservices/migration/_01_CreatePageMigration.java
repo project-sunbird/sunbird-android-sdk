@@ -1,6 +1,7 @@
 package org.ekstep.genieservices.migration;
 
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.db.contract.ImportedMetadataEntry;
 import org.ekstep.genieservices.commons.db.migration.Migration;
 import org.ekstep.genieservices.content.db.contract.ContentEntry;
 import org.ekstep.genieservices.content.db.contract.PageEntry;
@@ -8,7 +9,6 @@ import org.ekstep.genieservices.partner.db.contract.PartnerEntry;
 import org.ekstep.genieservices.profile.db.contract.ProfileEntry;
 import org.ekstep.genieservices.profile.db.contract.UserEntry;
 import org.ekstep.genieservices.telemetry.db.contract.EventPriority;
-import org.ekstep.genieservices.telemetry.db.contract.ImportedMetadataEntry;
 import org.ekstep.genieservices.telemetry.db.contract.TelemetryEntry;
 import org.ekstep.genieservices.telemetry.db.contract.TelemetryProcessedEntry;
 import org.ekstep.genieservices.telemetry.db.contract.TelemetryTagEntry;

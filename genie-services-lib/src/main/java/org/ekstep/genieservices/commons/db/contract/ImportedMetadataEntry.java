@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.telemetry.db.contract;
+package org.ekstep.genieservices.commons.db.contract;
 
 import org.ekstep.genieservices.commons.db.BaseColumns;
 import org.ekstep.genieservices.commons.db.DbConstants;
@@ -27,4 +27,5 @@ public abstract class ImportedMetadataEntry implements BaseColumns {
     public static final String getDeleteEntry() {
         return "DROP TABLE IF EXISTS " + ImportedMetadataEntry.TABLE_NAME;
     }
+
 }

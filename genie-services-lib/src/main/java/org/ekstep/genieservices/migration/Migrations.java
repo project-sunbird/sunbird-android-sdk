@@ -6,7 +6,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * @author anil
+ */
 public class Migrations {
+
     public static List<Migration> getGeServiceMigrations() {
         List<Migration> migrations = new ArrayList<>();
 
@@ -23,4 +27,15 @@ public class Migrations {
 
         return migrations;
     }
+
+    public static List<Migration> getSummarizerMigrations() {
+        List<Migration> migrations = new ArrayList<>();
+        //add migrations here
+        migrations.add(new _01_CreateQDescAndTitleForAssessmentMigration());
+
+        Collections.sort(migrations);
+
+        return migrations;
+    }
+
 }
