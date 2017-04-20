@@ -53,7 +53,7 @@ public abstract class BaseAPI {
     }
 
     private GenieResponse fetchFromServer(String requestType) {
-        if (!httpClient.isConnected()) {
+        if (!appContext.getConnectionInfo().isConnected()) {
             return GenieResponse.getErrorResponse(appContext, NetworkConstants.CONNECTION_ERROR, NetworkConstants.CONNECTION_ERROR_MESSAGE, TAG);
         }
         try {

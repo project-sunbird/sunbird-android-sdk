@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
  * Created by mathew on 20/4/17.
  */
 
-public class AndroidHttpClient extends AndroidNetworkConnectivity implements IHttpClient {
+public class AndroidHttpClient implements IHttpClient {
 
     private OkHttpClient httpClient;
     private Request.Builder requestBuilder;
@@ -61,8 +61,8 @@ public class AndroidHttpClient extends AndroidNetworkConnectivity implements IHt
         return new ApiResponse(response.isSuccessful(), response.body() != null ? response.body().string() : "");
     }
 
-    public AndroidHttpClient(AppContext<Context, AndroidLogger> appContext, Authenticator authenticator) {
-        super(appContext);
+    public AndroidHttpClient(Authenticator authenticator) {
+        this.authenticator = authenticator;
     }
 
     @Override

@@ -8,7 +8,7 @@ import java.util.Map;
  *
  * @author anil
  */
-public interface IHttpClient extends IConnectionInfo {
+public interface IHttpClient {
 
     Void createClient();
 
