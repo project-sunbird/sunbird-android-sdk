@@ -13,6 +13,4 @@ public interface IMigrate {
 
     boolean shouldBeApplied(int oldVersion, int newVersion);
 
-    void revert();
-
 }

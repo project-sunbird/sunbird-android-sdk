@@ -10,7 +10,6 @@ public class Migrations {
     public static List<Migration> getGeServiceMigrations() {
         List<Migration> migrations = new ArrayList<>();
 
-        //        migrations.add(new FirstMigration_NeedsToBeModified());
         migrations.add(new _01_CreatePageMigration());
         migrations.add(new _02_CreatedAtForProfileMigration());
         migrations.add(new _03_CreateResourceBundleMigration());

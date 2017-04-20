@@ -1,12 +1,13 @@
 package org.ekstep.genieservices.commons.db;
 
-import org.ekstep.genieservices.commons.db.migration.BeforeMigrations;
 import org.ekstep.genieservices.commons.db.migration.Migration;
 import org.ekstep.genieservices.migration.SummarizerMigrations;
-import org.ekstep.genieservices.migration.beforeMigration.SummarizerMigrationWasIntroduced;
 
 import java.util.List;
 
+/**
+ * @author anil
+ */
 public class SummarizerDBContext implements IDBContext {
 
     // Please don't make any changes in the class, except DATABASE_VERSION value.
@@ -28,8 +29,4 @@ public class SummarizerDBContext implements IDBContext {
         return SummarizerMigrations.getSummarizerMigrations();
     }
 
-    @Override
-    public BeforeMigrations getMigrationIntroduced() {
-        return new SummarizerMigrationWasIntroduced();
-    }
 }

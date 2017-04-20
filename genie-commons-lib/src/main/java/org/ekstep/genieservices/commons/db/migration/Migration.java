@@ -16,10 +16,6 @@ public abstract class Migration implements IMigrate, Comparable<Migration> {
     }
 
     @Override
-    public void revert() {
-    }
-
-    @Override
     public boolean shouldBeApplied(int oldVersion, int newVersion) {
         return oldVersion < targetDbVersion && targetDbVersion <= newVersion;
     }
