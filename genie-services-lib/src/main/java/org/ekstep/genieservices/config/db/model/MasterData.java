@@ -1,11 +1,11 @@
 package org.ekstep.genieservices.config.db.model;
 
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.ICleanDb;
 import org.ekstep.genieservices.commons.db.core.IReadDb;
-import org.ekstep.genieservices.commons.db.core.IWriteToDb;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
-import org.ekstep.genieservices.commons.db.core.ContentValues;
+import org.ekstep.genieservices.commons.db.core.IWriteToDb;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.config.db.contract.MasterDataEntry;
 
@@ -27,13 +27,13 @@ public class MasterData implements IReadDb, ICleanDb, IWriteToDb {
     private String mType;
     private AppContext mAppContext;
 
-    private  MasterData(AppContext appContext, String type, String json) {
+    private MasterData(AppContext appContext, String type, String json) {
         mAppContext = appContext;
         mType = type;
         mJson = json;
     }
 
-    public static MasterData write(AppContext appContext, String type, String json){
+    public static MasterData create(AppContext appContext, String type, String json) {
         return new MasterData(appContext, type, json);
     }
 
