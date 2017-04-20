@@ -1,8 +1,6 @@
 package org.ekstep.genieservices.migration;
 
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.db.contract.GameEntry;
-import org.ekstep.genieservices.commons.db.contract.LanguageEntry;
 import org.ekstep.genieservices.commons.db.migration.Migration;
 import org.ekstep.genieservices.content.db.contract.ContentEntry;
 import org.ekstep.genieservices.content.db.contract.PageEntry;
@@ -64,8 +62,6 @@ public class _01_CreatePageMigration extends Migration {
                 ProfileEntry.getCreateEntry(),
                 ImportedMetadataEntry.getCreateEntry(),
                 PartnerEntry.getCreateEntry(),
-                LanguageEntry.getCreateEntry(),
-                GameEntry.getCreateEntry(),
                 ContentEntry.getCreateEntry(),
                 TelemetryTagEntry.getCreateEntry()
         );

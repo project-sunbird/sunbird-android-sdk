@@ -17,6 +17,7 @@ public class Migrations {
         migrations.add(new _05_CreateRefCountContentMigration());
         migrations.add(new _06_CreateContentFeedbackMigration());
         migrations.add(new _07_UIBrandingMigration());
+        migrations.add(new _08_DeleteGameAndLanguageEntryMigration());
 
         Collections.sort(migrations);
 
