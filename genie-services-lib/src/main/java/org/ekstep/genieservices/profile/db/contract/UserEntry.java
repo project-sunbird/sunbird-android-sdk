@@ -3,7 +3,7 @@ package org.ekstep.genieservices.profile.db.contract;
 import org.ekstep.genieservices.commons.db.BaseColumns;
 import org.ekstep.genieservices.commons.db.DbConstants;
 
-public class UserEntry implements BaseColumns {
+public abstract class UserEntry implements BaseColumns {
 
     public static final String TABLE_NAME = "users";
     public static final String COLUMN_NAME_UID = "uid";

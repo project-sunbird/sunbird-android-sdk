@@ -12,7 +12,7 @@ import static java.util.Arrays.asList;
  *
  * @author anil
  */
-public class LearnerAssessmentsEntry implements BaseColumns {
+public abstract class LearnerAssessmentsEntry implements BaseColumns {
 
     public static final String TABLE_NAME = "learner_assessments";
     public static final String COLUMN_NAME_UID = "uid";

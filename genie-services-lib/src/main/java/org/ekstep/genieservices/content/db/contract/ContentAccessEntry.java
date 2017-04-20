@@ -8,7 +8,7 @@ import org.ekstep.genieservices.commons.db.DbConstants;
  *
  * @author anil
  */
-public class ContentAccessEntry implements BaseColumns {
+public abstract class ContentAccessEntry implements BaseColumns {
 
     public static final String TABLE_NAME = "content_access";
     public static final String COLUMN_NAME_UID = "uid";

@@ -3,7 +3,7 @@ package org.ekstep.genieservices.content.db.contract;
 import org.ekstep.genieservices.commons.db.BaseColumns;
 import org.ekstep.genieservices.commons.db.DbConstants;
 
-public class ContentFeedbackEntry implements BaseColumns {
+public abstract class ContentFeedbackEntry implements BaseColumns {
 
     public static final String TABLE_NAME = "feedback";
     public static final String COLUMN_NAME_CONTENT_ID = "identifier";

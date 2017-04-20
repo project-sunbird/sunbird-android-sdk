@@ -3,7 +3,7 @@ package org.ekstep.genieservices.config.db.contract;
 import org.ekstep.genieservices.commons.db.BaseColumns;
 import org.ekstep.genieservices.commons.db.DbConstants;
 
-public class OrdinalsEntry implements BaseColumns {
+public abstract class OrdinalsEntry implements BaseColumns {
 
     public static final String TABLE_NAME = "ordinals";
     public static final String COLUMN_NAME_ORDINAL_IDENTIFIER = "ordinal_identifier";

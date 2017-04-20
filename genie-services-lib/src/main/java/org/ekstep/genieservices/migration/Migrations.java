@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author anil
  */
-public class Migrations {
+public abstract class Migrations {
 
     public static List<Migration> getGeServiceMigrations() {
         List<Migration> migrations = new ArrayList<>();

@@ -8,7 +8,7 @@ import org.ekstep.genieservices.content.db.contract.PageEntry;
 import org.ekstep.genieservices.partner.db.contract.PartnerEntry;
 import org.ekstep.genieservices.profile.db.contract.ProfileEntry;
 import org.ekstep.genieservices.profile.db.contract.UserEntry;
-import org.ekstep.genieservices.telemetry.db.contract.EventPriority;
+import org.ekstep.genieservices.telemetry.db.contract.EventPriorityEntry;
 import org.ekstep.genieservices.telemetry.db.contract.TelemetryEntry;
 import org.ekstep.genieservices.telemetry.db.contract.TelemetryProcessedEntry;
 import org.ekstep.genieservices.telemetry.db.contract.TelemetryTagEntry;
@@ -57,7 +57,7 @@ public class _01_CreatePageMigration extends Migration {
         return Arrays.asList(
                 TelemetryEntry.getCreateEntry(),
                 TelemetryProcessedEntry.getCreateEntry(),
-                EventPriority.getCreateEntry(),
+                EventPriorityEntry.getCreateEntry(),
                 UserEntry.getCreateEntry(),
                 ProfileEntry.getCreateEntry(),
                 ImportedMetadataEntry.getCreateEntry(),

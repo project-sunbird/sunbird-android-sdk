@@ -8,7 +8,7 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 
-public class PageEntry implements BaseColumns {
+public abstract class PageEntry implements BaseColumns {
     public static final String TABLE_NAME = "pages";
     public static final String COLUMN_NAME_PAGE_IDENTIFIER = "page_identifier";
     public static final String COLUMN_NAME_PAGE_JSON = "page_json";

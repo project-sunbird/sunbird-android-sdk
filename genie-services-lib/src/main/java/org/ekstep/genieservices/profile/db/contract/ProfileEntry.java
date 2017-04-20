@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class ProfileEntry implements BaseColumns {
+public abstract class ProfileEntry implements BaseColumns {
 
     public static final String TABLE_NAME = "profiles";
     public static final String COLUMN_NAME_UID = "uid";

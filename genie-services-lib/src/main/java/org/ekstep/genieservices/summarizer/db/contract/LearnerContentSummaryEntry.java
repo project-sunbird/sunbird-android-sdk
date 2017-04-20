@@ -8,7 +8,7 @@ import org.ekstep.genieservices.commons.db.DbConstants;
  *
  * @author anil
  */
-public class LearnerContentSummaryEntry implements BaseColumns {
+public abstract class LearnerContentSummaryEntry implements BaseColumns {
 
     public static final String TABLE_NAME = "learner_content_summary";
     public static final String COLUMN_NAME_UID = "uid";

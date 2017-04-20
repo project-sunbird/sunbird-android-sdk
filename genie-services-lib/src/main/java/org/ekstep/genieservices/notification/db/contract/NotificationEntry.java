@@ -8,7 +8,7 @@ import org.ekstep.genieservices.commons.db.DbConstants;
  *
  * @author swayangjit
  */
-public class NotificationEntry implements BaseColumns {
+public abstract class NotificationEntry implements BaseColumns {
 
     public static final String TABLE_NAME = "notifications";
     public static final String COLUMN_NAME_MESSAGE_ID = "message_id";
