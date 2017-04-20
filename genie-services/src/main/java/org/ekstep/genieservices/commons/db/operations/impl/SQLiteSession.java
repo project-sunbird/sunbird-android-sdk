@@ -5,7 +5,6 @@ import android.database.sqlite.SQLiteDatabase;
 
 import org.ekstep.genieservices.commons.AndroidLogger;
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.ILogger;
 import org.ekstep.genieservices.commons.db.ServiceDbHelper;
 import org.ekstep.genieservices.commons.db.SummarizerDBContext;
 import org.ekstep.genieservices.commons.db.core.ICleanDb;

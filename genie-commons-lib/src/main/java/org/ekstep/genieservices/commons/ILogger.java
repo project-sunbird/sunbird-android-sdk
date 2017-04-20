@@ -1,24 +1,40 @@
 package org.ekstep.genieservices.commons;
 
 /**
- * Created by mathew on 18/4/17.
+ * Created on 18/4/17.
+ *
+ * @author mathew
  */
-
 public interface ILogger {
-    public boolean isDebugEnabled();
-    public boolean isErrorEnabled();
-    public boolean isVerboseEnabled();
-    public boolean isInfoEnabled();
-    public boolean isWarningEnabled();
 
-    public void verbose(String tag, String msg);
-    public void verbose(String tag, String msg, Throwable tr);
-    public void debug(String tag, String msg);
-    public void debug(String tag, String msg, Throwable tr);
-    public void info(String tag, String msg);
-    public void info(String tag, String msg, Throwable tr);
-    public void warn(String tag, String msg);
-    public void warn(String tag, String msg, Throwable tr);
-    public void error(String tag, String msg);
-    public void error(String tag, String msg, Throwable tr);
+    boolean isDebugEnabled();
+
+    boolean isErrorEnabled();
+
+    boolean isVerboseEnabled();
+
+    boolean isInfoEnabled();
+
+    boolean isWarningEnabled();
+
+    void verbose(String tag, String msg);
+
+    void verbose(String tag, String msg, Throwable tr);
+
+    void debug(String tag, String msg);
+
+    void debug(String tag, String msg, Throwable tr);
+
+    void info(String tag, String msg);
+
+    void info(String tag, String msg, Throwable tr);
+
+    void warn(String tag, String msg);
+
+    void warn(String tag, String msg, Throwable tr);
+
+    void error(String tag, String msg);
+
+    void error(String tag, String msg, Throwable tr);
+
 }

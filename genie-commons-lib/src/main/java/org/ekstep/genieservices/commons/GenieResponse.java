@@ -2,7 +2,7 @@ package org.ekstep.genieservices.commons;
 
 import org.ekstep.genieservices.commons.utils.Logger;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -19,15 +19,16 @@ public class GenieResponse<T> {
     private String error;
 
 
-    public static GenieResponse getErrorResponse(String error, String errorMessage, String logMessage, String logTag) {
+    public static GenieResponse getErrorResponse(AppContext context, String error, String errorMessage, String logTag) {
         GenieResponse response = new GenieResponse();
         response.setStatus(false);
-        response.setErrorMessages(Arrays.asList(new String[]{errorMessage}));
+        response.setErrorMessages(Collections.singletonList(errorMessage));
         response.setError(error);
+        Logger.e(context, logTag, error + ":" + errorMessage);
         return response;
     }
 
-    public static GenieResponse getSuccessResponse(String message, String logMessage, String logTag) {
+    public static GenieResponse getSuccessResponse(String message) {
         GenieResponse response = new GenieResponse();
         response.setStatus(true);
         response.setMessage(message);
