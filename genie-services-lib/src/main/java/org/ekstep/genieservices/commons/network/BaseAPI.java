@@ -33,15 +33,11 @@ public abstract class BaseAPI {
         this.TAG = TAG;
         this.httpClient = appContext.getHttpClient();
         this.headers = new HashMap<>();
-        addHttpHeaders("Accept-Encoding", "gzip, deflate");
+        this.headers.put("Accept-Encoding", "gzip, deflate");
     }
 
     public void handleAuth() {
         httpClient.handleAuth();
-    }
-
-    public void addHttpHeaders(String key, String value) {
-        this.headers.put(key, value);
     }
 
     public GenieResponse get() {

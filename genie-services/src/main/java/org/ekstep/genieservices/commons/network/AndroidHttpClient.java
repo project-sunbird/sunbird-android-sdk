@@ -37,10 +37,12 @@ public class AndroidHttpClient implements IHttpClient {
 
     @Override
     public Void setHeaders(Map<String, String> headers) {
-        Iterator it = headers.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<String, String> keyValuePair = (Map.Entry) it.next();
-            this.requestBuilder.addHeader(keyValuePair.getKey(), keyValuePair.getValue());
+        if (headers != null) {
+            Iterator it = headers.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry<String, String> keyValuePair = (Map.Entry) it.next();
+                this.requestBuilder.addHeader(keyValuePair.getKey(), keyValuePair.getValue());
+            }
         }
         return null;
     }
