@@ -19,7 +19,7 @@ public class BaseService {
 
     private IKeyValueOperation getKeyValueStore() {
         if (mkeyValueStore == null) {
-            return mAppContext.getKeyValueStore();
+            mkeyValueStore = mAppContext.getKeyValueStore();
         }
         return mkeyValueStore;
     }
