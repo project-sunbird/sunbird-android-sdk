@@ -27,7 +27,7 @@ import util.ResourcesReader;
  *
  * @author shriharsh
  */
-public class ConfigService extends BaseService{
+public class ConfigService extends BaseService {
 
     private static final String TAG = ConfigService.class.getSimpleName();
     private static final String TERM_JSON_FILE = "terms.json";
@@ -35,55 +35,7 @@ public class ConfigService extends BaseService{
     //    private APILogger mApiLogger;
 
     public ConfigService(AppContext appContext) {
-       super(appContext);
-    }
-
-    /**
-     * Save the master details
-     */
-    private  void saveMasterData() {
-
-        if (getBoolean(Constants.IS_MASTER_DATA_SAVED_KEY)) {
-            //get the string data from the locally stored json
-            String storedData = ResourcesReader.readFile(TERM_JSON_FILE);
-
-            if (!StringUtil.isNullOrEmpty(storedData)) {
-                LinkedTreeMap map = new Gson().fromJson(storedData, LinkedTreeMap.class);
-
-                Map result = convertToMap((LinkedTreeMap) map.get("result"));
-
-                //save the master data
-                if (result != null) {
-                    result.remove("ttl");
-                    for (Object keys : result.keySet()) {
-                        MasterData eachMasterData =MasterData.write(mAppContext, (String) keys, String.valueOf(new Gson().toJson(result.get(keys))));
-                        eachMasterData.save();
-                    }
-                    putBoolean(Constants.IS_MASTER_DATA_SAVED_KEY,true);
-                }
-            }
-
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    //TODO Call Term API
-                }
-            }).start();
-
-        } else {
-            if (isMasterDataExpired()) {
-
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //TODO Call Term API
-                    }
-                }).start();
-            }
-
-        }
-
+        super(appContext);
     }
 
     /**
@@ -96,13 +48,52 @@ public class ConfigService extends BaseService{
 
         GenieResponse<String> response = new GenieResponse<>();
 
-        saveMasterData();
+        if (getLong(Constants.MASTER_DATA_API_EXPIRATION_KEY) == 0) {
+            initializeMasterData();
+        } else {
+            if (isExpired(Constants.MASTER_DATA_API_EXPIRATION_KEY)) {
+                refreshMasterData();
+            }
+        }
 
         MasterData term = MasterData.findByType(mAppContext, type.getValue());
 
         String result = term.getTermJson();
 
         prepareResourceBundleResponse(responseHandler, response, result);
+    }
+
+    private void initializeMasterData() {
+
+        //get the string data from the locally stored json
+        String storedData = ResourcesReader.readFile(TERM_JSON_FILE);
+
+        if (!StringUtil.isNullOrEmpty(storedData)) {
+            LinkedTreeMap map = new Gson().fromJson(storedData, LinkedTreeMap.class);
+
+            Map result = convertToMap((LinkedTreeMap) map.get("result"));
+
+            //save the master data
+            if (result != null) {
+                result.remove("ttl");
+                for (Object keys : result.keySet()) {
+                    MasterData eachMasterData = MasterData.write(mAppContext, (String) keys, String.valueOf(new Gson().toJson(result.get(keys))));
+                    eachMasterData.save();
+                }
+            }
+        }
+
+        refreshMasterData();
+
+    }
+
+    private void refreshMasterData() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //TODO Call Term API
+            }
+        }).start();
     }
 
     /**
@@ -114,59 +105,51 @@ public class ConfigService extends BaseService{
     public void getResourceBundle(String languageIdentifier, IResponseHandler<String> responseHandler) {
         GenieResponse<String> response = new GenieResponse<>();
 
+        if (getLong(Constants.RESOURCE_BUNDLE_API_EXPIRATION_KEY) == 0) {
+            initializeResourceBundle();
+        } else {
+            if (isExpired(Constants.RESOURCE_BUNDLE_API_EXPIRATION_KEY)) {
+                refreshResourceBundle();
+            }
+        }
+
         ResourceBundle resourceBundle = ResourceBundle.findById(mAppContext, languageIdentifier);
 
-        if (resourceBundle == null) {
-            //get the string data from the locally stored json
-            String storedData = ResourcesReader.readFile(RESOURCE_BUNDLE_JSON_FILE);
+        //get the resource bundle in string format
+        String result = resourceBundle.getResourceString();
 
-            if (!StringUtil.isNullOrEmpty(storedData)) {
-                LinkedTreeMap map = new Gson().fromJson(storedData, LinkedTreeMap.class);
+        prepareResourceBundleResponse(responseHandler, response, result);
 
-                //save the bundle data
-                Map result = convertToMap((LinkedTreeMap) map.get("result"));
+    }
 
-                if (result != null) {
-                    for (Object keys : result.keySet()) {
-                        ResourceBundle eachResourceBundle = ResourceBundle.write(mAppContext, (String) keys, String.valueOf(new Gson().toJson(result.get(keys))));
-                        eachResourceBundle.save();
-                    }
+    private void initializeResourceBundle() {
+        //get the string data from the locally stored json
+        String storedData = ResourcesReader.readFile(RESOURCE_BUNDLE_JSON_FILE);
+
+        if (!StringUtil.isNullOrEmpty(storedData)) {
+            LinkedTreeMap map = new Gson().fromJson(storedData, LinkedTreeMap.class);
+
+            //save the bundle data
+            Map result = convertToMap((LinkedTreeMap) map.get("result"));
+
+            if (result != null) {
+                for (Object keys : result.keySet()) {
+                    ResourceBundle eachResourceBundle = ResourceBundle.write(mAppContext, (String) keys, String.valueOf(new Gson().toJson(result.get(keys))));
+                    eachResourceBundle.save();
                 }
             }
 
-            //re-fetch the bundle data that was saved just now
-            resourceBundle = ResourceBundle.findById(mAppContext, languageIdentifier);
-
-            if (resourceBundle != null) {
-                String result = resourceBundle.getResourceString();
-
-                prepareResourceBundleResponse(responseHandler, response, result);
-            }
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    // TODO: 18/4/17 Make Server Call to get the resource bundle
-                }
-            }).start();
-
-
-        } else {
-            //check if the data has expired
-            if (isResourceBundleExpired()) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // TODO: 18/4/17 Make Server Call to get the resource bundle
-                    }
-                }).start();
-            }
-
-            //get the resource bundle in string format
-            String result = resourceBundle.getResourceString();
-
-            prepareResourceBundleResponse(responseHandler, response, result);
+            refreshResourceBundle();
         }
+    }
+
+    private void refreshResourceBundle() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // TODO: 18/4/17 Make Server Call to get the resource bundle
+            }
+        }).start();
     }
 
     /**
@@ -185,28 +168,6 @@ public class ConfigService extends BaseService{
             response.setStatus(false);
             responseHandler.onError(response);
         }
-    }
-
-    /**
-     * Check if master data has expired
-     *
-     * @return
-     */
-    private boolean isMasterDataExpired() {
-        Long currentTime = TimeUtil.getEpochTime();
-        long expirationTime = getLong(Constants.MASTER_DATA_API_EXPIRATION_KEY);
-        return currentTime > expirationTime;
-    }
-
-    /**
-     * Check if resource bundle has expired
-     *
-     * @return
-     */
-    private boolean isResourceBundleExpired() {
-        Long currentTime = TimeUtil.getEpochTime();
-        long expirationTime = getLong(Constants.RESOURCE_BUNDLE_API_EXPIRATION_KEY);
-        return currentTime > expirationTime;
     }
 
     /**
