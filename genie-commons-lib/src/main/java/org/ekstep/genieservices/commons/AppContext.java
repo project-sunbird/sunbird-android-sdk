@@ -1,6 +1,6 @@
 package org.ekstep.genieservices.commons;
 
-import org.ekstep.genieservices.commons.db.cache.ICacheOperation;
+import org.ekstep.genieservices.commons.db.cache.IKeyValueOperation;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 
 /**
@@ -41,7 +41,7 @@ public abstract class AppContext<C,L extends ILogger> {
 
     public abstract IDBSession getSummarizerDBSession();
 
-    public abstract ICacheOperation getPreferenceCache();
+    public abstract IKeyValueOperation getKeyValueStore();
 
     public abstract String getStoredResourceData();
 
@@ -49,6 +49,6 @@ public abstract class AppContext<C,L extends ILogger> {
 
     public abstract Void setSummarizerDBSession(IDBSession dbSession);
 
-    public abstract Void setPreferenceCache(ICacheOperation cacheOperarion);
+    public abstract Void setKeyValueStore(IKeyValueOperation keyValueOperation);
 
  }

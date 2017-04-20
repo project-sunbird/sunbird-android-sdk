@@ -20,12 +20,17 @@ public class ResourceBundle implements IWriteToDb, IReadDb, IUpdateDb, ICleanDb 
     private Long id = -1L;
     private AppContext mAppContext;
 
-    public ResourceBundle(AppContext appContext, String identifier) {
+    private ResourceBundle(AppContext appContext, String identifier) {
         mAppContext = appContext;
         mIdentifier = identifier;
     }
 
-    public ResourceBundle(AppContext appContext, String identifier, String json) {
+    public static ResourceBundle write(AppContext appContext, String identifier, String json){
+        return new ResourceBundle(appContext,identifier,json);
+    }
+
+
+    private ResourceBundle(AppContext appContext, String identifier, String json) {
         mAppContext = appContext;
         mJson = json;
         mIdentifier = identifier;

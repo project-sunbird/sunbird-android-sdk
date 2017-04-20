@@ -6,13 +6,11 @@ import android.content.SharedPreferences;
 import org.ekstep.genieservices.commons.AndroidLogger;
 import org.ekstep.genieservices.commons.AppContext;
 
-import java.util.Set;
-
 /**
  * Created by swayangjit on 19/4/17.
  */
 
-public class PreferenceWrapper implements ICacheOperation {
+public class PreferenceWrapper implements IKeyValueOperation {
 
     private SharedPreferences mSharedPrefs;
     private SharedPreferences.Editor mPrefsEditor;
@@ -39,6 +37,12 @@ public class PreferenceWrapper implements ICacheOperation {
     }
 
     @Override
+    public void putBoolean(String key, boolean value) {
+        mPrefsEditor.putBoolean(key, value);
+        mPrefsEditor.commit();
+    }
+
+    @Override
     public String getString(String key, String defValue) {
          return mSharedPrefs.getString(key, defValue);
     }
@@ -46,6 +50,11 @@ public class PreferenceWrapper implements ICacheOperation {
     @Override
     public long getLong(String key, long defValue) {
         return  mSharedPrefs.getLong(key, defValue);
+    }
+
+    @Override
+    public boolean getBoolean(String key, boolean defValue) {
+        return mSharedPrefs.getBoolean(key, defValue);
     }
 
     @Override
@@ -64,4 +73,5 @@ public class PreferenceWrapper implements ICacheOperation {
         mPrefsEditor.clear();
         mPrefsEditor.commit();
     }
+
 }

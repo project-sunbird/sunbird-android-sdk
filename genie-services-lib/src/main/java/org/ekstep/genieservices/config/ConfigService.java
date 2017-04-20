@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
 
+import org.ekstep.genieservices.BaseService;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponse;
 import org.ekstep.genieservices.commons.IResponseHandler;
@@ -26,27 +27,23 @@ import util.ResourcesReader;
  *
  * @author shriharsh
  */
-public class ConfigService {
+public class ConfigService extends BaseService{
 
     private static final String TAG = ConfigService.class.getSimpleName();
     private static final String TERM_JSON_FILE = "terms.json";
     private static final String RESOURCE_BUNDLE_JSON_FILE = "resource_bundle.json";
     //    private APILogger mApiLogger;
-    private AppContext appContext;
 
     public ConfigService(AppContext appContext) {
-        this.appContext = appContext;
+       super(appContext);
     }
 
     /**
      * Save the master details
      */
-    public void saveMasterData(IResponseHandler<String> responseHandler) {
-        GenieResponse<String> response = new GenieResponse<>();
+    private  void saveMasterData() {
 
-        MasterData term = MasterData.findById(appContext);
-
-        if (!term.exists()) {
+        if (getBoolean(Constants.IS_MASTER_DATA_SAVED_KEY)) {
             //get the string data from the locally stored json
             String storedData = ResourcesReader.readFile(TERM_JSON_FILE);
 
@@ -59,25 +56,32 @@ public class ConfigService {
                 if (result != null) {
                     result.remove("ttl");
                     for (Object keys : result.keySet()) {
-                        MasterData eachTerm = new MasterData(appContext, (String) keys, String.valueOf(new Gson().toJson(result.get(keys))));
-                        eachTerm.save();
+                        MasterData eachMasterData =MasterData.write(mAppContext, (String) keys, String.valueOf(new Gson().toJson(result.get(keys))));
+                        eachMasterData.save();
                     }
+                    putBoolean(Constants.IS_MASTER_DATA_SAVED_KEY,true);
                 }
             }
 
-            response.setStatus(true);
 
-            responseHandler.onSuccess(response);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    //TODO Call Term API
+                }
+            }).start();
 
-            //TODO Call Term API
         } else {
             if (isMasterDataExpired()) {
-                //TODO Call Term API
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //TODO Call Term API
+                    }
+                }).start();
             }
 
-            response.setStatus(true);
-
-            responseHandler.onSuccess(response);
         }
 
     }
@@ -89,9 +93,12 @@ public class ConfigService {
      * @param responseHandler
      */
     public void getMasterData(MasterDataType type, IResponseHandler<String> responseHandler) {
+
         GenieResponse<String> response = new GenieResponse<>();
 
-        MasterData term = MasterData.find(appContext, type.getValue());
+        saveMasterData();
+
+        MasterData term = MasterData.findByType(mAppContext, type.getValue());
 
         String result = term.getTermJson();
 
@@ -107,7 +114,7 @@ public class ConfigService {
     public void getResourceBundle(String languageIdentifier, IResponseHandler<String> responseHandler) {
         GenieResponse<String> response = new GenieResponse<>();
 
-        ResourceBundle resourceBundle = ResourceBundle.findById(appContext, languageIdentifier);
+        ResourceBundle resourceBundle = ResourceBundle.findById(mAppContext, languageIdentifier);
 
         if (resourceBundle == null) {
             //get the string data from the locally stored json
@@ -121,14 +128,14 @@ public class ConfigService {
 
                 if (result != null) {
                     for (Object keys : result.keySet()) {
-                        ResourceBundle eachResourceBundle = new ResourceBundle(appContext, (String) keys, String.valueOf(new Gson().toJson(result.get(keys))));
+                        ResourceBundle eachResourceBundle = ResourceBundle.write(mAppContext, (String) keys, String.valueOf(new Gson().toJson(result.get(keys))));
                         eachResourceBundle.save();
                     }
                 }
             }
 
             //re-fetch the bundle data that was saved just now
-            resourceBundle = ResourceBundle.findById(appContext, languageIdentifier);
+            resourceBundle = ResourceBundle.findById(mAppContext, languageIdentifier);
 
             if (resourceBundle != null) {
                 String result = resourceBundle.getResourceString();
@@ -136,11 +143,23 @@ public class ConfigService {
                 prepareResourceBundleResponse(responseHandler, response, result);
             }
 
-            // TODO: 18/4/17 Make Server Call to get the resource bundle
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    // TODO: 18/4/17 Make Server Call to get the resource bundle
+                }
+            }).start();
+
+
         } else {
             //check if the data has expired
             if (isResourceBundleExpired()) {
-                // TODO: 18/4/17 Make Server Call to get the resource bundle
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // TODO: 18/4/17 Make Server Call to get the resource bundle
+                    }
+                }).start();
             }
 
             //get the resource bundle in string format
@@ -175,7 +194,7 @@ public class ConfigService {
      */
     private boolean isMasterDataExpired() {
         Long currentTime = TimeUtil.getEpochTime();
-        long expirationTime = appContext.getPreferenceCache().getLong(Constants.MASTER_DATA_API_EXPIRATION_KEY, 0);
+        long expirationTime = getLong(Constants.MASTER_DATA_API_EXPIRATION_KEY);
         return currentTime > expirationTime;
     }
 
@@ -186,7 +205,7 @@ public class ConfigService {
      */
     private boolean isResourceBundleExpired() {
         Long currentTime = TimeUtil.getEpochTime();
-        long expirationTime = appContext.getPreferenceCache().getLong(Constants.RESOURCE_BUNDLE_API_EXPIRATION_KEY, 0);
+        long expirationTime = getLong(Constants.RESOURCE_BUNDLE_API_EXPIRATION_KEY);
         return currentTime > expirationTime;
     }
 

@@ -27,19 +27,23 @@ public class MasterData implements IReadDb, ICleanDb, IWriteToDb {
     private String mType;
     private AppContext mAppContext;
 
-    public MasterData(AppContext appContext, String type, String json) {
+    private  MasterData(AppContext appContext, String type, String json) {
         mAppContext = appContext;
         mType = type;
         mJson = json;
     }
 
-    public static MasterData find(AppContext appContext, String type) {
+    public static MasterData write(AppContext appContext, String type, String json){
+        return new MasterData(appContext, type, json);
+    }
+
+    public static MasterData findByType(AppContext appContext, String type) {
         MasterData term = new MasterData(appContext, type, null);
         appContext.getDBSession().read(term);
         return term;
     }
 
-    public static MasterData findById(AppContext appContext) {
+    public static MasterData find(AppContext appContext) {
         MasterData term = new MasterData(appContext, null, null);
         appContext.getDBSession().read(term);
         return term;

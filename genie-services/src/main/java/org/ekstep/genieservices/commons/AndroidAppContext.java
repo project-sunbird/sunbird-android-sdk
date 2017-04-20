@@ -5,7 +5,7 @@ import android.content.Context;
 import org.ekstep.genieservices.Constants;
 import org.ekstep.genieservices.R;
 import org.ekstep.genieservices.commons.db.SummarizerDBContext;
-import org.ekstep.genieservices.commons.db.cache.ICacheOperation;
+import org.ekstep.genieservices.commons.db.cache.IKeyValueOperation;
 import org.ekstep.genieservices.commons.db.cache.PreferenceWrapper;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.impl.SQLiteSession;
@@ -19,7 +19,7 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
 
     private IDBSession mDBSession;
     private IDBSession mSummarizerDBSession;
-    private ICacheOperation mCacheOperation;
+    private IKeyValueOperation mKeyValueOperation;
 
     private AndroidAppContext(Context context, String appPackage, String key, AndroidLogger logger) {
         super(context, appPackage, key, logger);
@@ -29,7 +29,7 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
         AppContext<Context, AndroidLogger> appContext = new AndroidAppContext(context, appPackage, key, logger);
         appContext.setDBSession(new SQLiteSession(appContext));
         appContext.setSummarizerDBSession(new SQLiteSession(appContext, new SummarizerDBContext()));
-        appContext.setPreferenceCache(new PreferenceWrapper(appContext, Constants.SHARED_PREFERENCE_NAME));
+        appContext.setKeyValueStore(new PreferenceWrapper(appContext, Constants.SHARED_PREFERENCE_NAME));
         return appContext;
     }
 
@@ -44,8 +44,8 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
     }
 
     @Override
-    public ICacheOperation getPreferenceCache() {
-        return mCacheOperation;
+    public IKeyValueOperation getKeyValueStore() {
+        return mKeyValueOperation;
     }
 
     @Override
@@ -67,8 +67,8 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
     }
 
     @Override
-    public Void setPreferenceCache(ICacheOperation cacheOperarion) {
-        this.mCacheOperation=cacheOperarion;
+    public Void setKeyValueStore(IKeyValueOperation keyValueOperation) {
+        this.mKeyValueOperation=keyValueOperation;
         return null;
     }
 
