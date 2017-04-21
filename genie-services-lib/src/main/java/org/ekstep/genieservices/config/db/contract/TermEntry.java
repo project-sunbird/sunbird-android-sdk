@@ -8,7 +8,7 @@ import org.ekstep.genieservices.commons.db.DbConstants;
  *
  * @author swayangjit
  */
-public class TermEntry implements BaseColumns {
+public abstract class TermEntry implements BaseColumns {
 
     public static final String TABLE_NAME = "term";
     public static final String COLUMN_NAME_IDENTIFIER = "identifier";
