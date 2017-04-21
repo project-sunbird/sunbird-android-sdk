@@ -1,8 +1,5 @@
 package org.ekstep.genieservices.commons.network;
 
-import com.google.gson.Gson;
-import com.google.gson.internal.LinkedTreeMap;
-
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponse;
 import org.ekstep.genieservices.commons.utils.Logger;
@@ -59,14 +56,16 @@ public abstract class BaseAPI {
             httpClient.createRequest(url);
             httpClient.setHeaders(headers);
             httpClient.setHeaders(getRequestHeaders());
-            ApiResponse response = null;
+            ApiResponse apiResponse = null;
             if (GET.equals(requestType)) {
-                response = httpClient.doGet();
+                apiResponse = httpClient.doGet();
             } else if (POST.equals(requestType)) {
-                response = httpClient.doPost(createRequestData());
+                apiResponse = httpClient.doPost(createRequestData());
             }
-            if (response.isSuccessful()) {
-                handle(parseResult(response.getResponseBody()));
+            if (apiResponse.isSuccessful()) {
+                GenieResponse response = GenieResponse.getSuccessResponse("");
+                response.setResult(apiResponse.getResponseBody());
+                return response;
             } else {
                 return GenieResponse.getErrorResponse(appContext, NetworkConstants.SERVER_ERROR, NetworkConstants.SERVER_ERROR_MESSAGE, TAG);
             }
@@ -74,18 +73,10 @@ public abstract class BaseAPI {
             Logger.e(appContext, TAG, e.getMessage());
             return GenieResponse.getErrorResponse(appContext, NetworkConstants.NETWORK_ERROR, e.getMessage(), TAG);
         }
-        return null;
     }
 
     protected abstract Map<String, String> getRequestHeaders();
 
     protected abstract String createRequestData();
-
-    protected abstract void handle(LinkedTreeMap result) throws IOException;
-
-    private LinkedTreeMap parseResult(String body) {
-        LinkedTreeMap map = new Gson().fromJson(body, LinkedTreeMap.class);
-        return (LinkedTreeMap) map.get("result");
-    }
 
 }
