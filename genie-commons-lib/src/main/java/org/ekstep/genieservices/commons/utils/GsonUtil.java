@@ -1,36 +1,32 @@
 package org.ekstep.genieservices.commons.utils;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
-import java.util.Map;
+import com.google.gson.GsonBuilder;
 
 /**
  * @author anil
  */
 public class GsonUtil {
 
-    public static <K, V> Map<K, V> toMap(String json) {
-        Gson gson = new Gson();
-        Type type = new TypeToken<Map>() {
-        }.getType();
-        Map<K, V> map = gson.fromJson(json, type);
-        return map;
-    }
+    private static Gson sGson;
 
-    public static String toString(Object map) {
-        Gson gson = new Gson();
-
-        return gson.toJson(map);
+    public static Gson getGson() {
+        if (sGson == null) {
+            sGson = new GsonBuilder().create();
+        }
+        return sGson;
     }
 
     public static <C> C toMap(String json, Class<C> classOfC) {
-       return new Gson().fromJson(json, classOfC);
+        return getGson().fromJson(json, classOfC);
+    }
+
+    public static String toString(Object map) {
+        return getGson().toJson(map);
     }
 
     public static String toJson(Object json) {
-        return new Gson().toJson(json);
+        return getGson().toJson(json);
     }
 
 }

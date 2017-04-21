@@ -1,5 +1,6 @@
 package org.ekstep.genieservices.config;
 
+import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 
 import org.ekstep.genieservices.BaseService;
@@ -10,7 +11,9 @@ import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.config.db.model.MasterData;
+import org.ekstep.genieservices.config.db.model.Ordinals;
 import org.ekstep.genieservices.config.db.model.ResourceBundle;
+import org.ekstep.genieservices.config.network.OrdinalsAPI;
 
 import java.util.Map;
 
@@ -27,10 +30,16 @@ public class ConfigService extends BaseService {
     private static final String TAG = ConfigService.class.getSimpleName();
     private static final String TERM_JSON_FILE = "terms.json";
     private static final String RESOURCE_BUNDLE_JSON_FILE = "resource_bundle.json";
+    private static final String ORDINALS_JSON_FILE = "ordinals.json";
+
+    private static final String DB_KEY_ORDINALS = "ordinals_key";
     //    private APILogger mApiLogger;
 
     public ConfigService(AppContext appContext) {
         super(appContext);
+    }
+
+    public void getAllMasterData() {
     }
 
     /**
@@ -131,7 +140,7 @@ public class ConfigService extends BaseService {
             String resultDataString = null;
             if (mMapResource.containsKey("resourcebundles")) {
                 resultDataString = GsonUtil.toString(mMapResource.get("resourcebundles"));
-                result = GsonUtil.toMap(resultDataString);
+                result = GsonUtil.toMap(resultDataString, Map.class);
             }
 
             if (result != null) {
@@ -153,4 +162,62 @@ public class ConfigService extends BaseService {
             }
         }).start();
     }
+
+    public void getOrdinals(IResponseHandler<String> responseHandler) {
+        GenieResponse<String> response = new GenieResponse<>();
+
+        if (getLong(Constants.ORDINAL_API_EXPIRATION_KEY) == 0) {
+            initializeOrdinalsDate();
+        } else {
+            if (isExpired(Constants.ORDINAL_API_EXPIRATION_KEY)) {
+                refreshOrdinals();
+            }
+        }
+
+        Ordinals ordinals = Ordinals.findById(mAppContext, DB_KEY_ORDINALS);
+
+        prepareResponse(responseHandler, response, ordinals.getJSON());
+    }
+
+    private void initializeOrdinalsDate() {
+        //get the string data from the locally stored json
+        String storedData = ResourcesReader.readFile(ORDINALS_JSON_FILE);
+
+        if (!StringUtil.isNullOrEmpty(storedData)) {
+            LinkedTreeMap map = new Gson().fromJson(storedData, LinkedTreeMap.class);
+            LinkedTreeMap resultLinkedTreeMap = (LinkedTreeMap) map.get("result");
+
+            if (resultLinkedTreeMap.containsKey("ordinals")) {
+                Ordinals ordinals = Ordinals.create(mAppContext, DB_KEY_ORDINALS, GsonUtil.toJson(resultLinkedTreeMap.get("ordinals")));
+                ordinals.save();
+            }
+        }
+
+        refreshOrdinals();
+    }
+
+    private void refreshOrdinals() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                OrdinalsAPI api = new OrdinalsAPI(mAppContext);
+                GenieResponse genieResponse = api.get();
+
+                if (genieResponse.getStatus()) {
+                    String body = genieResponse.getResult().toString();
+                    LinkedTreeMap map = new Gson().fromJson(body, LinkedTreeMap.class);
+                    LinkedTreeMap resultLinkedTreeMap = (LinkedTreeMap) map.get("result");
+
+                    // Save data expiration time
+                    saveDataExpirationTime(resultLinkedTreeMap, Constants.ORDINAL_API_EXPIRATION_KEY);
+
+                    if (resultLinkedTreeMap.containsKey("ordinals")) {
+                        Ordinals ordinals = Ordinals.create(mAppContext, DB_KEY_ORDINALS, GsonUtil.toJson(resultLinkedTreeMap.get("ordinals")));
+                        ordinals.save();
+                    }
+                }
+            }
+        }).start();
+    }
+
 }
