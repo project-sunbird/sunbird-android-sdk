@@ -2,7 +2,7 @@ package org.ekstep.genieservices.migration;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.migration.Migration;
-import org.ekstep.genieservices.config.db.contract.TermEntry;
+import org.ekstep.genieservices.config.db.contract.MasterDataEntry;
 import org.ekstep.genieservices.content.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.content.db.contract.ContentEntry;
 import org.ekstep.genieservices.content.db.contract.PageEntry;
@@ -42,7 +42,7 @@ public class _07_UIBrandingMigration extends Migration {
         }
 
         // Create terms table.
-        appContext.getDBSession().execute(TermEntry.getCreateEntry());
+        appContext.getDBSession().execute(MasterDataEntry.getCreateEntry());
 
         // Create content_state col in content table
         appContext.getDBSession().execute(ContentEntry.getAlterEntryForContentState());
