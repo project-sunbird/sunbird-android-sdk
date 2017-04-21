@@ -8,19 +8,19 @@ import org.ekstep.genieservices.commons.db.DbConstants;
  *
  * @author swayangjit
  */
-public abstract class TermEntry implements BaseColumns {
+public abstract  class MasterDataEntry implements BaseColumns {
 
     public static final String TABLE_NAME = "term";
     public static final String COLUMN_NAME_IDENTIFIER = "identifier";
-    public static final String COLUMN_NAME_TERM_TYPE = "facet_type";
-    public static final String COLUMN_NAME_TERM_JSON = "facet_json";
+    public static final String COLUMN_NAME_TYPE = "facet_type";
+    public static final String COLUMN_NAME_JSON = "facet_json";
 
     public static final String getCreateEntry() {
-        return "CREATE TABLE IF NOT EXISTS " + TermEntry.TABLE_NAME + " (" +
+        return "CREATE TABLE IF NOT EXISTS " + MasterDataEntry.TABLE_NAME + " (" +
                 _ID + " INTEGER PRIMARY KEY," +
                 COLUMN_NAME_IDENTIFIER + DbConstants.TEXT_TYPE + "," +
-                COLUMN_NAME_TERM_TYPE + DbConstants.TEXT_TYPE + "," +
-                COLUMN_NAME_TERM_JSON + DbConstants.TEXT_TYPE +
+                COLUMN_NAME_TYPE + DbConstants.TEXT_TYPE + "," +
+                COLUMN_NAME_JSON + DbConstants.TEXT_TYPE +
                 " )";
     }
 

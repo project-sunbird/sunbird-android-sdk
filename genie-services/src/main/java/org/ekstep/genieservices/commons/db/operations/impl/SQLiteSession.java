@@ -7,11 +7,11 @@ import org.ekstep.genieservices.commons.AndroidLogger;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.ServiceDbHelper;
 import org.ekstep.genieservices.commons.db.SummarizerDBContext;
-import org.ekstep.genieservices.commons.db.core.ICleanDb;
-import org.ekstep.genieservices.commons.db.core.IReadDb;
-import org.ekstep.genieservices.commons.db.core.IUpdateDb;
-import org.ekstep.genieservices.commons.db.core.IWriteToDb;
-import org.ekstep.genieservices.commons.db.operations.IDBOperate;
+import org.ekstep.genieservices.commons.db.core.ICleanable;
+import org.ekstep.genieservices.commons.db.core.IReadable;
+import org.ekstep.genieservices.commons.db.core.IUpdatable;
+import org.ekstep.genieservices.commons.db.core.IWritable;
+import org.ekstep.genieservices.commons.db.operations.IDBOperation;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.commons.utils.Logger;
@@ -36,7 +36,7 @@ public class SQLiteSession implements IDBSession {
         this.database = serviceDbHelper.getWritableDatabase();
     }
 
-    private Void execute(IDBOperate<SQLiteDatabase> operate) {
+    private Void execute(IDBOperation<SQLiteDatabase> operate) {
         try {
             operate.perform(appContext, database);
         } catch (Exception e) {
@@ -79,22 +79,22 @@ public class SQLiteSession implements IDBSession {
     }
 
     @Override
-    public Void clean(ICleanDb cleanDb) {
+    public Void clean(ICleanable cleanDb) {
         return execute(new SQLiteCleaner(cleanDb));
     }
 
     @Override
-    public Void read(IReadDb readDb) {
+    public Void read(IReadable readDb) {
         return execute(new SQLiteReader(readDb));
     }
 
     @Override
-    public Void create(IWriteToDb writeToDb) {
+    public Void create(IWritable writeToDb) {
         return execute(new SQLiteWriter(writeToDb));
     }
 
     @Override
-    public Void update(IUpdateDb updateDb) {
+    public Void update(IUpdatable updateDb) {
         return execute(new SQLiteUpdater(updateDb));
     }
 

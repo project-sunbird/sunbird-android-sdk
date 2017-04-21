@@ -1,5 +1,6 @@
 package org.ekstep.genieservices.commons;
 
+import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.network.IHttpClient;
@@ -43,6 +44,8 @@ public abstract class AppContext<C, L extends ILogger> {
     public abstract IDBSession getDBSession();
 
     public abstract IDBSession getSummarizerDBSession();
+
+    public abstract IKeyValueStore getKeyValueStore();
 
     public abstract IConnectionInfo getConnectionInfo();
 

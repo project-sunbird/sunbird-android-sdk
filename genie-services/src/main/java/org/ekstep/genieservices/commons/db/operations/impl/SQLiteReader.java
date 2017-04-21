@@ -4,17 +4,17 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.db.core.IReadDb;
+import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.impl.SQLiteResultSet;
-import org.ekstep.genieservices.commons.db.operations.IDBOperate;
+import org.ekstep.genieservices.commons.db.operations.IDBOperation;
 
 import java.util.Locale;
 
-public class SQLiteReader implements IDBOperate<SQLiteDatabase> {
+public class SQLiteReader implements IDBOperation<SQLiteDatabase> {
 
-    private IReadDb model;
+    private IReadable model;
 
-    public SQLiteReader(IReadDb model) {
+    public SQLiteReader(IReadable model) {
         this.model = model;
     }
 

@@ -105,5 +105,18 @@ public interface IResultSet {
      */
     double getDouble(int columnIndex);
 
+    /**
+     * Returns the value of the requested column as a byte array.
+     *
+     * <p>The result and whether this method throws an exception when the
+     * column value is null or the column type is not a blob type is
+     * implementation-defined.
+     *
+     * @param columnIndex the zero-based index of the target column.
+     * @return the value of that column as a byte array.
+     */
+    byte[] getBlob(int columnIndex);
+
+
 
 }
