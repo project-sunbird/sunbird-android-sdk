@@ -1,8 +1,8 @@
 package org.ekstep.genieservices.commons.db.core;
 
-public interface IReadDb {
+public interface IReadable {
 
-    IReadDb read(IResultSet cursor);
+    IReadable read(IResultSet cursor);
 
     String getTableName();
 

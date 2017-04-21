@@ -3,9 +3,8 @@ package org.ekstep.genieservices.commons;
 import android.content.Context;
 
 import org.ekstep.genieservices.Constants;
-import org.ekstep.genieservices.R;
 import org.ekstep.genieservices.commons.db.SummarizerDBContext;
-import org.ekstep.genieservices.commons.db.cache.IKeyValueOperation;
+import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.cache.PreferenceWrapper;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.impl.SQLiteSession;
@@ -24,7 +23,7 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
     private IDBSession mSummarizerDBSession;
     private IConnectionInfo mConnectionInfo;
     private IHttpClient mHttpClient;
-    private IKeyValueOperation mKeyValueOperation;
+    private IKeyValueStore mKeyValueOperation;
 
 
     private AndroidAppContext(Context context, String appPackage, String key, AndroidLogger logger) {
@@ -46,50 +45,43 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
         return mDBSession;
     }
 
-    private void setDBSession(IDBSession dbSession) {
-        this.mDBSession = dbSession;
-    }
-
     @Override
     public IDBSession getSummarizerDBSession() {
         return mSummarizerDBSession;
     }
 
     @Override
-    public IKeyValueOperation getKeyValueStore() {
+    public IKeyValueStore getKeyValueStore() {
         return mKeyValueOperation;
-    }
-
-    @Override
-    public String getStoredResourceData() {
-        String response = RawFileUtil.readRawResource(this.getContext(), R.raw.resource_bundle);
-        return response;
-    }
-
-    private void setSummarizerDBSession(IDBSession dbSession) {
-        this.mSummarizerDBSession = dbSession;
     }
 
     @Override
     public IConnectionInfo getConnectionInfo() {
         return mConnectionInfo;
     }
-
-    private void setConnectionInfo(IConnectionInfo connectionInfo) {
-        this.mConnectionInfo = connectionInfo;
-    }
-
     @Override
     public IHttpClient getHttpClient() {
         return mHttpClient;
     }
 
+    private void setDBSession(IDBSession dbSession) {
+        this.mDBSession = dbSession;
+    }
+
+    private void setKeyValueStore(IKeyValueStore keyValueOperation) {
+        this.mKeyValueOperation = keyValueOperation;
+    }
+
     private void setHttpClient(IHttpClient client) {
         this.mHttpClient = client;
     }
-    @Override
-    public Void setKeyValueStore(IKeyValueOperation keyValueOperation) {
-        this.mKeyValueOperation=keyValueOperation;
-        return null;
+
+    private void setSummarizerDBSession(IDBSession dbSession) {
+        this.mSummarizerDBSession = dbSession;
     }
+
+    private void setConnectionInfo(IConnectionInfo connectionInfo) {
+        this.mConnectionInfo = connectionInfo;
+    }
+
 }

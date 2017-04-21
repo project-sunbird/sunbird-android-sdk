@@ -4,7 +4,7 @@ package org.ekstep.genieservices.commons.db.cache;
  * Created by swayangjit on 19/4/17.
  */
 
-public interface IKeyValueOperation {
+public interface IKeyValueStore {
 
     void putString(String key, String value);
 

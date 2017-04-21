@@ -10,7 +10,7 @@ import org.ekstep.genieservices.commons.AppContext;
  * Created by swayangjit on 19/4/17.
  */
 
-public class PreferenceWrapper implements IKeyValueOperation {
+public class PreferenceWrapper implements IKeyValueStore {
 
     private SharedPreferences mSharedPrefs;
     private SharedPreferences.Editor mPrefsEditor;

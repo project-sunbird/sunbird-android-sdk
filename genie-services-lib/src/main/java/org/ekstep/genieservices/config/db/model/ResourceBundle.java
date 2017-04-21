@@ -3,17 +3,18 @@ package org.ekstep.genieservices.config.db.model;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.BaseColumns;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
-import org.ekstep.genieservices.commons.db.core.ICleanDb;
-import org.ekstep.genieservices.commons.db.core.IReadDb;
+import org.ekstep.genieservices.commons.db.core.ICleanable;
+import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
-import org.ekstep.genieservices.commons.db.core.IUpdateDb;
-import org.ekstep.genieservices.commons.db.core.IWriteToDb;
+import org.ekstep.genieservices.commons.db.core.IUpdatable;
+import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.config.db.contract.ResourceBundleEntry;
 
+import java.sql.ResultSet;
 import java.util.Locale;
 
-public class ResourceBundle implements IWriteToDb, IReadDb, IUpdateDb, ICleanDb {
+public class ResourceBundle implements IWritable, IReadable, IUpdatable, ICleanable {
     private static final String TAG = "model-ResourceBundle";
     private String mIdentifier;
     private String mJson;
@@ -62,7 +63,7 @@ public class ResourceBundle implements IWriteToDb, IReadDb, IUpdateDb, ICleanDb 
     }
 
     @Override
-    public IReadDb read(IResultSet resultSet) {
+    public IReadable read(IResultSet resultSet) {
         if (resultSet != null && resultSet.moveToFirst())
             readByMovingToFirst(resultSet);
         return this;

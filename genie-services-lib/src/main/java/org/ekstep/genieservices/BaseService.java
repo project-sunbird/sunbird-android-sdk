@@ -3,7 +3,7 @@ package org.ekstep.genieservices;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponse;
 import org.ekstep.genieservices.commons.IResponseHandler;
-import org.ekstep.genieservices.commons.db.cache.IKeyValueOperation;
+import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 
 /**
@@ -13,13 +13,13 @@ import org.ekstep.genieservices.commons.utils.DateUtil;
 public class BaseService {
 
     protected AppContext mAppContext;
-    private IKeyValueOperation mkeyValueStore;
+    private IKeyValueStore mkeyValueStore;
 
     public BaseService(AppContext appContext) {
         mAppContext = appContext;
     }
 
-    private IKeyValueOperation getKeyValueStore() {
+    private IKeyValueStore getKeyValueStore() {
         if (mkeyValueStore == null) {
             mkeyValueStore = mAppContext.getKeyValueStore();
         }

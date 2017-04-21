@@ -5,7 +5,7 @@ import org.ekstep.genieservices.commons.AppContext;
 /**
  * @author anil
  */
-public interface IWriteToDb {
+public interface IWritable {
 
     ContentValues getContentValues();
 

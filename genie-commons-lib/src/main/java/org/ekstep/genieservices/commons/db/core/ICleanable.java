@@ -1,6 +1,6 @@
 package org.ekstep.genieservices.commons.db.core;
 
-public interface ICleanDb {
+public interface ICleanable {
     String getTableName();
 
     void clean();

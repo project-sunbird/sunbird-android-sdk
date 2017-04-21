@@ -2,10 +2,10 @@ package org.ekstep.genieservices.config.db.model;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
-import org.ekstep.genieservices.commons.db.core.ICleanDb;
-import org.ekstep.genieservices.commons.db.core.IReadDb;
+import org.ekstep.genieservices.commons.db.core.ICleanable;
+import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
-import org.ekstep.genieservices.commons.db.core.IWriteToDb;
+import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.config.db.contract.MasterDataEntry;
 
@@ -16,7 +16,7 @@ import java.util.Locale;
  *
  * @author swayangjit
  */
-public class MasterData implements IReadDb, ICleanDb, IWriteToDb {
+public class MasterData implements IReadable, ICleanable, IWritable {
 
     private Long id = -1L;
 
@@ -66,7 +66,7 @@ public class MasterData implements IReadDb, ICleanDb, IWriteToDb {
     }
 
     @Override
-    public IReadDb read(IResultSet resultSet) {
+    public IReadable read(IResultSet resultSet) {
         if (resultSet != null && resultSet.moveToFirst())
             readWithoutMoving(resultSet);
         return this;

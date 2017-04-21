@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
-import org.ekstep.genieservices.commons.db.core.IWriteToDb;
+import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBOperation;
 import org.ekstep.genieservices.commons.exception.DbException;
 import org.ekstep.genieservices.commons.utils.Logger;
@@ -17,9 +17,9 @@ import java.util.Locale;
  */
 public class SQLiteWriter implements IDBOperation<SQLiteDatabase> {
     private static final String LOG_TAG = "service-SQLiteWriter";
-    private IWriteToDb model;
+    private IWritable model;
 
-    public SQLiteWriter(IWriteToDb model) {
+    public SQLiteWriter(IWritable model) {
         this.model = model;
     }
 

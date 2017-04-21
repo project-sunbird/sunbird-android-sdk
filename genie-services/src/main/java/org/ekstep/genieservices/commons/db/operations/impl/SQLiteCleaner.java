@@ -3,16 +3,16 @@ package org.ekstep.genieservices.commons.db.operations.impl;
 import android.database.sqlite.SQLiteDatabase;
 
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.db.core.ICleanDb;
+import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.operations.IDBOperation;
 
 import java.util.Locale;
 
 public class SQLiteCleaner implements IDBOperation<SQLiteDatabase> {
 
-    private ICleanDb model;
+    private ICleanable model;
 
-    public SQLiteCleaner(ICleanDb model) {
+    public SQLiteCleaner(ICleanable model) {
         this.model = model;
     }
 

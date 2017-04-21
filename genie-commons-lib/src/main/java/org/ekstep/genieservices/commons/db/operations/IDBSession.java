@@ -1,9 +1,9 @@
 package org.ekstep.genieservices.commons.db.operations;
 
-import org.ekstep.genieservices.commons.db.core.ICleanDb;
-import org.ekstep.genieservices.commons.db.core.IReadDb;
-import org.ekstep.genieservices.commons.db.core.IUpdateDb;
-import org.ekstep.genieservices.commons.db.core.IWriteToDb;
+import org.ekstep.genieservices.commons.db.core.ICleanable;
+import org.ekstep.genieservices.commons.db.core.IReadable;
+import org.ekstep.genieservices.commons.db.core.IUpdatable;
+import org.ekstep.genieservices.commons.db.core.IWritable;
 
 /**
  * Created on 4/17/2017.
@@ -16,13 +16,13 @@ public interface IDBSession {
 
     Void endTransaction();
 
-    Void clean(ICleanDb cleanDb);
+    Void clean(ICleanable cleanDb);
 
-    Void read(IReadDb readDb);
+    Void read(IReadable readDb);
 
-    Void create(IWriteToDb writeToDb);
+    Void create(IWritable writeToDb);
 
-    Void update(IUpdateDb updateDb);
+    Void update(IUpdatable updateDb);
 
     Void execute(String query);
 
