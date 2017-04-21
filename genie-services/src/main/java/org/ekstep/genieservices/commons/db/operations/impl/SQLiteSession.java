@@ -24,11 +24,11 @@ public class SQLiteSession implements IDBSession {
     private boolean isOperationSuccessful;
 
     public SQLiteSession(AppContext<Context, AndroidLogger> appContext) {
-        this(appContext, ServiceDbHelper.getGSDBInstance(appContext.getContext()));
+        this(appContext, ServiceDbHelper.getGSDBInstance(appContext));
     }
 
     public SQLiteSession(AppContext<Context, AndroidLogger> appContext, SummarizerDBContext dbContext) {
-        this(appContext, ServiceDbHelper.getSummarizerDBInstance(appContext.getContext()));
+        this(appContext, ServiceDbHelper.getSummarizerDBInstance(appContext));
     }
 
     private SQLiteSession(AppContext<Context, AndroidLogger> appContext, ServiceDbHelper serviceDbHelper) {

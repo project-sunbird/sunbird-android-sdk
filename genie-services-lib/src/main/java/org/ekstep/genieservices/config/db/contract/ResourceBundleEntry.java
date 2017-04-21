@@ -1,12 +1,10 @@
 package org.ekstep.genieservices.config.db.contract;
 
-
-
 import org.ekstep.genieservices.commons.db.BaseColumns;
 import org.ekstep.genieservices.commons.db.DbConstants;
 
+public abstract class ResourceBundleEntry implements BaseColumns {
 
-public class ResourceBundleEntry implements BaseColumns {
     public static final String TABLE_NAME = "resourceBundle";
     public static final String COLUMN_NAME_BUNDLE_IDENTIFIER = "bundle_identifier";
     public static final String COLUMN_NAME_BUNDLE_JSON = "bundle_json";

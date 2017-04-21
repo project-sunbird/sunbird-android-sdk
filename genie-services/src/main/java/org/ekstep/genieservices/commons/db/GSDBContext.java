@@ -1,15 +1,18 @@
 package org.ekstep.genieservices.commons.db;
 
+import org.ekstep.genieservices.commons.db.migration.Migration;
+import org.ekstep.genieservices.migration.Migrations;
 
-public class GSDBContext implements DBContext {
+import java.util.List;
+
+/**
+ * @author anil
+ */
+public class GSDBContext implements IDBContext {
+
     // Please don't make any changes in the class, except DATABASE_VERSION value.
-    private static final int DATABASE_VERSION = 12;
+    private static final int DATABASE_VERSION = 13;
     private static final String DATABASE_NAME = "GenieServices.db";
-//    private List<Migration> migrations;
-
-    public GSDBContext() {
-//        setMigrations(Migrations.getGeServiceMigrations());
-    }
 
     @Override
     public int getDBVersion() {
@@ -21,17 +24,9 @@ public class GSDBContext implements DBContext {
         return DATABASE_NAME;
     }
 
-//    @Override
-//    public List<Migration> getMigrations() {
-//        return migrations;
-//    }
+    @Override
+    public List<Migration> getMigrations() {
+        return Migrations.getGeServiceMigrations();
+    }
 
-//    public void setMigrations(List<Migration> migrations) {
-//        this.migrations = migrations;
-//    }
-
-//    @Override
-//    public BeforeMigrations getMigrationIntroduced() {
-//        return new BeforeMigrationWasIntroduced();
-//    }
 }
