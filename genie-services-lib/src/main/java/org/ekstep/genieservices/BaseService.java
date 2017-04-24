@@ -26,8 +26,8 @@ public class BaseService {
         return currentTime > expirationTime;
     }
 
-    protected void saveDataExpirationTime(LinkedTreeMap result, String key) {
-        Double ttl = (Double) result.get("ttl");
+    protected void saveDataExpirationTime(Double ttl, String key) {
+//        Double ttl = (Double) result.get("ttl");
         if (ttl != null) {
             long ttlInMilliSeconds = (long) (ttl * DateUtil.MILLISECONDS_IN_AN_HOUR);
             Long currentTime = DateUtil.getEpochTime();
