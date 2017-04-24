@@ -51,4 +51,6 @@ public abstract class AppContext<C, L extends ILogger> {
 
     public abstract IHttpClient getHttpClient();
 
+    public abstract IDeviceInfo getDeviceInfo();
+
 }

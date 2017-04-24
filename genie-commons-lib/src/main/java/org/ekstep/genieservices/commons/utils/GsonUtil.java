@@ -19,18 +19,11 @@ public class GsonUtil {
         return map;
     }
 
-    public static String toString(Object map) {
-        Gson gson = new Gson();
-
-        return gson.toJson(map);
-    }
-
-    public static <C> C toMap(String json, Class<C> classOfC) {
+    public static <C> C fromJson(String json, Class<C> classOfC) {
        return new Gson().fromJson(json, classOfC);
     }
 
     public static String toJson(Object json) {
         return new Gson().toJson(json);
     }
-
 }

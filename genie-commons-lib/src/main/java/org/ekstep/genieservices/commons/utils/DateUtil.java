@@ -8,6 +8,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class DateUtil {
     public static final int MILLISECONDS_IN_AN_HOUR = 3600000;
@@ -39,6 +40,28 @@ public class DateUtil {
         Date date = new Date(dateTime);
         String timeRequired = sdf.format(date);
         return timeRequired;
+    }
+
+    public static Long dateToEpoch(String dateInString) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT, Locale.US);
+            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+            sdf.parse(dateInString).getTime();
+            return sdf.parse(dateInString).getTime();
+        } catch (Exception ex) {
+            return getEpochTime();
+        }
+    }
+
+    public static Long dateToEpoch(String dateInString, String dateFormat) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(dateFormat, Locale.US);
+            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+            sdf.parse(dateInString).getTime();
+            return sdf.parse(dateInString).getTime();
+        } catch (Exception ex) {
+            return getEpochTime();
+        }
     }
 
 }

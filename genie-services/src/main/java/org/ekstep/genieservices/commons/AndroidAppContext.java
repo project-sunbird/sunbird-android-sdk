@@ -24,6 +24,7 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
     private IConnectionInfo mConnectionInfo;
     private IHttpClient mHttpClient;
     private IKeyValueStore mKeyValueOperation;
+    private IDeviceInfo mDeviceInfo;
 
 
     private AndroidAppContext(Context context, String appPackage, String key, AndroidLogger logger) {
@@ -37,6 +38,7 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
         appContext.setConnectionInfo(new AndroidNetworkConnectivity(appContext));
         appContext.setHttpClient(new AndroidHttpClient(new BasicAuthenticator()));
         appContext.setKeyValueStore(new PreferenceWrapper(appContext, Constants.SHARED_PREFERENCE_NAME));
+        appContext.setDeviceInfo(new DeviceInfo(context));
         return appContext;
     }
 
@@ -45,9 +47,17 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
         return mDBSession;
     }
 
+    private void setDBSession(IDBSession dbSession) {
+        this.mDBSession = dbSession;
+    }
+
     @Override
     public IDBSession getSummarizerDBSession() {
         return mSummarizerDBSession;
+    }
+
+    private void setSummarizerDBSession(IDBSession dbSession) {
+        this.mSummarizerDBSession = dbSession;
     }
 
     @Override
@@ -55,33 +65,34 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
         return mKeyValueOperation;
     }
 
-    @Override
-    public IConnectionInfo getConnectionInfo() {
-        return mConnectionInfo;
-    }
-    @Override
-    public IHttpClient getHttpClient() {
-        return mHttpClient;
-    }
-
-    private void setDBSession(IDBSession dbSession) {
-        this.mDBSession = dbSession;
-    }
-
     private void setKeyValueStore(IKeyValueStore keyValueOperation) {
         this.mKeyValueOperation = keyValueOperation;
     }
 
-    private void setHttpClient(IHttpClient client) {
-        this.mHttpClient = client;
-    }
-
-    private void setSummarizerDBSession(IDBSession dbSession) {
-        this.mSummarizerDBSession = dbSession;
+    @Override
+    public IConnectionInfo getConnectionInfo() {
+        return mConnectionInfo;
     }
 
     private void setConnectionInfo(IConnectionInfo connectionInfo) {
         this.mConnectionInfo = connectionInfo;
     }
 
+    @Override
+    public IHttpClient getHttpClient() {
+        return mHttpClient;
+    }
+
+    private void setHttpClient(IHttpClient client) {
+        this.mHttpClient = client;
+    }
+
+    @Override
+    public IDeviceInfo getDeviceInfo() {
+        return mDeviceInfo;
+    }
+
+    private void setDeviceInfo(IDeviceInfo deviceInfo) {
+        this.mDeviceInfo = deviceInfo;
+    }
 }

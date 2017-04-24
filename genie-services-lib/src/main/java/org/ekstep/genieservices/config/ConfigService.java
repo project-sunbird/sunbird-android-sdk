@@ -64,7 +64,7 @@ public class ConfigService extends BaseService {
         String storedData = ResourcesReader.readFile(TERM_JSON_FILE);
 
         if (!StringUtil.isNullOrEmpty(storedData)) {
-            LinkedTreeMap map = GsonUtil.toMap(storedData, LinkedTreeMap.class);
+            LinkedTreeMap map = GsonUtil.fromJson(storedData, LinkedTreeMap.class);
 
             Map result = ((LinkedTreeMap) map.get("result"));
 
@@ -121,7 +121,7 @@ public class ConfigService extends BaseService {
         String storedData = ResourcesReader.readFile(RESOURCE_BUNDLE_JSON_FILE);
 
         if (!StringUtil.isNullOrEmpty(storedData)) {
-            LinkedTreeMap map = GsonUtil.toMap(storedData, LinkedTreeMap.class);
+            LinkedTreeMap map = GsonUtil.fromJson(storedData, LinkedTreeMap.class);
 
             //save the bundle data
             Map mMapResource = (LinkedTreeMap) map.get("result");
@@ -130,7 +130,7 @@ public class ConfigService extends BaseService {
 
             String resultDataString = null;
             if (mMapResource.containsKey("resourcebundles")) {
-                resultDataString = GsonUtil.toString(mMapResource.get("resourcebundles"));
+                resultDataString = GsonUtil.toJson(mMapResource.get("resourcebundles"));
                 result = GsonUtil.toMap(resultDataString);
             }
 
