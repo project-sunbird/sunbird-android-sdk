@@ -8,6 +8,8 @@ import org.ekstep.genieservices.commons.AndroidLogger;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.migration.IMigrate;
 import org.ekstep.genieservices.commons.db.migration.Migration;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.commons.db.operations.impl.SQLiteSession;
 
 import java.util.List;
 
@@ -22,6 +24,7 @@ public class ServiceDbHelper extends SQLiteOpenHelper {
     private static ServiceDbHelper mSummarizerDBInstance;
     private final List<Migration> migrations;
     private AppContext mAppContext;
+    private IDBSessionHandler handler;
 
     private ServiceDbHelper(AppContext<Context, AndroidLogger> appContext, IDBContext dbContext) {
         // Use the application context, which will ensure that you don't accidentally leak an Activity's context.
@@ -31,24 +34,40 @@ public class ServiceDbHelper extends SQLiteOpenHelper {
         this.migrations = dbContext.getMigrations();
     }
 
-    public static synchronized ServiceDbHelper getGSDBInstance(AppContext<Context, AndroidLogger> appContext) {
+    public static synchronized IDBSession getGSDBSession(AppContext<Context, AndroidLogger> appContext) {
         if (mGSDBInstance == null) {
             mGSDBInstance = new ServiceDbHelper(appContext, new GSDBContext());
+            mGSDBInstance.handler = new IDBSessionHandler() {
+                @Override
+                public Void setDBSession(AppContext<Context, AndroidLogger> appContext, SQLiteDatabase database) {
+                    appContext.setDBSession(new SQLiteSession(appContext, database));
+                    return null;
+                }
+            };
         }
-
-        return mGSDBInstance;
+        return new SQLiteSession(appContext, mGSDBInstance.getWritableDatabase());
     }
 
-    public static synchronized ServiceDbHelper getSummarizerDBInstance(AppContext<Context, AndroidLogger> appContext) {
+    public static synchronized IDBSession getSummarizerDBSession(AppContext<Context, AndroidLogger> appContext) {
         if (mSummarizerDBInstance == null) {
             mSummarizerDBInstance = new ServiceDbHelper(appContext, new SummarizerDBContext());
+            mSummarizerDBInstance.handler = new IDBSessionHandler() {
+                @Override
+                public Void setDBSession(AppContext<Context, AndroidLogger> appContext, SQLiteDatabase database) {
+                    appContext.setSummarizerDBSession(new SQLiteSession(appContext, database));
+                    return null;
+                }
+            };
         }
-
-        return mSummarizerDBInstance;
+        return new SQLiteSession(appContext, mSummarizerDBInstance.getWritableDatabase());
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        /* Setting the dbsession so that the migrations can work. These callback methods get called
+            when getWriteableDatabase is called the first time after install/upgrade and at that point
+            the appContext will not contain the db session */
+        handler.setDBSession(mAppContext, db);
         for (IMigrate migration : migrations) {
             migration.apply(mAppContext);
         }
@@ -56,6 +75,10 @@ public class ServiceDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        /* Setting the dbsession so that the migrations can work. These callback methods get called
+            when getWriteableDatabase is called the first time after install/upgrade and at that point
+            the appContext will not contain the db session */
+        handler.setDBSession(mAppContext, db);
         for (IMigrate migration : migrations) {
             if (migration.shouldBeApplied(oldVersion, newVersion)) {
                 migration.apply(mAppContext);
@@ -63,4 +86,7 @@ public class ServiceDbHelper extends SQLiteOpenHelper {
         }
     }
 
+    interface IDBSessionHandler {
+        Void setDBSession(AppContext<Context, AndroidLogger> appContext, SQLiteDatabase database);
+    }
 }

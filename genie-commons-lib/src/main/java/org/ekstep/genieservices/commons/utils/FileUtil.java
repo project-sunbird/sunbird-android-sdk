@@ -1,18 +1,18 @@
-package util;
+package org.ekstep.genieservices.commons.utils;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.InputStreamReader;
 
 /**
  * Created by shriharsh on 20/4/17.
  */
 
-public class ResourcesReader {
+public class FileUtil {
 
-    public static String readFile(String filename) {
+    public static String readFileFromClasspath(String filename) {
         String result = "";
         try {
-            BufferedReader br = new BufferedReader(new FileReader(filename));
+            BufferedReader br = new BufferedReader(new InputStreamReader(FileUtil.class.getResourceAsStream("/" + filename)));;
             StringBuilder sb = new StringBuilder();
             String line = br.readLine();
             while (line != null) {

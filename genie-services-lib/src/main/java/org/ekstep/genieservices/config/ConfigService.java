@@ -15,7 +15,7 @@ import org.ekstep.genieservices.config.db.model.ResourceBundle;
 import java.util.Map;
 
 import util.Constants;
-import util.ResourcesReader;
+import org.ekstep.genieservices.commons.utils.FileUtil;
 
 /**
  * Created on 14/4/17.
@@ -61,7 +61,7 @@ public class ConfigService extends BaseService {
     private void initializeMasterData() {
 
         //get the string data from the locally stored json
-        String storedData = ResourcesReader.readFile(TERM_JSON_FILE);
+        String storedData = FileUtil.readFileFromClasspath(TERM_JSON_FILE);
 
         if (!StringUtil.isNullOrEmpty(storedData)) {
             LinkedTreeMap map = GsonUtil.toMap(storedData, LinkedTreeMap.class);
@@ -118,7 +118,7 @@ public class ConfigService extends BaseService {
 
     private void initializeResourceBundle() {
         //get the string data from the locally stored json
-        String storedData = ResourcesReader.readFile(RESOURCE_BUNDLE_JSON_FILE);
+        String storedData = FileUtil.readFileFromClasspath(RESOURCE_BUNDLE_JSON_FILE);
 
         if (!StringUtil.isNullOrEmpty(storedData)) {
             LinkedTreeMap map = GsonUtil.toMap(storedData, LinkedTreeMap.class);
