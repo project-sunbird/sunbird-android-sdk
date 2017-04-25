@@ -15,14 +15,14 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
 
-public class ProfileDTO implements IWritable, IReadable, IUpdatable, ICleanable {
+public class UserProfile implements IWritable, IReadable, IUpdatable, ICleanable {
 
     private long id = -1;
     private Profile profile;
     private AppContext appContext;
     private boolean isMigration_02;
 
-    private ProfileDTO(AppContext appContext, Profile profile) {
+    private UserProfile(AppContext appContext, Profile profile) {
         this.profile = profile;
         this.appContext = appContext;
 
@@ -36,8 +36,8 @@ public class ProfileDTO implements IWritable, IReadable, IUpdatable, ICleanable 
 
     }
 
-    public static ProfileDTO buildProfileDTO(AppContext appContext, Profile profile) {
-        ProfileDTO profileDTO = new ProfileDTO(appContext, profile);
+    public static UserProfile buildProfileDTO(AppContext appContext, Profile profile) {
+        UserProfile profileDTO = new UserProfile(appContext, profile);
         return profileDTO;
     }
 

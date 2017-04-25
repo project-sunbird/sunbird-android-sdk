@@ -43,6 +43,11 @@ public class User implements IWritable, IReadable, ICleanable {
         return user;
     }
 
+    public static User buildUser(AppContext appContext) {
+        User user = new User(appContext);
+        return user;
+    }
+
     public Profile getProfile() {
         return profile;
     }
@@ -126,7 +131,7 @@ public class User implements IWritable, IReadable, ICleanable {
 
                 if (profile != null) {
                     profile.setUid(uid);
-                    ProfileDTO profileDTO = ProfileDTO.buildProfileDTO(mAppContext, profile);
+                    UserProfile profileDTO = UserProfile.buildProfileDTO(mAppContext, profile);
                     context.getDBSession().create(profileDTO);
 
                     // TODO: 24/4/17 Should add telemetry event after creating ProfileDTO
