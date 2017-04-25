@@ -8,6 +8,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponse;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
+import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.config.db.model.MasterData;
@@ -19,7 +20,6 @@ import org.ekstep.genieservices.config.network.TermsAPI;
 
 import java.util.Map;
 
-import util.Constants;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 
 /**
@@ -28,6 +28,10 @@ import org.ekstep.genieservices.commons.utils.FileUtil;
  * @author shriharsh
  */
 public class ConfigService extends BaseService {
+
+    private static final String RESOURCE_BUNDLE_API_EXPIRATION_KEY = "RESOURCE_BUNDLE_API_EXPIRATION_KEY";
+    private static final String MASTER_DATA_API_EXPIRATION_KEY = "TERMS_API_EXPIRATION_KEY";
+    private static final String ORDINAL_API_EXPIRATION_KEY = "ORDINAL_API_EXPIRATION_KEY";
 
     private static final String TAG = ConfigService.class.getSimpleName();
     private static final String TERM_JSON_FILE = "terms.json";
@@ -52,21 +56,17 @@ public class ConfigService extends BaseService {
      */
     public void getMasterData(MasterDataType type, IResponseHandler<String> responseHandler) {
 
-        GenieResponse<String> response = new GenieResponse<>();
-
-        if (getLong(Constants.MASTER_DATA_API_EXPIRATION_KEY) == 0) {
+        if (getLongFromKeyValueStore(MASTER_DATA_API_EXPIRATION_KEY) == 0) {
             initializeMasterData();
-        } else {
-            if (isExpired(Constants.MASTER_DATA_API_EXPIRATION_KEY)) {
-                refreshMasterData();
-            }
+        } else if (hasExpired(MASTER_DATA_API_EXPIRATION_KEY)) {
+            refreshMasterData();
         }
 
         MasterData term = MasterData.findByType(mAppContext, type.getValue());
 
         String result = term.getTermJson();
 
-        prepareResponse(responseHandler, response, result);
+        handleResponse(responseHandler, result, mAppContext);
     }
 
     private void initializeMasterData() {
@@ -75,28 +75,24 @@ public class ConfigService extends BaseService {
         String storedData = FileUtil.readFileFromClasspath(TERM_JSON_FILE);
 
         if (!StringUtil.isNullOrEmpty(storedData)) {
-            saveMasterData(storedData,false);
+            saveMasterData(storedData);
         }
 
         refreshMasterData();
     }
 
-    private void saveMasterData(String response,boolean isRefreshed){
+    private void saveMasterData(String response) {
         LinkedTreeMap map = GsonUtil.toMap(response, LinkedTreeMap.class);
 
         Map result = ((LinkedTreeMap) map.get("result"));
 
-        if(isRefreshed){
-            // Save data expiration time
-            Double ttl = (Double) result.get("ttl");
-            saveDataExpirationTime(ttl, Constants.MASTER_DATA_API_EXPIRATION_KEY);
-        }
-
         //save the master data
         if (result != null) {
+            Double ttl = (Double) result.get("ttl");
+            saveDataExpirationTime(ttl, MASTER_DATA_API_EXPIRATION_KEY);
             result.remove("ttl");
-            for (Object keys : result.keySet()) {
-                MasterData eachMasterData = MasterData.create(mAppContext, (String) keys, GsonUtil.toJson(result.get(keys)));
+            for (Object key : result.keySet()) {
+                MasterData eachMasterData = MasterData.create(mAppContext, (String) key, GsonUtil.toJson(result.get(key)));
                 eachMasterData.save();
             }
         }
@@ -106,11 +102,11 @@ public class ConfigService extends BaseService {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                TermsAPI termsAPI=new TermsAPI(mAppContext);
+                TermsAPI termsAPI = new TermsAPI(mAppContext);
                 GenieResponse genieResponse = termsAPI.get();
                 if (genieResponse.getStatus()) {
                     String body = genieResponse.getResult().toString();
-                    saveMasterData(body,true);
+                    saveMasterData(body);
                 }
             }
         }).start();
@@ -123,14 +119,11 @@ public class ConfigService extends BaseService {
      * @param responseHandler
      */
     public void getResourceBundle(String languageIdentifier, IResponseHandler<String> responseHandler) {
-        GenieResponse<String> response = new GenieResponse<>();
 
-        if (getLong(Constants.RESOURCE_BUNDLE_API_EXPIRATION_KEY) == 0) {
+        if (getLongFromKeyValueStore(RESOURCE_BUNDLE_API_EXPIRATION_KEY) == 0) {
             initializeResourceBundle();
-        } else {
-            if (isExpired(Constants.RESOURCE_BUNDLE_API_EXPIRATION_KEY)) {
-                refreshResourceBundle();
-            }
+        } else if (hasExpired(RESOURCE_BUNDLE_API_EXPIRATION_KEY)) {
+            refreshResourceBundle();
         }
 
         ResourceBundle resourceBundle = ResourceBundle.findById(mAppContext, languageIdentifier);
@@ -138,7 +131,7 @@ public class ConfigService extends BaseService {
         //get the resource bundle in string format
         String result = resourceBundle.getResourceString();
 
-        prepareResponse(responseHandler, response, result);
+        handleResponse(responseHandler, result, mAppContext);
 
     }
 
@@ -147,34 +140,28 @@ public class ConfigService extends BaseService {
         String storedData = FileUtil.readFileFromClasspath(RESOURCE_BUNDLE_JSON_FILE);
 
         if (!StringUtil.isNullOrEmpty(storedData)) {
-            saveResourceBundle(storedData,false);
+            saveResourceBundle(storedData);
         }
 
         refreshResourceBundle();
     }
 
-    private void saveResourceBundle(String response,boolean isRefreshed){
+    private void saveResourceBundle(String response) {
         LinkedTreeMap map = GsonUtil.toMap(response, LinkedTreeMap.class);
 
         //save the bundle data
-        Map mMapResource = (LinkedTreeMap) map.get("result");
+        Map resultMap = (LinkedTreeMap) map.get("result");
         Map result = null;
 
-        if(isRefreshed){
-            // Save data expiration time
-            Double ttl = (Double) map.get("ttl");
-            saveDataExpirationTime(ttl, Constants.RESOURCE_BUNDLE_API_EXPIRATION_KEY);
-        }
-
-        String resultDataString = null;
-        if (mMapResource.containsKey("resourcebundles")) {
-            resultDataString = GsonUtil.toString(mMapResource.get("resourcebundles"));
-            result = GsonUtil.toMap(resultDataString, Map.class);
+        if (resultMap.containsKey("resourcebundles")) {
+            result = (Map) resultMap.get("resourcebundles");
         }
 
         if (result != null) {
-            for (Object keys : result.keySet()) {
-                ResourceBundle eachResourceBundle = ResourceBundle.create(mAppContext, (String) keys, GsonUtil.toJson(result.get(keys)));
+            Double ttl = (Double) resultMap.get("ttl");
+            saveDataExpirationTime(ttl, RESOURCE_BUNDLE_API_EXPIRATION_KEY);
+            for (Object key : result.keySet()) {
+                ResourceBundle eachResourceBundle = ResourceBundle.create(mAppContext, (String) key, GsonUtil.toJson(result.get(key)));
                 eachResourceBundle.save();
             }
         }
@@ -185,53 +172,47 @@ public class ConfigService extends BaseService {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                ResourceBundleAPI resourceBundleAPI=new ResourceBundleAPI(mAppContext);
+                ResourceBundleAPI resourceBundleAPI = new ResourceBundleAPI(mAppContext);
                 GenieResponse genieResponse = resourceBundleAPI.get();
                 if (genieResponse.getStatus()) {
                     String body = genieResponse.getResult().toString();
-                    saveResourceBundle(body,true);
+                    saveResourceBundle(body);
                 }
             }
         }).start();
     }
 
     public void getOrdinals(IResponseHandler<String> responseHandler) {
-        GenieResponse<String> response = new GenieResponse<>();
 
-        if (getLong(Constants.ORDINAL_API_EXPIRATION_KEY) == 0) {
+        if (getLongFromKeyValueStore(ORDINAL_API_EXPIRATION_KEY) == 0) {
             initializeOrdinalsDate();
-        } else {
-            if (isExpired(Constants.ORDINAL_API_EXPIRATION_KEY)) {
-                refreshOrdinals();
-            }
+        } else if (hasExpired(ORDINAL_API_EXPIRATION_KEY)) {
+            refreshOrdinals();
         }
 
         Ordinals ordinals = Ordinals.findById(mAppContext, DB_KEY_ORDINALS);
 
-        prepareResponse(responseHandler, response, ordinals.getJSON());
+        handleResponse(responseHandler, ordinals.getJSON(), mAppContext);
     }
 
     private void initializeOrdinalsDate() {
         //get the string data from the locally stored json
-        String storedData = ResourcesReader.readFile(ORDINALS_JSON_FILE);
+        String storedData = FileUtil.readFileFromClasspath(ORDINALS_JSON_FILE);
 
         if (!StringUtil.isNullOrEmpty(storedData)) {
-            saveOrdinals(storedData,false);
+            saveOrdinals(storedData);
         }
 
         refreshOrdinals();
     }
 
-    private void saveOrdinals(String response,boolean isRefreshed){
+    private void saveOrdinals(String response) {
         LinkedTreeMap map = new Gson().fromJson(response, LinkedTreeMap.class);
         LinkedTreeMap resultLinkedTreeMap = (LinkedTreeMap) map.get("result");
 
-        if(isRefreshed){
-            // Save data expiration time
-            Double ttl = (Double) map.get("ttl");
-            saveDataExpirationTime(ttl, Constants.ORDINAL_API_EXPIRATION_KEY);
-        }
         if (resultLinkedTreeMap.containsKey("ordinals")) {
+            Double ttl = (Double) map.get("ttl");
+            saveDataExpirationTime(ttl, ORDINAL_API_EXPIRATION_KEY);
             Ordinals ordinals = Ordinals.create(mAppContext, DB_KEY_ORDINALS, GsonUtil.toJson(resultLinkedTreeMap.get("ordinals")));
             ordinals.save();
         }
@@ -246,10 +227,26 @@ public class ConfigService extends BaseService {
 
                 if (genieResponse.getStatus()) {
                     String body = genieResponse.getResult().toString();
-                    saveOrdinals(body,true);
+                    saveOrdinals(body);
                 }
             }
         }).start();
+    }
+
+    protected void saveDataExpirationTime(Double ttl, String key) {
+        if (ttl != null) {
+            long ttlInMilliSeconds = (long) (ttl * DateUtil.MILLISECONDS_IN_AN_HOUR);
+            Long currentTime = DateUtil.getEpochTime();
+            long expiration_time = ttlInMilliSeconds + currentTime;
+
+            putToKeyValueStore(key, expiration_time);
+        }
+    }
+
+    protected boolean hasExpired(String key) {
+        Long currentTime = DateUtil.getEpochTime();
+        long expirationTime = getLongFromKeyValueStore(key);
+        return currentTime > expirationTime;
     }
 
 }

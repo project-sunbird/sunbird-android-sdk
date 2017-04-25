@@ -1,7 +1,5 @@
 package org.ekstep.genieservices;
 
-import com.google.gson.internal.LinkedTreeMap;
-
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponse;
 import org.ekstep.genieservices.commons.IResponseHandler;
@@ -20,53 +18,35 @@ public class BaseService {
         mAppContext = appContext;
     }
 
-    protected boolean isExpired(String key) {
-        Long currentTime = DateUtil.getEpochTime();
-        long expirationTime = getLong(key);
-        return currentTime > expirationTime;
-    }
-
-    protected void saveDataExpirationTime(Double ttl, String key) {
-//        Double ttl = (Double) result.get("ttl");
-        if (ttl != null) {
-            long ttlInMilliSeconds = (long) (ttl * DateUtil.MILLISECONDS_IN_AN_HOUR);
-            Long currentTime = DateUtil.getEpochTime();
-            long expiration_time = ttlInMilliSeconds + currentTime;
-
-            putLong(key, expiration_time);
-        }
-    }
-
-    protected void putBoolean(String key, boolean value) {
+    protected void putToKeyValueStore(String key, boolean value) {
         mAppContext.getKeyValueStore().putBoolean(key, value);
     }
 
-    protected boolean getBoolean(String key) {
+    protected boolean getBooleanFromKeyValueStore(String key) {
         return mAppContext.getKeyValueStore().getBoolean(key, false);
     }
 
-    protected void putLong(String key, long value) {
+    protected void putToKeyValueStore(String key, long value) {
         mAppContext.getKeyValueStore().putLong(key, value);
     }
 
-    protected long getLong(String key) {
+    protected long getLongFromKeyValueStore(String key) {
         return mAppContext.getKeyValueStore().getLong(key, 0);
     }
 
     /**
      * Prepares the response to be given back to caller
-     *
-     * @param responseHandler
-     * @param response
+     *  @param responseHandler
      * @param result
-     */
-    protected void prepareResponse(IResponseHandler<String> responseHandler, GenieResponse<String> response, String result) {
+     * @param mAppContext*/
+    protected void handleResponse(IResponseHandler<String> responseHandler, String result, AppContext mAppContext) {
+        GenieResponse<String> response = null;
         if (result != null) {
-            response.setStatus(true);
+            response = GenieResponse.getSuccessResponse("");
             response.setResult(result);
             responseHandler.onSuccess(response);
         } else {
-            response.setStatus(false);
+            response = GenieResponse.getErrorResponse(mAppContext, ServiceConstants.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR);
             responseHandler.onError(response);
         }
     }
