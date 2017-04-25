@@ -20,6 +20,8 @@ public interface IDBSession {
 
     Void read(IReadable readDb);
 
+    Void read(IReadable readDb, String customQuery);
+
     Void create(IWritable writeToDb);
 
     Void update(IUpdatable updateDb);

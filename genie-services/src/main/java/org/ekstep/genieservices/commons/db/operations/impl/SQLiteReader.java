@@ -13,15 +13,17 @@ import java.util.Locale;
 public class SQLiteReader implements IDBOperation<SQLiteDatabase> {
 
     private IReadable model;
+    private String customQuery;
 
-    public SQLiteReader(IReadable model) {
+    public SQLiteReader(IReadable mode, String customQuery) {
         this.model = model;
+        this.customQuery = customQuery;
     }
 
     @Override
     public Void perform(AppContext context, SQLiteDatabase datasource) {
-        String query = String.format(Locale.US, "Select * from %s %s %s %s", model.getTableName(),
-                model.filterForRead(), model.orderBy(), model.limitBy());
+        String query = customQuery == null ? String.format(Locale.US, "Select * from %s %s %s %s", model.getTableName(),
+                model.filterForRead(), model.orderBy(), model.limitBy()) : customQuery;
         Cursor cursor = datasource.rawQuery(query, model.selectionArgsForFilter());
         model.read(new SQLiteResultSet(cursor));
         return null;
