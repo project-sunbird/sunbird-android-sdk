@@ -26,6 +26,7 @@ public class SQLiteReader implements IDBOperation<SQLiteDatabase> {
                 model.filterForRead(), model.orderBy(), model.limitBy()) : customQuery;
         Cursor cursor = datasource.rawQuery(query, model.selectionArgsForFilter());
         model.read(new SQLiteResultSet(cursor));
+        cursor.close();
         return null;
     }
 
