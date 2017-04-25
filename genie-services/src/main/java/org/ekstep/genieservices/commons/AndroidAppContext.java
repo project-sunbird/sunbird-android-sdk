@@ -3,6 +3,7 @@ package org.ekstep.genieservices.commons;
 import android.content.Context;
 
 import org.ekstep.genieservices.Constants;
+import org.ekstep.genieservices.commons.db.ServiceDbHelper;
 import org.ekstep.genieservices.commons.db.SummarizerDBContext;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.cache.PreferenceWrapper;
@@ -33,8 +34,8 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
 
     public static AppContext buildAppContext(Context context, String appPackage, String key, AndroidLogger logger) {
         AndroidAppContext appContext = new AndroidAppContext(context, appPackage, key, logger);
-        appContext.setDBSession(new SQLiteSession(appContext));
-        appContext.setSummarizerDBSession(new SQLiteSession(appContext, new SummarizerDBContext()));
+        appContext.setDBSession(ServiceDbHelper.getGSDBSession(appContext));
+        appContext.setSummarizerDBSession(ServiceDbHelper.getSummarizerDBSession(appContext));
         appContext.setConnectionInfo(new AndroidNetworkConnectivity(appContext));
         appContext.setHttpClient(new AndroidHttpClient(new BasicAuthenticator()));
         appContext.setKeyValueStore(new PreferenceWrapper(appContext, Constants.SHARED_PREFERENCE_NAME));
@@ -47,26 +48,14 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
         return mDBSession;
     }
 
-    private void setDBSession(IDBSession dbSession) {
-        this.mDBSession = dbSession;
-    }
-
     @Override
     public IDBSession getSummarizerDBSession() {
         return mSummarizerDBSession;
     }
 
-    private void setSummarizerDBSession(IDBSession dbSession) {
-        this.mSummarizerDBSession = dbSession;
-    }
-
     @Override
     public IKeyValueStore getKeyValueStore() {
         return mKeyValueOperation;
-    }
-
-    private void setKeyValueStore(IKeyValueStore keyValueOperation) {
-        this.mKeyValueOperation = keyValueOperation;
     }
 
     @Override
@@ -83,6 +72,22 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
         return mHttpClient;
     }
 
+    @Override
+    public Void setDBSession(IDBSession dbSession) {
+        this.mDBSession = dbSession;
+        return null;
+    }
+
+    @Override
+    public Void setSummarizerDBSession(IDBSession dbSession) {
+        this.mSummarizerDBSession = dbSession;
+        return null;
+    }
+
+    private void setKeyValueStore(IKeyValueStore keyValueOperation) {
+        this.mKeyValueOperation = keyValueOperation;
+    }
+
     private void setHttpClient(IHttpClient client) {
         this.mHttpClient = client;
     }
@@ -95,4 +100,5 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
     private void setDeviceInfo(IDeviceInfo deviceInfo) {
         this.mDeviceInfo = deviceInfo;
     }
+
 }

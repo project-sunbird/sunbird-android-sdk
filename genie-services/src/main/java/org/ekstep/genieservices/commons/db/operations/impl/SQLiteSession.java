@@ -23,17 +23,9 @@ public class SQLiteSession implements IDBSession {
     private SQLiteDatabase database;
     private boolean isOperationSuccessful;
 
-    public SQLiteSession(AppContext<Context, AndroidLogger> appContext) {
-        this(appContext, ServiceDbHelper.getGSDBInstance(appContext));
-    }
-
-    public SQLiteSession(AppContext<Context, AndroidLogger> appContext, SummarizerDBContext dbContext) {
-        this(appContext, ServiceDbHelper.getSummarizerDBInstance(appContext));
-    }
-
-    private SQLiteSession(AppContext<Context, AndroidLogger> appContext, ServiceDbHelper serviceDbHelper) {
+    public SQLiteSession(AppContext<Context, AndroidLogger> appContext, SQLiteDatabase database) {
         this.appContext = appContext;
-        this.database = serviceDbHelper.getWritableDatabase();
+        this.database = database;
     }
 
     private Void execute(IDBOperation<SQLiteDatabase> operate) {

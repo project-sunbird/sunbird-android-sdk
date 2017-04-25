@@ -27,6 +27,6 @@ public class GenieService {
     }
 
     public ConfigService getConfigService() {
-        return null;
+        return new ConfigService(applicationContext);
     }
 }

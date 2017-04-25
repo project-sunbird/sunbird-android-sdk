@@ -45,6 +45,10 @@ public abstract class AppContext<C, L extends ILogger> {
 
     public abstract IDBSession getSummarizerDBSession();
 
+    public abstract Void setDBSession(IDBSession session);
+
+    public abstract Void setSummarizerDBSession(IDBSession session);
+
     public abstract IKeyValueStore getKeyValueStore();
 
     public abstract IConnectionInfo getConnectionInfo();

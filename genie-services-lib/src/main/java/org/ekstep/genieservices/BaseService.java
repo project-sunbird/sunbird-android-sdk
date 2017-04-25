@@ -3,66 +3,50 @@ package org.ekstep.genieservices;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponse;
 import org.ekstep.genieservices.commons.IResponseHandler;
-import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 
 /**
- * Created by swayangjit on 20/4/17.
+ * Created on 20/4/17.
+ *
+ * @author swayangjit
  */
-
 public class BaseService {
 
     protected AppContext mAppContext;
-    private IKeyValueStore mkeyValueStore;
 
     public BaseService(AppContext appContext) {
         mAppContext = appContext;
     }
 
-    private IKeyValueStore getKeyValueStore() {
-        if (mkeyValueStore == null) {
-            mkeyValueStore = mAppContext.getKeyValueStore();
-        }
-        return mkeyValueStore;
+    protected void putToKeyValueStore(String key, boolean value) {
+        mAppContext.getKeyValueStore().putBoolean(key, value);
     }
 
-    protected boolean isExpired(String key) {
-        Long currentTime = DateUtil.getEpochTime();
-        long expirationTime = getLong(key);
-        return currentTime > expirationTime;
+    protected boolean getBooleanFromKeyValueStore(String key) {
+        return mAppContext.getKeyValueStore().getBoolean(key, false);
     }
 
-
-    protected void putBoolean(String key, boolean value) {
-        getKeyValueStore().putBoolean(key, value);
+    protected void putToKeyValueStore(String key, long value) {
+        mAppContext.getKeyValueStore().putLong(key, value);
     }
 
-    protected boolean getBoolean(String key) {
-        return getKeyValueStore().getBoolean(key, false);
-    }
-
-    protected void putLong(String key, long value) {
-        getKeyValueStore().putLong(key, value);
-    }
-
-    protected long getLong(String key) {
-        return getKeyValueStore().getLong(key, 0);
+    protected long getLongFromKeyValueStore(String key) {
+        return mAppContext.getKeyValueStore().getLong(key, 0);
     }
 
     /**
      * Prepares the response to be given back to caller
-     *
-     * @param responseHandler
-     * @param response
+     *  @param responseHandler
      * @param result
-     */
-    protected void prepareResponse(IResponseHandler<String> responseHandler, GenieResponse<String> response, String result) {
+     * @param mAppContext*/
+    protected void handleResponse(IResponseHandler<String> responseHandler, String result, AppContext mAppContext) {
+        GenieResponse<String> response = null;
         if (result != null) {
-            response.setStatus(true);
+            response = GenieResponse.getSuccessResponse("");
             response.setResult(result);
             responseHandler.onSuccess(response);
         } else {
-            response.setStatus(false);
+            response = GenieResponse.getErrorResponse(mAppContext, ServiceConstants.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR);
             responseHandler.onError(response);
         }
     }
