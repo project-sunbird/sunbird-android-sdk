@@ -13,6 +13,7 @@ import org.ekstep.genieservices.commons.db.DbConstants;
 import org.ekstep.genieservices.commons.exception.DbException;
 import org.ekstep.genieservices.commons.utils.BuildConfigUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.profile.db.model.AnonymousUser;
 import org.ekstep.genieservices.profile.db.model.User;
 
@@ -116,17 +117,33 @@ public class UserProfileService extends BaseService {
         //get the current user id
         String currentUserID = getCurrentUserID();
 
-        //match the current and requested user id if same
-        if (uid.equals(currentUserID)) {
-            setAnonymous(currentUserID);
+        try {
+            //match the current and requested user id if same then first set current user as anonymous
+            if (uid.equals(currentUserID)) {
+                setAnonymous(currentUserID);
+            }
+
+            //now delete the requested user id
+            User user = User.findByUserId(mAppContext, uid);
+
+            //if something goes wrong while deleting, then rollback the delete
+            if (user != null) {
+                user.delete(mAppContext, mAppContext.getDeviceInfo(), mAppContext.getAppPackage(), BuildConfigUtil.VERSION_NAME);
+            }
+
+            responseHandler.onSuccess(GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE));
+        } catch (Exception e) {
+            Logger.e(mAppContext, "Error when deleting user profile", e.getMessage());
+            rollBack(currentUserID);
+            responseHandler.onError(GenieResponse.getErrorResponse(mAppContext, e.toString(), ServiceConstants.ERROR_DELETING_A_USER, TAG));
         }
 
-        //if same, then first set current user as anonymous
+    }
 
-        //now delete the requested user id
-
-        //if something goes wrong while deleting, then rollback the delete
-
+    private void rollBack(String previousUserId) {
+        SetCurrentUserRequest request = new SetCurrentUserRequest(mAppContext.getAppPackage(), BuildConfigUtil.VERSION_NAME, previousUserId);
+        User previousCurrentUser = User.findByUserId(mAppContext, request.uid());
+        setCurrentUser(request, previousCurrentUser);
     }
 
     private String getCurrentUserID() {
@@ -172,6 +189,19 @@ public class UserProfileService extends BaseService {
         GenieResponse response = GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
 
         return response.toString();
+    }
+
+    private String setCurrentUser(SetCurrentUserRequest request, User user) {
+        if (!user.exists()) {
+//            return logAndSendResponse(request.gameID(), request.gameVersion(), new Response("failed", "INVALID_USER",
+//                    Collections.singletonList("There is no user with specified id exists"), ""), "setCurrentUser");
+            // TODO: 25/4/17 GEError Event has to be added here
+            return GenieResponse.getErrorResponse(mAppContext, ServiceConstants.INVALID_USER, ServiceConstants.NO_USER_WITH_SPECIFIED_ID, TAG).toString();
+        }
+
+        setUserSession(request.gameID(), request.gameVersion(), user.getUid());
+
+        return GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE).toString();
     }
 
     private String createAnonymousUser(String gameID, String gameVersion) {

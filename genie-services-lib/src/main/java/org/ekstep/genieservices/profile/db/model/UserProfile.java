@@ -36,7 +36,7 @@ public class UserProfile implements IWritable, IReadable, IUpdatable, ICleanable
 
     }
 
-    public static UserProfile buildProfileDTO(AppContext appContext, Profile profile) {
+    public static UserProfile buildUserProfile(AppContext appContext, Profile profile) {
         UserProfile profileDTO = new UserProfile(appContext, profile);
         return profileDTO;
     }

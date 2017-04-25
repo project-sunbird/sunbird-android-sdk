@@ -9,6 +9,7 @@ import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
+import org.ekstep.genieservices.content.db.model.ContentAccess;
 import org.ekstep.genieservices.profile.db.contract.UserEntry;
 
 import java.util.Locale;
@@ -45,6 +46,12 @@ public class User implements IWritable, IReadable, ICleanable {
 
     public static User buildUser(AppContext appContext) {
         User user = new User(appContext);
+        return user;
+    }
+
+    public static User findByUserId(AppContext appContext, String uid) {
+        User user = new User(appContext, uid);
+        appContext.getDBSession().read(user);
         return user;
     }
 
@@ -131,7 +138,7 @@ public class User implements IWritable, IReadable, ICleanable {
 
                 if (profile != null) {
                     profile.setUid(uid);
-                    UserProfile profileDTO = UserProfile.buildProfileDTO(mAppContext, profile);
+                    UserProfile profileDTO = UserProfile.buildUserProfile(mAppContext, profile);
                     context.getDBSession().create(profileDTO);
 
                     // TODO: 24/4/17 Should add telemetry event after creating ProfileDTO
@@ -178,13 +185,10 @@ public class User implements IWritable, IReadable, ICleanable {
 //        dbOperator.execute(reader);
 //    }
 
-//    @NonNull
-//    protected User getExistingUser(DbOperator dbOperator, String uid) {
-//        User otherUser = new User(uid);
-//        Reader reader = new Reader(otherUser);
-//        dbOperator.execute(reader);
-//        return otherUser;
-//    }
+    private User getExistingUser(String uid) {
+        User otherUser = User.findByUserId(mAppContext, uid);
+        return otherUser;
+    }
 
 //    public Void save(DbOperator dbOperator) {
 //        Writer writer = new Writer(this);
@@ -192,27 +196,38 @@ public class User implements IWritable, IReadable, ICleanable {
 //        return null;
 //    }
 
-//    public void delete(DbOperator dbOperator, Context context, DeviceInfo deviceInfo, String gameID, String versionName) {
+    public void delete(final AppContext appContext, IDeviceInfo deviceInfo, String gameID, String versionName) {
 //        List<IOperate> tasks = new ArrayList<>();
-//        Profile profile = new Profile("", "", "");
-//        profile.setUid(uid);
-//        ProfileDTO profileDTO = new ProfileDTO(profile);
-//        tasks.add(new Cleaner(profileDTO));
-//
-//        User existingUser = getExistingUser(dbOperator, uid);
+        Profile profile = new Profile("", "", "");
+        profile.setUid(uid);
+
+        final UserProfile userProfile = UserProfile.buildUserProfile(appContext, profile);
+//        tasks.add(new Cleaner(userProfile));
+
+        final User existingUser = getExistingUser(uid);
 //        tasks.add(new Cleaner(existingUser));
-//
-//        // Delete the rows for uid
-//        ContentAccess contentAccess = new ContentAccess(uid, null);
+
+        // Delete the rows for uid
+        final ContentAccess contentAccess = ContentAccess.buildContentAccess(appContext, uid, null);
 //        tasks.add(new Cleaner(contentAccess));
-//
+
+        // TODO: 25/4/17 Need to add a telemetry event
 //        Set<String> hashedGenieTags = TelemetryTagCache.activeTags(dbOperator, context);
 //        GEDeleteProfile geDeleteProfile = generateGeDeleteProfileEvent(profile, deviceInfo, gameID, versionName);
 //        Event deleteProfileEvent = new Event(geDeleteProfile.getEID(), hashedGenieTags).withEvent(geDeleteProfile.toString());
 //        tasks.add(new Writer(deleteProfileEvent));
-//
-//        dbOperator.executeInOneTransaction(tasks);
-//    }
+
+        appContext.getDBSession().executeInTransaction(new IDBTransaction() {
+            @Override
+            public Void perform(AppContext context) {
+                appContext.getDBSession().clean(userProfile);
+                appContext.getDBSession().clean(existingUser);
+                appContext.getDBSession().clean(contentAccess);
+
+                return null;
+            }
+        });
+    }
 
 //    private GEDeleteProfile generateGeDeleteProfileEvent(Profile profile, DeviceInfo deviceInfo, String gameID, String versionName) {
 //        GEDeleteProfile geDeleteProfile = new GEDeleteProfile(profile, gameID, versionName);
