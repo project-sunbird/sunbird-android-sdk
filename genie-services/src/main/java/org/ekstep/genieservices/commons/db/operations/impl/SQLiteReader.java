@@ -15,7 +15,7 @@ public class SQLiteReader implements IDBOperation<SQLiteDatabase> {
     private IReadable model;
     private String customQuery;
 
-    public SQLiteReader(IReadable mode, String customQuery) {
+    public SQLiteReader(IReadable model, String customQuery) {
         this.model = model;
         this.customQuery = customQuery;
     }
