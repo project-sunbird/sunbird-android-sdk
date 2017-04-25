@@ -1,6 +1,5 @@
 package org.ekstep.genieservices.config;
 
-import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 
 import org.ekstep.genieservices.BaseService;
@@ -82,7 +81,7 @@ public class ConfigService extends BaseService {
     }
 
     private void saveMasterData(String response) {
-        LinkedTreeMap map = GsonUtil.toMap(response, LinkedTreeMap.class);
+        LinkedTreeMap map = GsonUtil.fromJson(response, LinkedTreeMap.class);
 
         Map result = ((LinkedTreeMap) map.get("result"));
 
@@ -147,7 +146,7 @@ public class ConfigService extends BaseService {
     }
 
     private void saveResourceBundle(String response) {
-        LinkedTreeMap map = GsonUtil.toMap(response, LinkedTreeMap.class);
+        LinkedTreeMap map = GsonUtil.fromJson(response, LinkedTreeMap.class);
 
         //save the bundle data
         Map resultMap = (LinkedTreeMap) map.get("result");
@@ -207,7 +206,7 @@ public class ConfigService extends BaseService {
     }
 
     private void saveOrdinals(String response) {
-        LinkedTreeMap map = new Gson().fromJson(response, LinkedTreeMap.class);
+        LinkedTreeMap map = GsonUtil.fromJson(response, LinkedTreeMap.class);
         LinkedTreeMap resultLinkedTreeMap = (LinkedTreeMap) map.get("result");
 
         if (resultLinkedTreeMap.containsKey("ordinals")) {

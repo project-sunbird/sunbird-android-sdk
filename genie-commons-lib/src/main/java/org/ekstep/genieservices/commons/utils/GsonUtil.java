@@ -17,12 +17,8 @@ public class GsonUtil {
         return sGson;
     }
 
-    public static <C> C toMap(String json, Class<C> classOfC) {
+    public static <C> C fromJson(String json, Class<C> classOfC) {
         return getGson().fromJson(json, classOfC);
-    }
-
-    public static String toString(Object map) {
-        return getGson().toJson(map);
     }
 
     public static String toJson(Object json) {

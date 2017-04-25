@@ -63,13 +63,14 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
         return mConnectionInfo;
     }
 
-    private void setConnectionInfo(IConnectionInfo connectionInfo) {
-        this.mConnectionInfo = connectionInfo;
-    }
-
     @Override
     public IHttpClient getHttpClient() {
         return mHttpClient;
+    }
+
+    @Override
+    public IDeviceInfo getDeviceInfo() {
+        return mDeviceInfo;
     }
 
     @Override
@@ -92,9 +93,8 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
         this.mHttpClient = client;
     }
 
-    @Override
-    public IDeviceInfo getDeviceInfo() {
-        return mDeviceInfo;
+    private void setConnectionInfo(IConnectionInfo connectionInfo) {
+        this.mConnectionInfo = connectionInfo;
     }
 
     private void setDeviceInfo(IDeviceInfo deviceInfo) {
