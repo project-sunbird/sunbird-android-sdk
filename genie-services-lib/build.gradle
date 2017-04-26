@@ -2,6 +2,7 @@ apply plugin: 'java'
 
 dependencies {
     compile project(':genie-commons-lib')
+    compile 'org.greenrobot:eventbus:3.0.0'
 }
 
 sourceCompatibility = "1.7"
