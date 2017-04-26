@@ -131,7 +131,7 @@ public class UserProfileService extends BaseService {
 
             //if something goes wrong while deleting, then rollback the delete
             if (user != null) {
-                user.delete(mAppContext, mAppContext.getDeviceInfo(), mAppContext.getAppPackage(), BuildConfigUtil.VERSION_NAME);
+                user.delete(mAppContext, mAppContext.getDeviceInfo(), BuildConfigUtil.CLIENT_ID, BuildConfigUtil.VERSION_NAME);
             }
 
             responseHandler.onSuccess(GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE));
@@ -144,7 +144,7 @@ public class UserProfileService extends BaseService {
     }
 
     private void rollBack(String previousUserId) {
-        SetCurrentUserRequest request = new SetCurrentUserRequest(mAppContext.getAppPackage(), BuildConfigUtil.VERSION_NAME, previousUserId);
+        SetCurrentUserRequest request = new SetCurrentUserRequest(BuildConfigUtil.CLIENT_ID, BuildConfigUtil.VERSION_NAME, previousUserId);
         User previousCurrentUser = User.findByUserId(mAppContext, request.uid());
         setCurrentUser(request, previousCurrentUser);
     }
@@ -164,12 +164,12 @@ public class UserProfileService extends BaseService {
 
     private void setAnonymous(String currentUserID) {
         if (currentUserID != null) {
-            SetAnonymousUserRequest request = new SetAnonymousUserRequest(mAppContext.getAppPackage(), BuildConfigUtil.VERSION_NAME);
+            SetAnonymousUserRequest request = new SetAnonymousUserRequest(BuildConfigUtil.CLIENT_ID, BuildConfigUtil.VERSION_NAME);
             setAnonymousUser(request);
         }
     }
 
-    public String setAnonymousUser(SetAnonymousUserRequest request) {
+    private String setAnonymousUser(SetAnonymousUserRequest request) {
         String query = "select u.uid from users u left join profiles p on p.uid=u.uid where p.uid is null and u.uid is not null";
 
         AnonymousUser anonymousUser = AnonymousUser.findAnonymousUser(mAppContext, query);
@@ -221,7 +221,7 @@ public class UserProfileService extends BaseService {
         return user.getUid();
     }
 
-    protected void setUserSession(String gameID, String gameVersion, String uid) {
+    private void setUserSession(String gameID, String gameVersion, String uid) {
         // TODO: 25/4/17 Have to get location here
         String location = "";
         UserSession userSession = new UserSession(mAppContext, uid);
@@ -313,8 +313,132 @@ public class UserProfileService extends BaseService {
 
 
         return GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-
     }
 
+    /**
+     * set anonymous user
+     *
+     * @param responseHandler - the class which will receive the success or failure response
+     *                        with the data.
+     */
+    public void setAnonymousUser(IResponseHandler responseHandler) {
+        SetAnonymousUserRequest setAnonymousUserRequest = new SetAnonymousUserRequest();
+
+        String query = "select u.uid from users u left join profiles p on p.uid=u.uid where p.uid is null and u.uid is not null";
+        AnonymousUser anonymousUser = AnonymousUser.findAnonymousUser(mAppContext, query);
+
+        String uid = anonymousUser.getUid();
+        if (uid == null || uid.isEmpty()) {
+            uid = createAnonymousUser(setAnonymousUserRequest.gameID(), setAnonymousUserRequest.gameVersion());
+            if (uid.isEmpty()) {
+//                logAndSendResponse(request.gameID(), request.gameVersion(),
+//                        new Response("failed", "DB_ERROR",
+//                                Collections.singletonList("unable to create anonymous user"), ""), "setAnonymousUser");
+
+                // TODO: 25/4/17 GEError Event has to be added here
+                responseHandler.onError(GenieResponse.getErrorResponse(mAppContext, DbConstants.ERROR, ServiceConstants.UNABLE_TO_CREATE_ANONYMOUS_USER, TAG));
+            }
+
+        }
+
+        setUserSession(setAnonymousUserRequest.gameID(), setAnonymousUserRequest.gameVersion(), uid);
+        GenieResponse successResponse = GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+
+        responseHandler.onSuccess(successResponse);
+    }
+
+    /**
+     * Get anonymous user data
+     *
+     * @param responseHandler - the class which will receive the success or failure response
+     *                        with the data.
+     */
+    public void getAnonymousUser(IResponseHandler responseHandler) {
+        String query = "select u.uid from users u left join profiles p on p.uid=u.uid where p.uid is null and u.uid is not null";
+        AnonymousUser anonymousUser = AnonymousUser.findAnonymousUser(mAppContext, query);
+
+        String uid = anonymousUser.getUid();
+        Profile profile = new Profile("", "", "");
+        profile.setUid(uid);
+
+        GenieResponse successResponse = new GenieResponse<>();
+        successResponse.setStatus(true);
+        successResponse.setResult(GsonUtil.fromJson(profile.toString(), Profile.class));
+
+        responseHandler.onSuccess(successResponse);
+    }
+
+    /**
+     * set current user
+     *
+     * @param uid             - User id
+     * @param responseHandler - the class which will receive the success or failure response
+     *                        with the data.
+     */
+    public void setCurrentUser(String uid, IResponseHandler responseHandler) {
+        SetCurrentUserRequest setCurrentUserRequest = new SetCurrentUserRequest(uid);
+
+        User user = User.findByUserId(mAppContext, uid);
+
+        if (!user.exists()) {
+//            return logAndSendResponse(request.gameID(), request.gameVersion(), new Response("failed", "INVALID_USER",
+//                    Collections.singletonList("There is no user with specified id exists"), ""), "setCurrentUser");
+            // TODO: 25/4/17 GEError Event has to be added here
+            responseHandler.onError(GenieResponse.getErrorResponse(mAppContext, ServiceConstants.INVALID_USER, ServiceConstants.NO_USER_WITH_SPECIFIED_ID, TAG));
+        }
+
+        setUserSession(setCurrentUserRequest.gameID(), setCurrentUserRequest.gameVersion(), user.getUid());
+
+        GenieResponse successResponse = GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        responseHandler.onSuccess(successResponse);
+    }
+
+    /**
+     * Get current use data
+     *
+     * @param responseHandler - the class which will receive the success or failure response
+     *                        with the data.
+     */
+    public void getCurrentUser(IResponseHandler responseHandler) {
+        UserSession currentSession = new UserSession(mAppContext, "");
+
+        if (!currentSession.isValid()) {
+//            Response response = new Response("failed", "NOT_EXISTS", Collections.singletonList("There is no current user"), "");
+//            return logAndSendResponse(null, null, response, "getCurrentUser");
+
+            // TODO: 25/4/17 GEError Event has to be added here
+            responseHandler.onError(GenieResponse.getErrorResponse(mAppContext, ServiceConstants.NOT_EXISTS, ServiceConstants.NO_CURRENT_USER, TAG));
+            Profile profile = new Profile("", "", "");
+            profile.setUid(currentSession.getUid());
+            UserProfile userProfile = UserProfile.buildUserProfile(mAppContext, profile);
+
+            GenieResponse successResponse = new GenieResponse<>();
+            successResponse.setStatus(true);
+            successResponse.setResult(GsonUtil.fromJson(userProfile.getProfile().toString(), Profile.class));
+
+            responseHandler.onSuccess(successResponse);
+        }
+    }
+
+    /**
+     * Unset current user data
+     *
+     * @param responseHandler - the class which will receive the success or failure response
+     *                        with the data.
+     */
+    public void unsetCurrentUser(IResponseHandler responseHandler) {
+        UnsetCurrentUserRequest unsetCurrentUserRequest = new UnsetCurrentUserRequest();
+
+        UserSession userSession = new UserSession(mAppContext, "");
+
+        UserSession currentSession = userSession.getCurrentSession();
+
+        if (currentSession.isValid()) {
+            currentSession.endCurrentSession(unsetCurrentUserRequest.gameID(), unsetCurrentUserRequest.gameVersion(), currentSession, mAppContext.getDeviceInfo());
+        }
+
+        GenieResponse successResponse = GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        responseHandler.onSuccess(successResponse);
+    }
 
 }

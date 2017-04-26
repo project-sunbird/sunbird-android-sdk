@@ -82,6 +82,8 @@ public class UserSession {
     public void endCurrentSession(String gameID, String gameVersion, UserSession currentSession,
                                   IDeviceInfo deviceInfo) {
         sharedPref.putString("session", "");
+
+        // TODO: 26/4/17 Add GESessionEnd event
 //        GESessionEnd geSessionEnd = new GESessionEnd(gameID, gameVersion, currentSession, deviceInfo.getDeviceID());
 //        Event event = new Event(geSessionEnd.getEID(), TelemetryTagCache.activeTags(dbOperator, context())).withEvent(geSessionEnd.toString());
 //        event.save(dbOperator);

@@ -20,4 +20,6 @@ public interface ServiceConstants {
     String INVALID_PROFILE = "INVALID_PROFILE";
     String UNABLE_TO_FIND_PROFILE = "unable to find profile";
 
+    String NOT_EXISTS = "NOT_EXISTS";
+    String NO_CURRENT_USER = "There is no current user";
 }
