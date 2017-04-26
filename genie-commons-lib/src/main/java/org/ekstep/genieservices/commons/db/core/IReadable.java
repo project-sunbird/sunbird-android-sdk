@@ -2,7 +2,7 @@ package org.ekstep.genieservices.commons.db.core;
 
 public interface IReadable {
 
-    IReadable read(IResultSet cursor);
+    IReadable read(IResultSet resultSet);
 
     String getTableName();
 

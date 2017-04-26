@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import org.ekstep.genieservices.commons.AndroidLogger;
 import org.ekstep.genieservices.commons.AppContext;
 
+import java.util.Set;
+
 /**
  * Created by swayangjit on 19/4/17.
  */
@@ -31,6 +33,12 @@ public class PreferenceWrapper implements IKeyValueStore {
     }
 
     @Override
+    public void putStringSet(String key,  Set<String> value) {
+        mPrefsEditor.putStringSet(key, value);
+        mPrefsEditor.commit();
+    }
+
+    @Override
     public void putLong(String key, long value) {
         mPrefsEditor.putLong(key, value);
         mPrefsEditor.commit();
@@ -45,6 +53,11 @@ public class PreferenceWrapper implements IKeyValueStore {
     @Override
     public String getString(String key, String defValue) {
          return mSharedPrefs.getString(key, defValue);
+    }
+
+    @Override
+    public Set<String> getStringSet(String key,  Set<String> defValue) {
+        return mSharedPrefs.getStringSet(key, defValue);
     }
 
     @Override
