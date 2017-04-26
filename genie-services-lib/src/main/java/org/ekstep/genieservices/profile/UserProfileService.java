@@ -16,6 +16,7 @@ import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.profile.db.model.AnonymousUser;
 import org.ekstep.genieservices.profile.db.model.User;
+import org.ekstep.genieservices.profile.db.model.UserProfile;
 
 /**
  * Any service related to profile will be called using ProfileService
@@ -57,17 +58,19 @@ public class UserProfileService extends BaseService {
         try {
             profile = getProfileFromJson(request.profileJson());
         } catch (JsonSyntaxException ex) {
+            // TODO: 26/4/17 Need to create error event
 //            return logAndSendResponse(request.gameID(), request.gameVersion(), new Response("failed", "VALIDATION_ERROR",
 //                    Collections.singletonList("invalid json"), ""), "createProfile");
 
-            return GenieResponse.getErrorResponse(mAppContext, DbConstants.ERROR, ServiceConstants.INVALID_JSON, TAG);
+            return GenieResponse.getErrorResponse(mAppContext, ServiceConstants.VALIDATION_ERROR, ServiceConstants.INVALID_JSON, TAG);
         }
 
         if (profile != null && !profile.isValid()) {
+            // TODO: 26/4/17 Need to create error event
 //            return logAndSendResponse(request.gameID(), request.gameVersion(), new Response("failed", "VALIDATION_ERROR",
 //                    profile.getErrors(), ""), "createProfile");
 
-            return GenieResponse.getErrorResponse(mAppContext, DbConstants.ERROR, ServiceConstants.INVALID_JSON, TAG);
+            return GenieResponse.getErrorResponse(mAppContext, ServiceConstants.VALIDATION_ERROR, ServiceConstants.INVALID_JSON, TAG);
 
         }
 
@@ -223,6 +226,94 @@ public class UserProfileService extends BaseService {
         String location = "";
         UserSession userSession = new UserSession(mAppContext, uid);
         userSession.save(gameID, gameVersion, location, mAppContext.getDeviceInfo());
+    }
+
+    /**
+     * Update user profile
+     *
+     * @param profile          - User profile data
+     * @param responseHandler- the class which will receive the success or failure response
+     *                         with the data.
+     */
+    public void updateUserProfile(Profile profile, IResponseHandler responseHandler) {
+        //create profile request
+        mProfileRequest = new ProfileRequest(profile.toString());
+
+        GenieResponse genieResponse = update(mProfileRequest);
+
+        if (genieResponse != null) {
+            if (genieResponse.getStatus()) {
+                responseHandler.onSuccess(genieResponse);
+            } else {
+                responseHandler.onError(genieResponse);
+            }
+        }
+    }
+
+    private GenieResponse update(ProfileRequest request) {
+        Profile profile = null;
+
+        try {
+            profile = getProfileFromJson(request.profileJson());
+        } catch (JsonSyntaxException ex) {
+            Logger.e(mAppContext, TAG, "Invalid json" + ex.getMessage());
+
+            // TODO: 26/4/17 Need to create error event
+
+//            return logAndSendResponse(request.gameID(), request.gameVersion(), new Response("failed", "VALIDATION_ERROR",
+//                    Collections.singletonList("Invalid json"), ""), "updateUserProfile");
+
+            return GenieResponse.getErrorResponse(mAppContext, ServiceConstants.VALIDATION_ERROR, ServiceConstants.INVALID_JSON, TAG);
+
+        }
+
+        if (profile != null) {
+            String uid = profile.getUid();
+
+            if (uid == null || uid.isEmpty()) {
+//                return logAndSendResponse(request.gameID(), request.gameVersion(), new Response("failed", "INVALID_PROFILE",
+//                        Collections.singletonList("unable to find the profile"), ""), "updateUserProfile");
+
+                return GenieResponse.getErrorResponse(mAppContext, ServiceConstants.INVALID_PROFILE, ServiceConstants.UNABLE_TO_FIND_PROFILE, TAG);
+            }
+
+            if (!profile.isValid()) {
+//                return logAndSendResponse(request.gameID(), request.gameVersion(), new Response("failed", "VALIDATION_ERROR",
+//                        profile.getErrors(), ""), "updateUserProfile");
+                return GenieResponse.getErrorResponse(mAppContext, ServiceConstants.VALIDATION_ERROR, profile.getErrors().toString(), TAG);
+
+            }
+
+            Profile checkProfile = new Profile("", "", "");
+            checkProfile.setUid(profile.getUid());
+//            ProfileDTO profileDTO = new ProfileDTO(checkProfile);
+//            profileDTO.initialize(dbOperator);
+            UserProfile checkUserProfile = UserProfile.buildUserProfile(mAppContext, checkProfile);
+
+
+            if (!checkUserProfile.getProfile().isValid()) {
+//                return logAndSendResponse(request.gameID(), request.gameVersion(), new Response("failed", "INVALID_PROFILE",
+//                        Collections.singletonList("unable to find the profile"), ""), "updateUserProfile");
+                return GenieResponse.getErrorResponse(mAppContext, ServiceConstants.INVALID_PROFILE, ServiceConstants.UNABLE_TO_FIND_PROFILE, TAG);
+            }
+
+            try {
+                UserProfile userProfile = UserProfile.buildUserProfile(mAppContext, profile);
+                userProfile.update(request.appID(), request.appVersion(), mAppContext.getDeviceInfo(), mAppContext);
+//                profileDTO.update(request.gameID(), request.gameVersion(), dbOperator, deviceInfo, context);
+            } catch (DbException e) {
+                Logger.e(mAppContext, TAG, e.getMessage());
+
+//                return logAndSendResponse(request.gameID(), request.gameVersion(), new Response("failed", DbConstants.ERROR,
+//                        Collections.singletonList(e.getMessage()), ""), "updateUserProfile");
+
+                return GenieResponse.getErrorResponse(mAppContext, DbConstants.ERROR, e.getMessage(), TAG);
+            }
+        }
+
+
+        return GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+
     }
 
 

@@ -16,4 +16,8 @@ public interface ServiceConstants {
     int ACCESS_STATUS_VIEWED = 1;
     String INVALID_USER = "INVALID_USER";
     String NO_USER_WITH_SPECIFIED_ID = "There is no user with specified id exists";
+    String VALIDATION_ERROR = "VALIDATION_ERROR";
+    String INVALID_PROFILE = "INVALID_PROFILE";
+    String UNABLE_TO_FIND_PROFILE = "unable to find profile";
+
 }

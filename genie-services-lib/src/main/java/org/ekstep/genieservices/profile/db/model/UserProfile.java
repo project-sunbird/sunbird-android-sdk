@@ -2,6 +2,7 @@ package org.ekstep.genieservices.profile.db.model;
 
 
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.IDeviceInfo;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
@@ -9,6 +10,7 @@ import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
+import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.profile.db.contract.ProfileEntry;
 
 import java.util.Date;
@@ -189,17 +191,25 @@ public class UserProfile implements IWritable, IReadable, IUpdatable, ICleanable
         return String.format(Locale.US, "uid = '%s'", profile.getUid());
     }
 
-//    public void update(String gameID, String gameVersion, DbOperator dbOperator, DeviceInfo deviceInfo, Context context) {
+    public void update(String gameID, String gameVersion, IDeviceInfo deviceInfo, AppContext appContext) {
 //        List<IOperate> tasks = new ArrayList<>();
 //        tasks.add(new Updater(this));
-//
+
 //        GEUpdateProfile geUpdateProfile = new GEUpdateProfile(gameID, gameVersion, profile, deviceInfo.getDeviceID());
 //        Event profileEvent = new Event(geUpdateProfile.getEID(), TelemetryTagCache.activeTags(dbOperator, context)).withEvent(geUpdateProfile.toString());
 //
 //        tasks.add(new Writer(profileEvent));
-//
+        // TODO: 26/4/17 GEUpdateEvent has to be added to the telemetry
+        appContext.getDBSession().executeInTransaction(new IDBTransaction() {
+            @Override
+            public Void perform(AppContext context) {
+                context.getDBSession().update(UserProfile.this);
+                return null;
+            }
+        });
+
 //        dbOperator.executeInOneTransaction(tasks);
-//    }
+    }
 
 //    public Void create(DeviceDetails deviceDetails, DbOperator dbOperator) {
 //        Event event = generateGeCreateProfileEvent(deviceDetails.getGameID(), deviceDetails.getGameVersion(), deviceDetails.getLocation(), deviceDetails.getDeviceInfo(), deviceDetails.getActiveGenieTags());
