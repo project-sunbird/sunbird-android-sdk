@@ -6,7 +6,7 @@ package org.ekstep.genieservices.commons;
  *
  */
 
-public interface IDeviceInfo {
+public interface ILocationInfo {
 
-    String getDeviceID();
+    String getLocation();
 }

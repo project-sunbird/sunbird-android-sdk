@@ -4,30 +4,17 @@ package org.ekstep.genieservices.commons.bean;
 import com.google.gson.Gson;
 
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.IDeviceInfo;
-import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import java.util.UUID;
-
 public class UserSession {
-    private transient AppContext context;
     private String uid;
     private String sid;
     private String createdTime;
-    private transient IKeyValueStore sharedPref;
 
-    public UserSession(AppContext context, String uid) {
-        this(context, uid, context.getKeyValueStore());
-    }
-
-    UserSession(AppContext context, String uid, IKeyValueStore sharedPref) {
-        this.context = context;
+    public UserSession(String uid) {
         this.uid = uid;
-        this.sharedPref = sharedPref;
-        this.sid = UUID.randomUUID().toString();
         DateTime dt = new DateTime();
         DateTimeFormatter fmt = getDateTimeFormatter();
         createdTime = fmt.print(dt);
@@ -49,24 +36,20 @@ public class UserSession {
         return getDateTimeFormatter().parseDateTime(createdTime);
     }
 
-    public Void save(String gameID, String gameVersion, String location, IDeviceInfo deviceInfo) {
-        UserSession currentSession = getCurrentSession();
+    public Void save(AppContext appContext) {
+        UserSession currentSession = getCurrentSession(this.toString());
         if (currentSession.getUid().equalsIgnoreCase(getUid())) {
             return null;
         }
         if (currentSession.isValid()) {
-            endCurrentSession(gameID, gameVersion, currentSession, deviceInfo);
+            endCurrentSession(appContext);
         }
-        saveSession();
+
+        // TODO: 27/4/17 Need to add GESessionStart event
 //        GESessionStart geSessionStart = new GESessionStart(this, location, deviceInfo.getDeviceID(), gameID, gameVersion);
 //        Event event = new Event(geSessionStart.getEID(), TelemetryTagCache.activeTags(dbOperator, context())).withEvent(geSessionStart.toString());
 //        event.save(dbOperator);
         return null;
-    }
-
-    private void saveSession() {
-        String sessionJson = this.toString();
-        sharedPref.putString("session", sessionJson);
     }
 
     @Override
@@ -79,9 +62,7 @@ public class UserSession {
         return !uid.isEmpty();
     }
 
-    public void endCurrentSession(String gameID, String gameVersion, UserSession currentSession,
-                                  IDeviceInfo deviceInfo) {
-        sharedPref.putString("session", "");
+    public void endCurrentSession(AppContext appContext) {
 
         // TODO: 26/4/17 Add GESessionEnd event
 //        GESessionEnd geSessionEnd = new GESessionEnd(gameID, gameVersion, currentSession, deviceInfo.getDeviceID());
@@ -89,17 +70,13 @@ public class UserSession {
 //        event.save(dbOperator);
     }
 
-    public UserSession getCurrentSession() {
-        String sessionJson = sharedPref.getString("session", "");
+    public UserSession getCurrentSession(String sessionJson) {
         if (sessionJson == null || sessionJson.isEmpty()) {
-            return new UserSession(context, "", sharedPref);
+            return new UserSession(uid);
         }
         Gson gson = new Gson();
         UserSession userSession = gson.fromJson(sessionJson, UserSession.class);
         return userSession;
     }
 
-    public AppContext context() {
-        return context;
-    }
 }

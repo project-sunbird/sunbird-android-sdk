@@ -15,7 +15,7 @@ public class BuildConfigUtil {
     public static final String TAXONOMY_BASE_URL = "TAXONOMY_BASE_URL";
     public static final String API_PASS = "API_PASS";
     public static final String API_USER = "API_USER";
-    public static final String CLIENT_ID = "CLIENT_ID";
+    public static final String GDATA_ID = "GDATA_ID";
 
     private static final String TAG = BuildConfigUtil.class.getSimpleName();
 

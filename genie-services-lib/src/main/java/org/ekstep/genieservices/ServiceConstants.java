@@ -22,4 +22,7 @@ public interface ServiceConstants {
 
     String NOT_EXISTS = "NOT_EXISTS";
     String NO_CURRENT_USER = "There is no current user";
+
+    /* Key Constants for all the key value store */
+    String KEY_USER_SESSION = "session";
 }

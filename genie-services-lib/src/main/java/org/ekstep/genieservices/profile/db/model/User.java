@@ -13,7 +13,6 @@ import org.ekstep.genieservices.content.db.model.ContentAccess;
 import org.ekstep.genieservices.profile.db.contract.UserEntry;
 
 import java.util.Locale;
-import java.util.UUID;
 
 public class User implements IWritable, IReadable, ICleanable {
     private String uid;
@@ -21,16 +20,8 @@ public class User implements IWritable, IReadable, ICleanable {
     private AppContext mAppContext;
     private Profile profile = null;
 
-    private User(AppContext appContext) {
-        this(appContext, UUID.randomUUID().toString(), null);
-    }
-
     private User(AppContext appContext, String uid) {
         this(appContext, uid, null);
-    }
-
-    private User(AppContext appContext, Profile profile) {
-        this(appContext, UUID.randomUUID().toString(), profile);
     }
 
     private User(AppContext appContext, String uid, Profile profile) {
@@ -39,13 +30,13 @@ public class User implements IWritable, IReadable, ICleanable {
         this.profile = profile;
     }
 
-    public static User buildUser(AppContext appContext, Profile profile) {
-        User user = new User(appContext, profile);
+    public static User buildUser(AppContext appContext, String uid, Profile profile) {
+        User user = new User(appContext, uid, profile);
         return user;
     }
 
-    public static User buildUser(AppContext appContext) {
-        User user = new User(appContext);
+    public static User buildUser(AppContext appContext, String uid) {
+        User user = new User(appContext, uid);
         return user;
     }
 
@@ -126,8 +117,7 @@ public class User implements IWritable, IReadable, ICleanable {
         return "limit 1";
     }
 
-    public void create(String gameID, String gameVersion, String location,
-                       IDeviceInfo deviceInfo) {
+    public void create() {
 
         mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
             @Override
@@ -196,7 +186,7 @@ public class User implements IWritable, IReadable, ICleanable {
 //        return null;
 //    }
 
-    public void delete(final AppContext appContext, IDeviceInfo deviceInfo, String gameID, String versionName) {
+    public void delete(final AppContext appContext) {
 //        List<IOperate> tasks = new ArrayList<>();
         Profile profile = new Profile("", "", "");
         profile.setUid(uid);
@@ -223,7 +213,7 @@ public class User implements IWritable, IReadable, ICleanable {
                 appContext.getDBSession().clean(userProfile);
                 appContext.getDBSession().clean(existingUser);
                 appContext.getDBSession().clean(contentAccess);
-
+                clean();
                 return null;
             }
         });
