@@ -15,4 +15,13 @@ public interface ServiceConstants {
          String MISSING_PUBLIC_KEY = "MISSING_PUBLIC_KEY";
          String INVALID_RSA_PUBLIC_KEY = "INVALID_RSA_PUBLIC_KEY";
     }
+
+    interface Event {
+        String ERROR_INVALID_EVENT = "Invalid event";
+        String ERROR_INVALID_JSON = "Invalid Json";
+    }
+
+    interface Tags {
+        String KEY_GENIE_TAGS = "GENIE_TAGS";
+    }
 }

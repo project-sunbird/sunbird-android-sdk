@@ -1,15 +1,14 @@
 package org.ekstep.genieservices.commons;
 
-import android.app.Service;
 import android.content.Context;
 
+import org.ekstep.genieservices.BuildParams;
 import org.ekstep.genieservices.Constants;
+import org.ekstep.genieservices.commons.param.IParams;
 import org.ekstep.genieservices.commons.db.ServiceDbHelper;
-import org.ekstep.genieservices.commons.db.SummarizerDBContext;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.cache.PreferenceWrapper;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.commons.db.operations.impl.SQLiteSession;
 import org.ekstep.genieservices.commons.network.AndroidHttpClient;
 import org.ekstep.genieservices.commons.network.AndroidNetworkConnectivity;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
@@ -26,7 +25,7 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
     private IConnectionInfo mConnectionInfo;
     private IHttpClient mHttpClient;
     private IKeyValueStore mKeyValueOperation;
-
+    private IParams mParams;
 
     private AndroidAppContext(Context context, String appPackage, String key, AndroidLogger logger) {
         super(context, appPackage, key, logger);
@@ -39,6 +38,7 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
         appContext.setConnectionInfo(new AndroidNetworkConnectivity(appContext));
         appContext.setHttpClient(new AndroidHttpClient(new BasicAuthenticator()));
         appContext.setKeyValueStore(new PreferenceWrapper(appContext, Constants.SHARED_PREFERENCE_NAME));
+        appContext.setBuildConfig(new BuildParams(appPackage));
         return appContext;
     }
 
@@ -57,13 +57,31 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
         return mKeyValueOperation;
     }
 
+    private void setKeyValueStore(IKeyValueStore keyValueOperation) {
+        this.mKeyValueOperation = keyValueOperation;
+    }
+
     @Override
     public IConnectionInfo getConnectionInfo() {
         return mConnectionInfo;
     }
+
+    private void setConnectionInfo(IConnectionInfo connectionInfo) {
+        this.mConnectionInfo = connectionInfo;
+    }
+
     @Override
     public IHttpClient getHttpClient() {
         return mHttpClient;
+    }
+
+    private void setHttpClient(IHttpClient client) {
+        this.mHttpClient = client;
+    }
+
+    @Override
+    public IParams getBuildConfig() {
+        return mParams;
     }
 
     @Override
@@ -78,17 +96,11 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
         return null;
     }
 
-    private void setKeyValueStore(IKeyValueStore keyValueOperation) {
-        this.mKeyValueOperation = keyValueOperation;
+    @Override
+    public Void setBuildConfig(IParams params) {
+        this.mParams = params;
+        return null;
     }
 
-    private void setHttpClient(IHttpClient client) {
-        this.mHttpClient = client;
-    }
-
-
-    private void setConnectionInfo(IConnectionInfo connectionInfo) {
-        this.mConnectionInfo = connectionInfo;
-    }
 
 }

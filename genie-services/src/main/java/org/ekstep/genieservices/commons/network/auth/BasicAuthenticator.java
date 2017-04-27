@@ -6,7 +6,7 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
 import org.ekstep.genieservices.commons.exception.AuthenticationFailedException;
-import org.ekstep.genieservices.commons.utils.BuildConfigUtil;
+import org.ekstep.genieservices.utils.BuildConfigUtil;
 
 import java.io.IOException;
 import java.net.Proxy;
