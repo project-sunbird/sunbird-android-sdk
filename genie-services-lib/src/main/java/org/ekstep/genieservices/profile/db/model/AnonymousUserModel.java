@@ -6,18 +6,18 @@ import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.profile.db.contract.UserEntry;
 
-public class AnonymousUser implements IReadable {
+public class AnonymousUserModel implements IReadable {
     private String uid;
     private AppContext appContext;
     private String customQuery;
 
-    private AnonymousUser(AppContext appContext, String customQuery) {
+    private AnonymousUserModel(AppContext appContext, String customQuery) {
         this.appContext = appContext;
         this.customQuery = customQuery;
     }
 
-    public static AnonymousUser findAnonymousUser(AppContext appContext, String query) {
-        AnonymousUser anonymousUser = new AnonymousUser(appContext, query);
+    public static AnonymousUserModel findAnonymousUser(AppContext appContext, String query) {
+        AnonymousUserModel anonymousUser = new AnonymousUserModel(appContext, query);
         appContext.getDBSession().read(anonymousUser, query);
         return anonymousUser;
     }

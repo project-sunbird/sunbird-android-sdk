@@ -19,7 +19,7 @@ import java.util.Locale;
  *
  * @author anil
  */
-public class Ordinals implements IReadable, IWritable, IUpdatable, ICleanable {
+public class OrdinalsModel implements IReadable, IWritable, IUpdatable, ICleanable {
 
     private static final String TAG = "model-Ordinals";
 
@@ -29,23 +29,23 @@ public class Ordinals implements IReadable, IWritable, IUpdatable, ICleanable {
     private String mIdentifier;
     private String mJson;
 
-    private Ordinals(AppContext appContext, String identifier) {
+    private OrdinalsModel(AppContext appContext, String identifier) {
         mAppContext = appContext;
         this.mIdentifier = identifier;
     }
 
-    private Ordinals(AppContext appContext, String identifier, String json) {
+    private OrdinalsModel(AppContext appContext, String identifier, String json) {
         mAppContext = appContext;
         this.mJson = json;
         this.mIdentifier = identifier;
     }
 
-    public static Ordinals create(AppContext appContext, String identifier, String json) {
-        return new Ordinals(appContext, identifier, json);
+    public static OrdinalsModel create(AppContext appContext, String identifier, String json) {
+        return new OrdinalsModel(appContext, identifier, json);
     }
 
-    public static Ordinals findById(AppContext appContext, String identifier) {
-        Ordinals ordinals = new Ordinals(appContext, identifier);
+    public static OrdinalsModel findById(AppContext appContext, String identifier) {
+        OrdinalsModel ordinals = new OrdinalsModel(appContext, identifier);
         appContext.getDBSession().read(ordinals);
         return ordinals;
     }
@@ -58,8 +58,8 @@ public class Ordinals implements IReadable, IWritable, IUpdatable, ICleanable {
         mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
             @Override
             public Void perform(AppContext context) {
-                context.getDBSession().clean(Ordinals.this);
-                context.getDBSession().create(Ordinals.this);
+                context.getDBSession().clean(OrdinalsModel.this);
+                context.getDBSession().create(OrdinalsModel.this);
                 return null;
             }
         });

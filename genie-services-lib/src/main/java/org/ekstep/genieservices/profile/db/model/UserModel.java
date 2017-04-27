@@ -1,7 +1,6 @@
 package org.ekstep.genieservices.profile.db.model;
 
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.IDeviceInfo;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
@@ -9,39 +8,39 @@ import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
-import org.ekstep.genieservices.content.db.model.ContentAccess;
+import org.ekstep.genieservices.content.db.model.ContentAccessModel;
 import org.ekstep.genieservices.profile.db.contract.UserEntry;
 
 import java.util.Locale;
 
-public class User implements IWritable, IReadable, ICleanable {
+public class UserModel implements IWritable, IReadable, ICleanable {
     private String uid;
     private Long id = -1L;
     private AppContext mAppContext;
     private Profile profile = null;
 
-    private User(AppContext appContext, String uid) {
+    private UserModel(AppContext appContext, String uid) {
         this(appContext, uid, null);
     }
 
-    private User(AppContext appContext, String uid, Profile profile) {
+    private UserModel(AppContext appContext, String uid, Profile profile) {
         this.mAppContext = appContext;
         this.uid = uid;
         this.profile = profile;
     }
 
-    public static User buildUser(AppContext appContext, String uid, Profile profile) {
-        User user = new User(appContext, uid, profile);
+    public static UserModel buildUser(AppContext appContext, String uid, Profile profile) {
+        UserModel user = new UserModel(appContext, uid, profile);
         return user;
     }
 
-    public static User buildUser(AppContext appContext, String uid) {
-        User user = new User(appContext, uid);
+    public static UserModel buildUser(AppContext appContext, String uid) {
+        UserModel user = new UserModel(appContext, uid);
         return user;
     }
 
-    public static User findByUserId(AppContext appContext, String uid) {
-        User user = new User(appContext, uid);
+    public static UserModel findByUserId(AppContext appContext, String uid) {
+        UserModel user = new UserModel(appContext, uid);
         appContext.getDBSession().read(user);
         return user;
     }
@@ -122,13 +121,13 @@ public class User implements IWritable, IReadable, ICleanable {
         mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
             @Override
             public Void perform(AppContext context) {
-                context.getDBSession().create(User.this);
+                context.getDBSession().create(UserModel.this);
 
                 // TODO: 24/4/17 Should add telemetry event after creating a new user
 
                 if (profile != null) {
                     profile.setUid(uid);
-                    UserProfile profileDTO = UserProfile.buildUserProfile(mAppContext, profile);
+                    UserProfileModel profileDTO = UserProfileModel.buildUserProfile(mAppContext, profile);
                     context.getDBSession().create(profileDTO);
 
                     // TODO: 24/4/17 Should add telemetry event after creating ProfileDTO
@@ -175,8 +174,8 @@ public class User implements IWritable, IReadable, ICleanable {
 //        dbOperator.execute(reader);
 //    }
 
-    private User getExistingUser(String uid) {
-        User otherUser = User.findByUserId(mAppContext, uid);
+    private UserModel getExistingUser(String uid) {
+        UserModel otherUser = UserModel.findByUserId(mAppContext, uid);
         return otherUser;
     }
 
@@ -191,14 +190,14 @@ public class User implements IWritable, IReadable, ICleanable {
         Profile profile = new Profile("", "", "");
         profile.setUid(uid);
 
-        final UserProfile userProfile = UserProfile.buildUserProfile(appContext, profile);
+        final UserProfileModel userProfile = UserProfileModel.buildUserProfile(appContext, profile);
 //        tasks.add(new Cleaner(userProfile));
 
-        final User existingUser = getExistingUser(uid);
+        final UserModel existingUser = getExistingUser(uid);
 //        tasks.add(new Cleaner(existingUser));
 
         // Delete the rows for uid
-        final ContentAccess contentAccess = ContentAccess.buildContentAccess(appContext, uid, null);
+        final ContentAccessModel contentAccess = ContentAccessModel.buildContentAccess(appContext, uid, null);
 //        tasks.add(new Cleaner(contentAccess));
 
         // TODO: 25/4/17 Need to add a telemetry event

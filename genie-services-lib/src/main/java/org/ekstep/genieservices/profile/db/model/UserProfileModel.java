@@ -2,7 +2,6 @@ package org.ekstep.genieservices.profile.db.model;
 
 
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.IDeviceInfo;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
@@ -17,14 +16,14 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
 
-public class UserProfile implements IWritable, IReadable, IUpdatable, ICleanable {
+public class UserProfileModel implements IWritable, IReadable, IUpdatable, ICleanable {
 
     private long id = -1;
     private Profile profile;
     private AppContext appContext;
     private boolean isMigration_02;
 
-    private UserProfile(AppContext appContext, Profile profile) {
+    private UserProfileModel(AppContext appContext, Profile profile) {
         this.profile = profile;
         this.appContext = appContext;
 
@@ -38,8 +37,8 @@ public class UserProfile implements IWritable, IReadable, IUpdatable, ICleanable
 
     }
 
-    public static UserProfile buildUserProfile(AppContext appContext, Profile profile) {
-        UserProfile profileDTO = new UserProfile(appContext, profile);
+    public static UserProfileModel buildUserProfile(AppContext appContext, Profile profile) {
+        UserProfileModel profileDTO = new UserProfileModel(appContext, profile);
         return profileDTO;
     }
 
@@ -203,7 +202,7 @@ public class UserProfile implements IWritable, IReadable, IUpdatable, ICleanable
         appContext.getDBSession().executeInTransaction(new IDBTransaction() {
             @Override
             public Void perform(AppContext context) {
-                context.getDBSession().update(UserProfile.this);
+                context.getDBSession().update(UserProfileModel.this);
                 return null;
             }
         });

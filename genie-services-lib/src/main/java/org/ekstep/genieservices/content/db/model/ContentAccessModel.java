@@ -13,7 +13,6 @@ import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.content.db.contract.ContentAccessEntry;
-import org.ekstep.genieservices.profile.db.model.User;
 
 import java.util.Locale;
 import java.util.Map;
@@ -24,7 +23,7 @@ import java.util.Map;
  *
  * @author anil
  */
-public class ContentAccess implements IWritable, ICleanable, IReadable, IUpdatable {
+public class ContentAccessModel implements IWritable, ICleanable, IReadable, IUpdatable {
     private Long id = -1L;
 
     private String uid;
@@ -35,15 +34,15 @@ public class ContentAccess implements IWritable, ICleanable, IReadable, IUpdatab
     private Map<String, Object> learnerState;
     private AppContext appContext;
 
-    private ContentAccess() {
+    private ContentAccessModel() {
     }
 
     // TODO: Remove this and setter for uid and identifier
-    private ContentAccess(AppContext appContext, String uid, String identifier) {
+    private ContentAccessModel(AppContext appContext, String uid, String identifier) {
         this(appContext, uid, identifier, ServiceConstants.ACCESS_STATUS_VIEWED, null);
     }
 
-    private ContentAccess(AppContext appContext, String uid, String identifier, int status, String contentType) {
+    private ContentAccessModel(AppContext appContext, String uid, String identifier, int status, String contentType) {
         this.uid = uid;
         this.identifier = identifier;
         this.status = status;
@@ -51,17 +50,17 @@ public class ContentAccess implements IWritable, ICleanable, IReadable, IUpdatab
         this.appContext = appContext;
     }
 
-    private ContentAccess(String identifier) {
+    private ContentAccessModel(String identifier) {
         this.identifier = identifier;
     }
 
-    public static ContentAccess buildContentAccess(AppContext appContext, String uid, String identifier) {
-        ContentAccess contentAccess = new ContentAccess(appContext, uid, identifier);
+    public static ContentAccessModel buildContentAccess(AppContext appContext, String uid, String identifier) {
+        ContentAccessModel contentAccess = new ContentAccessModel(appContext, uid, identifier);
         return contentAccess;
     }
 
-    public static ContentAccess find(AppContext appContext, String uid, String identifier) {
-        ContentAccess contentAccess = new ContentAccess(appContext, uid, identifier);
+    public static ContentAccessModel find(AppContext appContext, String uid, String identifier) {
+        ContentAccessModel contentAccess = new ContentAccessModel(appContext, uid, identifier);
         appContext.getDBSession().read(contentAccess);
         return contentAccess;
     }

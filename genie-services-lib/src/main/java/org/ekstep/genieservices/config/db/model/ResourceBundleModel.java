@@ -11,33 +11,32 @@ import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.config.db.contract.ResourceBundleEntry;
 
-import java.sql.ResultSet;
 import java.util.Locale;
 
-public class ResourceBundle implements IWritable, IReadable, IUpdatable, ICleanable {
+public class ResourceBundleModel implements IWritable, IReadable, IUpdatable, ICleanable {
     private static final String TAG = "model-ResourceBundle";
     private String mIdentifier;
     private String mJson;
     private Long id = -1L;
     private AppContext mAppContext;
 
-    private ResourceBundle(AppContext appContext, String identifier) {
+    private ResourceBundleModel(AppContext appContext, String identifier) {
         mAppContext = appContext;
         mIdentifier = identifier;
     }
 
-    private ResourceBundle(AppContext appContext, String identifier, String json) {
+    private ResourceBundleModel(AppContext appContext, String identifier, String json) {
         mAppContext = appContext;
         mJson = json;
         mIdentifier = identifier;
     }
 
-    public static ResourceBundle create(AppContext appContext, String identifier, String json) {
-        return new ResourceBundle(appContext, identifier, json);
+    public static ResourceBundleModel create(AppContext appContext, String identifier, String json) {
+        return new ResourceBundleModel(appContext, identifier, json);
     }
 
-    public static ResourceBundle findById(AppContext appContext, String identifier) {
-        ResourceBundle resourceBundle = new ResourceBundle(appContext, identifier);
+    public static ResourceBundleModel findById(AppContext appContext, String identifier) {
+        ResourceBundleModel resourceBundle = new ResourceBundleModel(appContext, identifier);
         appContext.getDBSession().read(resourceBundle);
         return resourceBundle;
     }
@@ -138,8 +137,8 @@ public class ResourceBundle implements IWritable, IReadable, IUpdatable, ICleana
         mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
             @Override
             public Void perform(AppContext context) {
-                context.getDBSession().clean(ResourceBundle.this);
-                context.getDBSession().create(ResourceBundle.this);
+                context.getDBSession().clean(ResourceBundleModel.this);
+                context.getDBSession().create(ResourceBundleModel.this);
                 return null;
             }
         });

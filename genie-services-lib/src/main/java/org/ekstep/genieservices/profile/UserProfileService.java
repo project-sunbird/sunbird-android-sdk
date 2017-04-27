@@ -11,9 +11,9 @@ import org.ekstep.genieservices.commons.db.DbConstants;
 import org.ekstep.genieservices.commons.exception.DbException;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
-import org.ekstep.genieservices.profile.db.model.AnonymousUser;
-import org.ekstep.genieservices.profile.db.model.User;
-import org.ekstep.genieservices.profile.db.model.UserProfile;
+import org.ekstep.genieservices.profile.db.model.AnonymousUserModel;
+import org.ekstep.genieservices.profile.db.model.UserModel;
+import org.ekstep.genieservices.profile.db.model.UserProfileModel;
 import org.ekstep.genieservices.profile.db.model.UserSessionModel;
 
 import java.util.UUID;
@@ -80,7 +80,7 @@ public class UserProfileService extends BaseService {
     private GenieResponse<Profile> saveUserProfile(Profile profile) {
         // TODO: 24/4/17 Need to create Location Wrapper to get location
         String uid = UUID.randomUUID().toString();
-        User user = User.buildUser(mAppContext, uid, profile);
+        UserModel user = UserModel.buildUser(mAppContext, uid, profile);
 
         try {
             user.create();
@@ -114,7 +114,7 @@ public class UserProfileService extends BaseService {
             }
 
             //now delete the requested user id
-            User user = User.findByUserId(mAppContext, uid);
+            UserModel user = UserModel.findByUserId(mAppContext, uid);
 
             //if something goes wrong while deleting, then rollback the delete
             if (user != null) {
@@ -131,7 +131,7 @@ public class UserProfileService extends BaseService {
     }
 
     private void rollBack(String previousUserId) {
-        User previousCurrentUser = User.findByUserId(mAppContext, previousUserId);
+        UserModel previousCurrentUser = UserModel.findByUserId(mAppContext, previousUserId);
         setCurrentUser(previousCurrentUser);
     }
 
@@ -147,7 +147,7 @@ public class UserProfileService extends BaseService {
     private String setAnonymousUser() {
         String query = "select u.uid from users u left join profiles p on p.uid=u.uid where p.uid is null and u.uid is not null";
 
-        AnonymousUser anonymousUser = AnonymousUser.findAnonymousUser(mAppContext, query);
+        AnonymousUserModel anonymousUser = AnonymousUserModel.findAnonymousUser(mAppContext, query);
 
         String uid = anonymousUser.getUid();
         if (uid == null || uid.isEmpty()) {
@@ -165,7 +165,7 @@ public class UserProfileService extends BaseService {
         return response.toString();
     }
 
-    private String setCurrentUser(User user) {
+    private String setCurrentUser(UserModel user) {
         if (!user.exists()) {
             // TODO: 25/4/17 GEError Event has to be added here
             return GenieResponse.getErrorResponse(mAppContext, ServiceConstants.INVALID_USER, ServiceConstants.NO_USER_WITH_SPECIFIED_ID, TAG).toString();
@@ -179,7 +179,7 @@ public class UserProfileService extends BaseService {
     private String createAnonymousUser() {
         //random user id generated
         String uid = UUID.randomUUID().toString();
-        User user = User.buildUser(mAppContext, uid);
+        UserModel user = UserModel.buildUser(mAppContext, uid);
 
         try {
             user.create();
@@ -231,7 +231,7 @@ public class UserProfileService extends BaseService {
 
             Profile newProfile = new Profile("", "", "");
             newProfile.setUid(profile.getUid());
-            UserProfile newUserProfile = UserProfile.buildUserProfile(mAppContext, newProfile);
+            UserProfileModel newUserProfile = UserProfileModel.buildUserProfile(mAppContext, newProfile);
 
 
             if (!newUserProfile.getProfile().isValid()) {
@@ -240,7 +240,7 @@ public class UserProfileService extends BaseService {
             }
 
             try {
-                UserProfile userProfile = UserProfile.buildUserProfile(mAppContext, profile);
+                UserProfileModel userProfile = UserProfileModel.buildUserProfile(mAppContext, profile);
                 userProfile.update(mAppContext);
             } catch (DbException e) {
                 Logger.e(mAppContext, TAG, e.getMessage());
@@ -261,7 +261,7 @@ public class UserProfileService extends BaseService {
      */
     public void setAnonymousUser(IResponseHandler responseHandler) {
         String query = "select u.uid from users u left join profiles p on p.uid=u.uid where p.uid is null and u.uid is not null";
-        AnonymousUser anonymousUser = AnonymousUser.findAnonymousUser(mAppContext, query);
+        AnonymousUserModel anonymousUser = AnonymousUserModel.findAnonymousUser(mAppContext, query);
 
         String uid = anonymousUser.getUid();
         if (uid == null || uid.isEmpty()) {
@@ -287,7 +287,7 @@ public class UserProfileService extends BaseService {
      */
     public void getAnonymousUser(IResponseHandler responseHandler) {
         String query = "select u.uid from users u left join profiles p on p.uid=u.uid where p.uid is null and u.uid is not null";
-        AnonymousUser anonymousUser = AnonymousUser.findAnonymousUser(mAppContext, query);
+        AnonymousUserModel anonymousUser = AnonymousUserModel.findAnonymousUser(mAppContext, query);
 
         String uid = anonymousUser.getUid();
         Profile profile = new Profile("", "", "");
@@ -308,7 +308,7 @@ public class UserProfileService extends BaseService {
      *                        with the data.
      */
     public void setCurrentUser(String uid, IResponseHandler responseHandler) {
-        User user = User.findByUserId(mAppContext, uid);
+        UserModel user = UserModel.findByUserId(mAppContext, uid);
 
         if (!user.exists()) {
             // TODO: 25/4/17 GEError Event has to be added here
@@ -340,7 +340,7 @@ public class UserProfileService extends BaseService {
 
         Profile profile = new Profile("", "", "");
         profile.setUid(currentSession.getUid());
-        UserProfile userProfile = UserProfile.buildUserProfile(mAppContext, profile);
+        UserProfileModel userProfile = UserProfileModel.buildUserProfile(mAppContext, profile);
 
         GenieResponse successResponse = new GenieResponse<>();
         successResponse.setStatus(true);
