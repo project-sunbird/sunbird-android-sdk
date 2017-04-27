@@ -191,7 +191,7 @@ public class UserProfile implements IWritable, IReadable, IUpdatable, ICleanable
         return String.format(Locale.US, "uid = '%s'", profile.getUid());
     }
 
-    public void update(String gameID, String gameVersion, IDeviceInfo deviceInfo, AppContext appContext) {
+    public void update(AppContext appContext) {
 //        List<IOperate> tasks = new ArrayList<>();
 //        tasks.add(new Updater(this));
 

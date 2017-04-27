@@ -14,6 +14,7 @@ import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.profile.db.model.AnonymousUser;
 import org.ekstep.genieservices.profile.db.model.User;
 import org.ekstep.genieservices.profile.db.model.UserProfile;
+import org.ekstep.genieservices.profile.db.model.UserSessionModel;
 
 import java.util.UUID;
 
@@ -37,10 +38,10 @@ public class UserProfileService extends BaseService {
      * @param appContext
      * @return
      */
-    public static UserSession getCurrentUserSession(AppContext appContext) {
+    public static UserSessionModel getCurrentUserSession(AppContext appContext) {
         String sessionJson = appContext.getKeyValueStore().getString(ServiceConstants.KEY_USER_SESSION, "");
 
-        return GsonUtil.fromJson(sessionJson, UserSession.class);
+        return GsonUtil.fromJson(sessionJson, UserSessionModel.class);
     }
 
     /**
@@ -135,12 +136,12 @@ public class UserProfileService extends BaseService {
     }
 
     private String getCurrentUserID() {
-        UserSession userSession = new UserSession("");
-        UserSession currentSession = userSession.getCurrentSession(mAppContext.getKeyValueStore().getString(ServiceConstants.KEY_USER_SESSION, ""));
-        if (currentSession.isValid())
+        UserSessionModel userSession = UserSessionModel.buildUserSession(mAppContext, "");
+        UserSession currentSession = userSession.find();
+        if (currentSession != null && !currentSession.getUid().isEmpty())
             return currentSession.getUid();
         else
-            return userSession.getUid();
+            return null;
     }
 
     private String setAnonymousUser() {
@@ -190,11 +191,8 @@ public class UserProfileService extends BaseService {
     }
 
     private void setUserSession(String uid) {
-        UserSession userSession = new UserSession(uid);
-        userSession.save(mAppContext);
-
-        //save the session in shared pref
-        mAppContext.getKeyValueStore().putString(ServiceConstants.KEY_USER_SESSION, userSession.toString());
+        UserSessionModel userSession = UserSessionModel.buildUserSession(mAppContext, uid);
+        userSession.save();
     }
 
     /**
@@ -330,12 +328,12 @@ public class UserProfileService extends BaseService {
      *                        with the data.
      */
     public void getCurrentUser(IResponseHandler responseHandler) {
-        UserSession userSession = new UserSession("");
+        UserSessionModel userSession = UserSessionModel.buildUserSession(mAppContext, "");
 
         //get the current user session
-        UserSession currentSession = userSession.getCurrentSession(mAppContext.getKeyValueStore().getString(ServiceConstants.KEY_USER_SESSION,""));
+        UserSession currentSession = userSession.find();
 
-        if (!currentSession.isValid()) {
+        if (currentSession != null && currentSession.getUid().isEmpty()) {
             // TODO: 25/4/17 GEError Event has to be added here
             responseHandler.onError(GenieResponse.getErrorResponse(mAppContext, ServiceConstants.NOT_EXISTS, ServiceConstants.NO_CURRENT_USER, TAG));
         }
@@ -358,15 +356,12 @@ public class UserProfileService extends BaseService {
      *                        with the data.
      */
     public void unsetCurrentUser(IResponseHandler responseHandler) {
-        UserSession userSession = new UserSession("");
+        UserSessionModel userSession = UserSessionModel.buildUserSession(mAppContext, "");
 
-        UserSession currentSession = userSession.getCurrentSession(mAppContext.getKeyValueStore().getString(ServiceConstants.KEY_USER_SESSION, ""));
+        UserSession currentSession = userSession.find();
 
-        if (currentSession.isValid()) {
-            currentSession.endCurrentSession(mAppContext);
-
-            //put the current user session to empty
-            mAppContext.getKeyValueStore().putString(ServiceConstants.KEY_USER_SESSION, "");
+        if (currentSession != null && !currentSession.getUid().isEmpty()) {
+            userSession.endCurrentSession();
         }
 
         GenieResponse successResponse = GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
