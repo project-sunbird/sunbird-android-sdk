@@ -1,7 +1,7 @@
 package org.ekstep.genieservices.commons.bean.validator;
 
 import org.ekstep.genieservices.commons.IValidate;
-import org.ekstep.genieservices.commons.utils.DayMonth;
+import org.ekstep.genieservices.commons.bean.DayMonth;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

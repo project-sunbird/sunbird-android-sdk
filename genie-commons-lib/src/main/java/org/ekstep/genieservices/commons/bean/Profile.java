@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 
 import org.ekstep.genieservices.commons.IValidate;
 import org.ekstep.genieservices.commons.bean.validator.DateValidator;
-import org.ekstep.genieservices.commons.utils.DayMonth;
 import org.ekstep.genieservices.commons.bean.validator.StringValidator;
 
 import java.util.Arrays;

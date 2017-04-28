@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.commons.utils;
+package org.ekstep.genieservices.commons.bean;
 
 /**
  * Created on 24/4/17.
