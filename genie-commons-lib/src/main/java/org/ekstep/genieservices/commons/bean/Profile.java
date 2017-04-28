@@ -3,9 +3,9 @@ package org.ekstep.genieservices.commons.bean;
 import com.google.gson.Gson;
 
 import org.ekstep.genieservices.commons.IValidate;
-import org.ekstep.genieservices.commons.utils.DateValidator;
+import org.ekstep.genieservices.commons.bean.validator.DateValidator;
 import org.ekstep.genieservices.commons.utils.DayMonth;
-import org.ekstep.genieservices.commons.utils.StringValidator;
+import org.ekstep.genieservices.commons.bean.validator.StringValidator;
 
 import java.util.Arrays;
 import java.util.Calendar;

@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.commons.utils;
+package org.ekstep.genieservices.commons.bean.validator;
 
 import org.ekstep.genieservices.commons.IValidate;
 
