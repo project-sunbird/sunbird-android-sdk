@@ -16,8 +16,8 @@ public class GenieService {
 
     private AppContext<Context, AndroidLogger>  applicationContext;
 
-    public static GenieService init(Context context, String packageName, String apiKey) {
-        AppContext<Context, AndroidLogger>  applicationContext = AndroidAppContext.buildAppContext(context, packageName, apiKey, new AndroidLogger());
+    public static GenieService init(Context context, String packageName, String apiKey, String gDataId) {
+        AppContext<Context, AndroidLogger>  applicationContext = AndroidAppContext.buildAppContext(context, packageName, apiKey, new AndroidLogger(), gDataId);
         GenieService instance = new GenieService(applicationContext);
         return instance;
     }

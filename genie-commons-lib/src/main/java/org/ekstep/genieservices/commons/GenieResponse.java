@@ -19,8 +19,8 @@ public class GenieResponse<T> {
     private String error;
 
 
-    public static GenieResponse getErrorResponse(AppContext context, String error, String errorMessage, String logTag) {
-        GenieResponse response = new GenieResponse();
+    public static <T> GenieResponse<T> getErrorResponse(AppContext context, String error, String errorMessage, String logTag) {
+        GenieResponse<T> response = new GenieResponse<T>();
         response.setStatus(false);
         response.setErrorMessages(Collections.singletonList(errorMessage));
         response.setError(error);
@@ -28,8 +28,8 @@ public class GenieResponse<T> {
         return response;
     }
 
-    public static GenieResponse getSuccessResponse(String message) {
-        GenieResponse response = new GenieResponse();
+    public static <T> GenieResponse<T> getSuccessResponse(String message) {
+        GenieResponse<T> response = new GenieResponse<T>();
         response.setStatus(true);
         response.setMessage(message);
         return response;

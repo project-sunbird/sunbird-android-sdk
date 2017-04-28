@@ -16,7 +16,7 @@ import java.util.Locale;
  *
  * @author swayangjit
  */
-public class MasterData implements IReadable, ICleanable, IWritable {
+public class MasterDataModel implements IReadable, ICleanable, IWritable {
 
     private Long id = -1L;
 
@@ -27,24 +27,24 @@ public class MasterData implements IReadable, ICleanable, IWritable {
     private String mType;
     private AppContext mAppContext;
 
-    private MasterData(AppContext appContext, String type, String json) {
+    private MasterDataModel(AppContext appContext, String type, String json) {
         mAppContext = appContext;
         mType = type;
         mJson = json;
     }
 
-    public static MasterData create(AppContext appContext, String type, String json) {
-        return new MasterData(appContext, type, json);
+    public static MasterDataModel create(AppContext appContext, String type, String json) {
+        return new MasterDataModel(appContext, type, json);
     }
 
-    public static MasterData findByType(AppContext appContext, String type) {
-        MasterData term = new MasterData(appContext, type, null);
+    public static MasterDataModel findByType(AppContext appContext, String type) {
+        MasterDataModel term = new MasterDataModel(appContext, type, null);
         appContext.getDBSession().read(term);
         return term;
     }
 
-    public static MasterData find(AppContext appContext) {
-        MasterData term = new MasterData(appContext, null, null);
+    public static MasterDataModel find(AppContext appContext) {
+        MasterDataModel term = new MasterDataModel(appContext, null, null);
         appContext.getDBSession().read(term);
         return term;
     }
@@ -120,8 +120,8 @@ public class MasterData implements IReadable, ICleanable, IWritable {
         mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
             @Override
             public Void perform(AppContext context) {
-                context.getDBSession().clean(MasterData.this);
-                context.getDBSession().create(MasterData.this);
+                context.getDBSession().clean(MasterDataModel.this);
+                context.getDBSession().create(MasterDataModel.this);
                 return null;
             }
         });
