@@ -33,18 +33,6 @@ public class UserProfileService extends BaseService {
     }
 
     /**
-     * Gets the current User Session
-     *
-     * @param appContext
-     * @return
-     */
-    public static UserSessionModel getCurrentUserSession(AppContext appContext) {
-        String sessionJson = appContext.getKeyValueStore().getString(ServiceConstants.KEY_USER_SESSION, "");
-
-        return GsonUtil.fromJson(sessionJson, UserSessionModel.class);
-    }
-
-    /**
      * Create a new user profile
      *
      * @param profile         - User profile data
@@ -52,9 +40,7 @@ public class UserProfileService extends BaseService {
      *                        with the data.
      */
     public void createUserProfile(Profile profile, IResponseHandler<Profile> responseHandler) {
-        GenieResponse<Profile> response;
-
-        response = createProfile(profile);
+        GenieResponse<Profile> response = createProfile(profile);
 
         if (response != null) {
             if (response.getStatus()) {
@@ -81,16 +67,8 @@ public class UserProfileService extends BaseService {
         // TODO: 24/4/17 Need to create Location Wrapper to get location
         String uid = UUID.randomUUID().toString();
         UserModel user = UserModel.buildUser(mAppContext, uid, profile);
-
-        try {
-            user.create();
-        } catch (DbException e) {
-            return GenieResponse.getErrorResponse(mAppContext, DbConstants.ERROR, e.getMessage(), TAG + " - saveUserProfile");
-
-        }
-
-        GenieResponse<Profile> successResponse = new GenieResponse<>();
-        successResponse.setStatus(true);
+        user.create();
+        GenieResponse<Profile> successResponse = GenieResponse.getSuccessResponse("");
         successResponse.setResult(GsonUtil.fromJson(user.getProfile().toString(), Profile.class));
 
         return successResponse;
@@ -136,7 +114,7 @@ public class UserProfileService extends BaseService {
     }
 
     private String getCurrentUserID() {
-        UserSessionModel userSession = UserSessionModel.buildUserSession(mAppContext, "");
+        UserSessionModel userSession = UserSessionModel.findUserSession(mAppContext, "");
         UserSession currentSession = userSession.find();
         if (currentSession != null && !currentSession.getUid().isEmpty())
             return currentSession.getUid();

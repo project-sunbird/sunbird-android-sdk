@@ -56,7 +56,6 @@ public class UserModel implements IWritable, IReadable, ICleanable {
     @Override
     public ContentValues getContentValues() {
         ContentValues contentValues = new ContentValues();
-        contentValues.clear();
         contentValues.put(UserEntry.COLUMN_NAME_UID, uid);
         return contentValues;
     }
@@ -81,6 +80,7 @@ public class UserModel implements IWritable, IReadable, ICleanable {
     @Override
     public IReadable read(IResultSet cursor) {
         boolean movedToFirst = cursor != null && cursor.moveToFirst();
+
         readAfterMoving(cursor, movedToFirst);
         return this;
     }
@@ -136,7 +136,7 @@ public class UserModel implements IWritable, IReadable, ICleanable {
             }
         });
 
-
+                //TODO: THe below telemetry logging should be part of the service and not in the model. Model should only handle DB interactions
 //        GECreateUser geCreateUser = generateGeCreateUserEvent(gameID, gameVersion, location, deviceInfo);
 //        Set<String> hashedGenieTags = TelemetryTagCache.activeTags(dbOperator, context);
 //        Event userEvent = new Event(geCreateUser.getEID(), hashedGenieTags).withEvent(geCreateUser.toString());

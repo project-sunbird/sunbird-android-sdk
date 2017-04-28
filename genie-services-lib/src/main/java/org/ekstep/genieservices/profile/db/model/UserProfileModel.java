@@ -27,6 +27,7 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
         this.profile = profile;
         this.appContext = appContext;
 
+        //TODO this is probably not required
         if (profile.getUid() == null || profile.getUid().isEmpty()) {
             generateUID();
         }
@@ -58,7 +59,6 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
     @Override
     public ContentValues getContentValues() {
         ContentValues contentValues = new ContentValues();
-        contentValues.clear();
         contentValues.put(ProfileEntry.COLUMN_NAME_UID, profile.getUid());
         populateContentValues(contentValues);
 
