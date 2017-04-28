@@ -1,8 +1,8 @@
 package org.ekstep.genieservices.config.network;
 
+import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.network.BaseAPI;
-import org.ekstep.genieservices.commons.utils.BuildConfigUtil;
 
 import java.util.Locale;
 import java.util.Map;
@@ -16,14 +16,12 @@ public class ResourceBundleAPI extends BaseAPI {
     private static final String TAG = "service-RBAPI";
     private static final String ENDPOINT = "config/resourcebundles";
     private static final CharSequence SERVICE_ENDPOINTS = "config";
-    private static String URL;
 
-    static {
-        URL = String.format(Locale.US, BuildConfigUtil.TAXONOMY_BASE_URL, SERVICE_ENDPOINTS);
-    }
 
     public ResourceBundleAPI(AppContext appContext) {
-        super(appContext, String.format(Locale.US, "%s/%s", URL, ENDPOINT), TAG);
+        super(appContext, String.format(Locale.US, "%s/%s", String.format(Locale.US, "%s/%s",
+                appContext.getBuildConfig().getBaseApiUrl()
+                        + ServiceConstants.API.LP_EXTENSION, SERVICE_ENDPOINTS), ENDPOINT), TAG);
     }
 
     @Override

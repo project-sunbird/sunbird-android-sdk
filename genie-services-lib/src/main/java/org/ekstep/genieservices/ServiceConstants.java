@@ -5,15 +5,30 @@ package org.ekstep.genieservices;
  */
 
 public interface ServiceConstants {
+
+
+
     String NO_DATA_FOUND = "";
     String SERVICE_ERROR = "";
+    String SUCCESS_RESPONSE = "Successful";
+    String FAILURE_RESPONSE = "Failed";
 
-     interface Partner {
-         String KEY_PARTNER_ID = "partnerid";
-         String SHARED_PREF_SESSION_KEY = "partnersessionid";
-         String MISSING_PARTNER_ID = "MISSING_PARTNER_ID";
-         String MISSING_PUBLIC_KEY = "MISSING_PUBLIC_KEY";
-         String INVALID_RSA_PUBLIC_KEY = "INVALID_RSA_PUBLIC_KEY";
+    interface Error {
+
+    }
+
+    interface API {
+        String LP_EXTENSION = "/%s/v2";
+        String EP_EXTENSION = "/%s/v1";
+        String ANALYTICS_EXTENSION = "/analytics";
+    }
+
+    interface Partner {
+        String KEY_PARTNER_ID = "partnerid";
+        String SHARED_PREF_SESSION_KEY = "partnersessionid";
+        String MISSING_PARTNER_ID = "MISSING_PARTNER_ID";
+        String MISSING_PUBLIC_KEY = "MISSING_PUBLIC_KEY";
+        String INVALID_RSA_PUBLIC_KEY = "INVALID_RSA_PUBLIC_KEY";
     }
 
     interface Event {

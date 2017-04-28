@@ -4,7 +4,6 @@ import android.content.Context;
 
 import org.ekstep.genieservices.BuildParams;
 import org.ekstep.genieservices.Constants;
-import org.ekstep.genieservices.commons.param.IParams;
 import org.ekstep.genieservices.commons.db.ServiceDbHelper;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.cache.PreferenceWrapper;
@@ -14,6 +13,7 @@ import org.ekstep.genieservices.commons.network.AndroidNetworkConnectivity;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.network.IHttpClient;
 import org.ekstep.genieservices.commons.network.auth.BasicAuthenticator;
+import org.ekstep.genieservices.commons.param.IParams;
 
 /**
  * Created on 18/4/17.
@@ -33,12 +33,12 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
 
     public static AppContext buildAppContext(Context context, String appPackage, String key, AndroidLogger logger) {
         AndroidAppContext appContext = new AndroidAppContext(context, appPackage, key, logger);
+        appContext.setBuildConfig(new BuildParams(appPackage));
         appContext.setDBSession(ServiceDbHelper.getGSDBSession(appContext));
         appContext.setSummarizerDBSession(ServiceDbHelper.getSummarizerDBSession(appContext));
         appContext.setConnectionInfo(new AndroidNetworkConnectivity(appContext));
-        appContext.setHttpClient(new AndroidHttpClient(new BasicAuthenticator()));
+        appContext.setHttpClient(new AndroidHttpClient(new BasicAuthenticator(appContext.getBuildConfig().getUserName(),appContext.getBuildConfig().getPassword())));
         appContext.setKeyValueStore(new PreferenceWrapper(appContext, Constants.SHARED_PREFERENCE_NAME));
-        appContext.setBuildConfig(new BuildParams(appPackage));
         return appContext;
     }
 
