@@ -1,6 +1,5 @@
 package org.ekstep.genieservices.config;
 
-import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 
 import org.ekstep.genieservices.BaseService;
@@ -11,9 +10,9 @@ import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
-import org.ekstep.genieservices.config.db.model.MasterData;
-import org.ekstep.genieservices.config.db.model.Ordinals;
-import org.ekstep.genieservices.config.db.model.ResourceBundle;
+import org.ekstep.genieservices.config.db.model.MasterDataModel;
+import org.ekstep.genieservices.config.db.model.OrdinalsModel;
+import org.ekstep.genieservices.config.db.model.ResourceBundleModel;
 import org.ekstep.genieservices.config.network.OrdinalsAPI;
 import org.ekstep.genieservices.config.network.ResourceBundleAPI;
 import org.ekstep.genieservices.config.network.TermsAPI;
@@ -62,7 +61,7 @@ public class ConfigService extends BaseService {
             refreshMasterData();
         }
 
-        MasterData term = MasterData.findByType(mAppContext, type.getValue());
+        MasterDataModel term = MasterDataModel.findByType(mAppContext, type.getValue());
 
         String result = term.getTermJson();
 
@@ -92,7 +91,7 @@ public class ConfigService extends BaseService {
             saveDataExpirationTime(ttl, MASTER_DATA_API_EXPIRATION_KEY);
             result.remove("ttl");
             for (Object key : result.keySet()) {
-                MasterData eachMasterData = MasterData.create(mAppContext, (String) key, GsonUtil.toJson(result.get(key)));
+                MasterDataModel eachMasterData = MasterDataModel.create(mAppContext, (String) key, GsonUtil.toJson(result.get(key)));
                 eachMasterData.save();
             }
         }
@@ -126,7 +125,7 @@ public class ConfigService extends BaseService {
             refreshResourceBundle();
         }
 
-        ResourceBundle resourceBundle = ResourceBundle.findById(mAppContext, languageIdentifier);
+        ResourceBundleModel resourceBundle = ResourceBundleModel.findById(mAppContext, languageIdentifier);
 
         //get the resource bundle in string format
         String result = resourceBundle.getResourceString();
@@ -161,7 +160,7 @@ public class ConfigService extends BaseService {
             Double ttl = (Double) resultMap.get("ttl");
             saveDataExpirationTime(ttl, RESOURCE_BUNDLE_API_EXPIRATION_KEY);
             for (Object key : result.keySet()) {
-                ResourceBundle eachResourceBundle = ResourceBundle.create(mAppContext, (String) key, GsonUtil.toJson(result.get(key)));
+                ResourceBundleModel eachResourceBundle = ResourceBundleModel.create(mAppContext, (String) key, GsonUtil.toJson(result.get(key)));
                 eachResourceBundle.save();
             }
         }
@@ -190,7 +189,7 @@ public class ConfigService extends BaseService {
             refreshOrdinals();
         }
 
-        Ordinals ordinals = Ordinals.findById(mAppContext, DB_KEY_ORDINALS);
+        OrdinalsModel ordinals = OrdinalsModel.findById(mAppContext, DB_KEY_ORDINALS);
 
         handleResponse(responseHandler, ordinals.getJSON(), mAppContext);
     }
@@ -207,13 +206,13 @@ public class ConfigService extends BaseService {
     }
 
     private void saveOrdinals(String response) {
-        LinkedTreeMap map = new Gson().fromJson(response, LinkedTreeMap.class);
+        LinkedTreeMap map = GsonUtil.fromJson(response, LinkedTreeMap.class);
         LinkedTreeMap resultLinkedTreeMap = (LinkedTreeMap) map.get("result");
 
         if (resultLinkedTreeMap.containsKey("ordinals")) {
             Double ttl = (Double) map.get("ttl");
             saveDataExpirationTime(ttl, ORDINAL_API_EXPIRATION_KEY);
-            Ordinals ordinals = Ordinals.create(mAppContext, DB_KEY_ORDINALS, GsonUtil.toJson(resultLinkedTreeMap.get("ordinals")));
+            OrdinalsModel ordinals = OrdinalsModel.create(mAppContext, DB_KEY_ORDINALS, GsonUtil.toJson(resultLinkedTreeMap.get("ordinals")));
             ordinals.save();
         }
     }

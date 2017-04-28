@@ -32,10 +32,6 @@ public class GsonUtil {
         }
     }
 
-    public static String toString(Object map) {
-        return getGson().toJson(map);
-    }
-
     public static String toJson(Object json) {
         return getGson().toJson(json);
     }

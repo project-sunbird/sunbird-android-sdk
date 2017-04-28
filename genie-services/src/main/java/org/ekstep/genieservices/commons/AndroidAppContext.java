@@ -25,21 +25,34 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
     private IConnectionInfo mConnectionInfo;
     private IHttpClient mHttpClient;
     private IKeyValueStore mKeyValueOperation;
+    private IDeviceInfo mDeviceInfo;
+    private ILocationInfo mLocationInfo;
     private IParams mParams;
 
-    private AndroidAppContext(Context context, String appPackage, String key, AndroidLogger logger) {
-        super(context, appPackage, key, logger);
+    private AndroidAppContext(Context context, String appPackage, String key, AndroidLogger logger, String gDataId) {
+        super(context, appPackage, key, logger, gDataId);
     }
 
-    public static AppContext buildAppContext(Context context, String appPackage, String key, AndroidLogger logger) {
-        AndroidAppContext appContext = new AndroidAppContext(context, appPackage, key, logger);
+    public static AppContext buildAppContext(Context context, String appPackage, String key, AndroidLogger logger, String gDataId) {
+        AndroidAppContext appContext = new AndroidAppContext(context, appPackage, key, logger, gDataId);
         appContext.setBuildConfig(new BuildParams(appPackage));
         appContext.setDBSession(ServiceDbHelper.getGSDBSession(appContext));
         appContext.setSummarizerDBSession(ServiceDbHelper.getSummarizerDBSession(appContext));
         appContext.setConnectionInfo(new AndroidNetworkConnectivity(appContext));
         appContext.setHttpClient(new AndroidHttpClient(new BasicAuthenticator(appContext.getBuildConfig().getUserName(),appContext.getBuildConfig().getPassword())));
         appContext.setKeyValueStore(new PreferenceWrapper(appContext, Constants.SHARED_PREFERENCE_NAME));
+        appContext.setDeviceInfo(new DeviceInfo(context));
+        appContext.setLocationInfo(new LocationInfo(context));
+
         return appContext;
+    }
+
+    public ILocationInfo getLocationInfo() {
+        return mLocationInfo;
+    }
+
+    public void setLocationInfo(ILocationInfo mLocationInfo) {
+        this.mLocationInfo = mLocationInfo;
     }
 
     @Override
@@ -80,8 +93,17 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
     }
 
     @Override
+    public IDeviceInfo getDeviceInfo() {
+        return mDeviceInfo;
+    }
+
+    @Override
     public IParams getBuildConfig() {
         return mParams;
+    }
+
+    private void setDeviceInfo(IDeviceInfo deviceInfo) {
+        this.mDeviceInfo = deviceInfo;
     }
 
     @Override
@@ -94,6 +116,15 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
     public Void setSummarizerDBSession(IDBSession dbSession) {
         this.mSummarizerDBSession = dbSession;
         return null;
+    }
+
+    @Override
+    public IDeviceInfo getDeviceInfo() {
+        return mDeviceInfo;
+    }
+
+    private void setDeviceInfo(IDeviceInfo deviceInfo) {
+        this.mDeviceInfo = deviceInfo;
     }
 
     @Override

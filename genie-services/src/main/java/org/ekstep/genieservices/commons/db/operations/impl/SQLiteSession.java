@@ -77,7 +77,12 @@ public class SQLiteSession implements IDBSession {
 
     @Override
     public Void read(IReadable readDb) {
-        return execute(new SQLiteReader(readDb));
+        return execute(new SQLiteReader(readDb, null));
+    }
+
+    @Override
+    public Void read(IReadable readDb, String customQuery) {
+        return execute(new SQLiteReader(readDb, customQuery));
     }
 
     @Override

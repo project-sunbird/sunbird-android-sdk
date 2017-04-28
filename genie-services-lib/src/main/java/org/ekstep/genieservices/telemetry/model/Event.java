@@ -1,14 +1,21 @@
 package org.ekstep.genieservices.telemetry.model;
 
-import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
+import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.db.BaseColumns;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IWritable;
+import org.ekstep.genieservices.commons.exception.InvalidDataException;
+import org.ekstep.genieservices.commons.utils.DateUtil;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
+import org.ekstep.genieservices.profile.db.model.UserSessionModel;
 import org.ekstep.genieservices.telemetry.TelemetryEventPublisher;
+import org.ekstep.genieservices.telemetry.cache.TelemetryTagCache;
 import org.ekstep.genieservices.telemetry.db.contract.TelemetryEntry;
 import org.ekstep.genieservices.telemetry.taggers.IEventTagger;
 import org.ekstep.genieservices.telemetry.taggers.PartnerTagger;
@@ -70,16 +77,34 @@ public class Event implements IWritable {
         event.id = resultSet.getLong(resultSet.getColumnIndex(BaseColumns._ID));
         event.eventType = resultSet.getString(resultSet.getColumnIndex(TelemetryEntry.COLUMN_NAME_EVENT_TYPE));
         String eventString = resultSet.getString(resultSet.getColumnIndex(TelemetryEntry.COLUMN_NAME_EVENT));
-        event.event = new Gson().fromJson(eventString, HashMap.class);
+        event.event = GsonUtil.fromJson(eventString, HashMap.class);
         event.timestamp = resultSet.getString(resultSet.getColumnIndex(TelemetryEntry.COLUMN_NAME_TIMESTAMP));
         event.priority = Priority.build(appContext, event.eventType, resultSet.getInt(resultSet.getColumnIndex(TelemetryEntry.COLUMN_NAME_PRIORITY)));
         return event;
     }
 
+    public static Event find(AppContext appContext, String eventString) {
+        Event event = new Event(appContext, TelemetryTagCache.activeTags(appContext));
+        event.event = GsonUtil.fromJson(eventString, Map.class, ServiceConstants.Event.ERROR_INVALID_EVENT);
+        event.eventType = (String) event.event.get("eid");
+        if (event.eventType == null || event.eventType.isEmpty()) {
+            throw new InvalidDataException(ServiceConstants.Event.ERROR_INVALID_JSON);
+        }
+        event.priority = Priority.build(appContext, event.eventType);
+        event.updateEventDetails();
+        event.updateSessionDetails();
+        return event;
+    }
+
+    public static Event build(AppContext appContext, String eventType, Set<String> hashedTags) {
+
+        return new Event(appContext, eventType, hashedTags);
+    }
+
     @Override
     public ContentValues getContentValues() {
         contentValues.clear();
-        contentValues.put(TelemetryEntry.COLUMN_NAME_EVENT, new Gson().toJson(event));
+        contentValues.put(TelemetryEntry.COLUMN_NAME_EVENT, GsonUtil.toJson(event));
         contentValues.put(TelemetryEntry.COLUMN_NAME_EVENT_TYPE, eventType.toUpperCase());
         contentValues.put(TelemetryEntry.COLUMN_NAME_TIMESTAMP, new Date().getTime());
         contentValues.put(TelemetryEntry.COLUMN_NAME_PRIORITY, priority.getPriority());
@@ -102,19 +127,6 @@ public class Event implements IWritable {
         addMID();
     }
 
-//    public static Event getForSave(String eventString, DeviceInfo deviceInfo, UserSession userSession,
-//                                   DbOperator dbOperator, Context context) {
-//        Event event = new Event(TelemetryTagCache.activeTags(dbOperator, context));
-//        event.event = gsonWrapper.fromJson(eventString, Map.class, "invalid event");
-//        event.eventType = (String) event.event.get("eid");
-//        if (event.eventType == null || event.eventType.isEmpty())
-//            throw new InvalidDataException("Invalid Json");
-//        event.priority = new Priority(event.eventType);
-//        event.updateEventDetails(deviceInfo);
-//        event.updateSessionDetails(userSession);
-//        return event;
-//    }
-
     public Long getId() {
         return id;
     }
@@ -124,35 +136,35 @@ public class Event implements IWritable {
         return this;
     }
 
-//    public void updateSessionDetails(UserSession userSession) {
-//        UserSession currentSession = userSession.getCurrentSession();
-//        if (currentSession.isValid()) {
-//            event.put("uid", currentSession.getUid());
-//            event.put("sid", currentSession.getSid());
-//        }
-//    }
-//
-//    public void updateEventDetails(DeviceInfo deviceInfo) throws JsonSyntaxException {
-//        event.put("did", deviceInfo.getDeviceID());
-//        String ver = String.valueOf(event.get("ver"));
-//        if (ver.equals("1.0")) {
-//            String ts = (String) event.get("ts");
-//            if (ts == null || ts.isEmpty())
-//                event.put("ts", TimeUtil.getCurrentTimestamp());
-//        } else if (ver.equals("2.0")) {
-//            Double _ets;
-//            try {
-//                _ets = (Double) event.get("ets");
-//            } catch (java.lang.ClassCastException e) {
-//                _ets = null;
-//            }
-//            if (_ets == null) {
-//                event.put("ets", TimeUtil.getEpochTime());
-//            } else {
-//                event.put("ets", Math.round(_ets));
-//            }
-//        }
-//    }
+    public void updateSessionDetails() {
+        UserSession currentSession = UserSessionModel.find(mAppContext);
+        if (currentSession.isValid()) {
+            event.put("uid", currentSession.getUid());
+            event.put("sid", currentSession.getSid());
+        }
+    }
+
+    public void updateEventDetails() throws JsonSyntaxException {
+        event.put("did", mAppContext.getDeviceInfo().getDeviceID());
+        String ver = String.valueOf(event.get("ver"));
+        if (ver.equals("1.0")) {
+            String ts = (String) event.get("ts");
+            if (ts == null || ts.isEmpty())
+                event.put("ts", DateUtil.getCurrentTimestamp());
+        } else if (ver.equals("2.0")) {
+            Double _ets;
+            try {
+                _ets = (Double) event.get("ets");
+            } catch (java.lang.ClassCastException e) {
+                _ets = null;
+            }
+            if (_ets == null) {
+                event.put("ets", DateUtil.getEpochTime());
+            } else {
+                event.put("ets", Math.round(_ets));
+            }
+        }
+    }
 
     public Map getEventMap() {
         return event;
@@ -163,7 +175,7 @@ public class Event implements IWritable {
     }
 
     public Event withEvent(String eventString) {
-        this.event = new Gson().fromJson(eventString, Map.class);
+        this.event = GsonUtil.fromJson(eventString, Map.class);
         return this;
     }
 

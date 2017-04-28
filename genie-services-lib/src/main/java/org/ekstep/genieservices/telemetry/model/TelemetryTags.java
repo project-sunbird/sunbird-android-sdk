@@ -38,11 +38,11 @@ public class TelemetryTags implements IReadable {
         if (resultSet != null && resultSet.moveToFirst())
             do {
                 telemetryTags.add(TelemetryTag.build(mAppContext,
-                        resultSet.getString(1),
-                        resultSet.getString(2),
-                        resultSet.getString(3),
-                        resultSet.getString(4),
-                        resultSet.getString(5)
+                        resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_NAME)),
+                        resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_HASH)),
+                        resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_DESCRIPTION)),
+                        resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_START_DATE)),
+                        resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_END_DATE))
                 ));
             } while (resultSet.moveToNext());
         return this;
