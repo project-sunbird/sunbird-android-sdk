@@ -16,7 +16,9 @@ public class AnonymousUserModel implements IReadable {
         this.customQuery = customQuery;
     }
 
-    public static AnonymousUserModel findAnonymousUser(AppContext appContext, String query) {
+    public static AnonymousUserModel findAnonymousUser(AppContext appContext) {
+        String query = "select u.uid from users u left join profiles p on p.uid=u.uid where p.uid is null and u.uid is not null";
+
         AnonymousUserModel anonymousUser = new AnonymousUserModel(appContext, query);
         appContext.getDBSession().read(anonymousUser, query);
         return anonymousUser;

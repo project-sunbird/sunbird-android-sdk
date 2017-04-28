@@ -145,9 +145,7 @@ public class UserProfileService extends BaseService {
     }
 
     private String setAnonymousUser() {
-        String query = "select u.uid from users u left join profiles p on p.uid=u.uid where p.uid is null and u.uid is not null";
-
-        AnonymousUserModel anonymousUser = AnonymousUserModel.findAnonymousUser(mAppContext, query);
+        AnonymousUserModel anonymousUser = AnonymousUserModel.findAnonymousUser(mAppContext);
 
         String uid = anonymousUser.getUid();
         if (uid == null || uid.isEmpty()) {
@@ -260,8 +258,7 @@ public class UserProfileService extends BaseService {
      *                        with the data.
      */
     public void setAnonymousUser(IResponseHandler responseHandler) {
-        String query = "select u.uid from users u left join profiles p on p.uid=u.uid where p.uid is null and u.uid is not null";
-        AnonymousUserModel anonymousUser = AnonymousUserModel.findAnonymousUser(mAppContext, query);
+        AnonymousUserModel anonymousUser = AnonymousUserModel.findAnonymousUser(mAppContext);
 
         String uid = anonymousUser.getUid();
         if (uid == null || uid.isEmpty()) {
@@ -286,8 +283,7 @@ public class UserProfileService extends BaseService {
      *                        with the data.
      */
     public void getAnonymousUser(IResponseHandler responseHandler) {
-        String query = "select u.uid from users u left join profiles p on p.uid=u.uid where p.uid is null and u.uid is not null";
-        AnonymousUserModel anonymousUser = AnonymousUserModel.findAnonymousUser(mAppContext, query);
+        AnonymousUserModel anonymousUser = AnonymousUserModel.findAnonymousUser(mAppContext);
 
         String uid = anonymousUser.getUid();
         Profile profile = new Profile("", "", "");
