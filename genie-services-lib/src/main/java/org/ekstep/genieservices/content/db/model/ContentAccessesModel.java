@@ -1,9 +1,9 @@
 package org.ekstep.genieservices.content.db.model;
 
-import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.content.db.contract.ContentAccessEntry;
 
 import java.util.ArrayList;
@@ -17,27 +17,27 @@ import java.util.Locale;
  */
 public class ContentAccessesModel implements IReadable, ICleanable {
 
-    private AppContext appContext;
+    private IDBSession mDBSession;
     private String filterCondition;
 
     private List<ContentAccessModel> contentAccessModelList;
 
-    private ContentAccessesModel(AppContext appContext, String filter) {
-        this.appContext = appContext;
+    private ContentAccessesModel(IDBSession dbSession, String filter) {
+        this.mDBSession = dbSession;
         this.filterCondition = filter;
     }
 
-    public static ContentAccessesModel find(AppContext appContext, String filter) {
-        ContentAccessesModel contentAccessesModel = new ContentAccessesModel(appContext, filter);
-        appContext.getDBSession().read(contentAccessesModel);
+    public static ContentAccessesModel find(IDBSession dbSession, String filter) {
+        ContentAccessesModel contentAccessesModel = new ContentAccessesModel(dbSession, filter);
+        dbSession.read(contentAccessesModel);
         return contentAccessesModel;
     }
 
-    public static ContentAccessesModel findByUid(AppContext appContext, String uid) {
+    public static ContentAccessesModel findByUid(IDBSession dbSession, String uid) {
         String filter = String.format(Locale.US, " where %s = '%s' ", ContentAccessEntry.COLUMN_NAME_UID, uid);
-        ContentAccessesModel contentAccessesModel = new ContentAccessesModel(appContext, filter);
+        ContentAccessesModel contentAccessesModel = new ContentAccessesModel(dbSession, filter);
 
-        appContext.getDBSession().read(contentAccessesModel);
+        dbSession.read(contentAccessesModel);
 
         if (contentAccessesModel.getContentAccessModelList() == null) {
             return null;
@@ -46,10 +46,10 @@ public class ContentAccessesModel implements IReadable, ICleanable {
         }
     }
 
-    public static ContentAccessesModel findByContentIdentifier(AppContext appContext, String identifier) {
+    public static ContentAccessesModel findByContentIdentifier(IDBSession dbSession, String identifier) {
         String filter = String.format(Locale.US, " where %s = '%s' ", ContentAccessEntry.COLUMN_NAME_IDENTIFIER, identifier);
-        ContentAccessesModel contentAccessesModel = new ContentAccessesModel(appContext, filter);
-        appContext.getDBSession().read(contentAccessesModel);
+        ContentAccessesModel contentAccessesModel = new ContentAccessesModel(dbSession, filter);
+        dbSession.read(contentAccessesModel);
 
         if (contentAccessesModel.getContentAccessModelList() == null) {
             return null;
@@ -59,7 +59,7 @@ public class ContentAccessesModel implements IReadable, ICleanable {
     }
 
     public Void delete() {
-        appContext.getDBSession().clean(this);
+        mDBSession.clean(this);
         return null;
     }
 
@@ -69,7 +69,7 @@ public class ContentAccessesModel implements IReadable, ICleanable {
             contentAccessModelList = new ArrayList<>();
 
             do {
-                ContentAccessModel contentAccess = ContentAccessModel.buildContentAccess(appContext);
+                ContentAccessModel contentAccess = ContentAccessModel.buildContentAccess(mDBSession);
 
                 contentAccess.readWithoutMoving(resultSet);
 

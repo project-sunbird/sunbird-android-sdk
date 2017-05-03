@@ -7,6 +7,7 @@ import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.content.db.contract.ContentAccessEntry;
@@ -20,44 +21,45 @@ import java.util.Map;
  * @author anil
  */
 public class ContentAccessModel implements IWritable, IReadable, IUpdatable {
-    private Long id = -1L;
 
+    private IDBSession mDBSession;
+
+    private Long id = -1L;
     private String uid;
     private String identifier;
     private Long epochTimestamp;
     private int status;
     private String contentType;
     private Map<String, Object> learnerState;
-    private AppContext appContext;
 
-    private ContentAccessModel(AppContext appContext) {
-        this.appContext = appContext;
+    private ContentAccessModel(IDBSession dbSession) {
+        this.mDBSession = dbSession;
     }
 
-    private ContentAccessModel(AppContext appContext, String uid, String identifier) {
-        this(appContext, uid, identifier, ServiceConstants.ACCESS_STATUS_VIEWED, null);
+    private ContentAccessModel(IDBSession dbSession, String uid, String identifier) {
+        this(dbSession, uid, identifier, ServiceConstants.ACCESS_STATUS_VIEWED, null);
     }
 
-    private ContentAccessModel(AppContext appContext, String uid, String identifier, int status, String contentType) {
+    private ContentAccessModel(IDBSession dbSession, String uid, String identifier, int status, String contentType) {
+        this.mDBSession = dbSession;
         this.uid = uid;
         this.identifier = identifier;
         this.status = status;
         this.contentType = contentType;
-        this.appContext = appContext;
     }
 
-    public static ContentAccessModel buildContentAccess(AppContext appContext) {
-        return new ContentAccessModel(appContext);
+    public static ContentAccessModel buildContentAccess(IDBSession dbSession) {
+        return new ContentAccessModel(dbSession);
     }
 
-    public static ContentAccessModel buildContentAccess(AppContext appContext, String uid, String identifier, int status, String contentType) {
-        ContentAccessModel contentAccess = new ContentAccessModel(appContext, uid, identifier, status, contentType);
+    public static ContentAccessModel buildContentAccess(IDBSession dbSession, String uid, String identifier, int status, String contentType) {
+        ContentAccessModel contentAccess = new ContentAccessModel(dbSession, uid, identifier, status, contentType);
         return contentAccess;
     }
 
-    public static ContentAccessModel find(AppContext appContext, String uid, String identifier) {
-        ContentAccessModel contentAccess = new ContentAccessModel(appContext, uid, identifier);
-        appContext.getDBSession().read(contentAccess);
+    public static ContentAccessModel find(IDBSession dbSession, String uid, String identifier) {
+        ContentAccessModel contentAccess = new ContentAccessModel(dbSession, uid, identifier);
+        dbSession.read(contentAccess);
 
         if (contentAccess.getId() == -1) {
             return null;
@@ -66,12 +68,12 @@ public class ContentAccessModel implements IWritable, IReadable, IUpdatable {
         }
     }
 
-    public void save(AppContext appContext) {
-        appContext.getDBSession().create(ContentAccessModel.this);
+    public void save() {
+        mDBSession.create(ContentAccessModel.this);
     }
 
-    public void update(AppContext appContext) {
-        appContext.getDBSession().update(ContentAccessModel.this);
+    public void update() {
+        mDBSession.update(ContentAccessModel.this);
     }
 
     @Override
