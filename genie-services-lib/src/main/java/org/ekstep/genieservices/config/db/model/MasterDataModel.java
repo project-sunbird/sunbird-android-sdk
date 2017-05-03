@@ -6,6 +6,7 @@ import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IWritable;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.config.db.contract.MasterDataEntry;
 
@@ -119,9 +120,9 @@ public class MasterDataModel implements IReadable, ICleanable, IWritable {
     public void save() {
         mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
             @Override
-            public Void perform(AppContext context) {
-                context.getDBSession().clean(MasterDataModel.this);
-                context.getDBSession().create(MasterDataModel.this);
+            public Void perform(IDBSession dbSession) {
+                dbSession.clean(MasterDataModel.this);
+                dbSession.create(MasterDataModel.this);
                 return null;
             }
         });

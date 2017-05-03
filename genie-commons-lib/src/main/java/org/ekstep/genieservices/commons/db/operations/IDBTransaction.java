@@ -8,6 +8,6 @@ import org.ekstep.genieservices.commons.AppContext;
 
 public interface IDBTransaction {
 
-    Void perform(AppContext context);
+    Void perform(IDBSession dbSession);
 
 }

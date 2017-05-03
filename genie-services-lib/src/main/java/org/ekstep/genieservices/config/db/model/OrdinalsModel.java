@@ -8,6 +8,7 @@ import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.config.db.contract.OrdinalsEntry;
@@ -57,9 +58,9 @@ public class OrdinalsModel implements IReadable, IWritable, IUpdatable, ICleanab
     public void save() {
         mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
             @Override
-            public Void perform(AppContext context) {
-                context.getDBSession().clean(OrdinalsModel.this);
-                context.getDBSession().create(OrdinalsModel.this);
+            public Void perform(IDBSession dbSession) {
+                dbSession.clean(OrdinalsModel.this);
+                dbSession.create(OrdinalsModel.this);
                 return null;
             }
         });

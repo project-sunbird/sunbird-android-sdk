@@ -8,6 +8,7 @@ import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.config.db.contract.ResourceBundleEntry;
 
@@ -136,9 +137,9 @@ public class ResourceBundleModel implements IWritable, IReadable, IUpdatable, IC
     public void save() {
         mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
             @Override
-            public Void perform(AppContext context) {
-                context.getDBSession().clean(ResourceBundleModel.this);
-                context.getDBSession().create(ResourceBundleModel.this);
+            public Void perform(IDBSession dbSession) {
+                dbSession.clean(ResourceBundleModel.this);
+                dbSession.create(ResourceBundleModel.this);
                 return null;
             }
         });
