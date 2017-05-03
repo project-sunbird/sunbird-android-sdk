@@ -20,20 +20,11 @@ public class ContentAccessesModel implements IReadable, ICleanable {
     private AppContext appContext;
     private String filterCondition;
 
-    private String uid;
-    private String identifier;
-
     private List<ContentAccessModel> contentAccessModelList;
 
     private ContentAccessesModel(AppContext appContext, String filter) {
         this.appContext = appContext;
         this.filterCondition = filter;
-    }
-
-    private ContentAccessesModel(AppContext appContext, String uid, String identifier) {
-        this.appContext = appContext;
-        this.uid = uid;
-        this.identifier = identifier;
     }
 
     public static ContentAccessesModel find(AppContext appContext, String filter) {
@@ -42,14 +33,34 @@ public class ContentAccessesModel implements IReadable, ICleanable {
         return contentAccessesModel;
     }
 
-    public static void deleteByUid(AppContext appContext, String uid) {
-        ContentAccessesModel contentAccessesModel = new ContentAccessesModel(appContext, uid, null);
-        appContext.getDBSession().clean(contentAccessesModel);
+    public static ContentAccessesModel findByUid(AppContext appContext, String uid) {
+        String filter = String.format(Locale.US, " where %s = '%s' ", ContentAccessEntry.COLUMN_NAME_UID, uid);
+        ContentAccessesModel contentAccessesModel = new ContentAccessesModel(appContext, filter);
+
+        appContext.getDBSession().read(contentAccessesModel);
+
+        if (contentAccessesModel.getContentAccessModelList() == null) {
+            return null;
+        } else {
+            return contentAccessesModel;
+        }
     }
 
-    public static void deleteByContentIdentifier(AppContext appContext, String identifier) {
-        ContentAccessesModel contentAccessesModel = new ContentAccessesModel(appContext, null, identifier);
-        appContext.getDBSession().clean(contentAccessesModel);
+    public static ContentAccessesModel findByContentIdentifier(AppContext appContext, String identifier) {
+        String filter = String.format(Locale.US, " where %s = '%s' ", ContentAccessEntry.COLUMN_NAME_IDENTIFIER, identifier);
+        ContentAccessesModel contentAccessesModel = new ContentAccessesModel(appContext, filter);
+        appContext.getDBSession().read(contentAccessesModel);
+
+        if (contentAccessesModel.getContentAccessModelList() == null) {
+            return null;
+        } else {
+            return contentAccessesModel;
+        }
+    }
+
+    public Void delete() {
+        appContext.getDBSession().clean(this);
+        return null;
     }
 
     @Override
@@ -81,11 +92,7 @@ public class ContentAccessesModel implements IReadable, ICleanable {
 
     @Override
     public String selectionToClean() {
-        if (uid != null) {   // Delete all row by uid
-            return String.format(Locale.US, "where %s = '%s' ", ContentAccessEntry.COLUMN_NAME_UID, uid);
-        } else {    // Delete all row by content identifier
-            return String.format(Locale.US, "where %s = '%s' ", ContentAccessEntry.COLUMN_NAME_IDENTIFIER, identifier);
-        }
+        return filterCondition;
     }
 
     @Override
