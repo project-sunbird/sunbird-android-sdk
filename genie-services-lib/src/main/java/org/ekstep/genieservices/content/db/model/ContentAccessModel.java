@@ -27,10 +27,10 @@ public class ContentAccessModel implements IWritable, IReadable, IUpdatable {
     private Long id = -1L;
     private String uid;
     private String identifier;
-    private Long epochTimestamp;
     private int status;
     private String contentType;
     private Map<String, Object> learnerState;
+    private Long epochTimestamp;
 
     private ContentAccessModel(IDBSession dbSession) {
         this.mDBSession = dbSession;
@@ -138,20 +138,12 @@ public class ContentAccessModel implements IWritable, IReadable, IUpdatable {
 
     @Override
     public String filterForRead() {
-        if (uid != null) {
-            return String.format(Locale.US, "where %s = ? AND %s = ?", ContentAccessEntry.COLUMN_NAME_UID, ContentAccessEntry.COLUMN_NAME_IDENTIFIER);
-        } else {
-            return String.format(Locale.US, "where %s = ?", ContentAccessEntry.COLUMN_NAME_IDENTIFIER);
-        }
+        return String.format(Locale.US, "where %s = ? AND %s = ?", ContentAccessEntry.COLUMN_NAME_UID, ContentAccessEntry.COLUMN_NAME_IDENTIFIER);
     }
 
     @Override
     public String[] selectionArgsForFilter() {
-        if (uid != null) {
-            return new String[]{uid, identifier};
-        } else {
-            return new String[]{identifier};
-        }
+        return new String[]{uid, identifier};
     }
 
     @Override
