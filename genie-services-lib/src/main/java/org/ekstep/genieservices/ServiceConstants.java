@@ -25,4 +25,16 @@ public interface ServiceConstants {
 
     /* Key Constants for all the key value store */
     String KEY_USER_SESSION = "session";
+
+    interface PreferenceKey {
+        String RESOURCE_BUNDLE_API_EXPIRATION_KEY = "RESOURCE_BUNDLE_API_EXPIRATION_KEY";
+        String MASTER_DATA_API_EXPIRATION_KEY = "TERMS_API_EXPIRATION_KEY";
+        String ORDINAL_API_EXPIRATION_KEY = "ORDINAL_API_EXPIRATION_KEY";
+    }
+
+    interface ConfigResourceFiles {
+        String MASTER_DATA_JSON_FILE = "terms.json";
+        String RESOURCE_BUNDLE_JSON_FILE = "resource_bundle.json";
+        String ORDINALS_JSON_FILE = "ordinals.json";
+    }
 }

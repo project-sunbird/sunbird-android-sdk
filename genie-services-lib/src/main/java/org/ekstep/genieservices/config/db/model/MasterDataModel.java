@@ -26,29 +26,37 @@ public class MasterDataModel implements IReadable, ICleanable, IWritable {
 
     private String mJson;
     private String mType;
-    private AppContext mAppContext;
+    private IDBSession mDBSession;
 
-    private MasterDataModel(AppContext appContext, String type, String json) {
-        mAppContext = appContext;
+    private MasterDataModel(IDBSession dbSession, String type, String json) {
+        mDBSession = dbSession;
         mType = type;
         mJson = json;
     }
 
-    public static MasterDataModel create(AppContext appContext, String type, String json) {
-        return new MasterDataModel(appContext, type, json);
+    public static MasterDataModel build(IDBSession dbSession, String type, String json) {
+        return new MasterDataModel(dbSession, type, json);
     }
 
-    public static MasterDataModel findByType(AppContext appContext, String type) {
-        MasterDataModel term = new MasterDataModel(appContext, type, null);
-        appContext.getDBSession().read(term);
-        return term;
+    public static MasterDataModel findByType(IDBSession dbSession, String type) {
+        MasterDataModel masterDataModel = new MasterDataModel(dbSession, type, null);
+        dbSession.read(masterDataModel);
+        if (masterDataModel.getMasterDataJson() == null) {
+            return null;
+        } else {
+            return masterDataModel;
+        }
     }
 
-    public static MasterDataModel find(AppContext appContext) {
-        MasterDataModel term = new MasterDataModel(appContext, null, null);
-        appContext.getDBSession().read(term);
-        return term;
-    }
+//    public static MasterDataModel find(AppContext appContext) {
+//        MasterDataModel masterDataModel = new MasterDataModel(appContext, null, null);
+//        appContext.getDBSession().read(masterDataModel);
+//        if (masterDataModel.getMasterDataJson() == null) {
+//            return null;
+//        } else {
+//            return masterDataModel;
+//        }
+//    }
 
     private void readWithoutMoving(IResultSet resultSet) {
         id = resultSet.getLong(0);
@@ -118,17 +126,11 @@ public class MasterDataModel implements IReadable, ICleanable, IWritable {
     }
 
     public void save() {
-        mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
-            @Override
-            public Void perform(IDBSession dbSession) {
-                dbSession.clean(MasterDataModel.this);
-                dbSession.create(MasterDataModel.this);
-                return null;
-            }
-        });
+        mDBSession.clean(this);
+        mDBSession.create(this);
     }
 
-    public String getTermJson() {
+    public String getMasterDataJson() {
         return mJson;
     }
 
