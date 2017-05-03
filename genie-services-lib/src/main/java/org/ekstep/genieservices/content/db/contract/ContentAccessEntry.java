@@ -26,8 +26,7 @@ public abstract class ContentAccessEntry implements BaseColumns {
                 COLUMN_NAME_EPOCH_TIMESTAMP + DbConstants.INT_TYPE + DbConstants.COMMA_SEP +
                 COLUMN_NAME_STATUS + DbConstants.INT_TYPE + DbConstants.COMMA_SEP +
                 COLUMN_NAME_CONTENT_TYPE + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
-                COLUMN_NAME_LEARNER_STATE + DbConstants.BLOB_TYPE + DbConstants.COMMA_SEP +
-                " UNIQUE (" + COLUMN_NAME_UID + DbConstants.COMMA_SEP + COLUMN_NAME_IDENTIFIER + ") ON CONFLICT REPLACE" +
+                COLUMN_NAME_LEARNER_STATE + DbConstants.BLOB_TYPE +
                 " )";
     }
 

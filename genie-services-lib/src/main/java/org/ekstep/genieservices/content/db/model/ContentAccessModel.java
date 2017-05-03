@@ -1,29 +1,25 @@
 package org.ekstep.genieservices.content.db.model;
 
-
-import com.google.gson.Gson;
-
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
-import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.utils.DateUtil;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.content.db.contract.ContentAccessEntry;
 
 import java.util.Locale;
 import java.util.Map;
-
 
 /**
  * Created on 1/25/2017.
  *
  * @author anil
  */
-public class ContentAccessModel implements IWritable, ICleanable, IReadable, IUpdatable {
+public class ContentAccessModel implements IWritable, IReadable, IUpdatable {
     private Long id = -1L;
 
     private String uid;
@@ -34,10 +30,10 @@ public class ContentAccessModel implements IWritable, ICleanable, IReadable, IUp
     private Map<String, Object> learnerState;
     private AppContext appContext;
 
-    private ContentAccessModel() {
+    private ContentAccessModel(AppContext appContext) {
+        this.appContext = appContext;
     }
 
-    // TODO: Remove this and setter for uid and identifier
     private ContentAccessModel(AppContext appContext, String uid, String identifier) {
         this(appContext, uid, identifier, ServiceConstants.ACCESS_STATUS_VIEWED, null);
     }
@@ -50,58 +46,32 @@ public class ContentAccessModel implements IWritable, ICleanable, IReadable, IUp
         this.appContext = appContext;
     }
 
-    private ContentAccessModel(String identifier) {
-        this.identifier = identifier;
+    public static ContentAccessModel buildContentAccess(AppContext appContext) {
+        return new ContentAccessModel(appContext);
     }
 
-    public static ContentAccessModel buildContentAccess(AppContext appContext, String uid, String identifier) {
-        ContentAccessModel contentAccess = new ContentAccessModel(appContext, uid, identifier);
+    public static ContentAccessModel buildContentAccess(AppContext appContext, String uid, String identifier, int status, String contentType) {
+        ContentAccessModel contentAccess = new ContentAccessModel(appContext, uid, identifier, status, contentType);
         return contentAccess;
     }
 
     public static ContentAccessModel find(AppContext appContext, String uid, String identifier) {
         ContentAccessModel contentAccess = new ContentAccessModel(appContext, uid, identifier);
         appContext.getDBSession().read(contentAccess);
-        return contentAccess;
+
+        if (contentAccess.getId() == -1) {
+            return null;
+        } else {
+            return contentAccess;
+        }
     }
 
-//    public boolean exists(DbOperator dbOperator) {
-//        ContentAccess otherContentAccess = new ContentAccess(uid, identifier);
-//        Reader otherContentAccessReader = new Reader(otherContentAccess);
-//        dbOperator.execute(otherContentAccessReader);
-//        return otherContentAccess.id != -1L;
-//    }
-
-//    public void save(DbOperator dbOperator) {
-//        dbOperator.execute(new Writer(this));
-//    }
-
-//    public void update(DbOperator dbOperator) {
-//        dbOperator.execute(new Updater(this));
-//    }
-
-    public String getIdentifier() {
-        return identifier;
+    public void save(AppContext appContext) {
+        appContext.getDBSession().create(ContentAccessModel.this);
     }
 
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public Map<String, Object> getLearnerState() {
-        return learnerState;
-    }
-
-    public void setLearnerState(Map<String, Object> learnerState) {
-        this.learnerState = learnerState;
-    }
-
-    public String getContentType() {
-        return contentType;
+    public void update(AppContext appContext) {
+        appContext.getDBSession().update(ContentAccessModel.this);
     }
 
     @Override
@@ -123,9 +93,9 @@ public class ContentAccessModel implements IWritable, ICleanable, IReadable, IUp
     }
 
     @Override
-    public IReadable read(IResultSet cursor) {
-        if (cursor != null && cursor.moveToFirst()) {
-            readWithoutMoving(cursor);
+    public IReadable read(IResultSet resultSet) {
+        if (resultSet != null && resultSet.moveToFirst()) {
+            readWithoutMoving(resultSet);
         }
 
         return this;
@@ -171,7 +141,6 @@ public class ContentAccessModel implements IWritable, ICleanable, IReadable, IUp
         } else {
             return String.format(Locale.US, "where %s = ?", ContentAccessEntry.COLUMN_NAME_IDENTIFIER);
         }
-
     }
 
     @Override
@@ -181,8 +150,6 @@ public class ContentAccessModel implements IWritable, ICleanable, IReadable, IUp
         } else {
             return new String[]{identifier};
         }
-
-
     }
 
     @Override
@@ -190,27 +157,6 @@ public class ContentAccessModel implements IWritable, ICleanable, IReadable, IUp
         return "limit 1";
     }
 
-    @Override
-    public void clean() {
-        this.id = -1L;
-    }
-
-    @Override
-    public String selectionToClean() {
-        // Delete all row by uid
-        return String.format(Locale.US, "where %s = '%s' ", ContentAccessEntry.COLUMN_NAME_UID, uid);
-    }
-
-    /**
-     * Delete all row by content identifier.
-     */
-//    public void deleteByIdentifier() {
-//        String selectionToClean = String.format(Locale.US, "where %s = '%s' ", ContentAccessEntry.COLUMN_NAME_IDENTIFIER, identifier);
-//        String query = String.format(Locale.US, "DELETE FROM %s %s", ContentAccessEntry.TABLE_NAME, selectionToClean);
-//
-//        CustomQuery customQuery = new CustomQuery(query);
-//        dbOperator.execute(customQuery);
-//    }
     public void readWithoutMoving(IResultSet cursor) {
         id = cursor.getLong(0);
         uid = cursor.getString(cursor.getColumnIndex(ContentAccessEntry.COLUMN_NAME_UID));
@@ -218,7 +164,35 @@ public class ContentAccessModel implements IWritable, ICleanable, IReadable, IUp
         epochTimestamp = cursor.getLong(cursor.getColumnIndex(ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP));
         status = cursor.getInt(cursor.getColumnIndex(ContentAccessEntry.COLUMN_NAME_STATUS));
         contentType = cursor.getString(cursor.getColumnIndex(ContentAccessEntry.COLUMN_NAME_CONTENT_TYPE));
-        learnerState = new Gson().fromJson(cursor.getString(cursor.getColumnIndex(ContentAccessEntry.COLUMN_NAME_LEARNER_STATE)), Map.class);
+        learnerState = GsonUtil.fromJson(cursor.getString(cursor.getColumnIndex(ContentAccessEntry.COLUMN_NAME_LEARNER_STATE)), Map.class);
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public Map<String, Object> getLearnerState() {
+        return learnerState;
+    }
+
+    public void setLearnerState(Map<String, Object> learnerState) {
+        this.learnerState = learnerState;
+    }
+
+    public String getContentType() {
+        return contentType;
     }
 
 }

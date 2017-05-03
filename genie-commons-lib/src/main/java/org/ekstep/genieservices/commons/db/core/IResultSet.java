@@ -32,6 +32,16 @@ public interface IResultSet {
     boolean moveToFirst();
 
     /**
+     * Move the cursor to the next row.
+     *
+     * <p>This method will return false if the cursor is already past the
+     * last entry in the result set.
+     *
+     * @return whether the move succeeded.
+     */
+    boolean moveToNext();
+
+    /**
      * Returns the zero-based index for the given column name, or -1 if the column doesn't exist.
      *
      * @param columnName the name of the target column.

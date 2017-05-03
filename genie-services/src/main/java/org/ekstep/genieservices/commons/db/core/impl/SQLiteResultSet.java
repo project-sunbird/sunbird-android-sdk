@@ -32,6 +32,10 @@ public class SQLiteResultSet implements IResultSet {
         return cursor.moveToFirst();
     }
 
+    @Override
+    public boolean moveToNext() {
+        return cursor.moveToNext();
+    }
 
     @Override
     public int getColumnIndex(String columnName) {
