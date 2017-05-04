@@ -5,8 +5,6 @@ import android.database.sqlite.SQLiteDatabase;
 
 import org.ekstep.genieservices.commons.AndroidLogger;
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.db.ServiceDbHelper;
-import org.ekstep.genieservices.commons.db.SummarizerDBContext;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IUpdatable;
@@ -77,7 +75,7 @@ public class SQLiteSession implements IDBSession {
 
     @Override
     public Void read(IReadable readDb) {
-        return execute(new SQLiteReader(readDb, null));
+        return execute(new SQLiteReader(readDb));
     }
 
     @Override
