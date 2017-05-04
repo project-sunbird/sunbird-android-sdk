@@ -12,15 +12,13 @@ import org.ekstep.genieservices.commons.db.DbConstants;
 import org.ekstep.genieservices.commons.exception.DbException;
 import org.ekstep.genieservices.commons.exception.EncryptionException;
 import org.ekstep.genieservices.commons.utils.Logger;
-import org.ekstep.genieservices.partner.db.model.Partner;
+import org.ekstep.genieservices.partner.db.model.PartnerModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import sun.rmi.runtime.Log;
 
 /**
  * Created on 28/4/17.
@@ -46,19 +44,19 @@ public class PartnerService extends BaseService {
         GenieResponse<String> genieResponse = new GenieResponse<String>();
 
         try {
-            Partner partner = Partner.findByPartnerId(appContext, request.partnerID(), request.publicKey());
+            PartnerModel partnerModel = PartnerModel.findByPartnerId(appContext.getDBSession(), appContext, request.partnerID(), request.publicKey());
 
-            if (partner.exists()) {
+            if (partnerModel.exists()) {
                 Logger.i(appContext, TAG, "EXISTS Partner: " + request.partnerID());
             } else {
                 Logger.i(appContext, TAG, "CREATING Partner: " + request.partnerID());
-                partner = Partner.findByPartnerId(appContext, request.partnerID(), request.publicKey());
-                if (partner.isValid()) {
-                    partner.save();
+                partnerModel = PartnerModel.findByPartnerId(appContext.getDBSession(), appContext, request.partnerID(), request.publicKey());
+                if (partnerModel.isValid()) {
+                    partnerModel.save();
                     Logger.i(appContext, TAG, "CREATED Partner: " + request.partnerID());
                 } else {
                     Logger.e(appContext, TAG, "INVALID PARTNER DATA" + request.partnerID());
-                    List<String> errorMessages = partner.getErrorMessages();
+                    List<String> errorMessages = partnerModel.getErrorMessages();
                     String errorMessage = "INVALID_DATA";
                     if (!errorMessages.isEmpty())
                         errorMessage = errorMessages.get(0);
@@ -83,17 +81,17 @@ public class PartnerService extends BaseService {
         Logger.i(appContext, TAG, "STARTING Partner Session" + request.partnerID());
         GenieResponse<String> genieResponse = new GenieResponse<String>();
 
-        Partner partner = Partner.findByPartnerId(appContext, request.partnerID(), null);
+        PartnerModel partnerModel = PartnerModel.findByPartnerId(appContext.getDBSession(), appContext, request.partnerID(), null);
 
-        if (partner.exists()) {
+        if (partnerModel.exists()) {
             Logger.i(appContext, TAG, "EXISTS Partner");
             Logger.i(appContext, TAG, "TERMINATING Partner Session" + request.partnerID());
             GenieResponse<String> response1 = new GenieResponse<>();
 
-            Partner partner1 = Partner.findByPartnerId(appContext, request.partnerID(), null);
-            if (partner1.exists()) {
+            PartnerModel partnerModel1 = PartnerModel.findByPartnerId(appContext.getDBSession(), appContext, request.partnerID(), null);
+            if (partnerModel1.exists()) {
                 Logger.i(appContext, TAG, "EXISTS Partner");
-                partner1.terminateSession();
+                partnerModel1.terminateSession();
             } else {
                 Logger.e(appContext, TAG, UNREGISTERED_PARTNER);
                 response1 = GenieResponse.getErrorResponse(appContext, ServiceConstants.FAILED_RESPONSE, UNREGISTERED_PARTNER +
@@ -102,7 +100,7 @@ public class PartnerService extends BaseService {
             }
             Logger.i(appContext, TAG, "TERMINATED Partner Session " + request.partnerID());
             response1.toString();
-            partner.startSession();
+            partnerModel.startSession();
         } else {
             Logger.e(appContext, TAG, UNREGISTERED_PARTNER);
             genieResponse = GenieResponse.getErrorResponse(appContext, ServiceConstants.FAILED_RESPONSE, UNREGISTERED_PARTNER + String.format(Locale.US, "Session start failed! Partner: %s",
@@ -117,10 +115,10 @@ public class PartnerService extends BaseService {
         String partnerID = request.partnerID();
         Logger.i(appContext, TAG, "TERMINATING Partner Session" + partnerID);
         GenieResponse<String> response = new GenieResponse<>();
-        Partner partner = Partner.findByPartnerId(appContext, partnerID, null);
-        if (partner.exists()) {
+        PartnerModel partnerModel = PartnerModel.findByPartnerId(appContext.getDBSession(), appContext, partnerID, null);
+        if (partnerModel.exists()) {
             Logger.i(appContext, TAG, "EXISTS Partner");
-            partner.terminateSession();
+            partnerModel.terminateSession();
         } else {
             Logger.e(appContext, TAG, UNREGISTERED_PARTNER);
             response = GenieResponse.getErrorResponse(appContext, ServiceConstants.FAILED_RESPONSE, UNREGISTERED_PARTNER + String.format(Locale.US, "Session termination failed! Partner: %s", partnerID), TAG);
@@ -133,17 +131,17 @@ public class PartnerService extends BaseService {
         Logger.i(appContext, TAG, "SENDING Partner Data " + request.partnerID());
 
         GenieResponse<String> genieResponse = new GenieResponse<>();
-        Partner partner = Partner.findByPartnerId(appContext, request.partnerID(), null);
+        PartnerModel partnerModel = PartnerModel.findByPartnerId(appContext.getDBSession(), appContext, request.partnerID(), null);
 
-        if (partner.exists()) {
+        if (partnerModel.exists()) {
             Logger.i(appContext, TAG, "EXISTS Partner");
             try {
-                partner.setData(request.partnerData());
-                partner.sendData();
+                partnerModel.setData(request.partnerData());
+                partnerModel.sendData();
                 Map<String, Object> result = new HashMap<>();
-                result.put("encrypted_data", partner.getData());
-                result.put("encrypted_key", partner.getEncryptedKey());
-                result.put("iv", partner.getIV());
+                result.put("encrypted_data", partnerModel.getData());
+                result.put("encrypted_key", partnerModel.getEncryptedKey());
+                result.put("iv", partnerModel.getIV());
                 genieResponse.setResult(result.toString());
             } catch (RuntimeException e) {
                 Logger.e(appContext, TAG, CATASTROPHIC_FAILURE, e);
@@ -152,7 +150,7 @@ public class PartnerService extends BaseService {
                 errorMessages.add(errorMessage);
                 genieResponse = GenieResponse.getErrorResponse(appContext, ServiceConstants.FAILED_RESPONSE, CATASTROPHIC_FAILURE + String.format(Locale.US, "Sending data failed! Partner: %s", request.partnerID()), TAG);
             } catch (EncryptionException e) {
-                Logger.e(appContext,TAG, ENCRYPTION_FAILURE, e);
+                Logger.e(appContext, TAG, ENCRYPTION_FAILURE, e);
                 List<String> errorMessages = new ArrayList<>();
                 String errorMessage = e.getMessage();
                 errorMessages.add(errorMessage);
@@ -160,7 +158,7 @@ public class PartnerService extends BaseService {
             }
 
         } else {
-            Logger.e(appContext,TAG, UNREGISTERED_PARTNER);
+            Logger.e(appContext, TAG, UNREGISTERED_PARTNER);
             genieResponse = GenieResponse.getErrorResponse(appContext, ServiceConstants.FAILED_RESPONSE, UNREGISTERED_PARTNER + String.format(Locale.US, "Sending data failed! Partner: %s", request.partnerID()), TAG);
         }
 
