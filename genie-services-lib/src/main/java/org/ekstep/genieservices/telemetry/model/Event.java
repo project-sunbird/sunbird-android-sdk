@@ -137,7 +137,7 @@ public class Event implements IWritable {
     }
 
     public void updateSessionDetails() {
-        UserSession currentSession = UserSessionModel.find(mAppContext);
+        UserSession currentSession = UserSessionModel.findUserSession(mAppContext).find();
         if (currentSession.isValid()) {
             event.put("uid", currentSession.getUid());
             event.put("sid", currentSession.getSid());

@@ -5,6 +5,7 @@ import com.google.gson.internal.LinkedTreeMap;
 import org.ekstep.genieservices.BaseService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.CommonConstants;
 import org.ekstep.genieservices.commons.GenieResponse;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.MasterData;
@@ -19,6 +20,7 @@ import org.ekstep.genieservices.config.db.model.ResourceBundleModel;
 import org.ekstep.genieservices.config.network.OrdinalsAPI;
 import org.ekstep.genieservices.config.network.ResourceBundleAPI;
 import org.ekstep.genieservices.config.network.TermsAPI;
+import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,6 +50,11 @@ public class ConfigService extends BaseService {
      * @param responseHandler
      */
     public void getMasterData(MasterDataType type, IResponseHandler<MasterData> responseHandler) {
+
+        HashMap params = new HashMap();
+        params.put("type",type.getValue());
+        params.put("logLevel", CommonConstants.LOG_LEVEL);
+
         if (getLongFromKeyValueStore(ServiceConstants.PreferenceKey.MASTER_DATA_API_EXPIRATION_KEY) == 0) {
             initializeMasterData();
         } else if (hasExpired(ServiceConstants.PreferenceKey.MASTER_DATA_API_EXPIRATION_KEY)) {
@@ -62,12 +69,14 @@ public class ConfigService extends BaseService {
 
         GenieResponse<MasterData> response;
         if (result != null) {
-            response = GenieResponse.getSuccessResponse("");
+            response = GenieResponse.getSuccessResponse("MasterData retrieved successfully");
             response.setResult(masterData);
             responseHandler.onSuccess(response);
+            TelemetryLogger.logSuccess(mAppContext,response,new HashMap(),TAG,"getMasterData@ConfigService",params);
         } else {
             response = GenieResponse.getErrorResponse(mAppContext, ServiceConstants.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR);
             responseHandler.onError(response);
+            TelemetryLogger.logFailure(mAppContext,response,TAG,"Unable to get masterdata","getMasterData@ConfigService",params);
         }
     }
 
@@ -120,6 +129,12 @@ public class ConfigService extends BaseService {
      * @param responseHandler
      */
     public void getResourceBundle(String languageIdentifier, IResponseHandler<Map<String, Object>> responseHandler) {
+
+        HashMap params = new HashMap();
+        params.put("ResourceBundle", languageIdentifier);
+        params.put("mode",TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
+        params.put("logLevel", CommonConstants.LOG_LEVEL);
+
         if (getLongFromKeyValueStore(ServiceConstants.PreferenceKey.RESOURCE_BUNDLE_API_EXPIRATION_KEY) == 0) {
             initializeResourceBundle();
         } else if (hasExpired(ServiceConstants.PreferenceKey.RESOURCE_BUNDLE_API_EXPIRATION_KEY)) {
@@ -135,9 +150,11 @@ public class ConfigService extends BaseService {
             response = GenieResponse.getSuccessResponse("");
             response.setResult(resourceBundleMap);
             responseHandler.onSuccess(response);
+            TelemetryLogger.logSuccess(mAppContext,response,new HashMap(),TAG,"getResourceBundle@ConfigService",params);
         } else {
             response = GenieResponse.getErrorResponse(mAppContext, ServiceConstants.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR);
             responseHandler.onError(response);
+            TelemetryLogger.logFailure(mAppContext,response,TAG,"Unable to get resourcebundle","getResourceBundle@ConfigService",params);
         }
     }
 
@@ -188,6 +205,12 @@ public class ConfigService extends BaseService {
     }
 
     public void getOrdinals(IResponseHandler<HashMap> responseHandler) {
+
+        HashMap params = new HashMap();
+        params.put("Ordinals", "Get ordinals");
+        params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
+        params.put("logLevel", CommonConstants.LOG_LEVEL);
+
         if (getLongFromKeyValueStore(ServiceConstants.PreferenceKey.ORDINAL_API_EXPIRATION_KEY) == 0) {
             initializeOrdinalsData();
         } else if (hasExpired(ServiceConstants.PreferenceKey.ORDINAL_API_EXPIRATION_KEY)) {
@@ -200,9 +223,11 @@ public class ConfigService extends BaseService {
             response = GenieResponse.getSuccessResponse("");
             response.setResult(ordinalsMap);
             responseHandler.onSuccess(response);
+            TelemetryLogger.logSuccess(mAppContext,response,new HashMap(),TAG,"getOrdinals@ConfigService",params);
         } else {
             response = GenieResponse.getErrorResponse(mAppContext, ServiceConstants.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR);
             responseHandler.onError(response);
+            TelemetryLogger.logFailure(mAppContext,response,TAG,"Unable to get ordinals","getOrdinals@ConfigService",params);
         }
     }
 

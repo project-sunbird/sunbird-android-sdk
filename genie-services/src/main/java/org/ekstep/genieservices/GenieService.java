@@ -6,6 +6,8 @@ import org.ekstep.genieservices.commons.AndroidAppContext;
 import org.ekstep.genieservices.commons.AndroidLogger;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.config.ConfigService;
+import org.ekstep.genieservices.profile.UserProfileService;
+import org.ekstep.genieservices.telemetry.TelemetryService;
 
 /**
  * Created on 4/14/2017.
@@ -14,7 +16,7 @@ import org.ekstep.genieservices.config.ConfigService;
  */
 public class GenieService {
 
-    private AppContext<Context, AndroidLogger>  applicationContext;
+    private static AppContext<Context, AndroidLogger>  applicationContext;
     private static ConfigService sConfigService;
     private static TelemetryService sTelemetryService;
 
