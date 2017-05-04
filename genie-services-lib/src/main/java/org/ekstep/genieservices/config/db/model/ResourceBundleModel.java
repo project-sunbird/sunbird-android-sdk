@@ -138,8 +138,11 @@ public class ResourceBundleModel implements IWritable, IReadable, IUpdatable, IC
     }
 
     public void save() {
-        mDBSession.clean(this);
         mDBSession.create(this);
+    }
+
+    public void update() {
+        mDBSession.update(this);
     }
 
     public String getResourceString() {

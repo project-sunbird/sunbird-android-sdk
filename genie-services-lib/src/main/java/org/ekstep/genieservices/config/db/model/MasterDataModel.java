@@ -5,6 +5,7 @@ import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
+import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
@@ -17,7 +18,7 @@ import java.util.Locale;
  *
  * @author swayangjit
  */
-public class MasterDataModel implements IReadable, ICleanable, IWritable {
+public class MasterDataModel implements IReadable, ICleanable, IWritable,IUpdatable {
 
     private Long id = -1L;
 
@@ -92,11 +93,24 @@ public class MasterDataModel implements IReadable, ICleanable, IWritable {
 
     @Override
     public void updateId(long id) {
+        this.id=id;
+    }
+
+    @Override
+    public ContentValues getFieldsToUpdate() {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MasterDataEntry.COLUMN_NAME_JSON, mJson);
+        return contentValues;
     }
 
     @Override
     public String getTableName() {
         return MasterDataEntry.TABLE_NAME;
+    }
+
+    @Override
+    public String updateBy() {
+        return String.format(Locale.US, "%s = '%s'", MasterDataEntry.COLUMN_NAME_TYPE, mType);
     }
 
     @Override
@@ -126,8 +140,11 @@ public class MasterDataModel implements IReadable, ICleanable, IWritable {
     }
 
     public void save() {
-        mDBSession.clean(this);
         mDBSession.create(this);
+    }
+
+    public void update() {
+        mDBSession.update(this);
     }
 
     public String getMasterDataJson() {

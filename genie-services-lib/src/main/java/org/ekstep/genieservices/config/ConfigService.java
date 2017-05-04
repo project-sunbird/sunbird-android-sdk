@@ -9,8 +9,6 @@ import org.ekstep.genieservices.commons.GenieResponse;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
-import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -50,7 +48,6 @@ public class ConfigService extends BaseService {
      * @param responseHandler
      */
     public void getMasterData(MasterDataType type, IResponseHandler<MasterData> responseHandler) {
-
         if (getLongFromKeyValueStore(ServiceConstants.PreferenceKey.MASTER_DATA_API_EXPIRATION_KEY) == 0) {
             initializeMasterData();
         } else if (hasExpired(ServiceConstants.PreferenceKey.MASTER_DATA_API_EXPIRATION_KEY)) {
@@ -63,7 +60,7 @@ public class ConfigService extends BaseService {
 
         MasterData masterData = GsonUtil.fromJson(result, MasterData.class);
 
-        GenieResponse<MasterData> response = null;
+        GenieResponse<MasterData> response;
         if (result != null) {
             response = GenieResponse.getSuccessResponse("");
             response.setResult(masterData);
@@ -75,36 +72,28 @@ public class ConfigService extends BaseService {
     }
 
     private void initializeMasterData() {
-
-        //get the string data from the locally stored json
         String storedData = FileUtil.readFileFromClasspath(ServiceConstants.ConfigResourceFiles.MASTER_DATA_JSON_FILE);
-
         if (!StringUtil.isNullOrEmpty(storedData)) {
             saveMasterData(storedData);
         }
-
         refreshMasterData();
     }
 
     private void saveMasterData(String response) {
         LinkedTreeMap map = GsonUtil.fromJson(response, LinkedTreeMap.class);
-
         Map result = ((LinkedTreeMap) map.get("result"));
-
-        //save the master data
         if (result != null) {
             Double ttl = (Double) result.get("ttl");
             saveDataExpirationTime(ttl, ServiceConstants.PreferenceKey.MASTER_DATA_API_EXPIRATION_KEY);
             result.remove("ttl");
             for (Object key : result.keySet()) {
-                final MasterDataModel eachMasterData = MasterDataModel.build(mAppContext.getDBSession(), (String) key, GsonUtil.toJson(result.get(key)));
-                mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
-                    @Override
-                    public Void perform(IDBSession dbSession) {
-                        eachMasterData.save();
-                        return null;
-                    }
-                });
+                MasterDataModel eachMasterData = MasterDataModel.findByType(mAppContext.getDBSession(), String.valueOf(key));
+                if (eachMasterData != null) {
+                    eachMasterData.update();
+                } else {
+                    eachMasterData = MasterDataModel.build(mAppContext.getDBSession(), (String) key, GsonUtil.toJson(result.get(key)));
+                    eachMasterData.save();
+                }
 
             }
         }
@@ -131,20 +120,17 @@ public class ConfigService extends BaseService {
      * @param responseHandler
      */
     public void getResourceBundle(String languageIdentifier, IResponseHandler<Map<String, Object>> responseHandler) {
-
         if (getLongFromKeyValueStore(ServiceConstants.PreferenceKey.RESOURCE_BUNDLE_API_EXPIRATION_KEY) == 0) {
             initializeResourceBundle();
         } else if (hasExpired(ServiceConstants.PreferenceKey.RESOURCE_BUNDLE_API_EXPIRATION_KEY)) {
             refreshResourceBundle();
         }
-
         ResourceBundleModel resourceBundle = ResourceBundleModel.findById(mAppContext.getDBSession(), languageIdentifier);
-
         String result = resourceBundle.getResourceString();
         Map<String, Object> resourceBundleMap = new HashMap<>();
         resourceBundleMap.put(resourceBundle.getIdentifier(), resourceBundle.getResourceString());
 
-        GenieResponse<Map<String, Object>> response = null;
+        GenieResponse<Map<String, Object>> response;
         if (result != null) {
             response = GenieResponse.getSuccessResponse("");
             response.setResult(resourceBundleMap);
@@ -153,43 +139,34 @@ public class ConfigService extends BaseService {
             response = GenieResponse.getErrorResponse(mAppContext, ServiceConstants.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR);
             responseHandler.onError(response);
         }
-
     }
 
     private void initializeResourceBundle() {
-        //get the string data from the locally stored json
         String storedData = FileUtil.readFileFromClasspath(ServiceConstants.ConfigResourceFiles.RESOURCE_BUNDLE_JSON_FILE);
-
         if (!StringUtil.isNullOrEmpty(storedData)) {
             saveResourceBundle(storedData);
         }
-
         refreshResourceBundle();
     }
 
     private void saveResourceBundle(String response) {
         LinkedTreeMap map = GsonUtil.fromJson(response, LinkedTreeMap.class);
-
-        //save the bundle data
         Map resultMap = (LinkedTreeMap) map.get("result");
         Map result = null;
-
         if (resultMap.containsKey("resourcebundles")) {
             result = (Map) resultMap.get("resourcebundles");
         }
-
         if (result != null) {
             Double ttl = (Double) resultMap.get("ttl");
             saveDataExpirationTime(ttl, ServiceConstants.PreferenceKey.RESOURCE_BUNDLE_API_EXPIRATION_KEY);
             for (Object key : result.keySet()) {
-                final ResourceBundleModel eachResourceBundle = ResourceBundleModel.create(mAppContext.getDBSession(), (String) key, GsonUtil.toJson(result.get(key)));
-                mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
-                    @Override
-                    public Void perform(IDBSession dbSession) {
-                        eachResourceBundle.save();
-                        return null;
-                    }
-                });
+                ResourceBundleModel eachResourceBundle = ResourceBundleModel.findById(mAppContext.getDBSession(), String.valueOf(key));
+                if (eachResourceBundle != null) {
+                    eachResourceBundle.update();
+                } else {
+                    eachResourceBundle = ResourceBundleModel.create(mAppContext.getDBSession(), (String) key, GsonUtil.toJson(result.get(key)));
+                    eachResourceBundle.save();
+                }
 
             }
         }
@@ -211,17 +188,13 @@ public class ConfigService extends BaseService {
     }
 
     public void getOrdinals(IResponseHandler<HashMap> responseHandler) {
-
         if (getLongFromKeyValueStore(ServiceConstants.PreferenceKey.ORDINAL_API_EXPIRATION_KEY) == 0) {
             initializeOrdinalsData();
         } else if (hasExpired(ServiceConstants.PreferenceKey.ORDINAL_API_EXPIRATION_KEY)) {
             refreshOrdinals();
         }
-
         OrdinalsModel ordinals = OrdinalsModel.findById(mAppContext.getDBSession(), DB_KEY_ORDINALS);
-
         HashMap ordinalsMap = GsonUtil.fromJson(ordinals.getJSON(), HashMap.class);
-
         GenieResponse<HashMap> response;
         if (ordinalsMap != null) {
             response = GenieResponse.getSuccessResponse("");
@@ -234,31 +207,26 @@ public class ConfigService extends BaseService {
     }
 
     private void initializeOrdinalsData() {
-        //get the string data from the locally stored json
         String storedData = FileUtil.readFileFromClasspath(ServiceConstants.ConfigResourceFiles.ORDINALS_JSON_FILE);
-
         if (!StringUtil.isNullOrEmpty(storedData)) {
             saveOrdinals(storedData);
         }
-
         refreshOrdinals();
     }
 
     private void saveOrdinals(String response) {
         LinkedTreeMap map = GsonUtil.fromJson(response, LinkedTreeMap.class);
         LinkedTreeMap resultLinkedTreeMap = (LinkedTreeMap) map.get("result");
-
         if (resultLinkedTreeMap.containsKey("ordinals")) {
             Double ttl = (Double) map.get("ttl");
             saveDataExpirationTime(ttl, ServiceConstants.PreferenceKey.ORDINAL_API_EXPIRATION_KEY);
-            final OrdinalsModel ordinals = OrdinalsModel.build(mAppContext.getDBSession(), DB_KEY_ORDINALS, GsonUtil.toJson(resultLinkedTreeMap.get("ordinals")));
-            mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
-                @Override
-                public Void perform(IDBSession dbSession) {
-                    ordinals.save();
-                    return null;
-                }
-            });
+            OrdinalsModel ordinals = OrdinalsModel.findById(mAppContext.getDBSession(), DB_KEY_ORDINALS);
+            if (ordinals != null) {
+                ordinals.update();
+            } else {
+                ordinals = OrdinalsModel.build(mAppContext.getDBSession(), DB_KEY_ORDINALS, GsonUtil.toJson(resultLinkedTreeMap.get("ordinals")));
+                ordinals.save();
+            }
         }
     }
 
@@ -277,7 +245,7 @@ public class ConfigService extends BaseService {
         }).start();
     }
 
-    protected void saveDataExpirationTime(Double ttl, String key) {
+    private void saveDataExpirationTime(Double ttl, String key) {
         if (ttl != null) {
             long ttlInMilliSeconds = (long) (ttl * DateUtil.MILLISECONDS_IN_AN_HOUR);
             Long currentTime = DateUtil.getEpochTime();
@@ -287,7 +255,7 @@ public class ConfigService extends BaseService {
         }
     }
 
-    protected boolean hasExpired(String key) {
+    private boolean hasExpired(String key) {
         Long currentTime = DateUtil.getEpochTime();
         long expirationTime = getLongFromKeyValueStore(key);
         return currentTime > expirationTime;

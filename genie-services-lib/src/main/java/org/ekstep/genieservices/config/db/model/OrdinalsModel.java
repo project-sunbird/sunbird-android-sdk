@@ -60,8 +60,11 @@ public class OrdinalsModel implements IReadable, IWritable, IUpdatable, ICleanab
     }
 
     public void save() {
-        mDBSession.clean(this);
         mDBSession.create(this);
+    }
+
+    public void update() {
+        mDBSession.update(this);
     }
 
     public String getJSON() {
