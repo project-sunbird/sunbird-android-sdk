@@ -29,6 +29,10 @@ public class Profile implements IValidate {
     private Date createdAt;
     private transient List<IValidate> validators;
 
+    public Profile (String uid) {
+        this.uid = uid;
+    }
+
     public Profile(String handle, String avatar, String language) {
         this.handle = handle;
         this.avatar = avatar;

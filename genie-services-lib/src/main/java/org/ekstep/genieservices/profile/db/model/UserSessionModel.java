@@ -26,48 +26,38 @@ public class UserSessionModel {
         this.appContext = appContext;
     }
 
+    public UserSession getUserSessionBean() {
+        return userSessionBean;
+    }
+
     private void initSession(String uid) {
         userSessionBean = new UserSession(uid, UUID.randomUUID().toString(), DateUtil.getCurrentTimestamp());
     }
 
     public static UserSessionModel buildUserSession(AppContext appContext, String uid) {
         UserSessionModel userSession = new UserSessionModel(appContext, uid);
-        userSession.initSession(uid);
         return userSession;
     }
 
-    public static UserSessionModel findUserSession(AppContext appContext, String uid) {
-        UserSessionModel userSession = new UserSessionModel(appContext, uid);
-        return userSession;
-    }
-
-    public Void save() {
-        UserSession currentSession = find();
-        if (currentSession != null && currentSession.getUid().equalsIgnoreCase(userSessionBean.getUid())) {
+    public static UserSessionModel findUserSession(AppContext appContext) {
+        UserSessionModel userSessionModel = new UserSessionModel(appContext, null);
+        userSessionModel.userSessionBean = userSessionModel.find();
+        if (userSessionModel.userSessionBean == null) {
             return null;
+        } else {
+            return userSessionModel;
         }
-        if (!uid.isEmpty()) {
-            // TODO: End session should be called from service and not inside the model
-            endCurrentSession();
-        }
-        //save the session in shared pref
-        appContext.getKeyValueStore().putString(ServiceConstants.KEY_USER_SESSION, GsonUtil.toJson(userSessionBean));
+    }
 
-        // TODO: 27/4/17 Need to add GESessionStart event
-//        GESessionStart geSessionStart = new GESessionStart(this, location, deviceInfo.getDeviceID(), gameID, gameVersion);
-//        Event event = new Event(geSessionStart.getEID(), TelemetryTagCache.activeTags(dbOperator, context())).withEvent(geSessionStart.toString());
-//        event.save(dbOperator);
+    public Void startSession() {
+        initSession(uid);
         return null;
     }
 
-    public void endCurrentSession() {
+    public void endSession() {
         //put the current user session to empty
         appContext.getKeyValueStore().putString(ServiceConstants.KEY_USER_SESSION, "");
 
-        // TODO: 26/4/17 Add GESessionEnd event
-//        GESessionEnd geSessionEnd = new GESessionEnd(gameID, gameVersion, currentSession, deviceInfo.getDeviceID());
-//        Event event = new Event(geSessionEnd.getEID(), TelemetryTagCache.activeTags(dbOperator, context())).withEvent(geSessionEnd.toString());
-//        event.save(dbOperator);
     }
 
     public UserSession find() {

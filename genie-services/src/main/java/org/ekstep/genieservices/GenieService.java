@@ -6,6 +6,7 @@ import org.ekstep.genieservices.commons.AndroidAppContext;
 import org.ekstep.genieservices.commons.AndroidLogger;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.config.ConfigService;
+import org.ekstep.genieservices.profile.UserProfileService;
 
 /**
  * Created on 4/14/2017.
@@ -28,5 +29,9 @@ public class GenieService {
 
     public ConfigService getConfigService() {
         return new ConfigService(applicationContext);
+    }
+
+    public UserProfileService getUserProfileService() {
+        return new UserProfileService(applicationContext);
     }
 }

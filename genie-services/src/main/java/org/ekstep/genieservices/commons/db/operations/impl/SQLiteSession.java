@@ -42,7 +42,7 @@ public class SQLiteSession implements IDBSession {
     public Void executeInTransaction(IDBTransaction transaction) {
         beginTransaction();
         try {
-            transaction.perform(appContext);
+            transaction.perform(this);
             isOperationSuccessful = true;
         } catch (Exception e) {
             isOperationSuccessful = false;
