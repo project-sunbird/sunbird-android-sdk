@@ -8,14 +8,18 @@ import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.db.DbConstants;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.commons.exception.DbException;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
+import org.ekstep.genieservices.content.db.model.ContentAccessesModel;
 import org.ekstep.genieservices.profile.db.model.AnonymousUserModel;
 import org.ekstep.genieservices.profile.db.model.UserModel;
 import org.ekstep.genieservices.profile.db.model.UserProfileModel;
 import org.ekstep.genieservices.profile.db.model.UserSessionModel;
 
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -40,8 +44,15 @@ public class UserProfileService extends BaseService {
      *                        with the data.
      */
     public void createUserProfile(Profile profile, IResponseHandler<Profile> responseHandler) {
-        GenieResponse<Profile> response = createProfile(profile);
-
+        GenieResponse<Profile> response = null;
+        if (profile != null && !profile.isValid()) {
+            // TODO: 26/4/17 Need to create error event
+//            return logAndSendResponse(request.gameID(), request.gameVersion(), new Response("failed", "VALIDATION_ERROR",
+//                    profile.getErrors(), ""), "createProfile");
+            response = GenieResponse.getErrorResponse(mAppContext, ServiceConstants.VALIDATION_ERROR, profile.getErrors().toString(), TAG + " - createProfile");
+        } else {
+            response = saveUserProfile(profile, mAppContext.getDBSession());
+        }
         if (response != null) {
             if (response.getStatus()) {
                 responseHandler.onSuccess(response);
@@ -51,25 +62,27 @@ public class UserProfileService extends BaseService {
         }
     }
 
-    private GenieResponse<Profile> createProfile(Profile profile) {
-        if (profile != null && !profile.isValid()) {
-            // TODO: 26/4/17 Need to create error event
-//            return logAndSendResponse(request.gameID(), request.gameVersion(), new Response("failed", "VALIDATION_ERROR",
-//                    profile.getErrors(), ""), "createProfile");
-
-            return GenieResponse.getErrorResponse(mAppContext, ServiceConstants.VALIDATION_ERROR, profile.getErrors().toString(), TAG + " - createProfile");
-        }
-
-        return saveUserProfile(profile);
-    }
-
-    private GenieResponse<Profile> saveUserProfile(Profile profile) {
+    private GenieResponse<Profile> saveUserProfile(Profile profile, IDBSession dbSession) {
         // TODO: 24/4/17 Need to create Location Wrapper to get location
         String uid = UUID.randomUUID().toString();
-        UserModel user = UserModel.buildUser(mAppContext, uid, profile);
-        user.create();
+        if (profile.getCreatedAt() == null) {
+            profile.setCreatedAt(new Date());
+        }
+        final UserModel userModel = UserModel.buildUser(dbSession, uid);
+        final UserProfileModel profileModel = UserProfileModel.buildUserProfile(dbSession, profile);
+        dbSession.executeInTransaction(new IDBTransaction() {
+            @Override
+            public Void perform(IDBSession dbSession) {
+                userModel.save();
+                // TODO: 24/4/17 Should add telemetry event after creating a new user
+                profileModel.save();
+                // TODO: 24/4/17 Should add telemetry event after creating ProfileDTO
+
+                return null;
+            }
+        });
         GenieResponse<Profile> successResponse = GenieResponse.getSuccessResponse("");
-        successResponse.setResult(GsonUtil.fromJson(user.getProfile().toString(), Profile.class));
+        successResponse.setResult(GsonUtil.fromJson(profileModel.getProfile().toString(), Profile.class));
 
         return successResponse;
     }
@@ -83,92 +96,55 @@ public class UserProfileService extends BaseService {
      */
     public void deleteUserProfile(String uid, IResponseHandler responseHandler) {
         //get the current user id
-        String currentUserID = getCurrentUserID();
-
-        try {
-            //match the current and requested user id if same then first set current user as anonymous
-            if (uid.equals(currentUserID)) {
+        UserSessionModel userSession = UserSessionModel.findUserSession(mAppContext);
+        if (userSession != null) {
+            if (userSession.getUserSessionBean().getUid().equals(uid)) {
                 setAnonymousUser();
             }
-
-            //now delete the requested user id
-            UserModel user = UserModel.findByUserId(mAppContext, uid);
-
-            //if something goes wrong while deleting, then rollback the delete
-            if (user != null) {
-                user.delete(mAppContext);
-            }
-
-            responseHandler.onSuccess(GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE));
-        } catch (Exception e) {
-            Logger.e(mAppContext, "Error when deleting user profile", e.getMessage());
-            rollBack(currentUserID);
-            responseHandler.onError(GenieResponse.getErrorResponse(mAppContext, e.toString(), ServiceConstants.ERROR_DELETING_A_USER, TAG));
         }
+        final ContentAccessesModel accessesModel = ContentAccessesModel.findByUid(mAppContext.getDBSession(), uid);
+        final UserProfileModel userProfileModel = UserProfileModel.findUserProfile(mAppContext.getDBSession(), uid);
+        final UserModel userModel = UserModel.findByUserId(mAppContext.getDBSession(), uid);
+        mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
+            @Override
+            public Void perform(IDBSession dbSession) {
+                accessesModel.delete();
+                userProfileModel.delete();
+                // TODO: 24/4/17 Should add telemetry event after deleting a profile
+                userModel.delete();
+                // TODO: 24/4/17 Should add telemetry event after deleting user
+
+                return null;
+            }
+        });
 
     }
 
-    private void rollBack(String previousUserId) {
-        UserModel previousCurrentUser = UserModel.findByUserId(mAppContext, previousUserId);
-        setCurrentUser(previousCurrentUser);
-    }
-
-    private String getCurrentUserID() {
-        UserSessionModel userSession = UserSessionModel.findUserSession(mAppContext, "");
-        UserSession currentSession = userSession.find();
-        if (currentSession != null && !currentSession.getUid().isEmpty())
-            return currentSession.getUid();
-        else
-            return null;
-    }
-
-    private String setAnonymousUser() {
-        AnonymousUserModel anonymousUser = AnonymousUserModel.findAnonymousUser(mAppContext);
-
-        String uid = anonymousUser.getUid();
-        if (uid == null || uid.isEmpty()) {
+     private GenieResponse setAnonymousUser() {
+        AnonymousUserModel anonymousUserModel = AnonymousUserModel.findAnonymousUser(mAppContext.getDBSession());
+        String uid = null;
+        if (anonymousUserModel == null) {
             uid = createAnonymousUser();
-            if (uid.isEmpty()) {
-                // TODO: 25/4/17 GEError Event has to be added here
-                return GenieResponse.getErrorResponse(mAppContext, DbConstants.ERROR, ServiceConstants.UNABLE_TO_CREATE_ANONYMOUS_USER, TAG).toString();
-            }
-
+        } else {
+            uid = anonymousUserModel.getUid();
         }
-
         setUserSession(uid);
-        GenieResponse response = GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-
-        return response.toString();
-    }
-
-    private String setCurrentUser(UserModel user) {
-        if (!user.exists()) {
-            // TODO: 25/4/17 GEError Event has to be added here
-            return GenieResponse.getErrorResponse(mAppContext, ServiceConstants.INVALID_USER, ServiceConstants.NO_USER_WITH_SPECIFIED_ID, TAG).toString();
-        }
-
-        setUserSession(user.getUid());
-
-        return GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE).toString();
+        return GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
     }
 
     private String createAnonymousUser() {
         //random user id generated
         String uid = UUID.randomUUID().toString();
-        UserModel user = UserModel.buildUser(mAppContext, uid);
-
-        try {
-            user.create();
-        } catch (DbException e) {
-            return "";
-        }
-
+        UserModel user = UserModel.buildUser(mAppContext.getDBSession(), uid);
+        user.save();
         return user.getUid();
     }
 
     private void setUserSession(String uid) {
-        UserSessionModel userSession = UserSessionModel.buildUserSession(mAppContext, uid);
-        userSession.save();
+        // TODO Telemetry for GE_SESSION_END for current user and GE_SESSION_START for new user
+        // TODO Add check to not start a new session if the same uid is being set again
+        UserSessionModel userSessionModel = UserSessionModel.buildUserSession(mAppContext, uid);
+        userSessionModel.startSession();
     }
 
     /**
@@ -204,25 +180,9 @@ public class UserProfileService extends BaseService {
                 return GenieResponse.getErrorResponse(mAppContext, ServiceConstants.VALIDATION_ERROR, profile.getErrors().toString(), TAG);
 
             }
-
-            Profile newProfile = new Profile("", "", "");
-            newProfile.setUid(profile.getUid());
-            UserProfileModel newUserProfile = UserProfileModel.buildUserProfile(mAppContext, newProfile);
-
-
-            if (!newUserProfile.getProfile().isValid()) {
-                // TODO: 25/4/17 GEError Event has to be added here
-                return GenieResponse.getErrorResponse(mAppContext, ServiceConstants.INVALID_PROFILE, ServiceConstants.UNABLE_TO_FIND_PROFILE, TAG);
-            }
-
-            try {
-                UserProfileModel userProfile = UserProfileModel.buildUserProfile(mAppContext, profile);
-                userProfile.update(mAppContext);
-            } catch (DbException e) {
-                Logger.e(mAppContext, TAG, e.getMessage());
-                // TODO: 25/4/17 GEError Event has to be added here
-                return GenieResponse.getErrorResponse(mAppContext, DbConstants.ERROR, e.getMessage(), TAG);
-            }
+            // TODO: 26/4/17 GEUpdateEvent has to be added to the telemetry
+            UserProfileModel userProfileModel = UserProfileModel.buildUserProfile(mAppContext.getDBSession(), profile);
+            userProfileModel.update();
         }
 
 
@@ -236,22 +196,7 @@ public class UserProfileService extends BaseService {
      *                        with the data.
      */
     public void setAnonymousUser(IResponseHandler responseHandler) {
-        AnonymousUserModel anonymousUser = AnonymousUserModel.findAnonymousUser(mAppContext);
-
-        String uid = anonymousUser.getUid();
-        if (uid == null || uid.isEmpty()) {
-            uid = createAnonymousUser();
-            if (uid.isEmpty()) {
-                // TODO: 25/4/17 GEError Event has to be added here
-                responseHandler.onError(GenieResponse.getErrorResponse(mAppContext, DbConstants.ERROR, ServiceConstants.UNABLE_TO_CREATE_ANONYMOUS_USER, TAG));
-            }
-
-        }
-
-        setUserSession(uid);
-        GenieResponse successResponse = GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-
-        responseHandler.onSuccess(successResponse);
+        responseHandler.onSuccess(setAnonymousUser());
     }
 
     /**
@@ -260,17 +205,20 @@ public class UserProfileService extends BaseService {
      * @param responseHandler - the class which will receive the success or failure response
      *                        with the data.
      */
-    public void getAnonymousUser(IResponseHandler responseHandler) {
-        AnonymousUserModel anonymousUser = AnonymousUserModel.findAnonymousUser(mAppContext);
+    public void getAnonymousUser(IResponseHandler<Profile> responseHandler) {
+        AnonymousUserModel anonymousUserModel = AnonymousUserModel.findAnonymousUser(mAppContext.getDBSession());
 
-        String uid = anonymousUser.getUid();
-        Profile profile = new Profile("", "", "");
-        profile.setUid(uid);
+        String uid = null;
+        if (anonymousUserModel == null) {
+            uid = createAnonymousUser();
+        } else {
+            uid = anonymousUserModel.getUid();
+        }
+        Profile profile = new Profile(uid);
 
-        GenieResponse successResponse = new GenieResponse<>();
+        GenieResponse successResponse = new GenieResponse<Profile>();
         successResponse.setStatus(true);
-        successResponse.setResult(GsonUtil.fromJson(profile.toString(), Profile.class));
-
+        successResponse.setResult(profile);
         responseHandler.onSuccess(successResponse);
     }
 
@@ -282,14 +230,14 @@ public class UserProfileService extends BaseService {
      *                        with the data.
      */
     public void setCurrentUser(String uid, IResponseHandler responseHandler) {
-        UserModel user = UserModel.findByUserId(mAppContext, uid);
+        UserModel userModel = UserModel.findByUserId(mAppContext.getDBSession(), uid);
 
-        if (!user.exists()) {
+        if (userModel == null) {
             // TODO: 25/4/17 GEError Event has to be added here
             responseHandler.onError(GenieResponse.getErrorResponse(mAppContext, ServiceConstants.INVALID_USER, ServiceConstants.NO_USER_WITH_SPECIFIED_ID, TAG));
         }
 
-        setUserSession(user.getUid());
+        setUserSession(userModel.getUid());
 
         GenieResponse successResponse = GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         responseHandler.onSuccess(successResponse);
@@ -302,24 +250,17 @@ public class UserProfileService extends BaseService {
      *                        with the data.
      */
     public void getCurrentUser(IResponseHandler responseHandler) {
-        UserSessionModel userSession = UserSessionModel.buildUserSession(mAppContext, "");
+        UserSessionModel userSessionModel = UserSessionModel.findUserSession(mAppContext);
 
-        //get the current user session
-        UserSession currentSession = userSession.find();
-
-        if (currentSession != null && currentSession.getUid().isEmpty()) {
+        if (userSessionModel == null) {
             // TODO: 25/4/17 GEError Event has to be added here
             responseHandler.onError(GenieResponse.getErrorResponse(mAppContext, ServiceConstants.NOT_EXISTS, ServiceConstants.NO_CURRENT_USER, TAG));
         }
 
-        Profile profile = new Profile("", "", "");
-        profile.setUid(currentSession.getUid());
-        UserProfileModel userProfile = UserProfileModel.buildUserProfile(mAppContext, profile);
+        UserProfileModel userProfileModel = UserProfileModel.findUserProfile(mAppContext.getDBSession(), userSessionModel.getUserSessionBean().getUid());
 
-        GenieResponse successResponse = new GenieResponse<>();
-        successResponse.setStatus(true);
-        successResponse.setResult(GsonUtil.fromJson(userProfile.getProfile().toString(), Profile.class));
-
+        GenieResponse successResponse = GenieResponse.getSuccessResponse("");
+        successResponse.setResult(userProfileModel.getProfile());
         responseHandler.onSuccess(successResponse);
     }
 
@@ -330,14 +271,15 @@ public class UserProfileService extends BaseService {
      *                        with the data.
      */
     public void unsetCurrentUser(IResponseHandler responseHandler) {
-        UserSessionModel userSession = UserSessionModel.buildUserSession(mAppContext, "");
+        UserSessionModel userSessionModel = UserSessionModel.findUserSession(mAppContext);
 
-        UserSession currentSession = userSession.find();
-
-        if (currentSession != null && !currentSession.getUid().isEmpty()) {
-            userSession.endCurrentSession();
+        if (userSessionModel != null) {
+            // TODO: 26/4/17 Add GESessionEnd event
+//        GESessionEnd geSessionEnd = new GESessionEnd(gameID, gameVersion, currentSession, deviceInfo.getDeviceID());
+//        Event event = new Event(geSessionEnd.getEID(), TelemetryTagCache.activeTags(dbOperator, context())).withEvent(geSessionEnd.toString());
+//        event.save(dbOperator);
+            userSessionModel.endSession();
         }
-
         GenieResponse successResponse = GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         responseHandler.onSuccess(successResponse);
     }

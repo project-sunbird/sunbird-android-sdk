@@ -39,7 +39,7 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
         appContext.setDBSession(ServiceDbHelper.getGSDBSession(appContext));
         appContext.setSummarizerDBSession(ServiceDbHelper.getSummarizerDBSession(appContext));
         appContext.setConnectionInfo(new AndroidNetworkConnectivity(appContext));
-        appContext.setHttpClient(new AndroidHttpClient(new BasicAuthenticator(appContext.getBuildConfig().getUserName(),appContext.getBuildConfig().getPassword())));
+        appContext.setHttpClient(new AndroidHttpClient(new BasicAuthenticator(appContext.getBuildConfig().getUserName(), appContext.getBuildConfig().getPassword())));
         appContext.setKeyValueStore(new PreferenceWrapper(appContext, Constants.SHARED_PREFERENCE_NAME));
         appContext.setDeviceInfo(new DeviceInfo(context));
         appContext.setLocationInfo(new LocationInfo(context));
@@ -93,17 +93,8 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
     }
 
     @Override
-    public IDeviceInfo getDeviceInfo() {
-        return mDeviceInfo;
-    }
-
-    @Override
     public IParams getBuildConfig() {
         return mParams;
-    }
-
-    private void setDeviceInfo(IDeviceInfo deviceInfo) {
-        this.mDeviceInfo = deviceInfo;
     }
 
     @Override

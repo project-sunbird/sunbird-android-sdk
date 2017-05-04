@@ -6,6 +6,7 @@ package org.ekstep.genieservices;
 
 public interface Constants {
     String SHARED_PREFERENCE_NAME = "org.ekstep.genieservices.preference_file";
+    String TELEMETRY_VERSION = "2";
 
     interface Params {
         String VERSION_CODE = "VERSION_CODE";

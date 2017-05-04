@@ -8,6 +8,7 @@ import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.config.db.contract.ResourceBundleEntry;
 
@@ -18,27 +19,31 @@ public class ResourceBundleModel implements IWritable, IReadable, IUpdatable, IC
     private String mIdentifier;
     private String mJson;
     private Long id = -1L;
-    private AppContext mAppContext;
+    private IDBSession mDBSession;
 
-    private ResourceBundleModel(AppContext appContext, String identifier) {
-        mAppContext = appContext;
+    private ResourceBundleModel(IDBSession dbSession, String identifier) {
+        this.mDBSession = dbSession;
         mIdentifier = identifier;
     }
 
-    private ResourceBundleModel(AppContext appContext, String identifier, String json) {
-        mAppContext = appContext;
+    private ResourceBundleModel(IDBSession dbSession, String identifier, String json) {
+        this.mDBSession = dbSession;
         mJson = json;
         mIdentifier = identifier;
     }
 
-    public static ResourceBundleModel create(AppContext appContext, String identifier, String json) {
-        return new ResourceBundleModel(appContext, identifier, json);
+    public static ResourceBundleModel create(IDBSession dbSession, String identifier, String json) {
+        return new ResourceBundleModel(dbSession, identifier, json);
     }
 
-    public static ResourceBundleModel findById(AppContext appContext, String identifier) {
-        ResourceBundleModel resourceBundle = new ResourceBundleModel(appContext, identifier);
-        appContext.getDBSession().read(resourceBundle);
-        return resourceBundle;
+    public static ResourceBundleModel findById(IDBSession dbSession, String identifier) {
+        ResourceBundleModel resourceBundle = new ResourceBundleModel(dbSession, identifier);
+        dbSession.read(resourceBundle);
+        if (resourceBundle.getResourceString() == null) {
+            return null;
+        } else {
+            return resourceBundle;
+        }
     }
 
     @Override
@@ -118,7 +123,6 @@ public class ResourceBundleModel implements IWritable, IReadable, IUpdatable, IC
 
     @Override
     public String filterForRead() {
-        mAppContext.getLogger().info(TAG, String.format("SEARCH Bundle: %s", mIdentifier));
         String selectionCriteria = String.format(Locale.US, "where %s = '%s'", ResourceBundleEntry.COLUMN_NAME_BUNDLE_IDENTIFIER, mIdentifier);
         return selectionCriteria;
     }
@@ -134,18 +138,18 @@ public class ResourceBundleModel implements IWritable, IReadable, IUpdatable, IC
     }
 
     public void save() {
-        mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
-            @Override
-            public Void perform(AppContext context) {
-                context.getDBSession().clean(ResourceBundleModel.this);
-                context.getDBSession().create(ResourceBundleModel.this);
-                return null;
-            }
-        });
+        mDBSession.create(this);
+    }
+
+    public void update() {
+        mDBSession.update(this);
     }
 
     public String getResourceString() {
         return mJson;
+    }
+    public String getIdentifier() {
+        return mIdentifier;
     }
 
     public boolean exists() {

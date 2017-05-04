@@ -83,7 +83,7 @@ public class Event implements IWritable {
         return event;
     }
 
-    public static Event find(AppContext appContext, String eventString) {
+    public static Event build(AppContext appContext, String eventString) {
         Event event = new Event(appContext, TelemetryTagCache.activeTags(appContext));
         event.event = GsonUtil.fromJson(eventString, Map.class, ServiceConstants.Event.ERROR_INVALID_EVENT);
         event.eventType = (String) event.event.get("eid");

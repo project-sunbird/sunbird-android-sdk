@@ -15,6 +15,8 @@ import org.ekstep.genieservices.config.ConfigService;
 public class GenieService {
 
     private AppContext<Context, AndroidLogger>  applicationContext;
+    private static ConfigService sConfigService;
+    private static TelemetryService sTelemetryService;
 
     public static GenieService init(Context context, String packageName, String apiKey, String gDataId) {
         AppContext<Context, AndroidLogger>  applicationContext = AndroidAppContext.buildAppContext(context, packageName, apiKey, new AndroidLogger(), gDataId);
@@ -26,7 +28,21 @@ public class GenieService {
         this.applicationContext = applicationContext;
     }
 
-    public ConfigService getConfigService() {
-        return new ConfigService(applicationContext);
+    public static ConfigService getConfigService() {
+        if (sConfigService == null) {
+            sConfigService = new ConfigService(applicationContext);
+        }
+        return sConfigService;
+    }
+
+    public UserProfileService getUserProfileService() {
+        return new UserProfileService(applicationContext);
+    }
+
+    public static TelemetryService getTelemetryService() {
+        if (sTelemetryService == null) {
+            sTelemetryService = new TelemetryService(applicationContext);
+        }
+        return sTelemetryService;
     }
 }

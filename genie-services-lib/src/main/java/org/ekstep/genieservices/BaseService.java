@@ -45,6 +45,7 @@ public class BaseService {
             response = GenieResponse.getSuccessResponse("");
             response.setResult(result);
             responseHandler.onSuccess(response);
+
         } else {
             response = GenieResponse.getErrorResponse(mAppContext, ServiceConstants.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR);
             responseHandler.onError(response);

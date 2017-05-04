@@ -19,7 +19,7 @@ public class TelemetryEventPublisher {
                 .execute(new AsyncExecutor.RunnableEx() {
                     @Override
                     public void run() throws Exception {
-//                        TelemetryEvent event = TelemetryEvent.buildFromMap(unmodifiableMap(eventMap));
+//                        BaseTelemetry event = BaseTelemetry.buildFromMap(unmodifiableMap(eventMap));
 //                        Log.i(EventBus.TAG, "Posting event. " + event.eid());
 //                        EventBus.getDefault().post(event);
                     }

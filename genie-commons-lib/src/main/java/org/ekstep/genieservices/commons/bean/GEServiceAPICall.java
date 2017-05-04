@@ -2,7 +2,6 @@ package org.ekstep.genieservices.commons.bean;
 
 import org.ekstep.genieservices.commons.GenieResponse;
 import org.ekstep.genieservices.commons.ITelemetry;
-import org.ekstep.genieservices.commons.utils.DateUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -13,41 +12,28 @@ import java.util.Map;
  */
 
 public class GEServiceAPICall extends BaseTelemetry implements ITelemetry {
-    private final String eid = "GE_SERVICE_API_CALL" ;
-    private final Map<String,Object> edata;
 
-    public static final String MODE_WIFI = "WIFI";
-    public static final String MODE_MDATA = "MDATA";
-    public static final String MODE_LOCAL = "LOCAL";
-    public static final String MODE_NO_NETWORK = "NO_NETWORK";
+    private final String eid = "GE_SERVICE_API_CALL";
 
     public GEServiceAPICall(String service, String method, boolean status, String error,
                             String message, List<String> errorMessages, Object result,
                             String gameID, String gameVersion) {
-        edata=new HashMap<>();
-        edata.put("eks",createEKS(service,method,status,error,message,errorMessages,result));
-
-        String gdataId = (gameID == null || gameID.trim().isEmpty()) ? "genieservice.android" : gameID;
-//        String gdataVersion = (gameVersion == null || gameVersion.trim().isEmpty())
-//                ? BuildConfig.VERSION_NAME
-//                : gameVersion;
-        setGdata(new GameData(gdataId, gameVersion));
-        setVer("2.0");
-        setEts(DateUtil.getEpochTime());
+        super(gameID, gameVersion);
+        setEks(createEKS(service, method, status ? "Successful" : "Failed", error, message, errorMessages, result));
     }
 
-    public void setParams(Map params){
-        HashMap<String, Object> eks = (HashMap<String, Object>) edata.get("eks");
-        if(eks!=null){
-            eks.put("request",params);
+    public void setParams(Map params) {
+        HashMap<String, Object> eks = (HashMap<String, Object>) getEData().get("eks");
+        if (eks != null) {
+            eks.put("request", params);
         }
     }
 
-    protected HashMap<String, Object> createEKS(String service, String method, boolean status, String error, String message, List<String> errorMessages, Object result) {
+    protected HashMap<String, Object> createEKS(String service, String method, String status, String error, String message, List<String> errorMessages, Object result) {
         HashMap<String, Object> eks = new HashMap<>();
         eks.put("service", service);
         eks.put("method", method);
-        eks.put("status", status ? "Successful":"Failed");
+        eks.put("status", status);
         eks.put("error", error);
         eks.put("message", message);
         eks.put("errorMessages", errorMessages);
@@ -72,7 +58,7 @@ public class GEServiceAPICall extends BaseTelemetry implements ITelemetry {
     }
 
     public void setMode(String mode) {
-        HashMap<String, Object> eks = (HashMap<String, Object>) edata.get("eks");
+        HashMap<String, Object> eks = (HashMap<String, Object>) getEData().get("eks");
         if (eks != null) {
             eks.put("mode", mode);
         }
@@ -82,6 +68,7 @@ public class GEServiceAPICall extends BaseTelemetry implements ITelemetry {
         private String service;
         private String method;
         private GenieResponse response;
+        private HashMap result;
         private String gameID;
         private String gameVersion;
         private Map params;
@@ -102,9 +89,14 @@ public class GEServiceAPICall extends BaseTelemetry implements ITelemetry {
             return this;
         }
 
+        public Builder result(HashMap result) {
+            this.result = result;
+            return this;
+        }
+
         public GEServiceAPICall build() {
             GEServiceAPICall event = new GEServiceAPICall(service, method, response.getStatus(), response.getError(),
-                    response.getMessage(), response.getErrorMessages(), response.getResult(),
+                    response.getMessage(), response.getErrorMessages(), result,
                     gameID, gameVersion);
             event.setParams(this.params);
             event.setMode(mode);

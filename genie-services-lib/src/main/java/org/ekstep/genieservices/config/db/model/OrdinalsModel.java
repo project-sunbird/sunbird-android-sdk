@@ -8,6 +8,7 @@ import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.config.db.contract.OrdinalsEntry;
@@ -23,31 +24,35 @@ public class OrdinalsModel implements IReadable, IWritable, IUpdatable, ICleanab
 
     private static final String TAG = "model-Ordinals";
 
-    private AppContext mAppContext;
+    private IDBSession mDBSession;
 
     private Long id = -1L;
     private String mIdentifier;
     private String mJson;
 
-    private OrdinalsModel(AppContext appContext, String identifier) {
-        mAppContext = appContext;
+    private OrdinalsModel(IDBSession dbSession, String identifier) {
+        this.mDBSession = dbSession;
         this.mIdentifier = identifier;
     }
 
-    private OrdinalsModel(AppContext appContext, String identifier, String json) {
-        mAppContext = appContext;
+    private OrdinalsModel(IDBSession dbSession, String identifier, String json) {
+        this.mDBSession = dbSession;
         this.mJson = json;
         this.mIdentifier = identifier;
     }
 
-    public static OrdinalsModel create(AppContext appContext, String identifier, String json) {
-        return new OrdinalsModel(appContext, identifier, json);
+    public static OrdinalsModel build(IDBSession dbSession, String identifier, String json) {
+        return new OrdinalsModel(dbSession, identifier, json);
     }
 
-    public static OrdinalsModel findById(AppContext appContext, String identifier) {
-        OrdinalsModel ordinals = new OrdinalsModel(appContext, identifier);
-        appContext.getDBSession().read(ordinals);
-        return ordinals;
+    public static OrdinalsModel findById(IDBSession dbSession, String identifier) {
+        OrdinalsModel ordinals = new OrdinalsModel(dbSession, identifier);
+        dbSession.read(ordinals);
+        if (ordinals.getJSON() == null) {
+            return null;
+        } else {
+            return ordinals;
+        }
     }
 
     public boolean exists() {
@@ -55,14 +60,11 @@ public class OrdinalsModel implements IReadable, IWritable, IUpdatable, ICleanab
     }
 
     public void save() {
-        mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
-            @Override
-            public Void perform(AppContext context) {
-                context.getDBSession().clean(OrdinalsModel.this);
-                context.getDBSession().create(OrdinalsModel.this);
-                return null;
-            }
-        });
+        mDBSession.create(this);
+    }
+
+    public void update() {
+        mDBSession.update(this);
     }
 
     public String getJSON() {
@@ -141,8 +143,6 @@ public class OrdinalsModel implements IReadable, IWritable, IUpdatable, ICleanab
 
     @Override
     public String filterForRead() {
-        Logger.i(mAppContext, TAG, String.format("SEARCH Ordinals: %s", mIdentifier));
-
         String selectionCriteria = String.format(Locale.US, "where %s = '%s'", OrdinalsEntry.COLUMN_NAME_ORDINAL_IDENTIFIER, mIdentifier);
         return selectionCriteria;
     }

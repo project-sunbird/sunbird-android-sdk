@@ -37,7 +37,6 @@ public class SQLiteResultSet implements IResultSet {
         return cursor.moveToNext();
     }
 
-
     @Override
     public int getColumnIndex(String columnName) {
         return cursor.getColumnIndex(columnName);

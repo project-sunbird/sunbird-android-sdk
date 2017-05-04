@@ -9,29 +9,29 @@ import java.util.List;
  */
 public class MasterData {
 
-    private List<String> age;
-    private List<String> board;
-    private List<String> medium;
-    private List<String> subject;
-    private List<String> gradeLevel;
+    private String label;
+    private String value;
+    private String language;
+    private String description;
+    private List<MasterDataValues> values;
 
-    public List<String> getAge() {
-        return age;
+    public String getLabel() {
+        return label;
     }
 
-    public List<String> getBoard() {
-        return board;
+    public String getValue() {
+        return value;
     }
 
-    public List<String> getMedium() {
-        return medium;
+    public String getLanguage() {
+        return language;
     }
 
-    public List<String> getSubject() {
-        return subject;
+    public String getDescription() {
+        return description;
     }
 
-    public List<String> getGradeLevel() {
-        return gradeLevel;
+    public List<MasterDataValues> getValues() {
+        return values;
     }
 }

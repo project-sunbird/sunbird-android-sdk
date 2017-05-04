@@ -5,7 +5,9 @@ import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
+import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.config.db.contract.MasterDataEntry;
 
@@ -16,7 +18,7 @@ import java.util.Locale;
  *
  * @author swayangjit
  */
-public class MasterDataModel implements IReadable, ICleanable, IWritable {
+public class MasterDataModel implements IReadable, ICleanable, IWritable,IUpdatable {
 
     private Long id = -1L;
 
@@ -25,29 +27,37 @@ public class MasterDataModel implements IReadable, ICleanable, IWritable {
 
     private String mJson;
     private String mType;
-    private AppContext mAppContext;
+    private IDBSession mDBSession;
 
-    private MasterDataModel(AppContext appContext, String type, String json) {
-        mAppContext = appContext;
+    private MasterDataModel(IDBSession dbSession, String type, String json) {
+        mDBSession = dbSession;
         mType = type;
         mJson = json;
     }
 
-    public static MasterDataModel create(AppContext appContext, String type, String json) {
-        return new MasterDataModel(appContext, type, json);
+    public static MasterDataModel build(IDBSession dbSession, String type, String json) {
+        return new MasterDataModel(dbSession, type, json);
     }
 
-    public static MasterDataModel findByType(AppContext appContext, String type) {
-        MasterDataModel term = new MasterDataModel(appContext, type, null);
-        appContext.getDBSession().read(term);
-        return term;
+    public static MasterDataModel findByType(IDBSession dbSession, String type) {
+        MasterDataModel masterDataModel = new MasterDataModel(dbSession, type, null);
+        dbSession.read(masterDataModel);
+        if (masterDataModel.getMasterDataJson() == null) {
+            return null;
+        } else {
+            return masterDataModel;
+        }
     }
 
-    public static MasterDataModel find(AppContext appContext) {
-        MasterDataModel term = new MasterDataModel(appContext, null, null);
-        appContext.getDBSession().read(term);
-        return term;
-    }
+//    public static MasterDataModel find(AppContext appContext) {
+//        MasterDataModel masterDataModel = new MasterDataModel(appContext, null, null);
+//        appContext.getDBSession().read(masterDataModel);
+//        if (masterDataModel.getMasterDataJson() == null) {
+//            return null;
+//        } else {
+//            return masterDataModel;
+//        }
+//    }
 
     private void readWithoutMoving(IResultSet resultSet) {
         id = resultSet.getLong(0);
@@ -83,11 +93,24 @@ public class MasterDataModel implements IReadable, ICleanable, IWritable {
 
     @Override
     public void updateId(long id) {
+        this.id=id;
+    }
+
+    @Override
+    public ContentValues getFieldsToUpdate() {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MasterDataEntry.COLUMN_NAME_JSON, mJson);
+        return contentValues;
     }
 
     @Override
     public String getTableName() {
         return MasterDataEntry.TABLE_NAME;
+    }
+
+    @Override
+    public String updateBy() {
+        return String.format(Locale.US, "%s = '%s'", MasterDataEntry.COLUMN_NAME_TYPE, mType);
     }
 
     @Override
@@ -117,17 +140,14 @@ public class MasterDataModel implements IReadable, ICleanable, IWritable {
     }
 
     public void save() {
-        mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
-            @Override
-            public Void perform(AppContext context) {
-                context.getDBSession().clean(MasterDataModel.this);
-                context.getDBSession().create(MasterDataModel.this);
-                return null;
-            }
-        });
+        mDBSession.create(this);
     }
 
-    public String getTermJson() {
+    public void update() {
+        mDBSession.update(this);
+    }
+
+    public String getMasterDataJson() {
         return mJson;
     }
 

@@ -11,6 +11,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class DateUtil {
+
     public static final int MILLISECONDS_IN_AN_HOUR = 3600000;
     private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";
 

@@ -30,7 +30,7 @@ public class TelemetryLogger {
     public static int appLoggingLevel = 3;
 
 
-    public static void success(AppContext appContext,GenieResponse response,String service,String method, HashMap params){
+    public static void logSuccess(AppContext appContext,GenieResponse response,HashMap result,String service,String method, HashMap params){
         int parsedLogLevel = 3;
         if (params != null & params.get("logLevel") != null) {
             try {
@@ -38,31 +38,32 @@ public class TelemetryLogger {
             } catch (Exception ex) {}
         }
         if (parsedLogLevel >= appLoggingLevel) {
-            log(appContext,response,service,ServiceConstants.SUCCESS_RESPONSE, new HashMap<String, Object>(), method, params);
+            log(appContext,response,result,service, method, params);
         } else {
             //No logging as the log level requested was below the app logging level
         }
     }
 
-    public void error(AppContext appContext, GenieResponse response,String service, Exception e, String method, HashMap params){
+    public static void logFailure(AppContext appContext, GenieResponse response,String service, Exception e, String method, HashMap params){
         HashMap<String, Object> result = new HashMap<>();
         result.put("error", e.getMessage());
-        log(appContext,response,service,ServiceConstants.FAILURE_RESPONSE, result, method, params);
+        log(appContext,response,result,service,method, params);
     }
 
-    public void error(AppContext appContext, GenieResponse response,String service,String message, String method, HashMap params){
+    public static void logFailure(AppContext appContext, GenieResponse response,String service,String message, String method, HashMap params){
         HashMap<String, Object> result = new HashMap<>();
         result.put("message", message);
-        log(appContext,response,service,ServiceConstants.FAILURE_RESPONSE, result, method, params);
+        log(appContext,response,result,service,method, params);
     }
 
-    private static void log(AppContext appContext,GenieResponse response,String service, String status, Map<String, Object> result, String method, HashMap params) {
+    private static void log(AppContext appContext,GenieResponse response,HashMap result,String service,String method, HashMap params) {
         GEServiceAPICall.Builder eventBuilder = new GEServiceAPICall.Builder();
         GEServiceAPICall event = eventBuilder.service(service)
                 .method(method)
                 .mode(getNetworkMode(appContext.getConnectionInfo()))
                 .request(params)
                 .response(response)
+                .result(result)
                 .gameID(appContext.getBuildConfig().getGid())
                 .gameVersion(appContext.getBuildConfig().getVersionName())
                 .build();
@@ -78,12 +79,12 @@ public class TelemetryLogger {
     }
 
 
-    private static String  getNetworkMode(IConnectionInfo connectionInfo) {
+    public static String  getNetworkMode(IConnectionInfo connectionInfo) {
         if (connectionInfo.isConnectedOverWifi()) {
-            return GEServiceAPICall.MODE_WIFI;
+            return ServiceConstants.APIExecutionMode.MODE_WIFI;
         } else if (connectionInfo.isConnected()) {
-            return GEServiceAPICall.MODE_MDATA;
+            return ServiceConstants.APIExecutionMode.MODE_MDATA;
         }
-        return GEServiceAPICall.MODE_NO_NETWORK;
+        return ServiceConstants.APIExecutionMode.MODE_NO_NETWORK;
     }
 }

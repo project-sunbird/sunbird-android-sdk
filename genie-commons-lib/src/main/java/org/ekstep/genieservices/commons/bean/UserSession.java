@@ -1,5 +1,8 @@
 package org.ekstep.genieservices.commons.bean;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+
 /**
  * Created on 27/4/17.
  *
@@ -33,11 +36,15 @@ public class UserSession {
         this.sid = sid;
     }
 
-    public String getCreatedTime() {
-        return createdTime;
+    public DateTime getCreatedTime() {
+        return DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZZ").parseDateTime(createdTime);
     }
 
     public void setCreatedTime(String createdTime) {
         this.createdTime = createdTime;
+    }
+
+    public boolean isValid() {
+        return !uid.isEmpty();
     }
 }

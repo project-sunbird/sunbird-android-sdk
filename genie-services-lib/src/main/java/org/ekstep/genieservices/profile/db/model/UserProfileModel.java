@@ -9,7 +9,9 @@ import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
+import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.profile.db.contract.ProfileEntry;
 
 import java.util.Date;
@@ -20,27 +22,28 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
 
     private long id = -1;
     private Profile profile;
-    private AppContext appContext;
-    private boolean isMigration_02;
+    private IDBSession dbSession;
 
-    private UserProfileModel(AppContext appContext, Profile profile) {
+    private UserProfileModel(IDBSession dbSession, Profile profile) {
         this.profile = profile;
-        this.appContext = appContext;
-
-        //TODO this is probably not required
-        if (profile.getUid() == null || profile.getUid().isEmpty()) {
-            generateUID();
-        }
-
-        if (profile.getCreatedAt() == null) {
-            profile.setCreatedAt(new Date());
-        }
-
+        this.dbSession = dbSession;
     }
 
-    public static UserProfileModel buildUserProfile(AppContext appContext, Profile profile) {
-        UserProfileModel profileDTO = new UserProfileModel(appContext, profile);
-        return profileDTO;
+    public static UserProfileModel buildUserProfile(IDBSession dbSession, Profile profile) {
+        UserProfileModel profileModel = new UserProfileModel(dbSession, profile);
+        return profileModel;
+    }
+
+    public static UserProfileModel findUserProfile(IDBSession dbSession, String uid) {
+        Profile profile = new Profile(uid);
+        UserProfileModel profileModel = new UserProfileModel(dbSession, profile);
+        dbSession.read(profileModel);
+        //check if the profile was found and return null if the profile was not found
+        if (StringUtil.isNullOrEmpty(profileModel.profile.getHandle())) {
+            return null;
+        } else {
+            return profileModel;
+        }
     }
 
     public long getId() {
@@ -49,11 +52,6 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
 
     public Profile getProfile() {
         return profile;
-    }
-
-    private void generateUID() {
-        String uid = UUID.randomUUID().toString();
-        profile.setUid(uid);
     }
 
     @Override
@@ -75,7 +73,6 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
         if (cursor != null && cursor.moveToFirst()) {
             readWithoutMoving(cursor);
         }
-
         return this;
     }
 
@@ -90,10 +87,10 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
     }
 
     public void readWithoutMoving(IResultSet cursor) {
-        if (cursor == null) {
-            return;
-        }
-
+        /**
+         * The column index checks below are required because we allow exporting and importing profiles and profiles from previous Genie versions
+         * may not have some of these columns.
+         */
         id = cursor.getLong(0);
         profile.setUid(cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_UID)));
 
@@ -138,8 +135,6 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
             profile.setCreatedAt(new Date(cursor.getLong(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_CREATED_AT))));
         }
 
-        // In _07_UIBrandingMigration introducing two new col medium and board.
-        // Following check is required while importing profile before this migration.
         if (cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_MEDIUM) != -1) {
             profile.setMedium(cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_MEDIUM)));
         }
@@ -156,8 +151,7 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
 
     @Override
     public String filterForRead() {
-        String selectionCriteria = String.format(Locale.US, "where uid = '%s'", profile.getUid());
-        return selectionCriteria;
+        return String.format(Locale.US, "where uid = '%s'", profile.getUid());
     }
 
     @Override
@@ -170,18 +164,10 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
         return "limit 1";
     }
 
-//    public void initialize(DbOperator dbOperator) {
-//        Reader reader = new Reader(this);
-//        dbOperator.execute(reader);
-//    }
-
     @Override
     public ContentValues getFieldsToUpdate() {
         ContentValues contentValues = new ContentValues();
-        contentValues.clear();
-
         populateContentValues(contentValues);
-
         return contentValues;
     }
 
@@ -190,61 +176,18 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
         return String.format(Locale.US, "uid = '%s'", profile.getUid());
     }
 
-    public void update(AppContext appContext) {
-//        List<IOperate> tasks = new ArrayList<>();
-//        tasks.add(new Updater(this));
-
-//        GEUpdateProfile geUpdateProfile = new GEUpdateProfile(gameID, gameVersion, profile, deviceInfo.getDeviceID());
-//        Event profileEvent = new Event(geUpdateProfile.getEID(), TelemetryTagCache.activeTags(dbOperator, context)).withEvent(geUpdateProfile.toString());
-//
-//        tasks.add(new Writer(profileEvent));
-        // TODO: 26/4/17 GEUpdateEvent has to be added to the telemetry
-        appContext.getDBSession().executeInTransaction(new IDBTransaction() {
-            @Override
-            public Void perform(AppContext context) {
-                context.getDBSession().update(UserProfileModel.this);
-                return null;
-            }
-        });
-
-//        dbOperator.executeInOneTransaction(tasks);
+    public void update() {
+        dbSession.update(this);
     }
 
-//    public Void create(DeviceDetails deviceDetails, DbOperator dbOperator) {
-//        Event event = generateGeCreateProfileEvent(deviceDetails.getGameID(), deviceDetails.getGameVersion(), deviceDetails.getLocation(), deviceDetails.getDeviceInfo(), deviceDetails.getActiveGenieTags());
-//        Writer profileWriter = new Writer(this);
-//        Writer createProfileEventWriter = new Writer(event);
-//
-//        List<IOperate> dbOperations = new ArrayList<>();
-//        dbOperations.add(profileWriter);
-//        dbOperations.add(createProfileEventWriter);
-//
-//        dbOperator.executeInOneTransaction(dbOperations);
-//
-//        return null;
-//    }
+    public Void save() {
+        dbSession.create(this);
+        return null;
+    }
 
-//    public boolean exists(DbOperator dbOperator) {
-//        String uid = getProfile().getUid();
-//        Profile profile = new Profile("", "", "");
-//        profile.setUid(uid);
-//
-//        ProfileDTO otherProfileDTO = getOtherProfileDTO(dbOperator, profile);
-//
-//        return otherProfileDTO.getId() != -1;
-//    }
-
-//    @NonNull
-//    protected ProfileDTO getOtherProfileDTO(DbOperator dbOperator, Profile profile) {
-//        ProfileDTO otherProfileDTO = new ProfileDTO(profile);
-//        Reader reader = new Reader(otherProfileDTO);
-//        dbOperator.execute(reader);
-//
-//        return otherProfileDTO;
-//    }
-
-    public void enableMigration_02() {
-        isMigration_02 = true;
+    public Void delete() {
+        dbSession.clean(this);
+        return null;
     }
 
     private void populateContentValues(ContentValues contentValues) {
@@ -260,14 +203,8 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
         contentValues.put(ProfileEntry.COLUMN_NAME_MONTH, profile.getMonth());
         contentValues.put(ProfileEntry.COLUMN_NAME_IS_GROUP_USER, getGroupUser());
         contentValues.put(ProfileEntry.COLUMN_NAME_CREATED_AT, profile.getCreatedAt().getTime());
-
-        if (!isMigration_02) {
-            contentValues.put(ProfileEntry.COLUMN_NAME_MEDIUM, profile.getMedium());
-        }
-
-        if (!isMigration_02) {
-            contentValues.put(ProfileEntry.COLUMN_NAME_BOARD, profile.getBoard());
-        }
+        contentValues.put(ProfileEntry.COLUMN_NAME_MEDIUM, profile.getMedium());
+        contentValues.put(ProfileEntry.COLUMN_NAME_BOARD, profile.getBoard());
     }
 
     private void updateFieldsForGroupUser() {
@@ -286,10 +223,6 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
         return profile.isGroupUser() ? 1 : 0;
     }
 
-    protected void updateWithCurrentTime() {
-        profile.setCreatedAt(new Date());
-    }
-
     @Override
     public void clean() {
         id = -1L;
@@ -300,20 +233,5 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
     public String selectionToClean() {
         return String.format(Locale.US, "where %s = '%s'", ProfileEntry.COLUMN_NAME_UID, profile.getUid());
     }
-
-//    protected Event generateGeCreateProfileEvent(String gameID, String gameVersion, String location, DeviceInfo deviceInfo, Set<String> hashedTags) {
-//        GECreateProfile geCreateProfile = getGeCreateProfile(gameID, gameVersion, location, deviceInfo);
-//
-//        return new Event(geCreateProfile.getEID(), hashedTags).withEvent(geCreateProfile.toString());
-//    }
-//
-//    @NonNull
-//    private GECreateProfile getGeCreateProfile(String gameID, String gameVersion, String location, DeviceInfo deviceInfo) {
-//        GECreateProfile geCreateProfile = new GECreateProfile(gameID, gameVersion, profile, location);
-//        geCreateProfile.setDid(deviceInfo.getDeviceID());
-//        geCreateProfile.setTs(TimeUtil.getCurrentTimestamp());
-//
-//        return geCreateProfile;
-//    }
 
 }
