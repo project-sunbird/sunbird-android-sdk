@@ -6,6 +6,7 @@ import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IWritable;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.commons.exception.EncryptionException;
 import org.ekstep.genieservices.commons.utils.Logger;
@@ -159,8 +160,8 @@ public class Partner implements IWritable, IReadable {
         // TODO: 2/5/17 Generate GERegisterPartner
         appContext.getDBSession().executeInTransaction(new IDBTransaction() {
             @Override
-            public Void perform(AppContext context) {
-                context.getDBSession().create(Partner.this);
+            public Void perform(IDBSession dbSession) {
+                dbSession.create(Partner.this);
                 return null;
             }
         });
@@ -169,8 +170,8 @@ public class Partner implements IWritable, IReadable {
     public void initialize() {
         appContext.getDBSession().executeInTransaction(new IDBTransaction() {
             @Override
-            public Void perform(AppContext context) {
-                context.getDBSession().read(Partner.this);
+            public Void perform(IDBSession dbSession) {
+                dbSession.read(Partner.this);
                 return null;
             }
         });
