@@ -62,19 +62,22 @@ public class UserProfileService extends BaseService {
         }
     }
 
-    private GenieResponse<Profile> saveUserProfile(Profile profile, IDBSession dbSession) {
+    private GenieResponse<Profile> saveUserProfile(final Profile profile, IDBSession dbSession) {
         // TODO: 24/4/17 Need to create Location Wrapper to get location
         String uid = UUID.randomUUID().toString();
         if (profile.getCreatedAt() == null) {
             profile.setCreatedAt(new Date());
         }
-        final UserModel userModel = UserModel.buildUser(dbSession, uid);
+        final UserModel userModel = UserModel.build(dbSession, uid);
+
+        profile.setUid(uid);
         final UserProfileModel profileModel = UserProfileModel.buildUserProfile(dbSession, profile);
         dbSession.executeInTransaction(new IDBTransaction() {
             @Override
             public Void perform(IDBSession dbSession) {
                 userModel.save();
                 // TODO: 24/4/17 Should add telemetry event after creating a new user
+
                 profileModel.save();
                 // TODO: 24/4/17 Should add telemetry event after creating ProfileDTO
 
@@ -135,7 +138,7 @@ public class UserProfileService extends BaseService {
     private String createAnonymousUser() {
         //random user id generated
         String uid = UUID.randomUUID().toString();
-        UserModel user = UserModel.buildUser(mAppContext.getDBSession(), uid);
+        UserModel user = UserModel.build(mAppContext.getDBSession(), uid);
         user.save();
         return user.getUid();
     }
