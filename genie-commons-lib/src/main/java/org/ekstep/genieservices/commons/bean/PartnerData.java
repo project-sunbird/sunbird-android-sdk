@@ -1,27 +1,28 @@
 package org.ekstep.genieservices.commons.bean;
 
 /**
- * Created on 28/4/17.
- * @author shriharsh
+ * Created on 2/5/17.
  *
+ * @author shriharsh
  */
 
-public class PartnerRegistrationRequest {
+public class PartnerData {
     private String gameID;
     private String gameVersion;
     private String partnerID;
+    private String partnerData;
     private String publicKey;
 
-    public PartnerRegistrationRequest(String partnerID, String publicKey) {
-        this.partnerID = partnerID;
-        this.publicKey = publicKey;
-    }
-
-    public PartnerRegistrationRequest(String gameID, String gameVersion, String partnerID, String publicKey) {
+    public PartnerData(String gameID, String gameVersion, String partnerID, String partnerData, String publicKey) {
         this.gameID = gameID;
         this.gameVersion = gameVersion;
         this.partnerID = partnerID;
+        this.partnerData = partnerData;
         this.publicKey = publicKey;
+    }
+
+    public String getPublicKey() {
+        return publicKey;
     }
 
     public String gameID() {
@@ -36,7 +37,7 @@ public class PartnerRegistrationRequest {
         return this.partnerID;
     }
 
-    public String publicKey() {
-        return this.publicKey;
+    public String partnerData() {
+        return this.partnerData;
     }
 }
