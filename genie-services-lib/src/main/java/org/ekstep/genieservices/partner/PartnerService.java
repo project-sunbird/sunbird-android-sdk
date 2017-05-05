@@ -117,7 +117,6 @@ public class PartnerService extends BaseService {
             genieResponse = GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             responseHandler.onSuccess(genieResponse);
         } else {
-            Logger.e(appContext, TAG, UNREGISTERED_PARTNER);
             genieResponse = GenieResponse.getErrorResponse(appContext, ServiceConstants.FAILED_RESPONSE, UNREGISTERED_PARTNER + String.format(Locale.US, "Session start failed! Partner: %s",
                     partnerData.getPartnerID()), TAG);
             responseHandler.onError(genieResponse);
@@ -154,7 +153,6 @@ public class PartnerService extends BaseService {
                 genieResponse.setResult(data.toString());
                 responseHandler.onSuccess(genieResponse);
             } catch (EncryptionException e) {
-                Logger.e(appContext, TAG, ENCRYPTION_FAILURE, e);
                 List<String> errorMessages = new ArrayList<>();
                 String errorMessage = e.getMessage();
                 errorMessages.add(errorMessage);
@@ -162,7 +160,6 @@ public class PartnerService extends BaseService {
                 responseHandler.onError(genieResponse);
             }
         } else {
-            Logger.e(appContext, TAG, UNREGISTERED_PARTNER);
             genieResponse = GenieResponse.getErrorResponse(appContext, ServiceConstants.FAILED_RESPONSE, UNREGISTERED_PARTNER + String.format(Locale.US, "Sending data failed! Partner: %s", partnerData.getPartnerID()), TAG);
             responseHandler.onError(genieResponse);
         }

@@ -25,6 +25,7 @@ public class UserModel implements IWritable, IReadable, ICleanable {
         this.uid = uid;
     }
 
+    // TODO check with Shriharsh why this was required?
     public static UserModel build(IDBSession dbSession) {
         UserModel user = new UserModel(dbSession, UUID.randomUUID().toString());
         return user;
