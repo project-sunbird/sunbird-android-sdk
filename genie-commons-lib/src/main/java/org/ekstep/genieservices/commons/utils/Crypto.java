@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.util;
+package org.ekstep.genieservices.commons.utils;
 
 
 import java.io.UnsupportedEncodingException;
@@ -13,7 +13,6 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.UUID;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -176,7 +175,4 @@ public class Crypto {
         return new IvParameterSpec(realIV);
     }
 
-    public static String getUID(){
-        return UUID.randomUUID().toString();
-    }
-}
+ }

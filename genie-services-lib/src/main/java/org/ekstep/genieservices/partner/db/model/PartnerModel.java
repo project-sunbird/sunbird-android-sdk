@@ -7,8 +7,7 @@ import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
-import org.ekstep.genieservices.commons.utils.Logger;
+import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.partner.db.contract.PartnerEntry;
 
 import java.util.Locale;
@@ -16,31 +15,36 @@ import java.util.Set;
 
 public class PartnerModel implements IWritable, IReadable {
     private static final String TAG = "model-Partner";
+    private Long id = -1L;
     private String publicKeyId;
     private String partnerID;
     private String publicKey;
-    private ContentValues contentValues;
-    private AppContext appContext;
-    private IDBSession idbSession;
+    private IDBSession dbSession;
 
-    private PartnerModel(String partnerID, String publicKey, AppContext appContext, IDBSession idbSession, String publicKeyId) {
+    private PartnerModel(IDBSession dbSession, String partnerID, String publicKey, String publicKeyId) {
         this.partnerID = partnerID;
-        this.appContext = appContext;
-        this.idbSession = idbSession;
+        this.dbSession = dbSession;
         this.publicKey = publicKey;
-        contentValues = new ContentValues();
         this.publicKeyId = publicKeyId;
     }
 
-    public static PartnerModel findByPartnerId(IDBSession idbSession, AppContext appContext, String partnerID, String publicKey, String publicKeyId) {
-        PartnerModel partnerModel = new PartnerModel(partnerID, publicKey, appContext, idbSession, publicKeyId);
+    public static PartnerModel findByPartnerId(IDBSession idbSession, String partnerID) {
+        PartnerModel partnerModel = new PartnerModel(idbSession, partnerID, null, null);
         idbSession.read(partnerModel);
-        return partnerModel;
+        if (StringUtil.isNullOrEmpty(partnerModel.publicKey)) {
+            return null;
+        } else {
+            return partnerModel;
+        }
+    }
+
+    public static PartnerModel build(IDBSession idbSession, String partnerID, String publicKey, String publicKeyId) {
+        return new PartnerModel(idbSession, partnerID, publicKey, publicKeyId);
     }
 
     @Override
     public ContentValues getContentValues() {
-        contentValues.clear();
+        ContentValues contentValues = new ContentValues();
         contentValues.put(PartnerEntry.COLUMN_NAME_UID, partnerID);
         contentValues.put(PartnerEntry.COLUMN_NAME_KEY, publicKey);
         contentValues.put(PartnerEntry.COLUMN_NAME_KEY_ID, publicKeyId);
@@ -52,18 +56,14 @@ public class PartnerModel implements IWritable, IReadable {
 
     }
 
-    public boolean exists() {
-        return (partnerID != null && !partnerID.isEmpty());
-    }
-
     @Override
     public IReadable read(IResultSet cursor) {
         if (cursor != null && cursor.moveToFirst()) {
+            id = cursor.getLong(0);
             partnerID = cursor.getString(1);
             publicKey = cursor.getString(2);
             publicKeyId = cursor.getString(3);
-        } else
-            partnerID = "";
+        }
         return this;
     }
 
@@ -84,7 +84,6 @@ public class PartnerModel implements IWritable, IReadable {
 
     @Override
     public String filterForRead() {
-        Logger.i(appContext, TAG, String.format("SEARCH partnerID: %s", partnerID));
         String selectionCriteria = String.format(Locale.US, "where partnerID = '%s'", partnerID);
         return selectionCriteria;
     }
@@ -100,34 +99,8 @@ public class PartnerModel implements IWritable, IReadable {
     }
 
     public void save() {
-        // TODO: 2/5/17 Generate GERegisterPartner
-        idbSession.executeInTransaction(new IDBTransaction() {
-            @Override
-            public Void perform(IDBSession dbSession) {
-                dbSession.create(PartnerModel.this);
-                return null;
-            }
-        });
-    }
-
-    public void startSession() {
-        Logger.i(appContext, TAG, "SESSION START Partner: " + partnerID);
-        PartnerSessionModel partnerSessionModel = PartnerSessionModel.build(appContext, partnerID);
-        partnerSessionModel.save();
-        // TODO: 2/5/17 Generate GEStartPartnerSession
+       dbSession.create(this);
     }
 
 
-    public void terminateSession() {
-        if (isSessionToTerminate(partnerID)) {
-            Logger.i(appContext, TAG, "SESSION TERMINATE Partner: " + partnerID);
-            PartnerSessionModel partnerSessionModel = PartnerSessionModel.build(appContext, partnerID);
-            partnerSessionModel.clear();
-        }
-    }
-
-    private Boolean isSessionToTerminate(String partnerId) {
-        Set<String> activePartners = PartnerSessionModel.findActivePartners(appContext);
-        return (activePartners != null && activePartners.contains(partnerId));
-    }
-}
+ }

@@ -30,7 +30,6 @@ public interface ServiceConstants {
         String RESOURCE_BUNDLE_API_EXPIRATION_KEY = "RESOURCE_BUNDLE_API_EXPIRATION_KEY";
         String MASTER_DATA_API_EXPIRATION_KEY = "TERMS_API_EXPIRATION_KEY";
         String ORDINAL_API_EXPIRATION_KEY = "ORDINAL_API_EXPIRATION_KEY";
-        String PARTNER_ID = "partnerid";
     }
 
     interface ConfigResourceFiles {

@@ -1,17 +1,31 @@
 package org.ekstep.genieservices.commons.bean;
 
+import org.ekstep.genieservices.commons.IValidate;
+
+import java.util.List;
+
 /**
  * Created on 2/5/17.
  *
  * @author shriharsh
  */
 
-public class PartnerData {
+public class PartnerData implements IValidate {
     private String gameID;
     private String gameVersion;
     private String partnerID;
     private String partnerData;
     private String publicKey;
+
+    @Override
+    public boolean isValid() {
+        return false;
+    }
+
+    @Override
+    public List<String> getErrors() {
+        return null;
+    }
 
     public PartnerData(String gameID, String gameVersion, String partnerID, String partnerData, String publicKey) {
         this.gameID = gameID;
@@ -25,19 +39,19 @@ public class PartnerData {
         return publicKey;
     }
 
-    public String gameID() {
+    public String getGameID() {
         return this.gameID;
     }
 
-    public String gameVersion() {
+    public String getGameVersion() {
         return this.gameVersion;
     }
 
-    public String partnerID() {
+    public String getPartnerID() {
         return this.partnerID;
     }
 
-    public String partnerData() {
+    public String getPartnerData() {
         return this.partnerData;
     }
 }
