@@ -153,13 +153,6 @@ public class PartnerService extends BaseService {
                 genieResponse = GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
                 genieResponse.setResult(data.toString());
                 responseHandler.onSuccess(genieResponse);
-            } catch (RuntimeException e) {
-                Logger.e(appContext, TAG, CATASTROPHIC_FAILURE, e);
-                List<String> errorMessages = new ArrayList<>();
-                String errorMessage = e.getMessage();
-                errorMessages.add(errorMessage);
-                genieResponse = GenieResponse.getErrorResponse(appContext, ServiceConstants.FAILED_RESPONSE, CATASTROPHIC_FAILURE + String.format(Locale.US, "Sending data failed! Partner: %s", partnerData.getPartnerID()), TAG);
-                responseHandler.onError(genieResponse);
             } catch (EncryptionException e) {
                 Logger.e(appContext, TAG, ENCRYPTION_FAILURE, e);
                 List<String> errorMessages = new ArrayList<>();
