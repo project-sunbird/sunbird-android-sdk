@@ -32,7 +32,7 @@ public class ResourceBundleModel implements IWritable, IReadable, IUpdatable, IC
         mIdentifier = identifier;
     }
 
-    public static ResourceBundleModel create(IDBSession dbSession, String identifier, String json) {
+    public static ResourceBundleModel build(IDBSession dbSession, String identifier, String json) {
         return new ResourceBundleModel(dbSession, identifier, json);
     }
 

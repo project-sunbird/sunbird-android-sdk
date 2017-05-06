@@ -16,6 +16,8 @@ public interface IKeyValueStore {
 
     void putBoolean(String key, boolean value);
 
+    void putStringSet(String key, Set<String> value);
+
     String getString(String key, String defValue);
 
     Set<String> getStringSet(String key,  Set<String> defValue);
@@ -24,11 +26,12 @@ public interface IKeyValueStore {
 
     boolean getBoolean(String key, boolean defValue);
 
+    Set<String> getStringSet(String key, Set<String> defValue);
+
     boolean contains(String key);
 
     void remove(String key);
 
     void clear();
-
 
 }

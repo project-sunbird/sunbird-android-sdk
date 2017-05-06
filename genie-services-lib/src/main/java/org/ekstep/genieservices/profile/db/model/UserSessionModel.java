@@ -1,18 +1,12 @@
 package org.ekstep.genieservices.profile.db.model;
 
 
-import com.google.gson.Gson;
-
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
-import java.util.Base64;
 import java.util.UUID;
 
 public class UserSessionModel {
@@ -24,14 +18,6 @@ public class UserSessionModel {
     private UserSessionModel(AppContext appContext, String uid) {
         this.uid = uid;
         this.appContext = appContext;
-    }
-
-    public UserSession getUserSessionBean() {
-        return userSessionBean;
-    }
-
-    private void initSession(String uid) {
-        userSessionBean = new UserSession(uid, UUID.randomUUID().toString(), DateUtil.getCurrentTimestamp());
     }
 
     public static UserSessionModel buildUserSession(AppContext appContext, String uid) {
@@ -47,6 +33,14 @@ public class UserSessionModel {
         } else {
             return userSessionModel;
         }
+    }
+
+    public UserSession getUserSessionBean() {
+        return userSessionBean;
+    }
+
+    private void initSession(String uid) {
+        userSessionBean = new UserSession(uid, UUID.randomUUID().toString(), DateUtil.getCurrentTimestamp());
     }
 
     public Void startSession() {

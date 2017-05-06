@@ -96,11 +96,11 @@ public class ConfigService extends BaseService {
             saveDataExpirationTime(ttl, ServiceConstants.PreferenceKey.MASTER_DATA_API_EXPIRATION_KEY);
             result.remove("ttl");
             for (Object key : result.keySet()) {
-                MasterDataModel eachMasterData = MasterDataModel.findByType(mAppContext.getDBSession(), String.valueOf(key));
-                if (eachMasterData != null) {
+                MasterDataModel eachMasterData = MasterDataModel.build(mAppContext.getDBSession(), (String) key, GsonUtil.toJson(result.get(key)));
+                MasterDataModel masterDataInDb = MasterDataModel.findByType(mAppContext.getDBSession(), String.valueOf(key));
+                if (masterDataInDb != null) {
                     eachMasterData.update();
                 } else {
-                    eachMasterData = MasterDataModel.build(mAppContext.getDBSession(), (String) key, GsonUtil.toJson(result.get(key)));
                     eachMasterData.save();
                 }
 
@@ -177,11 +177,11 @@ public class ConfigService extends BaseService {
             Double ttl = (Double) resultMap.get("ttl");
             saveDataExpirationTime(ttl, ServiceConstants.PreferenceKey.RESOURCE_BUNDLE_API_EXPIRATION_KEY);
             for (Object key : result.keySet()) {
-                ResourceBundleModel eachResourceBundle = ResourceBundleModel.findById(mAppContext.getDBSession(), String.valueOf(key));
-                if (eachResourceBundle != null) {
+                ResourceBundleModel eachResourceBundle = ResourceBundleModel.build(mAppContext.getDBSession(), (String) key, GsonUtil.toJson(result.get(key)));
+                ResourceBundleModel resourceBundleInDb = ResourceBundleModel.findById(mAppContext.getDBSession(), String.valueOf(key));
+                if (resourceBundleInDb != null) {
                     eachResourceBundle.update();
                 } else {
-                    eachResourceBundle = ResourceBundleModel.create(mAppContext.getDBSession(), (String) key, GsonUtil.toJson(result.get(key)));
                     eachResourceBundle.save();
                 }
 
@@ -245,11 +245,11 @@ public class ConfigService extends BaseService {
         if (resultLinkedTreeMap.containsKey("ordinals")) {
             Double ttl = (Double) map.get("ttl");
             saveDataExpirationTime(ttl, ServiceConstants.PreferenceKey.ORDINAL_API_EXPIRATION_KEY);
-            OrdinalsModel ordinals = OrdinalsModel.findById(mAppContext.getDBSession(), DB_KEY_ORDINALS);
-            if (ordinals != null) {
+            OrdinalsModel ordinals = OrdinalsModel.build(mAppContext.getDBSession(), DB_KEY_ORDINALS, GsonUtil.toJson(resultLinkedTreeMap.get("ordinals")));
+            OrdinalsModel ordinalsInDb = OrdinalsModel.findById(mAppContext.getDBSession(), DB_KEY_ORDINALS);
+            if (ordinalsInDb != null) {
                 ordinals.update();
             } else {
-                ordinals = OrdinalsModel.build(mAppContext.getDBSession(), DB_KEY_ORDINALS, GsonUtil.toJson(resultLinkedTreeMap.get("ordinals")));
                 ordinals.save();
             }
         }

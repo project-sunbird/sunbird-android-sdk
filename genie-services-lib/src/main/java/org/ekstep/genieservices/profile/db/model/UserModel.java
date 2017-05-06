@@ -13,6 +13,7 @@ import org.ekstep.genieservices.content.db.model.ContentAccessModel;
 import org.ekstep.genieservices.profile.db.contract.UserEntry;
 
 import java.util.Locale;
+import java.util.UUID;
 
 public class UserModel implements IWritable, IReadable, ICleanable {
     private String uid;
@@ -24,7 +25,13 @@ public class UserModel implements IWritable, IReadable, ICleanable {
         this.uid = uid;
     }
 
-    public static UserModel buildUser(IDBSession dbSession, String uid) {
+    // TODO check with Shriharsh why this was required?
+    public static UserModel build(IDBSession dbSession) {
+        UserModel user = new UserModel(dbSession, UUID.randomUUID().toString());
+        return user;
+    }
+
+    public static UserModel build(IDBSession dbSession, String uid) {
         UserModel user = new UserModel(dbSession, uid);
         return user;
     }
