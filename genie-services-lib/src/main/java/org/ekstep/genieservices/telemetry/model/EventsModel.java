@@ -1,10 +1,12 @@
 package org.ekstep.genieservices.telemetry.model;
 
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.IDeviceInfo;
 import org.ekstep.genieservices.commons.db.DbConstants;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.telemetry.db.contract.TelemetryEntry;
 import org.ekstep.genieservices.telemetry.processors.EventProcessorFactory;
@@ -13,33 +15,45 @@ import org.ekstep.genieservices.telemetry.processors.IProcessEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Created by swayangjit on 26/4/17.
  */
 
-public class Events implements IReadable, ICleanable {
+public class EventsModel implements IReadable, ICleanable {
 
-    private List<Event> events;
+    private List<EventModel> events;
     private List<IProcessEvent> eventProcessors;
-    private AppContext mAppContext;
+    private IDBSession mDbSession;
 
 
-    private Events(AppContext appContext, EventProcessorFactory factory) {
-        mAppContext = appContext;
+    private EventsModel(IDBSession dbSession, EventProcessorFactory factory, IDeviceInfo deviceInfo) {
+        mDbSession = dbSession;
         events = new ArrayList<>();
-//        this.eventProcessors = factory.getProcessors(this, new DeviceInfo(context));
+        this.eventProcessors = factory.getProcessors(mDbSession,this, deviceInfo);
     }
 
-    private Events(AppContext appContext) {
-        this(appContext, new EventProcessorFactory());
+    private EventsModel(IDBSession dbSession,IDeviceInfo deviceInfo) {
+        this(dbSession, new EventProcessorFactory(),deviceInfo);
     }
+
+    public static EventsModel build(IDBSession dbSession,IDeviceInfo deviceInfo){
+        return new EventsModel(dbSession, new EventProcessorFactory(),deviceInfo);
+    }
+
+    public static EventsModel find(IDBSession dbSession,IDeviceInfo deviceInfo){
+        EventsModel eventsModel = new EventsModel(dbSession, deviceInfo);
+        dbSession.read(eventsModel);
+        return eventsModel;
+    }
+
 
     @Override
     public IReadable read(IResultSet resultSet) {
         if (resultSet != null && resultSet.moveToFirst())
             do {
-                events.add(Event.getForRead(mAppContext, resultSet));
+                events.add(EventModel.build(mDbSession, resultSet));
             } while (resultSet.moveToNext());
         return this;
     }
@@ -81,9 +95,30 @@ public class Events implements IReadable, ICleanable {
 
     private List<Long> getIds() {
         ArrayList<Long> ids = new ArrayList<>();
-        for (Event event : events) {
+        for (EventModel event : events) {
             ids.add(event.getId());
         }
         return ids;
     }
+
+    public List<Map> getEventsMap() {
+        ArrayList<Map> eventMaps = new ArrayList<>();
+        for (EventModel event : events)
+            eventMaps.add(event.getEventMap());
+        return eventMaps;
+    }
+
+    public Boolean isEmpty() {
+        return events == null || events.isEmpty();
+    }
+
+
+    public int size() {
+        return events.size();
+    }
+
+    public int getPriority() {
+        return events.get(0).getPriority();
+    }
+
 }

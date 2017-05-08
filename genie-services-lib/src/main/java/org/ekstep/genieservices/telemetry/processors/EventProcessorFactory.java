@@ -1,6 +1,9 @@
 package org.ekstep.genieservices.telemetry.processors;
 
-import org.ekstep.genieservices.telemetry.model.Events;
+
+import org.ekstep.genieservices.commons.IDeviceInfo;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.telemetry.model.EventsModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,10 +13,10 @@ import java.util.List;
  */
 
 public class EventProcessorFactory {
-//    public List<IProcessEvent> getProcessors(Events events, DeviceInfo deviceInfo) {
-//        ArrayList<IProcessEvent> processors = new ArrayList<>();
-//        processors.add(new DataPopulator(events, deviceInfo));
-//        processors.add(new DataZipper());
-//        return processors;
-//    }
+    public List<IProcessEvent> getProcessors(IDBSession dbSession, EventsModel events, IDeviceInfo deviceInfo) {
+        ArrayList<IProcessEvent> processors = new ArrayList<>();
+        processors.add(new DataPopulator(dbSession,events, deviceInfo));
+        processors.add(new DataZipper());
+        return processors;
+    }
 }

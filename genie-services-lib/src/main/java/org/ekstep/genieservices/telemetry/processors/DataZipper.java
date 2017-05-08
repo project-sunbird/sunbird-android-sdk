@@ -1,6 +1,6 @@
 package org.ekstep.genieservices.telemetry.processors;
 
-import org.ekstep.genieservices.telemetry.model.ProcessedEvent;
+import org.ekstep.genieservices.telemetry.model.ProcessedEventModel;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.util.zip.GZIPOutputStream;
 
 public class DataZipper implements IProcessEvent {
     @Override
-    public ProcessedEvent process(ProcessedEvent processedEvent) throws IOException {
+    public ProcessedEventModel process(ProcessedEventModel processedEvent) throws IOException {
 
         String data = new String(processedEvent.getData());
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length());

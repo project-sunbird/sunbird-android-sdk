@@ -1,6 +1,6 @@
 package org.ekstep.genieservices.telemetry.processors;
 
-import org.ekstep.genieservices.telemetry.model.ProcessedEvent;
+import org.ekstep.genieservices.telemetry.model.ProcessedEventModel;
 
 import java.io.IOException;
 
@@ -9,5 +9,5 @@ import java.io.IOException;
  */
 
 public interface IProcessEvent {
-    ProcessedEvent process(ProcessedEvent processedEvent) throws IOException;
+    ProcessedEventModel process(ProcessedEventModel processedEvent);
 }

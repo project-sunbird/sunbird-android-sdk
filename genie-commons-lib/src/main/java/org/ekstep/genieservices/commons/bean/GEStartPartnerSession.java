@@ -11,7 +11,7 @@ import java.util.List;
  * Created by swayangjit on 2/5/17.
  */
 
-public class GEStartPartnerSession extends BaseTelemetry implements ITelemetry {
+public class GEStartPartnerSession extends BaseTelemetry {
 
     private final String eid = "GE_START_PARTNER_SESSION";
 
@@ -34,19 +34,5 @@ public class GEStartPartnerSession extends BaseTelemetry implements ITelemetry {
         return eid;
     }
 
-    @Override
-    public boolean isValid() {
-        return true;
-    }
-
-    @Override
-    public List<String> getErrors() {
-        return null;
-    }
-
-    @Override
-    public String toString() {
-        return GsonUtil.toJson(this);
-    }
 }
 

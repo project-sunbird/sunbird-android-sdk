@@ -3,7 +3,7 @@ package org.ekstep.genieservices.telemetry.cache;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
-import org.ekstep.genieservices.telemetry.model.TelemetryTags;
+import org.ekstep.genieservices.telemetry.model.TelemetryTagsModel;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -20,7 +20,7 @@ public class TelemetryTagCache {
         if (!genieTags.isEmpty()) {
             return genieTags;
         } else {
-            TelemetryTags telemetryTags = TelemetryTags.find(appContext);
+            TelemetryTagsModel telemetryTags = TelemetryTagsModel.find(appContext.getDBSession());
 
             preference.putStringSet(ServiceConstants.Tags.KEY_GENIE_TAGS, telemetryTags.activeTagHashes());
             return telemetryTags.activeTagHashes();

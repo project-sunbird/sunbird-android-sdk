@@ -62,7 +62,7 @@ public abstract class AppContext<C, L extends ILogger> {
 
     public abstract Void setSummarizerDBSession(IDBSession session);
 
-    public abstract Void setBuildConfig(IParams buildConfig);
+    public abstract Void setParams(IParams params);
 
     public abstract IKeyValueStore getKeyValueStore();
 
@@ -72,6 +72,6 @@ public abstract class AppContext<C, L extends ILogger> {
 
     public abstract IDeviceInfo getDeviceInfo();
 
-    public abstract IParams getBuildConfig();
+    public abstract IParams getParams();
 
 }

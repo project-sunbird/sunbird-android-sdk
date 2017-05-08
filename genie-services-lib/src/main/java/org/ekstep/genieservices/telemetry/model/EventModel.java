@@ -1,21 +1,16 @@
 package org.ekstep.genieservices.telemetry.model;
 
-import com.google.gson.JsonSyntaxException;
-
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.db.BaseColumns;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IWritable;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.exception.InvalidDataException;
-import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
-import org.ekstep.genieservices.profile.db.model.UserSessionModel;
 import org.ekstep.genieservices.telemetry.TelemetryEventPublisher;
-import org.ekstep.genieservices.telemetry.cache.TelemetryTagCache;
 import org.ekstep.genieservices.telemetry.db.contract.TelemetryEntry;
 import org.ekstep.genieservices.telemetry.taggers.IEventTagger;
 import org.ekstep.genieservices.telemetry.taggers.PartnerTagger;
@@ -34,72 +29,70 @@ import java.util.UUID;
  * Created by swayangjit on 26/4/17.
  */
 
-public class Event implements IWritable {
+public class EventModel implements IWritable {
 
     private static final String TAG = "model-Event";
     private Long id;
     private Map event;
     private String eventType;
-    private Priority priority;
+    private PriorityModel priority;
     private String timestamp;
     private ContentValues contentValues;
     private List<IEventTagger> taggers = new ArrayList<>();
-    private AppContext mAppContext;
+    private IDBSession mDBSession;
 
 
-    private Event(AppContext appContext) {
-        this(appContext, null, null, new ContentValues());
+    private EventModel(IDBSession dbSession) {
+        this(dbSession, null, null, new ContentValues());
         addTagger(new PartnerTagger());
     }
 
-    private Event(AppContext appContext, Set<String> tags) {
-        this(appContext, null, null, new ContentValues());
+    private EventModel(IDBSession dbSession, Set<String> tags) {
+        this(dbSession, null, null, new ContentValues());
         addTagger(new PartnerTagger());
         addTagger(new TelemetryTagger(tags));
     }
 
-    private Event(AppContext appContext, String eventType, Set<String> hashedTags) {
-        this(appContext, eventType, Priority.build(appContext, eventType), new ContentValues());
+    private EventModel(IDBSession dbSession, String eventType, Set<String> hashedTags) {
+        this(dbSession, eventType, PriorityModel.build(dbSession, eventType), new ContentValues());
         addTagger(new PartnerTagger());
         addTagger(new TelemetryTagger(hashedTags));
     }
 
-    private Event(AppContext appContext, String eventType, Priority priority, ContentValues contentValues) {
-        this.mAppContext = appContext;
+    private EventModel(IDBSession dbSession, String eventType, PriorityModel priority, ContentValues contentValues) {
+        this.mDBSession = dbSession;
         this.eventType = eventType;
         this.priority = priority;
         this.contentValues = contentValues;
-        event = new HashMap();
+        this.event = new HashMap();
     }
 
-    public static Event getForRead(AppContext appContext, IResultSet resultSet) {
-        Event event = new Event(appContext);
+    public static EventModel build(IDBSession dbSession, IResultSet resultSet) {
+        EventModel event = new EventModel(dbSession);
         event.id = resultSet.getLong(resultSet.getColumnIndex(BaseColumns._ID));
         event.eventType = resultSet.getString(resultSet.getColumnIndex(TelemetryEntry.COLUMN_NAME_EVENT_TYPE));
         String eventString = resultSet.getString(resultSet.getColumnIndex(TelemetryEntry.COLUMN_NAME_EVENT));
         event.event = GsonUtil.fromJson(eventString, HashMap.class);
         event.timestamp = resultSet.getString(resultSet.getColumnIndex(TelemetryEntry.COLUMN_NAME_TIMESTAMP));
-        event.priority = Priority.build(appContext, event.eventType, resultSet.getInt(resultSet.getColumnIndex(TelemetryEntry.COLUMN_NAME_PRIORITY)));
+        event.priority = PriorityModel.build(dbSession, event.eventType, resultSet.getInt(resultSet.getColumnIndex(TelemetryEntry.COLUMN_NAME_PRIORITY)));
         return event;
     }
 
-    public static Event build(AppContext appContext, String eventString) {
-        Event event = new Event(appContext, TelemetryTagCache.activeTags(appContext));
+    public static EventModel build(IDBSession dbSession, String eventString, Set<String> activeTags) {
+        EventModel event = new EventModel(dbSession, activeTags);
         event.event = GsonUtil.fromJson(eventString, Map.class, ServiceConstants.Event.ERROR_INVALID_EVENT);
         event.eventType = (String) event.event.get("eid");
         if (event.eventType == null || event.eventType.isEmpty()) {
             throw new InvalidDataException(ServiceConstants.Event.ERROR_INVALID_JSON);
         }
-        event.priority = Priority.build(appContext, event.eventType);
-        event.updateEventDetails();
-        event.updateSessionDetails();
+        event.priority = PriorityModel.build(dbSession, event.eventType);
         return event;
     }
 
-    public static Event build(AppContext appContext, String eventType, Set<String> hashedTags) {
-
-        return new Event(appContext, eventType, hashedTags);
-    }
+//    public static Event build(IDBSession dbSession, String eventType, Set<String> hashedTags) {
+//
+//        return new Event(dbSession, eventType, hashedTags);
+//    }
 
     @Override
     public ContentValues getContentValues() {
@@ -131,74 +124,80 @@ public class Event implements IWritable {
         return id;
     }
 
-    public Event addTagger(IEventTagger tagger) {
-        taggers.add(tagger);
+    public EventModel addTagger(IEventTagger tagger) {
+        this.taggers.add(tagger);
         return this;
     }
 
-    public void updateSessionDetails() {
-        UserSession currentSession = UserSessionModel.findUserSession(mAppContext).find();
-        if (currentSession.isValid()) {
-            event.put("uid", currentSession.getUid());
-            event.put("sid", currentSession.getSid());
+    public void updateSessionDetails(String sid, String uid) {
+        this.event.put("uid", uid);
+        this.event.put("sid", sid);
+    }
+
+    public void updateTs(String timestamp) {
+        String ts = (String) event.get("ts");
+        if (ts == null || ts.isEmpty()) {
+            this.event.put("ts", timestamp);
+        }
+
+    }
+
+    public void updateEts(long ets) {
+        Double _ets;
+        try {
+            _ets = (Double) event.get("ets");
+        } catch (java.lang.ClassCastException e) {
+            _ets = null;
+        }
+        if (_ets == null) {
+            this.event.put("ets", ets);
+        } else {
+            this.event.put("ets", Math.round(_ets));
         }
     }
 
-    public void updateEventDetails() throws JsonSyntaxException {
-        event.put("did", mAppContext.getDeviceInfo().getDeviceID());
-        String ver = String.valueOf(event.get("ver"));
-        if (ver.equals("1.0")) {
-            String ts = (String) event.get("ts");
-            if (ts == null || ts.isEmpty())
-                event.put("ts", DateUtil.getCurrentTimestamp());
-        } else if (ver.equals("2.0")) {
-            Double _ets;
-            try {
-                _ets = (Double) event.get("ets");
-            } catch (java.lang.ClassCastException e) {
-                _ets = null;
-            }
-            if (_ets == null) {
-                event.put("ets", DateUtil.getEpochTime());
-            } else {
-                event.put("ets", Math.round(_ets));
-            }
-        }
+    public void updateDeviceInfo(String did) {
+        this.event.put("did", did);
+
     }
 
     public Map getEventMap() {
-        return event;
+        return this.event;
+    }
+
+    public String getVersion() {
+        return String.valueOf(this.event.get("ver"));
     }
 
     private void addMID() {
-        event.put("mid", UUID.randomUUID().toString());
+        this.event.put("mid", UUID.randomUUID().toString());
     }
 
-    public Event withEvent(String eventString) {
+    public EventModel withEvent(String eventString) {
         this.event = GsonUtil.fromJson(eventString, Map.class);
         return this;
     }
 
     public Void save() {
-        priority = Priority.findByType(mAppContext, priority.getEventType());
-        Logger.i(mAppContext, TAG, "Priority added:" + priority.getPriority());
-        mAppContext.getDBSession().create(this);
-        TelemetryEventPublisher.postTelemetryEvent(mAppContext, event);
+        this.priority = PriorityModel.findByType(this.mDBSession, this.priority.getEventType());
+//        Logger.i(mAppContext, TAG, "Priority added:" + priority.getPriority());
+        this.mDBSession.create(this);
+        TelemetryEventPublisher.postTelemetryEvent(this.mDBSession, this.event);
         return null;
     }
 
     public void addTag(String key, Object value) {
-        Logger.i(mAppContext, TAG, String.format("addTag %s:%s", key, value));
+//        Logger.i(mAppContext, TAG, String.format("addTag %s:%s", key, value));
         Map<String, Object> _map = new HashMap<>();
         _map.put(key, value);
-        List<Map<String, Object>> tags = (List<Map<String, Object>>) event.get("tags");
+        List<Map<String, Object>> tags = (List<Map<String, Object>>) this.event.get("tags");
         if (tags == null) {
-            Logger.i(mAppContext, TAG, String.format("CREATE TAG"));
+//            Logger.i(mAppContext, TAG, String.format("CREATE TAG"));
             tags = new ArrayList<>();
             tags.add(_map);
-            event.put("tags", tags);
+            this.event.put("tags", tags);
         } else {
-            Logger.i(mAppContext, TAG, String.format("EDIT TAG"));
+//            Logger.i(mAppContext, TAG, String.format("EDIT TAG"));
             tags.add(_map);
         }
     }
@@ -216,11 +215,11 @@ public class Event implements IWritable {
     }
 
     public int getPriority() {
-        return priority.getPriority();
+        return this.priority.getPriority();
     }
 
     public String eventType() {
-        return eventType;
+        return this.eventType;
     }
 
 }

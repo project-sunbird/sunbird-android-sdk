@@ -1,7 +1,7 @@
 package org.ekstep.genieservices.telemetry.taggers;
 
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.telemetry.model.Event;
+import org.ekstep.genieservices.telemetry.model.EventModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ public class TelemetryTagger implements IEventTagger {
     }
 
     @Override
-    public void tag(Event event, AppContext appContext) {
+    public void tag(EventModel event, AppContext appContext) {
         List<String> tagList = new ArrayList<>();
         for (String tag : tags) {
             tagList.add(tag);

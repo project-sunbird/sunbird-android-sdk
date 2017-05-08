@@ -1,6 +1,7 @@
 package org.ekstep.genieservices.telemetry;
 
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.greenrobot.eventbus.util.AsyncExecutor;
 
 import java.util.Map;
@@ -13,7 +14,7 @@ public class TelemetryEventPublisher {
 
     public static final String TAG = TelemetryEventPublisher.class.getSimpleName();
 
-    public static void postTelemetryEvent(final AppContext appContext, final Map<String, Object> eventMap) {
+    public static void postTelemetryEvent(final IDBSession dbSession, final Map<String, Object> eventMap) {
         TelemetryEventPublishThreadPool
                 .getInstance()
                 .execute(new AsyncExecutor.RunnableEx() {

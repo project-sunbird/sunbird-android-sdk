@@ -30,7 +30,7 @@ public class GenieService {
         this.applicationContext = applicationContext;
     }
 
-    public static ConfigService getConfigService() {
+    public ConfigService getConfigService() {
         if (sConfigService == null) {
             sConfigService = new ConfigService(applicationContext);
         }
@@ -41,7 +41,7 @@ public class GenieService {
         return new UserProfileService(applicationContext);
     }
 
-    public static TelemetryService getTelemetryService() {
+    public TelemetryService getTelemetryService() {
         if (sTelemetryService == null) {
             sTelemetryService = new TelemetryService(applicationContext);
         }

@@ -65,4 +65,8 @@ public class DateUtil {
         }
     }
 
+    public static DateTime parseDateTime(String dateInString) {
+        return DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZZ").parseDateTime(dateInString);
+    }
+
 }

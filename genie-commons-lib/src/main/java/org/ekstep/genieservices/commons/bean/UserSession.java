@@ -1,5 +1,6 @@
 package org.ekstep.genieservices.commons.bean;
 
+import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
@@ -37,7 +38,7 @@ public class UserSession {
     }
 
     public DateTime getCreatedTime() {
-        return DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZZ").parseDateTime(createdTime);
+        return DateUtil.parseDateTime(this.createdTime);
     }
 
     public void setCreatedTime(String createdTime) {

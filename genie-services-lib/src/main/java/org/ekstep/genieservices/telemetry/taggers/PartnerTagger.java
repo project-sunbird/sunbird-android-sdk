@@ -4,7 +4,7 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.utils.ArrayUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
-import org.ekstep.genieservices.telemetry.model.Event;
+import org.ekstep.genieservices.telemetry.model.EventModel;
 
 import java.util.List;
 import java.util.Map;
@@ -19,7 +19,7 @@ public class PartnerTagger implements IEventTagger {
     private static final String TAG = "tagger-PartnerTagger";
 
     @Override
-    public void tag(Event event, AppContext appContext) {
+    public void tag(EventModel event, AppContext appContext) {
         Set<String> values = appContext.getKeyValueStore().getStringSet(ServiceConstants.Partner.KEY_PARTNER_ID, null);
         List<Map<String, Object>> tags = (List<Map<String, Object>>) event.getEventMap().get("tags");
         if (values != null && !values.isEmpty()) {

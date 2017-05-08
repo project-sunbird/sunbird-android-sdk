@@ -12,7 +12,7 @@ import java.util.Map;
  * Created by swayangjit on 1/5/17.
  */
 
-public class GECreateProfile extends BaseTelemetry implements ITelemetry {
+public class GECreateProfile extends BaseTelemetry {
 
     private final String eid = "GE_CREATE_PROFILE";
 
@@ -50,18 +50,4 @@ public class GECreateProfile extends BaseTelemetry implements ITelemetry {
         return eid;
     }
 
-    @Override
-    public boolean isValid() {
-        return true;
-    }
-
-    @Override
-    public List<String> getErrors() {
-        return null;
-    }
-
-    @Override
-    public String toString() {
-        return GsonUtil.toJson(this);
-    }
 }

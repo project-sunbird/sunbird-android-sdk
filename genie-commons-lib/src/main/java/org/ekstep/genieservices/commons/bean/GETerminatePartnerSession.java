@@ -1,17 +1,15 @@
 package org.ekstep.genieservices.commons.bean;
 
-import org.ekstep.genieservices.commons.ITelemetry;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by swayangjit on 2/5/17.
  */
 
-public class GETerminatePartnerSession extends BaseTelemetry implements ITelemetry {
+public class GETerminatePartnerSession extends BaseTelemetry {
 
     private final String eid = "GE_STOP_PARTNER_SESSION";
 
@@ -36,19 +34,5 @@ public class GETerminatePartnerSession extends BaseTelemetry implements ITelemet
         return eid;
     }
 
-    @Override
-    public boolean isValid() {
-        return true;
-    }
-
-    @Override
-    public List<String> getErrors() {
-        return null;
-    }
-
-    @Override
-    public String toString() {
-        return GsonUtil.toJson(this);
-    }
 }
 

@@ -1,7 +1,6 @@
 package org.ekstep.genieservices.commons.bean;
 
 import org.ekstep.genieservices.commons.CommonConstants;
-import org.ekstep.genieservices.commons.ITelemetry;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
@@ -15,7 +14,7 @@ import java.util.Map;
  * Created by swayangjit on 2/5/17.
  */
 
-public class GESendPartnerData extends BaseTelemetry implements ITelemetry {
+public class GESendPartnerData extends BaseTelemetry {
 
     private final String eid = "GE_PARTNER_DATA";
 
@@ -43,15 +42,6 @@ public class GESendPartnerData extends BaseTelemetry implements ITelemetry {
         return eid;
     }
 
-    @Override
-    public boolean isValid() {
-        return true;
-    }
-
-    @Override
-    public List<String> getErrors() {
-        return null;
-    }
 
     @Override
     public String toString() {

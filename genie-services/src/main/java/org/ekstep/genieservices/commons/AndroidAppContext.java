@@ -35,11 +35,11 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
 
     public static AppContext buildAppContext(Context context, String appPackage, String key, AndroidLogger logger, String gDataId) {
         AndroidAppContext appContext = new AndroidAppContext(context, appPackage, key, logger, gDataId);
-        appContext.setBuildConfig(new BuildParams(appPackage));
+        appContext.setParams(new BuildParams(appPackage));
         appContext.setDBSession(ServiceDbHelper.getGSDBSession(appContext));
         appContext.setSummarizerDBSession(ServiceDbHelper.getSummarizerDBSession(appContext));
         appContext.setConnectionInfo(new AndroidNetworkConnectivity(appContext));
-        appContext.setHttpClient(new AndroidHttpClient(new BasicAuthenticator(appContext.getBuildConfig().getUserName(), appContext.getBuildConfig().getPassword())));
+        appContext.setHttpClient(new AndroidHttpClient(new BasicAuthenticator(appContext.getParams().getUserName(), appContext.getParams().getPassword())));
         appContext.setKeyValueStore(new PreferenceWrapper(appContext, Constants.SHARED_PREFERENCE_NAME));
         appContext.setDeviceInfo(new DeviceInfo(context));
         appContext.setLocationInfo(new LocationInfo(context));
@@ -93,7 +93,7 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
     }
 
     @Override
-    public IParams getBuildConfig() {
+    public IParams getParams() {
         return mParams;
     }
 
@@ -119,7 +119,7 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
     }
 
     @Override
-    public Void setBuildConfig(IParams params) {
+    public Void setParams(IParams params) {
         this.mParams = params;
         return null;
     }

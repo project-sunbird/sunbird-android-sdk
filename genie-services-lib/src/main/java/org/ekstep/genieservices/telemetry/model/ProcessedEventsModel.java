@@ -3,6 +3,7 @@ package org.ekstep.genieservices.telemetry.model;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.telemetry.db.contract.TelemetryProcessedEntry;
 
 import java.util.ArrayList;
@@ -12,24 +13,24 @@ import java.util.List;
  * Created by swayangjit on 26/4/17.
  */
 
-public class ProcessedEvents implements IReadable {
+public class ProcessedEventsModel implements IReadable {
 
-    private List<ProcessedEvent> processedEvents;
-    private AppContext mAppContext;
+    private List<ProcessedEventModel> processedEvents;
+    private IDBSession mDBSession;
 
-    private ProcessedEvents(AppContext appContext) {
-        this.mAppContext = appContext;
+    private ProcessedEventsModel(IDBSession dbSession) {
+        this.mDBSession = dbSession;
         this.processedEvents = new ArrayList<>();
     }
 
-    private ProcessedEvents(AppContext appContext, List<ProcessedEvent> processedEvents) {
-        this.mAppContext = appContext;
+    private ProcessedEventsModel(IDBSession dbSession, List<ProcessedEventModel> processedEvents) {
+        this.mDBSession = dbSession;
         this.processedEvents = processedEvents;
     }
 
-    public static ProcessedEvents find(AppContext appContext) {
-        ProcessedEvents processedEvents = new ProcessedEvents(appContext);
-        appContext.getDBSession().read(processedEvents);
+    public static ProcessedEventsModel find(IDBSession dbSession) {
+        ProcessedEventsModel processedEvents = new ProcessedEventsModel(dbSession);
+        dbSession.read(processedEvents);
         return processedEvents;
     }
 
@@ -37,7 +38,7 @@ public class ProcessedEvents implements IReadable {
     public IReadable read(IResultSet resultSet) {
         if (resultSet != null && resultSet.moveToFirst()) {
             do {
-                ProcessedEvent processedEvent = ProcessedEvent.build(mAppContext);
+                ProcessedEventModel processedEvent = ProcessedEventModel.build(mDBSession);
                 processedEvent.readWithoutMoving(resultSet);
                 processedEvents.add(processedEvent);
             } while (resultSet.moveToNext());
@@ -70,15 +71,15 @@ public class ProcessedEvents implements IReadable {
         return "";
     }
 
-    public List<ProcessedEvent> getAllProcessedEvents() {
+    public List<ProcessedEventModel> getAllProcessedEvents() {
         return processedEvents;
     }
 
     public int getTotalEvents() {
         int totalEvents = 0;
-        List<ProcessedEvent> processedEventList = getAllProcessedEvents();
+        List<ProcessedEventModel> processedEventList = getAllProcessedEvents();
         if (processedEventList != null && processedEventList.size() > 0) {
-            for (ProcessedEvent processedEvent : processedEventList) {
+            for (ProcessedEventModel processedEvent : processedEventList) {
                 totalEvents = totalEvents + processedEvent.getNumberOfEvents();
             }
         }

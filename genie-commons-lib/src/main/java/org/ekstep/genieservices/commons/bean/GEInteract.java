@@ -2,6 +2,7 @@ package org.ekstep.genieservices.commons.bean;
 
 import org.ekstep.genieservices.commons.ITelemetry;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import java.util.Map;
  * Created by swayangjit on 2/5/17.
  */
 
-public class GEInteract extends BaseTelemetry implements ITelemetry {
+public class GEInteract extends BaseTelemetry {
 
     private final String eid = "GE_INTERACT";
     private String fileSize;
@@ -28,21 +29,45 @@ public class GEInteract extends BaseTelemetry implements ITelemetry {
         setEks(createEKS(subType, stageId, type));
     }
 
-    public GEInteract(String gameID, String gameVersion, String stageId, String type, String subType,String extType,List positionList, List<Map> valueList,String id,String tid,String uri) {
+    public GEInteract(String gameID, String gameVersion, String stageId, String type, String subType,String extType,List positionList, List<Map<String,Object>> valueList,String id,String tid,String uri) {
         super(gameID, gameVersion);
+        setEks(createEKS( stageId,  type,  subType, extType, positionList,  valueList, id, tid, uri));
     }
 
-    protected HashMap<String, Object> createEKS(String stageId, String type, String subType,String extType,List positionList, List<Map> valueList,String id,String tid,String uri) {
+    protected HashMap<String, Object> createEKS(String stageId, String type, String subType,String extType,List positionList, List<Map<String,Object>> valueList,String id,String tid,String uri) {
         HashMap<String, Object> eks = new HashMap<>();
-        eks.put("extype", "");
-        eks.put("id", "");
-        eks.put("pos", new ArrayList<>());
-        eks.put("stageid", stageId);
-        eks.put("subtype", subType);
-        eks.put("tid", "");
+
+        if (!StringUtil.isNullOrEmpty(extType)) {
+            eks.put("extype", extType);
+        }
+
+        if (!StringUtil.isNullOrEmpty(id)) {
+            eks.put("id", id);
+        }
+
+        if(positionList!=null && !positionList.isEmpty()){
+            eks.put("pos", positionList);
+        }
+
+        if (!StringUtil.isNullOrEmpty(stageId)) {
+            eks.put("stageid", stageId);
+        }
+
+        if (!StringUtil.isNullOrEmpty(subType)) {
+            eks.put("subtype", subType);
+        }
+
+        if (!StringUtil.isNullOrEmpty(tid)) {
+            eks.put("tid", tid);
+        }
+
         eks.put("type", type);
-        eks.put("uri", "");
-        eks.put("values", createValues());
+
+        if (!StringUtil.isNullOrEmpty(uri)) {
+            eks.put("uri", uri);
+        }
+
+        eks.put("values", valueList);
 
         return eks;
     }
@@ -79,18 +104,14 @@ public class GEInteract extends BaseTelemetry implements ITelemetry {
     }
 
     @Override
-    public boolean isValid() {
-        return true;
+    public String toString() {
+        return GsonUtil.toJson(this);
     }
-
-    @Override
-    public List<String> getErrors() {
-        return null;
-    }
-
 
     public static class Builder {
 
+        private String gameId;
+        private String gameVersion;
         private String stageId = "";
         private String type = "";
         private String subType = "";
@@ -100,6 +121,12 @@ public class GEInteract extends BaseTelemetry implements ITelemetry {
         private List<Map<String, Object>> values = new ArrayList<>();
         private String targetResourceId = "";
         private String uri = "";
+        private  List<CoRelation> coRelation;
+
+        public Builder(String id, String version){
+            this.gameId=id;
+            this.gameVersion=version;
+        }
 
         public Builder stageId(String stageId) {
             this.stageId = stageId;
@@ -126,7 +153,7 @@ public class GEInteract extends BaseTelemetry implements ITelemetry {
             return this;
         }
 
-        public Builder values(String key, Object value) {
+        public Builder values(String key, String value) {
             Map<String, Object> valueMap = new HashMap<>();
             valueMap.put(key, value);
             this.values.add(valueMap);
@@ -148,6 +175,12 @@ public class GEInteract extends BaseTelemetry implements ITelemetry {
             return this;
         }
 
+        public Builder coRelation(List<CoRelation> coRelation) {
+            this.coRelation = new ArrayList<>();
+            this.coRelation.addAll(coRelation);
+            return this;
+        }
+
         public Builder positions(String x, String y, String z) {
             Map<String, String> posMap = new HashMap<>();
             posMap.put("x", x);
@@ -159,8 +192,9 @@ public class GEInteract extends BaseTelemetry implements ITelemetry {
 
 
         public GEInteract build() {
-//            GEInteract event = new GEInteract();
-            return null;
+            GEInteract event = new GEInteract(gameId,  gameVersion,  stageId,  type,  subType, exType, pos, values, id, targetResourceId, uri);
+            event.addCoRelation(coRelation);
+            return event;
         }
     }
 

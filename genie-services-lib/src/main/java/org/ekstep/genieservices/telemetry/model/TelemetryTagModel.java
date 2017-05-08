@@ -7,13 +7,14 @@ import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IWritable;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.telemetry.db.contract.TelemetryTagEntry;
 
 /**
  * Created by swayangjit on 26/4/17.
  */
 
-public class TelemetryTag implements IReadable, IWritable, ICleanable {
+public class TelemetryTagModel implements IReadable, IWritable, ICleanable {
 
     private String name;
     private String hash;
@@ -22,16 +23,16 @@ public class TelemetryTag implements IReadable, IWritable, ICleanable {
     private String endDate;
     private Long id;
     private ContentValues contentValues;
-    private AppContext mAppContext;
+    private IDBSession mDBSession;
 
-    private TelemetryTag(AppContext appContext) {
-        this.mAppContext = appContext;
+    private TelemetryTagModel(IDBSession dbSession) {
+        this.mDBSession = dbSession;
         this.contentValues = new ContentValues();
     }
 
-    private TelemetryTag(AppContext appContext, String name, String hash, String description,
+    private TelemetryTagModel(IDBSession dbSession, String name, String hash, String description,
                          String startDate, String endDate) {
-        this.mAppContext = appContext;
+        this.mDBSession = dbSession;
         this.name = name;
         this.hash = hash;
         this.description = description;
@@ -40,14 +41,14 @@ public class TelemetryTag implements IReadable, IWritable, ICleanable {
         this.contentValues = new ContentValues();
     }
 
-    public static TelemetryTag build(AppContext appContext, String name, String hash, String description,
+    public static TelemetryTagModel build(IDBSession dbSession, String name, String hash, String description,
                                      String startDate, String endDate) {
-        return new TelemetryTag(appContext, name, hash, description, startDate, endDate);
+        return new TelemetryTagModel(dbSession, name, hash, description, startDate, endDate);
     }
 
-    public static TelemetryTag find(AppContext appContext) {
-        TelemetryTag telemetryTag = new TelemetryTag(appContext);
-        appContext.getDBSession().read(telemetryTag);
+    public static TelemetryTagModel find(IDBSession dbSession) {
+        TelemetryTagModel telemetryTag = new TelemetryTagModel(dbSession);
+        dbSession.read(telemetryTag);
         return telemetryTag;
     }
 

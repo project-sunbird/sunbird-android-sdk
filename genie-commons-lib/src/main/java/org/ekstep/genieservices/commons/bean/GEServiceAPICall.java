@@ -2,6 +2,7 @@ package org.ekstep.genieservices.commons.bean;
 
 import org.ekstep.genieservices.commons.GenieResponse;
 import org.ekstep.genieservices.commons.ITelemetry;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.Map;
  * Created by swayangjit on 27/4/17.
  */
 
-public class GEServiceAPICall extends BaseTelemetry implements ITelemetry {
+public class GEServiceAPICall extends BaseTelemetry  {
 
     private final String eid = "GE_SERVICE_API_CALL";
 
@@ -45,16 +46,6 @@ public class GEServiceAPICall extends BaseTelemetry implements ITelemetry {
     @Override
     public String getEID() {
         return eid;
-    }
-
-    @Override
-    public boolean isValid() {
-        return true;
-    }
-
-    @Override
-    public List<String> getErrors() {
-        return null;
     }
 
     public void setMode(String mode) {

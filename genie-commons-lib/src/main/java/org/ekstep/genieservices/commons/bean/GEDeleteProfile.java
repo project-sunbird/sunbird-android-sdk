@@ -12,7 +12,7 @@ import java.util.Map;
  * Created by swayangjit on 2/5/17.
  */
 
-public class GEDeleteProfile extends BaseTelemetry implements ITelemetry {
+public class GEDeleteProfile extends BaseTelemetry{
 
     private final String eid = "GE_DELETE_PROFILE";
 
@@ -25,32 +25,11 @@ public class GEDeleteProfile extends BaseTelemetry implements ITelemetry {
     private Map<String, Object> createEKS(Profile profile) {
         HashMap<String, Object> map = new HashMap<>();
         map.put("uid", profile.getUid());
-        map.put("duration", getDuration(profile.getCreatedAt(), new Date()));
+        map.put("duration",  new Date().getTime() -profile.getCreatedAt().getTime());;
         return map;
     }
-
-    private long getDuration(Date profileCreationDate, Date currentDate) {
-        return currentDate.getTime() - profileCreationDate.getTime();
-    }
-
-
     @Override
     public String getEID() {
         return eid;
-    }
-
-    @Override
-    public boolean isValid() {
-        return true;
-    }
-
-    @Override
-    public List<String> getErrors() {
-        return null;
-    }
-
-    @Override
-    public String toString() {
-        return GsonUtil.toJson(this);
     }
 }

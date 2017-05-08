@@ -2,6 +2,7 @@ package org.ekstep.genieservices.commons.bean;
 
 import org.ekstep.genieservices.commons.CommonConstants;
 import org.ekstep.genieservices.commons.utils.DateUtil;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,11 +23,19 @@ public abstract class BaseTelemetry {
     private long ets;
     private GameData gdata;
     private List<Map<String, Object>> tags = new ArrayList();
+    private List<CoRelation> cdata;
 
     public BaseTelemetry(String gameId, String gameVersion) {
         setGdata(gameId, gameVersion);
         this.ver = CommonConstants.TELEMETRY_VERSION;
         this.ets = DateUtil.getEpochTime();
+    }
+
+    public void addCoRelation(List<CoRelation> coRelation) {
+        this.cdata = new ArrayList<>();
+        if (coRelation != null) {
+            this.cdata.addAll(coRelation);
+        }
     }
 
     public void addTag(Map<String, Object> map) {
@@ -41,7 +50,7 @@ public abstract class BaseTelemetry {
         edata.put("eks", eks);
     }
 
-    public Map<String,Object> getEData() {
+    public Map<String, Object> getEData() {
         return this.edata;
     }
 
@@ -50,7 +59,7 @@ public abstract class BaseTelemetry {
     }
 
     public void setGdata(String gameID, String gameVersion) {
-        String gdataId = isValidId(gameID) ? CommonConstants.GENIE_SERVICE_GID : gameID;
+        String gdataId = isValidId(gameID) ? gameID : CommonConstants.GENIE_SERVICE_GID;
         this.gdata = new GameData(gdataId, gameVersion);
     }
 
@@ -107,4 +116,9 @@ public abstract class BaseTelemetry {
     }
 
     protected abstract String getEID();
+
+    @Override
+    public String toString() {
+        return GsonUtil.toJson(this);
+    }
 }

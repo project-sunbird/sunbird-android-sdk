@@ -1,14 +1,18 @@
 package org.ekstep.genieservices.telemetry;
 
 import org.ekstep.genieservices.BaseService;
-import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponse;
 import org.ekstep.genieservices.commons.IResponseHandler;
+import org.ekstep.genieservices.commons.bean.BaseTelemetry;
+import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.exception.DbException;
 import org.ekstep.genieservices.commons.exception.InvalidDataException;
+import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
-import org.ekstep.genieservices.telemetry.model.Event;
+import org.ekstep.genieservices.profile.db.model.UserSessionModel;
+import org.ekstep.genieservices.telemetry.cache.TelemetryTagCache;
+import org.ekstep.genieservices.telemetry.model.EventModel;
 
 import java.util.HashMap;
 
@@ -17,33 +21,70 @@ import java.util.HashMap;
  */
 
 public class TelemetryService extends BaseService {
-    private static final  String SERVICE_NAME=TelemetryService.class.getName();
+
+    private static final String SERVICE_NAME = TelemetryService.class.getSimpleName();
 
     public TelemetryService(AppContext appContext) {
         super(appContext);
     }
 
+    public void saveTelemetry(BaseTelemetry telemetry, IResponseHandler responseHandler) {
+        saveTelemetry(telemetry.toString(),responseHandler);
+    }
+
     public void saveTelemetry(String eventString, IResponseHandler responseHandler) {
         String errorMessage = "Not able to save event";
         HashMap params = new HashMap();
-        params.put("Event",eventString);
+        params.put("Event", eventString);
         params.put("logLevel", "3");
 
         try {
-            Event event = Event.build(mAppContext,eventString);
+            EventModel event = EventModel.build(mAppContext.getDBSession(), eventString, TelemetryTagCache.activeTags(mAppContext));
+
+            //Stamp the event with current Sid and Uid
+            UserSessionModel userSession = UserSessionModel.findUserSession(mAppContext);
+            if (userSession != null) {
+                UserSession currentSession = userSession.find();
+                if (currentSession.isValid()) {
+                    event.updateSessionDetails(currentSession.getSid(), currentSession.getUid());
+                }
+            }
+
+            //Stamp the event with did
+            event.updateDeviceInfo(mAppContext.getDeviceInfo().getDeviceID());
+
+            //Stamp the event with proper timestamp
+            String version = event.getVersion();
+            if (version.equals("1.0")) {
+                event.updateTs(DateUtil.getCurrentTimestamp());
+            } else if (version.equals("2.0")) {
+                event.updateEts(DateUtil.getEpochTime());
+            }
             event.save();
-            Logger.i(mAppContext,SERVICE_NAME, "Event saved successfully");
-            GenieResponse response= GenieResponse.getSuccessResponse("Event Saved Successfully");
-            TelemetryLogger.logSuccess(mAppContext,response,new HashMap(),SERVICE_NAME,"saveTelemetry@"+SERVICE_NAME,params);
+
+            Logger.i(mAppContext, SERVICE_NAME, "Event saved successfully");
+            GenieResponse response = GenieResponse.getSuccessResponse("Event Saved Successfully");
+            responseHandler.onSuccess(response);
+
+            TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), SERVICE_NAME, "saveTelemetry@TelemetryService", params);
         } catch (DbException e) {
             String logMessage = "Event save failed" + e.toString();
-            GenieResponse response= GenieResponse.getErrorResponse(mAppContext, "PROCESSING_ERROR",errorMessage, logMessage);
-            TelemetryLogger.logFailure(mAppContext,response,SERVICE_NAME,"","saveTelemetry@"+SERVICE_NAME,params);
+            GenieResponse response = GenieResponse.getErrorResponse(mAppContext, "PROCESSING_ERROR", errorMessage, logMessage);
+            responseHandler.onError(response);
+            TelemetryLogger.logFailure(mAppContext, response, SERVICE_NAME, "", "saveTelemetry@TelemetryService", params);
         } catch (InvalidDataException e) {
             String logMessage = "Event save failed" + e.toString();
-            GenieResponse response= GenieResponse.getErrorResponse(mAppContext, "PROCESSING_ERROR",errorMessage, logMessage);
-            TelemetryLogger.logFailure(mAppContext,response,SERVICE_NAME,"","saveTelemetry@"+SERVICE_NAME,params);
+            GenieResponse response = GenieResponse.getErrorResponse(mAppContext, "PROCESSING_ERROR", errorMessage, logMessage);
+            responseHandler.onError(response);
+            TelemetryLogger.logFailure(mAppContext, response, SERVICE_NAME, "", "saveTelemetry@TelemetryService", params);
         }
 
     }
+
+    public void sync(IResponseHandler responseHandler){
+        HashMap params = new HashMap();
+        params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
+    }
+
+
 }

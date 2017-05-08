@@ -3,6 +3,7 @@ package org.ekstep.genieservices.telemetry.model;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.telemetry.db.contract.EventPriorityEntry;
 
 import java.util.Locale;
@@ -11,35 +12,35 @@ import java.util.Locale;
  * Created by swayangjit on 26/4/17.
  */
 
-public class Priority implements IReadable {
+public class PriorityModel implements IReadable {
 
     private final int DEFAULT_PRIORITY = 2;
-    private AppContext mAppContext;
+    private IDBSession mDBSession;
     private Integer priority;
     private String eventType;
 
-    private Priority(AppContext appContext, String eventType) {
-        this.mAppContext = appContext;
+    private PriorityModel(IDBSession dbSession, String eventType) {
+        this.mDBSession = dbSession;
         this.eventType = eventType;
     }
 
-    private Priority(AppContext appContext, String eventType, int priority) {
-        this.mAppContext = appContext;
+    private PriorityModel(IDBSession dbSession, String eventType, int priority) {
+        this.mDBSession = dbSession;
         this.eventType = eventType;
         this.priority = priority;
     }
 
-    public static Priority build(AppContext appContext, String eventType) {
-        return new Priority(appContext, eventType);
+    public static PriorityModel build(IDBSession dbSession, String eventType) {
+        return new PriorityModel(dbSession, eventType);
     }
 
-    public static Priority build(AppContext appContext, String eventType, int priority) {
-        return new Priority(appContext, eventType, priority);
+    public static PriorityModel build(IDBSession dbSession, String eventType, int priority) {
+        return new PriorityModel(dbSession, eventType, priority);
     }
 
-    public static Priority findByType(AppContext appContext, String eventType) {
-        Priority priority = new Priority(appContext, eventType);
-        appContext.getDBSession().read(priority);
+    public static PriorityModel findByType(IDBSession dbSession, String eventType) {
+        PriorityModel priority = new PriorityModel(dbSession, eventType);
+        dbSession.read(priority);
         return priority;
     }
 

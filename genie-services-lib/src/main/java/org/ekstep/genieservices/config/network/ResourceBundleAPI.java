@@ -20,7 +20,7 @@ public class ResourceBundleAPI extends BaseAPI {
 
     public ResourceBundleAPI(AppContext appContext) {
         super(appContext, String.format(Locale.US, "%s/%s", String.format(Locale.US, "%s/%s",
-                appContext.getBuildConfig().getBaseApiUrl()
+                appContext.getParams().getBaseApiUrl()
                         + ServiceConstants.API.LP_EXTENSION, SERVICE_ENDPOINTS), ENDPOINT), TAG);
     }
 

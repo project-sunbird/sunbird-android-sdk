@@ -3,6 +3,7 @@ package org.ekstep.genieservices.telemetry.model;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.telemetry.db.contract.TelemetryTagEntry;
 import org.joda.time.DateTime;
@@ -17,19 +18,19 @@ import java.util.Set;
  * Created by swayangjit on 26/4/17.
  */
 
-public class TelemetryTags implements IReadable {
+public class TelemetryTagsModel implements IReadable {
 
-    private List<TelemetryTag> telemetryTags;
-    private AppContext mAppContext;
+    private List<TelemetryTagModel> telemetryTags;
+    private IDBSession mDBSession;
 
-    public TelemetryTags(AppContext appContext) {
-        this.mAppContext = appContext;
+    public TelemetryTagsModel(IDBSession dbSession) {
+        this.mDBSession = dbSession;
         this.telemetryTags = new ArrayList<>();
     }
 
-    public static TelemetryTags find(AppContext appContext) {
-        TelemetryTags telemetryTags = new TelemetryTags(appContext);
-        appContext.getDBSession().read(telemetryTags);
+    public static TelemetryTagsModel find(IDBSession dbSession) {
+        TelemetryTagsModel telemetryTags = new TelemetryTagsModel(dbSession);
+        dbSession.read(telemetryTags);
         return telemetryTags;
     }
 
@@ -37,7 +38,7 @@ public class TelemetryTags implements IReadable {
     public IReadable read(IResultSet resultSet) {
         if (resultSet != null && resultSet.moveToFirst())
             do {
-                telemetryTags.add(TelemetryTag.build(mAppContext,
+                telemetryTags.add(TelemetryTagModel.build(mDBSession,
                         resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_NAME)),
                         resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_HASH)),
                         resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_DESCRIPTION)),
@@ -73,13 +74,13 @@ public class TelemetryTags implements IReadable {
         return "";
     }
 
-    public List<TelemetryTag> tags() {
+    public List<TelemetryTagModel> tags() {
         return telemetryTags;
     }
 
     public Set<String> activeTagHashes() {
         Set<String> tags = new HashSet<>();
-        for (TelemetryTag tag : telemetryTags) {
+        for (TelemetryTagModel tag : telemetryTags) {
             LocalDate today = DateTime.now().toLocalDate();
             LocalDate startDate = StringUtil.isNullOrEmpty(tag.startDate()) ? today : LocalDate.parse(tag.startDate());
             LocalDate endDate = StringUtil.isNullOrEmpty(tag.endDate()) ? today : LocalDate.parse(tag.endDate());

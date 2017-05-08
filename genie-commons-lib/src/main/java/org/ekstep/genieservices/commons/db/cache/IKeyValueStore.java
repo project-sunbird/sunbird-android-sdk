@@ -16,11 +16,7 @@ public interface IKeyValueStore {
 
     void putBoolean(String key, boolean value);
 
-    void putStringSet(String key, Set<String> value);
-
     String getString(String key, String defValue);
-
-    Set<String> getStringSet(String key,  Set<String> defValue);
 
     long getLong(String key, long defValue);
 

@@ -8,6 +8,7 @@ import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IWritable;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.telemetry.db.contract.TelemetryProcessedEntry;
 
 import java.util.Locale;
@@ -16,7 +17,7 @@ import java.util.Locale;
  * Created by swayangjit on 26/4/17.
  */
 
-public class ProcessedEvent implements IWritable, ICleanable, IReadable {
+public class ProcessedEventModel implements IWritable, ICleanable, IReadable {
 
     private String msgId;
     private byte[] data;
@@ -24,18 +25,19 @@ public class ProcessedEvent implements IWritable, ICleanable, IReadable {
     private int numberOfEvents;
     private int priority;
     private ContentValues contentValues;
-    private AppContext mAppContext;
+    private IDBSession mDBSession;
 
-    private ProcessedEvent(AppContext appContext) {
-        this.mAppContext = appContext;
+    private ProcessedEventModel(IDBSession dbSession) {
+        this.mDBSession = dbSession;
         this.contentValues = new ContentValues();
     }
 
-    private ProcessedEvent(AppContext appContext, String msgId, byte[] data, int numberOfEvents, int priority) {
-        this(appContext, msgId, data, numberOfEvents, priority, new ContentValues());
+    private ProcessedEventModel(IDBSession dbSession, String msgId, byte[] data, int numberOfEvents, int priority) {
+        this(dbSession, msgId, data, numberOfEvents, priority, new ContentValues());
     }
 
-    private ProcessedEvent(AppContext appContext, String msgId, byte[] data, int numberOfEvents, int priority, ContentValues contentValues) {
+    private ProcessedEventModel(IDBSession dbSession, String msgId, byte[] data, int numberOfEvents, int priority, ContentValues contentValues) {
+        this.mDBSession=dbSession;
         this.msgId = msgId;
         this.data = data;
         this.numberOfEvents = numberOfEvents;
@@ -43,9 +45,15 @@ public class ProcessedEvent implements IWritable, ICleanable, IReadable {
         this.priority = priority;
     }
 
-    public static ProcessedEvent build(AppContext appContext) {
-        return new ProcessedEvent(appContext);
+    public static ProcessedEventModel build(IDBSession dbSession) {
+        return new ProcessedEventModel(dbSession);
     }
+
+    public static ProcessedEventModel build(IDBSession dbSession, String msgId, byte[] data, int numberOfEvents, int priority) {
+        return new ProcessedEventModel(dbSession, msgId, data, numberOfEvents, priority, new ContentValues());
+    }
+
+
 
     @Override
     public IReadable read(IResultSet cursor) {
@@ -109,14 +117,14 @@ public class ProcessedEvent implements IWritable, ICleanable, IReadable {
 
     }
 
-    public void find(AppContext appContext) {
+    public void find(IDBSession dbSesion) {
         clean();
-        appContext.getDBSession().read(this);
+        dbSesion.read(this);
     }
 
     public int clear() {
         int eventExported = this.numberOfEvents;
-        mAppContext.getDBSession().clean(this);
+        mDBSession.clean(this);
         return eventExported;
     }
 
