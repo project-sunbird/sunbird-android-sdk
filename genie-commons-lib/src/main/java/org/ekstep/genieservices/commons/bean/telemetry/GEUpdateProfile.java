@@ -1,11 +1,10 @@
-package org.ekstep.genieservices.commons.bean;
+package org.ekstep.genieservices.commons.bean.telemetry;
 
-import org.ekstep.genieservices.commons.ITelemetry;
+import org.ekstep.genieservices.commons.bean.GameData;
+import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.utils.DateUtil;
-import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,8 +16,8 @@ public class GEUpdateProfile extends BaseTelemetry {
     private final String eid = "GE_UPDATE_PROFILE";
 
 
-    public GEUpdateProfile(String gameID, String gameVersion, Profile profile, String deviceId) {
-        super(gameID, gameVersion);
+    public GEUpdateProfile(GameData gameData, Profile profile, String deviceId) {
+        super(gameData);
         setEks(createEKS(profile));
         setUid(profile.getUid());
         setTs(DateUtil.getCurrentTimestamp());

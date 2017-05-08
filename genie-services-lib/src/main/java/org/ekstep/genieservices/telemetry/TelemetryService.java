@@ -4,7 +4,7 @@ import org.ekstep.genieservices.BaseService;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponse;
 import org.ekstep.genieservices.commons.IResponseHandler;
-import org.ekstep.genieservices.commons.bean.BaseTelemetry;
+import org.ekstep.genieservices.commons.bean.telemetry.BaseTelemetry;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.exception.DbException;
 import org.ekstep.genieservices.commons.exception.InvalidDataException;

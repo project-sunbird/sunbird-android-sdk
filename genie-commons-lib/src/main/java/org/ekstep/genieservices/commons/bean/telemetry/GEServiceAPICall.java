@@ -1,8 +1,7 @@
-package org.ekstep.genieservices.commons.bean;
+package org.ekstep.genieservices.commons.bean.telemetry;
 
 import org.ekstep.genieservices.commons.GenieResponse;
-import org.ekstep.genieservices.commons.ITelemetry;
-import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.commons.bean.GameData;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,10 +15,9 @@ public class GEServiceAPICall extends BaseTelemetry  {
 
     private final String eid = "GE_SERVICE_API_CALL";
 
-    public GEServiceAPICall(String service, String method, boolean status, String error,
-                            String message, List<String> errorMessages, Object result,
-                            String gameID, String gameVersion) {
-        super(gameID, gameVersion);
+    public GEServiceAPICall(GameData gameData, String service, String method, boolean status, String error,
+                            String message, List<String> errorMessages, Object result) {
+        super(gameData);
         setEks(createEKS(service, method, status ? "Successful" : "Failed", error, message, errorMessages, result));
     }
 
@@ -56,6 +54,8 @@ public class GEServiceAPICall extends BaseTelemetry  {
     }
 
     public static class Builder {
+
+        private GameData gameData;
         private String service;
         private String method;
         private GenieResponse response;
@@ -64,6 +64,10 @@ public class GEServiceAPICall extends BaseTelemetry  {
         private String gameVersion;
         private Map params;
         private String mode;
+
+        public Builder(GameData gameData){
+            this.gameData=gameData;
+        }
 
         public Builder service(String service) {
             this.service = service;
@@ -85,26 +89,6 @@ public class GEServiceAPICall extends BaseTelemetry  {
             return this;
         }
 
-        public GEServiceAPICall build() {
-            GEServiceAPICall event = new GEServiceAPICall(service, method, response.getStatus(), response.getError(),
-                    response.getMessage(), response.getErrorMessages(), result,
-                    gameID, gameVersion);
-            event.setParams(this.params);
-            event.setMode(mode);
-
-            return event;
-        }
-
-        public Builder gameID(String gameID) {
-            this.gameID = gameID;
-            return this;
-        }
-
-        public Builder gameVersion(String gameVersion) {
-            this.gameVersion = gameVersion;
-            return this;
-        }
-
         public Builder request(Map params) {
             this.params = params;
             return this;
@@ -113,6 +97,15 @@ public class GEServiceAPICall extends BaseTelemetry  {
         public Builder mode(String mode) {
             this.mode = mode;
             return this;
+        }
+
+        public GEServiceAPICall build() {
+            GEServiceAPICall event = new GEServiceAPICall(gameData,service, method, response.getStatus(), response.getError(),
+                    response.getMessage(), response.getErrorMessages(), result);
+            event.setParams(this.params);
+            event.setMode(mode);
+
+            return event;
         }
     }
 }

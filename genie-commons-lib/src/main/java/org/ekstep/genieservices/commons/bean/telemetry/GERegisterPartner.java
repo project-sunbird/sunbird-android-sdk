@@ -1,11 +1,9 @@
-package org.ekstep.genieservices.commons.bean;
+package org.ekstep.genieservices.commons.bean.telemetry;
 
-import org.ekstep.genieservices.commons.ITelemetry;
+import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.utils.DateUtil;
-import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by swayangjit on 2/5/17.
@@ -15,9 +13,9 @@ public class GERegisterPartner extends BaseTelemetry {
 
     private final String eid = "GE_REGISTER_PARTNER";
 
-    public GERegisterPartner(String gameID, String gameVersion, String partnerID, String publicKey,
+    public GERegisterPartner(GameData gameData, String partnerID, String publicKey,
                              String publicKeyID, String deviceId) {
-        super(gameID, gameVersion);
+        super(gameData);
         setEks(createEKS(partnerID, publicKey, publicKeyID));
         setDid(deviceId);
         setTs(DateUtil.getCurrentTimestamp());

@@ -1,10 +1,8 @@
-package org.ekstep.genieservices.commons.bean;
+package org.ekstep.genieservices.commons.bean.telemetry;
 
-import org.ekstep.genieservices.commons.ITelemetry;
-import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.commons.bean.GameData;
 
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by swayangjit on 2/5/17.
@@ -14,8 +12,8 @@ public class GECreateUser extends BaseTelemetry  {
 
     private final String eid = "GE_CREATE_USER";
 
-    public GECreateUser(String gameID, String gameVersion, String uid, String loc) {
-        super(gameID, gameVersion);
+    public GECreateUser(GameData gameData, String uid, String loc) {
+        super(gameData);
         setEks(createEKS(uid, loc));
         setUid(uid);
     }

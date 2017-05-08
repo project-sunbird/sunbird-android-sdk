@@ -3,7 +3,8 @@ package org.ekstep.genieservices.telemetry;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponse;
-import org.ekstep.genieservices.commons.bean.GEServiceAPICall;
+import org.ekstep.genieservices.commons.bean.telemetry.GEServiceAPICall;
+import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.exception.DbException;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
@@ -60,15 +61,13 @@ public class TelemetryLogger {
     }
 
     private static void log(AppContext appContext, GenieResponse response, HashMap result, String service, String method, HashMap params) {
-        GEServiceAPICall.Builder eventBuilder = new GEServiceAPICall.Builder();
+        GEServiceAPICall.Builder eventBuilder = new GEServiceAPICall.Builder(new GameData(appContext.getParams().getGid(),appContext.getParams().getVersionName()));
         GEServiceAPICall event = eventBuilder.service(service)
                 .method(method)
                 .mode(getNetworkMode(appContext.getConnectionInfo()))
                 .request(params)
                 .response(response)
                 .result(result)
-                .gameID(appContext.getParams().getGid())
-                .gameVersion(appContext.getParams().getVersionName())
                 .build();
         Set<String> telemetryTags = TelemetryTagCache.activeTags(appContext);
         EventModel eventWithWrapper = EventModel.build(appContext.getDBSession(), event.toString(), telemetryTags);

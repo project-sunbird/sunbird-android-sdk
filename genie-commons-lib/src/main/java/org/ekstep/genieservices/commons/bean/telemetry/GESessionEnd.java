@@ -1,13 +1,12 @@
-package org.ekstep.genieservices.commons.bean;
+package org.ekstep.genieservices.commons.bean.telemetry;
 
-import org.ekstep.genieservices.commons.ITelemetry;
+import org.ekstep.genieservices.commons.bean.GameData;
+import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.utils.DateUtil;
-import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by swayangjit on 2/5/17.
@@ -17,8 +16,8 @@ public class GESessionEnd extends BaseTelemetry {
 
     private final String eid = "GE_SESSION_END";
 
-    public GESessionEnd(String gameID, String gameVersion, UserSession session, String deviceId) {
-        super(gameID, gameVersion);
+    public GESessionEnd(GameData gameData, UserSession session, String deviceId) {
+        super(gameData);
         setEks(createEKS(session.getCreatedTime()));
         setSid(session.getSid());
         setUid(session.getUid());

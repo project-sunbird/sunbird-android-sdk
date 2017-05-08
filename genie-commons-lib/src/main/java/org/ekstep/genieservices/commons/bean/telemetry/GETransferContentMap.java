@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.commons.bean;
+package org.ekstep.genieservices.commons.bean.telemetry;
 
 /**
  * Created by swayangjit on 2/5/17.

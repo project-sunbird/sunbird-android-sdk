@@ -1,11 +1,10 @@
-package org.ekstep.genieservices.commons.bean;
+package org.ekstep.genieservices.commons.bean.telemetry;
 
-import org.ekstep.genieservices.commons.ITelemetry;
-import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.commons.bean.GameData;
+import org.ekstep.genieservices.commons.bean.Profile;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,8 +15,8 @@ public class GEDeleteProfile extends BaseTelemetry{
 
     private final String eid = "GE_DELETE_PROFILE";
 
-    public GEDeleteProfile(Profile profile, String gameID, String gameVersion) {
-        super(gameID, gameVersion);
+    public GEDeleteProfile(GameData gameData, Profile profile) {
+        super(gameData);
         setEks(createEKS(profile));
         setUid(profile.getUid());
     }

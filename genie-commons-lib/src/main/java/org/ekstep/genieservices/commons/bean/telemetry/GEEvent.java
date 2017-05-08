@@ -1,4 +1,6 @@
-package org.ekstep.genieservices.commons.bean;
+package org.ekstep.genieservices.commons.bean.telemetry;
+
+import org.ekstep.genieservices.commons.bean.GameData;
 
 import java.util.Map;
 
@@ -9,8 +11,8 @@ import java.util.Map;
 public class GEEvent extends BaseTelemetry{
     private String eid;
 
-    public GEEvent(String gameId,String gameVersion,String eid,Map<String,Object> eks){
-        super(gameId,gameVersion);
+    public GEEvent(GameData gameData, String eid, Map<String,Object> eks){
+        super(gameData);
         this.eid=eid;
         setEks(eks);
     }
@@ -21,14 +23,13 @@ public class GEEvent extends BaseTelemetry{
     }
 
     public static class Builder {
-        private String gameId;
+        private GameData gameData;
         private String gameVersion;
         private String eid;
         private Map<String,Object> eks;
 
-        public Builder(String id, String version,String eid){
-            this.gameId=id;
-            this.gameVersion=version;
+        public Builder(GameData gameData,String eid){
+            this.gameData=gameData;
             this.eid=eid;
         }
         public GEEvent.Builder eks(Map<String,Object> eks) {
@@ -37,7 +38,7 @@ public class GEEvent extends BaseTelemetry{
         }
 
         public GEEvent build() {
-            return new GEEvent(gameId,gameVersion,eid,eks);
+            return new GEEvent(gameData,eid,eks);
         }
     }
 }

@@ -10,6 +10,6 @@ import java.io.IOException;
 
 public interface IDBTransaction {
 
-    Void perform(IDBSession dbSession) throws IOException;
+    Void perform(IDBSession dbSession);
 
 }

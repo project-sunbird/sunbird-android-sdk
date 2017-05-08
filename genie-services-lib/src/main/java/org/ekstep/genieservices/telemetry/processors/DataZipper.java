@@ -12,16 +12,21 @@ import java.util.zip.GZIPOutputStream;
 
 public class DataZipper implements IProcessEvent {
     @Override
-    public ProcessedEventModel process(ProcessedEventModel processedEvent) throws IOException {
+    public ProcessedEventModel process(ProcessedEventModel processedEvent) {
 
         String data = new String(processedEvent.getData());
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length());
-        GZIPOutputStream zipOutputStream = new GZIPOutputStream(outputStream);
-        zipOutputStream.write(data.getBytes());
-        zipOutputStream.close();
-        byte[] compressedStream = outputStream.toByteArray();
-        outputStream.close();
-        processedEvent.setData(compressedStream);
+        try {
+            GZIPOutputStream zipOutputStream = new GZIPOutputStream(outputStream);
+            zipOutputStream.write(data.getBytes());
+            zipOutputStream.close();
+            byte[] compressedStream = outputStream.toByteArray();
+            outputStream.close();
+            processedEvent.setData(compressedStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         return processedEvent;
     }
 }

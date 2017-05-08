@@ -1,13 +1,13 @@
-package org.ekstep.genieservices.commons.bean;
+package org.ekstep.genieservices.commons.bean.telemetry;
 
 import org.ekstep.genieservices.commons.CommonConstants;
+import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,9 +18,9 @@ public class GESendPartnerData extends BaseTelemetry {
 
     private final String eid = "GE_PARTNER_DATA";
 
-    public GESendPartnerData(String gameID, String gameVersion, String partnerID, String publicKeyID,
+    public GESendPartnerData(GameData gameData, String partnerID, String publicKeyID,
                              String deviceId, String data, String encryptedKey, String iv) {
-        super(gameID, gameVersion);
+        super(gameData);
         setEks(createEKS(partnerID, publicKeyID, data, encryptedKey, iv));
         setTags(partnerID);
         setDid(deviceId);

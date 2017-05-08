@@ -77,7 +77,7 @@ public class ExportAdapter {
         while (!events.isEmpty()) {
             dbSession.executeInTransaction(new IDBTransaction() {
                 @Override
-                public Void perform(IDBSession dbSession) throws IOException {
+                public Void perform(IDBSession dbSession) {
                     EventsModel events=EventsModel.find(dbSession,mAppContext.getDeviceInfo());
                     List<IProcessEvent> eventProcessors=new EventProcessorFactory().getProcessors(dbSession,events,deviceInfo);
                     ProcessedEventModel processedEvent =ProcessedEventModel.build(dbSession);

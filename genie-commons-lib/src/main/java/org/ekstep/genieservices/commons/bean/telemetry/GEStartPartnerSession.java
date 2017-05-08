@@ -1,11 +1,9 @@
-package org.ekstep.genieservices.commons.bean;
+package org.ekstep.genieservices.commons.bean.telemetry;
 
-import org.ekstep.genieservices.commons.ITelemetry;
+import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.utils.DateUtil;
-import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by swayangjit on 2/5/17.
@@ -15,8 +13,8 @@ public class GEStartPartnerSession extends BaseTelemetry {
 
     private final String eid = "GE_START_PARTNER_SESSION";
 
-    public GEStartPartnerSession(String gameID, String gameVersion, String partnerID, String deviceId, String partnerSID) {
-        super(gameID, gameVersion);
+    public GEStartPartnerSession(GameData gameData, String partnerID, String deviceId, String partnerSID) {
+        super(gameData);
         setEks(createEKS(partnerID, partnerSID));
         setDid(deviceId);
         setTs(DateUtil.getCurrentTimestamp());

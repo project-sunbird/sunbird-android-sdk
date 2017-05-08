@@ -1,11 +1,10 @@
-package org.ekstep.genieservices.commons.bean;
+package org.ekstep.genieservices.commons.bean.telemetry;
 
-import org.ekstep.genieservices.commons.ITelemetry;
+import org.ekstep.genieservices.commons.bean.GameData;
+import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.utils.DateUtil;
-import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,8 +16,8 @@ public class GESessionStart extends BaseTelemetry {
     private final String eid = "GE_SESSION_START";
     private final Map<String, Object> edata;
 
-    public GESessionStart(UserSession session, String loc, String deviceId, String gameID, String gameVersion) {
-        super(gameID, gameVersion);
+    public GESessionStart(GameData gameData, UserSession session, String loc, String deviceId) {
+        super(gameData);
         edata = new HashMap<>();
         setEks(createEKS(loc));
         setEts(DateUtil.getEpochTime());

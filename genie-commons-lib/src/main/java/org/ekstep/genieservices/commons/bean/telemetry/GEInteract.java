@@ -1,6 +1,7 @@
-package org.ekstep.genieservices.commons.bean;
+package org.ekstep.genieservices.commons.bean.telemetry;
 
-import org.ekstep.genieservices.commons.ITelemetry;
+import org.ekstep.genieservices.commons.bean.CoRelation;
+import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
@@ -19,22 +20,22 @@ public class GEInteract extends BaseTelemetry {
     private final String eid = "GE_INTERACT";
     private String fileSize;
 
-    public GEInteract(String gameID, String gameVersion, String subType, String stageId, String type) {
-        this(gameID, gameVersion, subType, stageId, type, null);
+    public GEInteract(GameData gameData, String subType, String stageId, String type) {
+        this(gameData, subType, stageId, type, null);
     }
 
-    public GEInteract(String gameID, String gameVersion, String subType, String stageId, String type, String fileSize) {
-        super(gameID, gameVersion);
+    public GEInteract(GameData gameData, String subType, String stageId, String type, String fileSize) {
+        super(gameData);
         this.fileSize = fileSize;
         setEks(createEKS(subType, stageId, type));
     }
 
-    public GEInteract(String gameID, String gameVersion, String stageId, String type, String subType,String extType,List positionList, List<Map<String,Object>> valueList,String id,String tid,String uri) {
-        super(gameID, gameVersion);
-        setEks(createEKS( stageId,  type,  subType, extType, positionList,  valueList, id, tid, uri));
+    public GEInteract(GameData gameData, String stageId, String type, String subType, String extType, List positionList, List<Map<String, Object>> valueList, String id, String tid, String uri) {
+        super(gameData);
+        setEks(createEKS(stageId, type, subType, extType, positionList, valueList, id, tid, uri));
     }
 
-    protected HashMap<String, Object> createEKS(String stageId, String type, String subType,String extType,List positionList, List<Map<String,Object>> valueList,String id,String tid,String uri) {
+    protected HashMap<String, Object> createEKS(String stageId, String type, String subType, String extType, List positionList, List<Map<String, Object>> valueList, String id, String tid, String uri) {
         HashMap<String, Object> eks = new HashMap<>();
 
         if (!StringUtil.isNullOrEmpty(extType)) {
@@ -45,7 +46,7 @@ public class GEInteract extends BaseTelemetry {
             eks.put("id", id);
         }
 
-        if(positionList!=null && !positionList.isEmpty()){
+        if (positionList != null && !positionList.isEmpty()) {
             eks.put("pos", positionList);
         }
 
@@ -110,8 +111,7 @@ public class GEInteract extends BaseTelemetry {
 
     public static class Builder {
 
-        private String gameId;
-        private String gameVersion;
+        private GameData gameData;
         private String stageId = "";
         private String type = "";
         private String subType = "";
@@ -121,11 +121,10 @@ public class GEInteract extends BaseTelemetry {
         private List<Map<String, Object>> values = new ArrayList<>();
         private String targetResourceId = "";
         private String uri = "";
-        private  List<CoRelation> coRelation;
+        private List<CoRelation> coRelation;
 
-        public Builder(String id, String version){
-            this.gameId=id;
-            this.gameVersion=version;
+        public Builder(GameData gameData) {
+            this.gameData = gameData;
         }
 
         public Builder stageId(String stageId) {
@@ -192,7 +191,7 @@ public class GEInteract extends BaseTelemetry {
 
 
         public GEInteract build() {
-            GEInteract event = new GEInteract(gameId,  gameVersion,  stageId,  type,  subType, exType, pos, values, id, targetResourceId, uri);
+            GEInteract event = new GEInteract(gameData, stageId, type, subType, exType, pos, values, id, targetResourceId, uri);
             event.addCoRelation(coRelation);
             return event;
         }

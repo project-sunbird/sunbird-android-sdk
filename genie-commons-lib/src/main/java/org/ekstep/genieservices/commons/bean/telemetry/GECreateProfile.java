@@ -1,11 +1,10 @@
-package org.ekstep.genieservices.commons.bean;
+package org.ekstep.genieservices.commons.bean.telemetry;
 
-import org.ekstep.genieservices.commons.ITelemetry;
-import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.commons.bean.GameData;
+import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,8 +15,8 @@ public class GECreateProfile extends BaseTelemetry {
 
     private final String eid = "GE_CREATE_PROFILE";
 
-    public GECreateProfile(String gameID, String gameVersion, Profile profile, String loc) {
-        super(gameID, gameVersion);
+    public GECreateProfile(GameData gameData, Profile profile, String loc) {
+        super(gameData);
         setEks(createEKS(profile, loc));
         setUid(profile.getUid());
     }

@@ -1,7 +1,7 @@
-package org.ekstep.genieservices.commons.bean;
+package org.ekstep.genieservices.commons.bean.telemetry;
 
+import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.utils.DateUtil;
-import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 import java.util.HashMap;
 
@@ -13,9 +13,9 @@ public class GETerminatePartnerSession extends BaseTelemetry {
 
     private final String eid = "GE_STOP_PARTNER_SESSION";
 
-    public GETerminatePartnerSession(String gameID, String gameVersion, String partnerID,
+    public GETerminatePartnerSession(GameData gameData, String partnerID,
                                      String deviceId, Long length, String partnerSID) {
-        super(gameID, gameVersion);
+        super(gameData);
         setEks(createEKS(partnerID, length, partnerSID));
         setDid(deviceId);
         setTs(DateUtil.getCurrentTimestamp());

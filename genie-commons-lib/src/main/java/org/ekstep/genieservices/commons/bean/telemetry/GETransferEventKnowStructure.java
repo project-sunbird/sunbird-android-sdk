@@ -1,4 +1,6 @@
-package org.ekstep.genieservices.commons.bean;
+package org.ekstep.genieservices.commons.bean.telemetry;
+
+import org.ekstep.genieservices.commons.bean.telemetry.GETransferContentMap;
 
 import java.util.List;
 
