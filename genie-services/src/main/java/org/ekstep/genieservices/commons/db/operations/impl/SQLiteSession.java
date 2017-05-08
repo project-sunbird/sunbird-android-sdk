@@ -21,7 +21,7 @@ public class SQLiteSession implements IDBSession {
     private SQLiteDatabase database;
     private boolean isOperationSuccessful;
 
-    public SQLiteSession(AppContext<Context, AndroidLogger> appContext, SQLiteDatabase database) {
+    public SQLiteSession(AppContext<Context> appContext, SQLiteDatabase database) {
         this.appContext = appContext;
         this.database = database;
     }
@@ -31,7 +31,7 @@ public class SQLiteSession implements IDBSession {
             operate.perform(appContext, database);
         } catch (Exception e) {
             isOperationSuccessful = false;
-            Logger.e(appContext, LOG_TAG, "Error when performing execute. Exception: " + e, e);
+            Logger.e(LOG_TAG, "Error when performing execute. Exception: " + e, e);
         }
         return null;
     }
@@ -44,7 +44,7 @@ public class SQLiteSession implements IDBSession {
             isOperationSuccessful = true;
         } catch (Exception e) {
             isOperationSuccessful = false;
-            Logger.e(appContext, LOG_TAG, "Error when performing execute. Exception: " + e, e);
+            Logger.e(LOG_TAG, "Error when performing execute. Exception: " + e, e);
         } finally {
             endTransaction();
         }

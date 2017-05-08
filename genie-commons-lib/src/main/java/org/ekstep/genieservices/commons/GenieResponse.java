@@ -19,12 +19,28 @@ public class GenieResponse<T> {
     private String error;
 
 
-    public static <T> GenieResponse<T> getErrorResponse(AppContext context, String error, String errorMessage, String logTag) {
+    public static <T> GenieResponse<T> getErrorResponse(String error, String errorMessage, String logTag, Class<T> type) {
         GenieResponse<T> response = new GenieResponse<T>();
         response.setStatus(false);
         response.setErrorMessages(Collections.singletonList(errorMessage));
         response.setError(error);
-        Logger.e(context, logTag, error + ":" + errorMessage);
+        Logger.e(logTag, error + ":" + errorMessage);
+        return response;
+    }
+
+    public static <T> GenieResponse<T> getErrorResponse(String error, String errorMessage, String logTag) {
+        GenieResponse<T> response = new GenieResponse<T>();
+        response.setStatus(false);
+        response.setErrorMessages(Collections.singletonList(errorMessage));
+        response.setError(error);
+        Logger.e(logTag, error + ":" + errorMessage);
+        return response;
+    }
+
+    public static <T> GenieResponse<T> getSuccessResponse(String message, Class<T> type) {
+        GenieResponse<T> response = new GenieResponse<T>();
+        response.setStatus(true);
+        response.setMessage(message);
         return response;
     }
 

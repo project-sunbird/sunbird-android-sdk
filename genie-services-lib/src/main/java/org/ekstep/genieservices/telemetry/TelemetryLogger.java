@@ -93,7 +93,7 @@ public class TelemetryLogger {
             }
             eventWithWrapper.save();
         } catch (DbException ex) {
-            Logger.e(appContext, TAG, ex.getMessage());
+            Logger.e(TAG, ex.getMessage());
         }
     }
 

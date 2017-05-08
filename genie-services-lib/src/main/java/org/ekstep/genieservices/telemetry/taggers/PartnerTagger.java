@@ -23,7 +23,7 @@ public class PartnerTagger implements IEventTagger {
         Set<String> values = appContext.getKeyValueStore().getStringSet(ServiceConstants.Partner.KEY_PARTNER_ID, null);
         List<Map<String, Object>> tags = (List<Map<String, Object>>) event.getEventMap().get("tags");
         if (values != null && !values.isEmpty()) {
-            Logger.i(appContext, TAG, String.format("TAG %s:%s", ServiceConstants.Partner.KEY_PARTNER_ID, values));
+            Logger.i(TAG, String.format("TAG %s:%s", ServiceConstants.Partner.KEY_PARTNER_ID, values));
             if (!ArrayUtil.containsMap(tags, ServiceConstants.Partner.KEY_PARTNER_ID))
                 event.addTag(ServiceConstants.Partner.KEY_PARTNER_ID, values);
         }

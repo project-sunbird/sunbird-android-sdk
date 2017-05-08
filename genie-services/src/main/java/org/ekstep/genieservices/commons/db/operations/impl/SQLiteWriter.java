@@ -27,9 +27,9 @@ public class SQLiteWriter implements IDBOperation<SQLiteDatabase> {
     public Void perform(AppContext context, SQLiteDatabase datasource) {
         beforePerform(context);
         long id = datasource.insert(model.getTableName(), null, mapContentValues(model.getContentValues()));
-        Logger.i(context, LOG_TAG, "Saving in db:" + model.getTableName());
+        Logger.i(LOG_TAG, "Saving in db:" + model.getTableName());
         if (id != -1) {
-            Logger.i(context, LOG_TAG, "Saved successfully in:" + model.getTableName() + " with id:" + id);
+            Logger.i(LOG_TAG, "Saved successfully in:" + model.getTableName() + " with id:" + id);
             model.updateId(id);
         } else {
             throw new DbException(String.format(Locale.US, "Failed to write to %s", model.getTableName()));

@@ -18,7 +18,7 @@ import org.ekstep.genieservices.commons.param.IParams;
 /**
  * Created on 18/4/17.
  */
-public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
+public class AndroidAppContext extends AppContext<Context> {
 
     private IDBSession mDBSession;
     private IDBSession mSummarizerDBSession;
@@ -29,13 +29,12 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
     private ILocationInfo mLocationInfo;
     private IParams mParams;
 
-    private AndroidAppContext(Context context, String appPackage, String key, AndroidLogger logger, String gDataId) {
-        super(context, appPackage, key, logger, gDataId);
+    private AndroidAppContext(Context context, String appPackage, String key, String gDataId) {
+        super(context, appPackage, key, gDataId);
     }
 
-    public static AppContext buildAppContext(Context context, String appPackage, String key, AndroidLogger logger, String gDataId) {
-        AndroidAppContext appContext = new AndroidAppContext(context, appPackage, key, logger, gDataId);
-        appContext.setParams(new BuildParams(appPackage));
+    public static AppContext buildAppContext(Context context, String appPackage, String key, String gDataId) {
+        AndroidAppContext appContext = new AndroidAppContext(context, appPackage, key, gDataId);
         appContext.setDBSession(ServiceDbHelper.getGSDBSession(appContext));
         appContext.setSummarizerDBSession(ServiceDbHelper.getSummarizerDBSession(appContext));
         appContext.setConnectionInfo(new AndroidNetworkConnectivity(appContext));
@@ -43,16 +42,14 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
         appContext.setKeyValueStore(new PreferenceWrapper(appContext, Constants.SHARED_PREFERENCE_NAME));
         appContext.setDeviceInfo(new DeviceInfo(context));
         appContext.setLocationInfo(new LocationInfo(context));
+        appContext.setParams(new BuildParams(appPackage));
 
         return appContext;
     }
 
+    @Override
     public ILocationInfo getLocationInfo() {
         return mLocationInfo;
-    }
-
-    public void setLocationInfo(ILocationInfo mLocationInfo) {
-        this.mLocationInfo = mLocationInfo;
     }
 
     @Override
@@ -70,26 +67,14 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
         return mKeyValueOperation;
     }
 
-    private void setKeyValueStore(IKeyValueStore keyValueOperation) {
-        this.mKeyValueOperation = keyValueOperation;
-    }
-
     @Override
     public IConnectionInfo getConnectionInfo() {
         return mConnectionInfo;
     }
 
-    private void setConnectionInfo(IConnectionInfo connectionInfo) {
-        this.mConnectionInfo = connectionInfo;
-    }
-
     @Override
     public IHttpClient getHttpClient() {
         return mHttpClient;
-    }
-
-    private void setHttpClient(IHttpClient client) {
-        this.mHttpClient = client;
     }
 
     @Override
@@ -118,11 +103,24 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
         this.mDeviceInfo = deviceInfo;
     }
 
-    @Override
-    public Void setParams(IParams params) {
-        this.mParams = params;
-        return null;
+    private void setConnectionInfo(IConnectionInfo connectionInfo) {
+        this.mConnectionInfo = connectionInfo;
     }
 
+    private void setHttpClient(IHttpClient client) {
+        this.mHttpClient = client;
+    }
+
+    private void setKeyValueStore(IKeyValueStore keyValueOperation) {
+        this.mKeyValueOperation = keyValueOperation;
+    }
+
+    public void setLocationInfo(ILocationInfo mLocationInfo) {
+        this.mLocationInfo = mLocationInfo;
+    }
+
+    public void setParams(IParams params) {
+        this.mParams = params;
+    }
 
 }

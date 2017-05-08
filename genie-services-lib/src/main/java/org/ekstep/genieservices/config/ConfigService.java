@@ -69,12 +69,12 @@ public class ConfigService extends BaseService {
 
         GenieResponse<MasterData> response;
         if (result != null) {
-            response = GenieResponse.getSuccessResponse("MasterData retrieved successfully");
+            response = GenieResponse.getSuccessResponse("MasterData retrieved successfully", MasterData.class);
             response.setResult(masterData);
             TelemetryLogger.logSuccess(mAppContext,response,new HashMap(),TAG,"getMasterData@ConfigService",params);
             responseHandler.onSuccess(response);
         } else {
-            response = GenieResponse.getErrorResponse(mAppContext, ServiceConstants.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR);
+            response = GenieResponse.getErrorResponse(ServiceConstants.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR, MasterData.class);
             TelemetryLogger.logFailure(mAppContext,response,TAG,"Unable to get masterdata","getMasterData@ConfigService",params);
             responseHandler.onError(response);
         }
@@ -152,7 +152,7 @@ public class ConfigService extends BaseService {
             TelemetryLogger.logSuccess(mAppContext,response,new HashMap(),TAG,"getResourceBundle@ConfigService",params);
             responseHandler.onSuccess(response);
         } else {
-            response = GenieResponse.getErrorResponse(mAppContext, ServiceConstants.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR);
+            response = GenieResponse.getErrorResponse(ServiceConstants.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR);
             TelemetryLogger.logFailure(mAppContext,response,TAG,"Unable to get resourcebundle","getResourceBundle@ConfigService",params);
             responseHandler.onError(response);
         }
@@ -204,7 +204,7 @@ public class ConfigService extends BaseService {
         }).start();
     }
 
-    public void getOrdinals(IResponseHandler<HashMap<String,Object>> responseHandler) {
+    public void getOrdinals(IResponseHandler<Map<String,Object>> responseHandler) {
 
         HashMap params = new HashMap();
         params.put("Ordinals", "Get ordinals");
@@ -218,14 +218,14 @@ public class ConfigService extends BaseService {
         }
         OrdinalsModel ordinals = OrdinalsModel.findById(mAppContext.getDBSession(), DB_KEY_ORDINALS);
         HashMap ordinalsMap = GsonUtil.fromJson(ordinals.getJSON(), HashMap.class);
-        GenieResponse<HashMap<String,Object>> response;
+        GenieResponse<Map<String,Object>> response;
         if (ordinalsMap != null) {
             response = GenieResponse.getSuccessResponse("");
             response.setResult(ordinalsMap);
             TelemetryLogger.logSuccess(mAppContext,response,new HashMap(),TAG,"getOrdinals@ConfigService",params);
             responseHandler.onSuccess(response);
         } else {
-            response = GenieResponse.getErrorResponse(mAppContext, ServiceConstants.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR);
+            response = GenieResponse.getErrorResponse(ServiceConstants.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR);
             TelemetryLogger.logFailure(mAppContext,response,TAG,"Unable to get ordinals","getOrdinals@ConfigService",params);
             responseHandler.onError(response);
         }

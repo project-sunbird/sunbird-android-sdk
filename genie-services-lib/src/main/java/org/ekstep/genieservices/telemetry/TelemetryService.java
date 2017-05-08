@@ -32,7 +32,7 @@ public class TelemetryService extends BaseService {
         saveTelemetry(telemetry.toString(),responseHandler);
     }
 
-    public void saveTelemetry(String eventString, IResponseHandler responseHandler) {
+    public void saveTelemetry(String eventString, IResponseHandler<Void> responseHandler) {
         String errorMessage = "Not able to save event";
         HashMap params = new HashMap();
         params.put("Event", eventString);
@@ -62,19 +62,19 @@ public class TelemetryService extends BaseService {
             }
             event.save();
 
-            Logger.i(mAppContext, SERVICE_NAME, "Event saved successfully");
-            GenieResponse response = GenieResponse.getSuccessResponse("Event Saved Successfully");
+            Logger.i(SERVICE_NAME, "Event saved successfully");
+            GenieResponse response = GenieResponse.getSuccessResponse("Event Saved Successfully", Void.class);
             responseHandler.onSuccess(response);
 
             TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), SERVICE_NAME, "saveTelemetry@TelemetryService", params);
         } catch (DbException e) {
             String logMessage = "Event save failed" + e.toString();
-            GenieResponse response = GenieResponse.getErrorResponse(mAppContext, "PROCESSING_ERROR", errorMessage, logMessage);
+            GenieResponse response = GenieResponse.getErrorResponse("PROCESSING_ERROR", errorMessage, logMessage, Void.class);
             responseHandler.onError(response);
             TelemetryLogger.logFailure(mAppContext, response, SERVICE_NAME, "", "saveTelemetry@TelemetryService", params);
         } catch (InvalidDataException e) {
             String logMessage = "Event save failed" + e.toString();
-            GenieResponse response = GenieResponse.getErrorResponse(mAppContext, "PROCESSING_ERROR", errorMessage, logMessage);
+            GenieResponse response = GenieResponse.getErrorResponse("PROCESSING_ERROR", errorMessage, logMessage, Void.class);
             responseHandler.onError(response);
             TelemetryLogger.logFailure(mAppContext, response, SERVICE_NAME, "", "saveTelemetry@TelemetryService", params);
         }

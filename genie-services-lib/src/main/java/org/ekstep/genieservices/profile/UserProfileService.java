@@ -6,13 +6,9 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponse;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.Profile;
-import org.ekstep.genieservices.commons.bean.UserSession;
-import org.ekstep.genieservices.commons.db.DbConstants;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
-import org.ekstep.genieservices.commons.exception.DbException;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
-import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.content.db.model.ContentAccessesModel;
 import org.ekstep.genieservices.profile.db.model.AnonymousUserModel;
 import org.ekstep.genieservices.profile.db.model.UserModel;
@@ -20,7 +16,10 @@ import org.ekstep.genieservices.profile.db.model.UserProfileModel;
 import org.ekstep.genieservices.profile.db.model.UserSessionModel;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.UUID;
+
+import javax.xml.ws.Response;
 
 /**
  * Any service related to profile will be called using ProfileService
@@ -49,7 +48,7 @@ public class UserProfileService extends BaseService {
             // TODO: 26/4/17 Need to create error event
 //            return logAndSendResponse(request.gameID(), request.gameVersion(), new Response("failed", "VALIDATION_ERROR",
 //                    profile.getErrors(), ""), "createProfile");
-            response = GenieResponse.getErrorResponse(mAppContext, ServiceConstants.VALIDATION_ERROR, profile.getErrors().toString(), TAG + " - createProfile");
+            response = GenieResponse.getErrorResponse(ServiceConstants.VALIDATION_ERROR, profile.getErrors().toString(), TAG + " - createProfile", Profile.class);
         } else {
             response = saveUserProfile(profile, mAppContext.getDBSession());
         }
@@ -84,7 +83,7 @@ public class UserProfileService extends BaseService {
                 return null;
             }
         });
-        GenieResponse<Profile> successResponse = GenieResponse.getSuccessResponse("");
+        GenieResponse<Profile> successResponse = GenieResponse.getSuccessResponse("", Profile.class);
         successResponse.setResult(GsonUtil.fromJson(profileModel.getProfile().toString(), Profile.class));
 
         return successResponse;
@@ -97,7 +96,7 @@ public class UserProfileService extends BaseService {
      * @param responseHandler - the class which will receive the success or failure response
      *                        with the data.
      */
-    public void deleteUserProfile(String uid, IResponseHandler responseHandler) {
+    public void deleteUserProfile(String uid, IResponseHandler<String> responseHandler) {
         //get the current user id
         UserSessionModel userSession = UserSessionModel.findUserSession(mAppContext);
         if (userSession != null) {
@@ -120,10 +119,13 @@ public class UserProfileService extends BaseService {
                 return null;
             }
         });
+        GenieResponse<String> response = GenieResponse.getSuccessResponse("", String.class);
+        response.setResult(uid);
+        responseHandler.onSuccess(response);
 
     }
 
-     private GenieResponse setAnonymousUser() {
+     private GenieResponse<String> setAnonymousUser() {
         AnonymousUserModel anonymousUserModel = AnonymousUserModel.findAnonymousUser(mAppContext.getDBSession());
         String uid = null;
         if (anonymousUserModel == null) {
@@ -132,7 +134,9 @@ public class UserProfileService extends BaseService {
             uid = anonymousUserModel.getUid();
         }
         setUserSession(uid);
-        return GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        GenieResponse<String> response = GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, String.class);
+        response.setResult(uid);
+        return response;
     }
 
     private String createAnonymousUser() {
@@ -157,7 +161,7 @@ public class UserProfileService extends BaseService {
      * @param responseHandler- the class which will receive the success or failure response
      *                         with the data.
      */
-    public void updateUserProfile(Profile profile, IResponseHandler responseHandler) {
+    public void updateUserProfile(Profile profile, IResponseHandler<Profile> responseHandler) {
         GenieResponse genieResponse = update(profile);
 
         if (genieResponse != null) {
@@ -169,18 +173,18 @@ public class UserProfileService extends BaseService {
         }
     }
 
-    private GenieResponse update(Profile profile) {
+    private GenieResponse<Profile> update(Profile profile) {
         if (profile != null) {
             String uid = profile.getUid();
 
             if (uid == null || uid.isEmpty()) {
                 // TODO: 25/4/17 GEError Event has to be added here
-                return GenieResponse.getErrorResponse(mAppContext, ServiceConstants.INVALID_PROFILE, ServiceConstants.UNABLE_TO_FIND_PROFILE, TAG);
+                return GenieResponse.getErrorResponse(ServiceConstants.INVALID_PROFILE, ServiceConstants.UNABLE_TO_FIND_PROFILE, TAG, Profile.class);
             }
 
             if (!profile.isValid()) {
                 // TODO: 25/4/17 GEError Event has to be added here
-                return GenieResponse.getErrorResponse(mAppContext, ServiceConstants.VALIDATION_ERROR, profile.getErrors().toString(), TAG);
+                return GenieResponse.getErrorResponse(ServiceConstants.VALIDATION_ERROR, profile.getErrors().toString(), TAG, Profile.class);
 
             }
             // TODO: 26/4/17 GEUpdateEvent has to be added to the telemetry
@@ -188,8 +192,9 @@ public class UserProfileService extends BaseService {
             userProfileModel.update();
         }
 
-
-        return GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        GenieResponse<Profile> response = GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Profile.class);
+        response.setResult(profile);
+        return response;
     }
 
     /**
@@ -198,7 +203,7 @@ public class UserProfileService extends BaseService {
      * @param responseHandler - the class which will receive the success or failure response
      *                        with the data.
      */
-    public void setAnonymousUser(IResponseHandler responseHandler) {
+    public void setAnonymousUser(IResponseHandler<String> responseHandler) {
         responseHandler.onSuccess(setAnonymousUser());
     }
 
@@ -219,8 +224,7 @@ public class UserProfileService extends BaseService {
         }
         Profile profile = new Profile(uid);
 
-        GenieResponse successResponse = new GenieResponse<Profile>();
-        successResponse.setStatus(true);
+        GenieResponse successResponse = GenieResponse.getSuccessResponse("", Profile.class);
         successResponse.setResult(profile);
         responseHandler.onSuccess(successResponse);
     }
@@ -232,17 +236,17 @@ public class UserProfileService extends BaseService {
      * @param responseHandler - the class which will receive the success or failure response
      *                        with the data.
      */
-    public void setCurrentUser(String uid, IResponseHandler responseHandler) {
+    public void setCurrentUser(String uid, IResponseHandler<Void> responseHandler) {
         UserModel userModel = UserModel.findByUserId(mAppContext.getDBSession(), uid);
 
         if (userModel == null) {
             // TODO: 25/4/17 GEError Event has to be added here
-            responseHandler.onError(GenieResponse.getErrorResponse(mAppContext, ServiceConstants.INVALID_USER, ServiceConstants.NO_USER_WITH_SPECIFIED_ID, TAG));
+            responseHandler.onError(GenieResponse.getErrorResponse(ServiceConstants.INVALID_USER, ServiceConstants.NO_USER_WITH_SPECIFIED_ID, TAG, Void.class));
         }
 
         setUserSession(userModel.getUid());
 
-        GenieResponse successResponse = GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        GenieResponse<Void> successResponse = GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
         responseHandler.onSuccess(successResponse);
     }
 
@@ -252,17 +256,17 @@ public class UserProfileService extends BaseService {
      * @param responseHandler - the class which will receive the success or failure response
      *                        with the data.
      */
-    public void getCurrentUser(IResponseHandler responseHandler) {
+    public void getCurrentUser(IResponseHandler<Profile> responseHandler) {
         UserSessionModel userSessionModel = UserSessionModel.findUserSession(mAppContext);
 
         if (userSessionModel == null) {
             // TODO: 25/4/17 GEError Event has to be added here
-            responseHandler.onError(GenieResponse.getErrorResponse(mAppContext, ServiceConstants.NOT_EXISTS, ServiceConstants.NO_CURRENT_USER, TAG));
+            responseHandler.onError(GenieResponse.getErrorResponse(ServiceConstants.NOT_EXISTS, ServiceConstants.NO_CURRENT_USER, TAG, Profile.class));
         }
 
         UserProfileModel userProfileModel = UserProfileModel.findUserProfile(mAppContext.getDBSession(), userSessionModel.getUserSessionBean().getUid());
 
-        GenieResponse successResponse = GenieResponse.getSuccessResponse("");
+        GenieResponse<Profile> successResponse = GenieResponse.getSuccessResponse("", Profile.class);
         successResponse.setResult(userProfileModel.getProfile());
         responseHandler.onSuccess(successResponse);
     }
@@ -273,7 +277,7 @@ public class UserProfileService extends BaseService {
      * @param responseHandler - the class which will receive the success or failure response
      *                        with the data.
      */
-    public void unsetCurrentUser(IResponseHandler responseHandler) {
+    public void unsetCurrentUser(IResponseHandler<Void> responseHandler) {
         UserSessionModel userSessionModel = UserSessionModel.findUserSession(mAppContext);
 
         if (userSessionModel != null) {
@@ -283,7 +287,7 @@ public class UserProfileService extends BaseService {
 //        event.save(dbOperator);
             userSessionModel.endSession();
         }
-        GenieResponse successResponse = GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        GenieResponse<Void> successResponse = GenieResponse.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
         responseHandler.onSuccess(successResponse);
     }
 

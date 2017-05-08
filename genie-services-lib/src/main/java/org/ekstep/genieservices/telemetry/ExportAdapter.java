@@ -14,7 +14,6 @@ import org.ekstep.genieservices.telemetry.processors.EventProcessorFactory;
 import org.ekstep.genieservices.telemetry.processors.IProcessEvent;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -36,16 +35,16 @@ public class ExportAdapter {
 
     public GenieResponse export(IExport exportingStrategy) {
         try {
-            Logger.i(mAppContext,"service-GEA", "About to export");
+            Logger.i("service-GEA", "About to export");
 
             processEvents();
 
             return exportingStrategy.send(mAppContext.getDBSession());
         } catch (DbException e) {
-            Logger.e(mAppContext,"service-GEA", "Db exception:" + e.getMessage());
+            Logger.e("service-GEA", "Db exception:" + e.getMessage());
             return failedResponse(DbConstants.ERROR, e.getMessage());
         } catch (IOException e) {
-            Logger.e(mAppContext,"service-GEA", "Error zipping:" + e.getMessage());
+            Logger.e("service-GEA", "Error zipping:" + e.getMessage());
             return failedResponse("PROCESSING_ERROR", e.getMessage());
         }/* catch (SQLiteException e) {
             return failedResponse("NETWORK_ERROR", e.getMessage());
@@ -55,10 +54,10 @@ public class ExportAdapter {
     // TODO Refactor this; make processEvents an explicit task
     public GenieResponse exportWithoutProcessEvents(IExport exportingStrategy) {
         try {
-            Logger.i(mAppContext,"service-GEA", "About to export");
+            Logger.i("service-GEA", "About to export");
             return exportingStrategy.send(mAppContext.getDBSession());
         } catch (DbException e) {
-            Logger.e(mAppContext,"service-GEA", "Db exception:" + e.getMessage());
+            Logger.e("service-GEA", "Db exception:" + e.getMessage());
             return failedResponse(DbConstants.ERROR, e.getMessage());
         }/* catch (SQLiteException e) {
             return failedResponse("NETWORK_ERROR", e.getMessage());
@@ -67,7 +66,7 @@ public class ExportAdapter {
 
 
     private GenieResponse failedResponse(String error, String errorMessage) {
-        return GenieResponse.getErrorResponse(mAppContext,"failed", error, errorMessage);
+        return GenieResponse.getErrorResponse("failed", error, errorMessage, );
     }
 
     private void processEvents() throws IOException {

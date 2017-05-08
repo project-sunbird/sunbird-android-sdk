@@ -11,19 +11,17 @@ import org.ekstep.genieservices.commons.network.IHttpClient;
  *
  * @author shriharsh
  */
-public abstract class AppContext<C, L extends ILogger> {
+public abstract class AppContext<C> {
 
     private C mContext;
-    private L mLogger;
 
     private String mAppPackage;
     private String mKey;
     private String mGDataId;
     private String mGDataVersionName;
 
-    protected AppContext(C context, String appPackage, String key, L logger, String gDataId) {
+    protected AppContext(C context, String appPackage, String key, String gDataId) {
         this.mContext = context;
-        this.mLogger = logger;
         this.mAppPackage = appPackage;
         this.mKey = key;
         this.mGDataId = gDataId;
@@ -42,10 +40,6 @@ public abstract class AppContext<C, L extends ILogger> {
         return mContext;
     }
 
-    public L getLogger() {
-        return mLogger;
-    }
-
     public String getAppPackage() {
         return mAppPackage;
     }
@@ -62,8 +56,6 @@ public abstract class AppContext<C, L extends ILogger> {
 
     public abstract Void setSummarizerDBSession(IDBSession session);
 
-    public abstract Void setParams(IParams params);
-
     public abstract IKeyValueStore getKeyValueStore();
 
     public abstract IConnectionInfo getConnectionInfo();
@@ -73,5 +65,7 @@ public abstract class AppContext<C, L extends ILogger> {
     public abstract IDeviceInfo getDeviceInfo();
 
     public abstract IParams getParams();
+
+    public abstract ILocationInfo getLocationInfo();
 
 }

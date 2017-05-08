@@ -203,12 +203,12 @@ public class EventModel implements IWritable {
     }
 
     private void tag(AppContext context) {
-        Logger.i(context, TAG, "TAG");
+        Logger.i(TAG, "TAG");
         Iterator<IEventTagger> iterator = taggers.iterator();
         IEventTagger tagger;
         while (iterator.hasNext()) {
             tagger = iterator.next();
-            Logger.i(context, TAG, String.format("TAGGER %s", tagger));
+            Logger.i(TAG, String.format("TAGGER %s", tagger));
             tagger.tag(this, context);
         }
 

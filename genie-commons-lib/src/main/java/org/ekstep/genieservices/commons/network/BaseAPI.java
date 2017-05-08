@@ -47,7 +47,7 @@ public abstract class BaseAPI {
 
     private GenieResponse fetchFromServer(String requestType) {
         if (!appContext.getConnectionInfo().isConnected()) {
-            return GenieResponse.getErrorResponse(appContext, NetworkConstants.CONNECTION_ERROR, NetworkConstants.CONNECTION_ERROR_MESSAGE, TAG);
+            return GenieResponse.getErrorResponse(NetworkConstants.CONNECTION_ERROR, NetworkConstants.CONNECTION_ERROR_MESSAGE, TAG, String.class);
         }
         try {
             httpClient.createClient();
@@ -63,15 +63,15 @@ public abstract class BaseAPI {
                 apiResponse = httpClient.doPost(createRequestData());
             }
             if (apiResponse.isSuccessful()) {
-                GenieResponse response = GenieResponse.getSuccessResponse("");
+                GenieResponse<String> response = GenieResponse.getSuccessResponse("", String.class);
                 response.setResult(apiResponse.getResponseBody());
                 return response;
             } else {
-                return GenieResponse.getErrorResponse(appContext, NetworkConstants.SERVER_ERROR, NetworkConstants.SERVER_ERROR_MESSAGE, TAG);
+                return GenieResponse.getErrorResponse(NetworkConstants.SERVER_ERROR, NetworkConstants.SERVER_ERROR_MESSAGE, TAG, String.class);
             }
         } catch (IOException e) {
-            Logger.e(appContext, TAG, e.getMessage());
-            return GenieResponse.getErrorResponse(appContext, NetworkConstants.NETWORK_ERROR, e.getMessage(), TAG);
+            Logger.e(TAG, e.getMessage());
+            return GenieResponse.getErrorResponse(NetworkConstants.NETWORK_ERROR, e.getMessage(), TAG, String.class);
         }
     }
 
