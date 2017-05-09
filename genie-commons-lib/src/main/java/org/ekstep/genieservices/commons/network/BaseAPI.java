@@ -60,7 +60,7 @@ public abstract class BaseAPI {
             if (GET.equals(requestType)) {
                 apiResponse = httpClient.doGet();
             } else if (POST.equals(requestType)) {
-                apiResponse = httpClient.doPost(createRequestData());
+                apiResponse = httpClient.doPost(getRequestData());
             }
             if (apiResponse.isSuccessful()) {
                 GenieResponse<String> response = GenieResponse.getSuccessResponse("", String.class);
@@ -76,6 +76,10 @@ public abstract class BaseAPI {
     }
 
     protected abstract Map<String, String> getRequestHeaders();
+
+    protected byte[] getRequestData() {
+        return createRequestData().getBytes();
+    }
 
     protected abstract String createRequestData();
 

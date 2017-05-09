@@ -22,6 +22,6 @@ public interface IHttpClient {
 
     ApiResponse doGet() throws IOException;
 
-    ApiResponse doPost(String requestBody) throws IOException;
+    ApiResponse doPost(byte[] requestBody) throws IOException;
 
 }
