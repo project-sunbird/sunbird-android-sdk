@@ -8,6 +8,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.config.ConfigService;
 import org.ekstep.genieservices.profile.UserProfileService;
+import org.ekstep.genieservices.telemetry.SyncService;
 import org.ekstep.genieservices.telemetry.TelemetryService;
 
 /**
@@ -23,6 +24,7 @@ public class GenieService {
     private ConfigService sConfigService;
     private TelemetryService sTelemetryService;
     private UserProfileService sProfileService;
+    private SyncService syncService;
 
     public static GenieService getService() {
         return service;
@@ -60,5 +62,12 @@ public class GenieService {
             sTelemetryService = new TelemetryService(applicationContext);
         }
         return sTelemetryService;
+    }
+
+    public SyncService getSyncService() {
+        if (syncService == null) {
+            syncService = new SyncService(applicationContext);
+        }
+        return syncService;
     }
 }

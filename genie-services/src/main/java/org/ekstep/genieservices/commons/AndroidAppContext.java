@@ -35,6 +35,7 @@ public class AndroidAppContext extends AppContext<Context> {
 
     public static AppContext buildAppContext(Context context, String appPackage, String key, String gDataId) {
         AndroidAppContext appContext = new AndroidAppContext(context, appPackage, key, gDataId);
+        appContext.setParams(new BuildParams(appPackage));
         appContext.setDBSession(ServiceDbHelper.getGSDBSession(appContext));
         appContext.setSummarizerDBSession(ServiceDbHelper.getSummarizerDBSession(appContext));
         appContext.setConnectionInfo(new AndroidNetworkConnectivity(appContext));
@@ -42,8 +43,6 @@ public class AndroidAppContext extends AppContext<Context> {
         appContext.setKeyValueStore(new PreferenceWrapper(appContext, Constants.SHARED_PREFERENCE_NAME));
         appContext.setDeviceInfo(new DeviceInfo(context));
         appContext.setLocationInfo(new LocationInfo(context));
-        appContext.setParams(new BuildParams(appPackage));
-
         return appContext;
     }
 

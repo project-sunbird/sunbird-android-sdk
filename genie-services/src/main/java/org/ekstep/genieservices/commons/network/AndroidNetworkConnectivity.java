@@ -14,9 +14,9 @@ import org.ekstep.genieservices.commons.AppContext;
  */
 public class AndroidNetworkConnectivity implements IConnectionInfo {
 
-    private AppContext<Context, AndroidLogger> appContext;
+    private AppContext<Context> appContext;
 
-    public AndroidNetworkConnectivity(AppContext<Context, AndroidLogger> appContext) {
+    public AndroidNetworkConnectivity(AppContext<Context> appContext) {
         this.appContext = appContext;
     }
 

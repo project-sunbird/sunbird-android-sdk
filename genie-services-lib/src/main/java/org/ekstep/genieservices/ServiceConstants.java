@@ -26,14 +26,24 @@ public interface ServiceConstants {
     /* Key Constants for all the key value store */
     String KEY_USER_SESSION = "session";
 
+    String NEVER_SYNCED = "NEVER";
+    String SYNC_PROMPT = "SYNC_PROMPT";
+
     interface Error {
 
     }
 
     interface PreferenceKey {
+
+        //Config service pref keys
         String RESOURCE_BUNDLE_API_EXPIRATION_KEY = "RESOURCE_BUNDLE_API_EXPIRATION_KEY";
         String MASTER_DATA_API_EXPIRATION_KEY = "TERMS_API_EXPIRATION_KEY";
         String ORDINAL_API_EXPIRATION_KEY = "ORDINAL_API_EXPIRATION_KEY";
+
+        //Sync service pref keys
+        String SYNC_CONFIG_SHARED_PREFERENCE_KEY = "syncConfig";
+        String LAST_SYNC_TIME = "lastSyncTime";
+        String SYNC_FILE_SIZE = "SYNC_FILE_SIZE";
     }
 
     interface ConfigResourceFiles {

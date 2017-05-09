@@ -108,6 +108,10 @@ public class EventsModel implements IReadable, ICleanable {
         return eventMaps;
     }
 
+    public void clear(){
+        mDbSession.clean(this);
+    }
+
     public Boolean isEmpty() {
         return events == null || events.isEmpty();
     }

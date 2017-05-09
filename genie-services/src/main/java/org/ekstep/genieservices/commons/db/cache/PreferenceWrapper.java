@@ -19,7 +19,7 @@ public class PreferenceWrapper implements IKeyValueStore {
     private AppContext mAppContext;
 
 
-    public PreferenceWrapper(AppContext<Context,AndroidLogger> appContext,String name) {
+    public PreferenceWrapper(AppContext<Context> appContext,String name) {
         mAppContext=appContext;
         Context context=((Context) mAppContext.getContext()).getApplicationContext();
         mSharedPrefs = context.getSharedPreferences(name, Context.MODE_PRIVATE);

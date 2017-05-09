@@ -99,7 +99,11 @@ public class ProcessedEventModel implements IWritable, ICleanable, IReadable {
 
     @Override
     public ContentValues getContentValues() {
-        return null;
+        contentValues.put(TelemetryProcessedEntry.COLUMN_NAME_MSG_ID, msgId);
+        contentValues.put(TelemetryProcessedEntry.COLUMN_NAME_DATA,data);
+        contentValues.put(TelemetryProcessedEntry.COLUMN_NAME_NUMBER_OF_EVENTS, numberOfEvents);
+        contentValues.put(TelemetryProcessedEntry.COLUMN_NAME_PRIORITY, priority);
+        return contentValues;
     }
 
     @Override
@@ -126,6 +130,10 @@ public class ProcessedEventModel implements IWritable, ICleanable, IReadable {
         int eventExported = this.numberOfEvents;
         mDBSession.clean(this);
         return eventExported;
+    }
+
+    public void save() {
+       mDBSession.create(this);
     }
 
     public void readWithoutMoving(IResultSet resultSet) {

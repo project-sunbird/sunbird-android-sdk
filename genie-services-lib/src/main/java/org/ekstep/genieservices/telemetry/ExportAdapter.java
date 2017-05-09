@@ -25,7 +25,7 @@ public class ExportAdapter {
     private EventsModel events;
 
     public ExportAdapter(AppContext context) {
-        this(context,EventsModel.build(context.getDBSession(),context.getDeviceInfo()));
+        this(context, EventsModel.build(context.getDBSession(), context.getDeviceInfo()));
     }
 
     ExportAdapter(AppContext context, EventsModel events) {
@@ -33,22 +33,22 @@ public class ExportAdapter {
         this.events = events;
     }
 
-    public GenieResponse export(IExport exportingStrategy) {
+    public void export(IExport exportingStrategy) {
         try {
             Logger.i("service-GEA", "About to export");
 
             processEvents();
 
-            return exportingStrategy.send(mAppContext.getDBSession());
+//            return exportingStrategy.send(mAppContext.getDBSession());
         } catch (DbException e) {
             Logger.e("service-GEA", "Db exception:" + e.getMessage());
-            return failedResponse(DbConstants.ERROR, e.getMessage());
+//            return failedResponse(DbConstants.ERROR, e.getMessage());
         } catch (IOException e) {
             Logger.e("service-GEA", "Error zipping:" + e.getMessage());
-            return failedResponse("PROCESSING_ERROR", e.getMessage());
-        }/* catch (SQLiteException e) {
-            return failedResponse("NETWORK_ERROR", e.getMessage());
-        }*/
+//            return failedResponse("PROCESSING_ERROR", e.getMessage());
+        } catch (Exception e) {
+//            return failedResponse("NETWORK_ERROR", e.getMessage());
+        }
     }
 
     // TODO Refactor this; make processEvents an explicit task
@@ -59,37 +59,41 @@ public class ExportAdapter {
         } catch (DbException e) {
             Logger.e("service-GEA", "Db exception:" + e.getMessage());
             return failedResponse(DbConstants.ERROR, e.getMessage());
-        }/* catch (SQLiteException e) {
+        } catch (Exception e) {
             return failedResponse("NETWORK_ERROR", e.getMessage());
-        }*/
+        }
     }
 
 
     private GenieResponse failedResponse(String error, String errorMessage) {
-        return GenieResponse.getErrorResponse("failed", error, errorMessage, );
+        return GenieResponse.getErrorResponse("failed", error, errorMessage, String.class);
     }
 
     private void processEvents() throws IOException {
 
-       final  IDBSession dbSession=mAppContext.getDBSession();
-       final  IDeviceInfo deviceInfo=mAppContext.getDeviceInfo();
-        while (!events.isEmpty()) {
-            dbSession.executeInTransaction(new IDBTransaction() {
-                @Override
-                public Void perform(IDBSession dbSession) {
-                    EventsModel events=EventsModel.find(dbSession,mAppContext.getDeviceInfo());
-                    List<IProcessEvent> eventProcessors=new EventProcessorFactory().getProcessors(dbSession,events,deviceInfo);
-                    ProcessedEventModel processedEvent =ProcessedEventModel.build(dbSession);
+        final IDBSession dbSession = mAppContext.getDBSession();
+        final IDeviceInfo deviceInfo = mAppContext.getDeviceInfo();
+
+        dbSession.executeInTransaction(new IDBTransaction() {
+            @Override
+            public Void perform(IDBSession dbSession) {
+                EventsModel events=null;
+                events = EventsModel.find(dbSession, mAppContext.getDeviceInfo());
+                while (!events.isEmpty()) {
+                    List<IProcessEvent> eventProcessors = new EventProcessorFactory().getProcessors(dbSession, events, deviceInfo);
+                    ProcessedEventModel processedEvent = ProcessedEventModel.build(dbSession);
                     for (IProcessEvent processor : eventProcessors) {
                         processedEvent = processor.process(processedEvent);
                     }
-                    events.clean();
-                    events=EventsModel.find(dbSession,mAppContext.getDeviceInfo());
-                    return null;
+                    processedEvent.save();
+                    events.clear();
+                    events = EventsModel.find(dbSession, mAppContext.getDeviceInfo());
                 }
-            });
 
-        }
+                return null;
+            }
+        });
+
     }
 
 }
