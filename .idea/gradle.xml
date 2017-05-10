@@ -8,9 +8,13 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/genie-commons-lib" />
+            <option value="$PROJECT_DIR$/commons-lib" />
+            <option value="$PROJECT_DIR$/commons-services-lib" />
+            <option value="$PROJECT_DIR$/config-services-lib" />
+            <option value="$PROJECT_DIR$/content-services-lib" />
             <option value="$PROJECT_DIR$/genie-services" />
-            <option value="$PROJECT_DIR$/genie-services-lib" />
+            <option value="$PROJECT_DIR$/partner-services-lib" />
+            <option value="$PROJECT_DIR$/usermanagement-services-lib" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

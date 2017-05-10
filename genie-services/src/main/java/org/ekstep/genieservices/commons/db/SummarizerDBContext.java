@@ -1,7 +1,7 @@
 package org.ekstep.genieservices.commons.db;
 
 import org.ekstep.genieservices.commons.db.migration.Migration;
-import org.ekstep.genieservices.migration.Migrations;
+import org.ekstep.genieservices.commons.db.migration.impl.Migrations;
 
 import java.util.List;
 

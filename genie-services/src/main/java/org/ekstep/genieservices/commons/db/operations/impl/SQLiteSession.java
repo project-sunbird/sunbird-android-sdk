@@ -3,7 +3,6 @@ package org.ekstep.genieservices.commons.db.operations.impl;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-import org.ekstep.genieservices.commons.AndroidLogger;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
@@ -21,7 +20,7 @@ public class SQLiteSession implements IDBSession {
     private SQLiteDatabase database;
     private boolean isOperationSuccessful;
 
-    public SQLiteSession(AppContext<Context, AndroidLogger> appContext, SQLiteDatabase database) {
+    public SQLiteSession(AppContext<Context> appContext, SQLiteDatabase database) {
         this.appContext = appContext;
         this.database = database;
     }
@@ -31,7 +30,7 @@ public class SQLiteSession implements IDBSession {
             operate.perform(appContext, database);
         } catch (Exception e) {
             isOperationSuccessful = false;
-            Logger.e(appContext, LOG_TAG, "Error when performing execute. Exception: " + e, e);
+            Logger.e(LOG_TAG, "Error when performing execute. Exception: " + e, e);
         }
         return null;
     }
@@ -44,7 +43,7 @@ public class SQLiteSession implements IDBSession {
             isOperationSuccessful = true;
         } catch (Exception e) {
             isOperationSuccessful = false;
-            Logger.e(appContext, LOG_TAG, "Error when performing execute. Exception: " + e, e);
+            Logger.e(LOG_TAG, "Error when performing execute. Exception: " + e, e);
         } finally {
             endTransaction();
         }

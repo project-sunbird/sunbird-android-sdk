@@ -16,7 +16,7 @@ import org.ekstep.genieservices.commons.network.auth.BasicAuthenticator;
 /**
  * Created on 18/4/17.
  */
-public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
+public class AndroidAppContext extends AppContext<Context> {
 
     private IDBSession mDBSession;
     private IDBSession mSummarizerDBSession;
@@ -25,29 +25,31 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
     private IKeyValueStore mKeyValueOperation;
     private IDeviceInfo mDeviceInfo;
     private ILocationInfo mLocationInfo;
+    private IParams mParams;
 
-    private AndroidAppContext(Context context, String appPackage, String key, AndroidLogger logger, String gDataId) {
-        super(context, appPackage, key, logger, gDataId);
+    private AndroidAppContext(Context context, String appPackage, String key, String gDataId) {
+        super(context, appPackage, key, gDataId);
     }
 
-    public static AppContext buildAppContext(Context context, String appPackage, String key, AndroidLogger logger, String gDataId) {
-        AndroidAppContext appContext = new AndroidAppContext(context, appPackage, key, logger, gDataId);
+    public static AppContext buildAppContext(Context context, String appPackage, String key, String gDataId) {
+        AndroidAppContext appContext = new AndroidAppContext(context, appPackage, key, gDataId);
+        appContext.setParams(new BuildParams(appPackage));
         appContext.setDBSession(ServiceDbHelper.getGSDBSession(appContext));
         appContext.setSummarizerDBSession(ServiceDbHelper.getSummarizerDBSession(appContext));
         appContext.setConnectionInfo(new AndroidNetworkConnectivity(appContext));
-        appContext.setHttpClient(new AndroidHttpClient(new BasicAuthenticator()));
+        appContext.setHttpClient(new AndroidHttpClient(new BasicAuthenticator(appContext.getParams().getUserName(), appContext.getParams().getPassword())));
         appContext.setKeyValueStore(new PreferenceWrapper(appContext, Constants.SHARED_PREFERENCE_NAME));
         appContext.setDeviceInfo(new DeviceInfo(context));
         appContext.setLocationInfo(new LocationInfo(context));
-
         return appContext;
     }
 
+    @Override
     public ILocationInfo getLocationInfo() {
         return mLocationInfo;
     }
 
-    public void setLocationInfo(ILocationInfo mLocationInfo) {
+    private void setLocationInfo(ILocationInfo mLocationInfo) {
         this.mLocationInfo = mLocationInfo;
     }
 
@@ -89,12 +91,12 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
     }
 
     @Override
-    public IDeviceInfo getDeviceInfo() {
-        return mDeviceInfo;
+    public IParams getParams() {
+        return mParams;
     }
 
-    private void setDeviceInfo(IDeviceInfo deviceInfo) {
-        this.mDeviceInfo = deviceInfo;
+    private void setParams(IParams params) {
+        this.mParams = params;
     }
 
     @Override
@@ -107,6 +109,15 @@ public class AndroidAppContext extends AppContext<Context, AndroidLogger> {
     public Void setSummarizerDBSession(IDBSession dbSession) {
         this.mSummarizerDBSession = dbSession;
         return null;
+    }
+
+    @Override
+    public IDeviceInfo getDeviceInfo() {
+        return mDeviceInfo;
+    }
+
+    private void setDeviceInfo(IDeviceInfo deviceInfo) {
+        this.mDeviceInfo = deviceInfo;
     }
 
 }

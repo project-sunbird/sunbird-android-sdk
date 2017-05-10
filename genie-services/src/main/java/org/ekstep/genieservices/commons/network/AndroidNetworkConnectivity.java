@@ -4,7 +4,6 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import org.ekstep.genieservices.commons.AndroidLogger;
 import org.ekstep.genieservices.commons.AppContext;
 
 /**
@@ -14,9 +13,9 @@ import org.ekstep.genieservices.commons.AppContext;
  */
 public class AndroidNetworkConnectivity implements IConnectionInfo {
 
-    private AppContext<Context, AndroidLogger> appContext;
+    private AppContext<Context> appContext;
 
-    public AndroidNetworkConnectivity(AppContext<Context, AndroidLogger> appContext) {
+    public AndroidNetworkConnectivity(AppContext<Context> appContext) {
         this.appContext = appContext;
     }
 

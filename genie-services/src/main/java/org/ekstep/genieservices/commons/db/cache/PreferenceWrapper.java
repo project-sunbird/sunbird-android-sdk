@@ -3,7 +3,6 @@ package org.ekstep.genieservices.commons.db.cache;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import org.ekstep.genieservices.commons.AndroidLogger;
 import org.ekstep.genieservices.commons.AppContext;
 
 import java.util.Set;
@@ -19,7 +18,7 @@ public class PreferenceWrapper implements IKeyValueStore {
     private AppContext mAppContext;
 
 
-    public PreferenceWrapper(AppContext<Context,AndroidLogger> appContext,String name) {
+    public PreferenceWrapper(AppContext<Context> appContext,String name) {
         mAppContext=appContext;
         Context context=((Context) mAppContext.getContext()).getApplicationContext();
         mSharedPrefs = context.getSharedPreferences(name, Context.MODE_PRIVATE);
@@ -29,6 +28,12 @@ public class PreferenceWrapper implements IKeyValueStore {
     @Override
     public void putString(String key, String value) {
         mPrefsEditor.putString(key, value);
+        mPrefsEditor.commit();
+    }
+
+    @Override
+    public void putStringSet(String key,  Set<String> value) {
+        mPrefsEditor.putStringSet(key, value);
         mPrefsEditor.commit();
     }
 
@@ -45,14 +50,13 @@ public class PreferenceWrapper implements IKeyValueStore {
     }
 
     @Override
-    public void putStringSet(String key, Set<String> value) {
-        mPrefsEditor.putStringSet(key, value);
-        mPrefsEditor.commit();
+    public String getString(String key, String defValue) {
+         return mSharedPrefs.getString(key, defValue);
     }
 
     @Override
-    public String getString(String key, String defValue) {
-         return mSharedPrefs.getString(key, defValue);
+    public Set<String> getStringSet(String key,  Set<String> defValue) {
+        return mSharedPrefs.getStringSet(key, defValue);
     }
 
     @Override
@@ -63,11 +67,6 @@ public class PreferenceWrapper implements IKeyValueStore {
     @Override
     public boolean getBoolean(String key, boolean defValue) {
         return mSharedPrefs.getBoolean(key, defValue);
-    }
-
-    @Override
-    public Set<String> getStringSet(String key, Set<String> defValue) {
-        return mSharedPrefs.getStringSet(key, defValue);
     }
 
     @Override

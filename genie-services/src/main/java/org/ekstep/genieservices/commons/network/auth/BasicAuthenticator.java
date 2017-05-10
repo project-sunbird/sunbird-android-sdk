@@ -6,7 +6,6 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
 import org.ekstep.genieservices.commons.exception.AuthenticationFailedException;
-import org.ekstep.genieservices.commons.utils.BuildConfigUtil;
 
 import java.io.IOException;
 import java.net.Proxy;
@@ -21,6 +20,14 @@ public class BasicAuthenticator implements Authenticator {
     private static final int MAX_RETRY = 1;
     private int currentAttempt = 0;
 
+    private String user;
+    private String pass;
+
+    public BasicAuthenticator(String user, String pass) {
+        this.user = user;
+        this.pass = pass;
+    }
+
     @Override
     public Request authenticate(Proxy proxy, Response response) throws IOException {
 
@@ -30,7 +37,7 @@ public class BasicAuthenticator implements Authenticator {
 
         currentAttempt++;
 
-        String credentials = Credentials.basic(BuildConfigUtil.API_USER, BuildConfigUtil.API_PASS);
+        String credentials = Credentials.basic(user, pass);
 
         return response.request().newBuilder().header("Authorization", credentials).build();
     }

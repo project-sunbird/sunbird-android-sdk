@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import org.ekstep.genieservices.commons.AndroidLogger;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.migration.IMigrate;
 import org.ekstep.genieservices.commons.db.migration.Migration;
@@ -26,7 +25,7 @@ public class ServiceDbHelper extends SQLiteOpenHelper {
     private AppContext mAppContext;
     private IDBSessionHandler handler;
 
-    private ServiceDbHelper(AppContext<Context, AndroidLogger> appContext, IDBContext dbContext) {
+    private ServiceDbHelper(AppContext<Context> appContext, IDBContext dbContext) {
         // Use the application context, which will ensure that you don't accidentally leak an Activity's context.
         super(appContext.getContext().getApplicationContext(), dbContext.getDBName(), null, dbContext.getDBVersion());
 
@@ -34,12 +33,12 @@ public class ServiceDbHelper extends SQLiteOpenHelper {
         this.migrations = dbContext.getMigrations();
     }
 
-    public static synchronized IDBSession getGSDBSession(AppContext<Context, AndroidLogger> appContext) {
+    public static synchronized IDBSession getGSDBSession(AppContext<Context> appContext) {
         if (mGSDBInstance == null) {
             mGSDBInstance = new ServiceDbHelper(appContext, new GSDBContext());
             mGSDBInstance.handler = new IDBSessionHandler() {
                 @Override
-                public Void setDBSession(AppContext<Context, AndroidLogger> appContext, SQLiteDatabase database) {
+                public Void setDBSession(AppContext<Context> appContext, SQLiteDatabase database) {
                     appContext.setDBSession(new SQLiteSession(appContext, database));
                     return null;
                 }
@@ -48,12 +47,12 @@ public class ServiceDbHelper extends SQLiteOpenHelper {
         return new SQLiteSession(appContext, mGSDBInstance.getWritableDatabase());
     }
 
-    public static synchronized IDBSession getSummarizerDBSession(AppContext<Context, AndroidLogger> appContext) {
+    public static synchronized IDBSession getSummarizerDBSession(AppContext<Context> appContext) {
         if (mSummarizerDBInstance == null) {
             mSummarizerDBInstance = new ServiceDbHelper(appContext, new SummarizerDBContext());
             mSummarizerDBInstance.handler = new IDBSessionHandler() {
                 @Override
-                public Void setDBSession(AppContext<Context, AndroidLogger> appContext, SQLiteDatabase database) {
+                public Void setDBSession(AppContext<Context> appContext, SQLiteDatabase database) {
                     appContext.setSummarizerDBSession(new SQLiteSession(appContext, database));
                     return null;
                 }
@@ -87,6 +86,6 @@ public class ServiceDbHelper extends SQLiteOpenHelper {
     }
 
     interface IDBSessionHandler {
-        Void setDBSession(AppContext<Context, AndroidLogger> appContext, SQLiteDatabase database);
+        Void setDBSession(AppContext<Context> appContext, SQLiteDatabase database);
     }
 }

@@ -54,7 +54,7 @@ public class AndroidHttpClient implements IHttpClient {
     }
 
     @Override
-    public ApiResponse doPost(String requestBody) throws IOException {
+    public ApiResponse doPost(byte[] requestBody) throws IOException {
         requestBuilder.post(RequestBody.create(MediaType.parse("application/json"), requestBody));
         Request request = requestBuilder.build();
         Response response = httpClient.newCall(request).execute();
