@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.profile.profile;
+package org.ekstep.genieservices.profile;
 
 import org.ekstep.genieservices.BaseService;
 import org.ekstep.genieservices.IUserService;
@@ -12,16 +12,14 @@ import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
-import org.ekstep.genieservices.profile.profile.db.model.AnonymousUserModel;
-import org.ekstep.genieservices.profile.profile.db.model.ContentAccessesModel;
-import org.ekstep.genieservices.profile.profile.db.model.UserModel;
-import org.ekstep.genieservices.profile.profile.db.model.UserProfileModel;
-import org.ekstep.genieservices.profile.profile.db.model.UserSessionModel;
+import org.ekstep.genieservices.profile.db.model.AnonymousUserModel;
+import org.ekstep.genieservices.profile.db.model.ContentAccessesModel;
+import org.ekstep.genieservices.profile.db.model.UserModel;
+import org.ekstep.genieservices.profile.db.model.UserProfileModel;
+import org.ekstep.genieservices.profile.db.model.UserSessionModel;
 
 import java.util.Date;
 import java.util.UUID;
-
-import static org.ekstep.genieservices.profile.profile.db.model.UserSessionModel.findUserSession;
 
 /**
  * Any service related to profile will be called using ProfileService

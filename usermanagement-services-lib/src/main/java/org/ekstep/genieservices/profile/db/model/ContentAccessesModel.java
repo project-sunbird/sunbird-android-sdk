@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.profile.profile.db.model;
+package org.ekstep.genieservices.profile.db.model;
 
 import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
