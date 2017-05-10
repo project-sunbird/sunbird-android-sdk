@@ -32,7 +32,7 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
     }
 
     @Override
-    public GenieResponse sync() {
+    public GenieResponse<Map> sync() {
         HashMap params = new HashMap();
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
 
@@ -67,7 +67,7 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
         mAppContext.getKeyValueStore().putString(ServiceConstants.PreferenceKey.SYNC_FILE_SIZE, fileSize);
         mAppContext.getKeyValueStore().putLong(ServiceConstants.PreferenceKey.LAST_SYNC_TIME, new Date().getTime());
 
-        GenieResponse response = GenieResponseBuilder.getSuccessResponse(getMessage(numberOfSync, numberOfEventsProcessed));
+        GenieResponse<Map> response = GenieResponseBuilder.getSuccessResponse(getMessage(numberOfSync, numberOfEventsProcessed));
 
         Map<String, Object> objectMap = new HashMap<>();
         objectMap.put("fileSize", fileSize);

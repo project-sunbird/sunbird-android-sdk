@@ -2,6 +2,7 @@ package org.ekstep.genieservices.telemetry;
 
 import org.ekstep.genieservices.BaseService;
 import org.ekstep.genieservices.ITelemetryService;
+import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -24,9 +25,11 @@ import java.util.HashMap;
 public class TelemetryServiceImpl extends BaseService implements ITelemetryService {
 
     private static final String SERVICE_NAME = TelemetryServiceImpl.class.getSimpleName();
+    private IUserService mUserService=null;
 
-    public TelemetryServiceImpl(AppContext appContext) {
+    public TelemetryServiceImpl(AppContext appContext, IUserService userService) {
         super(appContext);
+        this.mUserService=userService;
     }
 
     @Override
@@ -40,6 +43,9 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
             EventModel event = EventModel.build(mAppContext.getDBSession(), eventString, TelemetryTagCache.activeTags(mAppContext));
 
             //Stamp the event with current Sid and Uid
+            if(mUserService!=null){
+
+            }
             UserSessionModel userSession = UserSessionModel.findUserSession(mAppContext);
             if (userSession != null) {
                 UserSession currentSession = userSession.find();
