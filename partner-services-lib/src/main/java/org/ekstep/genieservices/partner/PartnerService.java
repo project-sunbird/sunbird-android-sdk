@@ -1,18 +1,18 @@
 package org.ekstep.genieservices.partner;
 
 import org.ekstep.genieservices.BaseService;
+import org.ekstep.genieservices.IPartnerService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.PartnerData;
 import org.ekstep.genieservices.commons.exception.EncryptionException;
+import org.ekstep.genieservices.commons.utils.Base64;
+import org.ekstep.genieservices.commons.utils.Crypto;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.partner.db.model.PartnerModel;
 import org.ekstep.genieservices.partner.db.model.PartnerSessionModel;
-import org.ekstep.genieservices.commons.utils.Base64;
-import org.ekstep.genieservices.commons.utils.Crypto;
 
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
@@ -38,7 +38,7 @@ import javax.crypto.spec.IvParameterSpec;
  * @author shriharsh
  */
 
-public class PartnerService extends BaseService {
+public class PartnerService extends BaseService implements IPartnerService {
 
     public static final String TAG = PartnerService.class.getSimpleName();
     public static final String UNREGISTERED_PARTNER = "UNREGISTERED_PARTNER";
@@ -55,30 +55,30 @@ public class PartnerService extends BaseService {
         this.appContext = appContext;
     }
 
-    public void registerPartner(PartnerData partnerData, IResponseHandler<Void> responseHandler) {
+    @Override
+    public GenieResponse<Void> registerPartner(PartnerData partnerData) {
         Logger.i(TAG, "REGISTERING Partner: " + partnerData.getPartnerID());
-        GenieResponse<Void> genieResponse;
+        GenieResponse<Void> response;
 
         PartnerModel partnerModel = PartnerModel.findByPartnerId(appContext.getDBSession(), partnerData.getPartnerID());
         if (partnerModel != null) {
-            genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
-            responseHandler.onSuccess(genieResponse);
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
+            return response;
         } else {
             List<String> errors = isValid(partnerData);
             if (errors.isEmpty()) {
                 partnerModel = PartnerModel.build(appContext.getDBSession(), partnerData.getPartnerID(), partnerData.getPublicKey(), getPublicKeyId(partnerData));
                 partnerModel.save();
                 // TODO: 2/5/17 Generate GERegisterPartner
-                genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
-                responseHandler.onSuccess(genieResponse);
+                response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
+                return response;
             } else {
                 String errorMessage = "INVALID_DATA";
-                genieResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, errorMessage, TAG, Void.class);
-                genieResponse.setErrorMessages(errors);
-                responseHandler.onError(genieResponse);
+                response = GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, errorMessage, TAG, Void.class);
+                response.setErrorMessages(errors);
+                return response;
             }
         }
-
     }
 
     private String getPublicKeyId(PartnerData request) {
@@ -93,7 +93,8 @@ public class PartnerService extends BaseService {
         return null;
     }
 
-    public void isRegistered(String partnerID, IResponseHandler<Boolean> responseHandler) {
+    @Override
+    public GenieResponse<Boolean> isRegistered(String partnerID) {
         PartnerModel partnerModel = PartnerModel.findByPartnerId(appContext.getDBSession(), partnerID);
         GenieResponse<Boolean> response = GenieResponseBuilder.getSuccessResponse("", Boolean.class);
         if (partnerModel != null) {
@@ -101,12 +102,14 @@ public class PartnerService extends BaseService {
         } else {
             response.setResult(false);
         }
-        responseHandler.onSuccess(response);
+
+        return response;
     }
 
-    public void startPartnerSession(PartnerData partnerData, IResponseHandler<Void> responseHandler) {
+    @Override
+    public GenieResponse<Void> startPartnerSession(PartnerData partnerData) {
         Logger.i(TAG, "STARTING Partner Session" + partnerData.getPartnerID());
-        GenieResponse<Void> genieResponse;
+        GenieResponse<Void> response;
         PartnerModel partnerModel = PartnerModel.findByPartnerId(appContext.getDBSession(), partnerData.getPartnerID());
 
         if (partnerModel != null) {
@@ -117,54 +120,56 @@ public class PartnerService extends BaseService {
             }
             partnerSessionModel = PartnerSessionModel.build(appContext, partnerData.getPartnerID());
             partnerSessionModel.startSession();
-            genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
-            responseHandler.onSuccess(genieResponse);
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
+            return response;
         } else {
-            genieResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, UNREGISTERED_PARTNER + String.format(Locale.US, "Session start failed! Partner: %s",
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, UNREGISTERED_PARTNER + String.format(Locale.US, "Session start failed! Partner: %s",
                     partnerData.getPartnerID()), TAG, Void.class);
-            responseHandler.onError(genieResponse);
+            return response;
         }
     }
 
-    public void terminatePartnerSession(PartnerData partnerData, IResponseHandler<Void> responseHandler) {
+    @Override
+    public GenieResponse<Void> terminatePartnerSession(PartnerData partnerData) {
         String partnerID = partnerData.getPartnerID();
         Logger.i(TAG, "TERMINATING Partner Session" + partnerID);
-        GenieResponse<Void> genieResponse;
+        GenieResponse<Void> response;
         PartnerModel partnerModel = PartnerModel.findByPartnerId(appContext.getDBSession(), partnerID);
         PartnerSessionModel partnerSessionModel = PartnerSessionModel.findPartnerSession(appContext);
         if (partnerModel != null && partnerSessionModel != null && partnerID.equals(partnerSessionModel.getPartnerID())) {
             partnerSessionModel.endSession();
-            genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
-            responseHandler.onSuccess(genieResponse);
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
+            return response;
         } else {
-            genieResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, UNREGISTERED_PARTNER + String.format(Locale.US, "Session termination failed! Partner: %s", partnerID), TAG, Void.class);
-            responseHandler.onError(genieResponse);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, UNREGISTERED_PARTNER + String.format(Locale.US, "Session termination failed! Partner: %s", partnerID), TAG, Void.class);
+            return response;
         }
     }
 
-    public void sendData(PartnerData partnerData, IResponseHandler<String> responseHandler) {
+    @Override
+    public GenieResponse<String> sendData(PartnerData partnerData) {
         Logger.i(TAG, "SENDING Partner Data " + partnerData.getPartnerID());
 
-        GenieResponse<String> genieResponse;
+        GenieResponse<String> response;
         PartnerModel partnerModel = PartnerModel.findByPartnerId(appContext.getDBSession(), partnerData.getPartnerID());
 
         if (partnerModel != null) {
             try {
                 Map<String, String> data = processData(partnerData);
                 sendEventData(data);
-                genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, String.class);
-                genieResponse.setResult(data.toString());
-                responseHandler.onSuccess(genieResponse);
+                response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, String.class);
+                response.setResult(data.toString());
+                return response;
             } catch (EncryptionException e) {
                 List<String> errorMessages = new ArrayList<>();
                 String errorMessage = e.getMessage();
                 errorMessages.add(errorMessage);
-                genieResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, ENCRYPTION_FAILURE + String.format(Locale.US, "Encrypting data failed! Partner: %s", partnerData.getPartnerID()), TAG, String.class);
-                responseHandler.onError(genieResponse);
+                response = GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, ENCRYPTION_FAILURE + String.format(Locale.US, "Encrypting data failed! Partner: %s", partnerData.getPartnerID()), TAG, String.class);
+                return response;
             }
         } else {
-            genieResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, UNREGISTERED_PARTNER + String.format(Locale.US, "Sending data failed! Partner: %s", partnerData.getPartnerID()), TAG, String.class);
-            responseHandler.onError(genieResponse);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, UNREGISTERED_PARTNER + String.format(Locale.US, "Sending data failed! Partner: %s", partnerData.getPartnerID()), TAG, String.class);
+            return response;
         }
     }
 
@@ -191,7 +196,7 @@ public class PartnerService extends BaseService {
         return data;
     }
 
-     //TODO This should be moved into the bean class using the ivalidate interface
+    //TODO This should be moved into the bean class using the ivalidate interface
     private List<String> isValid(PartnerData request) {
         List<String> errorMessages = new ArrayList<String>();
         if (request.getPartnerID() == null || request.getPartnerID().isEmpty())
