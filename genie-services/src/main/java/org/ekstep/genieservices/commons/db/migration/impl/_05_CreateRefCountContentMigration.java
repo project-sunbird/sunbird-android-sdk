@@ -1,8 +1,8 @@
 package org.ekstep.genieservices.commons.db.migration.impl;
 
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.db.contract.ContentEntry;
 import org.ekstep.genieservices.commons.db.migration.Migration;
-import org.ekstep.genieservices.content.db.contract.ContentEntry;
 
 public class _05_CreateRefCountContentMigration extends Migration {
     //Don't change these values

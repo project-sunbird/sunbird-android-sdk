@@ -1,17 +1,18 @@
 package org.ekstep.genieservices.commons.db.migration.impl;
 
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.db.contract.ContentEntry;
+import org.ekstep.genieservices.commons.db.contract.EventPriorityEntry;
 import org.ekstep.genieservices.commons.db.contract.ImportedMetadataEntry;
+import org.ekstep.genieservices.commons.db.contract.PageEntry;
+import org.ekstep.genieservices.commons.db.contract.PartnerEntry;
+import org.ekstep.genieservices.commons.db.contract.ProfileEntry;
+import org.ekstep.genieservices.commons.db.contract.TelemetryEntry;
+import org.ekstep.genieservices.commons.db.contract.TelemetryProcessedEntry;
+import org.ekstep.genieservices.commons.db.contract.TelemetryTagEntry;
+import org.ekstep.genieservices.commons.db.contract.UserEntry;
 import org.ekstep.genieservices.commons.db.migration.Migration;
-import org.ekstep.genieservices.content.db.contract.ContentEntry;
-import org.ekstep.genieservices.content.db.contract.PageEntry;
-import org.ekstep.genieservices.partner.db.contract.PartnerEntry;
-import org.ekstep.genieservices.profile.db.contract.ProfileEntry;
-import org.ekstep.genieservices.profile.db.contract.UserEntry;
-import org.ekstep.genieservices.telemetry.db.contract.EventPriorityEntry;
-import org.ekstep.genieservices.telemetry.db.contract.TelemetryEntry;
-import org.ekstep.genieservices.telemetry.db.contract.TelemetryProcessedEntry;
-import org.ekstep.genieservices.telemetry.db.contract.TelemetryTagEntry;
+
 
 import java.util.Arrays;
 import java.util.List;

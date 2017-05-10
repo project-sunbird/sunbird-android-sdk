@@ -1,9 +1,9 @@
 package org.ekstep.genieservices.commons.db.migration.impl;
 
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
+import org.ekstep.genieservices.commons.db.contract.LearnerContentSummaryEntry;
 import org.ekstep.genieservices.commons.db.migration.Migration;
-import org.ekstep.genieservices.summarizer.db.contract.LearnerAssessmentsEntry;
-import org.ekstep.genieservices.summarizer.db.contract.LearnerContentSummaryEntry;
 
 import java.util.List;
 

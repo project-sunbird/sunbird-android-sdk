@@ -1,8 +1,8 @@
 package org.ekstep.genieservices.commons.db.migration.impl;
 
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.db.contract.ProfileEntry;
 import org.ekstep.genieservices.commons.db.migration.Migration;
-import org.ekstep.genieservices.profile.db.contract.ProfileEntry;
 
 public class _02_CreatedAtForProfileMigration extends Migration {
 

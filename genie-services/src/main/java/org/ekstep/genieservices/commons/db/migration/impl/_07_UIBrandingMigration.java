@@ -1,13 +1,13 @@
 package org.ekstep.genieservices.commons.db.migration.impl;
 
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
+import org.ekstep.genieservices.commons.db.contract.ContentEntry;
+import org.ekstep.genieservices.commons.db.contract.NotificationEntry;
+import org.ekstep.genieservices.commons.db.contract.PageEntry;
+import org.ekstep.genieservices.commons.db.contract.ProfileEntry;
 import org.ekstep.genieservices.commons.db.migration.Migration;
 import org.ekstep.genieservices.commons.db.contract.MasterDataEntry;
-import org.ekstep.genieservices.content.db.contract.ContentAccessEntry;
-import org.ekstep.genieservices.content.db.contract.ContentEntry;
-import org.ekstep.genieservices.content.db.contract.PageEntry;
-import org.ekstep.genieservices.notification.db.contract.NotificationEntry;
-import org.ekstep.genieservices.profile.db.contract.ProfileEntry;
 
 import java.util.List;
 

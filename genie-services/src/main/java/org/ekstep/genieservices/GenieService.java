@@ -6,9 +6,11 @@ import org.ekstep.genieservices.commons.AndroidAppContext;
 import org.ekstep.genieservices.commons.AndroidLogger;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.utils.Logger;
-import org.ekstep.genieservices.config.ConfigService;
-import org.ekstep.genieservices.profile.UserProfileService;
+import org.ekstep.genieservices.config.ConfigServiceImpl;
+import org.ekstep.genieservices.partner.PartnerServiceImpl;
+import org.ekstep.genieservices.profile.UserServiceImpl;
 import org.ekstep.genieservices.telemetry.SyncServiceImpl;
+import org.ekstep.genieservices.telemetry.TelemetryLogger;
 import org.ekstep.genieservices.telemetry.TelemetryServiceImpl;
 
 /**
@@ -18,57 +20,66 @@ import org.ekstep.genieservices.telemetry.TelemetryServiceImpl;
  */
 public class GenieService {
 
-    private static GenieService service;
+    private static GenieService sService;
 
-    private AppContext<Context>  applicationContext;
-    private ConfigService sConfigService;
-    private TelemetryServiceImpl sTelemetryService;
-    private UserProfileService sProfileService;
-    private SyncServiceImpl syncService;
+    private AppContext<Context> mAppContext;
+    private IConfigService mConfigService;
+    private ITelemetryService mTelemetryService;
+    private IUserService mUserService;
+    private ISyncService mSyncService;
+    private IPartnerService mPartnerService;
+
+    private GenieService(AppContext<Context> applicationContext) {
+        this.mAppContext = applicationContext;
+    }
 
     public static GenieService getService() {
-        return service;
+        return sService;
     }
 
     public static GenieService init(Context context, String packageName, String apiKey, String gDataId) {
 
-        if (service == null) {
+        if (sService == null) {
             AppContext<Context> applicationContext = AndroidAppContext.buildAppContext(context, packageName, apiKey, gDataId);
             Logger.init(new AndroidLogger());
-            service = new GenieService(applicationContext);
+            TelemetryLogger.init(new TelemetryServiceImpl(applicationContext,new UserServiceImpl(applicationContext)));
+            sService = new GenieService(applicationContext);
         }
-        return service;
+        return sService;
     }
 
-    private GenieService(AppContext<Context> applicationContext) {
-        this.applicationContext = applicationContext;
+    public IConfigService getConfigService() {
+        if (mConfigService == null) {
+            mConfigService = new ConfigServiceImpl(mAppContext);
+        }
+        return mConfigService;
     }
 
-    public ConfigService getConfigService() {
-        if (sConfigService == null) {
-            sConfigService = new ConfigService(applicationContext);
+    public IUserService getUserProfileService() {
+        if (mUserService == null) {
+            mUserService = new UserServiceImpl(mAppContext);
         }
-        return sConfigService;
+        return mUserService;
     }
 
-    public UserProfileService getUserProfileService() {
-        if (sProfileService == null) {
-            sProfileService = new UserProfileService(applicationContext);
+    public ITelemetryService getTelemetryService() {
+        if (mTelemetryService == null) {
+            mTelemetryService = new TelemetryServiceImpl(mAppContext, getUserProfileService());
         }
-        return sProfileService;
+        return mTelemetryService;
     }
 
-    public TelemetryServiceImpl getTelemetryService() {
-        if (sTelemetryService == null) {
-            sTelemetryService = new TelemetryServiceImpl(applicationContext);
+    public ISyncService getSyncService() {
+        if (mSyncService == null) {
+            mSyncService = new SyncServiceImpl(mAppContext);
         }
-        return sTelemetryService;
+        return mSyncService;
     }
 
-    public SyncServiceImpl getSyncService() {
-        if (syncService == null) {
-            syncService = new SyncServiceImpl(applicationContext);
+    public IPartnerService getPartnerService() {
+        if (mPartnerService == null) {
+            mPartnerService = new PartnerServiceImpl(mAppContext);
         }
-        return syncService;
+        return mPartnerService;
     }
 }

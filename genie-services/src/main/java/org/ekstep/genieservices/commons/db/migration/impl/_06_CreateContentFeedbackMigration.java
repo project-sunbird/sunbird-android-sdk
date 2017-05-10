@@ -1,8 +1,8 @@
 package org.ekstep.genieservices.commons.db.migration.impl;
 
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.db.contract.ContentFeedbackEntry;
 import org.ekstep.genieservices.commons.db.migration.Migration;
-import org.ekstep.genieservices.content.db.contract.ContentFeedbackEntry;
 
 public class _06_CreateContentFeedbackMigration extends Migration {
     //Don't change these values

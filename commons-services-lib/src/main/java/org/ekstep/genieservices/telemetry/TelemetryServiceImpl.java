@@ -12,7 +12,6 @@ import org.ekstep.genieservices.commons.exception.DbException;
 import org.ekstep.genieservices.commons.exception.InvalidDataException;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
-import org.ekstep.genieservices.profile.db.model.UserSessionModel;
 import org.ekstep.genieservices.telemetry.cache.TelemetryTagCache;
 import org.ekstep.genieservices.telemetry.model.EventModel;
 
@@ -44,13 +43,9 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
 
             //Stamp the event with current Sid and Uid
             if(mUserService!=null){
-
-            }
-            UserSessionModel userSession = UserSessionModel.findUserSession(mAppContext);
-            if (userSession != null) {
-                UserSession currentSession = userSession.find();
-                if (currentSession.isValid()) {
-                    event.updateSessionDetails(currentSession.getSid(), currentSession.getUid());
+                UserSession currentUserSession = mUserService.getCurrentUserSession().getResult();
+                if (currentUserSession.isValid()) {
+                    event.updateSessionDetails(currentUserSession.getSid(), currentUserSession.getUid());
                 }
             }
 

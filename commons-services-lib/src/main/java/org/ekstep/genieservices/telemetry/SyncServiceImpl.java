@@ -81,11 +81,13 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
      * @return the active sync configuration. It defaults to OVER_WIFI_ONLY when no configuration is active.
      */
     @Override
-    public GenieResponse getConfiguration() {
+    public GenieResponse<SyncConfiguration> getConfiguration() {
         String syncConfig = mAppContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.SYNC_CONFIG_SHARED_PREFERENCE_KEY, SyncConfiguration.OVER_WIFI_ONLY.toString());
         SyncConfiguration syncConfiguration = SyncConfiguration.valueOf(syncConfig);
+        GenieResponse<SyncConfiguration> genieResponse=GenieResponseBuilder.getSuccessResponse("SyncConfiguraion retrieved successfully");
+        genieResponse.setResult(syncConfiguration);
         TelemetryLogger.logSuccess(mAppContext, GenieResponseBuilder.getSuccessResponse("SyncConfiguraion retrieved successfully"), new HashMap(), TAG, "getConfiguration@SyncServiceImpl", new HashMap());
-        return syncConfiguration;
+        return genieResponse;
     }
 
     @Override
@@ -175,7 +177,8 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
     private boolean isInternetConnected() {
         boolean syncPrompt = false;
         IConnectionInfo connectionInfo = mAppContext.getConnectionInfo();
-        switch (getConfiguration()) {
+        SyncConfiguration syncConfiguration = getConfiguration().getResult();
+        switch (syncConfiguration) {
             case MANUAL:
                 if (connectionInfo.isConnected()) {
                     syncPrompt = true;
