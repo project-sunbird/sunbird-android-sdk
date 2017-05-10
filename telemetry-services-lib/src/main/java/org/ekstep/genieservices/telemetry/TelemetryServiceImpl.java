@@ -1,10 +1,10 @@
 package org.ekstep.genieservices.telemetry;
 
 import org.ekstep.genieservices.BaseService;
+import org.ekstep.genieservices.ITelemetryService;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.telemetry.BaseTelemetry;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.exception.DbException;
@@ -21,19 +21,16 @@ import java.util.HashMap;
  * Created by swayangjit on 26/4/17.
  */
 
-public class TelemetryService extends BaseService {
+public class TelemetryServiceImpl extends BaseService implements ITelemetryService {
 
-    private static final String SERVICE_NAME = TelemetryService.class.getSimpleName();
+    private static final String SERVICE_NAME = TelemetryServiceImpl.class.getSimpleName();
 
-    public TelemetryService(AppContext appContext) {
+    public TelemetryServiceImpl(AppContext appContext) {
         super(appContext);
     }
 
-    public void saveTelemetry(BaseTelemetry telemetry, IResponseHandler responseHandler) {
-        saveTelemetry(telemetry.toString(),responseHandler);
-    }
-
-    public void saveTelemetry(String eventString, IResponseHandler<Void> responseHandler) {
+    @Override
+    public GenieResponse<Void> saveTelemetry(String eventString) {
         String errorMessage = "Not able to save event";
         HashMap params = new HashMap();
         params.put("Event", eventString);
@@ -65,27 +62,24 @@ public class TelemetryService extends BaseService {
 
             Logger.i(SERVICE_NAME, "Event saved successfully");
             GenieResponse response = GenieResponseBuilder.getSuccessResponse("Event Saved Successfully", Void.class);
-            responseHandler.onSuccess(response);
-
-            TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), SERVICE_NAME, "saveTelemetry@TelemetryService", params);
+            TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), SERVICE_NAME, "saveTelemetry@TelemetryServiceImpl", params);
+            return response;
         } catch (DbException e) {
             String logMessage = "Event save failed" + e.toString();
             GenieResponse response = GenieResponseBuilder.getErrorResponse("PROCESSING_ERROR", errorMessage, logMessage, Void.class);
-            responseHandler.onError(response);
-            TelemetryLogger.logFailure(mAppContext, response, SERVICE_NAME, "", "saveTelemetry@TelemetryService", params);
+            TelemetryLogger.logFailure(mAppContext, response, SERVICE_NAME, "", "saveTelemetry@TelemetryServiceImpl", params);
+            return response;
         } catch (InvalidDataException e) {
             String logMessage = "Event save failed" + e.toString();
             GenieResponse response = GenieResponseBuilder.getErrorResponse("PROCESSING_ERROR", errorMessage, logMessage, Void.class);
-            responseHandler.onError(response);
-            TelemetryLogger.logFailure(mAppContext, response, SERVICE_NAME, "", "saveTelemetry@TelemetryService", params);
+            TelemetryLogger.logFailure(mAppContext, response, SERVICE_NAME, "", "saveTelemetry@TelemetryServiceImpl", params);
+            return response;
         }
 
     }
 
-    public void sync(IResponseHandler responseHandler){
-        HashMap params = new HashMap();
-        params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
+    @Override
+    public GenieResponse<Void> saveTelemetry(BaseTelemetry event) {
+        return saveTelemetry(event.toString());
     }
-
-
 }
