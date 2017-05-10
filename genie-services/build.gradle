@@ -22,7 +22,6 @@ android {
 }
 
 dependencies {
-    compile project(':telemetry-services-lib')
     compile project(':commons-lib')
 
     compile 'com.android.support:appcompat-v7:25.3.1'

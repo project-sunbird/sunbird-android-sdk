@@ -9,7 +9,6 @@
       <module fileurl="file://$PROJECT_DIR$/content-services-lib/content-services-lib.iml" filepath="$PROJECT_DIR$/content-services-lib/content-services-lib.iml" />
       <module fileurl="file://$PROJECT_DIR$/genie-services/genie-services.iml" filepath="$PROJECT_DIR$/genie-services/genie-services.iml" />
       <module fileurl="file://$PROJECT_DIR$/partner-services-lib/partner-services-lib.iml" filepath="$PROJECT_DIR$/partner-services-lib/partner-services-lib.iml" />
-      <module fileurl="file://$PROJECT_DIR$/telemetry-services-lib/telemetry-services-lib.iml" filepath="$PROJECT_DIR$/telemetry-services-lib/telemetry-services-lib.iml" />
       <module fileurl="file://$PROJECT_DIR$/usermanagement-services-lib/usermanagement-services-lib.iml" filepath="$PROJECT_DIR$/usermanagement-services-lib/usermanagement-services-lib.iml" />
     </modules>
   </component>
