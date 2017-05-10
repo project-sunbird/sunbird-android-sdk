@@ -20,9 +20,10 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Created by swayangjit on 8/5/17.
+ * Created on 8/5/17.
+ *
+ * @author swayangjit
  */
-
 public class SyncServiceImpl extends BaseService implements ISyncService {
 
     private static final String TAG = TelemetryServiceImpl.class.getSimpleName();
@@ -97,12 +98,13 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
             if (lastSyncTime == 0) {
                 syncTime = ServiceConstants.NEVER_SYNCED;
             }
-            SimpleDateFormat timeFormat = new SimpleDateFormat("dd/MM/yyyy, hh:mma");
+            SimpleDateFormat timeFormat = new SimpleDateFormat("dd/MM/yyyy, hh:mma", Locale.US);
             syncTime = timeFormat.format(new Date(lastSyncTime));
             genieResponse.setResult(syncTime);
         } else {
             genieResponse.setResult(ServiceConstants.NEVER_SYNCED);
         }
+
         TelemetryLogger.logSuccess(mAppContext, GenieResponseBuilder.getSuccessResponse("Last sync time fetched successfully"), new HashMap(), TAG, "getLastSyncTime@SyncServiceImpl", new HashMap());
         return genieResponse;
     }
@@ -119,7 +121,6 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
     @Override
     public GenieResponse<Boolean> shouldShowSyncPrompt() {
         boolean syncPrompt = isInternetConnected();
-
 
         GenieResponse<Boolean> genieResponse = GenieResponseBuilder.getSuccessResponse("Sync prompt event fetched Successfully");
         if (syncPrompt) {
@@ -149,17 +150,15 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
         params.put("logLevel", CommonConstants.LOG_LEVEL);
 
         mAppContext.getKeyValueStore().putString(ServiceConstants.PreferenceKey.SYNC_CONFIG_SHARED_PREFERENCE_KEY, configuration.toString());
-        GenieResponse genieResponse = GenieResponseBuilder.getSuccessResponse("SyncConfiguraion set successfully");
+        GenieResponse<Void> genieResponse = GenieResponseBuilder.getSuccessResponse("SyncConfiguration set successfully");
         TelemetryLogger.logSuccess(mAppContext, genieResponse, new HashMap(), TAG, "setConfiguration@SyncServiceImpl", params);
         return genieResponse;
-
     }
-
 
     private String calculateByteCountInKB(long bytes) {
         try {
             int unit = 1024;
-            return String.format("%.2f", bytes / Math.pow(unit, 1));
+            return String.format(Locale.US, "%.2f", bytes / Math.pow(unit, 1));
         } catch (Exception e) {
             return "0.00";
         }
