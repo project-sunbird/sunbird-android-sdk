@@ -1,8 +1,8 @@
-package org.ekstep.genieservices.migration;
+package org.ekstep.genieservices.commons.db.migration.impl;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.migration.Migration;
-import org.ekstep.genieservices.config.db.contract.MasterDataEntry;
+import org.ekstep.genieservices.commons.db.contract.MasterDataEntry;
 import org.ekstep.genieservices.content.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.content.db.contract.ContentEntry;
 import org.ekstep.genieservices.content.db.contract.PageEntry;

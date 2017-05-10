@@ -13,7 +13,6 @@ import org.ekstep.genieservices.commons.network.AndroidNetworkConnectivity;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.network.IHttpClient;
 import org.ekstep.genieservices.commons.network.auth.BasicAuthenticator;
-import org.ekstep.genieservices.commons.param.IParams;
 
 /**
  * Created on 18/4/17.

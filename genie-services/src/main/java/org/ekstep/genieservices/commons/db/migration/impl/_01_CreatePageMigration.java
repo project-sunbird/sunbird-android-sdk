@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.migration;
+package org.ekstep.genieservices.commons.db.migration.impl;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.contract.ImportedMetadataEntry;
