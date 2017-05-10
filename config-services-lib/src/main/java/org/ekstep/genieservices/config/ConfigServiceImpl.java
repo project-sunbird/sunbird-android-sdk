@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.config.db;
+package org.ekstep.genieservices.config;
 
 import com.google.gson.internal.LinkedTreeMap;
 
@@ -18,9 +18,9 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.config.db.model.MasterDataModel;
 import org.ekstep.genieservices.config.db.model.OrdinalsModel;
 import org.ekstep.genieservices.config.db.model.ResourceBundleModel;
-import org.ekstep.genieservices.config.db.network.OrdinalsAPI;
-import org.ekstep.genieservices.config.db.network.ResourceBundleAPI;
-import org.ekstep.genieservices.config.db.network.TermsAPI;
+import org.ekstep.genieservices.config.network.OrdinalsAPI;
+import org.ekstep.genieservices.config.network.ResourceBundleAPI;
+import org.ekstep.genieservices.config.network.TermsAPI;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.util.HashMap;
@@ -54,9 +54,9 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
         params.put("type", type.getValue());
         params.put("logLevel", CommonConstants.LOG_LEVEL);
 
-        if (getLongFromKeyValueStore(ServiceConstants.PreferenceKey.MASTER_DATA_API_EXPIRATION_KEY) == 0) {
+        if (getLongFromKeyValueStore(ConfigConstants.PreferenceKey.MASTER_DATA_API_EXPIRATION_KEY) == 0) {
             initializeMasterData();
-        } else if (hasExpired(ServiceConstants.PreferenceKey.MASTER_DATA_API_EXPIRATION_KEY)) {
+        } else if (hasExpired(ConfigConstants.PreferenceKey.MASTER_DATA_API_EXPIRATION_KEY)) {
             refreshMasterData();
         }
 
@@ -80,7 +80,7 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
     }
 
     private void initializeMasterData() {
-        String storedData = FileUtil.readFileFromClasspath(ServiceConstants.ConfigResourceFiles.MASTER_DATA_JSON_FILE);
+        String storedData = FileUtil.readFileFromClasspath(ConfigConstants.ResourceFile.MASTER_DATA_JSON_FILE);
         if (!StringUtil.isNullOrEmpty(storedData)) {
             saveMasterData(storedData);
         }
@@ -92,7 +92,7 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
         Map result = ((LinkedTreeMap) map.get("result"));
         if (result != null) {
             Double ttl = (Double) result.get("ttl");
-            saveDataExpirationTime(ttl, ServiceConstants.PreferenceKey.MASTER_DATA_API_EXPIRATION_KEY);
+            saveDataExpirationTime(ttl, ConfigConstants.PreferenceKey.MASTER_DATA_API_EXPIRATION_KEY);
             result.remove("ttl");
             for (Object key : result.keySet()) {
                 MasterDataModel eachMasterData = MasterDataModel.build(mAppContext.getDBSession(), (String) key, GsonUtil.toJson(result.get(key)));
@@ -127,9 +127,9 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
         params.put("logLevel", CommonConstants.LOG_LEVEL);
 
-        if (getLongFromKeyValueStore(ServiceConstants.PreferenceKey.RESOURCE_BUNDLE_API_EXPIRATION_KEY) == 0) {
+        if (getLongFromKeyValueStore(ConfigConstants.PreferenceKey.RESOURCE_BUNDLE_API_EXPIRATION_KEY) == 0) {
             initializeResourceBundle();
-        } else if (hasExpired(ServiceConstants.PreferenceKey.RESOURCE_BUNDLE_API_EXPIRATION_KEY)) {
+        } else if (hasExpired(ConfigConstants.PreferenceKey.RESOURCE_BUNDLE_API_EXPIRATION_KEY)) {
             refreshResourceBundle();
         }
         ResourceBundleModel resourceBundle = ResourceBundleModel.findById(mAppContext.getDBSession(), languageIdentifier);
@@ -151,7 +151,7 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
     }
 
     private void initializeResourceBundle() {
-        String storedData = FileUtil.readFileFromClasspath(ServiceConstants.ConfigResourceFiles.RESOURCE_BUNDLE_JSON_FILE);
+        String storedData = FileUtil.readFileFromClasspath(ConfigConstants.ResourceFile.RESOURCE_BUNDLE_JSON_FILE);
         if (!StringUtil.isNullOrEmpty(storedData)) {
             saveResourceBundle(storedData);
         }
@@ -169,7 +169,7 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
 
         if (result != null) {
             Double ttl = (Double) resultMap.get("ttl");
-            saveDataExpirationTime(ttl, ServiceConstants.PreferenceKey.RESOURCE_BUNDLE_API_EXPIRATION_KEY);
+            saveDataExpirationTime(ttl, ConfigConstants.PreferenceKey.RESOURCE_BUNDLE_API_EXPIRATION_KEY);
             for (Object key : result.keySet()) {
                 ResourceBundleModel eachResourceBundle = ResourceBundleModel.build(mAppContext.getDBSession(), (String) key, GsonUtil.toJson(result.get(key)));
                 ResourceBundleModel resourceBundleInDb = ResourceBundleModel.findById(mAppContext.getDBSession(), String.valueOf(key));
@@ -202,9 +202,9 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
         params.put("logLevel", CommonConstants.LOG_LEVEL);
 
-        if (getLongFromKeyValueStore(ServiceConstants.PreferenceKey.ORDINAL_API_EXPIRATION_KEY) == 0) {
+        if (getLongFromKeyValueStore(ConfigConstants.PreferenceKey.ORDINAL_API_EXPIRATION_KEY) == 0) {
             initializeOrdinalsData();
-        } else if (hasExpired(ServiceConstants.PreferenceKey.ORDINAL_API_EXPIRATION_KEY)) {
+        } else if (hasExpired(ConfigConstants.PreferenceKey.ORDINAL_API_EXPIRATION_KEY)) {
             refreshOrdinals();
         }
 
@@ -225,7 +225,7 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
     }
 
     private void initializeOrdinalsData() {
-        String storedData = FileUtil.readFileFromClasspath(ServiceConstants.ConfigResourceFiles.ORDINALS_JSON_FILE);
+        String storedData = FileUtil.readFileFromClasspath(ConfigConstants.ResourceFile.ORDINALS_JSON_FILE);
         if (!StringUtil.isNullOrEmpty(storedData)) {
             saveOrdinals(storedData);
         }
@@ -237,7 +237,7 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
         LinkedTreeMap resultLinkedTreeMap = (LinkedTreeMap) map.get("result");
         if (resultLinkedTreeMap.containsKey("ordinals")) {
             Double ttl = (Double) map.get("ttl");
-            saveDataExpirationTime(ttl, ServiceConstants.PreferenceKey.ORDINAL_API_EXPIRATION_KEY);
+            saveDataExpirationTime(ttl, ConfigConstants.PreferenceKey.ORDINAL_API_EXPIRATION_KEY);
             OrdinalsModel ordinals = OrdinalsModel.build(mAppContext.getDBSession(), DB_KEY_ORDINALS, GsonUtil.toJson(resultLinkedTreeMap.get("ordinals")));
             OrdinalsModel ordinalsInDb = OrdinalsModel.findById(mAppContext.getDBSession(), DB_KEY_ORDINALS);
             if (ordinalsInDb != null) {

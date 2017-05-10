@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.config.db.network;
+package org.ekstep.genieservices.config.network;
 
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
