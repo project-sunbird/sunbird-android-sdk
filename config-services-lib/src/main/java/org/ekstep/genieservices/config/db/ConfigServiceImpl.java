@@ -3,27 +3,28 @@ package org.ekstep.genieservices.config.db;
 import com.google.gson.internal.LinkedTreeMap;
 
 import org.ekstep.genieservices.BaseService;
+import org.ekstep.genieservices.IConfigService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.CommonConstants;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
-import org.ekstep.genieservices.config.db.model.ResourceBundleModel;
-import org.ekstep.genieservices.config.db.network.TermsAPI;
 import org.ekstep.genieservices.config.db.model.MasterDataModel;
 import org.ekstep.genieservices.config.db.model.OrdinalsModel;
+import org.ekstep.genieservices.config.db.model.ResourceBundleModel;
 import org.ekstep.genieservices.config.db.network.OrdinalsAPI;
 import org.ekstep.genieservices.config.db.network.ResourceBundleAPI;
+import org.ekstep.genieservices.config.db.network.TermsAPI;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,29 +32,26 @@ import java.util.Map;
  *
  * @author shriharsh
  */
-public class ConfigService extends BaseService {
+public class ConfigServiceImpl extends BaseService implements IConfigService {
 
-    private static final String TAG = ConfigService.class.getSimpleName();
+    private static final String TAG = ConfigServiceImpl.class.getSimpleName();
 
     private static final String DB_KEY_ORDINALS = "ordinals_key";
 
-    public ConfigService(AppContext appContext) {
+    public ConfigServiceImpl(AppContext appContext) {
         super(appContext);
     }
 
-    public void getAllMasterData() {
+    @Override
+    public GenieResponse<List<MasterData>> getAllMasterData() {
+        return null;
     }
 
-    /**
-     * Get terms
-     *
-     * @param type
-     * @param responseHandler
-     */
-    public void getMasterData(MasterDataType type, IResponseHandler<MasterData> responseHandler) {
+    @Override
+    public GenieResponse<MasterData> getMasterData(MasterDataType type) {
 
         HashMap params = new HashMap();
-        params.put("type",type.getValue());
+        params.put("type", type.getValue());
         params.put("logLevel", CommonConstants.LOG_LEVEL);
 
         if (getLongFromKeyValueStore(ServiceConstants.PreferenceKey.MASTER_DATA_API_EXPIRATION_KEY) == 0) {
@@ -72,12 +70,12 @@ public class ConfigService extends BaseService {
         if (result != null) {
             response = GenieResponseBuilder.getSuccessResponse("MasterData retrieved successfully", MasterData.class);
             response.setResult(masterData);
-            TelemetryLogger.logSuccess(mAppContext,response,new HashMap(),TAG,"getMasterData@ConfigService",params);
-            responseHandler.onSuccess(response);
+            TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "getMasterData@ConfigServiceImpl", params);
+            return response;
         } else {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR, MasterData.class);
-            TelemetryLogger.logFailure(mAppContext,response,TAG,"Unable to get masterdata","getMasterData@ConfigService",params);
-            responseHandler.onError(response);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, "Unable to get masterdata", "getMasterData@ConfigServiceImpl", params);
+            return response;
         }
     }
 
@@ -104,7 +102,6 @@ public class ConfigService extends BaseService {
                 } else {
                     eachMasterData.save();
                 }
-
             }
         }
     }
@@ -123,17 +120,11 @@ public class ConfigService extends BaseService {
         }).start();
     }
 
-    /**
-     * Get resource bundles
-     *
-     * @param languageIdentifier
-     * @param responseHandler
-     */
-    public void getResourceBundle(String languageIdentifier, IResponseHandler<Map<String, Object>> responseHandler) {
-
+    @Override
+    public GenieResponse<Map<String, Object>> getResourceBundle(String languageIdentifier) {
         HashMap params = new HashMap();
         params.put("ResourceBundle", languageIdentifier);
-        params.put("mode",TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
+        params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
         params.put("logLevel", CommonConstants.LOG_LEVEL);
 
         if (getLongFromKeyValueStore(ServiceConstants.PreferenceKey.RESOURCE_BUNDLE_API_EXPIRATION_KEY) == 0) {
@@ -150,12 +141,12 @@ public class ConfigService extends BaseService {
         if (result != null) {
             response = GenieResponseBuilder.getSuccessResponse("");
             response.setResult(resourceBundleMap);
-            TelemetryLogger.logSuccess(mAppContext,response,new HashMap(),TAG,"getResourceBundle@ConfigService",params);
-            responseHandler.onSuccess(response);
+            TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "getResourceBundle@ConfigServiceImpl", params);
+            return response;
         } else {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR);
-            TelemetryLogger.logFailure(mAppContext,response,TAG,"Unable to get resourcebundle","getResourceBundle@ConfigService",params);
-            responseHandler.onError(response);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, "Unable to get resourcebundle", "getResourceBundle@ConfigServiceImpl", params);
+            return response;
         }
     }
 
@@ -171,9 +162,11 @@ public class ConfigService extends BaseService {
         LinkedTreeMap map = GsonUtil.fromJson(response, LinkedTreeMap.class);
         Map resultMap = (LinkedTreeMap) map.get("result");
         Map result = null;
+
         if (resultMap.containsKey("resourcebundles")) {
             result = (Map) resultMap.get("resourcebundles");
         }
+
         if (result != null) {
             Double ttl = (Double) resultMap.get("ttl");
             saveDataExpirationTime(ttl, ServiceConstants.PreferenceKey.RESOURCE_BUNDLE_API_EXPIRATION_KEY);
@@ -185,10 +178,8 @@ public class ConfigService extends BaseService {
                 } else {
                     eachResourceBundle.save();
                 }
-
             }
         }
-
     }
 
     private void refreshResourceBundle() {
@@ -205,8 +196,7 @@ public class ConfigService extends BaseService {
         }).start();
     }
 
-    public void getOrdinals(IResponseHandler<Map<String,Object>> responseHandler) {
-
+    public GenieResponse<Map<String, Object>> getOrdinals() {
         HashMap params = new HashMap();
         params.put("Ordinals", "Get ordinals");
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
@@ -217,18 +207,20 @@ public class ConfigService extends BaseService {
         } else if (hasExpired(ServiceConstants.PreferenceKey.ORDINAL_API_EXPIRATION_KEY)) {
             refreshOrdinals();
         }
+
         OrdinalsModel ordinals = OrdinalsModel.findById(mAppContext.getDBSession(), DB_KEY_ORDINALS);
         HashMap ordinalsMap = GsonUtil.fromJson(ordinals.getJSON(), HashMap.class);
-        GenieResponse<Map<String,Object>> response;
+
+        GenieResponse<Map<String, Object>> response;
         if (ordinalsMap != null) {
             response = GenieResponseBuilder.getSuccessResponse("");
             response.setResult(ordinalsMap);
-            TelemetryLogger.logSuccess(mAppContext,response,new HashMap(),TAG,"getOrdinals@ConfigService",params);
-            responseHandler.onSuccess(response);
+            TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "getOrdinals@ConfigServiceImpl", params);
+            return response;
         } else {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR);
-            TelemetryLogger.logFailure(mAppContext,response,TAG,"Unable to get ordinals","getOrdinals@ConfigService",params);
-            responseHandler.onError(response);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, "Unable to get ordinals", "getOrdinals@ConfigServiceImpl", params);
+            return response;
         }
     }
 
