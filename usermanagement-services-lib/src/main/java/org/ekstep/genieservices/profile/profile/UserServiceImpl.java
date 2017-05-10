@@ -7,6 +7,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -84,6 +85,34 @@ public class UserServiceImpl extends BaseService implements IUserService {
     }
 
     /**
+     * Update user profile
+     *
+     * @param profile          - User profile data
+     */
+    @Override
+    public GenieResponse<Profile> updateUserProfile(Profile profile) {
+
+        if (profile == null || StringUtil.isNullOrEmpty(profile.getUid())) {
+            // TODO: 25/4/17 GEError Event has to be added here
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.INVALID_PROFILE, ServiceConstants.UNABLE_TO_FIND_PROFILE, TAG, Profile.class);
+        }
+
+        if (!profile.isValid()) {
+            // TODO: 25/4/17 GEError Event has to be added here
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.VALIDATION_ERROR, profile.getErrors().toString(), TAG, Profile.class);
+
+        }
+        // TODO: 26/4/17 GEUpdateEvent has to be added to the telemetry
+        UserProfileModel userProfileModel = UserProfileModel.buildUserProfile(mAppContext.getDBSession(), profile);
+        userProfileModel.update();
+
+        GenieResponse<Profile> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Profile.class);
+        response.setResult(profile);
+        return response;
+
+    }
+
+    /**
      * Delete user profile
      *
      * @param uid-            user id
@@ -91,7 +120,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     @Override
     public GenieResponse<Void> deleteUser(String uid) {
         //get the current user id
-        UserSessionModel userSession = findUserSession(mAppContext);
+        UserSessionModel userSession = UserSessionModel.findUserSession(mAppContext);
         if (userSession != null) {
             if (userSession.getUserSessionBean().getUid().equals(uid)) {
                 setAnonymousUser();
@@ -124,36 +153,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         return user.getUid();
     }
 
-    /**
-     * Update user profile
-     *
-     * @param profile          - User profile data
-     */
-    @Override
-    public GenieResponse<Profile> updateUserProfile(Profile profile) {
-        String uid = profile.getUid();
-
-        if (profile == null || StringUtil.isNullOrEmpty(profile.getUid())) {
-            // TODO: 25/4/17 GEError Event has to be added here
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.INVALID_PROFILE, ServiceConstants.UNABLE_TO_FIND_PROFILE, TAG, Profile.class);
-        }
-
-        if (!profile.isValid()) {
-            // TODO: 25/4/17 GEError Event has to be added here
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.VALIDATION_ERROR, profile.getErrors().toString(), TAG, Profile.class);
-
-        }
-        // TODO: 26/4/17 GEUpdateEvent has to be added to the telemetry
-        UserProfileModel userProfileModel = UserProfileModel.buildUserProfile(mAppContext.getDBSession(), profile);
-        userProfileModel.update();
-
-        GenieResponse<Profile> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Profile.class);
-        response.setResult(profile);
-        return response;
-
-    }
-
-    /**
+     /**
      * set anonymous user
      *
      */
@@ -220,11 +220,12 @@ public class UserServiceImpl extends BaseService implements IUserService {
      */
     @Override
     public GenieResponse<Profile> getCurrentUser() {
-        UserSessionModel userSessionModel = findUserSession(mAppContext);
+        UserSessionModel userSessionModel = UserSessionModel.findUserSession(mAppContext);
 
+        //This should not happen if the calling app has set an anonymous user during launch. If they have not, we will create and set an anonymous user as the current user.
         if (userSessionModel == null) {
-            // TODO: 25/4/17 GEError Event has to be added here
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.NOT_EXISTS, ServiceConstants.NO_CURRENT_USER, TAG, Profile.class);
+            setAnonymousUser();
+            userSessionModel = UserSessionModel.findUserSession(mAppContext);
         }
 
         UserProfileModel userProfileModel = UserProfileModel.findUserProfile(mAppContext.getDBSession(), userSessionModel.getUserSessionBean().getUid());
@@ -236,6 +237,20 @@ public class UserServiceImpl extends BaseService implements IUserService {
         }
         GenieResponse<Profile> response = GenieResponseBuilder.getSuccessResponse("", Profile.class);
         response.setResult(profile);
+        return response;
+    }
+
+    @Override
+    public GenieResponse<UserSession> getCurrentUserSession() {
+        UserSessionModel userSessionModel = UserSessionModel.findUserSession(mAppContext);
+
+        //This should not happen if the calling app has set an anonymous user during launch. If they have not, we will create and set an anonymous user as the current user.
+        if (userSessionModel == null) {
+            setAnonymousUser();
+            userSessionModel = UserSessionModel.findUserSession(mAppContext);
+        }
+        GenieResponse<UserSession> response = GenieResponseBuilder.getSuccessResponse("");
+        response.setResult(userSessionModel.getUserSessionBean());
         return response;
     }
 
