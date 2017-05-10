@@ -39,13 +39,9 @@ public class UserSessionModel {
         return userSessionBean;
     }
 
-    private void initSession(String uid) {
+    public void startSession() {
         userSessionBean = new UserSession(uid, UUID.randomUUID().toString(), DateUtil.getCurrentTimestamp());
-    }
-
-    public Void startSession() {
-        initSession(uid);
-        return null;
+        appContext.getKeyValueStore().putString(ServiceConstants.KEY_USER_SESSION, GsonUtil.toJson(userSessionBean));
     }
 
     public void endSession() {
