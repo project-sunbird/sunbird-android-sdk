@@ -1,5 +1,7 @@
 package org.ekstep.genieservices.telemetry.network;
 
+import com.google.gson.Gson;
+
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.network.BaseAPI;

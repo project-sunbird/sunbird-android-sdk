@@ -3,6 +3,7 @@ package org.ekstep.genieservices.telemetry.model;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.BaseColumns;
+import org.ekstep.genieservices.commons.db.contract.TelemetryEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IWritable;
@@ -11,7 +12,6 @@ import org.ekstep.genieservices.commons.exception.InvalidDataException;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.telemetry.TelemetryEventPublisher;
-import org.ekstep.genieservices.commons.db.contract.TelemetryEntry;
 import org.ekstep.genieservices.telemetry.taggers.IEventTagger;
 import org.ekstep.genieservices.telemetry.taggers.PartnerTagger;
 import org.ekstep.genieservices.telemetry.taggers.TelemetryTagger;
@@ -182,7 +182,7 @@ public class EventModel implements IWritable {
         this.priority = PriorityModel.findByType(this.mDBSession, this.priority.getEventType());
 //        Logger.i(mAppContext, TAG, "Priority added:" + priority.getPriority());
         this.mDBSession.create(this);
-        TelemetryEventPublisher.postTelemetryEvent(this.mDBSession, this.event);
+        TelemetryEventPublisher.postTelemetryEvent(this.event);
         return null;
     }
 

@@ -38,38 +38,15 @@ public class GEInteract extends BaseTelemetry {
     protected HashMap<String, Object> createEKS(String stageId, String type, String subType, String extType, List positionList, List<Map<String, Object>> valueList, String id, String tid, String uri) {
         HashMap<String, Object> eks = new HashMap<>();
 
-        if (!StringUtil.isNullOrEmpty(extType)) {
-            eks.put("extype", extType);
-        }
-
-        if (!StringUtil.isNullOrEmpty(id)) {
-            eks.put("id", id);
-        }
-
-        if (positionList != null && !positionList.isEmpty()) {
-            eks.put("pos", positionList);
-        }
-
-        if (!StringUtil.isNullOrEmpty(stageId)) {
-            eks.put("stageid", stageId);
-        }
-
-        if (!StringUtil.isNullOrEmpty(subType)) {
-            eks.put("subtype", subType);
-        }
-
-        if (!StringUtil.isNullOrEmpty(tid)) {
-            eks.put("tid", tid);
-        }
-
+        eks.put("extype", extType != null ? extType : "");
+        eks.put("id", id != null ? id : "");
+        eks.put("pos", positionList != null ? positionList : new ArrayList<>());
+        eks.put("stageid", stageId != null ? stageId : "");
+        eks.put("subtype", subType != null ? subType : "");
+        eks.put("tid", tid != null ? tid : "");
         eks.put("type", type);
-
-        if (!StringUtil.isNullOrEmpty(uri)) {
-            eks.put("uri", uri);
-        }
-
-        eks.put("values", valueList);
-
+        eks.put("uri", uri != null ? uri : "");
+        eks.put("values", valueList != null ? valueList : new ArrayList<>());
         return eks;
     }
 

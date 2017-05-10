@@ -6,7 +6,10 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.CommonConstants;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.enums.InteractionType;
+import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.telemetry.model.ProcessedEventModel;
@@ -31,6 +34,114 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
     public SyncServiceImpl(AppContext appContext) {
         super(appContext);
     }
+
+    private GenieResponse sync(SyncConfiguration syncConfiguration) {
+        HashMap params = new HashMap();
+        params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
+        if (syncConfiguration.canSync(mAppContext.getConnectionInfo())) {
+            new ExportAdapter(mAppContext).export(null);
+
+            return syncTelemetry();
+        }
+        return GenieResponseBuilder.getErrorResponse("failed", "", "", String.class);
+
+    }
+
+    public GenieResponse<Void> manualSync() {
+        HashMap params = new HashMap();
+        params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
+        GenieResponse genieResponse = sync(SyncConfiguration.NO_CONFIG);
+        if (genieResponse.getStatus()) {
+            TelemetryLogger.logSuccess(mAppContext, genieResponse, new HashMap(), TAG, "manualSync@SyncService" + TAG, params);
+        } else {
+            TelemetryLogger.logFailure(mAppContext, genieResponse, TAG, "Failed to sync", "manualSync@SyncService", params);
+        }
+        return genieResponse;
+    }
+
+    public  GenieResponse<Void> autoSync() {
+        HashMap params = new HashMap();
+        params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
+
+        logGEInteractInitiate(ServiceConstants.Telemetry.AUTO_SYNC_STAGE_ID,
+                ServiceConstants.Telemetry.AUTO_SYNC_SUB_TYPE_INITIATED, InteractionType.TOUCH);
+
+        GenieResponse genieResponse = sync(getConfiguration().getResult());
+        if (genieResponse.getStatus()) {
+            Map<String, Object> result = (Map<String, Object>) genieResponse.getResult();
+            Object fileSize = result.get("fileSize");
+            HashMap<String,Object> eks=new HashMap<>();
+            if(fileSize!=null){
+                eks.put(ServiceConstants.Telemetry.SIZE_OF_DATA_IN_KB,fileSize);
+            }
+
+            logGEInteractSuccess(ServiceConstants.Telemetry.AUTO_SYNC_STAGE_ID,
+                    ServiceConstants.Telemetry.AUTO_SYNC_SUB_TYPE_SUCCESS,InteractionType.TOUCH,eks);
+
+
+            TelemetryLogger.logSuccess(mAppContext, genieResponse, new HashMap(), TAG, "autoSync@SyncService" + TAG, params);
+        } else {
+            TelemetryLogger.logFailure(mAppContext, genieResponse, TAG, "Failed to sync", "autoSync@SyncService", params);
+        }
+
+        return genieResponse;
+    }
+
+    private GenieResponse syncTelemetry() {
+        int numberOfSync = 0;
+        int numberOfEventsProcessed = 0;
+
+        ProcessedEventModel processedEvent = ProcessedEventModel.find(mAppContext.getDBSession());
+
+        long totalByteSize = 0;
+
+        while (!processedEvent.isEmpty()) {
+            totalByteSize = totalByteSize + processedEvent.getData().length;
+            GenieResponse response = new TelemetrySyncAPI(mAppContext, processedEvent.getData()).post();
+
+            if (!response.getStatus()) {
+                String message = getMessage(numberOfSync, numberOfEventsProcessed);
+                response.setMessage(message);
+                return response;
+            }
+
+            numberOfSync++;
+            numberOfEventsProcessed += processedEvent.getNumberOfEvents();
+
+            processedEvent.clear();
+            processedEvent = ProcessedEventModel.find(mAppContext.getDBSession());
+        }
+
+        String fileSize = calculateByteCountInKB(totalByteSize);
+        mAppContext.getKeyValueStore().putString(ServiceConstants.PreferenceKey.SYNC_FILE_SIZE, fileSize);
+        mAppContext.getKeyValueStore().putLong(ServiceConstants.PreferenceKey.LAST_SYNC_TIME, new Date().getTime());
+
+        GenieResponse response = GenieResponseBuilder.getSuccessResponse(getMessage(numberOfSync, numberOfEventsProcessed));
+
+        Map<String, Object> objectMap = new HashMap<>();
+        objectMap.put("fileSize", fileSize);
+
+        response.setResult(objectMap);
+
+        return response;
+    }
+
+    private void logGEInteractInitiate(String stageId,String subType,InteractionType touchType){
+        GEInteract geInteract = new GEInteract.Builder(new GameData(mAppContext.getGDataId(), mAppContext.getGDataVersionName())).
+                stageId(stageId).
+                subType(subType).
+                interActionType(touchType).build();
+        TelemetryLogger.log(geInteract);
+    }
+
+    private  void logGEInteractSuccess(String stageId,String subType,InteractionType touchType,Map<String,Object> eks){
+        GEInteract geInteract = new GEInteract.Builder(new GameData(mAppContext.getGDataId(), mAppContext.getGDataVersionName())).
+                stageId(stageId).
+                subType(subType).
+                interActionType(touchType).values(eks).build();
+        TelemetryLogger.log( geInteract);
+    }
+
 
     @Override
     public GenieResponse<Map> sync() {
