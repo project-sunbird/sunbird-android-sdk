@@ -1,6 +1,6 @@
 package org.ekstep.genieservices.utils;
 
-import org.ekstep.genieservices.commons.utils.ReflectionUtils;
+import org.ekstep.genieservices.commons.utils.ReflectionUtil;
 
 /**
  * Created on 4/18/2017.
@@ -10,11 +10,11 @@ import org.ekstep.genieservices.commons.utils.ReflectionUtils;
 public class BuildConfigUtil {
 
     public static Class<?> getBuildConfigClass(String packageName) {
-        return ReflectionUtils.getClass(packageName + ".BuildConfig");
+        return ReflectionUtil.getClass(packageName + ".BuildConfig");
     }
 
     public static <T> T getBuildConfigValue(String packageName, String property) {
-        Object value = ReflectionUtils.getStaticFieldValue(getBuildConfigClass(packageName), property);
+        Object value = ReflectionUtil.getStaticFieldValue(getBuildConfigClass(packageName), property);
         return (T) value;
     }
 }

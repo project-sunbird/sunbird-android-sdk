@@ -38,9 +38,9 @@ import javax.crypto.spec.IvParameterSpec;
  * @author shriharsh
  */
 
-public class PartnerService extends BaseService implements IPartnerService {
+public class PartnerServiceImpl extends BaseService implements IPartnerService {
 
-    public static final String TAG = PartnerService.class.getSimpleName();
+    public static final String TAG = PartnerServiceImpl.class.getSimpleName();
     public static final String UNREGISTERED_PARTNER = "UNREGISTERED_PARTNER";
     public static final String CATASTROPHIC_FAILURE = "CATASTROPHIC_FAILURE";
     public static final String ENCRYPTION_FAILURE = "ENCRYPTION_FAILURE";
@@ -50,7 +50,7 @@ public class PartnerService extends BaseService implements IPartnerService {
     private static final String TEST = "test";
     private AppContext appContext;
 
-    public PartnerService(AppContext appContext) {
+    public PartnerServiceImpl(AppContext appContext) {
         super(appContext);
         this.appContext = appContext;
     }

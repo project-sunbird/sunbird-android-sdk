@@ -4,7 +4,7 @@ package org.ekstep.genieservices.commons.utils;
  * Created by swayangjit on 27/4/17.
  */
 
-public class ReflectionUtils {
+public class ReflectionUtil {
     public static Object getStaticFieldValue(Class<?> clazz, String fieldName) {
         try {
             return clazz.getField(fieldName).get(null);
