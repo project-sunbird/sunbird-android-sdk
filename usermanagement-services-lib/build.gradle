@@ -1,0 +1,9 @@
+apply plugin: 'java'
+
+dependencies {
+    compile project(':commons-lib')
+    compile project(':commons-services-lib')
+}
+
+sourceCompatibility = "1.7"
+targetCompatibility = "1.7"

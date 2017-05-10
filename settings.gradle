@@ -1,1 +1,1 @@
-include ':genie-services', ':genie-commons-lib', ':genie-services-lib'
+include ':genie-services', ':commons-lib', ':telemetry-services-lib', ':config-services-lib', ':partner-services-lib', ':commons-services-lib', ':content-services-lib', ':usermanagement-services-lib'

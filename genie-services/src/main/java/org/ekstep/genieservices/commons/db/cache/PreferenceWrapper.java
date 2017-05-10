@@ -3,7 +3,6 @@ package org.ekstep.genieservices.commons.db.cache;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import org.ekstep.genieservices.commons.AndroidLogger;
 import org.ekstep.genieservices.commons.AppContext;
 
 import java.util.Set;

@@ -31,6 +31,7 @@ public class GenieService {
     }
 
     public static GenieService init(Context context, String packageName, String apiKey, String gDataId) {
+
         if (service == null) {
             AppContext<Context> applicationContext = AndroidAppContext.buildAppContext(context, packageName, apiKey, gDataId);
             Logger.init(new AndroidLogger());

@@ -1,6 +1,6 @@
 package org.ekstep.genieservices;
 
-import org.ekstep.genieservices.commons.param.IParams;
+import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.utils.BuildConfigUtil;
 
 /**
