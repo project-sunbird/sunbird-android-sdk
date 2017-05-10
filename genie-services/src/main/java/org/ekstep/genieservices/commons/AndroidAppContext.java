@@ -2,7 +2,6 @@ package org.ekstep.genieservices.commons;
 
 import android.content.Context;
 
-import org.ekstep.genieservices.BuildParams;
 import org.ekstep.genieservices.Constants;
 import org.ekstep.genieservices.commons.db.ServiceDbHelper;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
@@ -50,6 +49,10 @@ public class AndroidAppContext extends AppContext<Context> {
         return mLocationInfo;
     }
 
+    private void setLocationInfo(ILocationInfo mLocationInfo) {
+        this.mLocationInfo = mLocationInfo;
+    }
+
     @Override
     public IDBSession getDBSession() {
         return mDBSession;
@@ -65,9 +68,17 @@ public class AndroidAppContext extends AppContext<Context> {
         return mKeyValueOperation;
     }
 
+    private void setKeyValueStore(IKeyValueStore keyValueOperation) {
+        this.mKeyValueOperation = keyValueOperation;
+    }
+
     @Override
     public IConnectionInfo getConnectionInfo() {
         return mConnectionInfo;
+    }
+
+    private void setConnectionInfo(IConnectionInfo connectionInfo) {
+        this.mConnectionInfo = connectionInfo;
     }
 
     @Override
@@ -75,9 +86,17 @@ public class AndroidAppContext extends AppContext<Context> {
         return mHttpClient;
     }
 
+    private void setHttpClient(IHttpClient client) {
+        this.mHttpClient = client;
+    }
+
     @Override
     public IParams getParams() {
         return mParams;
+    }
+
+    private void setParams(IParams params) {
+        this.mParams = params;
     }
 
     @Override
@@ -99,26 +118,6 @@ public class AndroidAppContext extends AppContext<Context> {
 
     private void setDeviceInfo(IDeviceInfo deviceInfo) {
         this.mDeviceInfo = deviceInfo;
-    }
-
-    private void setConnectionInfo(IConnectionInfo connectionInfo) {
-        this.mConnectionInfo = connectionInfo;
-    }
-
-    private void setHttpClient(IHttpClient client) {
-        this.mHttpClient = client;
-    }
-
-    private void setKeyValueStore(IKeyValueStore keyValueOperation) {
-        this.mKeyValueOperation = keyValueOperation;
-    }
-
-    public void setLocationInfo(ILocationInfo mLocationInfo) {
-        this.mLocationInfo = mLocationInfo;
-    }
-
-    public void setParams(IParams params) {
-        this.mParams = params;
     }
 
 }

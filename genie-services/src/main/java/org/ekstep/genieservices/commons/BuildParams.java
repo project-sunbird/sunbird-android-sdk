@@ -1,12 +1,13 @@
-package org.ekstep.genieservices;
+package org.ekstep.genieservices.commons;
 
-import org.ekstep.genieservices.commons.IParams;
+import org.ekstep.genieservices.Constants;
 import org.ekstep.genieservices.utils.BuildConfigUtil;
 
 /**
- * Created by swayangjit on 27/4/17.
+ * Created on 27/4/17.
+ *
+ * @author swayangjit
  */
-
 public class BuildParams implements IParams {
 
     private String baseApiUrl;
