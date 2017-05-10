@@ -5,20 +5,27 @@ import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.LearnerState;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.UserSession;
+import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.profile.db.model.AnonymousUserModel;
+import org.ekstep.genieservices.profile.db.model.ContentAccessModel;
 import org.ekstep.genieservices.profile.db.model.ContentAccessesModel;
 import org.ekstep.genieservices.profile.db.model.UserModel;
 import org.ekstep.genieservices.profile.db.model.UserProfileModel;
 import org.ekstep.genieservices.profile.db.model.UserSessionModel;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -38,7 +45,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     /**
      * Create a new user profile
      *
-     * @param profile         - User profile data
+     * @param profile - User profile data
      */
     @Override
     public GenieResponse<Profile> createUserProfile(Profile profile) {
@@ -85,7 +92,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     /**
      * Update user profile
      *
-     * @param profile          - User profile data
+     * @param profile - User profile data
      */
     @Override
     public GenieResponse<Profile> updateUserProfile(Profile profile) {
@@ -113,7 +120,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     /**
      * Delete user profile
      *
-     * @param uid-            user id
+     * @param uid- user id
      */
     @Override
     public GenieResponse<Void> deleteUser(String uid) {
@@ -151,9 +158,8 @@ public class UserServiceImpl extends BaseService implements IUserService {
         return user.getUid();
     }
 
-     /**
+    /**
      * set anonymous user
-     *
      */
     @Override
     public GenieResponse<String> setAnonymousUser() {
@@ -166,7 +172,6 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
     /**
      * Get anonymous user data
-     *
      */
     @Override
     public GenieResponse<Profile> getAnonymousUser() {
@@ -188,7 +193,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     /**
      * set current user
      *
-     * @param uid             - User id
+     * @param uid - User id
      */
     @Override
     public GenieResponse<Void> setCurrentUser(String uid) {
@@ -214,7 +219,6 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
     /**
      * Get current use data
-     *
      */
     @Override
     public GenieResponse<Profile> getCurrentUser() {
@@ -249,6 +253,72 @@ public class UserServiceImpl extends BaseService implements IUserService {
         }
         GenieResponse<UserSession> response = GenieResponseBuilder.getSuccessResponse("");
         response.setResult(userSessionModel.getUserSessionBean());
+        return response;
+    }
+
+    @Override
+    public GenieResponse<List<ContentAccess>> getContentAccessesByContentIdentifier(String contentIdentifier) {
+        ContentAccessesModel contentAccessesModel = ContentAccessesModel.findByContentIdentifier(mAppContext.getDBSession(), contentIdentifier);
+
+        return getContentAccessList(contentAccessesModel);
+    }
+
+    @Override
+    public GenieResponse<List<ContentAccess>> getAllContentAccessesByUid(String uid) {
+        String isUid = String.format(Locale.US, "%s = '%s'", ContentAccessEntry.COLUMN_NAME_UID, uid);
+
+        // Filter for content_access table
+        String filter = String.format(Locale.US, " where %s", isUid);
+
+        return getContentAccessList(filter);
+    }
+
+    @Override
+    public GenieResponse<List<ContentAccess>> getAllNonTextbookContentAccessesByUid(String uid) {
+        String isNotTextbook = String.format(Locale.US, "%s is not '%s'", ContentAccessEntry.COLUMN_NAME_CONTENT_TYPE, ContentConstants.Type.TEXTBOOK);
+        String isUid = String.format(Locale.US, "%s = '%s'", ContentAccessEntry.COLUMN_NAME_UID, uid);
+
+        // Filter for content_access table
+        String filter = String.format(Locale.US, " where (%s AND %s)", isUid, isNotTextbook);
+
+        return getContentAccessList(filter);
+    }
+
+    @Override
+    public GenieResponse<List<ContentAccess>> getAllTextbookContentAccessesByUid(String uid) {
+        String isTextbook = String.format(Locale.US, "%s = '%s'", ContentAccessEntry.COLUMN_NAME_CONTENT_TYPE, ContentConstants.Type.TEXTBOOK);
+        String isUid = String.format(Locale.US, "%s = '%s'", ContentAccessEntry.COLUMN_NAME_UID, uid);
+
+        // Filter for content_access table
+        String filter = String.format(Locale.US, " where (%s AND %s)", isUid, isTextbook);
+
+        return getContentAccessList(filter);
+    }
+
+    private GenieResponse<List<ContentAccess>> getContentAccessList(String filter) {
+        ContentAccessesModel contentAccessesModel = ContentAccessesModel.find(mAppContext.getDBSession(), filter);
+
+        return getContentAccessList(contentAccessesModel);
+    }
+
+    private GenieResponse<List<ContentAccess>> getContentAccessList(ContentAccessesModel contentAccessesModel) {
+        List<ContentAccess> contentAccessList = new ArrayList<>();
+
+        if (contentAccessesModel != null) {
+            for (ContentAccessModel contentAccessModel : contentAccessesModel.getContentAccessModelList()) {
+                ContentAccess contentAccess = new ContentAccess();
+
+                contentAccess.setIdentifier(contentAccessModel.getIdentifier());
+                contentAccess.setUid(contentAccessModel.getUid());
+                contentAccess.setStatus(contentAccessModel.getStatus());
+                contentAccess.setLearnerState(GsonUtil.fromMap(contentAccessModel.getLearnerState(), LearnerState.class));
+
+                contentAccessList.add(contentAccess);
+            }
+        }
+
+        GenieResponse<List<ContentAccess>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        response.setResult(contentAccessList);
         return response;
     }
 

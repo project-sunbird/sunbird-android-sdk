@@ -2,6 +2,7 @@ package org.ekstep.genieservices.profile.db.model;
 
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
@@ -10,7 +11,6 @@ import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
-import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 
 import java.util.Locale;
 import java.util.Map;
@@ -32,8 +32,7 @@ public class ContentAccessModel implements IWritable, IReadable, IUpdatable {
     private Map<String, Object> learnerState;
     private Long epochTimestamp;
 
-    private ContentAccessModel(IDBSession dbSession) {
-        this.mDBSession = dbSession;
+    private ContentAccessModel() {
     }
 
     private ContentAccessModel(IDBSession dbSession, String uid, String identifier) {
@@ -48,11 +47,11 @@ public class ContentAccessModel implements IWritable, IReadable, IUpdatable {
         this.contentType = contentType;
     }
 
-    public static ContentAccessModel buildContentAccess(IDBSession dbSession) {
-        return new ContentAccessModel(dbSession);
+    public static ContentAccessModel build() {
+        return new ContentAccessModel();
     }
 
-    public static ContentAccessModel buildContentAccess(IDBSession dbSession, String uid, String identifier, int status, String contentType) {
+    public static ContentAccessModel build(IDBSession dbSession, String uid, String identifier, int status, String contentType) {
         ContentAccessModel contentAccess = new ContentAccessModel(dbSession, uid, identifier, status, contentType);
         return contentAccess;
     }
@@ -69,11 +68,11 @@ public class ContentAccessModel implements IWritable, IReadable, IUpdatable {
     }
 
     public void save() {
-        mDBSession.create(ContentAccessModel.this);
+        mDBSession.create(this);
     }
 
     public void update() {
-        mDBSession.update(ContentAccessModel.this);
+        mDBSession.update(this);
     }
 
     @Override
@@ -151,14 +150,14 @@ public class ContentAccessModel implements IWritable, IReadable, IUpdatable {
         return "limit 1";
     }
 
-    public void readWithoutMoving(IResultSet cursor) {
-        id = cursor.getLong(0);
-        uid = cursor.getString(cursor.getColumnIndex(ContentAccessEntry.COLUMN_NAME_UID));
-        identifier = cursor.getString(cursor.getColumnIndex(ContentAccessEntry.COLUMN_NAME_IDENTIFIER));
-        epochTimestamp = cursor.getLong(cursor.getColumnIndex(ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP));
-        status = cursor.getInt(cursor.getColumnIndex(ContentAccessEntry.COLUMN_NAME_STATUS));
-        contentType = cursor.getString(cursor.getColumnIndex(ContentAccessEntry.COLUMN_NAME_CONTENT_TYPE));
-        learnerState = GsonUtil.fromJson(cursor.getString(cursor.getColumnIndex(ContentAccessEntry.COLUMN_NAME_LEARNER_STATE)), Map.class);
+    public void readWithoutMoving(IResultSet resultSet) {
+        id = resultSet.getLong(0);
+        uid = resultSet.getString(resultSet.getColumnIndex(ContentAccessEntry.COLUMN_NAME_UID));
+        identifier = resultSet.getString(resultSet.getColumnIndex(ContentAccessEntry.COLUMN_NAME_IDENTIFIER));
+        epochTimestamp = resultSet.getLong(resultSet.getColumnIndex(ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP));
+        status = resultSet.getInt(resultSet.getColumnIndex(ContentAccessEntry.COLUMN_NAME_STATUS));
+        contentType = resultSet.getString(resultSet.getColumnIndex(ContentAccessEntry.COLUMN_NAME_CONTENT_TYPE));
+        learnerState = GsonUtil.fromJson(resultSet.getString(resultSet.getColumnIndex(ContentAccessEntry.COLUMN_NAME_LEARNER_STATE)), Map.class);
     }
 
     public Long getId() {
@@ -169,6 +168,10 @@ public class ContentAccessModel implements IWritable, IReadable, IUpdatable {
         return identifier;
     }
 
+    public String getUid() {
+        return uid;
+    }
+
     public int getStatus() {
         return status;
     }
@@ -177,16 +180,16 @@ public class ContentAccessModel implements IWritable, IReadable, IUpdatable {
         this.status = status;
     }
 
+    public String getContentType() {
+        return contentType;
+    }
+
     public Map<String, Object> getLearnerState() {
         return learnerState;
     }
 
     public void setLearnerState(Map<String, Object> learnerState) {
         this.learnerState = learnerState;
-    }
-
-    public String getContentType() {
-        return contentType;
     }
 
 }
