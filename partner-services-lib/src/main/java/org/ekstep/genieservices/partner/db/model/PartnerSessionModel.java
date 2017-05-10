@@ -1,6 +1,5 @@
 package org.ekstep.genieservices.partner.db.model;
 
-import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
@@ -12,7 +11,6 @@ import java.util.UUID;
  *
  * @author shriharsh
  */
-
 public class PartnerSessionModel {
 
     private static final String SHARED_PREF_SESSION_KEY = "partnersessionid";

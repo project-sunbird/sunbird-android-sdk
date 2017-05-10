@@ -1,35 +1,36 @@
 package org.ekstep.genieservices.partner.db.model;
 
-
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.db.contract.PartnerEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.StringUtil;
-import org.ekstep.genieservices.commons.db.contract.PartnerEntry;
 
 import java.util.Locale;
 
 public class PartnerModel implements IWritable, IReadable {
+
     private static final String TAG = "model-Partner";
-    private Long id = -1L;
-    private String publicKeyId;
-    private String partnerID;
-    private String publicKey;
     private IDBSession dbSession;
 
+    private Long id = -1L;
+    private String partnerID;
+    private String publicKeyId;
+    private String publicKey;
+
     private PartnerModel(IDBSession dbSession, String partnerID, String publicKey, String publicKeyId) {
-        this.partnerID = partnerID;
         this.dbSession = dbSession;
+        this.partnerID = partnerID;
         this.publicKey = publicKey;
         this.publicKeyId = publicKeyId;
     }
 
-    public static PartnerModel findByPartnerId(IDBSession idbSession, String partnerID) {
-        PartnerModel partnerModel = new PartnerModel(idbSession, partnerID, null, null);
-        idbSession.read(partnerModel);
+    public static PartnerModel findByPartnerId(IDBSession dbSession, String partnerID) {
+        PartnerModel partnerModel = new PartnerModel(dbSession, partnerID, null, null);
+        dbSession.read(partnerModel);
         if (StringUtil.isNullOrEmpty(partnerModel.publicKey)) {
             return null;
         } else {
@@ -39,6 +40,10 @@ public class PartnerModel implements IWritable, IReadable {
 
     public static PartnerModel build(IDBSession idbSession, String partnerID, String publicKey, String publicKeyId) {
         return new PartnerModel(idbSession, partnerID, publicKey, publicKeyId);
+    }
+
+    public void save() {
+        dbSession.create(this);
     }
 
     @Override
@@ -52,7 +57,7 @@ public class PartnerModel implements IWritable, IReadable {
 
     @Override
     public void updateId(long id) {
-
+        this.id = id;
     }
 
     @Override
@@ -97,9 +102,4 @@ public class PartnerModel implements IWritable, IReadable {
         return "limit 1";
     }
 
-    public void save() {
-       dbSession.create(this);
-    }
-
-
- }
+}
