@@ -33,9 +33,8 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
 /**
- * Created on 28/4/17.
+ * PartnerServiceImpl is the implementation class for the interface {@link IPartnerService}
  *
- * @author shriharsh
  */
 
 public class PartnerServiceImpl extends BaseService implements IPartnerService {
@@ -50,6 +49,11 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
     private static final String TEST = "test";
     private AppContext appContext;
 
+    /**
+     * Constructor of PartnerServiceImpl
+     *
+     * @param appContext
+     */
     public PartnerServiceImpl(AppContext appContext) {
         super(appContext);
         this.appContext = appContext;

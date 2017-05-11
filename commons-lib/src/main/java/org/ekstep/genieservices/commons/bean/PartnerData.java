@@ -5,9 +5,10 @@ import org.ekstep.genieservices.commons.IValidate;
 import java.util.List;
 
 /**
- * Created on 2/5/17.
+ * This class is used to store the Partner Details.
+ * <p>
+ * And also to check the validity of the contents in this class, it implements interface {@link IValidate}
  *
- * @author shriharsh
  */
 
 public class PartnerData implements IValidate {
@@ -19,11 +20,13 @@ public class PartnerData implements IValidate {
 
     @Override
     public boolean isValid() {
+        // TODO: 10/5/17 It cannot be false all time, need to add logic for it
         return false;
     }
 
     @Override
     public List<String> getErrors() {
+        // TODO: 10/5/17 Errors cannot be null, needs to check to how it has to be done
         return null;
     }
 
