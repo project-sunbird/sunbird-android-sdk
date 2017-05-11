@@ -206,12 +206,16 @@ public class UserServiceImpl extends BaseService implements IUserService {
         }
 
         UserSessionModel session = UserSessionModel.findUserSession(mAppContext);
-        if (session != null) {
+        boolean sessionCreationRequired = false;
+        if (session == null) {
+            sessionCreationRequired = true;
+        } else if (!session.getUserSessionBean().getUid().equals(uid)) {
             session.endSession();
             //TODO GE_SESSION_END telemetry
-        } else if (session.getUserSessionBean().getUid().equals(uid)) {
-            //Do nothing - the same session continues
-        } else {
+            sessionCreationRequired = true;
+        }
+
+        if (sessionCreationRequired) {
             UserSessionModel userSessionModel = UserSessionModel.buildUserSession(mAppContext, uid);
             userSessionModel.startSession();
             //TODO GE_session-start telemetry to be sent
