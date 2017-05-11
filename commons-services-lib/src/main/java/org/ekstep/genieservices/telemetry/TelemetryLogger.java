@@ -32,8 +32,6 @@ public class TelemetryLogger {
      */
     public static int appLoggingLevel = 3;
 
-
-
     private static TelemetryLogger sTelemetryLogger;
 
     private ITelemetryService mTelemetryService;
@@ -69,41 +67,32 @@ public class TelemetryLogger {
         log(appContext, response, result, service, method, params);
     }
 
-    public static void logFailure(AppContext appContext, GenieResponse response, String service, String message, String method, HashMap params) {
+    public static void logFailure(AppContext appContext, GenieResponse response, String service, String method, HashMap params, String message) {
         HashMap<String, Object> result = new HashMap<>();
         result.put("message", message);
         log(appContext, response, result, service, method, params);
     }
 
-    private static void log(AppContext appContext, GenieResponse response, HashMap result, String service, String method, HashMap params) {
+    public static void log(AppContext appContext, GenieResponse response, HashMap result, String service, String method, HashMap params) {
+        save(create(appContext, response, result, service, method, params));
+    }
+
+    public static BaseTelemetry create(AppContext appContext, GenieResponse response, HashMap result, String service, String method, HashMap params) {
         GEServiceAPICall.Builder eventBuilder = new GEServiceAPICall.Builder(new GameData(appContext.getParams().getGid(), appContext.getParams().getVersionName()));
-        GEServiceAPICall event = eventBuilder.service(service)
+        return eventBuilder.service(service)
                 .method(method)
                 .mode(getNetworkMode(appContext.getConnectionInfo()))
                 .request(params)
                 .response(response)
                 .result(result)
                 .build();
-
-        sTelemetryLogger.mTelemetryService.saveTelemetry(event);
-
     }
 
-//    private static void create(AppContext appContext, GenieResponse response, HashMap result, String service, String method, HashMap params) {
-//        GEServiceAPICall.Builder eventBuilder = new GEServiceAPICall.Builder(new GameData(appContext.getParams().getGid(), appContext.getParams().getVersionName()));
-//        GEServiceAPICall event = eventBuilder.service(service)
-//                .method(method)
-//                .mode(getNetworkMode(appContext.getConnectionInfo()))
-//                .request(params)
-//                .response(response)
-//                .result(result)
-//                .build();
-//        sTelemetryLogger.mTelemetryService.
-//    }
-
-//    private  void save(BaseTelemetry event){
-//        sTelemetryLogger.mTelemetryService.saveTelemetry(event);
-//    }
+    private static void save(BaseTelemetry event) {
+        //This could throw a NPE if the telemetry service is not injected via the init method.
+        // Have purposefully kept it this way so that the caller knows that init has not happened during testing.
+        sTelemetryLogger.mTelemetryService.saveTelemetry(event);
+    }
 
 
     public static String getNetworkMode(IConnectionInfo connectionInfo) {
