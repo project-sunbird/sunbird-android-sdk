@@ -191,9 +191,11 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 //            }
         }
 
-        Contents remainingContents = new Contents(localContents, null);
-
-        childSpecificContents.addAll(remainingContents.asMap());
+        // Add the remaining content into list
+        for (ContentModel contentModel : contentModelList) {
+            Content c = getContent(contentModel, false, false);
+            childSpecificContents.add(c);
+        }
 
         return childSpecificContents;
     }
