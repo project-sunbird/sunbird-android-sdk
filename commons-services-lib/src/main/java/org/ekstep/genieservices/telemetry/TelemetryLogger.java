@@ -5,7 +5,7 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.telemetry.BaseTelemetry;
+import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.bean.telemetry.GEServiceAPICall;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 
@@ -70,11 +70,11 @@ public class TelemetryLogger {
         save(create(appContext, response, result, service, method, params));
     }
 
-    public static void log(BaseTelemetry telemetry) {
+    public static void log(Telemetry telemetry) {
         save(telemetry);
     }
 
-    public static BaseTelemetry create(AppContext appContext, GenieResponse response, HashMap result, String service, String method, HashMap params) {
+    public static Telemetry create(AppContext appContext, GenieResponse response, HashMap result, String service, String method, HashMap params) {
         GEServiceAPICall.Builder eventBuilder = new GEServiceAPICall.Builder(new GameData(appContext.getParams().getGid(), appContext.getParams().getVersionName()));
         return eventBuilder.service(service)
                 .method(method)
@@ -85,7 +85,7 @@ public class TelemetryLogger {
                 .build();
     }
 
-    private static void save(BaseTelemetry event) {
+    private static void save(Telemetry event) {
         //This could throw a NPE if the telemetry service is not injected via the init method.
         // Have purposefully kept it this way so that the caller knows that init has not happened during testing.
         sTelemetryLogger.mTelemetryService.saveTelemetry(event);

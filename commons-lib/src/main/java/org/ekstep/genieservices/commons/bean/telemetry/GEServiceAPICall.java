@@ -1,7 +1,7 @@
 package org.ekstep.genieservices.commons.bean.telemetry;
 
-import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.GameData;
+import org.ekstep.genieservices.commons.bean.GenieResponse;
 
 import java.util.HashMap;
 import java.util.List;
@@ -11,13 +11,13 @@ import java.util.Map;
  * Created by swayangjit on 27/4/17.
  */
 
-public class GEServiceAPICall extends BaseTelemetry  {
+public class GEServiceAPICall extends Telemetry {
 
-    private final String eid = "GE_SERVICE_API_CALL";
+    private static final String EID = "GE_SERVICE_API_CALL";
 
     public GEServiceAPICall(GameData gameData, String service, String method, boolean status, String error,
                             String message, List<String> errorMessages, Object result) {
-        super(gameData);
+        super(gameData, EID);
         setEks(createEKS(service, method, status ? "Successful" : "Failed", error, message, errorMessages, result));
     }
 
@@ -41,10 +41,6 @@ public class GEServiceAPICall extends BaseTelemetry  {
         return eks;
     }
 
-    @Override
-    public String getEID() {
-        return eid;
-    }
 
     public void setMode(String mode) {
         HashMap<String, Object> eks = (HashMap<String, Object>) getEData().get("eks");
@@ -65,8 +61,8 @@ public class GEServiceAPICall extends BaseTelemetry  {
         private Map params;
         private String mode;
 
-        public Builder(GameData gameData){
-            this.gameData=gameData;
+        public Builder(GameData gameData) {
+            this.gameData = gameData;
         }
 
         public Builder service(String service) {
@@ -100,7 +96,7 @@ public class GEServiceAPICall extends BaseTelemetry  {
         }
 
         public GEServiceAPICall build() {
-            GEServiceAPICall event = new GEServiceAPICall(gameData,service, method, response.getStatus(), response.getError(),
+            GEServiceAPICall event = new GEServiceAPICall(gameData, service, method, response.getStatus(), response.getError(),
                     response.getMessage(), response.getErrorMessages(), result);
             event.setParams(this.params);
             event.setMode(mode);

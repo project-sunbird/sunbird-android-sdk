@@ -15,9 +15,9 @@ import java.util.Map;
  * Created by swayangjit on 2/5/17.
  */
 
-public class GEInteract extends BaseTelemetry {
+public class GEInteract extends Telemetry {
 
-    private final String eid = "GE_INTERACT";
+    private static final String EID = "GE_INTERACT";
     private String fileSize;
 
     public GEInteract(GameData gameData, String subType, String stageId, String type) {
@@ -25,13 +25,13 @@ public class GEInteract extends BaseTelemetry {
     }
 
     public GEInteract(GameData gameData, String subType, String stageId, String type, String fileSize) {
-        super(gameData);
+        super(gameData, EID);
         this.fileSize = fileSize;
         setEks(createEKS(subType, stageId, type));
     }
 
     public GEInteract(GameData gameData, String stageId, String type, String subType, String extType, List positionList, List<Map<String, Object>> valueList, String id, String tid, String uri) {
-        super(gameData);
+        super(gameData, EID);
         setEks(createEKS(stageId, type, subType, extType, positionList, valueList, id, tid, uri));
     }
 
@@ -74,11 +74,6 @@ public class GEInteract extends BaseTelemetry {
         }
 
         return values;
-    }
-
-    @Override
-    public String getEID() {
-        return eid;
     }
 
     @Override

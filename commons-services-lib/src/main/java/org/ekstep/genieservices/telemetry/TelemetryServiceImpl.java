@@ -7,14 +7,16 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.telemetry.BaseTelemetry;
+import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.exception.DbException;
 import org.ekstep.genieservices.commons.exception.InvalidDataException;
 import org.ekstep.genieservices.commons.utils.ArrayUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.telemetry.cache.TelemetryTagCache;
+import org.ekstep.genieservices.telemetry.eventbus.TelemetryEventPublisher;
 import org.ekstep.genieservices.telemetry.model.EventModel;
 
 import java.util.ArrayList;
@@ -63,7 +65,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
     }
 
     @Override
-    public GenieResponse<Void> saveTelemetry(BaseTelemetry event) {
+    public GenieResponse<Void> saveTelemetry(Telemetry event) {
         return saveTelemetry(event.toString());
     }
 
@@ -72,7 +74,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         EventModel event = EventModel.build(mAppContext.getDBSession(), eventString);
         patchEventData(event);
         event.save();
-        TelemetryEventPublisher.postTelemetryEvent(event.getEventMap());
+        TelemetryEventPublisher.postTelemetryEvent(GsonUtil.fromMap(event.getEventMap(),Telemetry.class));
         Logger.i(SERVICE_NAME, "Event saved successfully");
         return GenieResponseBuilder.getSuccessResponse("Event Saved Successfully", Void.class);
     }

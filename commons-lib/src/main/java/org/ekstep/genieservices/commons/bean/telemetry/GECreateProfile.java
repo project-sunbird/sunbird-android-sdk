@@ -11,12 +11,12 @@ import java.util.Map;
  * Created by swayangjit on 1/5/17.
  */
 
-public class GECreateProfile extends BaseTelemetry {
+public class GECreateProfile extends Telemetry {
 
-    private final String eid = "GE_CREATE_PROFILE";
+    private static final String EID = "GE_CREATE_PROFILE";
 
     public GECreateProfile(GameData gameData, Profile profile, String loc) {
-        super(gameData);
+        super(gameData, EID);
         setEks(createEKS(profile, loc));
         setUid(profile.getUid());
     }
@@ -42,11 +42,6 @@ public class GECreateProfile extends BaseTelemetry {
         map.put("medium", profile.getMedium());
         map.put("board", profile.getBoard());
         return map;
-    }
-
-    @Override
-    public String getEID() {
-        return eid;
     }
 
 }

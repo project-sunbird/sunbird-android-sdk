@@ -1,7 +1,7 @@
 package org.ekstep.genieservices.telemetry.eventbus;
 
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.bean.telemetry.TelemetryEvent;
+import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.Logger;
 
@@ -13,43 +13,43 @@ public class EventBusSubscriber {
 
     private static final String TAG = EventBusSubscriber.class.getSimpleName();
 
-    public static void onTelemetryEvents(TelemetryEvent event, AppContext context) {
+    public static void onTelemetryEvents(Telemetry event, AppContext context) {
         if (event == null) {
             return;
         }
-        if ("OE_ASSESS".equals(event.eid())) {
+        if ("OE_ASSESS".equals(event.getEid())) {
             processOEAssess(event, context.getDBSession());
-        } else if ("OE_END".equals(event.eid())) {
+        } else if ("OE_END".equals(event.getEid())) {
             processOEEnd(event,  context.getDBSession());
-        } else if ("GE_FEEDBACK".equals(event.eid())) {
+        } else if ("GE_FEEDBACK".equals(event.getEid())) {
             processGEFeedbackEvent(event,  context.getDBSession());
-        } else if ("GE_LAUNCH_GAME".equals(event.eid())) {
+        } else if ("GE_LAUNCH_GAME".equals(event.getEid())) {
             processGELaunchGameEvent(event,  context.getDBSession());
-        } else if ("OE_INTERACT".equals(event.eid())) {
+        } else if ("OE_INTERACT".equals(event.getEid())) {
             processOEInteractEvent(event,  context.getDBSession());
         }
     }
 
-    private static void processOEAssess(TelemetryEvent event, IDBSession dbSession) {
+    private static void processOEAssess(Telemetry event, IDBSession dbSession) {
         Logger.i(TAG, "Process OE ASSESS");
 //        LearnerAssessments assessmentsReader = new LearnerAssessments(event);
 //        assessmentsReader.save(new DbOperator(context, new SummarizerDBContext()));
     }
 
-    private static void processOEEnd(TelemetryEvent event,  IDBSession dbSession) {
+    private static void processOEEnd(Telemetry event, IDBSession dbSession) {
         Logger.i(TAG, "Process OE END");
 //        DbOperator dbOperator = new DbOperator(context, new SummarizerDBContext());
 //        LearnerContentSummary summary = new LearnerContentSummary(event);
 //        summary.save(dbOperator);
     }
 
-    private static void processGEFeedbackEvent(TelemetryEvent event,  IDBSession dbSession) {
+    private static void processGEFeedbackEvent(Telemetry event, IDBSession dbSession) {
         Logger.i(TAG, "Process GE_FEEDBACK");
 //        ContentFeedback contentFeedback = new ContentFeedback(event);
 //        contentFeedback.save(new DbOperator(context));
     }
 
-    private static void processGELaunchGameEvent(TelemetryEvent event, IDBSession dbSession) {
+    private static void processGELaunchGameEvent(Telemetry event, IDBSession dbSession) {
         Logger.i(TAG, "Process GE_LAUNCH_GAME");
 
 //        String uid = event.uid();
@@ -71,7 +71,7 @@ public class EventBusSubscriber {
 //        }
     }
 
-    private static void processOEInteractEvent(TelemetryEvent event, IDBSession dbSession) {
+    private static void processOEInteractEvent(Telemetry event, IDBSession dbSession) {
         Logger.i(TAG, "Process OE_INTERACT");
 
 //        Map<String, Object> eks = (Map<String, Object>) event.edata().get("eks");

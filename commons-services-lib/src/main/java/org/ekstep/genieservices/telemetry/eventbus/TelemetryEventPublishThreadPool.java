@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.telemetry;
+package org.ekstep.genieservices.telemetry.eventbus;
 
 import org.greenrobot.eventbus.util.AsyncExecutor;
 

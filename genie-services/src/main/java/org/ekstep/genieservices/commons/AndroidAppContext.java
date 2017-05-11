@@ -12,6 +12,7 @@ import org.ekstep.genieservices.commons.network.AndroidNetworkConnectivity;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.network.IHttpClient;
 import org.ekstep.genieservices.commons.network.auth.BasicAuthenticator;
+import org.ekstep.genieservices.telemetry.eventbus.TelemetryListener;
 
 /**
  * Created on 18/4/17.
@@ -41,6 +42,7 @@ public class AndroidAppContext extends AppContext<Context> {
         appContext.setKeyValueStore(new PreferenceWrapper(appContext, Constants.SHARED_PREFERENCE_NAME));
         appContext.setDeviceInfo(new DeviceInfo(context));
         appContext.setLocationInfo(new LocationInfo(context));
+        TelemetryListener.init(appContext);
         return appContext;
     }
 
