@@ -70,6 +70,10 @@ public class TelemetryLogger {
         save(create(appContext, response, result, service, method, params));
     }
 
+    public static void log(BaseTelemetry telemetry) {
+        save(telemetry);
+    }
+
     public static BaseTelemetry create(AppContext appContext, GenieResponse response, HashMap result, String service, String method, HashMap params) {
         GEServiceAPICall.Builder eventBuilder = new GEServiceAPICall.Builder(new GameData(appContext.getParams().getGid(), appContext.getParams().getVersionName()));
         return eventBuilder.service(service)

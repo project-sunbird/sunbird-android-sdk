@@ -54,7 +54,7 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
         if (genieResponse.getStatus()) {
             TelemetryLogger.logSuccess(mAppContext, genieResponse, new HashMap(), TAG, "manualSync@SyncService" + TAG, params);
         } else {
-            TelemetryLogger.logFailure(mAppContext, genieResponse, TAG, "Failed to sync", "manualSync@SyncService", params);
+            TelemetryLogger.logFailure(mAppContext, genieResponse, TAG,"manualSync@SyncService", params,"Failed to sync");
         }
         return genieResponse;
     }
@@ -81,7 +81,7 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
 
             TelemetryLogger.logSuccess(mAppContext, genieResponse, new HashMap(), TAG, "autoSync@SyncService" + TAG, params);
         } else {
-            TelemetryLogger.logFailure(mAppContext, genieResponse, TAG, "Failed to sync", "autoSync@SyncService", params);
+            TelemetryLogger.logFailure(mAppContext, genieResponse, TAG,"autoSync@SyncService", params,"Failed to sync");
         }
 
         return genieResponse;
