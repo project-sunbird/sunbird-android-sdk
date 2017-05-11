@@ -3,6 +3,7 @@ package org.ekstep.genieservices.telemetry;
 import org.ekstep.genieservices.BaseService;
 import org.ekstep.genieservices.ITelemetryService;
 import org.ekstep.genieservices.IUserService;
+import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -10,12 +11,17 @@ import org.ekstep.genieservices.commons.bean.telemetry.BaseTelemetry;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.exception.DbException;
 import org.ekstep.genieservices.commons.exception.InvalidDataException;
+import org.ekstep.genieservices.commons.utils.ArrayUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.telemetry.cache.TelemetryTagCache;
 import org.ekstep.genieservices.telemetry.model.EventModel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by swayangjit on 26/4/17.
@@ -56,17 +62,19 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
 
     }
 
-    private GenieResponse saveEvent(String eventString) {
-        EventModel event = EventModel.build(mAppContext.getDBSession(), eventString, TelemetryTagCache.activeTags(mAppContext));
-        patchEventData(event);
-        event.save();
-        Logger.i(SERVICE_NAME, "Event saved successfully");
-        return GenieResponseBuilder.getSuccessResponse("Event Saved Successfully", Void.class);
-    }
-
     @Override
     public GenieResponse<Void> saveTelemetry(BaseTelemetry event) {
         return saveTelemetry(event.toString());
+    }
+
+
+    private GenieResponse saveEvent(String eventString) {
+        EventModel event = EventModel.build(mAppContext.getDBSession(), eventString);
+        patchEventData(event);
+        event.save();
+        TelemetryEventPublisher.postTelemetryEvent(event.getEventMap());
+        Logger.i(SERVICE_NAME, "Event saved successfully");
+        return GenieResponseBuilder.getSuccessResponse("Event Saved Successfully", Void.class);
     }
 
     private void patchEventData(EventModel event){
@@ -89,6 +97,23 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         } else if (version.equals("2.0")) {
             event.updateEts(DateUtil.getEpochTime());
         }
+
+        //Patch Partner tagss
+        Set<String> values = mAppContext.getKeyValueStore().getStringSet(ServiceConstants.Partner.KEY_PARTNER_ID, null);
+        List<Map<String, Object>> tags = (List<Map<String, Object>>) event.getEventMap().get("tags");
+        if (values != null && !values.isEmpty()) {
+            if (!ArrayUtil.containsMap(tags, ServiceConstants.Partner.KEY_PARTNER_ID))
+                event.addTag(ServiceConstants.Partner.KEY_PARTNER_ID, values);
+        }
+
+        //Patch Program tags
+        Set<String> activeProgramTags = TelemetryTagCache.activeTags(mAppContext);
+        List<String> tagList = new ArrayList<>();
+        for (String tag : activeProgramTags) {
+            tagList.add(tag);
+        }
+        event.addTag("genie", tagList);
+
     }
 
 }

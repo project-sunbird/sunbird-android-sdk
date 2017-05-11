@@ -11,18 +11,12 @@ import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.exception.InvalidDataException;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
-import org.ekstep.genieservices.telemetry.TelemetryEventPublisher;
-import org.ekstep.genieservices.telemetry.taggers.IEventTagger;
-import org.ekstep.genieservices.telemetry.taggers.PartnerTagger;
-import org.ekstep.genieservices.telemetry.taggers.TelemetryTagger;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -38,25 +32,15 @@ public class EventModel implements IWritable {
     private PriorityModel priority;
     private String timestamp;
     private ContentValues contentValues;
-    private List<IEventTagger> taggers = new ArrayList<>();
     private IDBSession mDBSession;
 
 
     private EventModel(IDBSession dbSession) {
         this(dbSession, null, null, new ContentValues());
-        addTagger(new PartnerTagger());
     }
 
-    private EventModel(IDBSession dbSession, Set<String> tags) {
-        this(dbSession, null, null, new ContentValues());
-        addTagger(new PartnerTagger());
-        addTagger(new TelemetryTagger(tags));
-    }
-
-    private EventModel(IDBSession dbSession, String eventType, Set<String> hashedTags) {
+    private EventModel(IDBSession dbSession, String eventType) {
         this(dbSession, eventType, PriorityModel.build(dbSession, eventType), new ContentValues());
-        addTagger(new PartnerTagger());
-        addTagger(new TelemetryTagger(hashedTags));
     }
 
     private EventModel(IDBSession dbSession, String eventType, PriorityModel priority, ContentValues contentValues) {
@@ -78,8 +62,8 @@ public class EventModel implements IWritable {
         return event;
     }
 
-    public static EventModel build(IDBSession dbSession, String eventString, Set<String> activeTags) {
-        EventModel event = new EventModel(dbSession, activeTags);
+    public static EventModel build(IDBSession dbSession, String eventString) {
+        EventModel event = new EventModel(dbSession);
         event.event = GsonUtil.fromJson(eventString, Map.class, ServiceConstants.Event.ERROR_INVALID_EVENT);
         event.eventType = (String) event.event.get("eid");
         if (event.eventType == null || event.eventType.isEmpty()) {
@@ -88,11 +72,6 @@ public class EventModel implements IWritable {
         event.priority = PriorityModel.build(dbSession, event.eventType);
         return event;
     }
-
-//    public static Event build(IDBSession dbSession, String eventType, Set<String> hashedTags) {
-//
-//        return new Event(dbSession, eventType, hashedTags);
-//    }
 
     @Override
     public ContentValues getContentValues() {
@@ -116,17 +95,11 @@ public class EventModel implements IWritable {
 
     @Override
     public void beforeWrite(AppContext context) {
-        tag(context);
         addMID();
     }
 
     public Long getId() {
         return id;
-    }
-
-    public EventModel addTagger(IEventTagger tagger) {
-        this.taggers.add(tagger);
-        return this;
     }
 
     public void updateSessionDetails(String sid, String uid) {
@@ -180,39 +153,27 @@ public class EventModel implements IWritable {
 
     public Void save() {
         this.priority = PriorityModel.findByType(this.mDBSession, this.priority.getEventType());
-//        Logger.i(mAppContext, TAG, "Priority added:" + priority.getPriority());
         this.mDBSession.create(this);
-        TelemetryEventPublisher.postTelemetryEvent(this.event);
+
         return null;
     }
 
     public void addTag(String key, Object value) {
-//        Logger.i(mAppContext, TAG, String.format("addTag %s:%s", key, value));
-        Map<String, Object> _map = new HashMap<>();
-        _map.put(key, value);
+        Logger.i(TAG, String.format("addTag %s:%s", key, value));
+        Map<String, Object> map = new HashMap<>();
+        map.put(key, value);
         List<Map<String, Object>> tags = (List<Map<String, Object>>) this.event.get("tags");
         if (tags == null) {
-//            Logger.i(mAppContext, TAG, String.format("CREATE TAG"));
+            Logger.i( TAG, String.format("CREATE TAG"));
             tags = new ArrayList<>();
-            tags.add(_map);
+            tags.add(map);
             this.event.put("tags", tags);
         } else {
-//            Logger.i(mAppContext, TAG, String.format("EDIT TAG"));
-            tags.add(_map);
+            Logger.i(TAG, String.format("EDIT TAG"));
+            tags.add(map);
         }
     }
 
-    private void tag(AppContext context) {
-        Logger.i(TAG, "TAG");
-        Iterator<IEventTagger> iterator = taggers.iterator();
-        IEventTagger tagger;
-        while (iterator.hasNext()) {
-            tagger = iterator.next();
-            Logger.i(TAG, String.format("TAGGER %s", tagger));
-            tagger.tag(this, context);
-        }
-
-    }
 
     public int getPriority() {
         return this.priority.getPriority();

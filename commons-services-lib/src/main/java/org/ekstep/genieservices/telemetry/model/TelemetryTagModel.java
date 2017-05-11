@@ -2,13 +2,13 @@ package org.ekstep.genieservices.telemetry.model;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.BaseColumns;
+import org.ekstep.genieservices.commons.db.contract.TelemetryTagEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.commons.db.contract.TelemetryTagEntry;
 
 /**
  * Created by swayangjit on 26/4/17.
@@ -31,7 +31,7 @@ public class TelemetryTagModel implements IReadable, IWritable, ICleanable {
     }
 
     private TelemetryTagModel(IDBSession dbSession, String name, String hash, String description,
-                         String startDate, String endDate) {
+                              String startDate, String endDate) {
         this.mDBSession = dbSession;
         this.name = name;
         this.hash = hash;
@@ -41,8 +41,12 @@ public class TelemetryTagModel implements IReadable, IWritable, ICleanable {
         this.contentValues = new ContentValues();
     }
 
+    public static TelemetryTagModel build(IDBSession dbSession) {
+        return new TelemetryTagModel(dbSession);
+    }
+
     public static TelemetryTagModel build(IDBSession dbSession, String name, String hash, String description,
-                                     String startDate, String endDate) {
+                                          String startDate, String endDate) {
         return new TelemetryTagModel(dbSession, name, hash, description, startDate, endDate);
     }
 
@@ -55,12 +59,7 @@ public class TelemetryTagModel implements IReadable, IWritable, ICleanable {
     @Override
     public IReadable read(IResultSet resultSet) {
         if (resultSet != null && resultSet.moveToFirst()) {
-            id = resultSet.getLong(resultSet.getColumnIndex(BaseColumns._ID));
-            name = resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_NAME));
-            hash = resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_HASH));
-            description = resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_DESCRIPTION));
-            startDate = resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_START_DATE));
-            endDate = resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_END_DATE));
+            readWithoutMoving(resultSet);
         }
         return this;
     }
@@ -120,6 +119,15 @@ public class TelemetryTagModel implements IReadable, IWritable, ICleanable {
     @Override
     public String selectionToClean() {
         return "";
+    }
+
+    public void readWithoutMoving(IResultSet resultSet) {
+        id = resultSet.getLong(resultSet.getColumnIndex(BaseColumns._ID));
+        name = resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_NAME));
+        hash = resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_HASH));
+        description = resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_DESCRIPTION));
+        startDate = resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_START_DATE));
+        endDate = resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_END_DATE));
     }
 
     public String name() {

@@ -37,13 +37,8 @@ public class TelemetryTagsModel implements IReadable {
     public IReadable read(IResultSet resultSet) {
         if (resultSet != null && resultSet.moveToFirst())
             do {
-                telemetryTags.add(TelemetryTagModel.build(mDBSession,
-                        resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_NAME)),
-                        resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_HASH)),
-                        resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_DESCRIPTION)),
-                        resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_START_DATE)),
-                        resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_END_DATE))
-                ));
+                TelemetryTagModel telemetryTagModel=TelemetryTagModel.build(mDBSession);
+                telemetryTagModel.readWithoutMoving(resultSet);
             } while (resultSet.moveToNext());
         return this;
     }
