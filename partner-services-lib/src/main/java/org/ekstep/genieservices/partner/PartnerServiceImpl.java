@@ -33,7 +33,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
 /**
- * PartnerServiceImpl is the implementation class for the interface {@link IPartnerService}
+ * PartnerServiceImpl is the implementation of the interface {@link IPartnerService}
  *
  */
 
@@ -127,7 +127,7 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
             return response;
         } else {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, UNREGISTERED_PARTNER + String.format(Locale.US, "Session start failed! Partner: %s",
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, UNREGISTERED_PARTNER + String.format(Locale.US, "- Session start failed! Partner: %s",
                     partnerData.getPartnerID()), TAG, Void.class);
             return response;
         }
@@ -145,7 +145,7 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
             return response;
         } else {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, UNREGISTERED_PARTNER + String.format(Locale.US, "Session termination failed! Partner: %s", partnerID), TAG, Void.class);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, UNREGISTERED_PARTNER + String.format(Locale.US, "- Session termination failed! Partner: %s", partnerID), TAG, Void.class);
             return response;
         }
     }
@@ -168,11 +168,11 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
                 List<String> errorMessages = new ArrayList<>();
                 String errorMessage = e.getMessage();
                 errorMessages.add(errorMessage);
-                response = GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, ENCRYPTION_FAILURE + String.format(Locale.US, "Encrypting data failed! Partner: %s", partnerData.getPartnerID()), TAG, String.class);
+                response = GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, ENCRYPTION_FAILURE + String.format(Locale.US, "- Encrypting data failed! Partner: %s", partnerData.getPartnerID()), TAG, String.class);
                 return response;
             }
         } else {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, UNREGISTERED_PARTNER + String.format(Locale.US, "Sending data failed! Partner: %s", partnerData.getPartnerID()), TAG, String.class);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, UNREGISTERED_PARTNER + String.format(Locale.US, "- Sending data failed! Partner: %s", partnerData.getPartnerID()), TAG, String.class);
             return response;
         }
     }

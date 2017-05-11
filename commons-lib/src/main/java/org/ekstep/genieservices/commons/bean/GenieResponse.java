@@ -16,7 +16,7 @@ public class GenieResponse<T> {
     /**
      * Gets the result of the api
      *
-     * @return The result data will be represented in the form of caller expectations using generics
+     * @return The result data will be of type <T>
      */
     public T getResult() {
         return this.result;
@@ -25,7 +25,7 @@ public class GenieResponse<T> {
     /**
      * Set the result of the api
      *
-     * @param result The result data will be set in the form of caller expectations using generics
+     * @param result
      */
     public void setResult(T result) {
         this.result = result;
