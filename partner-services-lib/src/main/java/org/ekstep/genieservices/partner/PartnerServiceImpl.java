@@ -33,7 +33,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
 /**
- * PartnerServiceImpl is the implementation of the interface {@link IPartnerService}
+ * This is the implementation of the interface {@link IPartnerService}
  *
  */
 
