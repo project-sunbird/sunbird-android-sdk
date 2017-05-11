@@ -1,6 +1,7 @@
 package org.ekstep.genieservices.commons.bean;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * Created on 5/9/2017.
@@ -13,7 +14,7 @@ public class ContentAccess implements Serializable {
     private String uid;
     private int status;
     private String contentType;
-    private LearnerState learnerState;
+    private Map<String, Object> learnerState;
 
     public String getIdentifier() {
         return identifier;
@@ -47,11 +48,11 @@ public class ContentAccess implements Serializable {
         this.contentType = contentType;
     }
 
-    public LearnerState getLearnerState() {
+    public Map<String, Object> getLearnerState() {
         return learnerState;
     }
 
-    public void setLearnerState(LearnerState learnerState) {
+    public void setLearnerState(Map<String, Object> learnerState) {
         this.learnerState = learnerState;
     }
 }

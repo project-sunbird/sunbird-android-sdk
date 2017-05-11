@@ -6,10 +6,11 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
+import org.ekstep.genieservices.commons.bean.ContentAccessCriteria;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.LearnerState;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.UserSession;
+import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -257,53 +259,47 @@ public class UserServiceImpl extends BaseService implements IUserService {
     }
 
     @Override
-    public GenieResponse<List<ContentAccess>> getContentAccessesByContentIdentifier(String contentIdentifier) {
-        ContentAccessesModel contentAccessesModel = ContentAccessesModel.findByContentIdentifier(mAppContext.getDBSession(), contentIdentifier);
+    public GenieResponse<List<ContentAccess>> getAllContentAccess(ContentAccessCriteria criteria) {
+        String isContentIdentifier = null;
+        if (!StringUtil.isNullOrEmpty(criteria.getContentIdentifier())) {
+            isContentIdentifier = String.format(Locale.US, "%s = '%s'", ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER, criteria.getContentIdentifier());
+        }
 
-        return getContentAccessList(contentAccessesModel);
-    }
+        String isUid = null;
+        if (!StringUtil.isNullOrEmpty(criteria.getUid())) {
+            isUid = String.format(Locale.US, "%s = '%s'", ContentAccessEntry.COLUMN_NAME_UID, criteria.getUid());
+        }
 
-    @Override
-    public GenieResponse<List<ContentAccess>> getAllContentAccessesByUid(String uid) {
-        String isUid = String.format(Locale.US, "%s = '%s'", ContentAccessEntry.COLUMN_NAME_UID, uid);
+        String contentTypes;
+        if (criteria.getContentTypes() != null) {
+            List<String> contentTypeList = new ArrayList<>();
+            for (ContentType contentType : criteria.getContentTypes()) {
+                contentTypeList.add(contentType.getValue());
+            }
+            contentTypes = StringUtil.join("','", contentTypeList);
+        } else {
+            contentTypes = StringUtil.join("','", ContentType.values());
+        }
 
-        // Filter for content_access table
-        String filter = String.format(Locale.US, " where %s", isUid);
+        String isContentType = String.format(Locale.US, "%s in ('%s')", ContentAccessEntry.COLUMN_NAME_CONTENT_TYPE, contentTypes);
 
-        return getContentAccessList(filter);
-    }
+        String filter = null;
+        if (!StringUtil.isNullOrEmpty(isContentIdentifier) && !StringUtil.isNullOrEmpty(isUid)) {
+            filter = String.format(Locale.US, " where (%s AND %s AND %s)", isContentIdentifier, isUid, isContentType);
+        }
+        if (!StringUtil.isNullOrEmpty(isContentIdentifier)) {
+            filter = String.format(Locale.US, " where (%s AND %s)", isContentIdentifier, isContentType);
+        }
+        if (!StringUtil.isNullOrEmpty(isUid)) {
+            filter = String.format(Locale.US, " where (%s AND %s)", isUid, isContentType);
+        }
 
-    @Override
-    public GenieResponse<List<ContentAccess>> getAllNonTextbookContentAccessesByUid(String uid) {
-        String isNotTextbook = String.format(Locale.US, "%s is not '%s'", ContentAccessEntry.COLUMN_NAME_CONTENT_TYPE, ContentConstants.Type.TEXTBOOK);
-        String isUid = String.format(Locale.US, "%s = '%s'", ContentAccessEntry.COLUMN_NAME_UID, uid);
+        ContentAccessesModel contentAccessesModel = null;
+        if (filter != null) {
+            contentAccessesModel = ContentAccessesModel.find(mAppContext.getDBSession(), filter);
+        }
 
-        // Filter for content_access table
-        String filter = String.format(Locale.US, " where (%s AND %s)", isUid, isNotTextbook);
-
-        return getContentAccessList(filter);
-    }
-
-    @Override
-    public GenieResponse<List<ContentAccess>> getAllTextbookContentAccessesByUid(String uid) {
-        String isTextbook = String.format(Locale.US, "%s = '%s'", ContentAccessEntry.COLUMN_NAME_CONTENT_TYPE, ContentConstants.Type.TEXTBOOK);
-        String isUid = String.format(Locale.US, "%s = '%s'", ContentAccessEntry.COLUMN_NAME_UID, uid);
-
-        // Filter for content_access table
-        String filter = String.format(Locale.US, " where (%s AND %s)", isUid, isTextbook);
-
-        return getContentAccessList(filter);
-    }
-
-    private GenieResponse<List<ContentAccess>> getContentAccessList(String filter) {
-        ContentAccessesModel contentAccessesModel = ContentAccessesModel.find(mAppContext.getDBSession(), filter);
-
-        return getContentAccessList(contentAccessesModel);
-    }
-
-    private GenieResponse<List<ContentAccess>> getContentAccessList(ContentAccessesModel contentAccessesModel) {
         List<ContentAccess> contentAccessList = new ArrayList<>();
-
         if (contentAccessesModel != null) {
             for (ContentAccessModel contentAccessModel : contentAccessesModel.getContentAccessModelList()) {
                 ContentAccess contentAccess = new ContentAccess();
@@ -311,7 +307,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
                 contentAccess.setIdentifier(contentAccessModel.getIdentifier());
                 contentAccess.setUid(contentAccessModel.getUid());
                 contentAccess.setStatus(contentAccessModel.getStatus());
-                contentAccess.setLearnerState(GsonUtil.fromMap(contentAccessModel.getLearnerState(), LearnerState.class));
+                contentAccess.setLearnerState(GsonUtil.fromJson(contentAccessModel.getLearnerStateJson(), Map.class));
 
                 contentAccessList.add(contentAccess);
             }

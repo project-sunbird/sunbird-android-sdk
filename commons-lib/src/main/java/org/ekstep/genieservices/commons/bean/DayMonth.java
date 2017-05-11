@@ -1,10 +1,12 @@
 package org.ekstep.genieservices.commons.bean;
 
+import java.util.Locale;
+
 /**
  * Created on 24/4/17.
- *  @author shriharsh
+ *
+ * @author shriharsh
  */
-
 public class DayMonth {
     private int day;
     private int month;
@@ -33,6 +35,6 @@ public class DayMonth {
     }
 
     public String toString() {
-        return String.format("%d/%d/%d", new Object[]{Integer.valueOf(this.day), Integer.valueOf(this.month), Integer.valueOf(this.year)});
+        return String.format(Locale.US, "%d/%d/%d", this.day, this.month, this.year);
     }
 }

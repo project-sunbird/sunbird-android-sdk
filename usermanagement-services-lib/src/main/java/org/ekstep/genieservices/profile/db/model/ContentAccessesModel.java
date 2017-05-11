@@ -45,7 +45,7 @@ public class ContentAccessesModel implements IReadable, ICleanable {
     }
 
     public static ContentAccessesModel findByContentIdentifier(IDBSession dbSession, String identifier) {
-        String filter = String.format(Locale.US, " where %s = '%s' ", ContentAccessEntry.COLUMN_NAME_IDENTIFIER, identifier);
+        String filter = String.format(Locale.US, " where %s = '%s' ", ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER, identifier);
 
         return find(dbSession, filter);
     }

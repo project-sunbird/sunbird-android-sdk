@@ -35,7 +35,6 @@ public interface ContentConstants {
     }
 
     interface AccessStatus {
-        int IMPORTED_OR_NEW = 0;
         int VIEWED = 1;
         int FULLY_PLAYED = 2;
     }

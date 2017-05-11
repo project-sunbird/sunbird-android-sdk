@@ -9,6 +9,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
+import org.ekstep.genieservices.commons.bean.ContentAccessCriteria;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
@@ -47,9 +48,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<Content> getContentDetail(String contentIdentifier) {
+    public GenieResponse<Content> getContentDetails(String contentIdentifier) {
         // TODO: Telemetry logger
-        String methodName = "getContentDetail@ContentServiceImpl";
+        String methodName = "getContentDetails@ContentServiceImpl";
 
         GenieResponse<Content> response;
         ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), contentIdentifier);
@@ -72,19 +73,22 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         ContentData serverData = null;
         if (contentModel.getServerData() != null) {
-            serverData = GsonUtil.fromMap(contentModel.getServerData(), ContentData.class);
+            serverData = GsonUtil.fromJson(contentModel.getServerData(), ContentData.class);
         }
 
         ContentData localData = null;
         if (contentModel.getLocalData() != null) {
-            localData = GsonUtil.fromMap(contentModel.getLocalData(), ContentData.class);
+            localData = GsonUtil.fromJson(contentModel.getLocalData(), ContentData.class);
         }
 
         content.setContentData(serverData);
 
         content.setMimeType(contentModel.getMimeType());
-        content.setPath(contentModel.getPath());
+        content.setBasePath(contentModel.getPath());
         content.setContentType(contentModel.getContentType());
+        content.setAvailableLocally(isAvailableLocally(contentModel.getContentState()));
+        content.setReferenceCount(contentModel.getRefCount());
+        content.setUpdateAvailable(isUpdateAvailable(serverData, localData));
 
         long contentCreationTime = 0;
         String localLastUpdatedTime = contentModel.getLocalLastUpdatedTime();
@@ -93,19 +97,35 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         }
         content.setLastUpdatedTime(contentCreationTime);
 
-        if (attachFeedback && contentFeedbackService != null) {
-            content.setContentFeedbackList(contentFeedbackService.getFeedbacksByContentIdentifier(contentModel.getIdentifier()).getResult());
+        String uid = getCurrentUserId();
+        if (attachFeedback) {
+            addContentFeedback(content, uid);
         }
 
         if (attachContentAccess && userService != null) {
-            content.setContentAccessList(userService.getContentAccessesByContentIdentifier(contentModel.getIdentifier()).getResult());
+            addContentAccess(content, uid);
         }
-        content.setExternalContent(contentModel.isExternalContent());
-        content.setArtifactAvailable(isArtifactAvailable(contentModel.getContentState()));
-        content.setAccessedElseWhere(isAccessedElseWhere(contentModel.getRefCount()));
-        content.setUpdateAvailable(isUpdateAvailable(serverData, localData));
 
         return content;
+    }
+
+    private void addContentFeedback(Content content, String uid) {
+        if (contentFeedbackService != null) {
+            content.setContentFeedback(contentFeedbackService.getFeedback(uid, content.getIdentifier()).getResult());
+        }
+    }
+
+    private void addContentAccess(Content content, String uid) {
+        if (userService != null) {
+            ContentAccessCriteria criteria = new ContentAccessCriteria();
+            criteria.setUid(uid);
+            criteria.setContentIdentifier(content.getIdentifier());
+
+            List<ContentAccess> contentAccessList = userService.getAllContentAccess(criteria).getResult();
+            if (contentAccessList.size() > 0) {
+                content.setContentAccess(contentAccessList.get(0));
+            }
+        }
     }
 
     private boolean isUpdateAvailable(ContentData serverData, ContentData localData) {
@@ -123,33 +143,33 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         return sVersion > 0 && lVersion > 0 && sVersion > lVersion;
     }
 
-    private boolean isArtifactAvailable(int contentState) {
+    private boolean isAvailableLocally(int contentState) {
         return contentState == ContentConstants.State.ARTIFACT_AVAILABLE;
     }
 
-    private boolean isAccessedElseWhere(int refCount) {
-        return refCount > 1;
-    }
-
     @Override
-    public GenieResponse<List<Content>> getAllLocalContents() {
+    public GenieResponse<List<Content>> getAllLocalContent() {
         // TODO: Telemetry logger
-        String methodName = "getAllLocalContents@ContentServiceImpl";
+        String methodName = "getAllLocalContent@ContentServiceImpl";
 
         GenieResponse<List<Content>> response;
-        String uid = null;
-        if (userService != null) {
-            UserSession userSession = userService.getCurrentUserSession().getResult();
-            if (userSession != null) {
-                uid = userSession.getUid();
-            }
-        }
+        String uid = getCurrentUserId();
 
         List<Content> contentList = getProfileSpecificContents(uid, getAllContentsFilter());
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(contentList);
         return response;
+    }
+
+    private String getCurrentUserId() {
+        if (userService != null) {
+            UserSession userSession = userService.getCurrentUserSession().getResult();
+            if (userSession != null) {
+                return userSession.getUid();
+            }
+        }
+        return null;
     }
 
     private List<Content> getProfileSpecificContents(String uid, String contentFilter) {
@@ -166,7 +186,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         // Get the content access for profile.
         List<ContentAccess> contentAccessList;
         if (userService != null) {
-            contentAccessList = userService.getAllContentAccessesByUid(uid).getResult();
+            ContentAccessCriteria criteria = new ContentAccessCriteria();
+            criteria.setUid(uid);
+            contentAccessList = userService.getAllContentAccess(criteria).getResult();
         } else {
             contentAccessList = new ArrayList<>();
         }
@@ -174,21 +196,11 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         for (ContentAccess contentAccess : contentAccessList) {
             ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), contentAccess.getIdentifier());
             if (contentModel != null && contentModelList.contains(contentModel)) {
-                // TODO: needs to recheck
                 Content c = getContent(contentModel, false, false);
+                c.setContentAccess(contentAccess);
                 childSpecificContents.add(c);
-                // TODO: Need to discuss with Mathew
-                // contentAsMap.put("accessStatus", contentAccess.getStatus());
                 contentModelList.remove(contentModel);
             }
-
-//            if (localContents.contains(c)) {
-//                Map<String, Object> contentAsMap = c.asMap();
-//                contentAsMap.put("accessStatus", contentAccess.getStatus());
-//                childSpecificContents.add(contentAsMap);
-//
-//                localContents.remove(c);
-//            }
         }
 
         // Add the remaining content into list
@@ -273,7 +285,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<Void> delete(String contentIdentifier, int level) {
+    public GenieResponse<Void> deleteContent(String contentIdentifier, int level) {
         GenieResponse<Void> response;
         ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), contentIdentifier);
 

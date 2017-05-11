@@ -48,8 +48,8 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
 
     private Long id = -1L;
     private String identifier;
-    private Map<String, Object> serverData;
-    private Map<String, Object> localData;
+    private String serverData;
+    private String localData;
     private String mimeType;
     private String path;
     private String visibility;
@@ -73,17 +73,13 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
     }
 
     private ContentModel(IDBSession dbSession, Map data, String manifestVersion, boolean isLocalData) {
-        if (data == null) {
-            return;
-        }
-
         this.mDBSession = dbSession;
 
         if (isLocalData) {
             this.manifestVersion = manifestVersion;
-            this.localData = data;
+            this.localData = GsonUtil.toJson(data);
         } else {
-            this.serverData = data;
+            this.serverData = GsonUtil.toJson(data);
         }
 
         if (data.containsKey(IDENTIFIER_KEY)) {
@@ -135,11 +131,11 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
     }
 
     public boolean hasPreRequisites() {
-        return (localData != null) && (localData.get(PRE_REQUISITES_KEY) != null);
+        return (localData != null) && (GsonUtil.fromJson(localData, Map.class).get(PRE_REQUISITES_KEY) != null);
     }
 
     public List<String> getPreRequisitesIdentifiers() {
-        List<Map> children = (List) localData.get(PRE_REQUISITES_KEY);
+        List<Map> children = (List) GsonUtil.fromJson(localData, Map.class).get(PRE_REQUISITES_KEY);
 
         List<String> childIdentifiers = new ArrayList<>();
         for (Map child : children) {
@@ -152,11 +148,11 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
     }
 
     public boolean hasChildren() {
-        return (localData != null) && (localData.get(CHILDREN_KEY) != null);
+        return (localData != null) && (GsonUtil.fromJson(localData, Map.class).get(CHILDREN_KEY) != null);
     }
 
     public List<String> getChildContentsIdentifiers() {
-        List<Map> children = (List) localData.get(CHILDREN_KEY);
+        List<Map> children = (List) GsonUtil.fromJson(localData, Map.class).get(CHILDREN_KEY);
 
         List<String> childIdentifiers = new ArrayList<>();
         for (Map child : children) {
@@ -327,8 +323,8 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
     public void readWithoutMoving(IResultSet resultSet) {
         id = resultSet.getLong(0);
         identifier = resultSet.getString(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_IDENTIFIER));
-        serverData = GsonUtil.fromJson(resultSet.getString(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_SERVER_DATA)), Map.class);
-        localData = GsonUtil.fromJson(resultSet.getString(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_LOCAL_DATA)), Map.class);
+        serverData = resultSet.getString(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_SERVER_DATA));
+        localData = resultSet.getString(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_LOCAL_DATA));
         mimeType = resultSet.getString(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_MIME_TYPE));
         path = resultSet.getString(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_PATH));
         visibility = resultSet.getString(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_VISIBILITY));
@@ -337,10 +333,8 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         contentType = resultSet.getString(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_CONTENT_TYPE));
         localLastUpdatedTime = resultSet.getString(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_LOCAL_LAST_UPDATED_ON));
 
+        // TODO: Needs to remove
         isExternalContent = isExternalContent(path);
-
-        // TODO: add feedback in content service if required
-//        feedback = addContentFeedback(identifier);
     }
 
     private boolean isExternalContent(String path) {
@@ -350,12 +344,6 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
     private void with(ContentValues contentValues, String key, String value) {
         if (value != null) {
             contentValues.put(key, value);
-        }
-    }
-
-    private void with(ContentValues contentValues, String key, Map<String, Object> value) {
-        if (value != null) {
-            contentValues.put(key, GsonUtil.toJson(value));
         }
     }
 
@@ -377,7 +365,7 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
 
     private String serverLastUpdatedOn() {
         return serverData != null
-                ? (String) serverData.get(LAST_UPDATED_ON_KEY)
+                ? (String) GsonUtil.fromJson(serverData, Map.class).get(LAST_UPDATED_ON_KEY)
                 : null;
     }
 
@@ -389,12 +377,12 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
     private String searchIndex() {
         if (ContentConstants.MimeType.APPLICATION.equals(mimeType)) {
             if (serverData != null) {
-                return ArrayUtil.mapToCommaSeparatedString(serverData.values());
+                return ArrayUtil.mapToCommaSeparatedString(GsonUtil.fromJson(serverData, Map.class).values());
             }
         } else if (localData != null) {
-            return ArrayUtil.mapToCommaSeparatedString(localData.values());
+            return ArrayUtil.mapToCommaSeparatedString(GsonUtil.fromJson(localData, Map.class).values());
         } else if (serverData != null) {
-            return ArrayUtil.mapToCommaSeparatedString(serverData.values());
+            return ArrayUtil.mapToCommaSeparatedString(GsonUtil.fromJson(serverData, Map.class).values());
         }
 
         return null;
@@ -415,11 +403,11 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         return identifier;
     }
 
-    public Map<String, Object> getServerData() {
+    public String getServerData() {
         return serverData;
     }
 
-    public Map<String, Object> getLocalData() {
+    public String getLocalData() {
         return localData;
     }
 

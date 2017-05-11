@@ -12,11 +12,11 @@ import java.util.List;
  */
 public interface IContentService {
 
-    GenieResponse<Content> getContentDetail(String contentIdentifier);
+    GenieResponse<Content> getContentDetails(String contentIdentifier);
 
-    GenieResponse<List<Content>> getAllLocalContents();
+    GenieResponse<List<Content>> getAllLocalContent();
 
     GenieResponse<List<Content>> getChildContents(String contentIdentifier, int levelAndState);
 
-    GenieResponse<Void> delete(String contentIdentifier, int level);
+    GenieResponse<Void> deleteContent(String contentIdentifier, int level);
 }

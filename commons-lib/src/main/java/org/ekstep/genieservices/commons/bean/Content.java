@@ -1,26 +1,25 @@
 package org.ekstep.genieservices.commons.bean;
 
-import java.util.List;
+import java.io.Serializable;
 
 /**
  * Created on 5/4/2017.
  *
  * @author anil
  */
-public class Content {
+public class Content implements Serializable {
 
     private String identifier;
     private ContentData contentData;
     private String mimeType;
-    private String path;
+    private String basePath;
     private String contentType;
+    private int referenceCount;
     private Long lastUpdatedTime;
-    private List<ContentFeedback> contentFeedbackList;
-    private List<ContentAccess> contentAccessList;
-    private boolean isExternalContent;
-    private boolean isArtifactAvailable;
-    private boolean isAccessedElseWhere;
+    private boolean isAvailableLocally;
     private boolean isUpdateAvailable;
+    private ContentFeedback contentFeedback;
+    private ContentAccess contentAccess;
 
     public String getIdentifier() {
         return identifier;
@@ -46,12 +45,12 @@ public class Content {
         this.mimeType = mimeType;
     }
 
-    public String getPath() {
-        return path;
+    public String getBasePath() {
+        return basePath;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public void setBasePath(String basePath) {
+        this.basePath = basePath;
     }
 
     public String getContentType() {
@@ -62,6 +61,14 @@ public class Content {
         this.contentType = contentType;
     }
 
+    public int getReferenceCount() {
+        return referenceCount;
+    }
+
+    public void setReferenceCount(int referenceCount) {
+        this.referenceCount = referenceCount;
+    }
+
     public Long getLastUpdatedTime() {
         return lastUpdatedTime;
     }
@@ -70,44 +77,12 @@ public class Content {
         this.lastUpdatedTime = lastUpdatedTime;
     }
 
-    public List<ContentFeedback> getContentFeedbackList() {
-        return contentFeedbackList;
+    public boolean isAvailableLocally() {
+        return isAvailableLocally;
     }
 
-    public void setContentFeedbackList(List<ContentFeedback> contentFeedbackList) {
-        this.contentFeedbackList = contentFeedbackList;
-    }
-
-    public List<ContentAccess> getContentAccessList() {
-        return contentAccessList;
-    }
-
-    public void setContentAccessList(List<ContentAccess> contentAccessList) {
-        this.contentAccessList = contentAccessList;
-    }
-
-    public boolean isExternalContent() {
-        return isExternalContent;
-    }
-
-    public void setExternalContent(boolean externalContent) {
-        isExternalContent = externalContent;
-    }
-
-    public boolean isArtifactAvailable() {
-        return isArtifactAvailable;
-    }
-
-    public void setArtifactAvailable(boolean artifactAvailable) {
-        isArtifactAvailable = artifactAvailable;
-    }
-
-    public boolean isAccessedElseWhere() {
-        return isAccessedElseWhere;
-    }
-
-    public void setAccessedElseWhere(boolean accessedElseWhere) {
-        isAccessedElseWhere = accessedElseWhere;
+    public void setAvailableLocally(boolean availableLocally) {
+        isAvailableLocally = availableLocally;
     }
 
     public boolean isUpdateAvailable() {
@@ -116,5 +91,21 @@ public class Content {
 
     public void setUpdateAvailable(boolean updateAvailable) {
         isUpdateAvailable = updateAvailable;
+    }
+
+    public ContentFeedback getContentFeedback() {
+        return contentFeedback;
+    }
+
+    public void setContentFeedback(ContentFeedback contentFeedback) {
+        this.contentFeedback = contentFeedback;
+    }
+
+    public ContentAccess getContentAccess() {
+        return contentAccess;
+    }
+
+    public void setContentAccess(ContentAccess contentAccess) {
+        this.contentAccess = contentAccess;
     }
 }

@@ -10,10 +10,8 @@ import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.DateUtil;
-import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 import java.util.Locale;
-import java.util.Map;
 
 /**
  * Created on 1/25/2017.
@@ -29,7 +27,7 @@ public class ContentAccessModel implements IWritable, IReadable, IUpdatable {
     private String identifier;
     private int status;
     private String contentType;
-    private Map<String, Object> learnerState;
+    private String learnerStateJson;
     private Long epochTimestamp;
 
     private ContentAccessModel() {
@@ -79,11 +77,11 @@ public class ContentAccessModel implements IWritable, IReadable, IUpdatable {
     public ContentValues getContentValues() {
         ContentValues contentValues = new ContentValues();
         contentValues.put(ContentAccessEntry.COLUMN_NAME_UID, this.uid);
-        contentValues.put(ContentAccessEntry.COLUMN_NAME_IDENTIFIER, this.identifier);
+        contentValues.put(ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER, this.identifier);
         contentValues.put(ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP, DateUtil.getEpochTime());
         contentValues.put(ContentAccessEntry.COLUMN_NAME_STATUS, this.status);
         contentValues.put(ContentAccessEntry.COLUMN_NAME_CONTENT_TYPE, this.contentType);
-        contentValues.put(ContentAccessEntry.COLUMN_NAME_LEARNER_STATE, this.learnerState);
+        contentValues.put(ContentAccessEntry.COLUMN_NAME_LEARNER_STATE, this.learnerStateJson);
 
         return contentValues;
     }
@@ -106,11 +104,11 @@ public class ContentAccessModel implements IWritable, IReadable, IUpdatable {
     public ContentValues getFieldsToUpdate() {
         ContentValues contentValues = new ContentValues();
         contentValues.put(ContentAccessEntry.COLUMN_NAME_UID, this.uid);
-        contentValues.put(ContentAccessEntry.COLUMN_NAME_IDENTIFIER, this.identifier);
+        contentValues.put(ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER, this.identifier);
         contentValues.put(ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP, DateUtil.getEpochTime());
         contentValues.put(ContentAccessEntry.COLUMN_NAME_STATUS, this.status);
         contentValues.put(ContentAccessEntry.COLUMN_NAME_CONTENT_TYPE, this.contentType);
-        contentValues.put(ContentAccessEntry.COLUMN_NAME_LEARNER_STATE, this.learnerState);
+        contentValues.put(ContentAccessEntry.COLUMN_NAME_LEARNER_STATE, this.learnerStateJson);
 
         return contentValues;
     }
@@ -127,7 +125,7 @@ public class ContentAccessModel implements IWritable, IReadable, IUpdatable {
 
     @Override
     public String updateBy() {
-        return String.format(Locale.US, "%s = '%s' AND %s = '%s'", ContentAccessEntry.COLUMN_NAME_UID, uid, ContentAccessEntry.COLUMN_NAME_IDENTIFIER, identifier);
+        return String.format(Locale.US, "%s = '%s' AND %s = '%s'", ContentAccessEntry.COLUMN_NAME_UID, uid, ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER, identifier);
     }
 
     @Override
@@ -137,7 +135,7 @@ public class ContentAccessModel implements IWritable, IReadable, IUpdatable {
 
     @Override
     public String filterForRead() {
-        return String.format(Locale.US, "where %s = ? AND %s = ?", ContentAccessEntry.COLUMN_NAME_UID, ContentAccessEntry.COLUMN_NAME_IDENTIFIER);
+        return String.format(Locale.US, "where %s = ? AND %s = ?", ContentAccessEntry.COLUMN_NAME_UID, ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER);
     }
 
     @Override
@@ -153,11 +151,11 @@ public class ContentAccessModel implements IWritable, IReadable, IUpdatable {
     public void readWithoutMoving(IResultSet resultSet) {
         id = resultSet.getLong(0);
         uid = resultSet.getString(resultSet.getColumnIndex(ContentAccessEntry.COLUMN_NAME_UID));
-        identifier = resultSet.getString(resultSet.getColumnIndex(ContentAccessEntry.COLUMN_NAME_IDENTIFIER));
+        identifier = resultSet.getString(resultSet.getColumnIndex(ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER));
         epochTimestamp = resultSet.getLong(resultSet.getColumnIndex(ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP));
         status = resultSet.getInt(resultSet.getColumnIndex(ContentAccessEntry.COLUMN_NAME_STATUS));
         contentType = resultSet.getString(resultSet.getColumnIndex(ContentAccessEntry.COLUMN_NAME_CONTENT_TYPE));
-        learnerState = GsonUtil.fromJson(resultSet.getString(resultSet.getColumnIndex(ContentAccessEntry.COLUMN_NAME_LEARNER_STATE)), Map.class);
+        learnerStateJson = resultSet.getString(resultSet.getColumnIndex(ContentAccessEntry.COLUMN_NAME_LEARNER_STATE));
     }
 
     public Long getId() {
@@ -184,12 +182,12 @@ public class ContentAccessModel implements IWritable, IReadable, IUpdatable {
         return contentType;
     }
 
-    public Map<String, Object> getLearnerState() {
-        return learnerState;
+    public String getLearnerStateJson() {
+        return learnerStateJson;
     }
 
-    public void setLearnerState(Map<String, Object> learnerState) {
-        this.learnerState = learnerState;
+    public void setLearnerStateJson(String learnerStateJson) {
+        this.learnerStateJson = learnerStateJson;
     }
 
 }

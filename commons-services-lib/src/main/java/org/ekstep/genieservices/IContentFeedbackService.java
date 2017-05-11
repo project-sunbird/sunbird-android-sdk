@@ -3,8 +3,6 @@ package org.ekstep.genieservices;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 
-import java.util.List;
-
 /**
  * Created on 5/10/2017.
  *
@@ -12,6 +10,6 @@ import java.util.List;
  */
 public interface IContentFeedbackService {
 
-    GenieResponse<List<ContentFeedback>> getFeedbacksByContentIdentifier(String contentIdentifier);
+    GenieResponse<ContentFeedback> getFeedback(String uid, String contentIdentifier);
 
 }

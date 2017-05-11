@@ -1,6 +1,7 @@
 package org.ekstep.genieservices;
 
 import org.ekstep.genieservices.commons.bean.ContentAccess;
+import org.ekstep.genieservices.commons.bean.ContentAccessCriteria;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.UserSession;
@@ -30,11 +31,6 @@ public interface IUserService {
 
     GenieResponse<Profile> updateUserProfile(Profile profile);
 
-    GenieResponse<List<ContentAccess>> getContentAccessesByContentIdentifier(String contentIdentifier);
+    GenieResponse<List<ContentAccess>> getAllContentAccess(ContentAccessCriteria criteria);
 
-    GenieResponse<List<ContentAccess>> getAllContentAccessesByUid(String uid);
-
-    GenieResponse<List<ContentAccess>> getAllNonTextbookContentAccessesByUid(String uid);
-
-    GenieResponse<List<ContentAccess>> getAllTextbookContentAccessesByUid(String uid);
 }
