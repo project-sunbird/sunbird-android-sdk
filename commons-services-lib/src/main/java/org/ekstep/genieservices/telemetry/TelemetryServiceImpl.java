@@ -14,6 +14,7 @@ import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.telemetry.cache.TelemetryTagCache;
 import org.ekstep.genieservices.telemetry.model.EventModel;
+import org.ekstep.genieservices.telemetry.model.EventsModel;
 
 import java.util.HashMap;
 
@@ -41,28 +42,13 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         try {
             EventModel event = EventModel.build(mAppContext.getDBSession(), eventString, TelemetryTagCache.activeTags(mAppContext));
 
-            //Stamp the event with current Sid and Uid
-            if(mUserService!=null){
-                UserSession currentUserSession = mUserService.getCurrentUserSession().getResult();
-                if (currentUserSession.isValid()) {
-                    event.updateSessionDetails(currentUserSession.getSid(), currentUserSession.getUid());
-                }
-            }
+            patchEvents(event);
 
-            //Stamp the event with did
-            event.updateDeviceInfo(mAppContext.getDeviceInfo().getDeviceID());
-
-            //Stamp the event with proper timestamp
-            String version = event.getVersion();
-            if (version.equals("1.0")) {
-                event.updateTs(DateUtil.getCurrentTimestamp());
-            } else if (version.equals("2.0")) {
-                event.updateEts(DateUtil.getEpochTime());
-            }
-            event.save();
+            save(event);
 
             Logger.i(SERVICE_NAME, "Event saved successfully");
             GenieResponse response = GenieResponseBuilder.getSuccessResponse("Event Saved Successfully", Void.class);
+
             TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), SERVICE_NAME, "saveTelemetry@TelemetryServiceImpl", params);
             return response;
         } catch (DbException e) {
@@ -82,5 +68,31 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
     @Override
     public GenieResponse<Void> saveTelemetry(BaseTelemetry event) {
         return saveTelemetry(event.toString());
+    }
+
+    public void patchEvents(EventModel event){
+
+        //Patch the event with current Sid and Uid
+        if(mUserService!=null){
+            UserSession currentUserSession = mUserService.getCurrentUserSession().getResult();
+            if (currentUserSession.isValid()) {
+                event.updateSessionDetails(currentUserSession.getSid(), currentUserSession.getUid());
+            }
+        }
+
+        //Patch the event with did
+        event.updateDeviceInfo(mAppContext.getDeviceInfo().getDeviceID());
+
+        //Patch the event with proper timestamp
+        String version = event.getVersion();
+        if (version.equals("1.0")) {
+            event.updateTs(DateUtil.getCurrentTimestamp());
+        } else if (version.equals("2.0")) {
+            event.updateEts(DateUtil.getEpochTime());
+        }
+    }
+
+    public void save(EventModel event){
+       event.save();
     }
 }

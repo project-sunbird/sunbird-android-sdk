@@ -19,7 +19,21 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    productFlavors {
+        production {
+
+        }
+        integrationTest {
+            buildConfigField 'String', 'API_BASE_URL', '"https://qa.ekstep.in/api"'
+            buildConfigField 'String', 'API_USER', '"ekstep"'
+            buildConfigField 'String', 'API_PASS', '"genie!"'
+            buildConfigField 'String', 'GID', '"org.ekstep"'
+        }
+    }
 }
+
+
 
 dependencies {
     compile project(':commons-lib')

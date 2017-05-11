@@ -6,6 +6,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
+import org.ekstep.genieservices.commons.bean.telemetry.BaseTelemetry;
 import org.ekstep.genieservices.commons.bean.telemetry.GEServiceAPICall;
 import org.ekstep.genieservices.commons.exception.DbException;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
@@ -87,6 +88,22 @@ public class TelemetryLogger {
         sTelemetryLogger.mTelemetryService.saveTelemetry(event);
 
     }
+
+//    private static void create(AppContext appContext, GenieResponse response, HashMap result, String service, String method, HashMap params) {
+//        GEServiceAPICall.Builder eventBuilder = new GEServiceAPICall.Builder(new GameData(appContext.getParams().getGid(), appContext.getParams().getVersionName()));
+//        GEServiceAPICall event = eventBuilder.service(service)
+//                .method(method)
+//                .mode(getNetworkMode(appContext.getConnectionInfo()))
+//                .request(params)
+//                .response(response)
+//                .result(result)
+//                .build();
+//        sTelemetryLogger.mTelemetryService.
+//    }
+
+//    private  void save(BaseTelemetry event){
+//        sTelemetryLogger.mTelemetryService.saveTelemetry(event);
+//    }
 
 
     public static String getNetworkMode(IConnectionInfo connectionInfo) {
