@@ -39,48 +39,56 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         params.put("logLevel", "3");
 
         try {
-            EventModel event = EventModel.build(mAppContext.getDBSession(), eventString, TelemetryTagCache.activeTags(mAppContext));
-
-            //Stamp the event with current Sid and Uid
-            if(mUserService!=null){
-                UserSession currentUserSession = mUserService.getCurrentUserSession().getResult();
-                if (currentUserSession.isValid()) {
-                    event.updateSessionDetails(currentUserSession.getSid(), currentUserSession.getUid());
-                }
-            }
-
-            //Stamp the event with did
-            event.updateDeviceInfo(mAppContext.getDeviceInfo().getDeviceID());
-
-            //Stamp the event with proper timestamp
-            String version = event.getVersion();
-            if (version.equals("1.0")) {
-                event.updateTs(DateUtil.getCurrentTimestamp());
-            } else if (version.equals("2.0")) {
-                event.updateEts(DateUtil.getEpochTime());
-            }
-            event.save();
-
-            Logger.i(SERVICE_NAME, "Event saved successfully");
-            GenieResponse response = GenieResponseBuilder.getSuccessResponse("Event Saved Successfully", Void.class);
-            TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), SERVICE_NAME, "saveTelemetry@TelemetryServiceImpl", params);
+            GenieResponse response = saveEvent(eventString);
+            saveEvent(TelemetryLogger.create(mAppContext, response, new HashMap(), SERVICE_NAME, "saveTelemetry@TelemetryServiceImpl", params).toString());
             return response;
         } catch (DbException e) {
             String logMessage = "Event save failed" + e.toString();
             GenieResponse response = GenieResponseBuilder.getErrorResponse("PROCESSING_ERROR", errorMessage, logMessage, Void.class);
-            TelemetryLogger.logFailure(mAppContext, response, SERVICE_NAME, "", "saveTelemetry@TelemetryServiceImpl", params);
+            saveEvent(TelemetryLogger.create(mAppContext, response, new HashMap(), SERVICE_NAME, "saveTelemetry@TelemetryServiceImpl", params).toString());
             return response;
         } catch (InvalidDataException e) {
             String logMessage = "Event save failed" + e.toString();
             GenieResponse response = GenieResponseBuilder.getErrorResponse("PROCESSING_ERROR", errorMessage, logMessage, Void.class);
-            TelemetryLogger.logFailure(mAppContext, response, SERVICE_NAME, "", "saveTelemetry@TelemetryServiceImpl", params);
+            saveEvent(TelemetryLogger.create(mAppContext, response, new HashMap(), SERVICE_NAME, "saveTelemetry@TelemetryServiceImpl", params).toString());
             return response;
         }
 
+    }
+
+    private GenieResponse saveEvent(String eventString) {
+        EventModel event = EventModel.build(mAppContext.getDBSession(), eventString, TelemetryTagCache.activeTags(mAppContext));
+        patchEventData(event);
+        event.save();
+        Logger.i(SERVICE_NAME, "Event saved successfully");
+        return GenieResponseBuilder.getSuccessResponse("Event Saved Successfully", Void.class);
     }
 
     @Override
     public GenieResponse<Void> saveTelemetry(BaseTelemetry event) {
         return saveTelemetry(event.toString());
     }
+
+    private void patchEventData(EventModel event){
+
+        //Patch the event with current Sid and Uid
+        if(mUserService!=null){
+            UserSession currentUserSession = mUserService.getCurrentUserSession().getResult();
+            if (currentUserSession.isValid()) {
+                event.updateSessionDetails(currentUserSession.getSid(), currentUserSession.getUid());
+            }
+        }
+
+        //Patch the event with did
+        event.updateDeviceInfo(mAppContext.getDeviceInfo().getDeviceID());
+
+        //Patch the event with proper timestamp
+        String version = event.getVersion();
+        if (version.equals("1.0")) {
+            event.updateTs(DateUtil.getCurrentTimestamp());
+        } else if (version.equals("2.0")) {
+            event.updateEts(DateUtil.getEpochTime());
+        }
+    }
+
 }

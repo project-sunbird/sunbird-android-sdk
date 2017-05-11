@@ -74,7 +74,7 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
             return response;
         } else {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR, MasterData.class);
-            TelemetryLogger.logFailure(mAppContext, response, TAG, "Unable to get masterdata", "getMasterData@ConfigServiceImpl", params);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, "getMasterData@ConfigServiceImpl", params, "Unable to get masterdata");
             return response;
         }
     }
@@ -145,7 +145,7 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
             return response;
         } else {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR);
-            TelemetryLogger.logFailure(mAppContext, response, TAG, "Unable to get resourcebundle", "getResourceBundle@ConfigServiceImpl", params);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, "getResourceBundle@ConfigServiceImpl", params, "Unable to get resourcebundle");
             return response;
         }
     }
@@ -219,7 +219,7 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
             return response;
         } else {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR);
-            TelemetryLogger.logFailure(mAppContext, response, TAG, "Unable to get ordinals", "getOrdinals@ConfigServiceImpl", params);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, "getOrdinals@ConfigServiceImpl", params, "Unable to get ordinals");
             return response;
         }
     }

@@ -1,4 +1,4 @@
-package org.ekstep.genieservicestest;
+package org.ekstep.genieservices;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,8 +21,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(AndroidJUnit4.class)
 public class MainActivityTest {
     @Rule
-    public ActivityTestRule<MainActivity> rule = new ActivityTestRule<>(
-            MainActivity.class);
+    public ActivityTestRule<MainActivity> rule = new ActivityTestRule<>(MainActivity.class);
     private MainActivity activity;
 
     @Before
@@ -35,7 +34,6 @@ public class MainActivityTest {
     @After
     public void tearDown() throws IOException {
 
-        activity.setIdle();
     }
 
     @Test
@@ -43,7 +41,7 @@ public class MainActivityTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("org.ekstep.genieservicestest", appContext.getPackageName());
+        assertEquals("org.ekstep.genieservices.test", appContext.getPackageName());
 
 
     }
