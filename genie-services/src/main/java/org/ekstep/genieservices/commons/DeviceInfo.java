@@ -1,7 +1,6 @@
 package org.ekstep.genieservices.commons;
 
 import android.content.Context;
-import android.os.Build;
 import android.provider.Settings;
 
 import java.security.MessageDigest;
@@ -24,16 +23,6 @@ public class DeviceInfo implements IDeviceInfo {
         } catch (Exception e) {
             return android_id;
         }
-    }
-
-    @Override
-    public int getAndroidSdkVersion() {
-        return Build.VERSION.SDK_INT;
-    }
-
-    @Override
-    public int getKitkatVersionCode() {
-        return Build.VERSION_CODES.KITKAT;
     }
 
     private String sha1(String input) {

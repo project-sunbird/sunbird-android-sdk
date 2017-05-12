@@ -13,10 +13,12 @@ import org.ekstep.genieservices.commons.bean.ContentAccessCriteria;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
+import org.ekstep.genieservices.commons.bean.Variant;
 import org.ekstep.genieservices.commons.db.contract.ContentEntry;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
+import org.ekstep.genieservices.content.bean.ContentVariant;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.db.model.ContentsModel;
 
@@ -25,6 +27,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Queue;
 
 /**
@@ -81,7 +84,17 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             localData = GsonUtil.fromJson(contentModel.getLocalData(), ContentData.class);
         }
 
-        content.setContentData(serverData);
+        ContentData contentData = null;
+        if (serverData != null) {
+            contentData = serverData;
+
+            addContentVariants(contentData, contentModel.getServerData());
+        } else if (localData != null) {
+            contentData = localData;
+
+            addContentVariants(contentData, contentModel.getLocalData());
+        }
+        content.setContentData(contentData);
 
         content.setMimeType(contentModel.getMimeType());
         content.setBasePath(contentModel.getPath());
@@ -107,6 +120,31 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         }
 
         return content;
+    }
+
+    private void addContentVariants(ContentData contentData, String dataJson) {
+        List<Variant> variantList = new ArrayList<>();
+
+        Map<String, Object> dataMap = GsonUtil.fromJson(dataJson, Map.class);
+        Object variants = dataMap.get("variants");
+        if (variants != null) {
+            String variantsString;
+            if (variants instanceof Map) {
+                variantsString = GsonUtil.getGson().toJson(variants);
+            } else {
+                variantsString = (String) variants;
+            }
+
+            variantsString = variantsString.replace("\\", "");
+            ContentVariant contentVariant = GsonUtil.fromJson(variantsString, ContentVariant.class);
+
+            if (contentVariant.getSpine() != null) {
+                Variant variant = new Variant("spine", contentVariant.getSpine().getEcarUrl(), contentVariant.getSpine().getSize());
+                variantList.add(variant);
+            }
+        }
+
+        contentData.setVariants(variantList);
     }
 
     private void addContentFeedback(Content content, String uid) {
@@ -294,10 +332,11 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             return response;
         }
 
-        if (contentModel.isExternalContent() && mAppContext.getDeviceInfo().getAndroidSdkVersion() <= mAppContext.getDeviceInfo().getKitkatVersionCode()) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, "This content cannot be deleted.", TAG);
-            return response;
-        }
+        // TODO: Removing external content code
+//        if (contentModel.isExternalContent() && mAppContext.getDeviceInfo().getAndroidSdkVersion() <= mAppContext.getDeviceInfo().getKitkatVersionCode()) {
+//            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, "This content cannot be deleted.", TAG);
+//            return response;
+//        }
 
         if (contentModel.hasPreRequisites()) {
             List<String> preRequisitesIdentifier = contentModel.getPreRequisitesIdentifiers();
@@ -318,9 +357,10 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         //delete or update parent items
         deleteOrUpdateContent(contentModel, false, level);
 
-        if (contentModel.isExternalContent()) {
-            FileHandler.refreshSDCard();
-        }
+        // TODO: Removing external content code
+//        if (contentModel.isExternalContent()) {
+//            FileHandler.refreshSDCard();
+//        }
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         return response;

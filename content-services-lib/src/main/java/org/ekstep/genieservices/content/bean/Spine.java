@@ -1,6 +1,4 @@
-package org.ekstep.genieservices.commons.bean;
-
-import java.io.Serializable;
+package org.ekstep.genieservices.content.bean;
 
 /**
  * "spine": {
@@ -13,7 +11,7 @@ import java.io.Serializable;
  * @author anil
  */
 
-public class Spine implements Serializable {
+public class Spine {
 
     private String ecarUrl;
     private String size;

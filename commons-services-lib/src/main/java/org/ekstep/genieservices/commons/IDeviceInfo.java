@@ -10,8 +10,4 @@ public interface IDeviceInfo {
 
     String getDeviceID();
 
-    int getAndroidSdkVersion();
-
-    int getKitkatVersionCode();
-
 }

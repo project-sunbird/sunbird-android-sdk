@@ -1,10 +1,7 @@
 package org.ekstep.genieservices.commons.bean;
 
-import org.ekstep.genieservices.commons.utils.GsonUtil;
-
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created on 1/5/2016.
@@ -13,6 +10,7 @@ import java.util.Map;
  */
 public class ContentData implements Serializable {
 
+    List<Variant> variantList;
     private String identifier;
     private String name;
     private String appIcon;
@@ -30,10 +28,8 @@ public class ContentData implements Serializable {
     private String expires;
     private String downloadUrl;
     private List<String> language;
-    private Object variants;
     //    private String osId;
     //    private ContentMetadata contentMetadata;
-
 
     public String getIdentifier() {
         return identifier;
@@ -103,22 +99,12 @@ public class ContentData implements Serializable {
         return language;
     }
 
-    public Variants getVariants() {
-        Variants contentVariants = null;
+    public List<Variant> getVariants() {
+        return variantList;
+    }
 
-        if (variants != null) {
-            String variantsString;
-            if (variants instanceof Map) {
-                variantsString = GsonUtil.getGson().toJson(variants);
-            } else {
-                variantsString = (String) variants;
-            }
-
-            variantsString = variantsString.replace("\\", "");
-            contentVariants = GsonUtil.fromJson(variantsString, Variants.class);
-        }
-
-        return contentVariants;
+    public void setVariants(List<Variant> variantList) {
+        this.variantList = variantList;
     }
 
     @Override
