@@ -6,6 +6,7 @@ import org.ekstep.genieservices.commons.IValidate;
 import org.ekstep.genieservices.commons.bean.validator.DateValidator;
 import org.ekstep.genieservices.commons.bean.validator.StringValidator;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -29,7 +30,7 @@ public class Profile implements IValidate {
     private Date createdAt;
     private transient List<IValidate> validators;
 
-    public Profile (String uid) {
+    public Profile(String uid) {
         this.uid = uid;
     }
 
@@ -169,8 +170,8 @@ public class Profile implements IValidate {
         Boolean isValid = Boolean.valueOf(true);
 
         IValidate validator;
-        for(Iterator var2 = this.validators.iterator(); var2.hasNext(); isValid = Boolean.valueOf(isValid.booleanValue() & validator.isValid())) {
-            validator = (IValidate)var2.next();
+        for (Iterator var2 = this.validators.iterator(); var2.hasNext(); isValid = Boolean.valueOf(isValid.booleanValue() & validator.isValid())) {
+            validator = (IValidate) var2.next();
         }
 
         return isValid.booleanValue();
@@ -191,6 +192,14 @@ public class Profile implements IValidate {
 
     @Override
     public List<String> getErrors() {
-        return null;
+        ArrayList errors = new ArrayList();
+        Iterator var2 = this.validators.iterator();
+
+        while (var2.hasNext()) {
+            IValidate validator = (IValidate) var2.next();
+            errors.addAll(validator.getErrors());
+        }
+
+        return errors;
     }
 }
