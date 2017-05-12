@@ -10,6 +10,8 @@ import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 
+import java.util.Locale;
+
 /**
  * Created by swayangjit on 26/4/17.
  */
@@ -27,6 +29,12 @@ public class TelemetryTagModel implements IReadable, IWritable, ICleanable {
 
     private TelemetryTagModel(IDBSession dbSession) {
         this.mDBSession = dbSession;
+        this.contentValues = new ContentValues();
+    }
+
+    private TelemetryTagModel(IDBSession dbSession, String name) {
+        this.mDBSession = dbSession;
+        this.name = name;
         this.contentValues = new ContentValues();
     }
 
@@ -50,8 +58,8 @@ public class TelemetryTagModel implements IReadable, IWritable, ICleanable {
         return new TelemetryTagModel(dbSession, name, hash, description, startDate, endDate);
     }
 
-    public static TelemetryTagModel find(IDBSession dbSession) {
-        TelemetryTagModel telemetryTag = new TelemetryTagModel(dbSession);
+    public static TelemetryTagModel find(IDBSession dbSession,String tagName) {
+        TelemetryTagModel telemetryTag = new TelemetryTagModel(dbSession,tagName);
         dbSession.read(telemetryTag);
         return telemetryTag;
     }
@@ -98,12 +106,12 @@ public class TelemetryTagModel implements IReadable, IWritable, ICleanable {
 
     @Override
     public String filterForRead() {
-        return "";
+        return String.format(Locale.US, "where %s = %s", TelemetryTagEntry.COLUMN_NAME_NAME);
     }
 
     @Override
     public String[] selectionArgsForFilter() {
-        return null;
+        return new String[]{name};
     }
 
     @Override
@@ -128,6 +136,10 @@ public class TelemetryTagModel implements IReadable, IWritable, ICleanable {
         description = resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_DESCRIPTION));
         startDate = resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_START_DATE));
         endDate = resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_END_DATE));
+    }
+
+    public void save(){
+        mDBSession.create(this);
     }
 
     public String name() {
