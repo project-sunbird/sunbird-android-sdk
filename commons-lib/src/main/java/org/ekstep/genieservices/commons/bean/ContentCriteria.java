@@ -9,19 +9,10 @@ import org.ekstep.genieservices.commons.bean.enums.ContentType;
  */
 public class ContentCriteria {
 
-    private String contentIdentifier;
     private String uid;
     private ContentType[] contentTypes;
     private boolean attachFeedback;
     private boolean attachContentAccess;
-
-    public String getContentIdentifier() {
-        return contentIdentifier;
-    }
-
-    public void setContentIdentifier(String contentIdentifier) {
-        this.contentIdentifier = contentIdentifier;
-    }
 
     public String getUid() {
         return uid;
