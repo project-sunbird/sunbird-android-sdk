@@ -58,10 +58,11 @@ public class TelemetryTagModel implements IReadable, IWritable, ICleanable {
         return new TelemetryTagModel(dbSession, name, hash, description, startDate, endDate);
     }
 
-    public static TelemetryTagModel find(IDBSession dbSession,String tagName) {
-        TelemetryTagModel telemetryTag = new TelemetryTagModel(dbSession,tagName);
+    public static TelemetryTagModel find(IDBSession dbSession, String tagName) {
+        TelemetryTagModel telemetryTag = new TelemetryTagModel(dbSession, tagName);
         dbSession.read(telemetryTag);
-        return telemetryTag;
+        return telemetryTag.tagHash() != null ? telemetryTag : null;
+
     }
 
     @Override
@@ -138,7 +139,7 @@ public class TelemetryTagModel implements IReadable, IWritable, ICleanable {
         endDate = resultSet.getString(resultSet.getColumnIndex(TelemetryTagEntry.COLUMN_NAME_END_DATE));
     }
 
-    public void save(){
+    public void save() {
         mDBSession.create(this);
     }
 
