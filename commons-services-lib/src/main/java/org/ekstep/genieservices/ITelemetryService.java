@@ -4,7 +4,7 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.telemetry.BaseTelemetry;
 
 /**
- * Created by swayangjit on 10/5/17.
+ * This is the interface with all the required APIs to perform necessary operations related to Telemetry
  */
 
 public interface ITelemetryService {
