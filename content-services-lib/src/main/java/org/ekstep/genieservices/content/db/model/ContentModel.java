@@ -72,14 +72,14 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         this.identifier = identifier;
     }
 
-    private ContentModel(IDBSession dbSession, Map data, String manifestVersion, boolean isLocalData) {
+    private ContentModel(IDBSession dbSession, Map data, String manifestVersion) {
         this.mDBSession = dbSession;
 
-        if (isLocalData) {
+        if (StringUtil.isNullOrEmpty(manifestVersion)) {
+            this.serverData = GsonUtil.toJson(data);
+        } else {
             this.manifestVersion = manifestVersion;
             this.localData = GsonUtil.toJson(data);
-        } else {
-            this.serverData = GsonUtil.toJson(data);
         }
 
         if (data.containsKey(IDENTIFIER_KEY)) {
@@ -115,8 +115,8 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         return new ContentModel();
     }
 
-    public static ContentModel build(IDBSession dbSession, Map data, String manifestVersion, boolean isLocal) {
-        ContentModel contentModel = new ContentModel(dbSession, data, manifestVersion, isLocal);
+    public static ContentModel build(IDBSession dbSession, Map data, String manifestVersion) {
+        ContentModel contentModel = new ContentModel(dbSession, data, manifestVersion);
         return contentModel;
     }
 
