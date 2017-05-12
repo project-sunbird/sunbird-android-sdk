@@ -265,36 +265,37 @@ public class UserServiceImpl extends BaseService implements IUserService {
     @Override
     public GenieResponse<List<ContentAccess>> getAllContentAccess(ContentAccessCriteria criteria) {
         String isContentIdentifier = null;
-        if (!StringUtil.isNullOrEmpty(criteria.getContentIdentifier())) {
-            isContentIdentifier = String.format(Locale.US, "%s = '%s'", ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER, criteria.getContentIdentifier());
-        }
-
         String isUid = null;
-        if (!StringUtil.isNullOrEmpty(criteria.getUid())) {
-            isUid = String.format(Locale.US, "%s = '%s'", ContentAccessEntry.COLUMN_NAME_UID, criteria.getUid());
-        }
+        String isContentType = null;
 
-        String contentTypes;
-        if (criteria.getContentTypes() != null) {
-            List<String> contentTypeList = new ArrayList<>();
-            for (ContentType contentType : criteria.getContentTypes()) {
-                contentTypeList.add(contentType.getValue());
+        if (criteria != null) {
+            if (!StringUtil.isNullOrEmpty(criteria.getContentIdentifier())) {
+                isContentIdentifier = String.format(Locale.US, "%s = '%s'", ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER, criteria.getContentIdentifier());
             }
-            contentTypes = StringUtil.join("','", contentTypeList);
-        } else {
-            contentTypes = StringUtil.join("','", ContentType.values());
-        }
 
-        String isContentType = String.format(Locale.US, "%s in ('%s')", ContentAccessEntry.COLUMN_NAME_CONTENT_TYPE, contentTypes);
+            if (!StringUtil.isNullOrEmpty(criteria.getUid())) {
+                isUid = String.format(Locale.US, "%s = '%s'", ContentAccessEntry.COLUMN_NAME_UID, criteria.getUid());
+            }
+
+            String contentTypes;
+            if (criteria.getContentTypes() != null) {
+                List<String> contentTypeList = new ArrayList<>();
+                for (ContentType contentType : criteria.getContentTypes()) {
+                    contentTypeList.add(contentType.getValue());
+                }
+                contentTypes = StringUtil.join("','", contentTypeList);
+            } else {
+                contentTypes = StringUtil.join("','", ContentType.values());
+            }
+            isContentType = String.format(Locale.US, "%s in ('%s')", ContentAccessEntry.COLUMN_NAME_CONTENT_TYPE, contentTypes);
+        }
 
         String filter = null;
         if (!StringUtil.isNullOrEmpty(isContentIdentifier) && !StringUtil.isNullOrEmpty(isUid)) {
             filter = String.format(Locale.US, " where (%s AND %s AND %s)", isContentIdentifier, isUid, isContentType);
-        }
-        if (!StringUtil.isNullOrEmpty(isContentIdentifier)) {
+        } else if (!StringUtil.isNullOrEmpty(isContentIdentifier)) {
             filter = String.format(Locale.US, " where (%s AND %s)", isContentIdentifier, isContentType);
-        }
-        if (!StringUtil.isNullOrEmpty(isUid)) {
+        } else if (!StringUtil.isNullOrEmpty(isUid)) {
             filter = String.format(Locale.US, " where (%s AND %s)", isUid, isContentType);
         }
 

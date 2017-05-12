@@ -12,10 +12,12 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessCriteria;
+import org.ekstep.genieservices.commons.bean.ContentCriteria;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.Variant;
+import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.db.contract.ContentEntry;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -239,14 +241,74 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<List<Content>> getAllLocalContent() {
+    public GenieResponse<List<Content>> getAllLocalContent(ContentCriteria criteria) {
         // TODO: Telemetry logger
         String methodName = "getAllLocalContent@ContentServiceImpl";
 
         GenieResponse<List<Content>> response;
-        String uid = getCurrentUserId();
+        if (criteria == null) {
+            criteria = new ContentCriteria();
+        }
 
-        List<Content> contentList = getProfileSpecificContents(uid, getAllContentsFilter());
+        String contentTypes;
+        if (criteria.getContentTypes() != null) {
+            List<String> contentTypeList = new ArrayList<>();
+            for (ContentType contentType : criteria.getContentTypes()) {
+                contentTypeList.add(contentType.getValue());
+            }
+            contentTypes = StringUtil.join("','", contentTypeList);
+        } else {
+            contentTypes = StringUtil.join("','", ContentType.values());
+        }
+
+        String isContentType = String.format(Locale.US, "%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypes);
+        String isVisible = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
+        // For hiding the non compatible imported content, which visibility is DEFAULT.
+        String isArtifactAvailable = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
+
+        String filter = String.format(Locale.US, " where (%s AND %s AND %s)", isVisible, isArtifactAvailable, isContentType);
+
+        List<ContentModel> contentModelListInDB;
+        ContentsModel contentsModel = ContentsModel.find(mAppContext.getDBSession(), filter);
+        if (contentsModel != null) {
+            contentModelListInDB = contentsModel.getContentModelList();
+        } else {
+            contentModelListInDB = new ArrayList<>();
+        }
+
+        String uid;
+        if (!StringUtil.isNullOrEmpty(criteria.getUid())) {
+            uid = criteria.getUid();
+        } else {
+            uid = getCurrentUserId();
+        }
+
+        // Get the content access for profile.
+        List<ContentAccess> contentAccessList;
+        if (userService != null) {
+            ContentAccessCriteria contentAccessCriteria = new ContentAccessCriteria();
+            contentAccessCriteria.setUid(uid);
+            contentAccessList = userService.getAllContentAccess(contentAccessCriteria).getResult();
+        } else {
+            contentAccessList = new ArrayList<>();
+        }
+
+        List<Content> contentList = new ArrayList<>();
+        for (ContentAccess contentAccess : contentAccessList) {
+            ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), contentAccess.getIdentifier());
+            if (contentModel != null && contentModelListInDB.contains(contentModel)) {
+                Content c = getContent(contentModel, criteria.isAttachFeedback(), criteria.isAttachContentAccess());
+                c.setContentAccess(contentAccess);
+                contentList.add(c);
+                contentModelListInDB.remove(contentModel);
+            }
+        }
+
+        // Add the remaining content into list
+        for (ContentModel contentModel : contentModelListInDB) {
+            Content c = getContent(contentModel, criteria.isAttachFeedback(), criteria.isAttachContentAccess());
+            contentList.add(c);
+        }
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(contentList);
@@ -261,83 +323,6 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             }
         }
         return null;
-    }
-
-    private List<Content> getProfileSpecificContents(String uid, String contentFilter) {
-        List<Content> childSpecificContents = new ArrayList<>();
-
-        List<ContentModel> contentModelList;
-        ContentsModel contentsModel = ContentsModel.find(mAppContext.getDBSession(), contentFilter);
-        if (contentsModel != null) {
-            contentModelList = contentsModel.getContentModelList();
-        } else {
-            contentModelList = new ArrayList<>();
-        }
-
-        // Get the content access for profile.
-        List<ContentAccess> contentAccessList;
-        if (userService != null) {
-            ContentAccessCriteria criteria = new ContentAccessCriteria();
-            criteria.setUid(uid);
-            contentAccessList = userService.getAllContentAccess(criteria).getResult();
-        } else {
-            contentAccessList = new ArrayList<>();
-        }
-
-        for (ContentAccess contentAccess : contentAccessList) {
-            ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), contentAccess.getIdentifier());
-            if (contentModel != null && contentModelList.contains(contentModel)) {
-                Content c = getContent(contentModel, false, false);
-                c.setContentAccess(contentAccess);
-                childSpecificContents.add(c);
-                contentModelList.remove(contentModel);
-            }
-        }
-
-        // Add the remaining content into list
-        for (ContentModel contentModel : contentModelList) {
-            Content c = getContent(contentModel, false, false);
-            childSpecificContents.add(c);
-        }
-
-        return childSpecificContents;
-    }
-
-    /**
-     * Get filter condition for profile specific contents.
-     *
-     * @return Filter.
-     */
-    private String getAllContentsFilter() {
-        String isVisible = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
-        // For hiding the non compatible imported content, which visibility is DEFAULT.
-        String isArtifactAvailable = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
-
-        // Filter for content table
-        return String.format(Locale.US, " where (%s AND %s)", isVisible, isArtifactAvailable);
-    }
-
-    /**
-     * Get filter condition for profile specific contents.
-     *
-     * @return Filter.
-     */
-    private String getAllNonTextbookContentsFilter() {
-        String isNotTextbook = String.format(Locale.US, "%s is not '%s'", ContentEntry.COLUMN_NAME_CONTENT_TYPE, ContentConstants.Type.TEXTBOOK);
-        String isVisible = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
-        // For hiding the non compatible imported content, which visibility is DEFAULT.
-        String isArtifactAvailable = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
-
-        // Filter for content table
-        return String.format(Locale.US, " where (%s AND %s AND %s)", isVisible, isNotTextbook, isArtifactAvailable);
-    }
-
-    private String getAllTextbookContentFilter() {
-        String isTextbook = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_TYPE, ContentConstants.Type.TEXTBOOK);
-        String isVisible = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
-
-        // Filter for content table
-        return String.format(Locale.US, " where (%s AND %s)", isVisible, isTextbook);
     }
 
     @Override

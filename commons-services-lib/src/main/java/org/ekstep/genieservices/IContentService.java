@@ -1,6 +1,7 @@
 package org.ekstep.genieservices;
 
 import org.ekstep.genieservices.commons.bean.Content;
+import org.ekstep.genieservices.commons.bean.ContentCriteria;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 
 import java.util.List;
@@ -14,7 +15,7 @@ public interface IContentService {
 
     GenieResponse<Content> getContentDetails(String contentIdentifier);
 
-    GenieResponse<List<Content>> getAllLocalContent();
+    GenieResponse<List<Content>> getAllLocalContent(ContentCriteria criteria);
 
     GenieResponse<List<Content>> getChildContents(String contentIdentifier, int levelAndState);
 
