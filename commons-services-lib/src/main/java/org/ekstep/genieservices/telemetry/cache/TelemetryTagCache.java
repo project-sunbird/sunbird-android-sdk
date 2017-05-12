@@ -1,33 +1,44 @@
 package org.ekstep.genieservices.telemetry.cache;
 
-import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
+import org.ekstep.genieservices.commons.utils.DateUtil;
+import org.ekstep.genieservices.telemetry.model.TelemetryTagModel;
 import org.ekstep.genieservices.telemetry.model.TelemetryTagsModel;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
  * Created by swayangjit on 26/4/17.
  */
-
 public class TelemetryTagCache {
+
+    private static Set<String> hashedtags;
+    private static long validUntil;
+
     public static Set<String> activeTags(AppContext appContext) {
-        IKeyValueStore preference=appContext.getKeyValueStore();
-        Set<String> genieTags = preference.getStringSet(ServiceConstants.Tags.KEY_GENIE_TAGS,new HashSet<String>());
-
-        if (!genieTags.isEmpty()) {
-            return genieTags;
-        } else {
+        if (hashedtags == null || (DateUtil.getEpochTime() > validUntil)) {
+            hashedtags = new HashSet<>();
             TelemetryTagsModel telemetryTags = TelemetryTagsModel.find(appContext.getDBSession());
-
-            preference.putStringSet(ServiceConstants.Tags.KEY_GENIE_TAGS, telemetryTags.activeTagHashes());
-            return telemetryTags.activeTagHashes();
+            hashedtags.addAll(activeTagHashes(telemetryTags.getTags()));
+            validUntil = DateUtil.getTodayMidnightEpochTime();
         }
+        return hashedtags;
     }
 
     public static void clearCache(AppContext appContext) {
-        appContext.getKeyValueStore().remove(ServiceConstants.Tags.KEY_GENIE_TAGS);
+        hashedtags = null;
+        validUntil = 0;
+    }
+
+    private static Set<String> activeTagHashes(List<TelemetryTagModel> tags) {
+        Set<String> hashedTags = new HashSet<>();
+        for (TelemetryTagModel tag : tags) {
+            if (DateUtil.isTodayWithin(tag.startDate(), tag.endDate())) {
+                hashedTags.add(tag.tagHash());
+            }
+        }
+        return hashedTags;
     }
 }

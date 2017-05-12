@@ -1,9 +1,5 @@
 package org.ekstep.genieservices.commons.bean;
 
-import org.ekstep.genieservices.commons.utils.DateUtil;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-
 /**
  * Created on 27/4/17.
  *
@@ -25,24 +21,12 @@ public class UserSession {
         return uid;
     }
 
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-
     public String getSid() {
         return sid;
     }
 
-    public void setSid(String sid) {
-        this.sid = sid;
-    }
-
-    public DateTime getCreatedTime() {
-        return DateUtil.parseDateTime(this.createdTime);
-    }
-
-    public void setCreatedTime(String createdTime) {
-        this.createdTime = createdTime;
+    public String getCreatedTime() {
+        return this.createdTime;
     }
 
     public boolean isValid() {

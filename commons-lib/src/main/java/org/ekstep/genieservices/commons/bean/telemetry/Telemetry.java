@@ -19,7 +19,6 @@ public class Telemetry {
     private static final String TELEMETRY_VERSION = "2.0";
     private static final String GENIE_SERVICE_GID = "genieservice.android";
 
-    private final Map<String, Object> edata = new HashMap<>();
     private String ts;
     private String ver;
     private String sid = "";
@@ -28,6 +27,7 @@ public class Telemetry {
     private String eid;
     private long ets;
     private GameData gdata;
+    private Map<String, Object> edata = new HashMap<>();
     private List<Map<String, Object>> tags = new ArrayList();
     private List<CoRelation> cdata;
 

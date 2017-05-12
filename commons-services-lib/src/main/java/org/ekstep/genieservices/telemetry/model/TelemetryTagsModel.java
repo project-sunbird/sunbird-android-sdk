@@ -1,17 +1,12 @@
 package org.ekstep.genieservices.telemetry.model;
 
+import org.ekstep.genieservices.commons.db.contract.TelemetryTagEntry;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.commons.utils.StringUtil;
-import org.ekstep.genieservices.commons.db.contract.TelemetryTagEntry;
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by swayangjit on 26/4/17.
@@ -28,9 +23,9 @@ public class TelemetryTagsModel implements IReadable {
     }
 
     public static TelemetryTagsModel find(IDBSession dbSession) {
-        TelemetryTagsModel telemetryTags = new TelemetryTagsModel(dbSession);
-        dbSession.read(telemetryTags);
-        return telemetryTags;
+        TelemetryTagsModel telemetryTagsModel = new TelemetryTagsModel(dbSession);
+        dbSession.read(telemetryTagsModel);
+        return telemetryTagsModel;
     }
 
     @Override
@@ -68,20 +63,8 @@ public class TelemetryTagsModel implements IReadable {
         return "";
     }
 
-    public List<TelemetryTagModel> tags() {
+    public List<TelemetryTagModel> getTags() {
         return telemetryTags;
     }
 
-    public Set<String> activeTagHashes() {
-        Set<String> tags = new HashSet<>();
-        for (TelemetryTagModel tag : telemetryTags) {
-            LocalDate today = DateTime.now().toLocalDate();
-            LocalDate startDate = StringUtil.isNullOrEmpty(tag.startDate()) ? today : LocalDate.parse(tag.startDate());
-            LocalDate endDate = StringUtil.isNullOrEmpty(tag.endDate()) ? today : LocalDate.parse(tag.endDate());
-            if (!startDate.isAfter(today) && !endDate.isBefore(today)) {
-                tags.add(tag.tagHash());
-            }
-        }
-        return tags;
-    }
 }

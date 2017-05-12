@@ -3,8 +3,6 @@ package org.ekstep.genieservices.commons.bean.telemetry;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.utils.DateUtil;
-import org.joda.time.DateTime;
-import org.joda.time.Seconds;
 
 import java.util.HashMap;
 
@@ -25,11 +23,10 @@ public class GESessionEnd extends Telemetry {
         setTs(DateUtil.getCurrentTimestamp());
     }
 
-    protected HashMap<String, Object> createEKS(DateTime createdTime) {
-        DateTime now = DateTime.now();
-        Seconds seconds = Seconds.secondsBetween(createdTime, now);
+    protected HashMap<String, Object> createEKS(String createdTime) {
+
         HashMap<String, Object> eks = new HashMap<>();
-        eks.put("length", seconds.getSeconds());
+        eks.put("length", DateUtil.elapsedTimeTillNow(createdTime));
         return eks;
     }
 }
