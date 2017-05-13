@@ -20,6 +20,15 @@ public class GenieResponseBuilder {
         return response;
     }
 
+    public static <T> GenieResponse<T> getErrorResponse(String error,String logTag) {
+        GenieResponse<T> response = new GenieResponse<T>();
+        response.setStatus(false);
+        response.setErrorMessages(Collections.singletonList(""));
+        response.setError(error);
+        Logger.e(logTag, error);
+        return response;
+    }
+
     public static <T> GenieResponse<T> getErrorResponse(String error, String errorMessage, String logTag) {
         GenieResponse<T> response = new GenieResponse<T>();
         response.setStatus(false);

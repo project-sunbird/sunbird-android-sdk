@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.telemetry.model;
+package org.ekstep.genieservices.tag.model;
 
 import org.ekstep.genieservices.commons.db.contract.TelemetryTagEntry;
 import org.ekstep.genieservices.commons.db.core.IReadable;
@@ -12,18 +12,18 @@ import java.util.List;
  * Created by swayangjit on 26/4/17.
  */
 
-public class TelemetryTagsModel implements IReadable {
+public class TagsModel implements IReadable {
 
-    private List<TelemetryTagModel> telemetryTags;
+    private List<TagModel> telemetryTags;
     private IDBSession mDBSession;
 
-    public TelemetryTagsModel(IDBSession dbSession) {
+    public TagsModel(IDBSession dbSession) {
         this.mDBSession = dbSession;
         this.telemetryTags = new ArrayList<>();
     }
 
-    public static TelemetryTagsModel find(IDBSession dbSession) {
-        TelemetryTagsModel telemetryTagsModel = new TelemetryTagsModel(dbSession);
+    public static TagsModel find(IDBSession dbSession) {
+        TagsModel telemetryTagsModel = new TagsModel(dbSession);
         dbSession.read(telemetryTagsModel);
         return telemetryTagsModel;
     }
@@ -32,7 +32,7 @@ public class TelemetryTagsModel implements IReadable {
     public IReadable read(IResultSet resultSet) {
         if (resultSet != null && resultSet.moveToFirst())
             do {
-                TelemetryTagModel telemetryTagModel=TelemetryTagModel.build(mDBSession);
+                TagModel telemetryTagModel= TagModel.build(mDBSession);
                 telemetryTagModel.readWithoutMoving(resultSet);
             } while (resultSet.moveToNext());
         return this;
@@ -63,7 +63,7 @@ public class TelemetryTagsModel implements IReadable {
         return "";
     }
 
-    public List<TelemetryTagModel> getTags() {
+    public List<TagModel> getTags() {
         return telemetryTags;
     }
 

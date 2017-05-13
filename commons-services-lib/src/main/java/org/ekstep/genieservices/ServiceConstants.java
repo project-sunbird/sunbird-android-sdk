@@ -76,4 +76,12 @@ public interface ServiceConstants {
         String TYPE_TOUCH = "TOUCH";
         String SIZE_OF_DATA_IN_KB = "SizeOfDataInKB";
     }
+
+    interface ErrorCode {
+        String PROCESSING_ERROR = "PROCESSING_ERROR";
+        String DATA_NOT_FOUND_ERROR = "NO_DATA_FOUND";
+        String VALIDATION_ERROR = "VALIDATION_ERROR";
+        String DB_ERROR = "DB_ERROR";
+    }
+
 }

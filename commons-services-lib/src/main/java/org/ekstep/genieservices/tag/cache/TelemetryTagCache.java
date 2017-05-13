@@ -1,9 +1,9 @@
-package org.ekstep.genieservices.telemetry.cache;
+package org.ekstep.genieservices.tag.cache;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.utils.DateUtil;
-import org.ekstep.genieservices.telemetry.model.TelemetryTagModel;
-import org.ekstep.genieservices.telemetry.model.TelemetryTagsModel;
+import org.ekstep.genieservices.tag.model.TagModel;
+import org.ekstep.genieservices.tag.model.TagsModel;
 
 import java.util.HashSet;
 import java.util.List;
@@ -20,7 +20,7 @@ public class TelemetryTagCache {
     public static Set<String> activeTags(AppContext appContext) {
         if (hashedtags == null || (DateUtil.getEpochTime() > validUntil)) {
             hashedtags = new HashSet<>();
-            TelemetryTagsModel telemetryTags = TelemetryTagsModel.find(appContext.getDBSession());
+            TagsModel telemetryTags = TagsModel.find(appContext.getDBSession());
             hashedtags.addAll(activeTagHashes(telemetryTags.getTags()));
             validUntil = DateUtil.getTodayMidnightEpochTime();
         }
@@ -32,9 +32,9 @@ public class TelemetryTagCache {
         validUntil = 0;
     }
 
-    private static Set<String> activeTagHashes(List<TelemetryTagModel> tags) {
+    private static Set<String> activeTagHashes(List<TagModel> tags) {
         Set<String> hashedTags = new HashSet<>();
-        for (TelemetryTagModel tag : tags) {
+        for (TagModel tag : tags) {
             if (DateUtil.isTodayWithin(tag.startDate(), tag.endDate())) {
                 hashedTags.add(tag.tagHash());
             }

@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.telemetry.model;
+package org.ekstep.genieservices.tag.model;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.BaseColumns;
@@ -7,6 +7,7 @@ import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
+import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 
@@ -16,7 +17,7 @@ import java.util.Locale;
  * Created by swayangjit on 26/4/17.
  */
 
-public class TelemetryTagModel implements IReadable, IWritable, ICleanable {
+public class TagModel implements IReadable, IWritable, ICleanable, IUpdatable {
 
     private String name;
     private String hash;
@@ -27,19 +28,19 @@ public class TelemetryTagModel implements IReadable, IWritable, ICleanable {
     private ContentValues contentValues;
     private IDBSession mDBSession;
 
-    private TelemetryTagModel(IDBSession dbSession) {
+    private TagModel(IDBSession dbSession) {
         this.mDBSession = dbSession;
         this.contentValues = new ContentValues();
     }
 
-    private TelemetryTagModel(IDBSession dbSession, String name) {
+    private TagModel(IDBSession dbSession, String name) {
         this.mDBSession = dbSession;
         this.name = name;
         this.contentValues = new ContentValues();
     }
 
-    private TelemetryTagModel(IDBSession dbSession, String name, String hash, String description,
-                              String startDate, String endDate) {
+    private TagModel(IDBSession dbSession, String name, String hash, String description,
+                     String startDate, String endDate) {
         this.mDBSession = dbSession;
         this.name = name;
         this.hash = hash;
@@ -49,17 +50,21 @@ public class TelemetryTagModel implements IReadable, IWritable, ICleanable {
         this.contentValues = new ContentValues();
     }
 
-    public static TelemetryTagModel build(IDBSession dbSession) {
-        return new TelemetryTagModel(dbSession);
+    public static TagModel build(IDBSession dbSession) {
+        return new TagModel(dbSession);
     }
 
-    public static TelemetryTagModel build(IDBSession dbSession, String name, String hash, String description,
-                                          String startDate, String endDate) {
-        return new TelemetryTagModel(dbSession, name, hash, description, startDate, endDate);
+    public static TagModel build(IDBSession dbSession, String tagName) {
+        return new TagModel(dbSession, tagName);
     }
 
-    public static TelemetryTagModel find(IDBSession dbSession, String tagName) {
-        TelemetryTagModel telemetryTag = new TelemetryTagModel(dbSession, tagName);
+    public static TagModel build(IDBSession dbSession, String name, String hash, String description,
+                                 String startDate, String endDate) {
+        return new TagModel(dbSession, name, hash, description, startDate, endDate);
+    }
+
+    public static TagModel find(IDBSession dbSession, String tagName) {
+        TagModel telemetryTag = new TagModel(dbSession, tagName);
         dbSession.read(telemetryTag);
         return telemetryTag.tagHash() != null ? telemetryTag : null;
 
@@ -91,8 +96,23 @@ public class TelemetryTagModel implements IReadable, IWritable, ICleanable {
     }
 
     @Override
+    public ContentValues getFieldsToUpdate() {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(TelemetryTagEntry.COLUMN_NAME_NAME, name);
+        contentValues.put(TelemetryTagEntry.COLUMN_NAME_DESCRIPTION, description);
+        contentValues.put(TelemetryTagEntry.COLUMN_NAME_START_DATE, startDate);
+        contentValues.put(TelemetryTagEntry.COLUMN_NAME_END_DATE, endDate);
+        return contentValues;
+    }
+
+    @Override
     public String getTableName() {
         return TelemetryTagEntry.TABLE_NAME;
+    }
+
+    @Override
+    public String updateBy() {
+        return String.format(Locale.US, "%s = '%s'", TelemetryTagEntry.COLUMN_NAME_NAME, name);
     }
 
     @Override
@@ -127,7 +147,7 @@ public class TelemetryTagModel implements IReadable, IWritable, ICleanable {
 
     @Override
     public String selectionToClean() {
-        return "";
+        return String.format(Locale.US, "where %s = '%s'", TelemetryTagEntry.COLUMN_NAME_NAME, name);
     }
 
     public void readWithoutMoving(IResultSet resultSet) {
@@ -141,6 +161,14 @@ public class TelemetryTagModel implements IReadable, IWritable, ICleanable {
 
     public void save() {
         mDBSession.create(this);
+    }
+
+    public void update() {
+        mDBSession.update(this);
+    }
+
+    public void clear() {
+        mDBSession.clean(this);
     }
 
     public String name() {

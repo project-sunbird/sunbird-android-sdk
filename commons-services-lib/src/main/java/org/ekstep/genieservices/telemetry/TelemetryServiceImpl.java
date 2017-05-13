@@ -15,7 +15,7 @@ import org.ekstep.genieservices.commons.utils.ArrayUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
-import org.ekstep.genieservices.telemetry.cache.TelemetryTagCache;
+import org.ekstep.genieservices.tag.cache.TelemetryTagCache;
 import org.ekstep.genieservices.telemetry.eventbus.TelemetryEventPublisher;
 import org.ekstep.genieservices.telemetry.model.EventModel;
 
