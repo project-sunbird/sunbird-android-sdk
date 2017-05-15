@@ -1,16 +1,19 @@
 package org.ekstep.genieservices.UserProfile;
 
-import android.util.Log;
-
 import com.google.gson.Gson;
 
+import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.Assert.fail;
@@ -24,11 +27,34 @@ public class UserProfileTest extends GenieServiceTestBase {
     private static final String TAG = UserProfileTest.class.getSimpleName();
 
     /**
-     * Method to create a new user profile and return uid.
+     * Check if the profile is deleted.
+     *
+     * @return
+     */
+    public static void userProfileDoesNotExist() {
+        List<Profile> profile = GenieServiceDBHelper.findProfile();
+        Assert.assertEquals(0, profile.size());
+    }
+
+    @Before
+    public void setup() throws IOException {
+        super.setup();
+        activity = rule.getActivity();
+        GenieServiceDBHelper.clearProfileTableEntry();
+    }
+
+    @After
+    public void tearDown() throws IOException {
+        super.tearDown();
+    }
+
+    /**
+     * Method to create a new user profile and return it.
      *
      * @return
      */
     public Profile createNewUserProfile(String handle, boolean isGroupUser) {
+
         Profile profile = new Profile(handle, "@drawable/ic_avatar2", "en");
         profile.setAge(7);
         profile.setDay(12);
@@ -38,13 +64,11 @@ public class UserProfileTest extends GenieServiceTestBase {
         activity.createUserProfile(profile, new IResponseHandler() {
             @Override
             public void onSuccess(GenieResponse genieResponse) {
-                Profile createdProfile = (Profile) genieResponse.getResult();
-                Log.v(TAG, "New Profile :: Name:" + createdProfile.getHandle() + "\n uid:" + createdProfile.getUid());
+                GenieServiceDBHelper.findProfile();
             }
 
             @Override
             public void onError(GenieResponse genieResponse) {
-                Log.v(TAG, "ERROR CREATING PROFILE : " + genieResponse.getErrorMessages().get(0));
                 Assert.assertEquals("Failure ::", genieResponse.getErrorMessages().get(0));
             }
         });
@@ -57,6 +81,7 @@ public class UserProfileTest extends GenieServiceTestBase {
      */
     @Test
     public void _1ShouldCreateUserProfile() {
+
         final Profile profile = new Profile("Happy1 " + UUID.randomUUID().toString(), "@drawable/ic_avatar2", "en");
         profile.setAge(4);
         profile.setDay(12);
@@ -65,15 +90,12 @@ public class UserProfileTest extends GenieServiceTestBase {
         activity.createUserProfile(profile, new IResponseHandler() {
             @Override
             public void onSuccess(GenieResponse genieResponse) {
-                Profile createdProfile = (Profile) genieResponse.getResult();
-//                assertProfileEntryExist(getGenieServicesDatabase(), createdProfile.getHandle(), false);
+                GenieServiceDBHelper.findProfile();
                 Assert.assertEquals("Month should not be null", ((Profile) genieResponse.getResult()).getMonth(), profile.getMonth());
                 Assert.assertEquals("Handle should not be null", ((Profile) genieResponse.getResult()).getHandle(), profile.getHandle());
                 Assert.assertEquals("Avatar should not be null", ((Profile) genieResponse.getResult()).getAvatar(), profile.getAvatar());
                 Assert.assertEquals("Day should not be null", ((Profile) genieResponse.getResult()).getDay(), profile.getDay());
 
-                Log.v(TAG, "PROFILE CREATION SUCCESSFUL :: Name:" + createdProfile.getHandle() + " Age:" + createdProfile.getAge() +
-                        " UID:" + createdProfile.getUid());
             }
 
             @Override
@@ -103,13 +125,11 @@ public class UserProfileTest extends GenieServiceTestBase {
         activity.updateUserProfile(profile, new IResponseHandler() {
             @Override
             public void onSuccess(GenieResponse genieResponse) {
-                //assertProfileEntryExist(getGenieServicesDatabase(), profile.getHandle(), false);
-                Log.v(TAG, "UPDATE PROFILE SUCCESSFUL :: name : " + profile.getHandle() + " uuid:: " + profile.getUid() + "day : " + profile.getDay());
+                GenieServiceDBHelper.findProfile();
             }
 
             @Override
             public void onError(GenieResponse genieResponse) {
-                Log.v(TAG, "ERROR PROFILE UPDATION :: " + genieResponse.getErrorMessages().get(0));
                 Assert.assertEquals("Failure ::", genieResponse.getErrorMessages().get(0));
             }
         });
@@ -122,7 +142,7 @@ public class UserProfileTest extends GenieServiceTestBase {
     public void _5ShouldSetCurrentUser() {
 
         final Profile newUserProfile = createNewUserProfile("Happy5", false);
-//        assertProfileEntryExist(getGenieServicesDatabase(), newUserProfile.getHandle(), false);
+        GenieServiceDBHelper.findProfile();
 
         waitForGenieToBecomeIdle();
 
@@ -138,13 +158,11 @@ public class UserProfileTest extends GenieServiceTestBase {
                         Assert.assertEquals(((Profile) genieResponse.getResult()).getAge(), newUserProfile.getAge());
                         Assert.assertEquals(((Profile) genieResponse.getResult()).getDay(), newUserProfile.getDay());
                         Assert.assertEquals(((Profile) genieResponse.getResult()).getMonth(), newUserProfile.getMonth());
-                        Log.v(TAG, "SUCCESSFUL GET CURRENT USER :: " + genieResponse.getStatus());
                     }
 
                     @Override
                     public void onError(GenieResponse genieResponse) {
-                        Log.v(TAG, "Failure :: " + genieResponse.getError());
-//                        Assert.assertEquals("Failure ::", genieResponse.getErrorMessages().get(0));
+                        Assert.assertEquals("Failure ::", genieResponse.getErrorMessages().get(0));
                     }
                 });
 
@@ -153,7 +171,6 @@ public class UserProfileTest extends GenieServiceTestBase {
             @Override
             public void onError(GenieResponse genieResponse) {
                 Assert.assertEquals("Failure ::", genieResponse.getErrorMessages().get(0));
-                Log.v(TAG, "Failure set current :: " + genieResponse.getErrorMessages().get(0));
             }
         });
     }
@@ -165,21 +182,20 @@ public class UserProfileTest extends GenieServiceTestBase {
     public void _6ShouldDeleteUserProfile() {
 
         final Profile createdProfile = createNewUserProfile("Happy6", false);
-//        assertProfileEntryExist(getGenieServicesDatabase(), handle, false);
-        Log.v(TAG, "uid:" + createdProfile);
+
+        GenieServiceDBHelper.findProfile();
 
         waitForGenieToBecomeIdle();
 
         activity.deleteUserProfile(createdProfile.getUid(), new IResponseHandler() {
             @Override
             public void onSuccess(GenieResponse genieResponse) {
-//                assertUserProfileDoesNotExist(getGenieServicesDatabase(), uid);
-                Log.v(TAG, "SUCCESSFULLY DELETED USER :: " + genieResponse.getMessage());
+                userProfileDoesNotExist();
             }
 
             @Override
             public void onError(GenieResponse genieResponse) {
-                Log.v(TAG, "FAILED TO DELETE USER PROFILE : " + genieResponse.getErrorMessages().get(0));
+                Assert.assertEquals("Failure ::", genieResponse.getErrorMessages().get(0));
             }
         });
     }
@@ -191,6 +207,7 @@ public class UserProfileTest extends GenieServiceTestBase {
     public void _11ShouldDeleteUserProfileIfUserIsCurrentUser() {
 
         final Profile profile = createNewUserProfile("Happy11", false);
+        GenieServiceDBHelper.findProfile();
 
         waitForGenieToBecomeIdle();
 
@@ -206,13 +223,12 @@ public class UserProfileTest extends GenieServiceTestBase {
                 activity.deleteUserProfile(profile.getUid(), new IResponseHandler() {
                     @Override
                     public void onSuccess(GenieResponse genieResponse) {
-//                      assertUserProfileDoesNotExist(getGenieServicesDatabase(), ((Profile) genieResponse.getResult()).getUid());
-                        Log.v(TAG, "SUCCESSFULLY DELETED CURRENT USER PROFILE");
+
+                        userProfileDoesNotExist();
 
                         activity.getAnonymousUser(new IResponseHandler() {
                             @Override
                             public void onSuccess(GenieResponse genieResponse) {
-                                Log.v(TAG, "SUCCESSFUL GET ANONYMOUS USER");
                                 Assert.assertTrue(genieResponse.getStatus());
                             }
 
@@ -226,14 +242,12 @@ public class UserProfileTest extends GenieServiceTestBase {
                     @Override
                     public void onError(GenieResponse genieResponse) {
                         Assert.assertFalse(genieResponse.getStatus());
-                        Log.v(TAG, "UNABLE TO DELETE USER PROFILE");
                     }
                 });
             }
 
             @Override
             public void onError(GenieResponse genieResponse) {
-                Log.v(TAG, "Failure to set current user :: " + genieResponse.getErrorMessages().get(0));
                 Assert.assertFalse(genieResponse.getStatus());
             }
         });
@@ -253,8 +267,7 @@ public class UserProfileTest extends GenieServiceTestBase {
         activity.createUserProfile(profile, new IResponseHandler() {
             @Override
             public void onSuccess(GenieResponse genieResponse) {
-                Log.v(TAG, "SUCCESSFULLY CREATED GROUP PROFILE :: name : " + profile.getHandle() + " uid : " + profile.getUid());
-//                assertProfileEntryExist(getGenieServicesDatabase(), profile.getHandle(), true);
+                GenieServiceDBHelper.findProfile();
                 Assert.assertEquals("Avatar should not be null", ((Profile) genieResponse.getResult()).getAvatar(), profile.getAvatar());
                 Assert.assertEquals("Handle should not be null", ((Profile) genieResponse.getResult()).getHandle(), profile.getHandle());
                 Assert.assertEquals("Gender should be null", ((Profile) genieResponse.getResult()).getGender(), profile.getGender());
@@ -267,7 +280,6 @@ public class UserProfileTest extends GenieServiceTestBase {
 
             @Override
             public void onError(GenieResponse genieResponse) {
-                Log.v(TAG, "FAILURE :: " + genieResponse.getErrorMessages().get(0));
                 Assert.assertEquals("Failure ::", genieResponse.getErrorMessages().get(0));
             }
         });
@@ -286,18 +298,15 @@ public class UserProfileTest extends GenieServiceTestBase {
         activity.updateUserProfile(profile, new IResponseHandler() {
             @Override
             public void onSuccess(GenieResponse genieResponse) {
-//          assertProfileEntryExist(getGenieServicesDatabase(), profile.getHandle(), true);
+                GenieServiceDBHelper.findProfile();
                 Assert.assertTrue(genieResponse.getStatus());
                 Assert.assertEquals(((Profile) genieResponse.getResult()).getUid(), profile.getUid());
                 Assert.assertEquals(((Profile) genieResponse.getResult()).getGender(), profile.getGender());
                 Assert.assertEquals(((Profile) genieResponse.getResult()).getAge(), profile.getAge());
-
-                Log.v(TAG, "SUCCESSFULLY UPDATED GROUP :: name: " + profile.getHandle() + "age :: " + profile.getAge());
             }
 
             @Override
             public void onError(GenieResponse genieResponse) {
-                Log.v(TAG, "FAILURE :: " + genieResponse.getErrorMessages().get(0));
                 Assert.assertEquals("Failure ::", genieResponse.getErrorMessages().get(0));
             }
         });
@@ -317,18 +326,15 @@ public class UserProfileTest extends GenieServiceTestBase {
         activity.createUserProfile(profile, new IResponseHandler() {
             @Override
             public void onSuccess(GenieResponse genieResponse) {
-                Log.v(TAG, "SUCCESS CREATE USER");
-//                assertProfileEntryExist(getGenieServicesDatabase(), profile.getHandle(), true);
+                GenieServiceDBHelper.findProfile();
 
                 activity.setCurrentUser(profile.getUid(), new IResponseHandler() {
                     @Override
                     public void onSuccess(GenieResponse genieResponse) {
-                        Log.v(TAG, "SUCCESS SET CURRENT USER");
 
                         activity.getCurrentUser(new IResponseHandler() {
                             @Override
                             public void onSuccess(GenieResponse genieResponse) {
-                                Log.v(TAG, "SUCCESS GET CURRENT USER");
 
                                 Assert.assertEquals("IS_GROUP_USER should be true", ((Profile) genieResponse.getResult()).isGroupUser(), profile.isGroupUser());
                                 Assert.assertEquals("AGE should be defaulted to -1", ((Profile) genieResponse.getResult()).getAge(), -1);
@@ -339,7 +345,6 @@ public class UserProfileTest extends GenieServiceTestBase {
 
                             @Override
                             public void onError(GenieResponse genieResponse) {
-                                Log.v(TAG, "GET CURRENT FAILURE :: " + genieResponse.getError() + "Msg ::" + genieResponse.getErrorMessages().get(0));
                                 Assert.assertEquals("ERROR GET CURRENT OBJECT ::", genieResponse.getErrorMessages().get(0));
 
                             }
@@ -348,7 +353,6 @@ public class UserProfileTest extends GenieServiceTestBase {
 
                     @Override
                     public void onError(GenieResponse genieResponse) {
-                        Log.v(TAG, "Failure :: " + genieResponse.getError());
                         Assert.assertEquals("ERROR SET CURRENT OBJECT ::", genieResponse.getErrorMessages().get(0));
                     }
                 });
@@ -369,17 +373,17 @@ public class UserProfileTest extends GenieServiceTestBase {
 
         final Profile profile = createNewUserProfile("Group10", true);
 
+        GenieServiceDBHelper.findProfile();
+
         activity.deleteUserProfile(profile.getUid(), new IResponseHandler() {
             @Override
             public void onSuccess(GenieResponse genieResponse) {
-//                assertUserProfileDoesNotExist(getGenieServicesDatabase(),profile.getUid());
-                Log.v(TAG, "SUCCESSFULLY DELETED GROUP USER :: " + genieResponse.getStatus());
+                userProfileDoesNotExist();
             }
 
             @Override
             public void onError(GenieResponse genieResponse) {
-                Log.v(TAG, "FAILED DELETE PROFILE :: " + genieResponse.getErrorMessages().get(0));
-                Log.v(TAG, "ERROR :: " + genieResponse.getError());
+                Assert.assertEquals("Failure ::", genieResponse.getErrorMessages().get(0));
             }
         });
     }
@@ -402,7 +406,6 @@ public class UserProfileTest extends GenieServiceTestBase {
 
             @Override
             public void onError(GenieResponse genieResponse) {
-                Log.v(TAG, "Failure :: " + genieResponse.getErrorMessages().get(0));
                 Assert.assertFalse(genieResponse.getStatus());
             }
         });
@@ -424,7 +427,6 @@ public class UserProfileTest extends GenieServiceTestBase {
 
             @Override
             public void onError(GenieResponse genieResponse) {
-                Log.v(TAG, "Failure :: " + genieResponse.getErrorMessages().get(0));
                 Assert.assertFalse(genieResponse.getStatus());
             }
         });
@@ -442,12 +444,10 @@ public class UserProfileTest extends GenieServiceTestBase {
             @Override
             public void onSuccess(GenieResponse genieResponse) {
                 fail("ERROR DATE VALIDATION. Response" + new Gson().toJson(genieResponse));
-                Log.v(TAG, "Success :: " + genieResponse.getStatus());
             }
 
             @Override
             public void onError(GenieResponse genieResponse) {
-                Log.v(TAG, "Failure :: " + genieResponse.getErrorMessages().get(0));
                 Assert.assertFalse(genieResponse.getStatus());
             }
         });
@@ -471,7 +471,6 @@ public class UserProfileTest extends GenieServiceTestBase {
 
             @Override
             public void onError(GenieResponse genieResponse) {
-                Log.e(TAG, "Failure :: " + genieResponse.getErrorMessages().get(0));
                 Assert.assertFalse(genieResponse.getStatus());
             }
         });
@@ -491,7 +490,6 @@ public class UserProfileTest extends GenieServiceTestBase {
 
             @Override
             public void onError(GenieResponse genieResponse) {
-                Log.e(TAG, "Failure :: " + genieResponse.getErrorMessages().get(0));
                 Assert.assertFalse(genieResponse.getStatus());
             }
         });
@@ -511,7 +509,6 @@ public class UserProfileTest extends GenieServiceTestBase {
 
             @Override
             public void onError(GenieResponse genieResponse) {
-                Log.e(TAG, "Failure :: " + genieResponse.getErrorMessages().get(0));
                 Assert.assertFalse(genieResponse.getStatus());
             }
         });
@@ -528,13 +525,11 @@ public class UserProfileTest extends GenieServiceTestBase {
             @Override
             public void onSuccess(GenieResponse genieResponse) {
                 Assert.assertTrue(genieResponse.getStatus());
-                Log.v(TAG, "SUCCESSFULLY SET ANONYMOUS USER :: " + genieResponse.getStatus());
             }
 
             @Override
             public void onError(GenieResponse genieResponse) {
                 Assert.assertEquals("Failure ::", genieResponse.getErrorMessages().get(0));
-                Log.v(TAG, "Failure :: " + genieResponse.getErrorMessages().get(0));
             }
         });
     }
@@ -549,7 +544,6 @@ public class UserProfileTest extends GenieServiceTestBase {
             @Override
             public void onSuccess(GenieResponse genieResponse) {
                 Assert.assertTrue(genieResponse.getStatus());
-                Log.v(TAG, "SUCCESSFULLY SET ANONYMOUS USER");
 
                 waitForGenieToBecomeIdle();
 
@@ -557,7 +551,6 @@ public class UserProfileTest extends GenieServiceTestBase {
                     @Override
                     public void onSuccess(GenieResponse genieResponse) {
                         Assert.assertTrue(genieResponse.getStatus());
-                        Log.v(TAG, "SUCCESSFULLY GET ANONYMOUS USER");
                     }
 
                     @Override

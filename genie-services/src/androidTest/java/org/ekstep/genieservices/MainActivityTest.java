@@ -1,11 +1,8 @@
 package org.ekstep.genieservices;
 
-import android.content.Context;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -13,8 +10,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by swayangjit on 10/5/17.
@@ -41,7 +36,5 @@ public class MainActivityTest extends GenieServiceTestBase {
     public void useAppContext() throws Exception {
 //       activity.getMasterData(MasterDataType.AGE);
         GenieServiceDBHelper.findEventById("GE_SERVICE_API_CALL");
-
-
     }
 }
