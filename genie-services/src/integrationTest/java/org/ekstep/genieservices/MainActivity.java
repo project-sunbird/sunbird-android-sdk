@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
+import org.ekstep.genieservices.commons.AndroidAppContext;
+import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MasterData;
@@ -17,13 +19,20 @@ import org.ekstep.genieservices.config.ConfigServiceImpl;
 public class MainActivity extends Activity{
     private IConfigService mConfigService=null;
     private boolean idle = true;
+    private AppContext mAppContext=null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
         GenieService genieService=GenieService.init(this,getPackageName(),"","org.ekstep");
         mConfigService=genieService.getConfigService();
+
+        mAppContext= AndroidAppContext.buildAppContext(getApplicationContext(),getPackageName(),"","org.ekstep");
+        GenieServiceDBHelper.init(mAppContext);
+
         getMasterData(MasterDataType.AGE);
 
     }
@@ -51,5 +60,9 @@ public class MainActivity extends Activity{
 
     public void setIdle() {
         idle = true;
+    }
+
+    private void initGenieServiceDb(){
+
     }
 }
