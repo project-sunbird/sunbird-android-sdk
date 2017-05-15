@@ -34,15 +34,15 @@ public class ConfigServiceTest extends GenieServiceTestBase {
         activity.getMasterData(MasterDataType.AGE, new IResponseHandler() {
             @Override
             public void onSuccess(GenieResponse genieResponse) {
-                Assert.assertTrue("successful", genieResponse.getStatus());
                 String age = (String) genieResponse.getResult();
+                Assert.assertNotNull(age);
                 getJsonValuesArrayLength(age);
+
             }
 
             @Override
             public void onError(GenieResponse genieResponse) {
                 Assert.assertEquals("Failure", genieResponse.getErrorMessages().get(0));
-                Log.e("", "onError: onError block");
 
             }
         });
@@ -53,17 +53,14 @@ public class ConfigServiceTest extends GenieServiceTestBase {
         activity.getMasterData(MasterDataType.BOARD, new IResponseHandler() {
             @Override
             public void onSuccess(GenieResponse genieResponse) {
-                Assert.assertTrue("successful", genieResponse.getStatus());
-
                 String board = (String) genieResponse.getResult();
-
+                Assert.assertNotNull(board);
                 getJsonValuesArrayLength(board);
             }
 
             @Override
             public void onError(GenieResponse genieResponse) {
                 Assert.assertEquals("Failure", genieResponse.getErrorMessages().get(0));
-                Log.e("", "onError: onError block");
             }
         });
     }
@@ -73,16 +70,14 @@ public class ConfigServiceTest extends GenieServiceTestBase {
         activity.getMasterData(MasterDataType.MEDIUM, new IResponseHandler() {
             @Override
             public void onSuccess(GenieResponse genieResponse) {
-                Assert.assertTrue("successful", genieResponse.getStatus());
-
                 String medium = (String) genieResponse.getResult();
+                Assert.assertNotNull(medium);
                 getJsonValuesArrayLength(medium);
             }
 
             @Override
             public void onError(GenieResponse genieResponse) {
                 Assert.assertEquals("Failure", genieResponse.getErrorMessages().get(0));
-                Log.e("", "onError: onError block");
             }
         });
     }
@@ -92,16 +87,14 @@ public class ConfigServiceTest extends GenieServiceTestBase {
         activity.getMasterData(MasterDataType.SUBJECT, new IResponseHandler() {
             @Override
             public void onSuccess(GenieResponse genieResponse) {
-                Assert.assertTrue("successful", genieResponse.getStatus());
-
                 String subject = (String) genieResponse.getResult();
+                Assert.assertNotNull(subject);
                 getJsonValuesArrayLength(subject);
             }
 
             @Override
             public void onError(GenieResponse genieResponse) {
                 Assert.assertEquals("Failure", genieResponse.getErrorMessages().get(0));
-                Log.e("", "onError: onError block");
             }
         });
     }
@@ -123,15 +116,14 @@ public class ConfigServiceTest extends GenieServiceTestBase {
         activity.getMasterData(MasterDataType.GRADELEVEL, new IResponseHandler() {
             @Override
             public void onSuccess(GenieResponse genieResponse) {
-                Assert.assertTrue("successful", genieResponse.getStatus());
                 String gradeLevel = (String) genieResponse.getResult();
+                Assert.assertNotNull(gradeLevel);
                 getJsonValuesArrayLength(gradeLevel);
             }
 
             @Override
             public void onError(GenieResponse genieResponse) {
                 Assert.assertEquals("Failure", genieResponse.getErrorMessages().get(0));
-                Log.e("", "onError: onError block");
             }
         });
     }
@@ -143,15 +135,14 @@ public class ConfigServiceTest extends GenieServiceTestBase {
 
             @Override
             public void onSuccess(GenieResponse genieResponse) {
-                Assert.assertTrue("successful", genieResponse.getStatus());
                 String ageGroup = (String) genieResponse.getResult();
+                Assert.assertNotNull(ageGroup);
                 getJsonValuesArrayLength(ageGroup);
             }
 
             @Override
             public void onError(GenieResponse genieResponse) {
                 Assert.assertEquals("Failure", genieResponse.getErrorMessages().get(0));
-                Log.e("", "onError: onError block");
             }
         });
     }
@@ -164,15 +155,13 @@ public class ConfigServiceTest extends GenieServiceTestBase {
         activity.getOrdinals(new IResponseHandler() {
             @Override
             public void onSuccess(GenieResponse genieResponse) {
-                Assert.assertTrue("successful", genieResponse.getStatus());
-
                 String result = (String) genieResponse.getResult();
-                Log.e(TAG, "onSuccess: result :: " + result);
+                Assert.assertNotNull(result);
             }
 
             @Override
             public void onError(GenieResponse genieResponse) {
-                Log.e(TAG, "onError: " + genieResponse.getStatus());
+                Assert.assertFalse(genieResponse.getStatus());
             }
         });
     }
@@ -185,15 +174,13 @@ public class ConfigServiceTest extends GenieServiceTestBase {
         activity.getResourceBundle("en", new IResponseHandler() {
             @Override
             public void onSuccess(GenieResponse genieResponse) {
-                Assert.assertTrue("successful", genieResponse.getStatus());
-
                 String result = (String) genieResponse.getResult();
-                Log.v(TAG, "onSuccess: result :: " + result);
+                Assert.assertNotNull(result);
             }
 
             @Override
             public void onError(GenieResponse genieResponse) {
-                Log.e(TAG, "onError: " + genieResponse.getStatus());
+                Assert.assertFalse(genieResponse.getStatus());
             }
         });
     }
