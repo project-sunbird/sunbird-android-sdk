@@ -45,6 +45,7 @@ dependencies {
 
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile "com.squareup.okhttp:okhttp:2.7.5"
+    androidTestCompile 'com.jayway.awaitility:awaitility:1.7.0'
 
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
