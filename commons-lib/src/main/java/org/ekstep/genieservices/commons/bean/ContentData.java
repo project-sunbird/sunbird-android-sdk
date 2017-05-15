@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class ContentData implements Serializable {
 
-    List<Variant> variantList;
+    private List<Variant> variantList;
     private String identifier;
     private String name;
     private String appIcon;
