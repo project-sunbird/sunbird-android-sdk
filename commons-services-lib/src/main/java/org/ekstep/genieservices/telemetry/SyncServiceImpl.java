@@ -62,7 +62,7 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
 
         String fileSize = calculateByteCountInKB(totalByteSize);
         mAppContext.getKeyValueStore().putString(ServiceConstants.PreferenceKey.SYNC_FILE_SIZE, fileSize);
-        mAppContext.getKeyValueStore().putLong(ServiceConstants.PreferenceKey.LAST_SYNC_TIME, DateUtil.getCurrentTime());
+        mAppContext.getKeyValueStore().putLong(ServiceConstants.PreferenceKey.LAST_SYNC_TIME, DateUtil.getEpochTime());
 
         GenieResponse<Map> response = GenieResponseBuilder.getSuccessResponse(getMessage(numberOfSync, numberOfEventsProcessed));
 

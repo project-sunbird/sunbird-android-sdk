@@ -9,6 +9,7 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.bean.UserSession;
+import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
 import org.ekstep.genieservices.commons.exception.DbException;
 import org.ekstep.genieservices.commons.exception.InvalidDataException;
 import org.ekstep.genieservices.commons.utils.ArrayUtil;
@@ -50,14 +51,9 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
             GenieResponse response = saveEvent(eventString);
             saveEvent(TelemetryLogger.create(mAppContext, response, new HashMap(), SERVICE_NAME, "saveTelemetry@TelemetryServiceImpl", params).toString());
             return response;
-        } catch (DbException e) {
-            String logMessage = "Event save failed" + e.toString();
-            GenieResponse response = GenieResponseBuilder.getErrorResponse("PROCESSING_ERROR", errorMessage, logMessage, Void.class);
-            saveEvent(TelemetryLogger.create(mAppContext, response, new HashMap(), SERVICE_NAME, "saveTelemetry@TelemetryServiceImpl", params).toString());
-            return response;
         } catch (InvalidDataException e) {
             String logMessage = "Event save failed" + e.toString();
-            GenieResponse response = GenieResponseBuilder.getErrorResponse("PROCESSING_ERROR", errorMessage, logMessage, Void.class);
+            GenieResponse response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.VALIDATION_ERROR, errorMessage, logMessage, Void.class);
             saveEvent(TelemetryLogger.create(mAppContext, response, new HashMap(), SERVICE_NAME, "saveTelemetry@TelemetryServiceImpl", params).toString());
             return response;
         }
@@ -67,6 +63,33 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
     @Override
     public GenieResponse<Void> saveTelemetry(Telemetry event) {
         return saveTelemetry(event.toString());
+    }
+
+    @Override
+    public GenieResponse<HashMap> getTelemetryStats() {
+
+        String telemetryEventCountQuery="select count(*) from telemetry";
+        String processedTelemetryEventCountQuery="select sum(event_count) from processed_telemetry";
+        CustomReaderModel telemetryReaderModel=CustomReaderModel.find(mAppContext.getDBSession(),telemetryEventCountQuery);
+        CustomReaderModel processedTelemetryReaderModel=CustomReaderModel.find(mAppContext.getDBSession(),processedTelemetryEventCountQuery);
+
+        int telemetryEventCount=0;
+        int processedTelemetryEventCount=0;
+        if(telemetryReaderModel!=null){
+            telemetryEventCount=Integer.valueOf(telemetryReaderModel.getData());
+        }
+
+        if(processedTelemetryReaderModel!=null){
+            processedTelemetryEventCount=Integer.valueOf(processedTelemetryReaderModel.getData());
+        }
+
+        HashMap map=new HashMap();
+        map.put("unsyncedeventscount",(telemetryEventCount+processedTelemetryEventCount));
+
+        GenieResponse<HashMap> genieResponse=GenieResponseBuilder.getSuccessResponse("Telemetry stats retrieved successfully");
+        genieResponse.setResult(map);
+
+        return genieResponse;
     }
 
 

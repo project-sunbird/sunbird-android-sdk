@@ -36,6 +36,10 @@ public class DateUtil {
         return DateTimeFormat.forPattern(format).print(date.getTime());
     }
 
+    public static String format(long dateTime,String format) {
+        return format(new Date(dateTime),format);
+    }
+
     public static Integer elapsedTimeTillNow(String dateInString) {
         DateTime parseDateTime = parse(dateInString, DATETIME_FORMAT);
         DateTime now = DateTime.now();
@@ -65,12 +69,5 @@ public class DateUtil {
         return date.isAfter(startDateTime) && date.isBefore(endDateTime);
     }
 
-    public static long getCurrentTime() {
-        return new Date().getTime();
-    }
 
-    public static String format(long dateTime,String format) {
-        SimpleDateFormat timeFormat = new SimpleDateFormat(format, Locale.US);
-        return timeFormat.format(new Date(dateTime));
-    }
 }

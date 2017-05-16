@@ -3,6 +3,8 @@ package org.ekstep.genieservices;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 
+import java.util.HashMap;
+
 /**
  * This is the interface with all the required APIs to perform necessary operations related to Telemetry
  */
@@ -34,6 +36,8 @@ public interface ITelemetryService {
      * @return {@link GenieResponse<Void>}
      */
     GenieResponse<Void> saveTelemetry(Telemetry event);
+
+    GenieResponse<HashMap> getTelemetryStats();
 
 
 }
