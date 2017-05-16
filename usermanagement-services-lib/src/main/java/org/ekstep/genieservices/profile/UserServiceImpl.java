@@ -127,30 +127,21 @@ public class UserServiceImpl extends BaseService implements IUserService {
         final ContentAccessesModel accessesModel = ContentAccessesModel.findByUid(mAppContext.getDBSession(), uid);
         final UserProfileModel userProfileModel = UserProfileModel.findUserProfile(mAppContext.getDBSession(), uid);
         final UserModel userModel = UserModel.findByUserId(mAppContext.getDBSession(), uid);
-        try {
-            mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
-                @Override
-                public Void perform(IDBSession dbSession) {
-                    if (accessesModel != null) {
-                        accessesModel.delete();
-                    }
-                    userProfileModel.delete();
-                    // TODO: 24/4/17 Should add telemetry event after deleting a profile
-                    userModel.delete();
-                    // TODO: 24/4/17 Should add telemetry event after deleting user
-
-                    return null;
+        mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
+            @Override
+            public Void perform(IDBSession dbSession) {
+                if (accessesModel != null) {
+                    accessesModel.delete();
                 }
-            });
-            return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
-        } catch (Exception e) {
-            rollBack(getCurrentUser().getResult().getUid());
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, "Unable to delete user -- " + e.getMessage(), TAG);
-        }
-    }
+                userProfileModel.delete();
+                // TODO: 24/4/17 Should add telemetry event after deleting a profile
+                userModel.delete();
+                // TODO: 24/4/17 Should add telemetry event after deleting user
 
-    private void rollBack(String previousUserId) {
-        setCurrentUser(previousUserId);
+                return null;
+            }
+        });
+        return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
     }
 
     private String createAnonymousUser() {
