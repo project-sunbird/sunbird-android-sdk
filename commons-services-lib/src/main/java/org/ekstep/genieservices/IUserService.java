@@ -114,5 +114,9 @@ public interface IUserService {
      */
     public GenieResponse<Profile> updateUserProfile(Profile profile);
 
+    /**
+     * @param criteria
+     * @return
+     */
     public GenieResponse<List<ContentAccess>> getAllContentAccess(ContentAccessCriteria criteria);
 }
