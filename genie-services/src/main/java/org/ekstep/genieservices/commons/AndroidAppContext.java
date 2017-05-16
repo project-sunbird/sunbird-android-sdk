@@ -12,7 +12,7 @@ import org.ekstep.genieservices.commons.network.AndroidNetworkConnectivity;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.network.IHttpClient;
 import org.ekstep.genieservices.commons.network.auth.BasicAuthenticator;
-import org.ekstep.genieservices.telemetry.eventbus.TelemetryListener;
+import org.ekstep.genieservices.telemetry.event.TelemetryListener;
 
 /**
  * Created on 18/4/17.

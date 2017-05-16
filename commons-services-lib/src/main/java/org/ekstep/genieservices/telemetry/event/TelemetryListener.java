@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.telemetry.eventbus;
+package org.ekstep.genieservices.telemetry.event;
 
 import com.google.gson.Gson;
 
@@ -41,8 +41,8 @@ public class TelemetryListener {
     }
 
     @Subscribe
-    public void onBaseTelemetry(Telemetry baseTelemetry) throws InterruptedException {
-        EventBusSubscriber.onTelemetryEvents(baseTelemetry, this.appContext);
+    public void onTelemetryEvent(Telemetry telemetryEvent) throws InterruptedException {
+        TelemetryHandler.handleTelemetryEvent(telemetryEvent, this.appContext);
     }
 
     @Subscribe

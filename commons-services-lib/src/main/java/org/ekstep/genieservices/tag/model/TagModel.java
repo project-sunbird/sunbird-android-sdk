@@ -54,10 +54,6 @@ public class TagModel implements IReadable, IWritable, ICleanable, IUpdatable {
         return new TagModel(dbSession);
     }
 
-    public static TagModel build(IDBSession dbSession, String tagName) {
-        return new TagModel(dbSession, tagName);
-    }
-
     public static TagModel build(IDBSession dbSession, String name, String hash, String description,
                                  String startDate, String endDate) {
         return new TagModel(dbSession, name, hash, description, startDate, endDate);

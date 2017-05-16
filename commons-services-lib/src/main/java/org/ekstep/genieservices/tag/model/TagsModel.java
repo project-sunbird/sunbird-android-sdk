@@ -34,6 +34,7 @@ public class TagsModel implements IReadable {
             do {
                 TagModel telemetryTagModel= TagModel.build(mDBSession);
                 telemetryTagModel.readWithoutMoving(resultSet);
+                telemetryTags.add(telemetryTagModel);
             } while (resultSet.moveToNext());
         return this;
     }

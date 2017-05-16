@@ -16,7 +16,7 @@ import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.tag.cache.TelemetryTagCache;
-import org.ekstep.genieservices.telemetry.eventbus.TelemetryEventPublisher;
+import org.ekstep.genieservices.eventbus.EventPublisher;
 import org.ekstep.genieservices.telemetry.model.EventModel;
 
 import java.util.ArrayList;
@@ -72,15 +72,15 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
 
     private GenieResponse saveEvent(String eventString) {
         EventModel event = EventModel.build(mAppContext.getDBSession(), eventString);
-        patchEventData(event);
+        decorateEvent(event);
         event.save();
-        TelemetryEventPublisher.postTelemetryEvent(GsonUtil.fromMap(event.getEventMap(),Telemetry.class));
+        EventPublisher.postTelemetryEvent(GsonUtil.fromMap(event.getEventMap(),Telemetry.class));
         Logger.i(SERVICE_NAME, "Event saved successfully");
         return GenieResponseBuilder.getSuccessResponse("Event Saved Successfully", Void.class);
     }
 
-    private void patchEventData(EventModel event){
-
+    private void decorateEvent(EventModel event){
+        //TODO Decorate should only patch fields that are not already present.
         //Patch the event with current Sid and Uid
         if(mUserService!=null){
             UserSession currentUserSession = mUserService.getCurrentUserSession().getResult();

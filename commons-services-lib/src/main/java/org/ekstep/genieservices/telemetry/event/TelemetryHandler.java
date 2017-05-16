@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.telemetry.eventbus;
+package org.ekstep.genieservices.telemetry.event;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
@@ -9,11 +9,11 @@ import org.ekstep.genieservices.commons.utils.Logger;
  * Created by swayangjit on 9/5/17.
  */
 
-public class EventBusSubscriber {
+public class TelemetryHandler {
 
-    private static final String TAG = EventBusSubscriber.class.getSimpleName();
+    private static final String TAG = TelemetryHandler.class.getSimpleName();
 
-    public static void onTelemetryEvents(Telemetry event, AppContext context) {
+    public static void handleTelemetryEvent(Telemetry event, AppContext context) {
         if (event == null) {
             return;
         }
