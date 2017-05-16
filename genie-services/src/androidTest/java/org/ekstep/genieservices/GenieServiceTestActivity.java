@@ -3,10 +3,12 @@ package org.ekstep.genieservices;
 import android.app.Activity;
 import android.os.Bundle;
 
-import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
+
+import java.util.Map;
 
 /**
  * Created by Sneha on 4/26/2017.
@@ -20,74 +22,68 @@ public class GenieServiceTestActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_genie_services_test);
+        setContentView(R.layout.activity_genie_services_test);
         mGenieService = GenieService.init(getApplicationContext(), getPackageName(), "", "");
     }
 
-    public void getMasterData(MasterDataType masterDataType, final IResponseHandler responseHandler) {
+    public GenieResponse<MasterData> getMasterData(MasterDataType masterDataType) {
         idle = false;
-        mGenieService.getConfigService().getMasterData(masterDataType);
+        GenieResponse<MasterData> genieResponse = mGenieService.getConfigService().getMasterData(masterDataType);
+        return genieResponse;
     }
 
-    public void getOrdinals(final IResponseHandler responseHandler) {
+    public GenieResponse<Map<String, Object>> getOrdinals() {
         idle = false;
-        mGenieService.getConfigService().getOrdinals();
+        GenieResponse<Map<String, Object>> genieResponse = mGenieService.getConfigService().getOrdinals();
+        return genieResponse;
     }
 
-    public void getResourceBundle(String languageIdentifier, final IResponseHandler responseHandler) {
+    public GenieResponse<Map<String, Object>> getResourceBundle(String languageIdentifier) {
         idle = false;
-        mGenieService.getConfigService().getResourceBundle(languageIdentifier);
+        GenieResponse<Map<String, Object>> genieResponse = mGenieService.getConfigService().getResourceBundle(languageIdentifier);
+        return genieResponse;
     }
 
-    public void createUserProfile(Profile userProfile, final IResponseHandler responseHandler) {
+    public GenieResponse<Profile> createUserProfile(Profile userProfile) {
         idle = false;
-        mGenieService.getUserProfileService().createUserProfile(userProfile);
+        GenieResponse<Profile> response = mGenieService.getUserProfileService().createUserProfile(userProfile);
+        return response;
     }
 
-    public void deleteUserProfile(String uid, final IResponseHandler responseHandler) {
+    public GenieResponse deleteUserProfile(String uid) {
         idle = false;
-        mGenieService.getUserProfileService().deleteUser(uid);
+        GenieResponse response = mGenieService.getUserProfileService().deleteUser(uid);
+        return response;
     }
 
-    public void getAnonymousUser(final IResponseHandler responseHandler) {
+    public GenieResponse<Profile> getAnonymousUser() {
         idle = false;
-        mGenieService.getUserProfileService().getAnonymousUser();
+        GenieResponse<Profile> genieResponse = mGenieService.getUserProfileService().getAnonymousUser();
+        return genieResponse;
     }
 
-    public void setAnonymousUser(final IResponseHandler responseHandler) {
+    public GenieResponse<String> setAnonymousUser() {
         idle = false;
-        mGenieService.getUserProfileService().setAnonymousUser();
+        GenieResponse<String> genieResponse = mGenieService.getUserProfileService().setAnonymousUser();
+        return genieResponse;
     }
 
-    public void getCurrentUser(final IResponseHandler responseHandler) {
+    public GenieResponse<Profile> getCurrentUser() {
         idle = false;
-        mGenieService.getUserProfileService().getCurrentUser();
+        GenieResponse<Profile> genieResponse = mGenieService.getUserProfileService().getCurrentUser();
+        return genieResponse;
     }
 
-    public void setCurrentUser(String uid, final IResponseHandler responseHandler) {
+    public GenieResponse setCurrentUser(String uid) {
         idle = false;
-        mGenieService.getUserProfileService().setCurrentUser(uid);
+        GenieResponse response = mGenieService.getUserProfileService().setCurrentUser(uid);
+        return response;
     }
 
-    public void updateUserProfile(Profile profile, IResponseHandler responseHandler) {
+    public GenieResponse<Profile> updateUserProfile(Profile profile) {
         idle = false;
-        mGenieService.getUserProfileService().updateUserProfile(profile);
-    }
-
-    private IResponseHandler setIdleAndInvokeHandler(final IResponseHandler handler) {
-        return new IResponseHandler() {
-            @Override
-            public void onSuccess(GenieResponse genieResponse) {
-                handler.onSuccess(genieResponse);
-                idle = true;
-            }
-
-            @Override
-            public void onError(GenieResponse genieResponse) {
-                handler.onError(genieResponse);
-                idle = true;
-            }
-        };
+        GenieResponse<Profile> response = mGenieService.getUserProfileService().updateUserProfile(profile);
+        return response;
     }
 
     public void setIdle() {
