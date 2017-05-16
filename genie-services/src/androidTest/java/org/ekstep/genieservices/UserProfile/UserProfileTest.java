@@ -28,7 +28,7 @@ public class UserProfileTest extends GenieServiceTestBase {
      */
     public static void userProfileDoesNotExist() {
         List<Profile> profile = GenieServiceDBHelper.findProfile();
-        Assert.assertEquals(null, profile);
+        Assert.assertNull(profile);
     }
 
     @Before
@@ -186,7 +186,6 @@ public class UserProfileTest extends GenieServiceTestBase {
         Assert.assertNotNull(anonymousProfile);
         Assert.assertTrue(response1.getStatus());
 
-        //write
         Assert.assertEquals(-1, anonymousProfile.getAge());
     }
 
@@ -229,8 +228,6 @@ public class UserProfileTest extends GenieServiceTestBase {
         String newHandle = "Group88";
         profile.setHandle(newHandle);
 
-//        waitForGenieToBecomeIdle();
-
         GenieResponse<Profile> response = activity.updateUserProfile(profile);
         Profile updatedProfile = response.getResult();
 
@@ -238,7 +235,6 @@ public class UserProfileTest extends GenieServiceTestBase {
         Assert.assertNotNull(profile);
         Assert.assertTrue("VALID_GROUP_PROFILE", updatedProfile.isValid());
         Assert.assertEquals(profile.getUid(), updatedProfile.getUid());
-//        Assert.assertNotEquals(profile, updatedProfile);
         GenieServiceDBHelper.findProfile();
 
     }
@@ -258,7 +254,6 @@ public class UserProfileTest extends GenieServiceTestBase {
         Profile createdProfile = genieResponse.getResult();
 
         Assert.assertNotNull(createdProfile);
-//        Assert.assertEquals(profile, genieResponse.getResult());
         GenieServiceDBHelper.findProfile();
 
         GenieResponse genieResponse1 = activity.setCurrentUser(createdProfile.getUid());
@@ -412,11 +407,9 @@ public class UserProfileTest extends GenieServiceTestBase {
         Assert.assertNotNull(result);
         Assert.assertTrue(genieResponse.getStatus());
 
-        //write
         GenieResponse<Profile> response = activity.getAnonymousUser();
         Profile anonymousProfile = response.getResult();
         Assert.assertNotNull(anonymousProfile);
         Assert.assertEquals(-1, anonymousProfile.getAge());
-
     }
 }
