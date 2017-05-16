@@ -1,18 +1,13 @@
 package org.ekstep.genieservices.ConfigService;
 
 import android.support.test.runner.AndroidJUnit4;
-import android.util.Log;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
 
 import junit.framework.Assert;
 
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,7 +19,6 @@ import org.junit.runner.RunWith;
 @RunWith(AndroidJUnit4.class)
 public class ConfigServiceTest extends GenieServiceTestBase {
     private static final String TAG = ConfigServiceTest.class.getSimpleName();
-    JsonParser jsonParser = new JsonParser();
 
     @Test
     public void _1shouldGetAgeFromMasterData() {
@@ -34,10 +28,9 @@ public class ConfigServiceTest extends GenieServiceTestBase {
         activity.getMasterData(MasterDataType.AGE, new IResponseHandler() {
             @Override
             public void onSuccess(GenieResponse genieResponse) {
-                String age = (String) genieResponse.getResult();
-                Assert.assertNotNull(age);
-                getJsonValuesArrayLength(age);
-
+                MasterData ageData = (MasterData) genieResponse.getResult();
+                Assert.assertNotNull(ageData);
+                Assert.assertEquals(ageData.getValue(), "age");
             }
 
             @Override
@@ -53,9 +46,9 @@ public class ConfigServiceTest extends GenieServiceTestBase {
         activity.getMasterData(MasterDataType.BOARD, new IResponseHandler() {
             @Override
             public void onSuccess(GenieResponse genieResponse) {
-                String board = (String) genieResponse.getResult();
-                Assert.assertNotNull(board);
-                getJsonValuesArrayLength(board);
+                MasterData boardData = (MasterData) genieResponse.getResult();
+                Assert.assertNotNull(boardData);
+                Assert.assertEquals(boardData.getValue(), "board");
             }
 
             @Override
@@ -70,9 +63,9 @@ public class ConfigServiceTest extends GenieServiceTestBase {
         activity.getMasterData(MasterDataType.MEDIUM, new IResponseHandler() {
             @Override
             public void onSuccess(GenieResponse genieResponse) {
-                String medium = (String) genieResponse.getResult();
-                Assert.assertNotNull(medium);
-                getJsonValuesArrayLength(medium);
+                MasterData mediumData = (MasterData) genieResponse.getResult();
+                Assert.assertNotNull(mediumData);
+                Assert.assertEquals(mediumData.getValue(), "medium");
             }
 
             @Override
@@ -87,9 +80,9 @@ public class ConfigServiceTest extends GenieServiceTestBase {
         activity.getMasterData(MasterDataType.SUBJECT, new IResponseHandler() {
             @Override
             public void onSuccess(GenieResponse genieResponse) {
-                String subject = (String) genieResponse.getResult();
-                Assert.assertNotNull(subject);
-                getJsonValuesArrayLength(subject);
+                MasterData subjectData = (MasterData) genieResponse.getResult();
+                Assert.assertNotNull(subjectData);
+                Assert.assertEquals(subjectData.getValue(), "subject");
             }
 
             @Override
@@ -99,26 +92,14 @@ public class ConfigServiceTest extends GenieServiceTestBase {
         });
     }
 
-    private void getJsonValuesArrayLength(String masterDataType) {
-
-        JsonObject boardObject = jsonParser.parse(masterDataType).getAsJsonObject();
-        try {
-            JsonArray boardValuesArray = boardObject.getAsJsonArray("values");
-            Log.e(TAG, "getJsonValuesArrayLength :: " + boardValuesArray.size());
-
-        } catch (JsonParseException e) {
-            e.printStackTrace();
-        }
-    }
-
     @Test
     public void _5shouldGetGradeLevelMasterData() {
         activity.getMasterData(MasterDataType.GRADELEVEL, new IResponseHandler() {
             @Override
             public void onSuccess(GenieResponse genieResponse) {
-                String gradeLevel = (String) genieResponse.getResult();
+                MasterData gradeLevel = (MasterData) genieResponse.getResult();
                 Assert.assertNotNull(gradeLevel);
-                getJsonValuesArrayLength(gradeLevel);
+                Assert.assertEquals(gradeLevel.getValue(), "gradeLevel");
             }
 
             @Override
@@ -135,9 +116,9 @@ public class ConfigServiceTest extends GenieServiceTestBase {
 
             @Override
             public void onSuccess(GenieResponse genieResponse) {
-                String ageGroup = (String) genieResponse.getResult();
-                Assert.assertNotNull(ageGroup);
-                getJsonValuesArrayLength(ageGroup);
+                MasterData ageGroupData = (MasterData) genieResponse.getResult();
+                Assert.assertNotNull(ageGroupData);
+                Assert.assertEquals(ageGroupData.getValue(), "ageGroup");
             }
 
             @Override
