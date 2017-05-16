@@ -305,7 +305,7 @@ public class UserProfileTest extends GenieServiceTestBase {
 
         Assert.assertNotNull(genieResponse);
         Assert.assertFalse(genieResponse.getStatus());
-        Assert.fail("ERROR DATE VALIDATION. Response " + genieResponse.getErrorMessages().get(0));
+        Assert.assertEquals("[invalid date, field: 29/2/2010]", genieResponse.getErrorMessages().get(0));
     }
 
     /**
@@ -320,7 +320,7 @@ public class UserProfileTest extends GenieServiceTestBase {
 
         Assert.assertNotNull(genieResponse);
         Assert.assertFalse(genieResponse.getStatus());
-        Assert.fail("ERROR DATE VALIDATION. Response " + genieResponse.getErrorMessages().get(0));
+        Assert.assertEquals("[invalid date, field: 12/-1/2017]", genieResponse.getErrorMessages().get(0));
     }
 
     /**
@@ -336,7 +336,7 @@ public class UserProfileTest extends GenieServiceTestBase {
         Assert.assertNotNull(genieResponse);
         Assert.assertFalse(genieResponse.getStatus());
         userProfileDoesNotExist();
-        Assert.fail("ERROR DATE VALIDATION. Response " + genieResponse.getErrorMessages().get(0));
+        Assert.assertEquals("[invalid date, field: -1/12/2017]", genieResponse.getErrorMessages().get(0));
     }
 
     /**
@@ -354,7 +354,7 @@ public class UserProfileTest extends GenieServiceTestBase {
         Assert.assertNotNull(genieResponse);
         Assert.assertFalse(genieResponse.getStatus());
         userProfileDoesNotExist();
-        Assert.fail("ERROR DATE VALIDATION. Response " + genieResponse.getErrorMessages().get(0));
+        Assert.assertEquals("[invalid date, field: 2/14/2009]", genieResponse.getErrorMessages().get(0));
     }
 
     /**
@@ -367,7 +367,7 @@ public class UserProfileTest extends GenieServiceTestBase {
 
         Assert.assertNotNull(genieResponse);
         Assert.assertFalse(genieResponse.getStatus());
-        Assert.fail("ERROR DATE VALIDATION. Response " + genieResponse.getErrorMessages().get(0));
+        Assert.assertEquals("[handle can not be empty]", genieResponse.getErrorMessages().get(0));
     }
 
     /**
@@ -380,7 +380,7 @@ public class UserProfileTest extends GenieServiceTestBase {
 
         Assert.assertNotNull(genieResponse);
         Assert.assertFalse(genieResponse.getStatus());
-        Assert.fail("ERROR DATE VALIDATION. Response " + genieResponse.getErrorMessages().get(0));
+        Assert.assertEquals("[avatar can not be empty]", genieResponse.getErrorMessages().get(0));
     }
 
     /**
