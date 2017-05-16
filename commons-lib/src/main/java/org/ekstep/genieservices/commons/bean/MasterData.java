@@ -3,9 +3,7 @@ package org.ekstep.genieservices.commons.bean;
 import java.util.List;
 
 /**
- * Created on 14/4/17.
- *
- * @author shriharsh
+ * This class holds the data about the MasterData
  */
 public class MasterData {
 

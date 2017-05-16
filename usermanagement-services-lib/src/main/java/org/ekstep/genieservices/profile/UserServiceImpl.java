@@ -38,7 +38,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     /**
      * Create a new user profile
      *
-     * @param profile         - User profile data
+     * @param profile - User profile data
      */
     @Override
     public GenieResponse<Profile> createUserProfile(Profile profile) {
@@ -85,7 +85,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     /**
      * Update user profile
      *
-     * @param profile          - User profile data
+     * @param profile - User profile data
      */
     @Override
     public GenieResponse<Profile> updateUserProfile(Profile profile) {
@@ -113,7 +113,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     /**
      * Delete user profile
      *
-     * @param uid-            user id
+     * @param uid- user id
      */
     @Override
     public GenieResponse<Void> deleteUser(String uid) {
@@ -127,20 +127,30 @@ public class UserServiceImpl extends BaseService implements IUserService {
         final ContentAccessesModel accessesModel = ContentAccessesModel.findByUid(mAppContext.getDBSession(), uid);
         final UserProfileModel userProfileModel = UserProfileModel.findUserProfile(mAppContext.getDBSession(), uid);
         final UserModel userModel = UserModel.findByUserId(mAppContext.getDBSession(), uid);
-        mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
-            @Override
-            public Void perform(IDBSession dbSession) {
-                accessesModel.delete();
-                userProfileModel.delete();
-                // TODO: 24/4/17 Should add telemetry event after deleting a profile
-                userModel.delete();
-                // TODO: 24/4/17 Should add telemetry event after deleting user
+        try {
+            mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
+                @Override
+                public Void perform(IDBSession dbSession) {
+                    if (accessesModel != null) {
+                        accessesModel.delete();
+                    }
+                    userProfileModel.delete();
+                    // TODO: 24/4/17 Should add telemetry event after deleting a profile
+                    userModel.delete();
+                    // TODO: 24/4/17 Should add telemetry event after deleting user
 
-                return null;
-            }
-        });
+                    return null;
+                }
+            });
+            return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
+        } catch (Exception e) {
+            rollBack(getCurrentUser().getResult().getUid());
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, "Unable to delete user -- " + e.getMessage(), TAG);
+        }
+    }
 
-        return GenieResponseBuilder.getSuccessResponse("", Void.class);
+    private void rollBack(String previousUserId) {
+        setCurrentUser(previousUserId);
     }
 
     private String createAnonymousUser() {
@@ -151,9 +161,8 @@ public class UserServiceImpl extends BaseService implements IUserService {
         return user.getUid();
     }
 
-     /**
+    /**
      * set anonymous user
-     *
      */
     @Override
     public GenieResponse<String> setAnonymousUser() {
@@ -166,7 +175,6 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
     /**
      * Get anonymous user data
-     *
      */
     @Override
     public GenieResponse<Profile> getAnonymousUser() {
@@ -188,7 +196,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     /**
      * set current user
      *
-     * @param uid             - User id
+     * @param uid - User id
      */
     @Override
     public GenieResponse<Void> setCurrentUser(String uid) {
@@ -218,7 +226,6 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
     /**
      * Get current use data
-     *
      */
     @Override
     public GenieResponse<Profile> getCurrentUser() {
