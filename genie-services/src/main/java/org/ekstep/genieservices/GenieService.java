@@ -42,7 +42,7 @@ public class GenieService {
         if (sService == null) {
             AppContext<Context> applicationContext = AndroidAppContext.buildAppContext(context, packageName, apiKey, gDataId);
             Logger.init(new AndroidLogger());
-            TelemetryLogger.init(new TelemetryServiceImpl(applicationContext,new UserServiceImpl(applicationContext)));
+            TelemetryLogger.init(new TelemetryServiceImpl(applicationContext, new UserServiceImpl(applicationContext)));
             sService = new GenieService(applicationContext);
         }
         return sService;

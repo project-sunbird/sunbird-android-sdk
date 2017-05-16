@@ -20,9 +20,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Created on 8/5/17.
- *
- * @author swayangjit
+ * This is the implementation of the interface {@link ISyncService}
  */
 public class SyncServiceImpl extends BaseService implements ISyncService {
 
@@ -84,9 +82,9 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
     public GenieResponse<SyncConfiguration> getConfiguration() {
         String syncConfig = mAppContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.SYNC_CONFIG_SHARED_PREFERENCE_KEY, SyncConfiguration.OVER_WIFI_ONLY.toString());
         SyncConfiguration syncConfiguration = SyncConfiguration.valueOf(syncConfig);
-        GenieResponse<SyncConfiguration> genieResponse=GenieResponseBuilder.getSuccessResponse("SyncConfiguraion retrieved successfully");
+        GenieResponse<SyncConfiguration> genieResponse = GenieResponseBuilder.getSuccessResponse("SyncConfiguration retrieved successfully");
         genieResponse.setResult(syncConfiguration);
-        TelemetryLogger.logSuccess(mAppContext, GenieResponseBuilder.getSuccessResponse("SyncConfiguraion retrieved successfully"), new HashMap(), TAG, "getConfiguration@SyncServiceImpl", new HashMap());
+        TelemetryLogger.logSuccess(mAppContext, GenieResponseBuilder.getSuccessResponse("SyncConfiguration retrieved successfully"), new HashMap(), TAG, "getConfiguration@SyncServiceImpl", new HashMap());
         return genieResponse;
     }
 
