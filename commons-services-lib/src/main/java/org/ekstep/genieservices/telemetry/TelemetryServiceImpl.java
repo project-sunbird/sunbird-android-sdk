@@ -6,8 +6,8 @@ import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.telemetry.BaseTelemetry;
 import org.ekstep.genieservices.commons.bean.UserSession;
+import org.ekstep.genieservices.commons.bean.telemetry.BaseTelemetry;
 import org.ekstep.genieservices.commons.exception.DbException;
 import org.ekstep.genieservices.commons.exception.InvalidDataException;
 import org.ekstep.genieservices.commons.utils.DateUtil;
@@ -18,17 +18,17 @@ import org.ekstep.genieservices.telemetry.model.EventModel;
 import java.util.HashMap;
 
 /**
- * Created by swayangjit on 26/4/17.
+ * This is the implementation of the interface {@link ITelemetryService}
  */
 
 public class TelemetryServiceImpl extends BaseService implements ITelemetryService {
 
     private static final String SERVICE_NAME = TelemetryServiceImpl.class.getSimpleName();
-    private IUserService mUserService=null;
+    private IUserService mUserService = null;
 
     public TelemetryServiceImpl(AppContext appContext, IUserService userService) {
         super(appContext);
-        this.mUserService=userService;
+        this.mUserService = userService;
     }
 
     @Override
@@ -69,10 +69,10 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         return saveTelemetry(event.toString());
     }
 
-    private void patchEventData(EventModel event){
+    private void patchEventData(EventModel event) {
 
         //Patch the event with current Sid and Uid
-        if(mUserService!=null){
+        if (mUserService != null) {
             UserSession currentUserSession = mUserService.getCurrentUserSession().getResult();
             if (currentUserSession.isValid()) {
                 event.updateSessionDetails(currentUserSession.getSid(), currentUserSession.getUid());

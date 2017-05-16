@@ -139,7 +139,9 @@ public class UserServiceImpl extends BaseService implements IUserService {
         mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
             @Override
             public Void perform(IDBSession dbSession) {
-                accessesModel.delete();
+                if (accessesModel != null) {
+                    accessesModel.delete();
+                }
                 userProfileModel.delete();
                 // TODO: 24/4/17 Should add telemetry event after deleting a profile
                 userModel.delete();
@@ -148,8 +150,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
                 return null;
             }
         });
-
-        return GenieResponseBuilder.getSuccessResponse("", Void.class);
+        return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
     }
 
     private String createAnonymousUser() {
