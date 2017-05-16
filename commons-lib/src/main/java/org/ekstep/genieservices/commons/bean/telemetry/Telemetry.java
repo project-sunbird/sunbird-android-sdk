@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by swayangjit on 27/4/17.
+ * This class holds the data about the Telemetry event
  */
 
 public class Telemetry {
@@ -66,7 +66,7 @@ public class Telemetry {
     }
 
     public void setGdata(GameData gameData) {
-        if(gameData!=null && !isValidId(gameData.getId())){
+        if (gameData != null && !isValidId(gameData.getId())) {
             gameData.setId(GENIE_SERVICE_GID);
         }
         this.gdata = gameData;

@@ -11,6 +11,11 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.util.Locale;
 
+/**
+ * PartnerModel handles all the DB related operations like Reading and Writing data to {@link PartnerEntry} table by implementing
+ * the {@link IWritable} and {@link IReadable} interfaces
+ *
+ */
 public class PartnerModel implements IWritable, IReadable {
 
     private static final String TAG = "model-Partner";
@@ -28,6 +33,13 @@ public class PartnerModel implements IWritable, IReadable {
         this.publicKeyId = publicKeyId;
     }
 
+    /**
+     * This api fetches the {@link PartnerModel} based on the partnerId
+     *
+     * @param dbSession
+     * @param partnerID
+     * @return
+     */
     public static PartnerModel findByPartnerId(IDBSession dbSession, String partnerID) {
         PartnerModel partnerModel = new PartnerModel(dbSession, partnerID, null, null);
         dbSession.read(partnerModel);
@@ -38,6 +50,15 @@ public class PartnerModel implements IWritable, IReadable {
         }
     }
 
+    /**
+     * This api builds the {@link PartnerModel} with all the inputs provided
+     *
+     * @param idbSession
+     * @param partnerID
+     * @param publicKey
+     * @param publicKeyId
+     * @return
+     */
     public static PartnerModel build(IDBSession idbSession, String partnerID, String publicKey, String publicKeyId) {
         return new PartnerModel(idbSession, partnerID, publicKey, publicKeyId);
     }

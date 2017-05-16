@@ -11,6 +11,16 @@ import java.util.Collections;
 
 public class GenieResponseBuilder {
 
+    /**
+     * It returns the error {@link GenieResponse} object.
+     *
+     * @param error
+     * @param errorMessage
+     * @param logTag
+     * @param type
+     * @param <T>
+     * @return
+     */
     public static <T> GenieResponse<T> getErrorResponse(String error, String errorMessage, String logTag, Class<T> type) {
         GenieResponse<T> response = new GenieResponse<T>();
         response.setStatus(false);
@@ -20,15 +30,15 @@ public class GenieResponseBuilder {
         return response;
     }
 
-    public static <T> GenieResponse<T> getErrorResponse(String error,String logTag) {
-        GenieResponse<T> response = new GenieResponse<T>();
-        response.setStatus(false);
-        response.setErrorMessages(Collections.singletonList(""));
-        response.setError(error);
-        Logger.e(logTag, error);
-        return response;
-    }
-
+    /**
+     * It returns the error {@link GenieResponse} object.
+     *
+     * @param error
+     * @param errorMessage
+     * @param logTag
+     * @param <T>
+     * @return
+     */
     public static <T> GenieResponse<T> getErrorResponse(String error, String errorMessage, String logTag) {
         GenieResponse<T> response = new GenieResponse<T>();
         response.setStatus(false);
@@ -38,6 +48,14 @@ public class GenieResponseBuilder {
         return response;
     }
 
+    /**
+     * It returns the success {@link GenieResponse} object.
+     *
+     * @param message
+     * @param type
+     * @param <T>
+     * @return
+     */
     public static <T> GenieResponse<T> getSuccessResponse(String message, Class<T> type) {
         GenieResponse<T> response = new GenieResponse<T>();
         response.setStatus(true);
@@ -45,6 +63,13 @@ public class GenieResponseBuilder {
         return response;
     }
 
+    /**
+     * It returns the success {@link GenieResponse} object.
+     *
+     * @param message
+     * @param <T>
+     * @return
+     */
     public static <T> GenieResponse<T> getSuccessResponse(String message) {
         GenieResponse<T> response = new GenieResponse<T>();
         response.setStatus(true);
