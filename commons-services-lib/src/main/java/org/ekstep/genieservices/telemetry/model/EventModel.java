@@ -5,6 +5,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.BaseColumns;
 import org.ekstep.genieservices.commons.db.contract.TelemetryEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
+import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
@@ -23,7 +24,7 @@ import java.util.UUID;
  * Created by swayangjit on 26/4/17.
  */
 
-public class EventModel implements IWritable {
+public class EventModel implements IWritable,IReadable {
 
     private static final String TAG = "model-Event";
     private Long id;
@@ -51,15 +52,8 @@ public class EventModel implements IWritable {
         this.event = new HashMap();
     }
 
-    public static EventModel build(IDBSession dbSession, IResultSet resultSet) {
-        EventModel event = new EventModel(dbSession);
-        event.id = resultSet.getLong(resultSet.getColumnIndex(BaseColumns._ID));
-        event.eventType = resultSet.getString(resultSet.getColumnIndex(TelemetryEntry.COLUMN_NAME_EVENT_TYPE));
-        String eventString = resultSet.getString(resultSet.getColumnIndex(TelemetryEntry.COLUMN_NAME_EVENT));
-        event.event = GsonUtil.fromJson(eventString, HashMap.class);
-        event.timestamp = resultSet.getString(resultSet.getColumnIndex(TelemetryEntry.COLUMN_NAME_TIMESTAMP));
-        event.priority = PriorityModel.build(dbSession, event.eventType, resultSet.getInt(resultSet.getColumnIndex(TelemetryEntry.COLUMN_NAME_PRIORITY)));
-        return event;
+    public static EventModel build(IDBSession dbSession) {
+        return new EventModel(dbSession);
     }
 
     public static EventModel build(IDBSession dbSession, String eventString) {
@@ -89,13 +83,50 @@ public class EventModel implements IWritable {
     }
 
     @Override
+    public IReadable read(IResultSet resultSet) {
+        if (resultSet != null && resultSet.moveToFirst()) {
+            readWithoutMoving(resultSet);
+        }
+        return this;
+    }
+
+    @Override
     public String getTableName() {
         return TelemetryEntry.TABLE_NAME;
     }
 
     @Override
+    public String orderBy() {
+        return "";
+    }
+
+    @Override
+    public String filterForRead() {
+        return "";
+    }
+
+    @Override
+    public String[] selectionArgsForFilter() {
+        return null;
+    }
+
+    @Override
+    public String limitBy() {
+        return "";
+    }
+
+    @Override
     public void beforeWrite(AppContext context) {
         addMID();
+    }
+
+    public void readWithoutMoving(IResultSet resultSet) {
+        id = resultSet.getLong(resultSet.getColumnIndex(BaseColumns._ID));
+        eventType = resultSet.getString(resultSet.getColumnIndex(TelemetryEntry.COLUMN_NAME_EVENT_TYPE));
+        String eventString = resultSet.getString(resultSet.getColumnIndex(TelemetryEntry.COLUMN_NAME_EVENT));
+        event = GsonUtil.fromJson(eventString, HashMap.class);
+        timestamp = resultSet.getString(resultSet.getColumnIndex(TelemetryEntry.COLUMN_NAME_TIMESTAMP));
+        priority = PriorityModel.build(mDBSession, eventType, resultSet.getInt(resultSet.getColumnIndex(TelemetryEntry.COLUMN_NAME_PRIORITY)));
     }
 
     public Long getId() {
@@ -164,7 +195,7 @@ public class EventModel implements IWritable {
         map.put(key, value);
         List<Map<String, Object>> tags = (List<Map<String, Object>>) this.event.get("tags");
         if (tags == null) {
-            Logger.i( TAG, String.format("CREATE TAG"));
+            Logger.i(TAG, String.format("CREATE TAG"));
             tags = new ArrayList<>();
             tags.add(map);
             this.event.put("tags", tags);

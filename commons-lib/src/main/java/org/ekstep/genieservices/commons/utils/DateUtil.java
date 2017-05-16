@@ -6,6 +6,7 @@ import org.joda.time.Seconds;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
@@ -14,6 +15,7 @@ public class DateUtil {
     public static final int MILLISECONDS_IN_AN_HOUR = 3600000;
     private static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";
     private static final String DATE_FORMAT = "yyyy-MM-dd";
+    public static final String DATE_TIME_AM_PM_FORMAT = "dd/MM/yyyy, hh:mma";
 
 
     public static String getCurrentTimestamp() {
@@ -61,5 +63,14 @@ public class DateUtil {
         LocalDate startDateTime = (startDate == null) ? date : parse(startDate, DATE_FORMAT).toLocalDate();
         LocalDate endDateTime = (endDate == null) ? date : parse(endDate, DATE_FORMAT).toLocalDate();
         return date.isAfter(startDateTime) && date.isBefore(endDateTime);
+    }
+
+    public static long getCurrentTime() {
+        return new Date().getTime();
+    }
+
+    public static String format(long dateTime,String format) {
+        SimpleDateFormat timeFormat = new SimpleDateFormat(format, Locale.US);
+        return timeFormat.format(new Date(dateTime));
     }
 }
