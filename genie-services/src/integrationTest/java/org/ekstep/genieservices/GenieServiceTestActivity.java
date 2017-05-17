@@ -10,7 +10,7 @@ import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.PartnerData;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
-import org.ekstep.genieservices.commons.bean.telemetry.BaseTelemetry;
+import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 
 import java.util.Map;
 
@@ -94,7 +94,7 @@ public class GenieServiceTestActivity extends Activity {
         return response;
     }
 
-    public GenieResponse saveTelemetry(BaseTelemetry event) {
+    public GenieResponse saveTelemetry(Telemetry event) {
         idle = false;
         GenieResponse response = mGenieService.getTelemetryService().saveTelemetry(event);
         return response;

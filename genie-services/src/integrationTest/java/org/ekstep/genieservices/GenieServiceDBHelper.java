@@ -47,7 +47,9 @@ public class GenieServiceDBHelper {
         List<EventModel> events = new ArrayList<>();
         if (cursor != null && cursor.moveToFirst())
             do {
-                events.add(EventModel.build(sGSDBHelper.mAppContext.getDBSession(), new SQLiteResultSet(cursor)));
+                EventModel eventModel=EventModel.build(sGSDBHelper.mAppContext.getDBSession());
+                eventModel.readWithoutMoving( new SQLiteResultSet(cursor));
+                events.add(eventModel);
             } while (cursor.moveToNext());
         cursor.close();
 
