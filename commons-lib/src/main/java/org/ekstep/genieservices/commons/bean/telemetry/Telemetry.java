@@ -14,24 +14,26 @@ import java.util.Map;
  * This class holds the data about the Telemetry event
  */
 
-public abstract class BaseTelemetry {
+public class Telemetry {
 
     private static final String TELEMETRY_VERSION = "2.0";
     private static final String GENIE_SERVICE_GID = "genieservice.android";
 
-    private final Map<String, Object> edata = new HashMap<>();
     private String ts;
     private String ver;
     private String sid = "";
     private String uid = "";
     private String did;
+    private String eid;
     private long ets;
     private GameData gdata;
+    private Map<String, Object> edata = new HashMap<>();
     private List<Map<String, Object>> tags = new ArrayList();
     private List<CoRelation> cdata;
 
-    public BaseTelemetry(GameData gameData) {
+    public Telemetry(GameData gameData, String eid) {
         setGdata(gameData);
+        this.eid=eid;
         this.ver = TELEMETRY_VERSION;
         this.ets = DateUtil.getEpochTime();
     }
@@ -106,6 +108,10 @@ public abstract class BaseTelemetry {
         return this.did;
     }
 
+    public String getEid() {
+        return this.eid;
+    }
+
     public void setDid(String did) {
         this.did = did;
     }
@@ -121,8 +127,6 @@ public abstract class BaseTelemetry {
     protected boolean isValidId(String gameID) {
         return gameID != null && !gameID.trim().isEmpty();
     }
-
-    protected abstract String getEID();
 
     @Override
     public String toString() {

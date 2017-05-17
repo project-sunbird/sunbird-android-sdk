@@ -13,6 +13,7 @@ import org.ekstep.genieservices.commons.network.AndroidNetworkConnectivity;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.network.IHttpClient;
 import org.ekstep.genieservices.commons.network.auth.BasicAuthenticator;
+import org.ekstep.genieservices.telemetry.event.TelemetryListener;
 
 import java.io.File;
 
@@ -46,6 +47,7 @@ public class AndroidAppContext extends AppContext<Context> {
         appContext.setDeviceInfo(new DeviceInfo(context));
         appContext.setLocationInfo(new LocationInfo(context));
         appContext.setPrimaryFilesDir(context.getExternalFilesDir(null));
+        TelemetryListener.init(appContext);
         return appContext;
     }
 

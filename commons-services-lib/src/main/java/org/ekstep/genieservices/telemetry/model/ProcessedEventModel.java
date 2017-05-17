@@ -3,13 +3,13 @@ package org.ekstep.genieservices.telemetry.model;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.BaseColumns;
 import org.ekstep.genieservices.commons.db.DbConstants;
+import org.ekstep.genieservices.commons.db.contract.TelemetryProcessedEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.commons.db.contract.TelemetryProcessedEntry;
 
 import java.util.Locale;
 
@@ -37,7 +37,7 @@ public class ProcessedEventModel implements IWritable, ICleanable, IReadable {
     }
 
     private ProcessedEventModel(IDBSession dbSession, String msgId, byte[] data, int numberOfEvents, int priority, ContentValues contentValues) {
-        this.mDBSession=dbSession;
+        this.mDBSession = dbSession;
         this.msgId = msgId;
         this.data = data;
         this.numberOfEvents = numberOfEvents;
@@ -53,7 +53,11 @@ public class ProcessedEventModel implements IWritable, ICleanable, IReadable {
         return new ProcessedEventModel(dbSession, msgId, data, numberOfEvents, priority, new ContentValues());
     }
 
-
+    public static ProcessedEventModel find(IDBSession dbSesion) {
+        ProcessedEventModel processedEventModel = new ProcessedEventModel(dbSesion);
+        dbSesion.read(processedEventModel);
+        return processedEventModel;
+    }
 
     @Override
     public IReadable read(IResultSet cursor) {
@@ -100,7 +104,7 @@ public class ProcessedEventModel implements IWritable, ICleanable, IReadable {
     @Override
     public ContentValues getContentValues() {
         contentValues.put(TelemetryProcessedEntry.COLUMN_NAME_MSG_ID, msgId);
-        contentValues.put(TelemetryProcessedEntry.COLUMN_NAME_DATA,data);
+        contentValues.put(TelemetryProcessedEntry.COLUMN_NAME_DATA, data);
         contentValues.put(TelemetryProcessedEntry.COLUMN_NAME_NUMBER_OF_EVENTS, numberOfEvents);
         contentValues.put(TelemetryProcessedEntry.COLUMN_NAME_PRIORITY, priority);
         return contentValues;
@@ -121,11 +125,6 @@ public class ProcessedEventModel implements IWritable, ICleanable, IReadable {
 
     }
 
-    public void find(IDBSession dbSesion) {
-        clean();
-        dbSesion.read(this);
-    }
-
     public int clear() {
         int eventExported = this.numberOfEvents;
         mDBSession.clean(this);
@@ -133,7 +132,7 @@ public class ProcessedEventModel implements IWritable, ICleanable, IReadable {
     }
 
     public void save() {
-       mDBSession.create(this);
+        mDBSession.create(this);
     }
 
     public void readWithoutMoving(IResultSet resultSet) {

@@ -8,12 +8,12 @@ import java.util.HashMap;
  * Created by swayangjit on 2/5/17.
  */
 
-public class GEError extends BaseTelemetry {
+public class GEError extends Telemetry {
 
-    private final String eid = "GE_ERROR";
+    private static final String EID = "GE_ERROR";
 
     public GEError(GameData gameData, String err, String id, String eventId, String data) {
-        super(gameData);
+        super(gameData,EID);
         String type = isValidId(gameData.getId()) ? "GENIESERVICES" : "PARTNERAPP";
         setEks(createEKS(err, id, eventId, data, type));
 
@@ -28,11 +28,5 @@ public class GEError extends BaseTelemetry {
         eks.put("type", type);
         return eks;
     }
-
-    @Override
-    public String getEID() {
-        return eid;
-    }
-
 }
 
