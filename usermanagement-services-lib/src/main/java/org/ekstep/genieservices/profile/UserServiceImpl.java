@@ -169,7 +169,8 @@ public class UserServiceImpl extends BaseService implements IUserService {
      */
     @Override
     public GenieResponse<Profile> getAnonymousUser() {
-        CustomReaderModel customReaderModel = CustomReaderModel.find(mAppContext.getDBSession(),"");
+        String anonymousUserQuery = "select u.uid from users u left join profiles p on p.uid=u.uid where p.uid is null and u.uid is not null";
+        CustomReaderModel customReaderModel = CustomReaderModel.find(mAppContext.getDBSession(),anonymousUserQuery);
 
         String uid = null;
         if (customReaderModel == null) {
