@@ -15,12 +15,14 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.ContentConstants;
 import org.ekstep.genieservices.content.bean.ImportContext;
 import org.ekstep.genieservices.content.db.model.ContentModel;
+import org.ekstep.genieservices.content.db.model.ContentsModel;
 
 import java.lang.reflect.Type;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * Created on 5/16/2017.
@@ -53,8 +55,6 @@ public class ValidateEcar implements IChainable {
             return getErrorResponse(importContext, ContentConstants.NO_CONTENT_TO_IMPORT, "Empty ecar, cannot import!");
         }
 
-        List<HashMap> skippedItemsList = new ArrayList<>();
-
         Type type = new TypeToken<List<HashMap<String, Object>>>() {
         }.getType();
         List<HashMap<String, Object>> items = GsonUtil.getGson().fromJson(itemsString, type);
@@ -65,8 +65,8 @@ public class ValidateEcar implements IChainable {
         for (HashMap<String, Object> item : items) {
             String identifier = (String) item.get(ContentModel.KEY_IDENTIFIER);
             ContentModel oldContentModel = ContentModel.find(appContext.getDBSession(), identifier);
-            String old_path = oldContentModel.getPath();
-            ContentModel content = ContentModel.build(appContext.getDBSession(), item, manifestVersion);
+            String oldContentPath = oldContentModel == null ? null : oldContentModel.getPath();
+            ContentModel newContentModel = ContentModel.build(appContext.getDBSession(), item, manifestVersion);
 
             //Draft content expiry .To prevent import of draft content if the expires-date is expired from the current date
             String expiryDate = (String) item.get("expires");
@@ -87,28 +87,23 @@ public class ValidateEcar implements IChainable {
             }
 
             // To check whether the file is already imported or not
-            if (ContentConstants.Visibility.DEFAULT.equals(content.getVisibility())) {
-                if (!isDuplicateCheckRequired(pkgVersion, status)) {
-                    // TODO: 5/17/2017  
-                    return response;
-                }
+            if (ContentConstants.Visibility.DEFAULT.equals(newContentModel.getVisibility()) // Check if visibility is default for new content. // TODO: 5/17/2017 - Is this check really needed?
+                    && isDuplicateCheckRequired(pkgVersion, status)     // Check if its draft and pkgVersion is 0.
+                    && !StringUtil.isNullOrEmpty(oldContentPath)     // Check if path of old content is not empty.
+                    && isImportFileExist(oldContentModel, newContentModel)) {   // Check whether the file is already imported or not.
 
-                if (!StringUtil.isNullOrEmpty(old_path) && isImportFileExist(oldContentModel, content)) {
-                    if (items.size() > 1) {
-                        //Skip the content
-                        importContext.getSkippedItemsIdentifier().add(identifier);
-                        skippedItemsList.add(item);
-                        if (content.hasChildren() || content.hasPreRequisites()) {
-                            return getErrorResponse(importContext, ContentConstants.IMPORT_FILE_EXIST, "The ECAR file is imported already!!!");
-                        }
-                    } else {
-                        return getErrorResponse(importContext, ContentConstants.IMPORT_FILE_EXIST, "The ECAR file is imported already!!!");
-                    }
+                //Skip the content
+                importContext.getSkippedItemsIdentifier().add(identifier);
+                // TODO: 5/17/2017
+                deleteChildItemsIfAny(items, newContentModel);
+//                if (items.size() > 1
+//                        && (newContentModel.hasChildren() || newContentModel.hasPreRequisites())) {
+//                    return getErrorResponse(importContext, ContentConstants.IMPORT_FILE_EXIST, "The ECAR file is imported already!!!");
+//                }
 
-                    //file already imported
-                    if (skippedItemsList.size() == items.size()) {
-                        return getErrorResponse(importContext, ContentConstants.IMPORT_FILE_EXIST, "The ECAR file is imported already!!!");
-                    }
+                //file already imported
+                if (importContext.getSkippedItemsIdentifier().size() == items.size()) {
+                    return getErrorResponse(importContext, ContentConstants.IMPORT_FILE_EXIST, "The ECAR file is imported already!!!");
                 }
             }
         }
@@ -143,30 +138,25 @@ public class ValidateEcar implements IChainable {
         return !(!StringUtil.isNullOrEmpty(status) && status.equalsIgnoreCase(ServiceConstants.ContentStatus.DRAFT) && pkgVersion == 0);
     }
 
-    /**
-     * To Check whether the file is already imported or not.
-     *
-     * @param oldContentModel
-     * @param newContentModel
-     * @return True - if file exists, False- does not exists
-     */
     private boolean isImportFileExist(ContentModel oldContentModel, ContentModel newContentModel) {
-        boolean isExist = false;
         if (oldContentModel == null || newContentModel == null) {
-            return isExist;
+            return false;
         }
 
+        boolean isExist = false;
         try {
             String oldIdentifier = oldContentModel.getIdentifier();
             String newIdentifier = newContentModel.getIdentifier();
             String oldVisibility = oldContentModel.getVisibility();
             String newVisibility = newContentModel.getVisibility();
+
             if (oldIdentifier.equalsIgnoreCase(newIdentifier) && oldVisibility.equalsIgnoreCase(newVisibility)) {
                 isExist = oldContentModel.pkgVersion() >= newContentModel.pkgVersion();
             }
         } catch (Exception e) {
-            isExist = false;
+            Logger.e(TAG, "isImportFileExist", e);
         }
+
         return isExist;
     }
 
@@ -174,6 +164,30 @@ public class ValidateEcar implements IChainable {
         Logger.e(TAG, errorMessage);
         FileHandler.rm(importContext.getTmpLocation());
         return GenieResponseBuilder.getErrorResponse(error, errorMessage, TAG);
+    }
+
+    private void deleteChildItemsIfAny(List<HashMap<String, Object>> items, ContentModel contentModel) {
+        Queue<ContentModel> queue = new LinkedList<>();
+
+        queue.add(contentModel);
+
+        ContentModel node;
+        while (!queue.isEmpty()) {
+            node = queue.remove();
+
+            if (node.hasChildren()) {
+                List<String> childContentsIdentifiers = node.getChildContentsIdentifiers();
+                ContentsModel contentsModel = ContentsModel.findAllContentsWithIdentifiers(mAppContext.getDBSession(), childContentsIdentifiers);
+                if (contentsModel != null) {
+                    queue.addAll(contentsModel.getContentModelList());
+                }
+            }
+
+            // Deleting only child content
+            if (!contentModel.getIdentifier().equalsIgnoreCase(node.getIdentifier())) {
+                deleteOrUpdateContent(node, true, level);
+            }
+        }
     }
 
 }
