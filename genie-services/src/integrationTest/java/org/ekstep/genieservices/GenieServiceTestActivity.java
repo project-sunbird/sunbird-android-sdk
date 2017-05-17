@@ -3,10 +3,13 @@ package org.ekstep.genieservices;
 import android.app.Activity;
 import android.os.Bundle;
 
+import org.ekstep.genieservices.commons.AndroidAppContext;
+import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
+import org.ekstep.genieservices.commons.bean.telemetry.BaseTelemetry;
 
 import java.util.Map;
 
@@ -18,12 +21,16 @@ public class GenieServiceTestActivity extends Activity {
 
     private boolean idle = true;
     private GenieService mGenieService;
+    private AppContext mAppContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_genie_services_test);
+
         mGenieService = GenieService.init(getApplicationContext(), getPackageName(), "", "");
+        mAppContext = AndroidAppContext.buildAppContext(getApplicationContext(), getPackageName(), "", "org.ekstep");
+        GenieServiceDBHelper.init(mAppContext);
     }
 
     public GenieResponse<MasterData> getMasterData(MasterDataType masterDataType) {
@@ -83,6 +90,18 @@ public class GenieServiceTestActivity extends Activity {
     public GenieResponse<Profile> updateUserProfile(Profile profile) {
         idle = false;
         GenieResponse<Profile> response = mGenieService.getUserProfileService().updateUserProfile(profile);
+        return response;
+    }
+
+    public GenieResponse saveTelemetry(BaseTelemetry event) {
+        idle = false;
+        GenieResponse response = mGenieService.getTelemetryService().saveTelemetry(event);
+        return response;
+    }
+
+    public GenieResponse saveTelemetry(String eventString) {
+        idle = false;
+        GenieResponse response = mGenieService.getTelemetryService().saveTelemetry(eventString);
         return response;
     }
 

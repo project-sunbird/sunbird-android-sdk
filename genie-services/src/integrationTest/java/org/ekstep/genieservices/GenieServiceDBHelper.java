@@ -2,6 +2,8 @@ package org.ekstep.genieservices;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
+import android.util.Log;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.Profile;
@@ -49,7 +51,7 @@ public class GenieServiceDBHelper {
             } while (cursor.moveToNext());
         cursor.close();
 
-        return null;
+        return events;
     }
 
     public static Cursor clearProfileTableEntry() {
@@ -107,6 +109,16 @@ public class GenieServiceDBHelper {
 
     public static String generateProfileClearQuery() {
         return "DELETE FROM profiles";
+    }
+
+    public static void clearTelemetryTableEntry() {
+        try {
+            int count = sSqliteDatabase.delete("telemetry", "1", null);
+            Log.v("Count:::::", "" + count);
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private static String generateProfileQuery() {
