@@ -7,8 +7,10 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.bean.UserSession;
+import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
 import org.ekstep.genieservices.commons.exception.DbException;
 import org.ekstep.genieservices.commons.exception.InvalidDataException;
@@ -66,7 +68,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
     }
 
     @Override
-    public GenieResponse<HashMap> getTelemetryStats() {
+    public GenieResponse<TelemetryStat> getTelemetryStat() {
 
         String telemetryEventCountQuery="select count(*) from telemetry";
         String processedTelemetryEventCountQuery="select sum(event_count) from processed_telemetry";
@@ -83,11 +85,24 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
             processedTelemetryEventCount=Integer.valueOf(processedTelemetryReaderModel.getData());
         }
 
-        HashMap map=new HashMap();
-        map.put("unsyncedeventscount",(telemetryEventCount+processedTelemetryEventCount));
+        int unSyncedEventCount=telemetryEventCount+processedTelemetryEventCount;
 
-        GenieResponse<HashMap> genieResponse=GenieResponseBuilder.getSuccessResponse("Telemetry stats retrieved successfully");
-        genieResponse.setResult(map);
+        IKeyValueStore keyValueStore = mAppContext.getKeyValueStore();
+        String syncTime = "";
+        if (keyValueStore.contains(ServiceConstants.PreferenceKey.LAST_SYNC_TIME)) {
+            Long lastSyncTime = keyValueStore.getLong(ServiceConstants.PreferenceKey.LAST_SYNC_TIME, 0L);
+            if (lastSyncTime == 0) {
+                syncTime = ServiceConstants.NEVER_SYNCED;
+            }
+            else{
+                syncTime=DateUtil.format(lastSyncTime,DateUtil.DATE_TIME_AM_PM_FORMAT);
+            }
+        } else {
+            syncTime=ServiceConstants.NEVER_SYNCED;
+        }
+
+        GenieResponse<TelemetryStat> genieResponse=GenieResponseBuilder.getSuccessResponse("Telemetry stat retrieved successfully");
+        genieResponse.setResult(new TelemetryStat(unSyncedEventCount,syncTime));
 
         return genieResponse;
     }

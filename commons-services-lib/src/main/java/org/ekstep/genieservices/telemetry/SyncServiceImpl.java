@@ -7,6 +7,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.SyncStat;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
@@ -31,7 +32,7 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
     }
 
     @Override
-    public GenieResponse<Map> sync() {
+    public GenieResponse<SyncStat> sync() {
         HashMap params = new HashMap();
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
 
@@ -61,37 +62,15 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
         }
 
         String fileSize = calculateByteCountInKB(totalByteSize);
-        mAppContext.getKeyValueStore().putString(ServiceConstants.PreferenceKey.SYNC_FILE_SIZE, fileSize);
-        mAppContext.getKeyValueStore().putLong(ServiceConstants.PreferenceKey.LAST_SYNC_TIME, DateUtil.getEpochTime());
+        long syncTime= DateUtil.getEpochTime();
+        mAppContext.getKeyValueStore().putLong(ServiceConstants.PreferenceKey.LAST_SYNC_TIME, syncTime);
+        GenieResponse<SyncStat> response = GenieResponseBuilder.getSuccessResponse(getMessage(numberOfSync, numberOfEventsProcessed));
+        SyncStat syncStat=new SyncStat(numberOfEventsProcessed,DateUtil.format(syncTime,DateUtil.DATE_TIME_AM_PM_FORMAT),fileSize);
+        response.setResult(syncStat);
 
-        GenieResponse<Map> response = GenieResponseBuilder.getSuccessResponse(getMessage(numberOfSync, numberOfEventsProcessed));
-
-        Map<String, Object> objectMap = new HashMap<>();
-        objectMap.put("fileSize", fileSize);
-
-        response.setResult(objectMap);
         return response;
     }
 
-
-    @Override
-    public GenieResponse<String> getLastSyncTime() {
-        IKeyValueStore keyValueStore = mAppContext.getKeyValueStore();
-        String syncTime = "";
-        GenieResponse<String> genieResponse = GenieResponseBuilder.getSuccessResponse("Last sync time fetched successfully");
-        if (keyValueStore.contains(ServiceConstants.PreferenceKey.LAST_SYNC_TIME)) {
-            Long lastSyncTime = keyValueStore.getLong(ServiceConstants.PreferenceKey.LAST_SYNC_TIME, 0L);
-            if (lastSyncTime == 0) {
-                syncTime = ServiceConstants.NEVER_SYNCED;
-            }
-            genieResponse.setResult(DateUtil.format(lastSyncTime,DateUtil.DATE_TIME_AM_PM_FORMAT));
-        } else {
-            genieResponse.setResult(ServiceConstants.NEVER_SYNCED);
-        }
-
-        TelemetryLogger.logSuccess(mAppContext, GenieResponseBuilder.getSuccessResponse("Last sync time fetched successfully"), new HashMap(), TAG, "getLastSyncTime@SyncServiceImpl", new HashMap());
-        return genieResponse;
-    }
 
     private void logGEInteractInitiate(String stageId, String subType, InteractionType touchType) {
         GEInteract geInteract = new GEInteract.Builder(new GameData(mAppContext.getGDataId(), mAppContext.getGDataVersionName())).

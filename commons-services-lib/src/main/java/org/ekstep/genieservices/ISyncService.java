@@ -1,6 +1,7 @@
 package org.ekstep.genieservices;
 
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.SyncStat;
 
 import java.util.Map;
 
@@ -24,19 +25,6 @@ public interface ISyncService {
      *
      * @return {@link GenieResponse<Map>}
      */
-    GenieResponse<Map> sync();
-
-
-    /**
-     * This api gets the last sync time, if never done, then it will be "NEVER".
-     * <p>
-     * <p>On successful fetching the last sync time, the response will return status as TRUE and with the message "Last sync time fetched successfully", and sync time set in the result, in "dd/MM/yyyy, hh:mma" format.
-     * <p>
-     * <p>
-     * <p> Their is no fail case with this api, as the last sync time will be "NEVER", if never synced, by default in the response
-     *
-     * @return {@link GenieResponse<String>}
-     */
-    GenieResponse<String> getLastSyncTime();
+    GenieResponse<SyncStat> sync();
 
 }

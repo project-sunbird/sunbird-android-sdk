@@ -1,6 +1,7 @@
 package org.ekstep.genieservices;
 
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 
 import java.util.HashMap;
@@ -37,7 +38,7 @@ public interface ITelemetryService {
      */
     GenieResponse<Void> saveTelemetry(Telemetry event);
 
-    GenieResponse<HashMap> getTelemetryStats();
+    GenieResponse<TelemetryStat> getTelemetryStat();
 
 
 }
