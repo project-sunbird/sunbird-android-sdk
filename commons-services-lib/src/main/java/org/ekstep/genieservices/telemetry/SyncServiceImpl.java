@@ -65,7 +65,7 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
         long syncTime= DateUtil.getEpochTime();
         mAppContext.getKeyValueStore().putLong(ServiceConstants.PreferenceKey.LAST_SYNC_TIME, syncTime);
         GenieResponse<SyncStat> response = GenieResponseBuilder.getSuccessResponse(getMessage(numberOfSync, numberOfEventsProcessed));
-        SyncStat syncStat=new SyncStat(numberOfEventsProcessed,DateUtil.format(syncTime,DateUtil.DATE_TIME_AM_PM_FORMAT),fileSize);
+        SyncStat syncStat=new SyncStat(numberOfEventsProcessed, syncTime, fileSize);
         response.setResult(syncStat);
 
         return response;

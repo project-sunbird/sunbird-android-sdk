@@ -7,10 +7,10 @@ package org.ekstep.genieservices.commons.bean;
 public class SyncStat {
 
     private int syncedEventCount;
-    private String syncTime;
+    private long syncTime;
     private String syncedFileSize;
 
-    public SyncStat(int syncedEventCount, String syncTime, String syncedFileSize) {
+    public SyncStat(int syncedEventCount, long syncTime, String syncedFileSize) {
         this.syncedEventCount = syncedEventCount;
         this.syncTime = syncTime;
         this.syncedFileSize = syncedFileSize;
@@ -20,7 +20,7 @@ public class SyncStat {
         return syncedEventCount;
     }
 
-    public String getSyncTime() {
+    public long getSyncTime() {
         return syncTime;
     }
 

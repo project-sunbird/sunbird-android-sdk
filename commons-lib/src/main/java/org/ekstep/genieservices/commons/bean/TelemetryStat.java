@@ -7,9 +7,9 @@ package org.ekstep.genieservices.commons.bean;
 public class TelemetryStat {
 
     private int unSyncedEventCount;
-    private String lastSyncTime;
+    private long lastSyncTime;
 
-    public TelemetryStat(int unSyncedEventCount, String lastSyncTime) {
+    public TelemetryStat(int unSyncedEventCount, long lastSyncTime) {
         this.unSyncedEventCount = unSyncedEventCount;
         this.lastSyncTime = lastSyncTime;
     }
@@ -18,7 +18,7 @@ public class TelemetryStat {
         return unSyncedEventCount;
     }
 
-    public String getLastSyncTime() {
+    public long getLastSyncTime() {
         return lastSyncTime;
     }
 

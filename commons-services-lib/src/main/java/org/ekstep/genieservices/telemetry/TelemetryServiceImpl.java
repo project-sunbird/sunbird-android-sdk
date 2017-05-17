@@ -12,7 +12,6 @@ import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
-import org.ekstep.genieservices.commons.exception.DbException;
 import org.ekstep.genieservices.commons.exception.InvalidDataException;
 import org.ekstep.genieservices.commons.utils.ArrayUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
@@ -72,37 +71,25 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
 
         String telemetryEventCountQuery="select count(*) from telemetry";
         String processedTelemetryEventCountQuery="select sum(event_count) from processed_telemetry";
-        CustomReaderModel telemetryReaderModel=CustomReaderModel.find(mAppContext.getDBSession(),telemetryEventCountQuery);
-        CustomReaderModel processedTelemetryReaderModel=CustomReaderModel.find(mAppContext.getDBSession(),processedTelemetryEventCountQuery);
+        CustomReaderModel telemetryCountReader=CustomReaderModel.find(mAppContext.getDBSession(),telemetryEventCountQuery);
+        CustomReaderModel processedTelemetryCountReader=CustomReaderModel.find(mAppContext.getDBSession(),processedTelemetryEventCountQuery);
 
         int telemetryEventCount=0;
         int processedTelemetryEventCount=0;
-        if(telemetryReaderModel!=null){
-            telemetryEventCount=Integer.valueOf(telemetryReaderModel.getData());
+        if(telemetryCountReader!=null){
+            telemetryEventCount=Integer.valueOf(telemetryCountReader.getData());
         }
 
-        if(processedTelemetryReaderModel!=null){
-            processedTelemetryEventCount=Integer.valueOf(processedTelemetryReaderModel.getData());
+        if(processedTelemetryCountReader!=null){
+            processedTelemetryEventCount=Integer.valueOf(processedTelemetryCountReader.getData());
         }
 
         int unSyncedEventCount=telemetryEventCount+processedTelemetryEventCount;
 
         IKeyValueStore keyValueStore = mAppContext.getKeyValueStore();
-        String syncTime = "";
-        if (keyValueStore.contains(ServiceConstants.PreferenceKey.LAST_SYNC_TIME)) {
-            Long lastSyncTime = keyValueStore.getLong(ServiceConstants.PreferenceKey.LAST_SYNC_TIME, 0L);
-            if (lastSyncTime == 0) {
-                syncTime = ServiceConstants.NEVER_SYNCED;
-            }
-            else{
-                syncTime=DateUtil.format(lastSyncTime,DateUtil.DATE_TIME_AM_PM_FORMAT);
-            }
-        } else {
-            syncTime=ServiceConstants.NEVER_SYNCED;
-        }
-
+        Long lastSyncTime = keyValueStore.getLong(ServiceConstants.PreferenceKey.LAST_SYNC_TIME, 0L);
         GenieResponse<TelemetryStat> genieResponse=GenieResponseBuilder.getSuccessResponse("Telemetry stat retrieved successfully");
-        genieResponse.setResult(new TelemetryStat(unSyncedEventCount,syncTime));
+        genieResponse.setResult(new TelemetryStat(unSyncedEventCount,lastSyncTime));
 
         return genieResponse;
     }
