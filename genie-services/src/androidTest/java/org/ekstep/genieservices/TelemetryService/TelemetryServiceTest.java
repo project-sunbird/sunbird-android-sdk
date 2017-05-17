@@ -53,10 +53,10 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
      */
     private void checkEventData(GECreateProfile geCreateProfile) {
 
-        List<EventModel> eventModelList = GenieServiceDBHelper.findEventById(geCreateProfile.getEID());
+        List<EventModel> eventModelList = GenieServiceDBHelper.findEventById(geCreateProfile.getEid());
         Map eventMap = eventModelList.get(0).getEventMap();
 
-        Assert.assertEquals(geCreateProfile.getEID(), eventMap.get("eid"));
+        Assert.assertEquals(geCreateProfile.getEid(), eventMap.get("eid"));
         Assert.assertEquals(geCreateProfile.getUid(), eventMap.get("uid"));
         Assert.assertNotNull(eventMap.get("sid"));
         Assert.assertNotNull(eventMap.get("did"));
@@ -129,7 +129,7 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
 
         activity.saveTelemetry(geCreateProfile);
 
-        List<EventModel> eventModelList = GenieServiceDBHelper.findEventById(geCreateProfile.getEID());
+        List<EventModel> eventModelList = GenieServiceDBHelper.findEventById(geCreateProfile.getEid());
         Map eventMap = eventModelList.get(0).getEventMap();
 
         Log.v(TAG, "eventMap :: " + eventMap);
