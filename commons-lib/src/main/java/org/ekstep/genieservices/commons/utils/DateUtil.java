@@ -14,14 +14,13 @@ public class DateUtil {
 
     public static final int MILLISECONDS_IN_AN_HOUR = 3600000;
     private static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";
+    private static final String DATETIME_FORMAT_WITHOUTTIMEZONE = "yyyy-MM-dd'T'HH:mm:ss";
     private static final String DATE_FORMAT = "yyyy-MM-dd";
     public static final String DATE_TIME_AM_PM_FORMAT = "dd/MM/yyyy, hh:mma";
 
 
     public static String getCurrentTimestamp() {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern(DATETIME_FORMAT).withLocale(Locale.US);
-        DateTime dateTime = new DateTime();
-        return dateTime.toString(dateTimeFormatter);
+        return format(getEpochTime(), DATETIME_FORMAT);
     }
 
     public static Long getEpochTime() {
@@ -30,6 +29,11 @@ public class DateUtil {
 
     public static DateTime parse(String dateInString, String format) {
         return DateTimeFormat.forPattern(format).parseDateTime(dateInString);
+    }
+
+    public static Long getTime(String date) {
+        DateTime dateTime = parse(date, DATETIME_FORMAT_WITHOUTTIMEZONE);
+        return dateTime.getMillis();
     }
 
     public static String format(Date date, String format) {
@@ -58,7 +62,7 @@ public class DateUtil {
     }
 
     public static boolean isTodayWithin(String startDate, String endDate) {
-        String today = format(new Date(), DATE_FORMAT);
+        String today = format(new Date().getTime(), DATE_FORMAT);
         return isDateBetween(startDate, endDate, today);
     }
 
