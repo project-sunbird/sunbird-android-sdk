@@ -7,6 +7,7 @@ import org.ekstep.genieservices.commons.AndroidAppContext;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MasterData;
+import org.ekstep.genieservices.commons.bean.PartnerData;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
 import org.ekstep.genieservices.commons.bean.telemetry.BaseTelemetry;
@@ -102,6 +103,12 @@ public class GenieServiceTestActivity extends Activity {
     public GenieResponse saveTelemetry(String eventString) {
         idle = false;
         GenieResponse response = mGenieService.getTelemetryService().saveTelemetry(eventString);
+        return response;
+    }
+
+    public GenieResponse registerPartner(PartnerData partnerData) {
+        idle = false;
+        GenieResponse response = mGenieService.getPartnerService().registerPartner(partnerData);
         return response;
     }
 
