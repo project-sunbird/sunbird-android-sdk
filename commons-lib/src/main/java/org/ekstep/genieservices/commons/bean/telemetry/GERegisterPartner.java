@@ -9,13 +9,13 @@ import java.util.HashMap;
  * Created by swayangjit on 2/5/17.
  */
 
-public class GERegisterPartner extends BaseTelemetry {
+public class GERegisterPartner extends Telemetry {
 
-    private final String eid = "GE_REGISTER_PARTNER";
+    private static final String EID = "GE_REGISTER_PARTNER";
 
     public GERegisterPartner(GameData gameData, String partnerID, String publicKey,
                              String publicKeyID, String deviceId) {
-        super(gameData);
+        super(gameData, EID);
         setEks(createEKS(partnerID, publicKey, publicKeyID));
         setDid(deviceId);
         setTs(DateUtil.getCurrentTimestamp());
@@ -27,11 +27,6 @@ public class GERegisterPartner extends BaseTelemetry {
         eks.put("publickey", publicKey);
         eks.put("publickeyid", publicKeyID);
         return eks;
-    }
-
-    @Override
-    public String getEID() {
-        return eid;
     }
 
 }

@@ -11,13 +11,13 @@ import java.util.Map;
  * Created by swayangjit on 2/5/17.
  */
 
-public class GEUpdateProfile extends BaseTelemetry {
+public class GEUpdateProfile extends Telemetry {
 
-    private final String eid = "GE_UPDATE_PROFILE";
+    private static final String EID = "GE_UPDATE_PROFILE";
 
 
     public GEUpdateProfile(GameData gameData, Profile profile, String deviceId) {
-        super(gameData);
+        super(gameData, EID);
         setEks(createEKS(profile));
         setUid(profile.getUid());
         setTs(DateUtil.getCurrentTimestamp());
@@ -38,11 +38,6 @@ public class GEUpdateProfile extends BaseTelemetry {
         map.put("medium", profile.getMedium());
         map.put("board", profile.getBoard());
         return map;
-    }
-
-    @Override
-    public String getEID() {
-        return eid;
     }
 
 }
