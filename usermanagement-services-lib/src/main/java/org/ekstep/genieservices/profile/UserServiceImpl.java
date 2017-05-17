@@ -15,6 +15,7 @@ import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
+import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.profile.db.model.ContentAccessModel;
@@ -67,7 +68,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         // TODO: 24/4/17 Need to create Location Wrapper to get location
         String uid = UUID.randomUUID().toString();
         if (profile.getCreatedAt() == null) {
-            profile.setCreatedAt(new Date());
+            profile.setCreatedAt(DateUtil.now());
         }
         final UserModel userModel = UserModel.build(dbSession, uid);
 

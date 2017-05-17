@@ -2,6 +2,7 @@ package org.ekstep.genieservices.commons.bean.telemetry;
 
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.utils.DateUtil;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -24,8 +25,7 @@ public class GEDeleteProfile extends Telemetry {
     private Map<String, Object> createEKS(Profile profile) {
         HashMap<String, Object> map = new HashMap<>();
         map.put("uid", profile.getUid());
-        map.put("duration", new Date().getTime() - profile.getCreatedAt().getTime());
-        ;
+        map.put("duration", DateUtil.elapsedTimeTillNow(profile.getCreatedAt().getTime()));
         return map;
     }
 }

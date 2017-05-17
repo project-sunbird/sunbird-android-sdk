@@ -23,6 +23,10 @@ public class DateUtil {
         return format(getEpochTime(), DATETIME_FORMAT);
     }
 
+    public static Date now() {
+        return new Date();
+    }
+
     public static Long getEpochTime() {
         return System.currentTimeMillis();
     }
@@ -42,6 +46,13 @@ public class DateUtil {
 
     public static String format(long dateTime,String format) {
         return format(new Date(dateTime),format);
+    }
+
+    public static Integer elapsedTimeTillNow(long time) {
+        DateTime parseDateTime = new DateTime(time);
+        DateTime now = DateTime.now();
+        Seconds seconds = Seconds.secondsBetween(parseDateTime, now);
+        return seconds.getSeconds();
     }
 
     public static Integer elapsedTimeTillNow(String dateInString) {
