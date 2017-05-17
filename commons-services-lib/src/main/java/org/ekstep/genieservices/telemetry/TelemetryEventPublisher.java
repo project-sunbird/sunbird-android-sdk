@@ -6,12 +6,13 @@ import org.greenrobot.eventbus.util.AsyncExecutor;
 import java.util.Map;
 
 /**
- * Created by swayangjit on 26/4/17.
+ * Created on 26/4/17.
+ *
+ * @author swayangjit
  */
-
 public class TelemetryEventPublisher {
 
-    public static final String TAG = TelemetryEventPublisher.class.getSimpleName();
+    private static final String TAG = TelemetryEventPublisher.class.getSimpleName();
 
     public static void postTelemetryEvent(final IDBSession dbSession, final Map<String, Object> eventMap) {
         TelemetryEventPublishThreadPool

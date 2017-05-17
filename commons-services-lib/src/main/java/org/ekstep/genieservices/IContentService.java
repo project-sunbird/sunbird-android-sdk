@@ -24,4 +24,6 @@ public interface IContentService {
     GenieResponse<Void> deleteContent(String contentIdentifier, int level);
 
     GenieResponse<ContentSearchResult> searchContent(ContentSearchCriteria contentSearchCriteria);
+
+    GenieResponse<Void> importContent(boolean isChildContent, String ecarFilePath);
 }

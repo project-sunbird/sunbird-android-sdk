@@ -30,14 +30,15 @@ import static java.lang.String.valueOf;
  */
 public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanable {
 
-    public static final String IDENTIFIER_KEY = "identifier";
-    public static final String CONTENT_TYPE_KEY = "contentType";
+    public static final String KEY_IDENTIFIER = "identifier";
+    public static final String KEY_PKG_VERSION = "pkgVersion";
+    public static final String KEY_CONTENT_TYPE = "contentType";
 
-    private static final String MIME_TYPE_KEY = "mimeType";
-    private static final String VISIBILITY_KEY = "visibility";
-    private static final String LAST_UPDATED_ON_KEY = "lastUpdatedOn";
-    private static final String PRE_REQUISITES_KEY = "pre_requisites";
-    private static final String CHILDREN_KEY = "children";
+    private static final String KEY_MIME_TYPE = "mimeType";
+    private static final String KEY_VISIBILITY = "visibility";
+    private static final String KEY_LAST_UPDATED_ON = "lastUpdatedOn";
+    private static final String KEY_PRE_REQUISITES = "pre_requisites";
+    private static final String KEY_CHILDREN = "children";
 
     public static int minCompatibilityLevel = 1;
     public static int maxCompatibilityLevel = 2;
@@ -82,22 +83,22 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
             this.localData = GsonUtil.toJson(data);
         }
 
-        if (data.containsKey(IDENTIFIER_KEY)) {
-            identifier = (String) data.get(IDENTIFIER_KEY);
+        if (data.containsKey(KEY_IDENTIFIER)) {
+            identifier = (String) data.get(KEY_IDENTIFIER);
         }
 
-        if (data.containsKey(MIME_TYPE_KEY)) {
-            mimeType = (String) data.get(MIME_TYPE_KEY);
+        if (data.containsKey(KEY_MIME_TYPE)) {
+            mimeType = (String) data.get(KEY_MIME_TYPE);
         }
 
-        if (data.containsKey(CONTENT_TYPE_KEY)) {
-            contentType = (String) data.get(CONTENT_TYPE_KEY);
+        if (data.containsKey(KEY_CONTENT_TYPE)) {
+            contentType = (String) data.get(KEY_CONTENT_TYPE);
             if (!StringUtil.isNullOrEmpty(contentType)) {
                 contentType = contentType.toLowerCase();
             }
         }
 
-        visibility = data.containsKey(VISIBILITY_KEY) ? (String) data.get(VISIBILITY_KEY) : ContentConstants.Visibility.DEFAULT;
+        visibility = data.containsKey(KEY_VISIBILITY) ? (String) data.get(KEY_VISIBILITY) : ContentConstants.Visibility.DEFAULT;
     }
 
     public static ContentModel find(IDBSession dbSession, Object identifier) {
@@ -131,15 +132,15 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
     }
 
     public boolean hasPreRequisites() {
-        return (localData != null) && (GsonUtil.fromJson(localData, Map.class).get(PRE_REQUISITES_KEY) != null);
+        return (localData != null) && (GsonUtil.fromJson(localData, Map.class).get(KEY_PRE_REQUISITES) != null);
     }
 
     public List<String> getPreRequisitesIdentifiers() {
-        List<Map> children = (List) GsonUtil.fromJson(localData, Map.class).get(PRE_REQUISITES_KEY);
+        List<Map> children = (List) GsonUtil.fromJson(localData, Map.class).get(KEY_PRE_REQUISITES);
 
         List<String> childIdentifiers = new ArrayList<>();
         for (Map child : children) {
-            String childIdentifier = valueOf(child.get(IDENTIFIER_KEY));
+            String childIdentifier = valueOf(child.get(KEY_IDENTIFIER));
             childIdentifiers.add(childIdentifier);
         }
 
@@ -148,15 +149,15 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
     }
 
     public boolean hasChildren() {
-        return (localData != null) && (GsonUtil.fromJson(localData, Map.class).get(CHILDREN_KEY) != null);
+        return (localData != null) && (GsonUtil.fromJson(localData, Map.class).get(KEY_CHILDREN) != null);
     }
 
     public List<String> getChildContentsIdentifiers() {
-        List<Map> children = (List) GsonUtil.fromJson(localData, Map.class).get(CHILDREN_KEY);
+        List<Map> children = (List) GsonUtil.fromJson(localData, Map.class).get(KEY_CHILDREN);
 
         List<String> childIdentifiers = new ArrayList<>();
         for (Map child : children) {
-            String childIdentifier = valueOf(child.get(IDENTIFIER_KEY));
+            String childIdentifier = valueOf(child.get(KEY_IDENTIFIER));
             childIdentifiers.add(childIdentifier);
         }
 
@@ -365,7 +366,7 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
 
     private String serverLastUpdatedOn() {
         return serverData != null
-                ? (String) GsonUtil.fromJson(serverData, Map.class).get(LAST_UPDATED_ON_KEY)
+                ? (String) GsonUtil.fromJson(serverData, Map.class).get(KEY_LAST_UPDATED_ON)
                 : null;
     }
 
@@ -449,5 +450,9 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
 
     public void setFileLastModified(long lastModified) {
         this.lastModified = lastModified;
+    }
+
+    public Double pkgVersion() {
+        return localData != null ? (Double) GsonUtil.fromJson(localData, Map.class).get(KEY_PKG_VERSION) : null;
     }
 }

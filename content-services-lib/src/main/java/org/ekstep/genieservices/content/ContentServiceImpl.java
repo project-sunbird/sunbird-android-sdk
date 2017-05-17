@@ -28,10 +28,20 @@ import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
 import org.ekstep.genieservices.commons.db.contract.ContentEntry;
 import org.ekstep.genieservices.commons.utils.DateUtil;
+import org.ekstep.genieservices.commons.utils.FileHandler;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.bean.ContentVariant;
+import org.ekstep.genieservices.content.bean.ImportContext;
+import org.ekstep.genieservices.content.chained.AddGeTransferContentImportEvent;
+import org.ekstep.genieservices.content.chained.ContentImportStep;
+import org.ekstep.genieservices.content.chained.DeviceMemoryCheck;
+import org.ekstep.genieservices.content.chained.EcarCleanUp;
+import org.ekstep.genieservices.content.chained.ExtractEcar;
+import org.ekstep.genieservices.content.chained.ExtractPayloads;
+import org.ekstep.genieservices.content.chained.IChainable;
+import org.ekstep.genieservices.content.chained.ValidateEcar;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.db.model.ContentsModel;
 import org.ekstep.genieservices.content.network.ContentDetailsAPI;
@@ -50,6 +60,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.UUID;
 
 /**
  * Created on 5/10/2017.
@@ -775,6 +786,43 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         }
 
         return -1;
+    }
+
+    @Override
+    public GenieResponse<Void> importContent(boolean isChildContent, String ecarFilePath) {
+        // TODO: 5/16/2017 - Telemetry logger
+        String method = "importContent@ContentServiceImpl";
+        Map<String, Object> params = new HashMap<>();
+        params.put("importContent", ecarFilePath);
+        params.put("isChildContent", isChildContent);
+        params.put("logLevel", "2");
+
+        GenieResponse<Void> response;
+
+        if (!FileHandler.doesFileExists(ecarFilePath)) {
+            response = GenieResponseBuilder.getErrorResponse(ContentConstants.INVALID_FILE, "content import failed, file doesn't exists", TAG);
+            return response;
+        }
+
+        String ext = FileHandler.getFileExt(ecarFilePath);
+        if (!ServiceConstants.FileExtension.CONTENT.equals(ext)) {
+            response = GenieResponseBuilder.getErrorResponse(ContentConstants.INVALID_FILE, "content import failed, unsupported file extension", TAG);
+            return response;
+        } else {
+            File ecarFile = new File(ecarFilePath);
+            File tmpLocation = new File(FileHandler.getTmpDir(mAppContext.getPrimaryFilesDir()), UUID.randomUUID().toString());
+            ImportContext importContext = new ImportContext(ecarFile, tmpLocation);
+
+            IChainable importContentSteps = ContentImportStep.initImportContent();
+            importContentSteps.then(new DeviceMemoryCheck());
+            importContentSteps.then(new ExtractEcar());
+            importContentSteps.then(new ValidateEcar());
+            importContentSteps.then(new ExtractPayloads());
+            importContentSteps.then(new EcarCleanUp());
+            importContentSteps.then(new AddGeTransferContentImportEvent());
+
+            return importContentSteps.execute(mAppContext, importContext);
+        }
     }
 
 }

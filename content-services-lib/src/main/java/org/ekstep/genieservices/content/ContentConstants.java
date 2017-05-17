@@ -10,6 +10,14 @@ public interface ContentConstants {
     String GENIE_EXTRACTED_ECAR_FOLDER_PATH = "/Ekstep/org.ekstep.genieservices";
     String ISO_DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SZZZZZ";
 
+    String IMPORT_FAILED = "IMPORT_FAILED";
+    String INVALID_FILE = "INVALID_FILE";
+    String IMPORT_FAILED_DEVICE_MEMORY_FULL = "IMPORT_FAILED_DEVICE_MEMORY_FULL";
+    String NO_CONTENT_TO_IMPORT = "NO_CONTENT_TO_IMPORT";
+    String UNSUPPORTED_MANIFEST = "UNSUPPORTED_MANIFEST";
+    String DRAFT_ECAR_FILE_EXPIRED = "DRAFT_ECAR_FILE_EXPIRED";
+    String IMPORT_FILE_EXIST = "IMPORT_FILE_EXIST";
+
     interface Visibility {
         String DEFAULT = "Default";
         String PARENT = "Parent";
@@ -32,11 +40,6 @@ public interface ContentConstants {
         int SEEN_BUT_NOT_AVAILABLE = 0; // Seen but not available (only serverData will be available)
         int ONLY_SPINE = 1; // Only spine
         int ARTIFACT_AVAILABLE = 2; // Artifact available
-    }
-
-    interface AccessStatus {
-        int VIEWED = 1;
-        int FULLY_PLAYED = 2;
     }
 
     interface ChildContents {

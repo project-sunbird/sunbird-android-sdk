@@ -7,11 +7,14 @@ import org.ekstep.genieservices.commons.db.ServiceDbHelper;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.cache.PreferenceWrapper;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.commons.exception.ExternalFileNotAccessibleException;
 import org.ekstep.genieservices.commons.network.AndroidHttpClient;
 import org.ekstep.genieservices.commons.network.AndroidNetworkConnectivity;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.network.IHttpClient;
 import org.ekstep.genieservices.commons.network.auth.BasicAuthenticator;
+
+import java.io.File;
 
 /**
  * Created on 18/4/17.
@@ -26,6 +29,7 @@ public class AndroidAppContext extends AppContext<Context> {
     private IDeviceInfo mDeviceInfo;
     private ILocationInfo mLocationInfo;
     private IParams mParams;
+    private File mPrimaryFilesDir;
 
     private AndroidAppContext(Context context, String appPackage, String key, String gDataId) {
         super(context, appPackage, key, gDataId);
@@ -41,6 +45,7 @@ public class AndroidAppContext extends AppContext<Context> {
         appContext.setKeyValueStore(new PreferenceWrapper(appContext, Constants.SHARED_PREFERENCE_NAME));
         appContext.setDeviceInfo(new DeviceInfo(context));
         appContext.setLocationInfo(new LocationInfo(context));
+        appContext.setPrimaryFilesDir(context.getExternalFilesDir(null));
         return appContext;
     }
 
@@ -118,6 +123,18 @@ public class AndroidAppContext extends AppContext<Context> {
 
     private void setDeviceInfo(IDeviceInfo deviceInfo) {
         this.mDeviceInfo = deviceInfo;
+    }
+
+    @Override
+    public File getPrimaryFilesDir() {
+        if (mPrimaryFilesDir == null) {
+            throw new ExternalFileNotAccessibleException();
+        }
+        return mPrimaryFilesDir;
+    }
+
+    private void setPrimaryFilesDir(File primaryFilesDir) {
+        this.mPrimaryFilesDir = primaryFilesDir;
     }
 
 }

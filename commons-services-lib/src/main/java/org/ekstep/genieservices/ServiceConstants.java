@@ -1,9 +1,10 @@
 package org.ekstep.genieservices;
 
 /**
- * Created by swayangjit on 19/4/17.
+ * Created on 19/4/17.
+ *
+ * @author swayangjit
  */
-
 public interface ServiceConstants {
     String NO_DATA_FOUND = "NO_DATA_FOUND";
     String SERVICE_ERROR = "SERVICE_ERROR";
@@ -28,6 +29,12 @@ public interface ServiceConstants {
 
     String NEVER_SYNCED = "NEVER";
     String SYNC_PROMPT = "SYNC_PROMPT";
+
+    interface FileExtension {
+        String CONTENT = "ecar";
+        String PROFILE = "epar";
+        String TELEMETRY = "gsa";
+    }
 
     interface PreferenceKey {
         //Sync service pref keys
@@ -64,5 +71,28 @@ public interface ServiceConstants {
         String MODE_MDATA = "MDATA";
         String MODE_LOCAL = "LOCAL";
         String MODE_NO_NETWORK = "NO_NETWORK";
+    }
+
+    interface ContentAccessStatus {
+        int NOT_PLAYED = 0;
+        int VIEWED = 1;
+        int FULLY_PLAYED = 2;
+    }
+
+    interface ContentStatus {
+        String LIVE = "LIVE";
+        String DRAFT = "DRAFT";
+    }
+
+    interface GeTransferEvent {
+        String TRANSFER_DIRECTION_EXPORT = "EXPORT";
+        String TRANSFER_DIRECTION_IMPORT = "IMPORT";
+        String DATATYPE_TELEMETRY = "TELEMETRY";
+        String DATATYPE_CONTENT = "CONTENT";
+        String DATATYPE_EXPLODED_CONTENT = "EXPLODEDCONTENT";
+        String DATATYPE_PROFILE = "PROFILE";
+        String CONTENT_ITEMS_KEY = "contents";
+        String FILE_SIZE = "FILE_SIZE";
+        String FILE_TYPE = "FILE_TYPE";
     }
 }
