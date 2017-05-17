@@ -6,7 +6,7 @@ import org.ekstep.genieservices.commons.utils.Logger;
 import java.util.Collections;
 
 /**
- * This class will build the success/error {@link GenieResponse} object.
+ * Created by mathew on 9/5/17.
  */
 
 public class GenieResponseBuilder {

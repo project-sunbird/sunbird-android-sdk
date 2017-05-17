@@ -1,7 +1,10 @@
 package org.ekstep.genieservices;
 
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.telemetry.BaseTelemetry;
+import org.ekstep.genieservices.commons.bean.TelemetryStat;
+import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
+
+import java.util.HashMap;
 
 /**
  * This is the interface with all the required APIs to perform necessary operations related to Telemetry
@@ -23,7 +26,7 @@ public interface ITelemetryService {
     GenieResponse<Void> saveTelemetry(String eventString);
 
     /**
-     * This api will save the telemetry details passed to it as {@link BaseTelemetry}.
+     * This api will save the telemetry details passed to it as {@link Telemetry}.
      * <p>
      * <p> On successful saving the telemetry, the response will return status as TRUE and with "Event Saved Successfully" message.
      * <p>
@@ -33,6 +36,9 @@ public interface ITelemetryService {
      * @param event
      * @return {@link GenieResponse<Void>}
      */
-    GenieResponse<Void> saveTelemetry(BaseTelemetry event);
+    GenieResponse<Void> saveTelemetry(Telemetry event);
+
+    GenieResponse<TelemetryStat> getTelemetryStat();
+
 
 }

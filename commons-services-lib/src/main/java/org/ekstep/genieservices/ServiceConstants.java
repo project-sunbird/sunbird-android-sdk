@@ -65,4 +65,23 @@ public interface ServiceConstants {
         String MODE_LOCAL = "LOCAL";
         String MODE_NO_NETWORK = "NO_NETWORK";
     }
+
+    interface Telemetry {
+        String CONTENT_IMPORT_SUB_TYPE = "ContentImport";
+        String CONTENT_IMPORT_STAGE_ID = "ImportContent";
+        String AUTO_SYNC_SUB_TYPE_INITIATED = "AutoSync-Initiated";
+        String AUTO_SYNC_SUB_TYPE_SUCCESS = "AutoSync-Success";
+        String AUTO_SYNC_STAGE_ID = "Genie-TelemetrySync";
+        String TYPE_OTHER = "OTHER";
+        String TYPE_TOUCH = "TOUCH";
+        String SIZE_OF_DATA_IN_KB = "SizeOfDataInKB";
+    }
+
+    interface ErrorCode {
+        String PROCESSING_ERROR = "PROCESSING_ERROR";
+        String DATA_NOT_FOUND_ERROR = "NO_DATA_FOUND";
+        String VALIDATION_ERROR = "VALIDATION_ERROR";
+        String DB_ERROR = "DB_ERROR";
+    }
+
 }

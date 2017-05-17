@@ -52,7 +52,11 @@ public class EventsModel implements IReadable, ICleanable {
     public IReadable read(IResultSet resultSet) {
         if (resultSet != null && resultSet.moveToFirst())
             do {
-                events.add(EventModel.build(mDbSession, resultSet));
+                EventModel eventModel = EventModel.build(mDbSession);
+
+                eventModel.readWithoutMoving(resultSet);
+
+                events.add(eventModel);
             } while (resultSet.moveToNext());
         return this;
     }

@@ -14,13 +14,13 @@ import java.util.Map;
  * Created by swayangjit on 2/5/17.
  */
 
-public class GESendPartnerData extends BaseTelemetry {
+public class GESendPartnerData extends Telemetry {
 
-    private final String eid = "GE_PARTNER_DATA";
+    private static final String EID = "GE_PARTNER_DATA";
 
     public GESendPartnerData(GameData gameData, String partnerID, String publicKeyID,
                              String deviceId, String data, String encryptedKey, String iv) {
-        super(gameData);
+        super(gameData, EID);
         setEks(createEKS(partnerID, publicKeyID, data, encryptedKey, iv));
         setTags(partnerID);
         setDid(deviceId);
@@ -36,12 +36,6 @@ public class GESendPartnerData extends BaseTelemetry {
         eks.put("iv", iv);
         return eks;
     }
-
-    @Override
-    public String getEID() {
-        return eid;
-    }
-
 
     @Override
     public String toString() {

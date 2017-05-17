@@ -11,12 +11,12 @@ import java.util.Map;
  * Created by swayangjit on 2/5/17.
  */
 
-public class GEDeleteProfile extends BaseTelemetry{
+public class GEDeleteProfile extends Telemetry {
 
-    private final String eid = "GE_DELETE_PROFILE";
+    private static final String EID = "GE_DELETE_PROFILE";
 
     public GEDeleteProfile(GameData gameData, Profile profile) {
-        super(gameData);
+        super(gameData, EID);
         setEks(createEKS(profile));
         setUid(profile.getUid());
     }
@@ -24,11 +24,8 @@ public class GEDeleteProfile extends BaseTelemetry{
     private Map<String, Object> createEKS(Profile profile) {
         HashMap<String, Object> map = new HashMap<>();
         map.put("uid", profile.getUid());
-        map.put("duration",  new Date().getTime() -profile.getCreatedAt().getTime());;
+        map.put("duration", new Date().getTime() - profile.getCreatedAt().getTime());
+        ;
         return map;
-    }
-    @Override
-    public String getEID() {
-        return eid;
     }
 }
