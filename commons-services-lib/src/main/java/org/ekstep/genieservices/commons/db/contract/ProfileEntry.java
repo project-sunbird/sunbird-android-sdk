@@ -5,7 +5,6 @@ import org.ekstep.genieservices.commons.db.DbConstants;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 public abstract class ProfileEntry implements BaseColumns {

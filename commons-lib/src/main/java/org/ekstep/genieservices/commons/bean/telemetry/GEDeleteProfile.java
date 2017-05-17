@@ -4,7 +4,6 @@ import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
