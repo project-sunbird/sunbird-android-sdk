@@ -3,6 +3,7 @@ package org.ekstep.genieservices.content.network;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.network.BaseAPI;
+import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 import java.util.HashMap;
@@ -10,20 +11,23 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Created on 5/15/2017.
+ * Created on 5/18/2017.
  *
  * @author anil
  */
-public class ContentSearchAPI extends BaseAPI {
+public class RecommendedContentAPI extends BaseAPI {
 
-    private static final String TAG = ContentSearchAPI.class.getSimpleName();
+    private static final String TAG = RecommendedContentAPI.class.getSimpleName();
 
-    private static final CharSequence SERVICE_ENDPOINTS = "search";
-    private static final String ENDPOINT = "search";
+    private static final String SERVICE_ENDPOINTS = "content";
+    private static final String ENDPOINT = "recommend";
+
+    private static final String VERSION = "1.0";
+    private static final String ID = "ekstep.analytics.recommendations";
 
     private Map<String, Object> requestMap;
 
-    public ContentSearchAPI(AppContext appContext, Map<String, Object> requestMap) {
+    public RecommendedContentAPI(AppContext appContext, Map<String, Object> requestMap) {
         super(appContext, String.format(Locale.US, "%s/%s",
                 String.format(Locale.US, appContext.getParams().getBaseApiUrl() + ServiceConstants.API.LP_EXTENSION, SERVICE_ENDPOINTS),
                 ENDPOINT), TAG);
@@ -33,14 +37,16 @@ public class ContentSearchAPI extends BaseAPI {
 
     @Override
     protected Map<String, String> getRequestHeaders() {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("user-id", "123");
-        return headers;
+        return null;
     }
 
     @Override
     protected String createRequestData() {
         Map<String, Object> request = new HashMap<>();
+        request.put("id", ID);
+        request.put("ver", VERSION);
+        // TODO: 5/18/2017 - Check with Mathew.
+        request.put("ts", DateUtil.getEpochTimeStamp());
         request.put("request", requestMap);
         return GsonUtil.toJson(request);
     }

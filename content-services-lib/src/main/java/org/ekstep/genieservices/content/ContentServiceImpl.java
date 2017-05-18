@@ -46,6 +46,7 @@ import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.db.model.ContentsModel;
 import org.ekstep.genieservices.content.network.ContentDetailsAPI;
 import org.ekstep.genieservices.content.network.ContentSearchAPI;
+import org.ekstep.genieservices.content.network.RecommendedContentAPI;
 import org.ekstep.genieservices.content.utils.ContentUtil;
 
 import java.io.File;
@@ -787,6 +788,63 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         }
 
         return -1;
+    }
+
+    @Override
+    public GenieResponse<ContentSearchResult> getRecommendedContent() {
+//        HashMap params = new HashMap();
+//        params.put("mode", getNetworkMode());
+        String method = "getRecommendedContents@ContentServiceImpl";
+
+        GenieResponse<ContentSearchResult> response;
+        RecommendedContentAPI recommendedContentAPI = new RecommendedContentAPI(mAppContext, getRecommendedContentRequest());
+        GenieResponse apiResponse = recommendedContentAPI.post();
+        if (apiResponse.getStatus()) {
+            String body = apiResponse.getResult().toString();
+
+            LinkedTreeMap map = GsonUtil.fromJson(body, LinkedTreeMap.class);
+            String id = (String) map.get("id");
+            LinkedTreeMap responseParams = (LinkedTreeMap) map.get("params");
+            LinkedTreeMap result = (LinkedTreeMap) map.get("result");
+            String contentDataListString = GsonUtil.toJson(result.get("content"));
+
+            Type type = new TypeToken<List<HashMap<String, Object>>>() {
+            }.getType();
+            List<Map<String, Object>> contentDataList = GsonUtil.getGson().fromJson(contentDataListString, type);
+
+            List<Content> contents = new ArrayList<>();
+            for (Map contentDataMap : contentDataList) {
+                // TODO: 5/15/2017 - Can fetch content from DB and return in response.
+                ContentModel contentModel = ContentModel.build(mAppContext.getDBSession(), contentDataMap, null);
+                Content content = getContent(contentModel, false, false);
+                contents.add(content);
+            }
+
+            ContentSearchResult searchResult = new ContentSearchResult();
+            searchResult.setId(id);
+            searchResult.setParams(responseParams);
+            searchResult.setContents(contents);
+
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+            response.setResult(searchResult);
+            return response;
+        }
+
+        response = GenieResponseBuilder.getErrorResponse(apiResponse.getError(), (String) apiResponse.getErrorMessages().get(0), TAG);
+        return response;
+    }
+
+    private HashMap<String, Object> getRecommendedContentRequest() {
+        HashMap<String, Object> contextMap = new HashMap<>();
+        contextMap.put("did", mAppContext.getDeviceInfo().getDeviceID());
+        // TODO: 5/18/2017 - From where will get the Current language.
+        contextMap.put("dlang", Session.getInstance().getLanguage());
+
+        HashMap<String, Object> requestMap = new HashMap<>();
+        requestMap.put("context", contextMap);
+        requestMap.put("limit", 10);
+
+        return requestMap;
     }
 
     @Override

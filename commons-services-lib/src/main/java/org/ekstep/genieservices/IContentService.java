@@ -2,9 +2,9 @@ package org.ekstep.genieservices;
 
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
+import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 
 import java.util.List;
 
@@ -24,6 +24,8 @@ public interface IContentService {
     GenieResponse<Void> deleteContent(String contentIdentifier, int level);
 
     GenieResponse<ContentSearchResult> searchContent(ContentSearchCriteria contentSearchCriteria);
+
+    GenieResponse<ContentSearchResult> getRecommendedContent();
 
     GenieResponse<Void> importContent(boolean isChildContent, String ecarFilePath);
 }
