@@ -85,4 +85,11 @@ public interface ServiceConstants {
         String DB_ERROR = "DB_ERROR";
     }
 
+    interface ProviderResolver {
+        String PROCESSING_ERROR = "PROCESSING_ERROR";
+        String GENIE_SERVICE_NOT_INSTALLED = "GENIE_SERVICE_NOT_INSTALLED";
+        String SUCCESSFUL = "successful";
+        String NETWORK_ERROR = "NETWORK_ERROR";
+        String NO_INTERNET_CONNECTIVITY_MESSAGE = "no internet connectivity available";
+    }
 }
