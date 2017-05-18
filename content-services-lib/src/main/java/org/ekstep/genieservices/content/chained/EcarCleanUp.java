@@ -1,7 +1,11 @@
 package org.ekstep.genieservices.content.chained;
 
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.utils.FileHandler;
+import org.ekstep.genieservices.commons.utils.Logger;
+import org.ekstep.genieservices.content.ContentConstants;
 import org.ekstep.genieservices.content.bean.ImportContext;
 
 /**
@@ -17,7 +21,14 @@ public class EcarCleanUp implements IChainable {
 
     @Override
     public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
-        return null;
+        Logger.d(TAG, importContext.getTmpLocation().getPath());
+        FileHandler.rm(importContext.getTmpLocation());
+
+        if (nextLink != null) {
+            return nextLink.execute(appContext, importContext);
+        } else {
+            return breakChain();
+        }
     }
 
     @Override
@@ -27,7 +38,7 @@ public class EcarCleanUp implements IChainable {
 
     @Override
     public GenieResponse<Void> breakChain() {
-        return null;
+        return GenieResponseBuilder.getErrorResponse(ContentConstants.IMPORT_FAILED, "Import content failed", TAG);
     }
 
     @Override
