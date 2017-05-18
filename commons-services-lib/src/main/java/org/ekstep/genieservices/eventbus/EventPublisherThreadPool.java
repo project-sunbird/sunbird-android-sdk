@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.telemetry;
+package org.ekstep.genieservices.eventbus;
 
 import org.greenrobot.eventbus.util.AsyncExecutor;
 
@@ -9,17 +9,18 @@ import java.util.concurrent.Executors;
  * Created by swayangjit on 26/4/17.
  */
 
-public class TelemetryEventPublishThreadPool {
+public class EventPublisherThreadPool {
 
-    public static final int MAX_THREADS = 30;
+    public static final int MAX_THREADS = Runtime.getRuntime().availableProcessors() * 2;
+
     private static volatile AsyncExecutor asyncExecutor;
 
-    private TelemetryEventPublishThreadPool() {
+    private EventPublisherThreadPool() {
     }
 
     public static AsyncExecutor getInstance() {
         if (asyncExecutor == null) {
-            synchronized (TelemetryEventPublishThreadPool.class) {
+            synchronized (EventPublisherThreadPool.class) {
                 if (asyncExecutor == null) {
                     AsyncExecutor.Builder builder = AsyncExecutor.builder();
                     ExecutorService threadPool =

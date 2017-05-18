@@ -11,13 +11,13 @@ import java.util.Map;
  * Created by swayangjit on 2/5/17.
  */
 
-public class GESessionStart extends BaseTelemetry {
+public class GESessionStart extends Telemetry {
 
-    private final String eid = "GE_SESSION_START";
+    private static final String EID = "GE_SESSION_START";
     private final Map<String, Object> edata;
 
     public GESessionStart(GameData gameData, UserSession session, String loc, String deviceId) {
-        super(gameData);
+        super(gameData,EID);
         edata = new HashMap<>();
         setEks(createEKS(loc));
         setEts(DateUtil.getEpochTime());
@@ -32,11 +32,5 @@ public class GESessionStart extends BaseTelemetry {
         eks.put("loc", loc);
         return eks;
     }
-
-    @Override
-    public String getEID() {
-        return eid;
-    }
-
 }
 

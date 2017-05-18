@@ -37,17 +37,17 @@ public class GenieServiceDBHelper {
         return sSqliteDatabase;
     }
 
-    public static List<EventModel> findEventById(String eid) {
-        Cursor cursor = GenieServiceDBHelper.getDatabase().rawQuery(generateQuery(eid), null);
-        List<EventModel> events = new ArrayList<>();
-        if (cursor != null && cursor.moveToFirst())
-            do {
-                events.add(EventModel.build(sGSDBHelper.mAppContext.getDBSession(),new SQLiteResultSet(cursor)));
-            } while (cursor.moveToNext());
-        cursor.close();
-
-        return null;
-    }
+//    public static List<EventModel> findEventById(String eid) {
+//        Cursor cursor = GenieServiceDBHelper.getDatabase().rawQuery(generateQuery(eid), null);
+//        List<EventModel> events = new ArrayList<>();
+//        if (cursor != null && cursor.moveToFirst())
+//            do {
+//                events.add(EventModel.build(sGSDBHelper.mAppContext.getDBSession(),new SQLiteResultSet(cursor)));
+//            } while (cursor.moveToNext());
+//        cursor.close();
+//
+//        return null;
+//    }
 
     public static String generateQuery(String eid) {
         return "SELECT * FROM telemetry  where event_type='" + eid + "'";

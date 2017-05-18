@@ -28,9 +28,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created on 14/4/17.
+ * This is the implementation of the interface {@link IConfigService}
  *
- * @author shriharsh
  */
 public class ConfigServiceImpl extends BaseService implements IConfigService {
 

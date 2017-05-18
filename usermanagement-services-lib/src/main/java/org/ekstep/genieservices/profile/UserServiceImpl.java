@@ -8,11 +8,11 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.UserSession;
+import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
-import org.ekstep.genieservices.profile.db.model.AnonymousUserModel;
 import org.ekstep.genieservices.profile.db.model.ContentAccessesModel;
 import org.ekstep.genieservices.profile.db.model.UserModel;
 import org.ekstep.genieservices.profile.db.model.UserProfileModel;
@@ -38,7 +38,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     /**
      * Create a new user profile
      *
-     * @param profile         - User profile data
+     * @param profile - User profile data
      */
     @Override
     public GenieResponse<Profile> createUserProfile(Profile profile) {
@@ -85,7 +85,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     /**
      * Update user profile
      *
-     * @param profile          - User profile data
+     * @param profile - User profile data
      */
     @Override
     public GenieResponse<Profile> updateUserProfile(Profile profile) {
@@ -113,7 +113,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     /**
      * Delete user profile
      *
-     * @param uid-            user id
+     * @param uid- user id
      */
     @Override
     public GenieResponse<Void> deleteUser(String uid) {
@@ -130,7 +130,9 @@ public class UserServiceImpl extends BaseService implements IUserService {
         mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
             @Override
             public Void perform(IDBSession dbSession) {
-                accessesModel.delete();
+                if (accessesModel != null) {
+                    accessesModel.delete();
+                }
                 userProfileModel.delete();
                 // TODO: 24/4/17 Should add telemetry event after deleting a profile
                 userModel.delete();
@@ -139,8 +141,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
                 return null;
             }
         });
-
-        return GenieResponseBuilder.getSuccessResponse("", Void.class);
+        return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
     }
 
     private String createAnonymousUser() {
@@ -151,9 +152,8 @@ public class UserServiceImpl extends BaseService implements IUserService {
         return user.getUid();
     }
 
-     /**
+    /**
      * set anonymous user
-     *
      */
     @Override
     public GenieResponse<String> setAnonymousUser() {
@@ -166,17 +166,17 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
     /**
      * Get anonymous user data
-     *
      */
     @Override
     public GenieResponse<Profile> getAnonymousUser() {
-        AnonymousUserModel anonymousUserModel = AnonymousUserModel.findAnonymousUser(mAppContext.getDBSession());
+        String anonymousUserQuery = "select u.uid from users u left join profiles p on p.uid=u.uid where p.uid is null and u.uid is not null";
+        CustomReaderModel customReaderModel = CustomReaderModel.find(mAppContext.getDBSession(),anonymousUserQuery);
 
         String uid = null;
-        if (anonymousUserModel == null) {
+        if (customReaderModel == null) {
             uid = createAnonymousUser();
         } else {
-            uid = anonymousUserModel.getUid();
+            uid = customReaderModel.getData();
         }
         Profile profile = new Profile(uid);
 
@@ -188,7 +188,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     /**
      * set current user
      *
-     * @param uid             - User id
+     * @param uid - User id
      */
     @Override
     public GenieResponse<Void> setCurrentUser(String uid) {
@@ -218,7 +218,6 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
     /**
      * Get current use data
-     *
      */
     @Override
     public GenieResponse<Profile> getCurrentUser() {
