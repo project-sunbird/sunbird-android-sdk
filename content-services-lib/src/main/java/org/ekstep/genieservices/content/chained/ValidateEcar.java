@@ -15,14 +15,10 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.ContentConstants;
 import org.ekstep.genieservices.content.bean.ImportContext;
 import org.ekstep.genieservices.content.db.model.ContentModel;
-import org.ekstep.genieservices.content.db.model.ContentsModel;
 
 import java.lang.reflect.Type;
-import java.text.ParseException;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 /**
  * Created on 5/16/2017.
@@ -73,15 +69,8 @@ public class ValidateEcar implements IChainable {
             String status = (String) item.get("status");
             Double pkgVersion = (Double) item.get(ContentModel.KEY_PKG_VERSION);
             if (!StringUtil.isNullOrEmpty(expiryDate) && (!StringUtil.isNullOrEmpty(status) && status.equalsIgnoreCase(ServiceConstants.ContentStatus.DRAFT))) {
-                long millis = -1;
-                try {
-                    millis = DateUtil.convertLocalTimeMillis(expiryDate);
-                } catch (ParseException e) {
-                    Logger.e(TAG, "Error in parsing expiry date.");
-                }
+                long millis = DateUtil.getTime(expiryDate);
                 if (millis > 0 && System.currentTimeMillis() > millis) {
-                    Logger.e(TAG, "The ECAR file is expired!!!");
-                    FileHandler.rm(importContext.getTmpLocation());
                     return getErrorResponse(importContext, ContentConstants.DRAFT_ECAR_FILE_EXPIRED, "The ECAR file is expired!!!");
                 }
             }
@@ -95,11 +84,12 @@ public class ValidateEcar implements IChainable {
                 //Skip the content
                 importContext.getSkippedItemsIdentifier().add(identifier);
                 // TODO: 5/17/2017
-                deleteChildItemsIfAny(items, newContentModel);
-//                if (items.size() > 1
-//                        && (newContentModel.hasChildren() || newContentModel.hasPreRequisites())) {
-//                    return getErrorResponse(importContext, ContentConstants.IMPORT_FILE_EXIST, "The ECAR file is imported already!!!");
-//                }
+//                items.remove(item);
+//                deleteChildItemsIfAny(appContext, items, newContentModel);
+                if (items.size() > 1
+                        && (newContentModel.hasChildren() || newContentModel.hasPreRequisites())) {
+                    return getErrorResponse(importContext, ContentConstants.IMPORT_FILE_EXIST, "The ECAR file is imported already!!!");
+                }
 
                 //file already imported
                 if (importContext.getSkippedItemsIdentifier().size() == items.size()) {
@@ -166,28 +156,41 @@ public class ValidateEcar implements IChainable {
         return GenieResponseBuilder.getErrorResponse(error, errorMessage, TAG);
     }
 
-    private void deleteChildItemsIfAny(List<HashMap<String, Object>> items, ContentModel contentModel) {
-        Queue<ContentModel> queue = new LinkedList<>();
-
-        queue.add(contentModel);
-
-        ContentModel node;
-        while (!queue.isEmpty()) {
-            node = queue.remove();
-
-            if (node.hasChildren()) {
-                List<String> childContentsIdentifiers = node.getChildContentsIdentifiers();
-                ContentsModel contentsModel = ContentsModel.findAllContentsWithIdentifiers(mAppContext.getDBSession(), childContentsIdentifiers);
-                if (contentsModel != null) {
-                    queue.addAll(contentsModel.getContentModelList());
-                }
-            }
-
-            // Deleting only child content
-            if (!contentModel.getIdentifier().equalsIgnoreCase(node.getIdentifier())) {
-                deleteOrUpdateContent(node, true, level);
-            }
-        }
-    }
+//    private void deleteChildItemsIfAny(AppContext appContext, List<HashMap<String, Object>> items, ContentModel contentModel) {
+//        Queue<ContentModel> queue = new LinkedList<>();
+//
+//        queue.add(contentModel);
+//
+//        ContentModel node;
+//        while (!queue.isEmpty()) {
+//            node = queue.remove();
+//
+//            if (node.hasChildren()) {
+//                List<String> childContentsIdentifiers = node.getChildContentsIdentifiers();
+//
+//                for (HashMap<String, Object> item : items) {
+//                    String identifier = (String) item.get(ContentModel.KEY_IDENTIFIER);
+//
+//                    ContentModel childContentModel = ContentModel.build(appContext.getDBSession(), item, null);
+//
+//
+//                    ContentModel oldContentModel = ContentModel.find(appContext.getDBSession(), identifier);
+//                    String oldContentPath = oldContentModel == null ? null : oldContentModel.getPath();
+//                }
+//
+//
+//
+//                ContentsModel contentsModel = ContentsModel.findAllContentsWithIdentifiers(mAppContext.getDBSession(), childContentsIdentifiers);
+//                if (contentsModel != null) {
+//                    queue.addAll(contentsModel.getContentModelList());
+//                }
+//            }
+//
+//            // Deleting only child content
+//            if (!contentModel.getIdentifier().equalsIgnoreCase(node.getIdentifier())) {
+//                deleteOrUpdateContent(node, true, level);
+//            }
+//        }
+//    }
 
 }
