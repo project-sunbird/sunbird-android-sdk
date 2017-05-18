@@ -12,13 +12,13 @@ import org.ekstep.genieresolvers.content.GenieContentResolver;
 public class GenieResolver {
 
     private static GenieResolver sGenieResolver;
-    private String authorityName;
+    private String appQualifier;
     private Context context;
     private GenieContentResolver mGenieContentResolver;
 
-    private GenieResolver(Context context, String authorityName) {
+    private GenieResolver(Context context, String appQualifier) {
         this.context = context;
-        this.authorityName = authorityName;
+        this.appQualifier = appQualifier;
     }
 
     public static GenieResolver getGenieResolver() {
@@ -35,7 +35,7 @@ public class GenieResolver {
 
     public GenieContentResolver getGenieContentResolver(String contentId) {
         if (mGenieContentResolver == null) {
-            mGenieContentResolver = new GenieContentResolver(context, authorityName, contentId);
+            mGenieContentResolver = new GenieContentResolver(context, appQualifier, contentId);
         }
         return mGenieContentResolver;
     }

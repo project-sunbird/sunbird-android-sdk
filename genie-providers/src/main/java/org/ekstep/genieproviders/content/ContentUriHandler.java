@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 
+import org.ekstep.genieproviders.IHandleUri;
+
 import java.util.HashMap;
 import java.util.Locale;
 

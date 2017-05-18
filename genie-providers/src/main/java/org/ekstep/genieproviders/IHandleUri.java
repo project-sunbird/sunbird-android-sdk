@@ -1,4 +1,4 @@
-package org.ekstep.genieproviders.content;
+package org.ekstep.genieproviders;
 
 import android.content.ContentValues;
 import android.database.Cursor;

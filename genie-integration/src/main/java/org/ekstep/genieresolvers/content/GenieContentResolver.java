@@ -1,4 +1,4 @@
-package org.ekstep.genieproviders.content;
+package org.ekstep.genieresolvers.content;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -7,35 +7,35 @@ import android.net.Uri;
 
 import com.google.gson.Gson;
 
-import org.ekstep.genieproviders.util.ProviderConstants;
-import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class GetContent {
-    private static final String getContentsUrl = "content://org.ekstep.genieservices.content/";
+public class GenieContentResolver {
     private String contentId;
+    private String appQualifier;
     private ContentResolver contentResolver;
-    private AppContext appContext;
+    private Context context;
 
-    public GetContent(AppContext appContext, String contentId) {
+    public GenieContentResolver(Context context, String appQualifier, String contentId) {
         this.contentId = contentId;
-        this.appContext = appContext;
+        this.appQualifier = appQualifier;
+        this.context = context;
     }
 
     public String execute() {
         Gson gson = new Gson();
 
         try {
-            contentResolver = ((Context) appContext.getContext()).getContentResolver();
+            contentResolver = context.getContentResolver();
 
             if (contentResolver == null) {
                 String logMessage = "Content Resolver for games not resolved";
                 String errorMessage = "Not able to resolve content provider, " + getErrorMessage();
-                GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(ProviderConstants.PROCESSING_ERROR, errorMessage, logMessage);
+                GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, errorMessage, logMessage);
                 return gson.toJson(errorResponse);
             }
 
@@ -43,18 +43,18 @@ public class GetContent {
 
             if (cursor == null || cursor.getCount() == 0) {
                 String logMessage = String.format("No response for content id:%s", contentId);
-                GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(ProviderConstants.PROCESSING_ERROR, getErrorMessage(), logMessage);
+                GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, getErrorMessage(), logMessage);
                 return gson.toJson(errorResponse);
             }
 
             Map<String, Object> getContent = getPath(cursor);
-            GenieResponse response = GenieResponseBuilder.getSuccessResponse(ProviderConstants.SUCCESSFUL);
+            GenieResponse response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.ProviderResolver.SUCCESSFUL);
             response.setResult(getContent);
             return gson.toJson(response);
         } catch (IllegalArgumentException e) {
             String errorMessage = "Latest Genie is not installed";
             String logMessage = getErrorMessage() + ", because latest genie is not installed";
-            GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(ProviderConstants.GENIE_SERVICE_NOT_INSTALLED, errorMessage, logMessage);
+            GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.GENIE_SERVICE_NOT_INSTALLED, errorMessage, logMessage);
             return gson.toJson(errorResponse);
         }
     }
@@ -93,7 +93,8 @@ public class GetContent {
     }
 
     private Uri getUri() {
-        return Uri.parse(getContentsUrl);
+        String authority = String.format("content://%s.content/", appQualifier);
+        return Uri.parse(authority);
     }
 
 }
