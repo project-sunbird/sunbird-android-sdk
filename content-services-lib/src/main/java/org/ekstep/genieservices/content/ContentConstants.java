@@ -23,15 +23,6 @@ public interface ContentConstants {
         String PARENT = "Parent";
     }
 
-    interface Type {
-        String GAME = "Game";
-        String STORY = "Story";
-        String WORKSHEET = "Worksheet";
-        String COLLECTION = "collection";
-        String TEXTBOOK = "textbook";
-        String TEXTBOOK_UNIT = "textbookunit";
-    }
-
     interface MimeType {
         String APPLICATION = "application/vnd.android.package-archive";
     }

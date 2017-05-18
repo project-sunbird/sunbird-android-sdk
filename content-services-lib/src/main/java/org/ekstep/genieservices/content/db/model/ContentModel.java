@@ -33,17 +33,18 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
     public static final String KEY_IDENTIFIER = "identifier";
     public static final String KEY_PKG_VERSION = "pkgVersion";
     public static final String KEY_CONTENT_TYPE = "contentType";
+    public static final String KEY_COMPATIBILITY_LEVEL = "compatibilityLevel";
+
+    public static final String KEY_CONTENT_METADATA = "contentMetadata";
+    public static final String KEY_VIRALITY_METADATA = "virality";
+    public static final String KEY_TRANSFER_COUNT = "transferCount";
+    public static final String KEY_ORIGIN = "origin";
 
     private static final String KEY_MIME_TYPE = "mimeType";
     private static final String KEY_VISIBILITY = "visibility";
     private static final String KEY_LAST_UPDATED_ON = "lastUpdatedOn";
     private static final String KEY_PRE_REQUISITES = "pre_requisites";
     private static final String KEY_CHILDREN = "children";
-
-    public static int minCompatibilityLevel = 1;
-    public static int maxCompatibilityLevel = 2;
-    // TODO: 02-03-2017 : We can remove this later after few release
-    public static int defaultCompatibilityLevel = 1;
 
     private IDBSession mDBSession;
 
@@ -418,6 +419,10 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
 
     public String getPath() {
         return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public String getVisibility() {

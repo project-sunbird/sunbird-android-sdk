@@ -46,6 +46,7 @@ import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.db.model.ContentsModel;
 import org.ekstep.genieservices.content.network.ContentDetailsAPI;
 import org.ekstep.genieservices.content.network.ContentSearchAPI;
+import org.ekstep.genieservices.content.utils.ContentUtil;
 
 import java.io.File;
 import java.lang.reflect.Type;
@@ -473,9 +474,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
             // Update the contentState
             // Do not update the content state if contentType is Collection / TextBook / TextBookUnit
-            if (ContentConstants.Type.COLLECTION.equalsIgnoreCase(contentModel.getContentType())
-                    || ContentConstants.Type.TEXTBOOK.equalsIgnoreCase(contentModel.getContentType())
-                    || ContentConstants.Type.TEXTBOOK_UNIT.equalsIgnoreCase(contentModel.getContentType())) {
+            if (ContentType.COLLECTION.getValue().equalsIgnoreCase(contentModel.getContentType())
+                    || ContentType.TEXTBOOK.getValue().equalsIgnoreCase(contentModel.getContentType())
+                    || ContentType.TEXTBOOK_UNIT.getValue().equalsIgnoreCase(contentModel.getContentType())) {
                 contentModel.addOrUpdateContentState(ContentConstants.State.ARTIFACT_AVAILABLE);
             } else {
                 contentModel.addOrUpdateContentState(ContentConstants.State.ONLY_SPINE);
@@ -489,9 +490,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         } else {
             // TODO: This check should be before updating the existing refCount.
             // Do not update the content state if contentType is Collection / TextBook / TextBookUnit and refCount is more than 1.
-            if ((ContentConstants.Type.COLLECTION.equalsIgnoreCase(contentModel.getContentType())
-                    || ContentConstants.Type.TEXTBOOK.equalsIgnoreCase(contentModel.getContentType())
-                    || ContentConstants.Type.TEXTBOOK_UNIT.equalsIgnoreCase(contentModel.getContentType()))
+            if ((ContentType.COLLECTION.getValue().equalsIgnoreCase(contentModel.getContentType())
+                    || ContentType.TEXTBOOK.getValue().equalsIgnoreCase(contentModel.getContentType())
+                    || ContentType.TEXTBOOK_UNIT.getValue().equalsIgnoreCase(contentModel.getContentType()))
                     && refCount > 1) {
                 contentModel.addOrUpdateContentState(ContentConstants.State.ARTIFACT_AVAILABLE);
             } else if (refCount > 1 && isChildItems) {  //contentModel.isVisibilityDefault() &&
@@ -710,8 +711,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
     private HashMap<String, Integer> getCompatibilityLevel() {
         HashMap<String, Integer> compatLevelMap = new HashMap<>();
-        compatLevelMap.put("max", ContentModel.maxCompatibilityLevel);
-        compatLevelMap.put("min", ContentModel.minCompatibilityLevel);
+        compatLevelMap.put("max", ContentUtil.maxCompatibilityLevel);
+        compatLevelMap.put("min", ContentUtil.minCompatibilityLevel);
         return compatLevelMap;
     }
 

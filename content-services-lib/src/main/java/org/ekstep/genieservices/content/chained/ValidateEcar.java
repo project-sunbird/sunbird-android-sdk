@@ -15,6 +15,7 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.ContentConstants;
 import org.ekstep.genieservices.content.bean.ImportContext;
 import org.ekstep.genieservices.content.db.model.ContentModel;
+import org.ekstep.genieservices.content.utils.ContentUtil;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -33,12 +34,12 @@ public class ValidateEcar implements IChainable {
 
     @Override
     public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
-        String json = FileHandler.readManifest(importContext.getTmpLocation());
-        if (json == null) {
+        String manifestJson = FileHandler.readManifest(importContext.getTmpLocation());
+        if (manifestJson == null) {
             return getErrorResponse(importContext, ContentConstants.NO_CONTENT_TO_IMPORT, "Empty ecar, cannot import!");
         }
 
-        LinkedTreeMap map = GsonUtil.fromJson(json, LinkedTreeMap.class);
+        LinkedTreeMap map = GsonUtil.fromJson(manifestJson, LinkedTreeMap.class);
         String manifestVersion = (String) map.get("ver");
         LinkedTreeMap archive = (LinkedTreeMap) map.get("archive");
         String itemsString = GsonUtil.toJson(archive.get("items"));
@@ -57,6 +58,11 @@ public class ValidateEcar implements IChainable {
         if (items.isEmpty()) {
             return getErrorResponse(importContext, ContentConstants.NO_CONTENT_TO_IMPORT, "Empty ecar, cannot import!");
         }
+
+        importContext.setManifestVersion(manifestVersion);
+        importContext.setItems(items);
+        importContext.getMetadata().put(ServiceConstants.GeTransferEvent.CONTENT_ITEMS_KEY, items);
+        Logger.d(TAG, items.toString());
 
         for (HashMap<String, Object> item : items) {
             String identifier = (String) item.get(ContentModel.KEY_IDENTIFIER);
@@ -79,11 +85,12 @@ public class ValidateEcar implements IChainable {
             if (ContentConstants.Visibility.DEFAULT.equals(newContentModel.getVisibility()) // Check if visibility is default for new content. // TODO: 5/17/2017 - Is this check really needed?
                     && isDuplicateCheckRequired(pkgVersion, status)     // Check if its draft and pkgVersion is 0.
                     && !StringUtil.isNullOrEmpty(oldContentPath)     // Check if path of old content is not empty.
-                    && isImportFileExist(oldContentModel, newContentModel)) {   // Check whether the file is already imported or not.
+                    && ContentUtil.isImportFileExist(oldContentModel, newContentModel)) {   // Check whether the file is already imported or not.
 
                 //Skip the content
                 importContext.getSkippedItemsIdentifier().add(identifier);
-                // TODO: 5/17/2017
+                // TODO: 5/17/2017 - Instead of creating the skippedItemIdentifier, try to remove the item from exitsing items list.
+                // TODO: And also need to handle the case when more than one content is bundled in one ECAR (and visibility is DEFAULT for both) and one of them is collection which is already exists and imported first then the import stop there only and second content is not importing.
 //                items.remove(item);
 //                deleteChildItemsIfAny(appContext, items, newContentModel);
                 if (items.size() > 1
@@ -126,28 +133,6 @@ public class ValidateEcar implements IChainable {
     private boolean isDuplicateCheckRequired(Double pkgVersion, String status) {
         //if status is DRAFT and pkgVersion == 0 then don't do the duplicate check..
         return !(!StringUtil.isNullOrEmpty(status) && status.equalsIgnoreCase(ServiceConstants.ContentStatus.DRAFT) && pkgVersion == 0);
-    }
-
-    private boolean isImportFileExist(ContentModel oldContentModel, ContentModel newContentModel) {
-        if (oldContentModel == null || newContentModel == null) {
-            return false;
-        }
-
-        boolean isExist = false;
-        try {
-            String oldIdentifier = oldContentModel.getIdentifier();
-            String newIdentifier = newContentModel.getIdentifier();
-            String oldVisibility = oldContentModel.getVisibility();
-            String newVisibility = newContentModel.getVisibility();
-
-            if (oldIdentifier.equalsIgnoreCase(newIdentifier) && oldVisibility.equalsIgnoreCase(newVisibility)) {
-                isExist = oldContentModel.pkgVersion() >= newContentModel.pkgVersion();
-            }
-        } catch (Exception e) {
-            Logger.e(TAG, "isImportFileExist", e);
-        }
-
-        return isExist;
     }
 
     private GenieResponse<Void> getErrorResponse(ImportContext importContext, String error, String errorMessage) {

@@ -34,6 +34,7 @@ public interface ServiceConstants {
         String CONTENT = "ecar";
         String PROFILE = "epar";
         String TELEMETRY = "gsa";
+        String APK = "apk";
     }
 
     interface PreferenceKey {
