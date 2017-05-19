@@ -7,6 +7,7 @@ import android.net.Uri;
 
 import com.google.gson.Gson;
 
+import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -30,7 +31,7 @@ public class GetTraversalRule {
         if (contentResolver == null) {
             String logMessage = "Content Resolver for games not resolved";
             String errorMessage = "Not able to resolve content provider, " + getErrorMessage();
-            GenieResponse<String> errorResponse = GenieResponseBuilder.getErrorResponse(ProviderConstants.PROCESSING_ERROR, errorMessage, logMessage);
+            GenieResponse<String> errorResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, errorMessage, logMessage);
             return gson.toJson(errorResponse);
         }
 
@@ -38,7 +39,7 @@ public class GetTraversalRule {
 
         if (cursor == null || cursor.getCount() == 0) {
             String logMessage = "Couldn't get the traversal rules";
-            GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(ProviderConstants.PROCESSING_ERROR,
+            GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR,
                     getErrorMessage(), logMessage);
             return gson.toJson(errorResponse);
         }

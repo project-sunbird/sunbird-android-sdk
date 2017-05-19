@@ -13,9 +13,7 @@ import android.net.Uri;
 public abstract class AbstractLanguageProvider extends ContentProvider {
 
     @Override
-    public boolean onCreate() {
-        return true;
-    }
+    public abstract boolean onCreate();
 
     @Override
     public abstract Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder);

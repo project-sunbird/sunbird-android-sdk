@@ -6,9 +6,7 @@ import android.net.Uri;
 
 public abstract class AbstractContentProvider extends android.content.ContentProvider {
     @Override
-    public boolean onCreate() {
-        return true;
-    }
+    public abstract boolean onCreate();
 
     @Override
     public abstract Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder);
