@@ -47,6 +47,7 @@ import org.ekstep.genieservices.content.db.model.ContentsModel;
 import org.ekstep.genieservices.content.network.ContentDetailsAPI;
 import org.ekstep.genieservices.content.network.ContentSearchAPI;
 import org.ekstep.genieservices.content.network.RecommendedContentAPI;
+import org.ekstep.genieservices.content.network.RelatedContentAPI;
 import org.ekstep.genieservices.content.utils.ContentUtil;
 
 import java.io.File;
@@ -281,31 +282,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             criteria = new ContentCriteria();
         }
 
-        String contentTypes;
-        if (criteria.getContentTypes() != null) {
-            List<String> contentTypeList = new ArrayList<>();
-            for (ContentType contentType : criteria.getContentTypes()) {
-                contentTypeList.add(contentType.getValue());
-            }
-            contentTypes = StringUtil.join("','", contentTypeList);
-        } else {
-            contentTypes = StringUtil.join("','", ContentType.values());
-        }
-
-        String isContentType = String.format(Locale.US, "%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypes);
-        String isVisible = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
-        // For hiding the non compatible imported content, which visibility is DEFAULT.
-        String isArtifactAvailable = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
-
-        String filter = String.format(Locale.US, " where (%s AND %s AND %s)", isVisible, isArtifactAvailable, isContentType);
-
-        List<ContentModel> contentModelListInDB;
-        ContentsModel contentsModel = ContentsModel.find(mAppContext.getDBSession(), filter);
-        if (contentsModel != null) {
-            contentModelListInDB = contentsModel.getContentModelList();
-        } else {
-            contentModelListInDB = new ArrayList<>();
-        }
+        List<ContentModel> contentModelListInDB = getAllLocalContentModel(criteria);
 
         String uid;
         if (!StringUtil.isNullOrEmpty(criteria.getUid())) {
@@ -344,6 +321,36 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(contentList);
         return response;
+    }
+
+    private List<ContentModel> getAllLocalContentModel(ContentCriteria criteria) {
+        String contentTypes;
+        if (criteria.getContentTypes() != null) {
+            List<String> contentTypeList = new ArrayList<>();
+            for (ContentType contentType : criteria.getContentTypes()) {
+                contentTypeList.add(contentType.getValue());
+            }
+            contentTypes = StringUtil.join("','", contentTypeList);
+        } else {
+            contentTypes = StringUtil.join("','", ContentType.values());
+        }
+
+        String isContentType = String.format(Locale.US, "%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypes);
+        String isVisible = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
+        // For hiding the non compatible imported content, which visibility is DEFAULT.
+        String isArtifactAvailable = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
+
+        String filter = String.format(Locale.US, " where (%s AND %s AND %s)", isVisible, isArtifactAvailable, isContentType);
+
+        List<ContentModel> contentModelListInDB;
+        ContentsModel contentsModel = ContentsModel.find(mAppContext.getDBSession(), filter);
+        if (contentsModel != null) {
+            contentModelListInDB = contentsModel.getContentModelList();
+        } else {
+            contentModelListInDB = new ArrayList<>();
+        }
+
+        return contentModelListInDB;
     }
 
     private String getCurrentUserId() {
@@ -839,6 +846,88 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         contextMap.put("did", mAppContext.getDeviceInfo().getDeviceID());
         // TODO: 5/18/2017 - From where will get the Current language.
         contextMap.put("dlang", Session.getInstance().getLanguage());
+
+        HashMap<String, Object> requestMap = new HashMap<>();
+        requestMap.put("context", contextMap);
+        requestMap.put("limit", 10);
+
+        return requestMap;
+    }
+
+    @Override
+    public GenieResponse<ContentSearchResult> getRelatedContent(String contentIdentifier, String uid) {
+        // TODO: 5/18/2017 - Telemetry
+//        HashMap params = new HashMap();
+//        params.put("uid", uid);
+//        params.put("content_id", contentIdentifier);
+//        params.put("mode", getNetworkMode());
+//        String method = "getRelatedContent@ContentServiceImpl";
+
+        GenieResponse<ContentSearchResult> response;
+        RelatedContentAPI relatedContentAPI = new RelatedContentAPI(mAppContext, getRelatedContentRequest(contentIdentifier, uid));
+        GenieResponse apiResponse = relatedContentAPI.post();
+        if (apiResponse.getStatus()) {
+            String body = apiResponse.getResult().toString();
+
+            LinkedTreeMap map = GsonUtil.fromJson(body, LinkedTreeMap.class);
+            String id = (String) map.get("id");
+            LinkedTreeMap responseParams = (LinkedTreeMap) map.get("params");
+            LinkedTreeMap result = (LinkedTreeMap) map.get("result");
+            String contentDataListString = GsonUtil.toJson(result.get("content"));
+
+            Type type = new TypeToken<List<HashMap<String, Object>>>() {
+            }.getType();
+            List<Map<String, Object>> contentDataList = GsonUtil.getGson().fromJson(contentDataListString, type);
+
+            List<ContentModel> allLocalContentModel = getAllLocalContentModel(new ContentCriteria());
+
+            List<Content> contents = new ArrayList<>();
+            for (Map contentDataMap : contentDataList) {
+                ContentModel contentModel = ContentModel.build(mAppContext.getDBSession(), contentDataMap, null);
+                Content content = getContent(contentModel, false, false);
+
+                if (allLocalContentModel.contains(contentModel)) {
+                    content.setAvailableLocally(true);
+                }
+
+                contents.add(content);
+            }
+
+            ContentSearchResult searchResult = new ContentSearchResult();
+            searchResult.setId(id);
+            searchResult.setParams(responseParams);
+            searchResult.setContents(contents);
+
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+            response.setResult(searchResult);
+            return response;
+        }
+
+        response = GenieResponseBuilder.getErrorResponse(apiResponse.getError(), (String) apiResponse.getErrorMessages().get(0), TAG);
+        return response;
+    }
+
+    private HashMap<String, Object> getRelatedContentRequest(String contentIdentifier, String uid) {
+//        Profile profile = new Profile("", "", "");
+//        profile.setUid(uid);
+//        ProfileDTO profileDTO = new ProfileDTO(profile);
+//        profileDTO.initialize(dbOperator);
+
+        String dlang = "";
+        if (userService != null) {
+            // TODO: 5/18/2017 - Get user by uid
+            GenieResponse<Profile> profileGenieResponse = userService.getUser(uid);
+            if (profileGenieResponse.getStatus()) {
+                Profile profile = profileGenieResponse.getResult();
+                dlang = profile.getLanguage();
+            }
+        }
+
+        HashMap<String, Object> contextMap = new HashMap<>();
+        contextMap.put("did", mAppContext.getDeviceInfo().getDeviceID());
+        contextMap.put("dlang", dlang);
+        contextMap.put("contentid", contentIdentifier);
+        contextMap.put("uid", uid);
 
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("context", contextMap);
