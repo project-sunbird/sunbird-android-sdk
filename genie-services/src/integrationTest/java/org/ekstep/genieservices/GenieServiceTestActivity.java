@@ -54,14 +54,14 @@ public class GenieServiceTestActivity extends Activity {
 
     public GenieResponse<Profile> createUserProfile(Profile userProfile) {
         idle = false;
-        GenieResponse<Profile> response = mGenieService.getUserProfileService().createUserProfile(userProfile);
-        return response;
+        GenieResponse<Profile> genieResponse = mGenieService.getUserProfileService().createUserProfile(userProfile);
+        return genieResponse;
     }
 
     public GenieResponse deleteUserProfile(String uid) {
         idle = false;
-        GenieResponse response = mGenieService.getUserProfileService().deleteUser(uid);
-        return response;
+        GenieResponse genieResponse = mGenieService.getUserProfileService().deleteUser(uid);
+        return genieResponse;
     }
 
     public GenieResponse<Profile> getAnonymousUser() {
@@ -84,32 +84,56 @@ public class GenieServiceTestActivity extends Activity {
 
     public GenieResponse setCurrentUser(String uid) {
         idle = false;
-        GenieResponse response = mGenieService.getUserProfileService().setCurrentUser(uid);
-        return response;
+        GenieResponse genieResponse = mGenieService.getUserProfileService().setCurrentUser(uid);
+        return genieResponse;
     }
 
     public GenieResponse<Profile> updateUserProfile(Profile profile) {
         idle = false;
-        GenieResponse<Profile> response = mGenieService.getUserProfileService().updateUserProfile(profile);
-        return response;
+        GenieResponse<Profile> genieResponse = mGenieService.getUserProfileService().updateUserProfile(profile);
+        return genieResponse;
     }
 
     public GenieResponse saveTelemetry(Telemetry event) {
         idle = false;
-        GenieResponse response = mGenieService.getTelemetryService().saveTelemetry(event);
-        return response;
+        GenieResponse genieResponse = mGenieService.getTelemetryService().saveTelemetry(event);
+        return genieResponse;
     }
 
     public GenieResponse saveTelemetry(String eventString) {
         idle = false;
-        GenieResponse response = mGenieService.getTelemetryService().saveTelemetry(eventString);
-        return response;
+        GenieResponse genieResponse = mGenieService.getTelemetryService().saveTelemetry(eventString);
+        return genieResponse;
     }
 
     public GenieResponse registerPartner(PartnerData partnerData) {
         idle = false;
-        GenieResponse response = mGenieService.getPartnerService().registerPartner(partnerData);
-        return response;
+        GenieResponse genieResponse = mGenieService.getPartnerService().registerPartner(partnerData);
+        return genieResponse;
+    }
+
+    public GenieResponse isPartnerRegistered(String partnerID) {
+        idle = false;
+        GenieResponse genieResponse = mGenieService.getPartnerService().isRegistered(partnerID);
+        return genieResponse;
+    }
+
+    public GenieResponse startPartnerSession(PartnerData partnerData) {
+        idle = false;
+        GenieResponse genieResponse = mGenieService.getPartnerService().startPartnerSession(partnerData);
+        return genieResponse;
+    }
+
+    public GenieResponse terminatePartnerSession(PartnerData partnerData) {
+        idle = false;
+        GenieResponse genieResponse = mGenieService.getPartnerService().terminatePartnerSession(partnerData);
+        return genieResponse;
+    }
+
+    public GenieResponse sendData(PartnerData partnerData) {
+        idle = false;
+        GenieResponse genieResponse = mGenieService.getPartnerService().sendData(partnerData);
+        return genieResponse;
     }
 
     public void setIdle() {
