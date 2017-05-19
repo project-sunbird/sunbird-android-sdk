@@ -318,7 +318,6 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         result = 31 * result + id.hashCode();
         result = 31 * result + (manifestVersion != null ? manifestVersion.hashCode() : 0);
         result = 31 * result + (contentType != null ? contentType.hashCode() : 0);
-        // TODO: add hashCode for contentState
         return result;
     }
 

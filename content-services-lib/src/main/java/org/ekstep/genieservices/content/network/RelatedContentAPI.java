@@ -45,8 +45,7 @@ public class RelatedContentAPI extends BaseAPI {
         Map<String, Object> request = new HashMap<>();
         request.put("id", ID);
         request.put("ver", VERSION);
-        // TODO: 5/18/2017 - Check with Mathew.
-        request.put("ts", DateUtil.getEpochTimeStamp());
+        request.put("ts", DateUtil.getCurrentTimestamp());
         request.put("request", requestMap);
         return GsonUtil.toJson(request);
     }

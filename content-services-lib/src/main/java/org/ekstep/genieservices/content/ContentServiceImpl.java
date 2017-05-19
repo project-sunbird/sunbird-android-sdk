@@ -62,6 +62,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.Stack;
 import java.util.TreeMap;
 import java.util.UUID;
 
@@ -193,7 +194,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         long contentCreationTime = 0;
         String localLastUpdatedTime = contentModel.getLocalLastUpdatedTime();
         if (!StringUtil.isNullOrEmpty(localLastUpdatedTime)) {
-            contentCreationTime = DateUtil.dateToEpoch(localLastUpdatedTime.substring(0, localLastUpdatedTime.lastIndexOf(".")), "yyyy-MM-dd'T'HH:mm:ss");
+            contentCreationTime = DateUtil.getTime(localLastUpdatedTime.substring(0, localLastUpdatedTime.lastIndexOf(".")));
         }
         content.setLastUpdatedTime(contentCreationTime);
 
@@ -798,13 +799,13 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<ContentSearchResult> getRecommendedContent() {
+    public GenieResponse<ContentSearchResult> getRecommendedContent(String language) {
 //        HashMap params = new HashMap();
 //        params.put("mode", getNetworkMode());
         String method = "getRecommendedContents@ContentServiceImpl";
 
         GenieResponse<ContentSearchResult> response;
-        RecommendedContentAPI recommendedContentAPI = new RecommendedContentAPI(mAppContext, getRecommendedContentRequest());
+        RecommendedContentAPI recommendedContentAPI = new RecommendedContentAPI(mAppContext, getRecommendedContentRequest(language));
         GenieResponse apiResponse = recommendedContentAPI.post();
         if (apiResponse.getStatus()) {
             String body = apiResponse.getResult().toString();
@@ -841,11 +842,10 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         return response;
     }
 
-    private HashMap<String, Object> getRecommendedContentRequest() {
+    private HashMap<String, Object> getRecommendedContentRequest(String language) {
         HashMap<String, Object> contextMap = new HashMap<>();
         contextMap.put("did", mAppContext.getDeviceInfo().getDeviceID());
-        // TODO: 5/18/2017 - From where will get the Current language.
-        contextMap.put("dlang", Session.getInstance().getLanguage());
+        contextMap.put("dlang", language);
 
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("context", contextMap);
@@ -855,7 +855,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<ContentSearchResult> getRelatedContent(String contentIdentifier, String uid) {
+    public GenieResponse<ContentSearchResult> getRelatedContent(String contentIdentifier) {
         // TODO: 5/18/2017 - Telemetry
 //        HashMap params = new HashMap();
 //        params.put("uid", uid);
@@ -864,7 +864,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 //        String method = "getRelatedContent@ContentServiceImpl";
 
         GenieResponse<ContentSearchResult> response;
-        RelatedContentAPI relatedContentAPI = new RelatedContentAPI(mAppContext, getRelatedContentRequest(contentIdentifier, uid));
+        RelatedContentAPI relatedContentAPI = new RelatedContentAPI(mAppContext, getRelatedContentRequest(contentIdentifier));
         GenieResponse apiResponse = relatedContentAPI.post();
         if (apiResponse.getStatus()) {
             String body = apiResponse.getResult().toString();
@@ -907,18 +907,14 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         return response;
     }
 
-    private HashMap<String, Object> getRelatedContentRequest(String contentIdentifier, String uid) {
-//        Profile profile = new Profile("", "", "");
-//        profile.setUid(uid);
-//        ProfileDTO profileDTO = new ProfileDTO(profile);
-//        profileDTO.initialize(dbOperator);
-
+    private HashMap<String, Object> getRelatedContentRequest(String contentIdentifier) {
         String dlang = "";
+        String uid = "";
         if (userService != null) {
-            // TODO: 5/18/2017 - Get user by uid
-            GenieResponse<Profile> profileGenieResponse = userService.getUser(uid);
+            GenieResponse<Profile> profileGenieResponse = userService.getCurrentUser();
             if (profileGenieResponse.getStatus()) {
                 Profile profile = profileGenieResponse.getResult();
+                uid = profile.getUid();
                 dlang = profile.getLanguage();
             }
         }
@@ -934,6 +930,110 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         requestMap.put("limit", 10);
 
         return requestMap;
+    }
+
+    private Map<String, Object> findNextStory(List<String> contentIdentifiers) {
+        Map<String, Object> resultMap = new HashMap<>();
+
+        try {
+            List<String> contentsKeyList = new ArrayList<>();
+            List<String> parentChildRelation = new ArrayList<>();
+            String key = null;
+
+            ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), contentIdentifiers.get(0));
+
+            Stack<ContentModel> stack = new Stack<>();
+            stack.push(contentModel);
+
+            ContentModel node;
+            while (!stack.isEmpty()) {
+                node = stack.pop();
+                if (node.hasChildren()) {
+                    List<ContentModel> childContents = ContentUtil.getSortedChildrenList(mAppContext.getDBSession(), node.getLocalData(), ContentConstants.ChildContents.FIRST_LEVEL_ALL);
+                    // TODO: 5/19/2017 -      List<ContentModel> childContents = node.getSortedChildrenList(dbOperator, CHILD_CONTENTS_FIRST_LEVEL_ALL);
+                    stack.addAll(childContents);
+
+                    for (ContentModel c : childContents) {
+                        parentChildRelation.add(node.getIdentifier() + "/" + c.getIdentifier());
+                    }
+                }
+
+                if (StringUtil.isNullOrEmpty(key)) {
+                    key = node.getIdentifier();
+
+                    // First content
+//                contents.put(key, node);
+
+                } else {
+                    String tempKey;
+
+                    for (int i = key.split("/").length - 1; i >= 0; i--) {
+                        String immediateParent = key.split("/")[i];
+
+                        if (parentChildRelation.contains(immediateParent + "/" + node.getIdentifier())) {
+                            break;
+                        } else {
+                            key = key.substring(0, key.lastIndexOf("/"));
+                        }
+                    }
+
+                    if (ContentType.COLLECTION.getValue().equalsIgnoreCase(node.getContentType())
+                            || ContentType.TEXTBOOK.getValue().equalsIgnoreCase(node.getContentType())
+                            || ContentType.TEXTBOOK_UNIT.getValue().equalsIgnoreCase(node.getContentType())) {
+                        key = key + "/" + node.getIdentifier();
+
+                    } else {
+                        tempKey = key + "/" + node.getIdentifier();
+
+                        contentsKeyList.add(tempKey);
+                    }
+                }
+            }
+
+            String currentIdentifiers = null;
+            for (String identifier : contentIdentifiers) {
+                if (StringUtil.isNullOrEmpty(currentIdentifiers)) {
+                    currentIdentifiers = identifier;
+                } else {
+                    currentIdentifiers = currentIdentifiers + "/" + identifier;
+                }
+            }
+
+            int indexOfCurrentContentIdentifier = contentsKeyList.indexOf(currentIdentifiers);
+            String nextContentIdentifier = null;
+            if (indexOfCurrentContentIdentifier > 0) {
+                nextContentIdentifier = contentsKeyList.get(indexOfCurrentContentIdentifier - 1);
+            }
+
+            List<Map<String, Object>> collectionsMap = new ArrayList<>();
+            if (!StringUtil.isNullOrEmpty(nextContentIdentifier)) {
+
+                String nextContentIdentifierList[] = nextContentIdentifier.split("/");
+                for (String identifier : nextContentIdentifierList) {
+                    ContentModel nextContentModel = ContentModel.find(mAppContext.getDBSession(), identifier);
+
+                    // TODO: 5/19/2017
+                    Content content = getContent(nextContentModel, false, false);
+                    Map<String, Object> contentMap = nextContentModel.asMap();
+
+                    Map<String, Object> localDataMap = (Map<String, Object>) contentMap.get("localData");
+                    localDataMap.put("path", contentMap.get("path"));
+                    localDataMap.put("isAvailable", contentMap.get("isArtifactAvailable"));
+
+                    collectionsMap.add(localDataMap);
+                }
+            }
+
+            resultMap.put("collection", collectionsMap);
+
+        } catch (Exception e) {
+            Logger.e(TAG, "" + e.getMessage());
+            resultMap.put("collection", new ArrayList<Map<String, Object>>());
+        }
+
+        resultMap.put("content", new ArrayList<String>());
+
+        return resultMap;
     }
 
     @Override
@@ -962,12 +1062,12 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             ImportContext importContext = new ImportContext(ecarFile, tmpLocation);
 
             IChainable importContentSteps = ContentImportStep.initImportContent();
-            importContentSteps.then(new DeviceMemoryCheck());
-            importContentSteps.then(new ExtractEcar());
-            importContentSteps.then(new ValidateEcar());
-            importContentSteps.then(new ExtractPayloads());
-            importContentSteps.then(new EcarCleanUp());
-            importContentSteps.then(new AddGeTransferContentImportEvent());
+            importContentSteps.then(new DeviceMemoryCheck())
+                    .then(new ExtractEcar())
+                    .then(new ValidateEcar())
+                    .then(new ExtractPayloads())
+                    .then(new EcarCleanUp())
+                    .then(new AddGeTransferContentImportEvent());
 
             return importContentSteps.execute(mAppContext, importContext);
         }

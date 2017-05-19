@@ -25,9 +25,9 @@ public interface IContentService {
 
     GenieResponse<ContentSearchResult> searchContent(ContentSearchCriteria contentSearchCriteria);
 
-    GenieResponse<ContentSearchResult> getRecommendedContent();
+    GenieResponse<ContentSearchResult> getRecommendedContent(String language);
 
-    GenieResponse<ContentSearchResult> getRelatedContent(String contentIdentifier, String uid);
+    GenieResponse<ContentSearchResult> getRelatedContent(String contentIdentifier);
 
     GenieResponse<Void> importContent(boolean isChildContent, String ecarFilePath);
 }

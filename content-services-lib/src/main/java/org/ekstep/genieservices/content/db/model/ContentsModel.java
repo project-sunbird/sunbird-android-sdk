@@ -45,6 +45,19 @@ public class ContentsModel implements IReadable {
         }
     }
 
+    public static ContentsModel find(IDBSession dbSession, String filter, List<String> identifiers, String orderBy) {
+        ContentsModel contentsModel = new ContentsModel(dbSession, filter);
+
+        String query = String.format(Locale.US, "Select * from %s where %s in ('%s') %s %s", contentsModel.getTableName(), ContentEntry.COLUMN_NAME_IDENTIFIER, StringUtil.join("','", identifiers), filter, orderBy);
+        dbSession.read(contentsModel, query);
+
+        if (contentsModel.getContentModelList() == null) {
+            return null;
+        } else {
+            return contentsModel;
+        }
+    }
+
     @Override
     public IReadable read(IResultSet resultSet) {
         if (resultSet != null && resultSet.moveToFirst()) {

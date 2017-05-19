@@ -1,11 +1,23 @@
 package org.ekstep.genieservices.content.utils;
 
+import com.google.gson.reflect.TypeToken;
+
+import org.ekstep.genieservices.commons.db.contract.ContentEntry;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.content.ContentConstants;
+import org.ekstep.genieservices.content.bean.ContentChild;
 import org.ekstep.genieservices.content.db.model.ContentModel;
+import org.ekstep.genieservices.content.db.model.ContentsModel;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static java.lang.String.valueOf;
@@ -132,6 +144,71 @@ public class ContentUtil {
                     (Map<String, Object>) ((Map<String, Object>) localDataMap.get(ContentModel.KEY_CONTENT_METADATA)).get(ContentModel.KEY_VIRALITY_METADATA);
             viralityMetadata.put(ContentModel.KEY_TRANSFER_COUNT, transferCount(localDataMap) + 1);
         }
+    }
+
+    public static List<ContentModel> getSortedChildrenList(IDBSession dbSession, String localData, int childContents) {
+        Map<String, Object> localDataMap = GsonUtil.fromJson(localData, Map.class);
+        String childrenString = GsonUtil.toJson(localDataMap.get("children"));
+
+        // json string to list of child
+        Type type = new TypeToken<List<ContentChild>>() {
+        }.getType();
+        List<ContentChild> contentChildList = GsonUtil.getGson().fromJson(childrenString, type);
+
+        // Sort by index of child content
+        Comparator<ContentChild> comparator = new Comparator<ContentChild>() {
+            @Override
+            public int compare(ContentChild left, ContentChild right) {
+                return (int) (left.getIndex() - right.getIndex()); // use your logic
+            }
+        };
+        Collections.sort(contentChildList, comparator);
+
+        List<String> childIdentifiers = new ArrayList<>();
+        StringBuilder whenAndThen = new StringBuilder();
+        int i = 0;
+
+        for (ContentChild contentChild : contentChildList) {
+            childIdentifiers.add(contentChild.getIdentifier());
+            whenAndThen.append(String.format(Locale.US, " WHEN '%s' THEN %s ", contentChild.getIdentifier(), i));
+            i++;
+        }
+
+        String orderBy = "";
+        if (i > 0) {
+            orderBy = String.format(Locale.US, " ORDER BY CASE %s %s END", ContentEntry.COLUMN_NAME_IDENTIFIER, whenAndThen.toString());
+        }
+
+        String filter;
+        switch (childContents) {
+            case ContentConstants.ChildContents.FIRST_LEVEL_DOWNLOADED:
+                filter = String.format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
+                break;
+
+            case ContentConstants.ChildContents.FIRST_LEVEL_SPINE:
+                filter = String.format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ONLY_SPINE);
+                break;
+
+//            case CHILD_CONTENTS_FIRST_LEVEL_TEXTBOOK_UNIT:
+//                filter = String.format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_TYPE, ContentType.TEXTBOOK_UNIT.getValue());
+//                break;
+
+            case ContentConstants.ChildContents.FIRST_LEVEL_ALL:
+            default:
+                filter = "";
+                break;
+        }
+
+        List<ContentModel> contentModelList;
+        ContentsModel contentsModel = ContentsModel.find(dbSession, filter, childIdentifiers, orderBy);
+        if (contentsModel != null) {
+            contentModelList = contentsModel.getContentModelList();
+        } else {
+            contentModelList = new ArrayList<>();
+        }
+
+        // Return the childrenInDB
+        return contentModelList;
     }
 
 }
