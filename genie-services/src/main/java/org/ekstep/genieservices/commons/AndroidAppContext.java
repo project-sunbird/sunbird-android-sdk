@@ -7,6 +7,7 @@ import org.ekstep.genieservices.commons.db.ServiceDbHelper;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.cache.PreferenceWrapper;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.commons.downloadmanager.DownloadManager;
 import org.ekstep.genieservices.commons.exception.ExternalFileNotAccessibleException;
 import org.ekstep.genieservices.commons.network.AndroidHttpClient;
 import org.ekstep.genieservices.commons.network.AndroidNetworkConnectivity;
@@ -31,6 +32,7 @@ public class AndroidAppContext extends AppContext<Context> {
     private ILocationInfo mLocationInfo;
     private IParams mParams;
     private File mPrimaryFilesDir;
+    private IDownloadManager mDownloadManager;
 
     private AndroidAppContext(Context context, String appPackage, String key, String gDataId) {
         super(context, appPackage, key, gDataId);
@@ -43,11 +45,12 @@ public class AndroidAppContext extends AppContext<Context> {
         appContext.setSummarizerDBSession(ServiceDbHelper.getSummarizerDBSession(appContext));
         appContext.setConnectionInfo(new AndroidNetworkConnectivity(appContext));
         appContext.setHttpClient(new AndroidHttpClient(new BasicAuthenticator(appContext.getParams().getUserName(), appContext.getParams().getPassword())));
-        appContext.setKeyValueStore(new PreferenceWrapper(appContext, Constants.SHARED_PREFERENCE_NAME));
+        appContext.setKeyValueStore(new PreferenceWrapper(context, Constants.SHARED_PREFERENCE_NAME));
         appContext.setDeviceInfo(new DeviceInfo(context));
         appContext.setLocationInfo(new LocationInfo(context));
         appContext.setPrimaryFilesDir(context.getExternalFilesDir(null));
         TelemetryListener.init(appContext);
+        appContext.setDownloadManager(new DownloadManager(context));
         return appContext;
     }
 
@@ -135,8 +138,17 @@ public class AndroidAppContext extends AppContext<Context> {
         return mPrimaryFilesDir;
     }
 
+    @Override
+    public IDownloadManager getDownloadManager() {
+        return mDownloadManager;
+    }
+
     private void setPrimaryFilesDir(File primaryFilesDir) {
         this.mPrimaryFilesDir = primaryFilesDir;
+    }
+
+    private void setDownloadManager(IDownloadManager downloadManager) {
+        this.mDownloadManager = downloadManager;
     }
 
 }

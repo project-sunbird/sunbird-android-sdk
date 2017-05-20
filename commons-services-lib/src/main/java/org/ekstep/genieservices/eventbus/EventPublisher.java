@@ -1,5 +1,7 @@
 package org.ekstep.genieservices.eventbus;
 
+import org.ekstep.genieservices.commons.bean.DownloadProgress;
+import org.ekstep.genieservices.commons.bean.DownloadResponse;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.util.AsyncExecutor;
@@ -19,6 +21,28 @@ public class EventPublisher {
                     @Override
                     public void run() throws Exception {
                         EventBus.getDefault().post(telemetry);
+                    }
+                });
+    }
+
+    public static void postDownloadResponse(final DownloadResponse downloadResponse) {
+        EventPublisherThreadPool
+                .getInstance()
+                .execute(new AsyncExecutor.RunnableEx() {
+                    @Override
+                    public void run() throws Exception {
+                        EventBus.getDefault().post(downloadResponse);
+                    }
+                });
+    }
+
+    public static void postDownloadProgress(final DownloadProgress downloadProgress) {
+        EventPublisherThreadPool
+                .getInstance()
+                .execute(new AsyncExecutor.RunnableEx() {
+                    @Override
+                    public void run() throws Exception {
+                        EventBus.getDefault().post(downloadProgress);
                     }
                 });
     }

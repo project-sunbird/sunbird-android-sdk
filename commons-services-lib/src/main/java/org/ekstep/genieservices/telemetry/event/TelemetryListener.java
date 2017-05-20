@@ -3,6 +3,7 @@ package org.ekstep.genieservices.telemetry.event;
 import com.google.gson.Gson;
 
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.bean.DownloadResponse;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.greenrobot.eventbus.EventBus;
@@ -44,6 +45,7 @@ public class TelemetryListener {
     public void onTelemetryEvent(Telemetry telemetryEvent) throws InterruptedException {
         TelemetryHandler.handleTelemetryEvent(telemetryEvent, this.appContext);
     }
+
 
     @Subscribe
     public void onThrowableFailureEvent(ThrowableFailureEvent event) {

@@ -42,6 +42,8 @@ public interface ServiceConstants {
         String SYNC_CONFIG_SHARED_PREFERENCE_KEY = "syncConfig";
         String LAST_SYNC_TIME = "lastSyncTime";
         String SYNC_FILE_SIZE = "SYNC_FILE_SIZE";
+
+        String DOWNLOAD_QUEUE="download_queue";
     }
 
     interface API {

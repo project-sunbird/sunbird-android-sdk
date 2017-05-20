@@ -71,4 +71,6 @@ public abstract class AppContext<C> {
 
     public abstract File getPrimaryFilesDir();
 
+    public abstract IDownloadManager getDownloadManager();
+
 }

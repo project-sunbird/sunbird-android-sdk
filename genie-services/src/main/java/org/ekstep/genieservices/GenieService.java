@@ -5,8 +5,13 @@ import android.content.Context;
 import org.ekstep.genieservices.commons.AndroidAppContext;
 import org.ekstep.genieservices.commons.AndroidLogger;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.config.ConfigServiceImpl;
+import org.ekstep.genieservices.content.ContentFeedbackServiceImpl;
+import org.ekstep.genieservices.content.ContentServiceImpl;
+import org.ekstep.genieservices.content.downloadmanager.DownloadQueueListener;
+import org.ekstep.genieservices.content.downloadmanager.DownloadService;
 import org.ekstep.genieservices.partner.PartnerServiceImpl;
 import org.ekstep.genieservices.profile.UserServiceImpl;
 import org.ekstep.genieservices.telemetry.SyncServiceImpl;
@@ -28,6 +33,9 @@ public class GenieService {
     private IUserService mUserService;
     private ISyncService mSyncService;
     private IPartnerService mPartnerService;
+    private DownloadService mDownloadService;
+    private IContentService mContentService;
+    private IContentFeedbackService mContentFeedbackService;
 
     private GenieService(AppContext<Context> applicationContext) {
         this.mAppContext = applicationContext;
@@ -43,6 +51,7 @@ public class GenieService {
             AppContext<Context> applicationContext = AndroidAppContext.buildAppContext(context, packageName, apiKey, gDataId);
             Logger.init(new AndroidLogger());
             TelemetryLogger.init(new TelemetryServiceImpl(applicationContext, new UserServiceImpl(applicationContext)));
+            DownloadQueueListener.init(applicationContext);
             sService = new GenieService(applicationContext);
         }
         return sService;
@@ -81,5 +90,30 @@ public class GenieService {
             mPartnerService = new PartnerServiceImpl(mAppContext);
         }
         return mPartnerService;
+    }
+
+    public DownloadService getDownloadService() {
+        if (mDownloadService == null) {
+            mDownloadService = new DownloadService(mAppContext);
+        }
+        return mDownloadService;
+    }
+
+    public IContentFeedbackService getContentFeedbackService() {
+        if (mContentFeedbackService == null) {
+            mContentFeedbackService = new ContentFeedbackServiceImpl(mAppContext);
+        }
+        return mContentFeedbackService;
+    }
+
+    public IContentService getContentService() {
+        if (mContentService == null) {
+            mContentService = new ContentServiceImpl(mAppContext,getUserProfileService(),getContentFeedbackService(),getConfigService());
+        }
+        return mContentService;
+    }
+
+    public IKeyValueStore getKeyStore() {
+        return mAppContext.getKeyValueStore();
     }
 }
