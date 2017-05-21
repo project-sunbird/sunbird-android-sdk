@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.TelemetryService;
+package org.ekstep.genieservices.telemetryservice;
 
 import android.util.Log;
 
@@ -63,9 +63,9 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
     }
 
     @Test
-    public void _1shouldSaveTelemetryData() {
+    public void shouldSaveTelemetryData() {
 
-        GenieServiceDBHelper.clearProfileTableEntry();
+        GenieServiceDBHelper.clearProfileTable();
         GenieServiceDBHelper.clearTelemetryTableEntry();
 
         Profile createdProfile = createUserProfile();
@@ -88,7 +88,7 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
     @Test
     public void _2shouldSaveTelemetryData() {
 
-        GenieServiceDBHelper.clearProfileTableEntry();
+        GenieServiceDBHelper.clearProfileTable();
         GenieServiceDBHelper.clearTelemetryTableEntry();
 
         Profile profile = createUserProfile();
@@ -110,7 +110,7 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
     @Test
     public void _3shouldCreatePartnerSession() {
 
-        GenieServiceDBHelper.clearProfileTableEntry();
+        GenieServiceDBHelper.clearProfileTable();
         GenieServiceDBHelper.clearTelemetryTableEntry();
 
         PartnerData partnerData = new PartnerData("org.ekstep.partner", "1.5", "1243", "PARTNER_DATA", PUBLIC_KEY);

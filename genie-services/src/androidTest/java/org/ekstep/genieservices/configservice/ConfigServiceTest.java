@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.ConfigService;
+package org.ekstep.genieservices.configservice;
 
 import android.support.test.runner.AndroidJUnit4;
 
@@ -22,7 +22,7 @@ public class ConfigServiceTest extends GenieServiceTestBase {
     private static final String TAG = ConfigServiceTest.class.getSimpleName();
 
     @Test
-    public void _1shouldGetAgeFromMasterData() {
+    public void shouldGetAgeFromMasterData() {
 
         waitForGenieToBecomeIdle();
 
@@ -34,7 +34,7 @@ public class ConfigServiceTest extends GenieServiceTestBase {
     }
 
     @Test
-    public void _2shouldGetBoardMasterData() {
+    public void shouldGetBoardMasterData() {
 
         waitForGenieToBecomeIdle();
 
@@ -46,7 +46,7 @@ public class ConfigServiceTest extends GenieServiceTestBase {
     }
 
     @Test
-    public void _3shouldGetMediumMasterData() {
+    public void shouldGetMediumMasterData() {
 
         waitForGenieToBecomeIdle();
 
@@ -58,7 +58,7 @@ public class ConfigServiceTest extends GenieServiceTestBase {
     }
 
     @Test
-    public void _4shouldGetSubjectMasterData() {
+    public void shouldGetSubjectMasterData() {
 
         waitForGenieToBecomeIdle();
 
@@ -70,7 +70,7 @@ public class ConfigServiceTest extends GenieServiceTestBase {
     }
 
     @Test
-    public void _5shouldGetGradeLevelMasterData() {
+    public void shouldGetGradeLevelMasterData() {
         GenieResponse<MasterData> genieResponse = activity.getMasterData(MasterDataType.GRADELEVEL);
         MasterData masterData = genieResponse.getResult();
         Assert.assertTrue(genieResponse.getStatus());
@@ -79,7 +79,7 @@ public class ConfigServiceTest extends GenieServiceTestBase {
     }
 
     @Test
-    public void _6shouldGetAgeGroupMasterData() {
+    public void shouldGetAgeGroupMasterData() {
 
         GenieResponse<MasterData> genieResponse = activity.getMasterData(MasterDataType.AGEGROUP);
         MasterData masterData = genieResponse.getResult();
@@ -89,7 +89,7 @@ public class ConfigServiceTest extends GenieServiceTestBase {
     }
 
     @Test
-    public void _7shouldGetOrdinals() {
+    public void shouldGetOrdinals() {
 
         waitForGenieToBecomeIdle();
 
@@ -100,7 +100,7 @@ public class ConfigServiceTest extends GenieServiceTestBase {
     }
 
     @Test
-    public void _8shouldGetResourceBundle() {
+    public void shouldGetResourceBundle() {
 
         waitForGenieToBecomeIdle();
 

@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.PartnerService;
+package org.ekstep.genieservices.partnerservice;
 
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -20,7 +20,7 @@ public class PartnerServiceTest extends GenieServiceTestBase {
             " * OSyoyYpX/JmDnxjq4QIDAQAB";
 
     @Test
-    public void _1shouldTestEntirePartnerFlow() {
+    public void shouldTestEntirePartnerFlow() {
 
         PartnerData partnerData = new PartnerData("org.ekstep.partner", "1.6", PARTNER_ID, PARTNER_DATA, PUBLIC_KEY);
 
@@ -59,7 +59,7 @@ public class PartnerServiceTest extends GenieServiceTestBase {
     }
 
     @Test
-    public void _2shouldTestEntirePartnerFlowForMultiplePartner() {
+    public void shouldTestEntirePartnerFlowForMultiplePartner() {
 
         PartnerData partner1Data = new PartnerData("org.ekstep.partner", "1.7", "PARTNER1_ID", "partner_1 data", PUBLIC_KEY);
 

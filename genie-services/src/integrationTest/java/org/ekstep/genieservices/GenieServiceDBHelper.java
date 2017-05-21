@@ -56,21 +56,26 @@ public class GenieServiceDBHelper {
         return events;
     }
 
-    public static Cursor clearProfileTableEntry() {
+    public static void clearProfileTable() {
 
-        Cursor cursor = GenieServiceDBHelper.getDatabase().rawQuery(generateProfileClearQuery(), null);
+        try {
+            int count =  GenieServiceDBHelper.getDatabase().delete("profiles", "1", null);
+            Log.v("Count:::::", "" + count);
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        }
 
-        return cursor;
     }
 
     public static List<Profile> findProfile() {
 
         Cursor cursor = GenieServiceDBHelper.getDatabase().rawQuery(generateProfileQuery(), null);
 
-        List<Profile> profiles = new ArrayList<>();
+        List<Profile> profiles =null;
 
         if (cursor != null && cursor.moveToFirst())
             do {
+                profiles = new ArrayList<>();
                 Profile profile = new Profile(cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_UID)));
 
                 profile.setUid(cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_UID)));
@@ -106,7 +111,7 @@ public class GenieServiceDBHelper {
 
         cursor.close();
 
-        return null;
+        return profiles;
     }
 
     public static String generateProfileClearQuery() {

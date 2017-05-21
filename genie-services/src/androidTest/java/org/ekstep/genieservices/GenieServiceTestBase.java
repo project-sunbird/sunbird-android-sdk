@@ -5,7 +5,11 @@ import android.support.test.espresso.Espresso;
 import android.support.test.espresso.IdlingPolicies;
 import android.support.test.rule.ActivityTestRule;
 
+import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.userprofile.AssertProfile;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 
@@ -24,14 +28,11 @@ public class GenieServiceTestBase {
     public static final int DEFAULT_TIMEOUT_IN_SECONDS = 30;
     public static final int MASTER_POLICY_TIMEOUT_IN_MINS = 1;
     public static final int IDLING_RESOURCE_TIMEOUT_IN_MINS = 1;
-    private final String GS_DB = "/data/data/org.ekstep.genieservices/databases/GenieServices.db";
 
     @Rule
     public ActivityTestRule<GenieServiceTestActivity> rule = new ActivityTestRule<GenieServiceTestActivity>
             (GenieServiceTestActivity.class);
     protected GenieServiceTestActivity activity;
-    String COPY_OF_GS_DB = format("{0}/Download/GenieServices_copy.db",
-            Environment.getExternalStorageDirectory().getPath());
     private GenieServiceIdlingResource idlingResource;
 
     @Before
@@ -73,4 +74,24 @@ public class GenieServiceTestBase {
                     }
                 });
     }
+
+
+    /**
+     * Method to create a new user profile and return it.
+     *
+     * @return
+     */
+    protected Profile createNewProfile(Profile profile) {
+        GenieResponse<Profile> genieResponse = activity.createUserProfile(profile);
+        Profile createdProfile = genieResponse.getResult();
+        Assert.assertNotNull(genieResponse);
+        Assert.assertNotNull(createdProfile);
+        Assert.assertTrue(createdProfile.isValid());
+        Assert.assertTrue(genieResponse.getStatus());
+        AssertProfile.verifyProfile(profile,genieResponse.getResult());
+        return createdProfile;
+    }
+
+
+
 }
