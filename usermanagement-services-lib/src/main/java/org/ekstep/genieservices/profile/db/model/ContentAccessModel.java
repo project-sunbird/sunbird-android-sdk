@@ -1,6 +1,5 @@
 package org.ekstep.genieservices.profile.db.model;
 
-import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
@@ -34,13 +33,18 @@ public class ContentAccessModel implements IWritable, IReadable, IUpdatable {
     }
 
     private ContentAccessModel(IDBSession dbSession, String uid, String identifier) {
-        this(dbSession, uid, identifier, ServiceConstants.ACCESS_STATUS_VIEWED, null);
-    }
-
-    private ContentAccessModel(IDBSession dbSession, String uid, String identifier, int status, String contentType) {
         this.mDBSession = dbSession;
         this.uid = uid;
         this.identifier = identifier;
+    }
+
+    private ContentAccessModel(IDBSession dbSession, String uid, String identifier, String learnerStateJson) {
+        this(dbSession, uid, identifier);
+        this.learnerStateJson = learnerStateJson;
+    }
+
+    private ContentAccessModel(IDBSession dbSession, String uid, String identifier, int status, String contentType) {
+        this(dbSession, uid, identifier);
         this.status = status;
         this.contentType = contentType;
     }
@@ -51,6 +55,11 @@ public class ContentAccessModel implements IWritable, IReadable, IUpdatable {
 
     public static ContentAccessModel build(IDBSession dbSession, String uid, String identifier, int status, String contentType) {
         ContentAccessModel contentAccess = new ContentAccessModel(dbSession, uid, identifier, status, contentType);
+        return contentAccess;
+    }
+
+    public static ContentAccessModel build(IDBSession dbSession, String uid, String identifier, String learnerStateJson) {
+        ContentAccessModel contentAccess = new ContentAccessModel(dbSession, uid, identifier, learnerStateJson);
         return contentAccess;
     }
 

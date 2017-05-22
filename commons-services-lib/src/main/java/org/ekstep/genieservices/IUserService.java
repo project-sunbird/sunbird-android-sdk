@@ -7,6 +7,7 @@ import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.UserSession;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * This is the interface with all the required APIs to perform necessary operations related to Users
@@ -119,4 +120,6 @@ public interface IUserService {
      * @return
      */
     public GenieResponse<List<ContentAccess>> getAllContentAccess(ContentAccessCriteria criteria);
+
+    GenieResponse<Void> setLearnerState(String contentIdentifier, Map<String, Object> learnerState);
 }

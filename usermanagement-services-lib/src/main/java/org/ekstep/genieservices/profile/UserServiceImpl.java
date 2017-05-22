@@ -325,4 +325,25 @@ public class UserServiceImpl extends BaseService implements IUserService {
         return response;
     }
 
+    @Override
+    public GenieResponse<Void> setLearnerState(String contentIdentifier, Map<String, Object> learnerState) {
+        UserSession userSession = getCurrentUserSession().getResult();
+        String uid = userSession.getUid();
+        if (StringUtil.isNullOrEmpty(uid)) {
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, "Failed to get the current user id.", TAG);
+        }
+
+        ContentAccessModel contentAccessModel = ContentAccessModel.build(mAppContext.getDBSession(), uid, contentIdentifier, GsonUtil.toJson(learnerState));
+        ContentAccessModel contentAccessModelInDb = ContentAccessModel.find(mAppContext.getDBSession(), uid, contentIdentifier);
+        if (contentAccessModelInDb == null) {
+            contentAccessModel.setStatus(ServiceConstants.ContentAccessStatus.VIEWED);
+            contentAccessModel.save();
+        } else {
+            contentAccessModel.setStatus(contentAccessModelInDb.getStatus());
+            contentAccessModel.update();
+        }
+
+        return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+    }
+
 }
