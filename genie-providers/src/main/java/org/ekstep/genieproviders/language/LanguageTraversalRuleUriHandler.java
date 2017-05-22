@@ -9,14 +9,14 @@ import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 
-import org.ekstep.genieproviders.IHandleUri;
+import org.ekstep.genieproviders.IUriHandler;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 
 import java.util.Locale;
 
-public class LanguageTraversalRuleUriHandler implements IHandleUri {
+public class LanguageTraversalRuleUriHandler implements IUriHandler {
     private static final String TAG = LanguageTraversalRuleUriHandler.class.getSimpleName();
     private String authority;
     private Context context;

@@ -5,12 +5,12 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 
-import org.ekstep.genieproviders.IHandleUri;
+import org.ekstep.genieproviders.IUriHandler;
 
 import java.util.HashMap;
 import java.util.Locale;
 
-public class ContentUriHandler implements IHandleUri {
+public class ContentUriHandler implements IUriHandler {
     private final static String METHOD_NAME = "get";
     private String TAG = "service-CUH";
     private String authority;

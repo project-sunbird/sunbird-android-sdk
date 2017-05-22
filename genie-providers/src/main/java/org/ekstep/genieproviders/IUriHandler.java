@@ -4,7 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 
-public interface IHandleUri {
+public interface IUriHandler {
     Cursor process();
 
     boolean canProcess(Uri uri);

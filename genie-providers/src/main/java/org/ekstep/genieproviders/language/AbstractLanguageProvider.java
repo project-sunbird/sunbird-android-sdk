@@ -6,7 +6,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import org.ekstep.genieproviders.BaseContentProvider;
-import org.ekstep.genieproviders.IHandleUri;
+import org.ekstep.genieproviders.IUriHandler;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ public abstract class AbstractLanguageProvider extends BaseContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         List<LanguageTraversalRuleUriHandler> handlers = getUriHandlers(selection, selectionArgs);
-        for (IHandleUri handler : handlers)
+        for (IUriHandler handler : handlers)
             if (handler.canProcess(uri))
                 return handler.process();
         return null;

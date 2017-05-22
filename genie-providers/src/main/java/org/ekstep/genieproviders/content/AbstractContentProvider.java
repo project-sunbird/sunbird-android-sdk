@@ -5,7 +5,7 @@ import android.database.Cursor;
 import android.net.Uri;
 
 import org.ekstep.genieproviders.BaseContentProvider;
-import org.ekstep.genieproviders.IHandleUri;
+import org.ekstep.genieproviders.IUriHandler;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ public abstract class AbstractContentProvider extends BaseContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         List<ContentUriHandler> handlers = ContentUriHandlerFactory.uriHandlers(getCompletePath(), getContext(), selection, selectionArgs);
-        for (IHandleUri handler : handlers) {
+        for (IUriHandler handler : handlers) {
             if (handler.canProcess(uri)) {
                 return handler.process();
             }
@@ -37,7 +37,7 @@ public abstract class AbstractContentProvider extends BaseContentProvider {
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         List<ContentUriHandler> handlers = ContentUriHandlerFactory.uriHandlers(getCompletePath(), getContext(), null, null);
-        for (IHandleUri handler : handlers) {
+        for (IUriHandler handler : handlers) {
             if (handler.canProcess(uri)) {
                 return handler.insert(uri, values);
             }

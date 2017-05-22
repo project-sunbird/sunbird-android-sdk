@@ -30,6 +30,9 @@ public interface ServiceConstants {
     String SYNC_PROMPT = "SYNC_PROMPT";
     String CONTENT_API_EXPIRATION_KEY = "content_api_expiration_time";
 
+    /*Key used while creating the user from Provider*/
+    String PROFILE = "profile";
+
     interface PreferenceKey {
         //Sync service pref keys
         String SYNC_CONFIG_SHARED_PREFERENCE_KEY = "syncConfig";

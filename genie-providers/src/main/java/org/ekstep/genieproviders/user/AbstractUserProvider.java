@@ -8,6 +8,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.ekstep.genieproviders.BaseContentProvider;
+import org.ekstep.genieproviders.IUriHandler;
+import org.ekstep.genieservices.ServiceConstants;
+import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
+
+import java.util.List;
 
 /**
  * Created on 19/5/17.
@@ -22,10 +28,12 @@ public abstract class AbstractUserProvider extends BaseContentProvider {
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        // TODO: 22/5/17 Need to add diffent service for getting all the users
-//        Cursor cursor = database.rawQuery(String.format(Locale.US, "select * from %s order by %s asc", ProfileEntry.TABLE_NAME, ProfileEntry.COLUMN_NAME_HANDLE), null);
-//        Log.i(LOG_TAG, "Read profiles, count:" + String.valueOf(cursor.getCount()));
-//        return cursor;
+        List<CurrentUserUriHandler> handlers = ProfileUriHandlerFactory.uriHandlers(getCompletePath(), getContext(), selection, selectionArgs, getService());
+        for (IUriHandler handler : handlers) {
+            if (handler.canProcess(uri)) {
+                return handler.process();
+            }
+        }
         return null;
     }
 
@@ -35,17 +43,36 @@ public abstract class AbstractUserProvider extends BaseContentProvider {
     }
 
     @Override
-    public abstract Uri insert(@NonNull Uri uri, @Nullable ContentValues values);
+    public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
+        Profile profile = GsonUtil.fromJson(values.getAsString(ServiceConstants.PROFILE), Profile.class);
+        getService().getUserProfileService().createUserProfile(profile);
+        return uri;
+    }
 
     @Override
-    public abstract int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs);
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
+        if (selectionArgs[0].isEmpty()) {
+            return 0;
+        } else {
+            getService().getUserProfileService().deleteUser(selectionArgs[0]);
+            return 1;
+        }
+    }
 
     @Override
-    public abstract int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs);
+    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        if (selectionArgs[0].isEmpty()) {
+            return 0;
+        } else {
+            Profile profile = GsonUtil.fromJson(values.getAsString(ServiceConstants.PROFILE), Profile.class);
+            getService().getUserProfileService().updateUserProfile(profile);
+            return 1;
+        }
+    }
 
-    public String getCompleteUserAuthority(String authority) {
-        String fullAuthorityName = String.format("%s.profiles", authority);
-        return fullAuthorityName;
+    private String getCompletePath() {
+        String CONTENT_PATH = "profiles";
+        return String.format("%s.%s", getPackageName(), CONTENT_PATH);
     }
 
     public abstract String getPackageName();
