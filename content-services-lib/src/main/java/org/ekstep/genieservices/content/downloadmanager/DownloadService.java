@@ -1,6 +1,5 @@
 package org.ekstep.genieservices.content.downloadmanager;
 
-import org.ekstep.genieservices.IContentService;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.Request;
@@ -9,12 +8,11 @@ import org.ekstep.genieservices.util.DownloadQueueManager;
 import java.util.List;
 
 /**
- * Created by swayangjit on 17/5/17.
+ * Created on 17/5/17.
+ *
+ * @author swayangjit
  */
-
 public class DownloadService {
-
-    private IContentService mContentService;
 
     private AppContext mAppContext;
     private DownloadQueueManager mDownloadQueueManager = null;
@@ -24,13 +22,14 @@ public class DownloadService {
         this.mDownloadQueueManager = new DownloadQueueManager(mAppContext.getKeyValueStore());
     }
 
+    // TODO: 5/22/2017
     public void enQueue(DownloadRequest... downloadRequest) {
-
         if (downloadRequest.length > 0) {
             for (DownloadRequest request : downloadRequest) {
-                 mDownloadQueueManager.save(request);
+                mDownloadQueueManager.save(request);
             }
         }
+
         startQueue();
     }
 
@@ -42,6 +41,5 @@ public class DownloadService {
             mDownloadQueueManager.update(request.getIdentifier(), downloadId);
             mAppContext.getDownloadManager().startDownloadProgressTracker();
         }
-
     }
 }

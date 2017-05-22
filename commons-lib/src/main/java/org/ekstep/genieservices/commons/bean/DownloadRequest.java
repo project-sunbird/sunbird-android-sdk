@@ -1,9 +1,10 @@
 package org.ekstep.genieservices.commons.bean;
 
 /**
- * Created by swayangjit on 17/5/17.
+ * Created on 17/5/17.
+ *
+ * @author swayangjit
  */
-
 public class DownloadRequest {
 
     private long downloadId;
@@ -18,6 +19,14 @@ public class DownloadRequest {
         this.identifier = identifier;
         this.downloadUrl = downloadUrl;
         this.mimeType = mimeType;
+    }
+
+    public long getDownloadId() {
+        return downloadId;
+    }
+
+    public void setDownloadId(long downloadId) {
+        this.downloadId = downloadId;
     }
 
     public String getIdentifier() {
@@ -36,10 +45,6 @@ public class DownloadRequest {
         this.name = name;
     }
 
-    public void setDownloadId(long downloadId) {
-        this.downloadId = downloadId;
-    }
-
     public String getMimeType() {
         return mimeType;
     }
@@ -52,7 +57,4 @@ public class DownloadRequest {
         this.filePath = filePath;
     }
 
-    public long getDownloadId() {
-        return downloadId;
-    }
 }

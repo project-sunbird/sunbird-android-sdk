@@ -11,7 +11,6 @@ import org.ekstep.genieservices.config.ConfigServiceImpl;
 import org.ekstep.genieservices.content.ContentFeedbackServiceImpl;
 import org.ekstep.genieservices.content.ContentServiceImpl;
 import org.ekstep.genieservices.content.downloadmanager.DownloadQueueListener;
-import org.ekstep.genieservices.content.downloadmanager.DownloadService;
 import org.ekstep.genieservices.partner.PartnerServiceImpl;
 import org.ekstep.genieservices.profile.UserServiceImpl;
 import org.ekstep.genieservices.telemetry.SyncServiceImpl;
@@ -33,7 +32,6 @@ public class GenieService {
     private IUserService mUserService;
     private ISyncService mSyncService;
     private IPartnerService mPartnerService;
-    private DownloadService mDownloadService;
     private IContentService mContentService;
     private IContentFeedbackService mContentFeedbackService;
 
@@ -90,13 +88,6 @@ public class GenieService {
             mPartnerService = new PartnerServiceImpl(mAppContext);
         }
         return mPartnerService;
-    }
-
-    public DownloadService getDownloadService() {
-        if (mDownloadService == null) {
-            mDownloadService = new DownloadService(mAppContext);
-        }
-        return mDownloadService;
     }
 
     public IContentFeedbackService getContentFeedbackService() {

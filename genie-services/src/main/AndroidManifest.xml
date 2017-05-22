@@ -12,7 +12,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true">
         <receiver
-            android:name=".commons.downloadmanager.DownloadBroadcastReceiver"
+            android:name=".commons.download.DownloadFileReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

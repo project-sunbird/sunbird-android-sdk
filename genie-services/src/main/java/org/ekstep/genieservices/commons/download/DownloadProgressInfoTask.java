@@ -1,6 +1,5 @@
-package org.ekstep.genieservices.commons.downloadmanager;
+package org.ekstep.genieservices.commons.download;
 
-import android.app.DownloadManager;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
@@ -13,23 +12,24 @@ import org.ekstep.genieservices.eventbus.EventPublisher;
 import org.ekstep.genieservices.util.DownloadQueueManager;
 
 /**
- * Created by swayangjit on 20/5/17.
+ * Created on 20/5/17.
+ *
+ * @author swayangjit
  */
-
 public class DownloadProgressInfoTask extends AsyncTask<Void, Integer, Void> {
 
-    private Context mContext = null;
     private DownloadRequest mDownloadRequest;
+    private android.app.DownloadManager downloadManager;
 
-    public DownloadProgressInfoTask(Context context, long id) {
-        this.mContext = context;
-        this.mDownloadRequest = new DownloadQueueManager(GenieService.getService().getKeyStore()).getRequest(id);
+    public DownloadProgressInfoTask(Context context, long downloadId) {
+        this.mDownloadRequest = new DownloadQueueManager(GenieService.getService().getKeyStore()).getRequest(downloadId);
+        downloadManager = (android.app.DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
     }
 
     @Override
     protected Void doInBackground(Void... params) {
         boolean downloading;
-        final android.app.DownloadManager downloadManager = getDownloadManager();
+
         do {
             android.app.DownloadManager.Query q = new android.app.DownloadManager.Query();
             q.setFilterById(mDownloadRequest.getDownloadId());
@@ -70,11 +70,6 @@ public class DownloadProgressInfoTask extends AsyncTask<Void, Integer, Void> {
     @Override
     protected void onProgressUpdate(Integer... values) {
         EventPublisher.postDownloadProgress(new DownloadProgress(mDownloadRequest.getIdentifier(), mDownloadRequest.getDownloadId(), values[0]));
-    }
-
-
-    private android.app.DownloadManager getDownloadManager() {
-        return (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);
     }
 
 }

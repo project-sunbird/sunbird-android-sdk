@@ -1,12 +1,14 @@
 package org.ekstep.genieservices.commons.bean;
 
 /**
- * Created by swayangjit on 20/5/17.
+ * Created on 20/5/17.
+ *
+ * @author swayangjit
  */
-
 public class DownloadProgress {
-    private String identifier;
+
     private long downloadId;
+    private String identifier;
     private int downloadProgress;
 
     public DownloadProgress(String identifier, long downloadId, int downloadProgress) {
@@ -15,12 +17,12 @@ public class DownloadProgress {
         this.downloadProgress = downloadProgress;
     }
 
-    public String getIdentifier() {
-        return identifier;
-    }
-
     public long getDownloadId() {
         return downloadId;
+    }
+
+    public String getIdentifier() {
+        return identifier;
     }
 
     public int getDownloadProgress() {

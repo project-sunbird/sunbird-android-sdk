@@ -9,15 +9,16 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 /**
- * Created by shriharsh on 20/4/17.
+ * Created on 20/4/17.
+ *
+ * @author shriharsh
  */
-
 public class FileUtil {
 
     public static String readFileFromClasspath(String filename) {
         String result = "";
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(FileUtil.class.getResourceAsStream("/" + filename)));;
+            BufferedReader br = new BufferedReader(new InputStreamReader(FileUtil.class.getResourceAsStream("/" + filename)));
             StringBuilder sb = new StringBuilder();
             String line = br.readLine();
             while (line != null) {
@@ -42,7 +43,12 @@ public class FileUtil {
         } catch (final IOException e) {
             e.printStackTrace();
         }
-        return targetFile.toString();
+
+        if (targetFile != null) {
+            return targetFile.toString();
+        }
+
+        return null;
     }
 
 }

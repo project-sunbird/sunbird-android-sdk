@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.commons.downloadmanager;
+package org.ekstep.genieservices.commons.download;
 
 import android.content.Context;
 import android.net.Uri;
@@ -7,9 +7,10 @@ import org.ekstep.genieservices.commons.IDownloadManager;
 import org.ekstep.genieservices.commons.bean.Request;
 
 /**
- * Created by swayangjit on 17/5/17.
+ * Created on 17/5/17.
+ *
+ * @author swayangjit
  */
-
 public class DownloadManager implements IDownloadManager {
 
     private Context mContext;
@@ -33,7 +34,7 @@ public class DownloadManager implements IDownloadManager {
 
     @Override
     public void startDownloadProgressTracker() {
-        DownloadProgressInfoTask downloadProgressInfoTask = new DownloadProgressInfoTask(mContext,mDownloadId);
+        DownloadProgressInfoTask downloadProgressInfoTask = new DownloadProgressInfoTask(mContext, mDownloadId);
         downloadProgressInfoTask.execute();
     }
 

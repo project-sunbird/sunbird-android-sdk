@@ -7,7 +7,7 @@ import org.ekstep.genieservices.commons.db.ServiceDbHelper;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.cache.PreferenceWrapper;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.commons.downloadmanager.DownloadManager;
+import org.ekstep.genieservices.commons.download.DownloadManager;
 import org.ekstep.genieservices.commons.exception.ExternalFileNotAccessibleException;
 import org.ekstep.genieservices.commons.network.AndroidHttpClient;
 import org.ekstep.genieservices.commons.network.AndroidNetworkConnectivity;

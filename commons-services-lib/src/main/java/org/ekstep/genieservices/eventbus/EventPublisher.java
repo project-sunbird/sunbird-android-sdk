@@ -7,9 +7,10 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.util.AsyncExecutor;
 
 /**
- * Created by swayangjit on 26/4/17.
+ * Created on 26/4/17.
+ *
+ * @author swayangjit
  */
-
 public class EventPublisher {
 
     public static final String TAG = EventPublisher.class.getSimpleName();
