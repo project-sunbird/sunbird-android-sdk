@@ -1,27 +1,38 @@
 package org.ekstep.genieproviders.user;
 
 
-import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.ekstep.genieproviders.BaseContentProvider;
+
 /**
  * Created on 19/5/17.
  * shriharsh
  */
 
-public abstract class AbstractUserProvider extends ContentProvider {
+public abstract class AbstractUserProvider extends BaseContentProvider {
     @Override
-    public abstract boolean onCreate();
+    public boolean onCreate() {
+        return true;
+    }
 
     @Override
-    public abstract Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder);
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        // TODO: 22/5/17 Need to add diffent service for getting all the users
+//        Cursor cursor = database.rawQuery(String.format(Locale.US, "select * from %s order by %s asc", ProfileEntry.TABLE_NAME, ProfileEntry.COLUMN_NAME_HANDLE), null);
+//        Log.i(LOG_TAG, "Read profiles, count:" + String.valueOf(cursor.getCount()));
+//        return cursor;
+        return null;
+    }
 
     @Override
-    public abstract String getType(@NonNull Uri uri);
+    public String getType(Uri uri) {
+        return String.format("vnd.android.cursor.item/%s.provider.profiles", getPackageName());
+    }
 
     @Override
     public abstract Uri insert(@NonNull Uri uri, @Nullable ContentValues values);
@@ -35,5 +46,12 @@ public abstract class AbstractUserProvider extends ContentProvider {
     public String getCompleteUserAuthority(String authority) {
         String fullAuthorityName = String.format("%s.profiles", authority);
         return fullAuthorityName;
+    }
+
+    public abstract String getPackageName();
+
+    @Override
+    public String getPackage() {
+        return getPackageName();
     }
 }

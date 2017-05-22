@@ -1,37 +1,72 @@
 package org.ekstep.genieproviders.language;
 
-import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.annotation.NonNull;
+
+import org.ekstep.genieproviders.BaseContentProvider;
+import org.ekstep.genieproviders.IHandleUri;
+
+import java.util.List;
 
 /**
  * Created on 18/5/17.
  * shriharsh
  */
 
-public abstract class AbstractLanguageProvider extends ContentProvider {
+public abstract class AbstractLanguageProvider extends BaseContentProvider {
 
     @Override
-    public abstract boolean onCreate();
+    public boolean onCreate() {
+        return true;
+    }
 
     @Override
-    public abstract Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder);
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        List<LanguageTraversalRuleUriHandler> handlers = getUriHandlers(selection, selectionArgs);
+        for (IHandleUri handler : handlers)
+            if (handler.canProcess(uri))
+                return handler.process();
+        return null;
+    }
+
+    @NonNull
+    protected List<LanguageTraversalRuleUriHandler> getUriHandlers(String selection, String[] selectionArgs) {
+        return LanguageUriHandlerFactory.uriHandlers(getCompletePath(),
+                getContext(), selection);
+    }
 
     @Override
-    public abstract String getType(Uri uri);
+    public String getType(Uri uri) {
+        return String.format("vnd.android.cursor.item/%s.provider.languages", getPackageName());
+    }
+
 
     @Override
-    public abstract Uri insert(Uri uri, ContentValues values);
+    public Uri insert(Uri uri, ContentValues values) {
+        return null;
+    }
 
     @Override
-    public abstract int delete(Uri uri, String selection, String[] selectionArgs);
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
+        return 0;
+    }
 
     @Override
-    public abstract int update(Uri uri, ContentValues values, String selection, String[] selectionArgs);
+    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        return 0;
+    }
 
-    public String getCompleteLanguageAuthority(String authority) {
-        String fullAuthorityName = String.format("%s.languages", authority);
-        return fullAuthorityName;
+    private String getCompletePath() {
+        String LANGUAGE_PATH = "languages";
+        return String.format("%s.%s", getPackageName(), LANGUAGE_PATH);
+    }
+
+    public abstract String getPackageName();
+
+    @Override
+    public String getPackage() {
+        return getPackageName();
     }
 }

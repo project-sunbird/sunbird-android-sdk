@@ -4,27 +4,67 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 
-public abstract class AbstractContentProvider extends android.content.ContentProvider {
-    @Override
-    public abstract boolean onCreate();
+import org.ekstep.genieproviders.BaseContentProvider;
+import org.ekstep.genieproviders.IHandleUri;
+
+import java.util.List;
+
+public abstract class AbstractContentProvider extends BaseContentProvider {
 
     @Override
-    public abstract Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder);
+    public boolean onCreate() {
+        return true;
+    }
 
     @Override
-    public abstract String getType(Uri uri);
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        List<ContentUriHandler> handlers = ContentUriHandlerFactory.uriHandlers(getCompletePath(), getContext(), selection, selectionArgs);
+        for (IHandleUri handler : handlers) {
+            if (handler.canProcess(uri)) {
+                return handler.process();
+            }
+        }
+
+        return null;
+    }
+
 
     @Override
-    public abstract Uri insert(Uri uri, ContentValues values);
+    public String getType(Uri uri) {
+        return String.format("vnd.android.cursor.item/%s.provider.content", getPackageName());
+    }
 
     @Override
-    public abstract int delete(Uri uri, String selection, String[] selectionArgs);
+    public Uri insert(Uri uri, ContentValues values) {
+        List<ContentUriHandler> handlers = ContentUriHandlerFactory.uriHandlers(getCompletePath(), getContext(), null, null);
+        for (IHandleUri handler : handlers) {
+            if (handler.canProcess(uri)) {
+                return handler.insert(uri, values);
+            }
+        }
+
+        return null;
+    }
 
     @Override
-    public abstract int update(Uri uri, ContentValues values, String selection, String[] selectionArgs);
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
+        return 0;
+    }
 
-    public String getCompleteContentAuthority(String authority) {
-        String fullAuthorityName = String.format("%s.languages", authority);
-        return fullAuthorityName;
+    @Override
+    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        return 0;
+    }
+
+    private String getCompletePath() {
+        String CONTENT_PATH = "content";
+        return String.format("%s.%s", getPackageName(), CONTENT_PATH);
+    }
+
+    public abstract String getPackageName();
+
+    @Override
+    public String getPackage() {
+        return  getPackageName();
     }
 }

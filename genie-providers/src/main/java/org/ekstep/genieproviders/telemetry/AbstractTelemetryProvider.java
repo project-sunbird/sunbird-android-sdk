@@ -1,39 +1,63 @@
 package org.ekstep.genieproviders.telemetry;
 
-import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.ekstep.genieproviders.BaseContentProvider;
+import org.ekstep.genieservices.commons.db.contract.TelemetryEntry;
+
 /**
  * Created on 19/5/17.
  * shriharsh
  */
 
-public abstract class AbstractTelemetryProvider extends ContentProvider {
+public abstract class AbstractTelemetryProvider extends BaseContentProvider {
 
     @Override
-    public abstract boolean onCreate();
+    public boolean onCreate() {
+        return true;
+    }
+
 
     @Override
-    public abstract Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder);
+    public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
+        return null;
+    }
 
     @Override
-    public abstract String getType(@NonNull Uri uri);
+    public String getType(Uri uri) {
+        return String.format("vnd.android.cursor.item/%s.provider.telemetry", getPackageName());
+    }
 
     @Override
-    public abstract Uri insert(@NonNull Uri uri, @Nullable ContentValues values);
+    public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
+        String eventString = values.getAsString(TelemetryEntry.COLUMN_NAME_EVENT);
+        getService().getTelemetryService().saveTelemetry(eventString);
+        return null;
+    }
 
     @Override
-    public abstract int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs);
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
+        return 0;
+    }
 
     @Override
-    public abstract int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs);
+    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        return 0;
+    }
 
-    public String getCompleteUserAuthority(String authority) {
-        String fullAuthorityName = String.format("%s.telemetry", authority);
-        return fullAuthorityName;
+    private String getCompletePath() {
+        String CONTENT_PATH = ".telemetry";
+        return String.format("%s.%s", getPackageName(), CONTENT_PATH);
+    }
+
+    public abstract String getPackageName();
+
+    @Override
+    public String getPackage() {
+        return getPackageName();
     }
 }

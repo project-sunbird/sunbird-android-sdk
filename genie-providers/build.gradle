@@ -1,5 +1,15 @@
 apply plugin: 'com.android.library'
 
+repositories {
+    mavenLocal()
+    mavenCentral()
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
+    }
+}
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.3"
@@ -24,7 +34,8 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':commons-lib')
-    compile project(path: ':commons-services-lib')
+    compile project(':commons-services-lib')
+    compile(name:'genie-services-production-debug',ext:'aar')
 
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
