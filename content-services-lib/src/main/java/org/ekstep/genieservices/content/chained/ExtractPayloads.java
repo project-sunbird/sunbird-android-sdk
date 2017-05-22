@@ -126,7 +126,7 @@ public class ExtractPayloads implements IChainable {
 
                 // TODO: 5/18/2017 - Revisit this - handling the APK while importing ECAR.
                 //launch system prompt for Install apk...
-//                showInstallAPKPrompt(context, contentPath, artifactUrl, preRequisites);
+                showInstallAPKPrompt(context, contentPath, artifactUrl, preRequisites);
 
             } else {
                 String status = (String) item.get("status");

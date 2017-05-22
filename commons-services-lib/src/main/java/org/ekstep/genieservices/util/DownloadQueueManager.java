@@ -11,9 +11,10 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by swayangjit on 20/5/17.
+ * Created on 20/5/17.
+ *
+ * @author swayangjit
  */
-
 public class DownloadQueueManager {
     private IKeyValueStore mKeyValueStore;
 
@@ -27,9 +28,9 @@ public class DownloadQueueManager {
         if (!StringUtil.isNullOrEmpty(jsonContents)) {
             DownloadRequest[] contentItems = GsonUtil.fromJson(jsonContents, DownloadRequest[].class);
             requestList = Arrays.asList(contentItems);
-            requestList = new ArrayList<DownloadRequest>(requestList);
+            requestList = new ArrayList<>(requestList);
         } else {
-            requestList = new ArrayList<DownloadRequest>();
+            requestList = new ArrayList<>();
         }
         return requestList;
     }
@@ -44,7 +45,6 @@ public class DownloadQueueManager {
                     return downloadingRequest;
                 }
             }
-
         }
         return null;
     }
@@ -60,12 +60,10 @@ public class DownloadQueueManager {
                     save(contentList);
                 }
             }
-
-
         }
     }
 
-    public void remove( long downloadId) {
+    public void remove(long downloadId) {
         List<DownloadRequest> contentList = findAll();
 
         if (contentList != null) {
@@ -76,7 +74,6 @@ public class DownloadQueueManager {
                     save(contentList);
                 }
             }
-
         }
     }
 
@@ -86,7 +83,7 @@ public class DownloadQueueManager {
     }
 
     public void save(DownloadRequest request) {
-        List<DownloadRequest> requestList =findAll();
+        List<DownloadRequest> requestList = findAll();
         requestList.add(request);
         save(requestList);
     }

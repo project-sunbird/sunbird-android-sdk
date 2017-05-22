@@ -3,22 +3,19 @@ package org.ekstep.genieservices.commons.db.cache;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import org.ekstep.genieservices.commons.AppContext;
-
 import java.util.Set;
 
 /**
- * Created by swayangjit on 19/4/17.
+ * Created on 19/4/17.
+ *
+ * @author swayangjit
  */
-
 public class PreferenceWrapper implements IKeyValueStore {
 
     private SharedPreferences mSharedPrefs;
     private SharedPreferences.Editor mPrefsEditor;
-    private AppContext mAppContext;
 
-
-    public PreferenceWrapper(Context context,String name) {
+    public PreferenceWrapper(Context context, String name) {
         mSharedPrefs = context.getApplicationContext().getSharedPreferences(name, Context.MODE_PRIVATE);
         mPrefsEditor = mSharedPrefs.edit();
     }
@@ -30,7 +27,7 @@ public class PreferenceWrapper implements IKeyValueStore {
     }
 
     @Override
-    public void putStringSet(String key,  Set<String> value) {
+    public void putStringSet(String key, Set<String> value) {
         mPrefsEditor.putStringSet(key, value);
         mPrefsEditor.commit();
     }
@@ -49,17 +46,17 @@ public class PreferenceWrapper implements IKeyValueStore {
 
     @Override
     public String getString(String key, String defValue) {
-         return mSharedPrefs.getString(key, defValue);
+        return mSharedPrefs.getString(key, defValue);
     }
 
     @Override
-    public Set<String> getStringSet(String key,  Set<String> defValue) {
+    public Set<String> getStringSet(String key, Set<String> defValue) {
         return mSharedPrefs.getStringSet(key, defValue);
     }
 
     @Override
     public long getLong(String key, long defValue) {
-        return  mSharedPrefs.getLong(key, defValue);
+        return mSharedPrefs.getLong(key, defValue);
     }
 
     @Override

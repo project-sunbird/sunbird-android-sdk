@@ -108,7 +108,7 @@ public class GenieService {
 
     public IContentService getContentService() {
         if (mContentService == null) {
-            mContentService = new ContentServiceImpl(mAppContext,getUserProfileService(),getContentFeedbackService(),getConfigService());
+            mContentService = new ContentServiceImpl(mAppContext, getUserProfileService(), getContentFeedbackService(), getConfigService());
         }
         return mContentService;
     }

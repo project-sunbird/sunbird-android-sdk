@@ -138,13 +138,13 @@ public class AndroidAppContext extends AppContext<Context> {
         return mPrimaryFilesDir;
     }
 
+    private void setPrimaryFilesDir(File primaryFilesDir) {
+        this.mPrimaryFilesDir = primaryFilesDir;
+    }
+
     @Override
     public IDownloadManager getDownloadManager() {
         return mDownloadManager;
-    }
-
-    private void setPrimaryFilesDir(File primaryFilesDir) {
-        this.mPrimaryFilesDir = primaryFilesDir;
     }
 
     private void setDownloadManager(IDownloadManager downloadManager) {

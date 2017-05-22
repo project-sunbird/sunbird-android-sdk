@@ -29,5 +29,7 @@ public interface IContentService {
 
     GenieResponse<ContentSearchResult> getRelatedContent(String contentIdentifier);
 
+    GenieResponse<List<Content>> nextContent(List<String> contentIdentifiers);
+
     GenieResponse<Void> importContent(boolean isChildContent, String ecarFilePath);
 }

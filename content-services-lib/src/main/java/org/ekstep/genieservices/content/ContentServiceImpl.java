@@ -932,8 +932,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         return requestMap;
     }
 
-    private Map<String, Object> findNextStory(List<String> contentIdentifiers) {
-        Map<String, Object> resultMap = new HashMap<>();
+    @Override
+    public GenieResponse<List<Content>> nextContent(List<String> contentIdentifiers) {
+        List<Content> contentList = new ArrayList<>();
 
         try {
             List<String> contentsKeyList = new ArrayList<>();
@@ -1005,35 +1006,23 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 nextContentIdentifier = contentsKeyList.get(indexOfCurrentContentIdentifier - 1);
             }
 
-            List<Map<String, Object>> collectionsMap = new ArrayList<>();
             if (!StringUtil.isNullOrEmpty(nextContentIdentifier)) {
 
                 String nextContentIdentifierList[] = nextContentIdentifier.split("/");
                 for (String identifier : nextContentIdentifierList) {
                     ContentModel nextContentModel = ContentModel.find(mAppContext.getDBSession(), identifier);
 
-                    // TODO: 5/19/2017
                     Content content = getContent(nextContentModel, false, false);
-                    Map<String, Object> contentMap = nextContentModel.asMap();
-
-                    Map<String, Object> localDataMap = (Map<String, Object>) contentMap.get("localData");
-                    localDataMap.put("path", contentMap.get("path"));
-                    localDataMap.put("isAvailable", contentMap.get("isArtifactAvailable"));
-
-                    collectionsMap.add(localDataMap);
+                    contentList.add(content);
                 }
             }
-
-            resultMap.put("collection", collectionsMap);
-
         } catch (Exception e) {
             Logger.e(TAG, "" + e.getMessage());
-            resultMap.put("collection", new ArrayList<Map<String, Object>>());
         }
 
-        resultMap.put("content", new ArrayList<String>());
-
-        return resultMap;
+        GenieResponse<List<Content>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        response.setResult(contentList);
+        return response;
     }
 
     @Override
