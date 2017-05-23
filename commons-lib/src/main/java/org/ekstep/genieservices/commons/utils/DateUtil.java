@@ -84,5 +84,13 @@ public class DateUtil {
         return date.isAfter(startDateTime) && date.isBefore(endDateTime);
     }
 
+    public static Long getEpochDiff(long time) {
+        Long length = 0L;
+        if (time != 0L) {
+            length = getEpochTime() - time;
+        }
+        return length;
+    }
+
 
 }

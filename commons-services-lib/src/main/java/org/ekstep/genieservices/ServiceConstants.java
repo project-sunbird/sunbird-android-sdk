@@ -42,7 +42,14 @@ public interface ServiceConstants {
         String LAST_SYNC_TIME = "lastSyncTime";
         String SYNC_FILE_SIZE = "SYNC_FILE_SIZE";
 
-        String DOWNLOAD_QUEUE="download_queue";
+        //Download queue
+        String DOWNLOAD_QUEUE = "download_queue";
+
+        //Partner
+        String KEY_PARTNER_ID = "partnerid";
+        String KEY_ACTIVE_PARTNER_ID = "partner.activeid";
+        String SHARED_PREF_SESSION_KEY = "partnersessionid";
+        String SHARED_PREF_PARTNERSET_EPOCH = "partnerSET";
     }
 
     interface API {
@@ -94,6 +101,14 @@ public interface ServiceConstants {
         String INVALID_PROFILE = "INVALID_PROFILE";
         String PROFILE_NOT_FOUND = "PROFILE_NOT_FOUND";
         String INVALID_USER = "INVALID_USER";
+
+        //Partner
+        String UNREGISTERED_PARTNER = "UNREGISTERED_PARTNER";
+        String CATASTROPHIC_FAILURE = "CATASTROPHIC_FAILURE";
+        String ENCRYPTION_FAILURE = "ENCRYPTION_FAILURE";
+        String MISSING_PARTNER_ID = "MISSING_PARTNER_ID";
+        String MISSING_PUBLIC_KEY = "MISSING_PUBLIC_KEY";
+        String INVALID_RSA_PUBLIC_KEY = "INVALID_RSA_PUBLIC_KEY";
     }
 
     interface ErrorMessage {
