@@ -2,7 +2,7 @@ package org.ekstep.genieresolvers;
 
 import android.content.Context;
 
-import org.ekstep.genieresolvers.content.GenieContentResolver;
+import org.ekstep.genieresolvers.content.GetContentTask;
 
 /**
  * Created on 18/5/17.
@@ -14,7 +14,7 @@ public class GenieResolver {
     private static GenieResolver sGenieResolver;
     private String appQualifier;
     private Context context;
-    private GenieContentResolver mGenieContentResolver;
+    private GetContentTask mGetContentTask;
 
     private GenieResolver(Context context, String appQualifier) {
         this.context = context;
@@ -33,11 +33,11 @@ public class GenieResolver {
         return sGenieResolver;
     }
 
-    public GenieContentResolver getGenieContentResolver(String contentId) {
-        if (mGenieContentResolver == null) {
-            mGenieContentResolver = new GenieContentResolver(context, appQualifier, contentId);
+    public GetContentTask getContentTask(String contentId) {
+        if (mGetContentTask == null) {
+            mGetContentTask = new GetContentTask(context, appQualifier, contentId);
         }
-        return mGenieContentResolver;
+        return mGetContentTask;
     }
 
 }
