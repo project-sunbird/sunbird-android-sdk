@@ -7,6 +7,7 @@ import org.ekstep.genieresolvers.content.GetContentsTask;
 import org.ekstep.genieresolvers.language.GetAllLanguagesTask;
 import org.ekstep.genieresolvers.language.GetLanguageSearchTask;
 import org.ekstep.genieresolvers.language.GetTraversalRuleTask;
+import org.ekstep.genieresolvers.telemetry.TelemetryEventTask;
 
 /**
  * Created on 18/5/17.
@@ -23,6 +24,7 @@ public class GenieResolver {
     private GetTraversalRuleTask mGetTraversalRuleTask;
     private GetAllLanguagesTask mGetAllLanguagesTask;
     private GetLanguageSearchTask mGetLanguageSearchTask;
+    private TelemetryEventTask mTelemetryEventTask;
 
     private GenieResolver(Context context, String appQualifier) {
         this.context = context;
@@ -74,6 +76,14 @@ public class GenieResolver {
             mGetLanguageSearchTask = new GetLanguageSearchTask(context, appQualifier, searchRequest);
         }
         return mGetLanguageSearchTask;
+    }
+
+    public TelemetryEventTask getmTelemetryEventTask(String eventString){
+        if(mTelemetryEventTask == null){
+            mTelemetryEventTask = new TelemetryEventTask(context, appQualifier, eventString);
+        }
+
+        return mTelemetryEventTask;
     }
 
 }
