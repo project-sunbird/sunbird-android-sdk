@@ -3,6 +3,10 @@ package org.ekstep.genieresolvers;
 import android.content.Context;
 
 import org.ekstep.genieresolvers.content.GetContentTask;
+import org.ekstep.genieresolvers.content.GetContentsTask;
+import org.ekstep.genieresolvers.language.GetAllLanguagesTask;
+import org.ekstep.genieresolvers.language.GetLanguageSearchTask;
+import org.ekstep.genieresolvers.language.GetTraversalRuleTask;
 
 /**
  * Created on 18/5/17.
@@ -15,6 +19,10 @@ public class GenieResolver {
     private String appQualifier;
     private Context context;
     private GetContentTask mGetContentTask;
+    private GetContentsTask mGetContentsTask;
+    private GetTraversalRuleTask mGetTraversalRuleTask;
+    private GetAllLanguagesTask mGetAllLanguagesTask;
+    private GetLanguageSearchTask mGetLanguageSearchTask;
 
     private GenieResolver(Context context, String appQualifier) {
         this.context = context;
@@ -38,6 +46,34 @@ public class GenieResolver {
             mGetContentTask = new GetContentTask(context, appQualifier, contentId);
         }
         return mGetContentTask;
+    }
+
+    public GetContentsTask getContentsTask() {
+        if (mGetContentsTask == null) {
+            mGetContentsTask = new GetContentsTask(context, appQualifier);
+        }
+        return mGetContentsTask;
+    }
+
+    public GetTraversalRuleTask getTraversalRuleTask(String languageId) {
+        if (mGetTraversalRuleTask == null) {
+            mGetTraversalRuleTask = new GetTraversalRuleTask(context, appQualifier, languageId);
+        }
+        return mGetTraversalRuleTask;
+    }
+
+    public GetAllLanguagesTask getAllLanguagesTask() {
+        if (mGetAllLanguagesTask == null) {
+            mGetAllLanguagesTask = new GetAllLanguagesTask(context, appQualifier);
+        }
+        return mGetAllLanguagesTask;
+    }
+
+    public GetLanguageSearchTask getLanguageSearchTask(String searchRequest) {
+        if (mGetLanguageSearchTask == null) {
+            mGetLanguageSearchTask = new GetLanguageSearchTask(context, appQualifier, searchRequest);
+        }
+        return mGetLanguageSearchTask;
     }
 
 }
