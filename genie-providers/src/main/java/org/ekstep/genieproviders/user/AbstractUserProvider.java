@@ -50,7 +50,7 @@ public abstract class AbstractUserProvider extends BaseContentProvider {
     }
 
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         if (selectionArgs[0].isEmpty()) {
             return 0;
         } else {
@@ -60,13 +60,13 @@ public abstract class AbstractUserProvider extends BaseContentProvider {
     }
 
     @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        if (selectionArgs[0].isEmpty()) {
-            return 0;
-        } else {
+    public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        if(values != null){
             Profile profile = GsonUtil.fromJson(values.getAsString(ServiceConstants.PROFILE), Profile.class);
             getService().getUserProfileService().updateUserProfile(profile);
             return 1;
+        }else{
+            return 0;
         }
     }
 

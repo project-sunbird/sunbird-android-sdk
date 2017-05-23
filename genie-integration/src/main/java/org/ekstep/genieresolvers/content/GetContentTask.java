@@ -10,6 +10,7 @@ import org.ekstep.genieresolvers.BaseTask;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,17 +32,16 @@ public class GetContentTask extends BaseTask {
 
     @Override
     protected String execute() {
-        Gson gson = new Gson();
         Cursor cursor = contentResolver.query(getUri(), null, null, new String[]{contentId}, "");
         if (cursor == null || cursor.getCount() == 0) {
             String logMessage = String.format("No response for content id:%s", contentId);
             GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, getErrorMessage(), logMessage);
-            return gson.toJson(errorResponse);
+            return GsonUtil.toJson(errorResponse);
         }
         Map<String, Object> getContent = getPath(cursor);
         GenieResponse response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.ProviderResolver.SUCCESSFUL);
         response.setResult(getContent);
-        return gson.toJson(response);
+        return GsonUtil.toJson(response);
     }
 
     private Map<String, Object> getPath(Cursor cursor) {
@@ -55,15 +55,14 @@ public class GetContentTask extends BaseTask {
     }
 
     private HashMap<String, Object> readContent(Cursor cursor) {
-        Gson gson = new Gson();
         HashMap<String, Object> content = new HashMap<>();
         content.put("identifier", cursor.getString(1));
         String serverData = cursor.getString(2);
-        HashMap serverJson = gson.fromJson(serverData, HashMap.class);
+        HashMap serverJson = GsonUtil.fromJson(serverData, HashMap.class);
         String localData = cursor.getString(3);
         boolean hasLocalData = localData != null && !localData.isEmpty();
         if (hasLocalData) {
-            HashMap localJson = gson.fromJson(localData, HashMap.class);
+            HashMap localJson = GsonUtil.fromJson(localData, HashMap.class);
             content.put("localData", localJson);
         }
         content.put("serverData", serverJson);

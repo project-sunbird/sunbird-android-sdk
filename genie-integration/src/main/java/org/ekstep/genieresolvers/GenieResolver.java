@@ -8,6 +8,11 @@ import org.ekstep.genieresolvers.language.GetAllLanguagesTask;
 import org.ekstep.genieresolvers.language.GetLanguageSearchTask;
 import org.ekstep.genieresolvers.language.GetTraversalRuleTask;
 import org.ekstep.genieresolvers.telemetry.TelemetryEventTask;
+import org.ekstep.genieresolvers.user.CreateUserTask;
+import org.ekstep.genieresolvers.user.DeleteUserTask;
+import org.ekstep.genieresolvers.user.GetCurrentUserTask;
+import org.ekstep.genieresolvers.user.UpdateUserTask;
+import org.ekstep.genieservices.commons.bean.Profile;
 
 /**
  * Created on 18/5/17.
@@ -25,6 +30,10 @@ public class GenieResolver {
     private GetAllLanguagesTask mGetAllLanguagesTask;
     private GetLanguageSearchTask mGetLanguageSearchTask;
     private TelemetryEventTask mTelemetryEventTask;
+    private CreateUserTask mCreateUserTask;
+    private DeleteUserTask mDeleteUserTask;
+    private UpdateUserTask mUpdateUserTask;
+    private GetCurrentUserTask mGetCurrentUserTask;
 
     private GenieResolver(Context context, String appQualifier) {
         this.context = context;
@@ -78,12 +87,39 @@ public class GenieResolver {
         return mGetLanguageSearchTask;
     }
 
-    public TelemetryEventTask getmTelemetryEventTask(String eventString){
-        if(mTelemetryEventTask == null){
+    public TelemetryEventTask getmTelemetryEventTask(String eventString) {
+        if (mTelemetryEventTask == null) {
             mTelemetryEventTask = new TelemetryEventTask(context, appQualifier, eventString);
         }
-
         return mTelemetryEventTask;
+    }
+
+    public CreateUserTask getCreateUserTask(Profile profile) {
+        if (mCreateUserTask == null) {
+            mCreateUserTask = new CreateUserTask(context, appQualifier, profile);
+        }
+        return mCreateUserTask;
+    }
+
+    public DeleteUserTask getDeleteUserTask(String userId){
+        if (mDeleteUserTask == null){
+            mDeleteUserTask = new DeleteUserTask(context, appQualifier, userId);
+        }
+        return  mDeleteUserTask;
+    }
+
+    public UpdateUserTask getUpdateUserTask(Profile profile){
+        if (mUpdateUserTask == null){
+            mUpdateUserTask = new UpdateUserTask(context, appQualifier, profile);
+        }
+        return mUpdateUserTask;
+    }
+
+    public GetCurrentUserTask getCurrentUserTask(){
+        if (mGetCurrentUserTask == null){
+            mGetCurrentUserTask = new GetCurrentUserTask(context, appQualifier);
+        }
+        return mGetCurrentUserTask;
     }
 
 }

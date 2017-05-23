@@ -38,7 +38,7 @@ public class CurrentUserUriHandler implements IUriHandler {
 
     @Override
     public boolean canProcess(Uri uri) {
-        String currentUserUri = String.format(Locale.US, "content://%s/currentUser", authority);
+        String currentUserUri = String.format(Locale.US, "content://%s.profiles/currentUser", authority);
         return uri != null && (currentUserUri.equals(uri.toString()));
     }
 
