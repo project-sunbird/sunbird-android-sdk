@@ -8,22 +8,27 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessCriteria;
+import org.ekstep.genieservices.commons.bean.ContentCriteria;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.Variant;
+import org.ekstep.genieservices.commons.bean.enums.ContentType;
+import org.ekstep.genieservices.commons.db.contract.ContentEntry;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.ContentConstants;
 import org.ekstep.genieservices.content.bean.ContentVariant;
 import org.ekstep.genieservices.content.db.model.ContentModel;
+import org.ekstep.genieservices.content.db.model.ContentsModel;
 import org.ekstep.genieservices.content.network.ContentDetailsAPI;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -152,11 +157,7 @@ public class ContentHandler {
 
     private static void addContentAccess(IUserService userService, Content content, String uid) {
         if (userService != null) {
-            ContentAccessCriteria criteria = new ContentAccessCriteria();
-            criteria.setUid(uid);
-            criteria.setContentIdentifier(content.getIdentifier());
-
-            List<ContentAccess> contentAccessList = userService.getAllContentAccess(criteria).getResult();
+            List<ContentAccess> contentAccessList = getAllContentAccess(userService, uid, content.getIdentifier());
             if (contentAccessList.size() > 0) {
                 content.setContentAccess(contentAccessList.get(0));
             }
@@ -190,5 +191,53 @@ public class ContentHandler {
             }
         }
         return null;
+    }
+
+    public static List<ContentModel> getAllLocalContentModel(AppContext appContext, ContentCriteria criteria) {
+        String contentTypes;
+        if (criteria.getContentTypes() != null) {
+            List<String> contentTypeList = new ArrayList<>();
+            for (ContentType contentType : criteria.getContentTypes()) {
+                contentTypeList.add(contentType.getValue());
+            }
+            contentTypes = StringUtil.join("','", contentTypeList);
+        } else {
+            contentTypes = StringUtil.join("','", ContentType.values());
+        }
+
+        String isContentType = String.format(Locale.US, "%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypes);
+        String isVisible = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
+        // For hiding the non compatible imported content, which visibility is DEFAULT.
+        String isArtifactAvailable = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
+
+        String filter = String.format(Locale.US, " where (%s AND %s AND %s)", isVisible, isArtifactAvailable, isContentType);
+
+        List<ContentModel> contentModelListInDB;
+        ContentsModel contentsModel = ContentsModel.find(appContext.getDBSession(), filter);
+        if (contentsModel != null) {
+            contentModelListInDB = contentsModel.getContentModelList();
+        } else {
+            contentModelListInDB = new ArrayList<>();
+        }
+
+        return contentModelListInDB;
+    }
+
+    public static List<ContentAccess> getAllContentAccessByUid(IUserService userService, String uid) {
+        List<ContentAccess> contentAccessList;
+        if (userService != null) {
+            contentAccessList = getAllContentAccess(userService, uid, null);
+        } else {
+            contentAccessList = new ArrayList<>();
+        }
+
+        return contentAccessList;
+    }
+
+    private static List<ContentAccess> getAllContentAccess(IUserService userService, String uid, String contentIdentifier) {
+        ContentAccessCriteria contentAccessCriteria = new ContentAccessCriteria();
+        contentAccessCriteria.setUid(uid);
+        contentAccessCriteria.setContentIdentifier(contentIdentifier);
+        return userService.getAllContentAccess(contentAccessCriteria).getResult();
     }
 }

@@ -23,7 +23,6 @@ import org.ekstep.genieservices.commons.bean.MasterDataValues;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
-import org.ekstep.genieservices.commons.db.contract.ContentEntry;
 import org.ekstep.genieservices.commons.utils.FileHandler;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
@@ -53,7 +52,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -119,7 +117,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             criteria = new ContentCriteria();
         }
 
-        List<ContentModel> contentModelListInDB = getAllLocalContentModel(criteria);
+        List<ContentModel> contentModelListInDB = ContentHandler.getAllLocalContentModel(mAppContext, criteria);
 
         String uid;
         if (!StringUtil.isNullOrEmpty(criteria.getUid())) {
@@ -129,14 +127,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         }
 
         // Get the content access for profile.
-        List<ContentAccess> contentAccessList;
-        if (userService != null) {
-            ContentAccessCriteria contentAccessCriteria = new ContentAccessCriteria();
-            contentAccessCriteria.setUid(uid);
-            contentAccessList = userService.getAllContentAccess(contentAccessCriteria).getResult();
-        } else {
-            contentAccessList = new ArrayList<>();
-        }
+        List<ContentAccess> contentAccessList = ContentHandler.getAllContentAccessByUid(userService, uid);
 
         List<Content> contentList = new ArrayList<>();
         for (ContentAccess contentAccess : contentAccessList) {
@@ -158,36 +149,6 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(contentList);
         return response;
-    }
-
-    private List<ContentModel> getAllLocalContentModel(ContentCriteria criteria) {
-        String contentTypes;
-        if (criteria.getContentTypes() != null) {
-            List<String> contentTypeList = new ArrayList<>();
-            for (ContentType contentType : criteria.getContentTypes()) {
-                contentTypeList.add(contentType.getValue());
-            }
-            contentTypes = StringUtil.join("','", contentTypeList);
-        } else {
-            contentTypes = StringUtil.join("','", ContentType.values());
-        }
-
-        String isContentType = String.format(Locale.US, "%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypes);
-        String isVisible = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
-        // For hiding the non compatible imported content, which visibility is DEFAULT.
-        String isArtifactAvailable = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
-
-        String filter = String.format(Locale.US, " where (%s AND %s AND %s)", isVisible, isArtifactAvailable, isContentType);
-
-        List<ContentModel> contentModelListInDB;
-        ContentsModel contentsModel = ContentsModel.find(mAppContext.getDBSession(), filter);
-        if (contentsModel != null) {
-            contentModelListInDB = contentsModel.getContentModelList();
-        } else {
-            contentModelListInDB = new ArrayList<>();
-        }
-
-        return contentModelListInDB;
     }
 
     @Override
@@ -705,7 +666,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             }.getType();
             List<Map<String, Object>> contentDataList = GsonUtil.getGson().fromJson(contentDataListString, type);
 
-            List<ContentModel> allLocalContentModel = getAllLocalContentModel(new ContentCriteria());
+            List<ContentModel> allLocalContentModel = ContentHandler.getAllLocalContentModel(mAppContext, new ContentCriteria());
 
             List<Content> contents = new ArrayList<>();
             for (Map contentDataMap : contentDataList) {
