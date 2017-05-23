@@ -31,7 +31,10 @@ public class UserProfileTest extends GenieServiceTestBase {
     }
 
     /**
-     * Test to create new user profile.
+     * Scenario : To create a new user with specific {@link Profile}.
+     * Given : To create a new user profile.
+     * When :
+     * Then : On Successful creation of new profile, the response will return status as TRUE and with successful message.
      */
     @Test
     public void shouldCreateUserProfile() {
@@ -50,7 +53,11 @@ public class UserProfileTest extends GenieServiceTestBase {
     }
 
     /**
-     * Test to update new profile.
+     * Scenario : To update the specific profile that is passed to it.
+     * Given : To update a specific profile
+     * When :
+     * Then : On successful updating the profile, the response will return status as TRUE
+     * and with the updated profile set in result.
      */
     @Test
     public void shouldUpdateUserProfile() {
@@ -73,7 +80,11 @@ public class UserProfileTest extends GenieServiceTestBase {
     }
 
     /**
-     * Test to set current user.
+     * Scenario : To set the specific uid passed to it as active current user.
+     * Given : To set a user as current user.
+     * When :
+     * Then : On successful setting a user active, the response will return status as TRUE
+     * and with successful message
      */
     @Test
     public void shouldSetCurrentUser() {
@@ -95,7 +106,11 @@ public class UserProfileTest extends GenieServiceTestBase {
     }
 
     /**
-     * Test to delete user profile.
+     * Scenario : To delete a existing user with a specific uid.
+     * Given : To delete existing user.
+     * When :
+     * Then : On successful deletion of a user, the response will return status as TRUE
+     * and with result set as Profile related data
      */
     @Test
     public void shouldDeleteUserProfile() {
@@ -112,7 +127,10 @@ public class UserProfileTest extends GenieServiceTestBase {
     }
 
     /**
-     * Test to delete user profile if the user is the current user.
+     * Scenario : Deleting the user profile which is set as current user.
+     * Given : To delete user profile which is a current user
+     * When : A profile is created, set as current user and that current user profile is deleted.
+     * Then : Profile is deleted, anonymous user is set as current user.
      */
     @Test
     public void shouldDeleteUserProfileIfUserIsCurrentUser() {
@@ -139,11 +157,15 @@ public class UserProfileTest extends GenieServiceTestBase {
         Assert.assertNotNull(anonymousProfile);
         Assert.assertTrue(response1.getStatus());
 
+        AssertProfile.verifyAnonymousUser(anonymousProfile);
         Assert.assertEquals(-1, anonymousProfile.getAge());
     }
 
     /**
-     * Test to create group user
+     * Scenario : To create a new group user with specific {@link Profile}.
+     * Given : To create a new group user profile.
+     * When :
+     * Then : On Successful creation of new group profile, the response will return status as TRUE and with successful message.
      */
     @Test
     public void shouldCreateGroupUser() {
@@ -159,7 +181,11 @@ public class UserProfileTest extends GenieServiceTestBase {
     }
 
     /**
-     * Test to update group user.
+     * Scenario : To update the specific group profile that is passed to it.
+     * Given : To update a specific group profile
+     * When :
+     * Then : On successful updating the profile, the response will return status as TRUE
+     * and with the updated group profile sent in result.
      */
     @Test
     public void shouldUpdateGroupUser() {
@@ -174,7 +200,6 @@ public class UserProfileTest extends GenieServiceTestBase {
         GenieResponse<Profile> response = activity.updateUserProfile(profile);
         Profile updatedProfile = response.getResult();
 
-
         AssertProfile.verifyProfile(profile, updatedProfile);
 
         Profile profileinDb = GenieServiceDBHelper.findProfile().get(0);
@@ -183,7 +208,10 @@ public class UserProfileTest extends GenieServiceTestBase {
     }
 
     /**
-     * Test to validate set current user for the group profile.
+     * Scenario : To set the specific uid passed to it as active current group user.
+     * Given : Set a group user as current group user.
+     * When : User creates a new group user, sets the user as current group user.
+     * Then : On successful setting a group user active, the response will return status as TRUE and with successful message
      */
     @Test
     public void shouldValidateSetCurrentUserForGroupUser() {
@@ -201,10 +229,13 @@ public class UserProfileTest extends GenieServiceTestBase {
         AssertProfile.verifyProfile(createdProfile, genieResponse2.getResult());
 
     }
-//
 
     /**
-     * Test to delete group user.
+     * Scenario : To delete a existing group user with a specific uid.
+     * Given : To delete existing group user.
+     * When :
+     * Then : On successful deletion of a group user, the response will return status as TRUE
+     * and with result set as Profile related data
      */
     @Test
     public void shouldDeleteGroupUser() {
@@ -221,8 +252,9 @@ public class UserProfileTest extends GenieServiceTestBase {
     }
 
     /**
-     * Check for leap year.
+     * Scenario :
      */
+
     @Test
     public void shouldValidateLeapYear() {
         final Profile profile = new Profile("Happy12", "@drawable/ic_avatar2", "en");
@@ -237,8 +269,10 @@ public class UserProfileTest extends GenieServiceTestBase {
         Assert.assertEquals("[invalid date, field: 29/2/2010]", genieResponse.getErrorMessages().get(0));
     }
 
-    /**
-     * Test when month is not set
+    /** Scenario : Invalid Date error while creating a new user profile.
+     * Given : A new user profile is bring created.
+     * When : User does not set the month.
+     * Then : Invalid date error message is displayed.
      */
     @Test
     public void shouldValidateDayAndMonthIfOnlyDayIsSet() {
@@ -252,8 +286,10 @@ public class UserProfileTest extends GenieServiceTestBase {
         Assert.assertEquals("[invalid date, field: 12/-1/2017]", genieResponse.getErrorMessages().get(0));
     }
 
-    /**
-     * Test when day is not set
+    /** Scenario : Invalid Date error while creating a new user profile.
+     * Given : A new user profile is bring created.
+     * When : User does not set the day.
+     * Then : Invalid error message is displayed.
      */
     @Test
     public void shouldValidateDayAndMonthIfOnlyMonthIsSet() {
@@ -268,8 +304,10 @@ public class UserProfileTest extends GenieServiceTestBase {
         Assert.assertEquals("[invalid date, field: -1/12/2017]", genieResponse.getErrorMessages().get(0));
     }
 
-    /**
-     * Test for month validation.
+    /**Scenario : Validate date for create new profile.
+     * Given : A new user profile is being created.
+     * When : Invalid date is given.
+     * Then : Invalid date error message is displayed.
      */
     @Test
     public void shouldValidateDayAndMonth() {
@@ -289,7 +327,8 @@ public class UserProfileTest extends GenieServiceTestBase {
     }
 
     /**
-     * Check for empty handler
+     * Scenario : When user is creating new profile, user does not set handle,
+     * handle cannot be empty error message is displayed.
      */
     @Test
     public void shouldBeAbleToLogGeErrorEventForEmptyHandler() {
@@ -304,7 +343,8 @@ public class UserProfileTest extends GenieServiceTestBase {
     }
 
     /**
-     * Check for empty avatar
+     * Scenario : When user is creating new profile, user does not set avatar,
+     * avatar cannot be empty error message is displayed.
      */
     @Test
     public void shouldBeAbleToLogGeErrorEventForEmptyAvatar() {
@@ -319,7 +359,23 @@ public class UserProfileTest extends GenieServiceTestBase {
     }
 
     /**
-     * Test to set anonymous user.
+     * Scenario : When user is creating new profile, user sends null instead of {@link Profile},
+     */
+    @Test
+    public void shouldCheckForNullProfile() {
+
+        GenieResponse<Profile> genieResponse = activity.createUserProfile(null);
+
+        Assert.assertNotNull(genieResponse);
+        Assert.assertFalse(genieResponse.getStatus());
+    }
+
+    /**
+     * Scenario : To get the anonymous user from getAnonymousUser() api and sets it to current active user.
+     * Given : To set an anonymous user.
+     * When :
+     * Then : On successful setting the anonymous user as active, the response will return status as TRUE
+     * and with the uid of anonymous user set in result.
      */
     @Test
     public void shouldSetAnonymousUser() {
@@ -332,7 +388,11 @@ public class UserProfileTest extends GenieServiceTestBase {
     }
 
     /**
-     * Test to get anonymous user.
+     * Scenario : To get the anonymous user the one if exists or a new anonymous user will be created.
+     * Given : To get the anonymous user.
+     * When :
+     * Then :On successful fetching the anonymous user, the response will return status as TRUE and
+     * with the profile of anonymous user set in result.
      */
     @Test
     public void shouldGetAnonymousUser() {

@@ -114,10 +114,6 @@ public class GenieServiceDBHelper {
         return profiles;
     }
 
-    public static String generateProfileClearQuery() {
-        return "DELETE FROM profiles";
-    }
-
     public static void clearTelemetryTableEntry() {
         try {
             int count = sSqliteDatabase.delete("telemetry", "1", null);

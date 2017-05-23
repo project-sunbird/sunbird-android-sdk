@@ -21,6 +21,13 @@ import java.util.Map;
 public class ConfigServiceTest extends GenieServiceTestBase {
     private static final String TAG = ConfigServiceTest.class.getSimpleName();
 
+    /**
+     * Scenario : To get the age data, on successful fetching of data the response will return the status as true
+     * with MasterData in the result.
+     * Given : To fetch the age data.
+     * When : MasterDataType is Age.
+     * Then : On success, the response will return the status as TRUE and with Age data in the result.
+     */
     @Test
     public void shouldGetAgeFromMasterData() {
 
@@ -33,6 +40,13 @@ public class ConfigServiceTest extends GenieServiceTestBase {
         Assert.assertEquals(ageData.getValue(), "age");
     }
 
+    /**
+     * Scenario : To get the board data, on successful fetching of data the response will return as true
+     * with MasterData in the result.
+     * Given : To fetch the board data.
+     * When : MasterDataType is Board.
+     * Then : On success, the response will return status as TRUE and with Board data in the result.
+     */
     @Test
     public void shouldGetBoardMasterData() {
 
@@ -45,6 +59,13 @@ public class ConfigServiceTest extends GenieServiceTestBase {
         Assert.assertEquals(boardData.getValue(), "board");
     }
 
+    /**
+     * Scenario : To get the medium data, on successful fetching of data the response will return as true
+     * with MasterData in the result.
+     * Given : To fetch the medium data.
+     * When : MasterDataType is Medium.
+     * Then : On success, the response will return status as TRUE and with Medium data in the result.
+     */
     @Test
     public void shouldGetMediumMasterData() {
 
@@ -57,6 +78,13 @@ public class ConfigServiceTest extends GenieServiceTestBase {
         Assert.assertEquals(masterData.getValue(), "medium");
     }
 
+    /**
+     * Scenario : To get the subject data, on successful fetching of data the response will return as true
+     * with MasterData in the result.
+     * Given : To get the Subject Data.
+     * When : MasterDataType is Subject.
+     * Then : On success, the response will return status as TRUE and with Subject data in the result.
+     */
     @Test
     public void shouldGetSubjectMasterData() {
 
@@ -69,6 +97,13 @@ public class ConfigServiceTest extends GenieServiceTestBase {
         Assert.assertEquals(masterData.getValue(), "subject");
     }
 
+    /**
+     * Scenario : To get the grade level data, on successful fetching of data the response will return as true
+     * with MasterData in the result.
+     * Given : To get the Grade level data.
+     * When : MasterDataType is GradeLevel.
+     * Then : On success, the response will return status as TRUE and with GradeLevel data in the result.
+     */
     @Test
     public void shouldGetGradeLevelMasterData() {
         GenieResponse<MasterData> genieResponse = activity.getMasterData(MasterDataType.GRADELEVEL);
@@ -78,6 +113,13 @@ public class ConfigServiceTest extends GenieServiceTestBase {
         Assert.assertEquals(masterData.getValue(), "gradeLevel");
     }
 
+    /**
+     * Scenario : To get the age group data, on successful fetching of data the response will return as true
+     * with MasterData in the result.
+     * Given : To get the Age group data
+     * When : MasterDataType is AgeGroup.
+     * Then : On success, the response will return status as TRUE and with AgeGroup data in the result.
+     */
     @Test
     public void shouldGetAgeGroupMasterData() {
 
@@ -88,6 +130,26 @@ public class ConfigServiceTest extends GenieServiceTestBase {
         Assert.assertEquals(masterData.getValue(), "ageGroup");
     }
 
+    /**
+     * Scenario : To check the response by the passing the request as null to get the MasterData.
+     * Given : To get the MasterData.
+     * When : MasterDataType is null.
+     * Then : Error message is displayed.
+     */
+    @Test
+    public void shouldCheckForNullMasterType() {
+
+        GenieResponse<MasterData> genieResponse = activity.getMasterData(null);
+        Assert.assertNotNull(genieResponse);
+        Assert.assertFalse(genieResponse.getStatus());
+    }
+
+    /**
+     * Scenario : To get the ordered related data about the platform and other platform parameters.
+     * Given : To fetch the ordered related data about the platform and other platform parameters.
+     * When :
+     * Then : On successful fetching of the data, the response will return status as TRUE and with result set in Map.
+     */
     @Test
     public void shouldGetOrdinals() {
 
@@ -99,6 +161,12 @@ public class ConfigServiceTest extends GenieServiceTestBase {
 
     }
 
+    /**
+     * Scenario : To get the platform specific data, specific to locale chosen.
+     * Given : To fetch the platform specific data.
+     * When :
+     * Then : On successful fetching the data, the response will return status as TRUE and with result set in Map.
+     */
     @Test
     public void shouldGetResourceBundle() {
 

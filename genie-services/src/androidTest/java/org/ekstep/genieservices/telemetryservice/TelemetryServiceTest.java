@@ -5,10 +5,9 @@ import android.util.Log;
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.commons.bean.GameData;
-import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.PartnerData;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.telemetry.GECreateProfile;
+import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.telemetry.model.EventModel;
 import org.ekstep.genieservices.test.BuildConfig;
 import org.junit.Assert;
@@ -24,31 +23,10 @@ import java.util.UUID;
 
 public class TelemetryServiceTest extends GenieServiceTestBase {
     private static final String TAG = TelemetryServiceTest.class.getSimpleName();
-    private String PUBLIC_KEY = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDGdo5VYOK9cTrQQ+ajOxfHMgg/\n" +
-            " * TDX77o/eVTUjcErLLYKBQ6qb8t/jCCuRNexIexRBldk4gC9STyuVWN8x2xkSildf\n" +
-            " * Nch3KUTvwgJx1n2y/03tIHkimOxEONCg3rWPdiWx7nLdW4TuHbwZTZmMdhLjM4lI\n" +
-            " * OSyoyYpX/JmDnxjq4QIDAQAB";
-
 
     /**
-     * To create profile.
-     * @return
-     */
-    private Profile createUserProfile() {
-
-        final Profile profile = new Profile("Happy2 " + UUID.randomUUID().toString(), "@drawable/ic_avatar2", "en");
-        profile.setAge(4);
-        profile.setDay(12);
-        profile.setMonth(11);
-
-        GenieResponse<Profile> genieResponse = activity.createUserProfile(profile);
-        Profile createdProfile = genieResponse.getResult();
-
-        return createdProfile;
-    }
-
-    /**
-     * To check for the event data.
+     * To check for the TelemetryEvent data.
+     *
      * @param geCreateProfile
      */
     private void checkEventData(GECreateProfile geCreateProfile) {
@@ -62,15 +40,13 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
         Assert.assertNotNull(eventMap.get("did"));
     }
 
+    /**
+     * Scenario : To save Telemetry details passed to it as {@link Telemetry}
+     */
     @Test
     public void shouldSaveTelemetryData() {
 
-        GenieServiceDBHelper.clearProfileTable();
-        GenieServiceDBHelper.clearTelemetryTableEntry();
-
         Profile createdProfile = createUserProfile();
-
-        activity.setCurrentUser(createdProfile.getUid());
 
         GameData gameData = new GameData(BuildConfig.APPLICATION_ID, BuildConfig.VERSION_NAME);
 
@@ -85,38 +61,31 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
 
     }
 
+    /**
+     * Scenario : To save Telemetry details passed to it as String.
+     */
     @Test
     public void _2shouldSaveTelemetryData() {
 
-        GenieServiceDBHelper.clearProfileTable();
-        GenieServiceDBHelper.clearTelemetryTableEntry();
-
-        Profile profile = createUserProfile();
-
-        activity.setCurrentUser(profile.getUid());
+        Profile createdProfile = createUserProfile();
 
         GameData gameData = new GameData(BuildConfig.APPLICATION_ID, BuildConfig.VERSION_NAME);
 
-        GECreateProfile geCreateProfile = new GECreateProfile(gameData, profile, null);
+        GECreateProfile geCreateProfile = new GECreateProfile(gameData, createdProfile, null);
 
         GenieServiceDBHelper.findProfile();
-        Assert.assertEquals(profile.getUid(), geCreateProfile.getUid());
+        Assert.assertEquals(createdProfile.getUid(), geCreateProfile.getUid());
 
         activity.saveTelemetry(geCreateProfile.toString());
 
         checkEventData(geCreateProfile);
     }
 
+    /**
+     * Scenario : To check if the partner telemetry events are saved.
+     */
     @Test
     public void _3shouldCreatePartnerSession() {
-
-        GenieServiceDBHelper.clearProfileTable();
-        GenieServiceDBHelper.clearTelemetryTableEntry();
-
-        PartnerData partnerData = new PartnerData("org.ekstep.partner", "1.5", "1243", "PARTNER_DATA", PUBLIC_KEY);
-
-        GenieResponse genieResponse = activity.registerPartner(partnerData);
-        Assert.assertEquals(true, genieResponse.getStatus());
 
         Profile profile = createUserProfile();
 
@@ -136,5 +105,25 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
 
         Log.v(TAG, "tags :: " + eventMap.get("tags").toString());
 
+    }
+
+    /**
+     * This method,
+     * 1. Clears profile table and telemetry table.
+     * 2. Creates new user profile.
+     * 3. Sets it as current user profile.
+     */
+    private Profile createUserProfile() {
+
+        Profile profile = new Profile("Happy5 " + UUID.randomUUID().toString(), "@drawable/ic_avatar2", "en");
+
+        GenieServiceDBHelper.clearProfileTable();
+        GenieServiceDBHelper.clearTelemetryTableEntry();
+
+        Profile createdProfile = createNewProfile(profile);
+
+        activity.setCurrentUser(createdProfile.getUid());
+
+        return createdProfile;
     }
 }
