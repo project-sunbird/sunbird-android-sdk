@@ -21,20 +21,9 @@ public abstract class AppContext<C> {
     private String mGDataId;
     private String mGDataVersionName;
 
-    protected AppContext(C context, String appPackage, String key, String gDataId) {
+    protected AppContext(C context, String appPackage) {
         this.mContext = context;
         this.mAppPackage = appPackage;
-        this.mKey = key;
-        this.mGDataId = gDataId;
-        this.mGDataVersionName = "";
-    }
-
-    public String getGDataId() {
-        return mGDataId;
-    }
-
-    public String getGDataVersionName() {
-        return mGDataVersionName;
     }
 
     public C getContext() {

@@ -45,10 +45,10 @@ public class GenieService {
         return sService;
     }
 
-    public static GenieService init(Context context, String packageName, String apiKey, String gDataId) {
+    public static GenieService init(Context context, String packageName) {
 
         if (sService == null) {
-            AppContext<Context> applicationContext = AndroidAppContext.buildAppContext(context, packageName, apiKey, gDataId);
+            AppContext<Context> applicationContext = AndroidAppContext.buildAppContext(context, packageName);
             Logger.init(new AndroidLogger());
             TelemetryLogger.init(new TelemetryServiceImpl(applicationContext, new UserServiceImpl(applicationContext)));
             DownloadQueueListener.init(applicationContext);

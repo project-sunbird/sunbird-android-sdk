@@ -15,4 +15,6 @@ public interface IParams {
      String getVersionName();
 
      String getGid();
+
+     int getLogLevel();
 }

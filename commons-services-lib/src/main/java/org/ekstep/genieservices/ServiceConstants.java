@@ -91,6 +91,14 @@ public interface ServiceConstants {
         String DATA_NOT_FOUND_ERROR = "NO_DATA_FOUND";
         String VALIDATION_ERROR = "VALIDATION_ERROR";
         String DB_ERROR = "DB_ERROR";
+        String INVALID_PROFILE = "INVALID_PROFILE";
+        String PROFILE_NOT_FOUND = "PROFILE_NOT_FOUND";
+        String INVALID_USER = "INVALID_USER";
+    }
+
+    interface ErrorMessage {
+        String UNABLE_TO_FIND_PROFILE = "unable to find profile";
+        String NO_USER_WITH_SPECIFIED_ID = "There is no user with specified id exists";
     }
 
     interface ContentAccessStatus {

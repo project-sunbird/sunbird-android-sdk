@@ -34,12 +34,12 @@ public class AndroidAppContext extends AppContext<Context> {
     private File mPrimaryFilesDir;
     private IDownloadManager mDownloadManager;
 
-    private AndroidAppContext(Context context, String appPackage, String key, String gDataId) {
-        super(context, appPackage, key, gDataId);
+    private AndroidAppContext(Context context, String appPackage) {
+        super(context, appPackage);
     }
 
-    public static AppContext buildAppContext(Context context, String appPackage, String key, String gDataId) {
-        AndroidAppContext appContext = new AndroidAppContext(context, appPackage, key, gDataId);
+    public static AppContext buildAppContext(Context context, String appPackage) {
+        AndroidAppContext appContext = new AndroidAppContext(context, appPackage);
         appContext.setParams(new BuildParams(appPackage));
         appContext.setDBSession(ServiceDbHelper.getGSDBSession(appContext));
         appContext.setSummarizerDBSession(ServiceDbHelper.getSummarizerDBSession(appContext));

@@ -4,13 +4,22 @@ import org.ekstep.genieservices.BaseService;
 import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.CommonConstants;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessCriteria;
+import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
+import org.ekstep.genieservices.commons.bean.telemetry.GECreateProfile;
+import org.ekstep.genieservices.commons.bean.telemetry.GECreateUser;
+import org.ekstep.genieservices.commons.bean.telemetry.GEDeleteProfile;
+import org.ekstep.genieservices.commons.bean.telemetry.GEError;
+import org.ekstep.genieservices.commons.bean.telemetry.GESessionEnd;
+import org.ekstep.genieservices.commons.bean.telemetry.GESessionStart;
+import org.ekstep.genieservices.commons.bean.telemetry.GEUpdateProfile;
 import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
@@ -23,8 +32,10 @@ import org.ekstep.genieservices.profile.db.model.ContentAccessesModel;
 import org.ekstep.genieservices.profile.db.model.UserModel;
 import org.ekstep.genieservices.profile.db.model.UserProfileModel;
 import org.ekstep.genieservices.profile.db.model.UserSessionModel;
+import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -40,8 +51,11 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
     private static final String TAG = UserServiceImpl.class.getSimpleName();
 
+    private GameData mGameData = null;
+
     public UserServiceImpl(AppContext appContext) {
         super(appContext);
+        mGameData = new GameData(mAppContext.getParams().getGid(), mAppContext.getParams().getVersionName());
     }
 
     /**
@@ -51,37 +65,53 @@ public class UserServiceImpl extends BaseService implements IUserService {
      */
     @Override
     public GenieResponse<Profile> createUserProfile(Profile profile) {
-        GenieResponse<Profile> response = null;
-        if (profile != null && !profile.isValid()) {
-            // TODO: 26/4/17 Need to create error event
-//            return logAndSendResponse(request.gameID(), request.gameVersion(), new Response("failed", "VALIDATION_ERROR",
-//                    profile.getErrors(), ""), "createProfile");
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.VALIDATION_ERROR, profile.getErrors().toString(), TAG + " - createProfile", Profile.class);
+        HashMap params = new HashMap();
+        params.put("logLevel", CommonConstants.LOG_LEVEL);
+
+        GenieResponse<Profile> response;
+        if (profile == null) {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_PROFILE, "invalid profile", "createUserProfile@UserServiceImpl", Profile.class);
+            logGEError(response, "createUserProfile");
+            TelemetryLogger.logFailure(mAppContext, response, TAG, "createUserProfile@UserServiceImpl", params, "Unable to create profile");
+            return response;
+        } else if (profile != null && !profile.isValid()) {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.VALIDATION_ERROR, profile.getErrors().toString(), "createUserProfile@UserServiceImpl", Profile.class);
+            logGEError(response, "createUserProfile");
+            TelemetryLogger.logFailure(mAppContext, response, TAG, "createUserProfile@UserServiceImpl", params, "Unable to create profile");
+            return response;
         } else {
             response = saveUserProfile(profile, mAppContext.getDBSession());
         }
+
+        TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "createUserProfile@UserServiceImpl", params);
+
         return response;
     }
 
+    private void logGEError(GenieResponse response, String id) {
+        GEError geError = new GEError(mGameData, response.getError(), id, "", response.getErrorMessages().toString());
+        TelemetryLogger.log(geError);
+    }
+
+
     private GenieResponse<Profile> saveUserProfile(final Profile profile, IDBSession dbSession) {
-        // TODO: 24/4/17 Need to create Location Wrapper to get location
         String uid = UUID.randomUUID().toString();
+        profile.setUid(uid);
         if (profile.getCreatedAt() == null) {
             profile.setCreatedAt(DateUtil.now());
         }
         final UserModel userModel = UserModel.build(dbSession, uid);
 
-        profile.setUid(uid);
+        final GECreateUser geCreateUser = new GECreateUser(mGameData, uid, mAppContext.getLocationInfo().getLocation());
         final UserProfileModel profileModel = UserProfileModel.buildUserProfile(dbSession, profile);
+        final GECreateProfile geCreateProfile = new GECreateProfile(mGameData, profile, mAppContext.getLocationInfo().getLocation());
         dbSession.executeInTransaction(new IDBTransaction() {
             @Override
             public Void perform(IDBSession dbSession) {
                 userModel.save();
-                // TODO: 24/4/17 Should add telemetry event after creating a new user
-
+                TelemetryLogger.log(geCreateUser);
                 profileModel.save();
-                // TODO: 24/4/17 Should add telemetry event after creating ProfileDTO
-
+                TelemetryLogger.log(geCreateProfile);
                 return null;
             }
         });
@@ -100,21 +130,30 @@ public class UserServiceImpl extends BaseService implements IUserService {
     public GenieResponse<Profile> updateUserProfile(Profile profile) {
 
         if (profile == null || StringUtil.isNullOrEmpty(profile.getUid())) {
-            // TODO: 25/4/17 GEError Event has to be added here
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.INVALID_PROFILE, ServiceConstants.UNABLE_TO_FIND_PROFILE, TAG, Profile.class);
+            GenieResponse<Profile> genieResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROFILE_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_PROFILE, TAG, Profile.class);
+            logGEError(genieResponse, "updateUserProfile");
+            TelemetryLogger.logFailure(mAppContext, genieResponse, TAG, "updateUserProfile@UserServiceImpl", new HashMap(), "Unable to update profile");
+            return genieResponse;
         }
 
         if (!profile.isValid()) {
-            // TODO: 25/4/17 GEError Event has to be added here
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.VALIDATION_ERROR, profile.getErrors().toString(), TAG, Profile.class);
+            GenieResponse<Profile> genieResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.VALIDATION_ERROR, profile.getErrors().toString(), TAG, Profile.class);
+            logGEError(genieResponse, "updateUserProfile");
+            TelemetryLogger.logFailure(mAppContext, genieResponse, TAG, "updateUserProfile@UserServiceImpl", new HashMap(), "Unable to update profile");
+            return genieResponse;
 
         }
-        // TODO: 26/4/17 GEUpdateEvent has to be added to the telemetry
         UserProfileModel userProfileModel = UserProfileModel.buildUserProfile(mAppContext.getDBSession(), profile);
         userProfileModel.update();
 
+        GEUpdateProfile geUpdateProfile = new GEUpdateProfile(mGameData, profile, mAppContext.getDeviceInfo().getDeviceID());
+        TelemetryLogger.log(geUpdateProfile);
+
         GenieResponse<Profile> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Profile.class);
         response.setResult(profile);
+
+        TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "updateUserProfile@UserServiceImpl", new HashMap());
+
         return response;
 
     }
@@ -126,6 +165,10 @@ public class UserServiceImpl extends BaseService implements IUserService {
      */
     @Override
     public GenieResponse<Void> deleteUser(String uid) {
+
+        HashMap params = new HashMap();
+        params.put("uid", uid);
+
         //get the current user id
         UserSessionModel userSession = UserSessionModel.findUserSession(mAppContext);
         if (userSession != null) {
@@ -135,22 +178,37 @@ public class UserServiceImpl extends BaseService implements IUserService {
         }
         final ContentAccessesModel accessesModel = ContentAccessesModel.findByUid(mAppContext.getDBSession(), uid);
         final UserProfileModel userProfileModel = UserProfileModel.findUserProfile(mAppContext.getDBSession(), uid);
-        final UserModel userModel = UserModel.findByUserId(mAppContext.getDBSession(), uid);
-        mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
-            @Override
-            public Void perform(IDBSession dbSession) {
-                if (accessesModel != null) {
-                    accessesModel.delete();
-                }
-                userProfileModel.delete();
-                // TODO: 24/4/17 Should add telemetry event after deleting a profile
-                userModel.delete();
-                // TODO: 24/4/17 Should add telemetry event after deleting user
+        if (userProfileModel == null) {
+            GenieResponse<Void> genieResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROFILE_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_PROFILE, TAG, Void.class);
+            TelemetryLogger.logFailure(mAppContext, genieResponse, TAG, "updateUserProfile@deleteUser", params, "Unable to delete profile");
+            return genieResponse;
+        } else {
+            final UserModel userModel = UserModel.findByUserId(mAppContext.getDBSession(), uid);
 
-                return null;
-            }
-        });
-        return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
+            Profile profile = new Profile("", "", "");
+            profile.setUid(uid);
+            final GEDeleteProfile geDeleteProfile = new GEDeleteProfile(mGameData, profile);
+            mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
+                @Override
+                public Void perform(IDBSession dbSession) {
+                    if (accessesModel != null) {
+                        accessesModel.delete();
+                    }
+                    userProfileModel.delete();
+
+                    userModel.delete();
+                    TelemetryLogger.log(geDeleteProfile);
+
+                    return null;
+                }
+            });
+
+            GenieResponse response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
+            TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "deleteUser@UserServiceImpl", params);
+
+            return response;
+        }
+
     }
 
     private String createAnonymousUser() {
@@ -170,6 +228,11 @@ public class UserServiceImpl extends BaseService implements IUserService {
         setCurrentUser(uid);
         GenieResponse<String> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, String.class);
         response.setResult(uid);
+        if (response.getStatus()) {
+            TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "setAnonymousUser@UserServiceImpl", new HashMap());
+        } else {
+            TelemetryLogger.logFailure(mAppContext, response, TAG, "setAnonymousUser@deleteUser", new HashMap(), "Unable to setAnonymous user");
+        }
         return response;
     }
 
@@ -191,6 +254,12 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
         GenieResponse response = GenieResponseBuilder.getSuccessResponse("", Profile.class);
         response.setResult(profile);
+
+        if (response.getStatus()) {
+            TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "getAnonymousUser@UserServiceImpl", new HashMap());
+        } else {
+            TelemetryLogger.logFailure(mAppContext, response, TAG, "getAnonymousUser@UserServiceImpl", new HashMap(), "Unable to get anonymous user");
+        }
         return response;
     }
 
@@ -201,10 +270,15 @@ public class UserServiceImpl extends BaseService implements IUserService {
      */
     @Override
     public GenieResponse<Void> setCurrentUser(String uid) {
+        HashMap params = new HashMap();
+        params.put("uid", uid);
+
         UserModel userModel = UserModel.findByUserId(mAppContext.getDBSession(), uid);
         if (userModel == null) {
-            // TODO: 25/4/17 GEError Event has to be added here
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.INVALID_USER, ServiceConstants.NO_USER_WITH_SPECIFIED_ID, TAG, Void.class);
+            GenieResponse response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_USER, ServiceConstants.ErrorMessage.NO_USER_WITH_SPECIFIED_ID, TAG, Void.class);
+            logGEError(response, "setCurrentUser");
+            TelemetryLogger.logFailure(mAppContext, response, TAG, "setCurrentUser@UserServiceImpl", params, "Unable to get anonymous user");
+            return response;
         }
 
         UserSessionModel session = UserSessionModel.findUserSession(mAppContext);
@@ -213,16 +287,23 @@ public class UserServiceImpl extends BaseService implements IUserService {
             sessionCreationRequired = true;
         } else if (!session.getUserSessionBean().getUid().equals(uid)) {
             session.endSession();
-            //TODO GE_SESSION_END telemetry
+            GESessionEnd geSessionEnd = new GESessionEnd(mGameData, session.getUserSessionBean(), mAppContext.getDeviceInfo().getDeviceID());
+            TelemetryLogger.log(geSessionEnd);
             sessionCreationRequired = true;
         }
 
         if (sessionCreationRequired) {
             UserSessionModel userSessionModel = UserSessionModel.buildUserSession(mAppContext, uid);
             userSessionModel.startSession();
-            //TODO GE_session-start telemetry to be sent
+            GESessionStart geSessionEnd = new GESessionStart(mGameData, userSessionModel.getUserSessionBean(), mAppContext.getLocationInfo().getLocation(), mAppContext.getDeviceInfo().getDeviceID());
+            TelemetryLogger.log(geSessionEnd);
         }
-        return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
+        GenieResponse response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
+
+        TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "setCurrentUser@UserServiceImpl", params);
+
+
+        return response;
     }
 
     /**
@@ -247,6 +328,10 @@ public class UserServiceImpl extends BaseService implements IUserService {
         }
         GenieResponse<Profile> response = GenieResponseBuilder.getSuccessResponse("", Profile.class);
         response.setResult(profile);
+
+        TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "getCurrentUser@UserServiceImpl", new HashMap());
+
+
         return response;
     }
 
@@ -261,6 +346,8 @@ public class UserServiceImpl extends BaseService implements IUserService {
         }
         GenieResponse<UserSession> response = GenieResponseBuilder.getSuccessResponse("");
         response.setResult(userSessionModel.getUserSessionBean());
+
+        TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "getCurrentUserSession@UserServiceImpl", new HashMap());
         return response;
     }
 
@@ -322,6 +409,10 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
         GenieResponse<List<ContentAccess>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(contentAccessList);
+
+        TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "getAllContentAccess@UserServiceImpl", new HashMap());
+
+
         return response;
     }
 
