@@ -52,6 +52,8 @@ public class GenieService {
             DownloadQueueListener.init(applicationContext);
             sService = new GenieService(applicationContext);
         }
+
+        //TODO init the async service here
         return sService;
     }
 
