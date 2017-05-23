@@ -15,24 +15,19 @@ import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessCriteria;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
-import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.MasterDataValues;
 import org.ekstep.genieservices.commons.bean.Profile;
-import org.ekstep.genieservices.commons.bean.UserSession;
-import org.ekstep.genieservices.commons.bean.Variant;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
 import org.ekstep.genieservices.commons.db.contract.ContentEntry;
-import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileHandler;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
-import org.ekstep.genieservices.content.bean.ContentVariant;
 import org.ekstep.genieservices.content.bean.ImportContext;
 import org.ekstep.genieservices.content.chained.AddGeTransferContentImportEvent;
 import org.ekstep.genieservices.content.chained.ContentImportStep;
@@ -74,7 +69,6 @@ import java.util.UUID;
 public class ContentServiceImpl extends BaseService implements IContentService {
 
     private static final String TAG = ContentServiceImpl.class.getSimpleName();
-    private static final int DEFAULT_PACKAGE_VERSION = -1;
 
     private IUserService userService;
     private IContentFeedbackService contentFeedbackService;
@@ -108,126 +102,11 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             ContentHandler.refreshContentDetails(mAppContext, contentIdentifier, contentModelInDB);
         }
 
-        Content content = getContent(contentModelInDB, true, true);
+        Content content = ContentHandler.getContent(contentModelInDB, true, true, contentFeedbackService, userService);
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(content);
         return response;
-    }
-
-    private Content getContent(ContentModel contentModel, boolean attachFeedback, boolean attachContentAccess) {
-        Content content = new Content();
-        content.setIdentifier(contentModel.getIdentifier());
-
-        ContentData serverData = null;
-        if (contentModel.getServerData() != null) {
-            serverData = GsonUtil.fromJson(contentModel.getServerData(), ContentData.class);
-        }
-
-        ContentData localData = null;
-        if (contentModel.getLocalData() != null) {
-            localData = GsonUtil.fromJson(contentModel.getLocalData(), ContentData.class);
-        }
-
-        ContentData contentData = null;
-        if (serverData != null) {
-            contentData = serverData;
-
-            addContentVariants(contentData, contentModel.getServerData());
-        } else if (localData != null) {
-            contentData = localData;
-
-            addContentVariants(contentData, contentModel.getLocalData());
-        }
-        content.setContentData(contentData);
-
-        content.setMimeType(contentModel.getMimeType());
-        content.setBasePath(contentModel.getPath());
-        content.setContentType(contentModel.getContentType());
-        content.setAvailableLocally(isAvailableLocally(contentModel.getContentState()));
-        content.setReferenceCount(contentModel.getRefCount());
-        content.setUpdateAvailable(isUpdateAvailable(serverData, localData));
-
-        long contentCreationTime = 0;
-        String localLastUpdatedTime = contentModel.getLocalLastUpdatedTime();
-        if (!StringUtil.isNullOrEmpty(localLastUpdatedTime)) {
-            contentCreationTime = DateUtil.getTime(localLastUpdatedTime.substring(0, localLastUpdatedTime.lastIndexOf(".")));
-        }
-        content.setLastUpdatedTime(contentCreationTime);
-
-        String uid = getCurrentUserId();
-        if (attachFeedback) {
-            addContentFeedback(content, uid);
-        }
-
-        if (attachContentAccess && userService != null) {
-            addContentAccess(content, uid);
-        }
-
-        return content;
-    }
-
-    private void addContentVariants(ContentData contentData, String dataJson) {
-        List<Variant> variantList = new ArrayList<>();
-
-        Map<String, Object> dataMap = GsonUtil.fromJson(dataJson, Map.class);
-        Object variants = dataMap.get("variants");
-        if (variants != null) {
-            String variantsString;
-            if (variants instanceof Map) {
-                variantsString = GsonUtil.getGson().toJson(variants);
-            } else {
-                variantsString = (String) variants;
-            }
-
-            variantsString = variantsString.replace("\\", "");
-            ContentVariant contentVariant = GsonUtil.fromJson(variantsString, ContentVariant.class);
-
-            if (contentVariant.getSpine() != null) {
-                Variant variant = new Variant("spine", contentVariant.getSpine().getEcarUrl(), contentVariant.getSpine().getSize());
-                variantList.add(variant);
-            }
-        }
-
-        contentData.setVariants(variantList);
-    }
-
-    private void addContentFeedback(Content content, String uid) {
-        if (contentFeedbackService != null) {
-            content.setContentFeedback(contentFeedbackService.getFeedback(uid, content.getIdentifier()).getResult());
-        }
-    }
-
-    private void addContentAccess(Content content, String uid) {
-        if (userService != null) {
-            ContentAccessCriteria criteria = new ContentAccessCriteria();
-            criteria.setUid(uid);
-            criteria.setContentIdentifier(content.getIdentifier());
-
-            List<ContentAccess> contentAccessList = userService.getAllContentAccess(criteria).getResult();
-            if (contentAccessList.size() > 0) {
-                content.setContentAccess(contentAccessList.get(0));
-            }
-        }
-    }
-
-    private boolean isUpdateAvailable(ContentData serverData, ContentData localData) {
-        float lVersion = DEFAULT_PACKAGE_VERSION;
-        float sVersion = DEFAULT_PACKAGE_VERSION;
-
-        if (serverData != null && !StringUtil.isNullOrEmpty(serverData.getPkgVersion())) {
-            sVersion = Float.valueOf(serverData.getPkgVersion());
-        }
-
-        if (localData != null && !StringUtil.isNullOrEmpty(localData.getPkgVersion())) {
-            lVersion = Float.valueOf(localData.getPkgVersion());
-        }
-
-        return sVersion > 0 && lVersion > 0 && sVersion > lVersion;
-    }
-
-    private boolean isAvailableLocally(int contentState) {
-        return contentState == ContentConstants.State.ARTIFACT_AVAILABLE;
     }
 
     @Override
@@ -246,7 +125,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         if (!StringUtil.isNullOrEmpty(criteria.getUid())) {
             uid = criteria.getUid();
         } else {
-            uid = getCurrentUserId();
+            uid = ContentHandler.getCurrentUserId(userService);
         }
 
         // Get the content access for profile.
@@ -263,7 +142,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         for (ContentAccess contentAccess : contentAccessList) {
             ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), contentAccess.getIdentifier());
             if (contentModel != null && contentModelListInDB.contains(contentModel)) {
-                Content c = getContent(contentModel, criteria.isAttachFeedback(), criteria.isAttachContentAccess());
+                Content c = ContentHandler.getContent(contentModel, criteria.isAttachFeedback(), criteria.isAttachContentAccess(), contentFeedbackService, userService);
                 c.setContentAccess(contentAccess);
                 contentList.add(c);
                 contentModelListInDB.remove(contentModel);
@@ -272,7 +151,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         // Add the remaining content into list
         for (ContentModel contentModel : contentModelListInDB) {
-            Content c = getContent(contentModel, criteria.isAttachFeedback(), criteria.isAttachContentAccess());
+            Content c = ContentHandler.getContent(contentModel, criteria.isAttachFeedback(), criteria.isAttachContentAccess(), contentFeedbackService, userService);
             contentList.add(c);
         }
 
@@ -309,16 +188,6 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         }
 
         return contentModelListInDB;
-    }
-
-    private String getCurrentUserId() {
-        if (userService != null) {
-            UserSession userSession = userService.getCurrentUserSession().getResult();
-            if (userSession != null) {
-                return userSession.getUid();
-            }
-        }
-        return null;
     }
 
     @Override
@@ -571,7 +440,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             for (Map contentDataMap : contentDataList) {
                 // TODO: 5/15/2017 - Can fetch content from DB and return in response.
                 ContentModel contentModel = ContentModel.build(mAppContext.getDBSession(), contentDataMap, null);
-                Content content = getContent(contentModel, false, false);
+                Content content = ContentHandler.getContent(contentModel, false, false, contentFeedbackService, userService);
                 contents.add(content);
             }
 
@@ -781,7 +650,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             for (Map contentDataMap : contentDataList) {
                 // TODO: 5/15/2017 - Can fetch content from DB and return in response.
                 ContentModel contentModel = ContentModel.build(mAppContext.getDBSession(), contentDataMap, null);
-                Content content = getContent(contentModel, false, false);
+                Content content = ContentHandler.getContent(contentModel, false, false, contentFeedbackService, userService);
                 contents.add(content);
             }
 
@@ -841,7 +710,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             List<Content> contents = new ArrayList<>();
             for (Map contentDataMap : contentDataList) {
                 ContentModel contentModel = ContentModel.build(mAppContext.getDBSession(), contentDataMap, null);
-                Content content = getContent(contentModel, false, false);
+                Content content = ContentHandler.getContent(contentModel, false, false, contentFeedbackService, userService);
 
                 if (allLocalContentModel.contains(contentModel)) {
                     content.setAvailableLocally(true);
@@ -969,7 +838,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 for (String identifier : nextContentIdentifierList) {
                     ContentModel nextContentModel = ContentModel.find(mAppContext.getDBSession(), identifier);
 
-                    Content content = getContent(nextContentModel, false, false);
+                    Content content = ContentHandler.getContent(nextContentModel, false, false, contentFeedbackService, userService);
                     contentList.add(content);
                 }
             }
