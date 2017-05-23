@@ -269,7 +269,8 @@ public class UserProfileTest extends GenieServiceTestBase {
         Assert.assertEquals("[invalid date, field: 29/2/2010]", genieResponse.getErrorMessages().get(0));
     }
 
-    /** Scenario : Invalid Date error while creating a new user profile.
+    /**
+     * Scenario : Invalid Date error while creating a new user profile.
      * Given : A new user profile is bring created.
      * When : User does not set the month.
      * Then : Invalid date error message is displayed.
@@ -286,7 +287,8 @@ public class UserProfileTest extends GenieServiceTestBase {
         Assert.assertEquals("[invalid date, field: 12/-1/2017]", genieResponse.getErrorMessages().get(0));
     }
 
-    /** Scenario : Invalid Date error while creating a new user profile.
+    /**
+     * Scenario : Invalid Date error while creating a new user profile.
      * Given : A new user profile is bring created.
      * When : User does not set the day.
      * Then : Invalid error message is displayed.
@@ -304,7 +306,8 @@ public class UserProfileTest extends GenieServiceTestBase {
         Assert.assertEquals("[invalid date, field: -1/12/2017]", genieResponse.getErrorMessages().get(0));
     }
 
-    /**Scenario : Validate date for create new profile.
+    /**
+     * Scenario : Validate date for create new profile.
      * Given : A new user profile is being created.
      * When : Invalid date is given.
      * Then : Invalid date error message is displayed.

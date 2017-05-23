@@ -20,13 +20,16 @@ public class PartnerServiceTest extends GenieServiceTestBase {
             " * OSyoyYpX/JmDnxjq4QIDAQAB";
 
     /**
-     * Scenario :
+     * Scenario : To check the entire partner flow.
+     *
      * Step 1. Register a partner with the specified partnerID and publicKey in PartnerData.
      * Step 2. Check if the partnerId is registered.
      * Step 3. Start the Partner Session with the specified partnerID in PartnerData.
      * Step 4. Send Partner data specified in PartnerData
      * Step 5. Terminate the Partner Session with the specified partnerID.
-     * Step 6. Check if telemetry event is logged in for every event.
+     * Step 6 : Save the telemetry event for the above steps.
+     *
+     * Then : Check if telemetry event is logged in for every event.
      */
     @Test
     public void shouldTestEntirePartnerFlow() {
@@ -55,12 +58,15 @@ public class PartnerServiceTest extends GenieServiceTestBase {
     }
 
     /**
-     * Scenario :
+     * Scenario : To the entire partner flow for multiple partners.
+     *
      * Step 1. Register multiple partner with the specified partnerID and publicKey in PartnerData.
      * Step 2. Start the multiple partners Session with their partnerID in PartnerData.
      * Step 3. Send Partner data specified in PartnerData
      * Step 4. Terminate the multiple partners session with the specified partnerID.
-     * Step 5. Check if telemetry event is logged in for every partner.
+     * Step 5. Save the telemtry event for the above steps
+     *
+     * Then :  Check if telemetry event is logged in for every partner.
      */
     @Test
     public void shouldTestEntirePartnerFlowForMultiplePartner() {

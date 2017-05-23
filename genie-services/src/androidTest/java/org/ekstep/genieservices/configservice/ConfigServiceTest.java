@@ -176,5 +176,21 @@ public class ConfigServiceTest extends GenieServiceTestBase {
         Assert.assertTrue(genieResponse.getStatus());
         Assert.assertNotNull(genieResponse.getResult());
     }
+
+    /**
+     * Scenario : To validate the platform specific data, for an invalid locale.
+     * Given : For an invalid locale, validate the platform specific data.
+     * When :
+     * Then : Error message for invalid locale.
+     */
+    @Test
+    public void shouldValidateResourceBundle() {
+
+        waitForGenieToBecomeIdle();
+
+        GenieResponse<Map<String, Object>> genieResponse = activity.getResourceBundle("se");
+        Assert.assertFalse(genieResponse.getStatus());
+        Assert.assertNotNull(genieResponse.getResult());
+    }
 }
 
