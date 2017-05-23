@@ -24,7 +24,7 @@ public abstract class AbstractLanguageProvider extends BaseContentProvider {
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        List<LanguageTraversalRuleUriHandler> handlers = getUriHandlers(selection, selectionArgs);
+        List<IUriHandler> handlers = getUriHandlers(selection, selectionArgs);
         for (IUriHandler handler : handlers)
             if (handler.canProcess(uri))
                 return handler.process();
@@ -32,7 +32,7 @@ public abstract class AbstractLanguageProvider extends BaseContentProvider {
     }
 
     @NonNull
-    protected List<LanguageTraversalRuleUriHandler> getUriHandlers(String selection, String[] selectionArgs) {
+    protected List<IUriHandler> getUriHandlers(String selection, String[] selectionArgs) {
         return LanguageUriHandlerFactory.uriHandlers(getCompletePath(),
                 getContext(), selection);
     }
