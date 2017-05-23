@@ -10,6 +10,7 @@ import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.config.ConfigServiceImpl;
 import org.ekstep.genieservices.content.ContentFeedbackServiceImpl;
 import org.ekstep.genieservices.content.ContentServiceImpl;
+import org.ekstep.genieservices.content.LanguageServiceImpl;
 import org.ekstep.genieservices.content.downloadmanager.DownloadQueueListener;
 import org.ekstep.genieservices.partner.PartnerServiceImpl;
 import org.ekstep.genieservices.profile.UserServiceImpl;
@@ -32,8 +33,9 @@ public class GenieService {
     private IUserService mUserService;
     private ISyncService mSyncService;
     private IPartnerService mPartnerService;
-    private IContentService mContentService;
     private IContentFeedbackService mContentFeedbackService;
+    private IContentService mContentService;
+    private ILanguageService mLanguageService;
 
     private GenieService(AppContext<Context> applicationContext) {
         this.mAppContext = applicationContext;
@@ -104,6 +106,13 @@ public class GenieService {
             mContentService = new ContentServiceImpl(mAppContext, getUserProfileService(), getContentFeedbackService(), getConfigService());
         }
         return mContentService;
+    }
+
+    public ILanguageService getLanguageService() {
+        if (mLanguageService == null) {
+            mLanguageService = new LanguageServiceImpl(mAppContext);
+        }
+        return mLanguageService;
     }
 
     public IKeyValueStore getKeyStore() {
