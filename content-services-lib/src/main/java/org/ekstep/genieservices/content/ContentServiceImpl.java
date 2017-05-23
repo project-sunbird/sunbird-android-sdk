@@ -44,10 +44,10 @@ import org.ekstep.genieservices.content.chained.IChainable;
 import org.ekstep.genieservices.content.chained.ValidateEcar;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.db.model.ContentsModel;
-import org.ekstep.genieservices.content.network.ContentDetailsAPI;
 import org.ekstep.genieservices.content.network.ContentSearchAPI;
 import org.ekstep.genieservices.content.network.RecommendedContentAPI;
 import org.ekstep.genieservices.content.network.RelatedContentAPI;
+import org.ekstep.genieservices.content.utils.ContentHandler;
 import org.ekstep.genieservices.content.utils.ContentUtil;
 
 import java.io.File;
@@ -96,15 +96,16 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         GenieResponse<Content> response;
         ContentModel contentModelInDB = ContentModel.find(mAppContext.getDBSession(), contentIdentifier);
 
-        if (contentModelInDB == null) {
-            // Fetch from server if detail is not available in DB
-            contentModelInDB = fetchContentDetails(contentIdentifier, contentModelInDB);
-            if (contentModelInDB == null) {
+        if (contentModelInDB == null) {     // Fetch from server if detail is not available in DB
+            Map contentData = ContentHandler.fetchContentDetails(mAppContext, contentIdentifier);
+            if (contentData == null) {
                 response = GenieResponseBuilder.getErrorResponse(ServiceConstants.NO_DATA_FOUND, "No content found for identifier = " + contentIdentifier, TAG);
                 return response;
             }
+
+            contentModelInDB = ContentModel.build(mAppContext.getDBSession(), contentData, null);
         } else {
-            refreshContentDetails(contentIdentifier, contentModelInDB);
+            ContentHandler.refreshContentDetails(mAppContext, contentIdentifier, contentModelInDB);
         }
 
         Content content = getContent(contentModelInDB, true, true);
@@ -112,50 +113,6 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(content);
         return response;
-    }
-
-    private void refreshContentDetails(final String contentIdentifier, final ContentModel existingContentModel) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                fetchContentDetails(contentIdentifier, existingContentModel);
-            }
-        }).start();
-    }
-
-    private ContentModel fetchContentDetails(String contentIdentifier, ContentModel contentModelInDB) {
-        ContentDetailsAPI api = new ContentDetailsAPI(mAppContext, contentIdentifier);
-        GenieResponse apiResponse = api.get();
-
-        if (apiResponse.getStatus()) {
-            String body = apiResponse.getResult().toString();
-
-            // Save into DB
-            LinkedTreeMap map = GsonUtil.fromJson(body, LinkedTreeMap.class);
-            LinkedTreeMap result = (LinkedTreeMap) map.get("result");
-            String contentDataString = GsonUtil.toJson(result.get("content"));
-            ContentModel contentModel = ContentModel.build(mAppContext.getDBSession(), GsonUtil.fromJson(contentDataString, Map.class), null);
-
-            if (contentModelInDB == null) {
-                // Visibility is setting to Parent because We not need to show any content in local content list
-                // until its not imported  as spine or as artifact.
-                contentModel.setVisibility(ContentConstants.Visibility.PARENT);
-                contentModel.addOrUpdateRefCount(0);
-                contentModel.addOrUpdateContentState(ContentConstants.State.SEEN_BUT_NOT_AVAILABLE);
-
-                contentModel.save();
-            } else {
-                contentModel.setVisibility(contentModelInDB.getVisibility());
-                contentModel.addOrUpdateRefCount(contentModelInDB.getRefCount());
-                contentModel.addOrUpdateContentState(contentModelInDB.getContentState());
-
-                contentModel.update();
-            }
-
-            return contentModel;
-        }
-
-        return null;
     }
 
     private Content getContent(ContentModel contentModel, boolean attachFeedback, boolean attachContentAccess) {
