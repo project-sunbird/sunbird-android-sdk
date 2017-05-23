@@ -45,7 +45,7 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
      * Given : Save telemetry details.
      * Step 1. Create a user profile and set as current user.
      * Step 2. Create a GameData Object.
-     * Step 3. Create a Telemetry event ie GECreateProfile by passing GameData and Profile to it.
+     * Step 3. Create a Telemetry event ie GECreateProfile by passing GameData and created Profile object to it.
      * Step 4. Save the telemetry event.
      * When :
      * Then : Check if the telemetry event is saved.
@@ -73,7 +73,7 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
      * Given : Save telemetry event as String.
      * Step 1. Create a user profile and set as current user.
      * Step 2. Create a GameData Object.
-     * Step 3. Create a Telemetry event ie GECreateProfile by passing GameData and Profile to it.
+     * Step 3. Create a Telemetry event ie GECreateProfile by passing GameData and Profile object to it.
      * Step 4. Save the telemetry event as String.
      *
      * Then :Check if the telemetry event is saved.

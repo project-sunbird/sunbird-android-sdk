@@ -24,8 +24,7 @@ public class ConfigServiceTest extends GenieServiceTestBase {
     /**
      * Scenario : To get the age data, on successful fetching of data the response will return the status as true
      * with MasterData in the result.
-     * Given : To fetch the age data.
-     * When : MasterDataType is Age.
+     * When : When SDK is fetching age from MasterData.
      * Then : On success, the response will return the status as TRUE and with Age data in the result.
      */
     @Test
@@ -43,8 +42,7 @@ public class ConfigServiceTest extends GenieServiceTestBase {
     /**
      * Scenario : To get the board data, on successful fetching of data the response will return as true
      * with MasterData in the result.
-     * Given : To fetch the board data.
-     * When : MasterDataType is Board.
+     * When : When SDK is fetching board data from MasterData.
      * Then : On success, the response will return status as TRUE and with Board data in the result.
      */
     @Test
@@ -62,8 +60,7 @@ public class ConfigServiceTest extends GenieServiceTestBase {
     /**
      * Scenario : To get the medium data, on successful fetching of data the response will return as true
      * with MasterData in the result.
-     * Given : To fetch the medium data.
-     * When : MasterDataType is Medium.
+     * When : When SDK is fetching medium from MasterData.
      * Then : On success, the response will return status as TRUE and with Medium data in the result.
      */
     @Test
@@ -81,8 +78,7 @@ public class ConfigServiceTest extends GenieServiceTestBase {
     /**
      * Scenario : To get the subject data, on successful fetching of data the response will return as true
      * with MasterData in the result.
-     * Given : To get the Subject Data.
-     * When : MasterDataType is Subject.
+     * When : When SDK is fetching subject from MasterData.
      * Then : On success, the response will return status as TRUE and with Subject data in the result.
      */
     @Test
@@ -100,8 +96,7 @@ public class ConfigServiceTest extends GenieServiceTestBase {
     /**
      * Scenario : To get the grade level data, on successful fetching of data the response will return as true
      * with MasterData in the result.
-     * Given : To get the Grade level data.
-     * When : MasterDataType is GradeLevel.
+     * When : When SDK is fetching GradeLevel from MasterData.
      * Then : On success, the response will return status as TRUE and with GradeLevel data in the result.
      */
     @Test
@@ -116,8 +111,7 @@ public class ConfigServiceTest extends GenieServiceTestBase {
     /**
      * Scenario : To get the age group data, on successful fetching of data the response will return as true
      * with MasterData in the result.
-     * Given : To get the Age group data
-     * When : MasterDataType is AgeGroup.
+     * When : When SDK is fetching  AgeGroup from MasterData.
      * Then : On success, the response will return status as TRUE and with AgeGroup data in the result.
      */
     @Test
@@ -133,7 +127,7 @@ public class ConfigServiceTest extends GenieServiceTestBase {
     /**
      * Scenario : To check the response by the passing the request as null to get the MasterData.
      * Given : To get the MasterData.
-     * When : MasterDataType is null.
+     * When : When SDK is fetching MasterData passing null.
      * Then : Error message is displayed.
      */
     @Test
@@ -146,8 +140,7 @@ public class ConfigServiceTest extends GenieServiceTestBase {
 
     /**
      * Scenario : To get the ordered related data about the platform and other platform parameters.
-     * Given : To fetch the ordered related data about the platform and other platform parameters.
-     * When :
+     * When : When SDK is fetching ordered related data about the platform
      * Then : On successful fetching of the data, the response will return status as TRUE and with result set in Map.
      */
     @Test
@@ -163,8 +156,7 @@ public class ConfigServiceTest extends GenieServiceTestBase {
 
     /**
      * Scenario : To get the platform specific data, specific to locale chosen.
-     * Given : To fetch the platform specific data.
-     * When :
+     * When : When SDK is fetching platform specific data by passing a specific locale.
      * Then : On successful fetching the data, the response will return status as TRUE and with result set in Map.
      */
     @Test
@@ -179,8 +171,7 @@ public class ConfigServiceTest extends GenieServiceTestBase {
 
     /**
      * Scenario : To validate the platform specific data, for an invalid locale.
-     * Given : For an invalid locale, validate the platform specific data.
-     * When :
+     * When : Validation for invalid locale when SDK is fetching platform specific data.
      * Then : Error message for invalid locale.
      */
     @Test
