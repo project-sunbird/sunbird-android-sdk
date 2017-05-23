@@ -4,6 +4,8 @@ import android.content.Context;
 
 import org.ekstep.genieresolvers.content.GetContentTask;
 import org.ekstep.genieresolvers.content.GetContentsTask;
+import org.ekstep.genieresolvers.content.GetRelatedContentTask;
+import org.ekstep.genieresolvers.content.SendFeedbackEventTask;
 import org.ekstep.genieresolvers.language.GetAllLanguagesTask;
 import org.ekstep.genieresolvers.language.GetLanguageSearchTask;
 import org.ekstep.genieresolvers.language.GetTraversalRuleTask;
@@ -13,6 +15,9 @@ import org.ekstep.genieresolvers.user.DeleteUserTask;
 import org.ekstep.genieresolvers.user.GetCurrentUserTask;
 import org.ekstep.genieresolvers.user.UpdateUserTask;
 import org.ekstep.genieservices.commons.bean.Profile;
+
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created on 18/5/17.
@@ -34,6 +39,8 @@ public class GenieResolver {
     private DeleteUserTask mDeleteUserTask;
     private UpdateUserTask mUpdateUserTask;
     private GetCurrentUserTask mGetCurrentUserTask;
+    private GetRelatedContentTask mGetRelatedContentTask;
+    private SendFeedbackEventTask mSendFeedbackEventTask;
 
     private GenieResolver(Context context, String appQualifier) {
         this.context = context;
@@ -101,25 +108,39 @@ public class GenieResolver {
         return mCreateUserTask;
     }
 
-    public DeleteUserTask getDeleteUserTask(String userId){
-        if (mDeleteUserTask == null){
+    public DeleteUserTask getDeleteUserTask(String userId) {
+        if (mDeleteUserTask == null) {
             mDeleteUserTask = new DeleteUserTask(context, appQualifier, userId);
         }
-        return  mDeleteUserTask;
+        return mDeleteUserTask;
     }
 
-    public UpdateUserTask getUpdateUserTask(Profile profile){
-        if (mUpdateUserTask == null){
+    public UpdateUserTask getUpdateUserTask(Profile profile) {
+        if (mUpdateUserTask == null) {
             mUpdateUserTask = new UpdateUserTask(context, appQualifier, profile);
         }
         return mUpdateUserTask;
     }
 
-    public GetCurrentUserTask getCurrentUserTask(){
-        if (mGetCurrentUserTask == null){
+    public GetCurrentUserTask getCurrentUserTask() {
+        if (mGetCurrentUserTask == null) {
             mGetCurrentUserTask = new GetCurrentUserTask(context, appQualifier);
         }
         return mGetCurrentUserTask;
+    }
+
+    public GetRelatedContentTask getRelatedContentTask(List<HashMap<String, Object>> contentIdentifiers, String userId) {
+        if (mGetRelatedContentTask == null) {
+            mGetRelatedContentTask = new GetRelatedContentTask(context, appQualifier, contentIdentifiers, userId);
+        }
+        return mGetRelatedContentTask;
+    }
+
+    public SendFeedbackEventTask getSendFeedbackEventTask(String feedbackString) {
+        if (mSendFeedbackEventTask == null) {
+            mSendFeedbackEventTask = new SendFeedbackEventTask(context, appQualifier, feedbackString);
+        }
+        return mSendFeedbackEventTask;
     }
 
 }

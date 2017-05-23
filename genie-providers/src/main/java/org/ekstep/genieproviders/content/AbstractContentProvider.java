@@ -18,7 +18,7 @@ public abstract class AbstractContentProvider extends BaseContentProvider {
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        List<ContentUriHandler> handlers = ContentUriHandlerFactory.uriHandlers(getCompletePath(), getContext(), selection, selectionArgs);
+        List<IUriHandler> handlers = ContentUriHandlerFactory.uriHandlers(getCompletePath(), getContext(), selection, selectionArgs);
         for (IUriHandler handler : handlers) {
             if (handler.canProcess(uri)) {
                 return handler.process();
@@ -36,7 +36,7 @@ public abstract class AbstractContentProvider extends BaseContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        List<ContentUriHandler> handlers = ContentUriHandlerFactory.uriHandlers(getCompletePath(), getContext(), null, null);
+        List<IUriHandler> handlers = ContentUriHandlerFactory.uriHandlers(getCompletePath(), getContext(), null, null);
         for (IUriHandler handler : handlers) {
             if (handler.canProcess(uri)) {
                 return handler.insert(uri, values);
