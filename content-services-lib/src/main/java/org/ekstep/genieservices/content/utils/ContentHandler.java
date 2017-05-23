@@ -16,6 +16,7 @@ import org.ekstep.genieservices.commons.bean.Variant;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.db.contract.ContentEntry;
 import org.ekstep.genieservices.commons.utils.DateUtil;
+import org.ekstep.genieservices.commons.utils.FileHandler;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.ContentConstants;
@@ -24,12 +25,15 @@ import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.db.model.ContentsModel;
 import org.ekstep.genieservices.content.network.ContentDetailsAPI;
 
+import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Queue;
 
 /**
  * Created on 5/23/2017.
@@ -240,4 +244,108 @@ public class ContentHandler {
         contentAccessCriteria.setContentIdentifier(contentIdentifier);
         return userService.getAllContentAccess(contentAccessCriteria).getResult();
     }
+
+    public static void deleteOrUpdateContent(ContentModel contentModel, boolean isChildItems, int level) {
+        int refCount = contentModel.getRefCount();
+
+        if (level == ContentConstants.Delete.NESTED) {
+            // If visibility is Default it means this content was visible in my downloads.
+            // After deleting artifact for this content it should not visible as well so reduce the refCount also for this.
+            if (refCount > 1 && ContentConstants.Visibility.DEFAULT.equalsIgnoreCase(contentModel.getVisibility())) {
+                refCount = refCount - 1;
+
+                // Update visibility
+                contentModel.setVisibility(ContentConstants.Visibility.PARENT);
+            }
+
+            // Update the contentState
+            // Do not update the content state if contentType is Collection / TextBook / TextBookUnit
+            if (ContentType.COLLECTION.getValue().equalsIgnoreCase(contentModel.getContentType())
+                    || ContentType.TEXTBOOK.getValue().equalsIgnoreCase(contentModel.getContentType())
+                    || ContentType.TEXTBOOK_UNIT.getValue().equalsIgnoreCase(contentModel.getContentType())) {
+                contentModel.addOrUpdateContentState(ContentConstants.State.ARTIFACT_AVAILABLE);
+            } else {
+                contentModel.addOrUpdateContentState(ContentConstants.State.ONLY_SPINE);
+
+                // if there are no entry in DB for any content then on this case contentModel.getPath() will be null
+                if (contentModel.getPath() != null) {
+                    FileHandler.rm(new File(contentModel.getPath()), contentModel.getIdentifier());
+                }
+            }
+
+        } else {
+            // TODO: This check should be before updating the existing refCount.
+            // Do not update the content state if contentType is Collection / TextBook / TextBookUnit and refCount is more than 1.
+            if ((ContentType.COLLECTION.getValue().equalsIgnoreCase(contentModel.getContentType())
+                    || ContentType.TEXTBOOK.getValue().equalsIgnoreCase(contentModel.getContentType())
+                    || ContentType.TEXTBOOK_UNIT.getValue().equalsIgnoreCase(contentModel.getContentType()))
+                    && refCount > 1) {
+                contentModel.addOrUpdateContentState(ContentConstants.State.ARTIFACT_AVAILABLE);
+            } else if (refCount > 1 && isChildItems) {  //contentModel.isVisibilityDefault() &&
+                // Visibility will remain Default only.
+
+                contentModel.addOrUpdateContentState(ContentConstants.State.ARTIFACT_AVAILABLE);
+            } else {
+
+                // Set the visibility to Parent so that this content will not visible in My contents / Downloads section.
+                // Update visibility
+                if (ContentConstants.Visibility.DEFAULT.equalsIgnoreCase(contentModel.getVisibility())) {
+                    contentModel.setVisibility(ContentConstants.Visibility.PARENT);
+                }
+
+                contentModel.addOrUpdateContentState(ContentConstants.State.ONLY_SPINE);
+
+                // if there are no entry in DB for any content then on this case contentModel.getPath() will be null
+                if (contentModel.getPath() != null) {
+                    FileHandler.rm(new File(contentModel.getPath()), contentModel.getIdentifier());
+                }
+            }
+
+            refCount = refCount - 1;
+        }
+
+        // Update the refCount
+        contentModel.addOrUpdateRefCount(refCount);
+
+        // if there are no entry in DB for any content then on this case contentModel.getPath() will be null
+        if (contentModel.getPath() != null) {
+            contentModel.update();
+        }
+    }
+
+    public static void deleteAllPreRequisites(AppContext appContext, ContentModel contentModel, int level) {
+        List<String> preRequisitesIdentifier = contentModel.getPreRequisitesIdentifiers();
+        ContentsModel contentsModel = ContentsModel.findAllContentsWithIdentifiers(appContext.getDBSession(), preRequisitesIdentifier);
+
+        if (contentsModel != null) {
+            for (ContentModel c : contentsModel.getContentModelList()) {
+                deleteOrUpdateContent(c, true, level);
+            }
+        }
+    }
+
+    public static void deleteAllChild(AppContext appContext, ContentModel contentModel, int level) {
+        Queue<ContentModel> queue = new LinkedList<>();
+
+        queue.add(contentModel);
+
+        ContentModel node;
+        while (!queue.isEmpty()) {
+            node = queue.remove();
+
+            if (node.hasChildren()) {
+                List<String> childContentsIdentifiers = node.getChildContentsIdentifiers();
+                ContentsModel contentsModel = ContentsModel.findAllContentsWithIdentifiers(appContext.getDBSession(), childContentsIdentifiers);
+                if (contentsModel != null) {
+                    queue.addAll(contentsModel.getContentModelList());
+                }
+            }
+
+            // Deleting only child content
+            if (!contentModel.getIdentifier().equalsIgnoreCase(node.getIdentifier())) {
+                deleteOrUpdateContent(node, true, level);
+            }
+        }
+    }
+
 }
