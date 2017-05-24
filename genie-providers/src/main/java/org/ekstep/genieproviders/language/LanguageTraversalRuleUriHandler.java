@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import com.google.gson.Gson;
 
 import org.ekstep.genieproviders.IUriHandler;
+import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -21,12 +22,14 @@ public class LanguageTraversalRuleUriHandler implements IUriHandler {
     private String authority;
     private Context context;
     private String selection;
+    private GenieService genieService;
 
     public LanguageTraversalRuleUriHandler(String authority, Context context,
-                                           String queryString) {
+                                           String queryString, GenieService genieService) {
         this.authority = authority;
         this.context = context;
         this.selection = queryString;
+        this.genieService = genieService;
     }
 
     @Override

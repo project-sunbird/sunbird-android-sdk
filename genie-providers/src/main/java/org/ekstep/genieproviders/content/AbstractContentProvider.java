@@ -18,7 +18,7 @@ public abstract class AbstractContentProvider extends BaseContentProvider {
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        List<IUriHandler> handlers = ContentUriHandlerFactory.uriHandlers(getCompletePath(), getContext(), selection, selectionArgs);
+        List<IUriHandler> handlers = ContentUriHandlerFactory.uriHandlers(getCompletePath(), getContext(), selection, selectionArgs, getService());
         for (IUriHandler handler : handlers) {
             if (handler.canProcess(uri)) {
                 return handler.process();

@@ -5,19 +5,24 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import org.ekstep.genieproviders.IUriHandler;
+import org.ekstep.genieservices.GenieService;
+import org.ekstep.genieservices.commons.bean.telemetry.GECreateProfile;
+
 import java.util.Locale;
 
 public class FeedbackUriHandler implements IUriHandler {
     private String authority;
     private Context context;
+    private GenieService genieService;
 
-    public FeedbackUriHandler(String authority, Context context, String selection, String[] selectionArgs) {
-        this(authority, context);
+    public FeedbackUriHandler(String authority, Context context, String selection, String[] selectionArgs, GenieService genieService) {
+        this(authority, context, genieService);
     }
 
-    public FeedbackUriHandler(String authority, Context context) {
+    public FeedbackUriHandler(String authority, Context context, GenieService genieService) {
         this.authority = authority;
         this.context = context;
+        this.genieService = genieService;
     }
 
     @Override

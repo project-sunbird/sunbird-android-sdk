@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import org.ekstep.genieproviders.IUriHandler;
+import org.ekstep.genieservices.GenieService;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -14,10 +15,12 @@ public class ContentUriHandler implements IUriHandler {
     private String TAG = ContentUriHandler.class.getSimpleName();
     private String authority;
     private String[] contentIdentifier;
+    private GenieService genieService;
 
-    public ContentUriHandler(String authority, String[] contentIdentifier) {
+    public ContentUriHandler(String authority, String[] contentIdentifier, GenieService genieService) {
         this.authority = authority;
         this.contentIdentifier = contentIdentifier;
+        this.genieService = genieService;
     }
 
     @Override

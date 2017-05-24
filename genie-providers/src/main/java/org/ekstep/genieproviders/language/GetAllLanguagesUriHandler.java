@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.net.Uri;
 
 import org.ekstep.genieproviders.IUriHandler;
+import org.ekstep.genieservices.GenieService;
 
 import java.util.Locale;
 
@@ -19,17 +20,19 @@ public class GetAllLanguagesUriHandler implements IUriHandler {
     private String authority;
     private Context context;
     private String selection;
+    private GenieService genieService;
 
-
-    public GetAllLanguagesUriHandler(String authority, Context context, String queryString) {
+    public GetAllLanguagesUriHandler(String authority, Context context, String queryString, GenieService genieService) {
         this.authority = authority;
         this.context = context;
         this.selection = queryString;
+        this.genieService = genieService;
     }
 
     @Override
     public Cursor process() {
         // TODO: 23/5/17 Need to invoke method from Language Service API and send back the required response
+
         return null;
     }
 

@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.net.Uri;
 
 import org.ekstep.genieproviders.IUriHandler;
+import org.ekstep.genieservices.GenieService;
 
 import java.util.Locale;
 
@@ -20,12 +21,14 @@ public class RelatedContentUriHandler implements IUriHandler {
     private String[] selectionArgs;
     private String authority;
     private Context context;
+    private GenieService genieService;
 
-    public RelatedContentUriHandler(String authority, Context context, String selection, String[] selectionArgs) {
+    public RelatedContentUriHandler(String authority, Context context, String selection, String[] selectionArgs, GenieService genieService) {
         this.authority = authority;
         this.context = context;
         this.selection = selection;
         this.selectionArgs = selectionArgs;
+        this.genieService = genieService;
     }
 
     @Override

@@ -34,7 +34,7 @@ public abstract class AbstractLanguageProvider extends BaseContentProvider {
     @NonNull
     protected List<IUriHandler> getUriHandlers(String selection, String[] selectionArgs) {
         return LanguageUriHandlerFactory.uriHandlers(getCompletePath(),
-                getContext(), selection);
+                getContext(), selection, getService());
     }
 
     @Override

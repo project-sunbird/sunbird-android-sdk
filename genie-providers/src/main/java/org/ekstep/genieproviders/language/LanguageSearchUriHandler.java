@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.net.Uri;
 
 import org.ekstep.genieproviders.IUriHandler;
+import org.ekstep.genieservices.GenieService;
 
 import java.util.Locale;
 
@@ -19,11 +20,13 @@ public class LanguageSearchUriHandler implements IUriHandler {
     private String authority;
     private Context context;
     private String selection;
+    private GenieService genieService;
 
-    public LanguageSearchUriHandler(String authority, Context context, String queryString) {
+    public LanguageSearchUriHandler(String authority, Context context, String queryString, GenieService genieService) {
         this.authority = authority;
         this.context = context;
         this.selection = queryString;
+        this.genieService = genieService;
     }
 
     @Override
