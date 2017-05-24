@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import org.ekstep.genieproviders.BaseContentProvider;
 import org.ekstep.genieproviders.IUriHandler;
 import org.ekstep.genieservices.ServiceConstants;
+import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
@@ -54,18 +55,26 @@ public abstract class AbstractUserProvider extends BaseContentProvider {
         if (selectionArgs[0].isEmpty()) {
             return 0;
         } else {
-            getService().getUserProfileService().deleteUser(selectionArgs[0]);
-            return 1;
+            GenieResponse response = getService().getUserProfileService().deleteUser(selectionArgs[0]);
+            if (response.getStatus()) {
+                return 1;
+            }
+
+            return 0;
         }
     }
 
     @Override
     public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        if(values != null){
+        if (values != null) {
             Profile profile = GsonUtil.fromJson(values.getAsString(ServiceConstants.PROFILE), Profile.class);
-            getService().getUserProfileService().updateUserProfile(profile);
-            return 1;
-        }else{
+            GenieResponse response = getService().getUserProfileService().updateUserProfile(profile);
+            if (response.getStatus()) {
+                return 1;
+            }
+
+            return 0;
+        } else {
             return 0;
         }
     }

@@ -11,8 +11,7 @@ import java.util.HashMap;
 import java.util.Locale;
 
 public class ContentUriHandler implements IUriHandler {
-    private final static String METHOD_NAME = "get";
-    private String TAG = "service-CUH";
+    private String TAG = ContentUriHandler.class.getSimpleName();
     private String authority;
     private String[] contentIdentifier;
 

@@ -36,13 +36,12 @@ public abstract class AbstractContentProvider extends BaseContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        List<IUriHandler> handlers = ContentUriHandlerFactory.uriHandlers(getCompletePath(), getContext(), null, null);
-        for (IUriHandler handler : handlers) {
-            if (handler.canProcess(uri)) {
-                return handler.insert(uri, values);
-            }
-        }
+        FeedbackUriHandler feedbackUriHandler = new FeedbackUriHandler(getCompletePath(), getContext(), null, null);
+        Uri responseUri = feedbackUriHandler.insert(uri, values);
 
+        if (responseUri != null) {
+            return responseUri;
+        }
         return null;
     }
 
@@ -65,6 +64,6 @@ public abstract class AbstractContentProvider extends BaseContentProvider {
 
     @Override
     public String getPackage() {
-        return  getPackageName();
+        return getPackageName();
     }
 }
