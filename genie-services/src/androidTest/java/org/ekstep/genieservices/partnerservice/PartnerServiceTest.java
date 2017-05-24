@@ -1,10 +1,17 @@
 package org.ekstep.genieservices.partnerservice;
 
+import android.util.Log;
+
+import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.PartnerData;
+import org.ekstep.genieservices.telemetry.model.EventModel;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Sneha on 5/17/2017.
@@ -21,14 +28,14 @@ public class PartnerServiceTest extends GenieServiceTestBase {
 
     /**
      * Scenario : To check the entire partner flow.
-     *
+     * <p>
      * Step 1. Register a partner with the specified partnerID and publicKey in PartnerData.
      * Step 2. Check if the partnerId is registered.
      * Step 3. Start the Partner Session with the specified partnerID in PartnerData.
      * Step 4. Send Partner data specified in PartnerData
      * Step 5. Terminate the Partner Session with the specified partnerID.
      * Step 6 : Save the telemetry event for the above steps.
-     *
+     * <p>
      * Then : Check if telemetry event is logged in for every event.
      */
     @Test
@@ -38,34 +45,34 @@ public class PartnerServiceTest extends GenieServiceTestBase {
 
         GenieResponse registerPartnerResponse = activity.registerPartner(partnerData);
         Assert.assertTrue(registerPartnerResponse.getStatus());
-        checkIfTelemetryEventIsLogged();
+        Log.v(TAG, "response :: " + registerPartnerResponse.getStatus());
+        checkIfTelemetryEventIsLogged("GE_REGISTER_PARTNER");
 
         GenieResponse isRegisteredPartnerResponse = activity.isPartnerRegistered(PARTNER_ID);
         Assert.assertTrue(isRegisteredPartnerResponse.getStatus());
 
         GenieResponse startPartnerSession = activity.startPartnerSession(partnerData);
         Assert.assertTrue(startPartnerSession.getStatus());
-//        GEStartPartnerSession geStartPartnerSession = new GEStartPartnerSession(gameData, PARTNER_ID, "20013fea6bcc820c", "PARTNER_SID");
-        checkIfTelemetryEventIsLogged();
+        checkIfTelemetryEventIsLogged("GE_START_PARTNER_SESSION");
 
         GenieResponse sendDataResponse = activity.sendData(partnerData);
         Assert.assertTrue(sendDataResponse.getStatus());
-        checkIfTelemetryEventIsLogged();
+        checkIfTelemetryEventIsLogged("GE_PARTNER_DATA");
 
         GenieResponse terminatePartnerSession = activity.terminatePartnerSession(partnerData);
         Assert.assertTrue(terminatePartnerSession.getStatus());
-        checkIfTelemetryEventIsLogged();
+        checkIfTelemetryEventIsLogged("GE_STOP_PARTNER_SESSION");
     }
 
     /**
      * Scenario : To the entire partner flow for multiple partners.
-     *
+     * <p>
      * Step 1. Register multiple partner with the specified partnerID and publicKey in PartnerData.
      * Step 2. Start the multiple partners Session with their partnerID in PartnerData.
      * Step 3. Send Partner data specified in PartnerData
      * Step 4. Terminate the multiple partners session with the specified partnerID.
      * Step 5. Save the telemtry event for the above steps
-     *
+     * <p>
      * Then :  Check if telemetry event is logged in for every partner.
      */
     @Test
@@ -75,44 +82,47 @@ public class PartnerServiceTest extends GenieServiceTestBase {
 
         GenieResponse registerPartner1Response = activity.registerPartner(partner1Data);
         Assert.assertTrue(registerPartner1Response.getStatus());
-        checkIfTelemetryEventIsLogged();
+        checkIfTelemetryEventIsLogged("GE_REGISTER_PARTNER");
 
         GenieResponse startPartner1Session = activity.startPartnerSession(partner1Data);
         Assert.assertTrue(startPartner1Session.getStatus());
-        checkIfTelemetryEventIsLogged();
+        checkIfTelemetryEventIsLogged("GE_START_PARTNER_SESSION");
 
         PartnerData partner2Data = new PartnerData("org.ekstep.partner", "1.8", "PARTNER2_ID", "partner_2 data", PUBLIC_KEY);
 
         GenieResponse registerPartner2Response = activity.registerPartner(partner2Data);
         Assert.assertTrue(registerPartner2Response.getStatus());
-        checkIfTelemetryEventIsLogged();
+        checkIfTelemetryEventIsLogged("GE_REGISTER_PARTNER");
 
         GenieResponse startPartner2Session = activity.startPartnerSession(partner2Data);
         Assert.assertTrue(startPartner2Session.getStatus());
-        checkIfTelemetryEventIsLogged();
+        checkIfTelemetryEventIsLogged("GE_START_PARTNER_SESSION");
 
         GenieResponse sendPartner1Data = activity.sendData(partner1Data);
         Assert.assertTrue(sendPartner1Data.getStatus());
-        checkIfTelemetryEventIsLogged();
+        checkIfTelemetryEventIsLogged("GE_PARTNER_DATA");
 
         GenieResponse sendPartner2Data = activity.sendData(partner2Data);
         Assert.assertTrue(sendPartner2Data.getStatus());
-        checkIfTelemetryEventIsLogged();
+        checkIfTelemetryEventIsLogged("GE_PARTNER_DATA");
 
         GenieResponse terminatePartner1Data = activity.terminatePartnerSession(partner1Data);
         Assert.assertTrue(terminatePartner1Data.getStatus());
-        checkIfTelemetryEventIsLogged();
+        checkIfTelemetryEventIsLogged("GE_STOP_PARTNER_SESSION");
 
         GenieResponse terminatePartner2Data = activity.terminatePartnerSession(partner2Data);
         Assert.assertTrue(terminatePartner2Data.getStatus());
-        checkIfTelemetryEventIsLogged();
+        checkIfTelemetryEventIsLogged("GE_STOP_PARTNER_SESSION");
     }
 
-    /**
-     * Check for the telemetry data.
-     */
-    private void checkIfTelemetryEventIsLogged() {
+
+    private void checkIfTelemetryEventIsLogged(String telemetryEvent) {
 
         //TODO : Check if telemetry events are logged.
+
+        List<EventModel> eventModelList = GenieServiceDBHelper.findEventById(telemetryEvent);
+        Map eventMap = eventModelList.get(0).getEventMap();
+
+        Log.v(TAG, "eventMap getEID() :::: " + eventMap.get("eid"));
     }
 }
