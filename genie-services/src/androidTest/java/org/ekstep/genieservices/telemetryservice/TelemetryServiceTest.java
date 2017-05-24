@@ -79,7 +79,7 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
      * Then :Check if the telemetry event is saved.
      */
     @Test
-    public void _2shouldSaveTelemetryData() {
+    public void shouldSaveTelemetryDataAsString() {
 
         Profile createdProfile = createUserProfile();
 
@@ -99,7 +99,7 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
      * Scenario : To check if the partner telemetry events are saved.
      */
     @Test
-    public void _3shouldCreatePartnerSession() {
+    public void shouldCreatePartnerSession() {
 
         Profile profile = createUserProfile();
 
