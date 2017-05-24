@@ -42,7 +42,6 @@ import org.ekstep.genieservices.content.network.ContentSearchAPI;
 import org.ekstep.genieservices.content.network.RecommendedContentAPI;
 import org.ekstep.genieservices.content.network.RelatedContentAPI;
 import org.ekstep.genieservices.content.utils.ContentHandler;
-import org.ekstep.genieservices.content.utils.ContentUtil;
 
 import java.io.File;
 import java.lang.reflect.Type;
@@ -87,7 +86,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         ContentModel contentModelInDB = ContentModel.find(mAppContext.getDBSession(), contentIdentifier);
 
         if (contentModelInDB == null) {     // Fetch from server if detail is not available in DB
-            Map contentData = ContentHandler.fetchContentDetails(mAppContext, contentIdentifier);
+            Map contentData = ContentHandler.fetchContentDetailsFromServer(mAppContext, contentIdentifier);
             if (contentData == null) {
                 response = GenieResponseBuilder.getErrorResponse(ServiceConstants.NO_DATA_FOUND, "No content found for identifier = " + contentIdentifier, TAG);
                 return response;
@@ -98,7 +97,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             ContentHandler.refreshContentDetails(mAppContext, contentIdentifier, contentModelInDB);
         }
 
-        Content content = ContentHandler.getContent(contentModelInDB, true, true, contentFeedbackService, userService);
+        Content content = ContentHandler.convertContentModelToBean(contentModelInDB, true, true, contentFeedbackService, userService);
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(content);
@@ -131,7 +130,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         for (ContentAccess contentAccess : contentAccessList) {
             ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), contentAccess.getIdentifier());
             if (contentModel != null && contentModelListInDB.contains(contentModel)) {
-                Content c = ContentHandler.getContent(contentModel, criteria.isAttachFeedback(), criteria.isAttachContentAccess(), contentFeedbackService, userService);
+                Content c = ContentHandler.convertContentModelToBean(contentModel, criteria.isAttachFeedback(), criteria.isAttachContentAccess(), contentFeedbackService, userService);
                 c.setContentAccess(contentAccess);
                 contentList.add(c);
                 contentModelListInDB.remove(contentModel);
@@ -140,7 +139,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         // Add the remaining content into list
         for (ContentModel contentModel : contentModelListInDB) {
-            Content c = ContentHandler.getContent(contentModel, criteria.isAttachFeedback(), criteria.isAttachContentAccess(), contentFeedbackService, userService);
+            Content c = ContentHandler.convertContentModelToBean(contentModel, criteria.isAttachFeedback(), criteria.isAttachContentAccess(), contentFeedbackService, userService);
             contentList.add(c);
         }
 
@@ -300,7 +299,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             for (Map contentDataMap : contentDataList) {
                 // TODO: 5/15/2017 - Can fetch content from DB and return in response.
                 ContentModel contentModel = ContentModel.build(mAppContext.getDBSession(), contentDataMap, null);
-                Content content = ContentHandler.getContent(contentModel, false, false, contentFeedbackService, userService);
+                Content content = ContentHandler.convertContentModelToBean(contentModel, false, false, contentFeedbackService, userService);
                 contents.add(content);
             }
 
@@ -406,8 +405,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
     private HashMap<String, Integer> getCompatibilityLevel() {
         HashMap<String, Integer> compatLevelMap = new HashMap<>();
-        compatLevelMap.put("max", ContentUtil.maxCompatibilityLevel);
-        compatLevelMap.put("min", ContentUtil.minCompatibilityLevel);
+        compatLevelMap.put("max", ContentHandler.maxCompatibilityLevel);
+        compatLevelMap.put("min", ContentHandler.minCompatibilityLevel);
         return compatLevelMap;
     }
 
@@ -510,7 +509,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             for (Map contentDataMap : contentDataList) {
                 // TODO: 5/15/2017 - Can fetch content from DB and return in response.
                 ContentModel contentModel = ContentModel.build(mAppContext.getDBSession(), contentDataMap, null);
-                Content content = ContentHandler.getContent(contentModel, false, false, contentFeedbackService, userService);
+                Content content = ContentHandler.convertContentModelToBean(contentModel, false, false, contentFeedbackService, userService);
                 contents.add(content);
             }
 
@@ -570,7 +569,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             List<Content> contents = new ArrayList<>();
             for (Map contentDataMap : contentDataList) {
                 ContentModel contentModel = ContentModel.build(mAppContext.getDBSession(), contentDataMap, null);
-                Content content = ContentHandler.getContent(contentModel, false, false, contentFeedbackService, userService);
+                Content content = ContentHandler.convertContentModelToBean(contentModel, false, false, contentFeedbackService, userService);
 
                 if (allLocalContentModel.contains(contentModel)) {
                     content.setAvailableLocally(true);
@@ -636,7 +635,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             while (!stack.isEmpty()) {
                 node = stack.pop();
                 if (node.hasChildren()) {
-                    List<ContentModel> childContents = ContentUtil.getSortedChildrenList(mAppContext.getDBSession(), node.getLocalData(), ContentConstants.ChildContents.FIRST_LEVEL_ALL);
+                    List<ContentModel> childContents = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), node.getLocalData(), ContentConstants.ChildContents.FIRST_LEVEL_ALL);
                     // TODO: 5/19/2017 -      List<ContentModel> childContents = node.getSortedChildrenList(dbOperator, CHILD_CONTENTS_FIRST_LEVEL_ALL);
                     stack.addAll(childContents);
 
@@ -698,7 +697,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 for (String identifier : nextContentIdentifierList) {
                     ContentModel nextContentModel = ContentModel.find(mAppContext.getDBSession(), identifier);
 
-                    Content content = ContentHandler.getContent(nextContentModel, false, false, contentFeedbackService, userService);
+                    Content content = ContentHandler.convertContentModelToBean(nextContentModel, false, false, contentFeedbackService, userService);
                     contentList.add(content);
                 }
             }
@@ -753,7 +752,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         DownloadService downloadService = new DownloadService(mAppContext);
 
         for (String contentIdentifier : contentIdentifiers) {
-            Map dataMap = ContentHandler.fetchContentDetails(mAppContext, contentIdentifier);
+            Map dataMap = ContentHandler.fetchContentDetailsFromServer(mAppContext, contentIdentifier);
             String downloadUrl = ContentHandler.getDownloadUrl(dataMap);
             if (downloadUrl != null) {
                 downloadUrl = downloadUrl.trim();

@@ -14,7 +14,7 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.ContentConstants;
 import org.ekstep.genieservices.content.bean.ImportContext;
 import org.ekstep.genieservices.content.db.model.ContentModel;
-import org.ekstep.genieservices.content.utils.ContentUtil;
+import org.ekstep.genieservices.content.utils.ContentHandler;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,7 +50,7 @@ public class ExtractPayloads implements IChainable {
 
         for (HashMap<String, Object> item : importContext.getItems()) {
             identifier = (String) item.get("identifier");
-            newContentCompatibilityLevel = (item.get(ContentModel.KEY_COMPATIBILITY_LEVEL) != null) ? (Double) item.get(ContentModel.KEY_COMPATIBILITY_LEVEL) : ContentUtil.defaultCompatibilityLevel;
+            newContentCompatibilityLevel = (item.get(ContentModel.KEY_COMPATIBILITY_LEVEL) != null) ? (Double) item.get(ContentModel.KEY_COMPATIBILITY_LEVEL) : ContentHandler.defaultCompatibilityLevel;
             artifactUrl = (String) item.get("artifactUrl");
             iconURL = (String) item.get("appIcon");
 
@@ -81,7 +81,7 @@ public class ExtractPayloads implements IChainable {
             oldContentModel = ContentModel.find(appContext.getDBSession(), identifier);
             oldContentPath = oldContentModel == null ? null : oldContentModel.getPath();
             newContentModel = ContentModel.build(appContext.getDBSession(), item, importContext.getManifestVersion());
-            boolean isContentExist = ContentUtil.isContentExist(oldContentModel, newContentModel);
+            boolean isContentExist = ContentHandler.isContentExist(oldContentModel, newContentModel);
 
             //Apk files
             if ((!StringUtil.isNullOrEmpty(mimeType) && mimeType.equalsIgnoreCase(ContentConstants.MimeType.APPLICATION)) ||
@@ -106,7 +106,7 @@ public class ExtractPayloads implements IChainable {
 
                     try {
                         // If compatibility level is not in range then do not copy artifact
-                        if (ContentUtil.isCompatible(newContentCompatibilityLevel)) {
+                        if (ContentHandler.isCompatible(newContentCompatibilityLevel)) {
                             copyAssets(importContext.getTmpLocation().getPath(), artifactUrl, payloadDestination);
 
                             newContentModel.addOrUpdateContentState(ContentConstants.State.ARTIFACT_AVAILABLE);
@@ -153,7 +153,7 @@ public class ExtractPayloads implements IChainable {
                     payloadDestination.mkdirs();
 
                     // If compatibility level is not in range then do not copy artifact
-                    if (ContentUtil.isCompatible(newContentCompatibilityLevel)) {
+                    if (ContentHandler.isCompatible(newContentCompatibilityLevel)) {
                         if (!StringUtil.isNullOrEmpty(artifactUrl)) {
                             payload = new File(importContext.getTmpLocation().getPath(), "/" + artifactUrl);
                             stage2 = new Decompress(payload, payloadDestination);
@@ -230,7 +230,7 @@ public class ExtractPayloads implements IChainable {
             }
 
             // TODO: 5/18/2017
-            ContentUtil.addOrUpdateViralityMetadata(newContentModel.getLocalData(), appContext.getDeviceInfo().getDeviceID());
+            ContentHandler.addOrUpdateViralityMetadata(newContentModel.getLocalData(), appContext.getDeviceInfo().getDeviceID());
 //            newContentModel.addOrUpdateViralityMetadata(appContext.getDeviceInfo().getDeviceID());
 
             if (oldContentModel == null) {

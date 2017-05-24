@@ -15,7 +15,7 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.ContentConstants;
 import org.ekstep.genieservices.content.bean.ImportContext;
 import org.ekstep.genieservices.content.db.model.ContentModel;
-import org.ekstep.genieservices.content.utils.ContentUtil;
+import org.ekstep.genieservices.content.utils.ContentHandler;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -85,7 +85,7 @@ public class ValidateEcar implements IChainable {
             if (ContentConstants.Visibility.DEFAULT.equals(newContentModel.getVisibility()) // Check if visibility is default for new content. // TODO: 5/17/2017 - Is this check really needed?
                     && isDuplicateCheckRequired(pkgVersion, status)     // Check if its draft and pkgVersion is 0.
                     && !StringUtil.isNullOrEmpty(oldContentPath)     // Check if path of old content is not empty.
-                    && ContentUtil.isImportFileExist(oldContentModel, newContentModel)) {   // Check whether the file is already imported or not.
+                    && ContentHandler.isImportFileExist(oldContentModel, newContentModel)) {   // Check whether the file is already imported or not.
 
                 //Skip the content
                 importContext.getSkippedItemsIdentifier().add(identifier);
