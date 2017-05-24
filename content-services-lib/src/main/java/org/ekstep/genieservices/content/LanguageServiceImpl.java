@@ -9,6 +9,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.content.network.LanguageSearchAPI;
 import org.ekstep.genieservices.content.network.LanguageTraversalAPI;
 
 /**
@@ -43,4 +44,26 @@ public class LanguageServiceImpl extends BaseService implements ILanguageService
         response = GenieResponseBuilder.getErrorResponse(apiResponse.getError(), (String) apiResponse.getErrorMessages().get(0), TAG);
         return response;
     }
+
+    @Override
+    public GenieResponse<String> getLanguageSearch(String requestData) {
+        GenieResponse<String> response;
+        LanguageSearchAPI api = new LanguageSearchAPI(mAppContext, requestData);
+        GenieResponse apiResponse = api.post();
+
+        if (apiResponse.getStatus()) {
+            String body = apiResponse.getResult().toString();
+
+            LinkedTreeMap map = GsonUtil.fromJson(body, LinkedTreeMap.class);
+            LinkedTreeMap result = (LinkedTreeMap) map.get("result");
+
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+            response.setResult(GsonUtil.toJson(result));
+        }
+
+        response = GenieResponseBuilder.getErrorResponse(apiResponse.getError(), (String) apiResponse.getErrorMessages().get(0), TAG);
+        return response;
+    }
+
+
 }

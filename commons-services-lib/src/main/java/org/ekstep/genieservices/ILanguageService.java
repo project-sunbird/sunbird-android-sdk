@@ -10,4 +10,6 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 public interface ILanguageService {
 
     GenieResponse<String> getLanguageTraversalRule(String languageId);
+
+    GenieResponse<String> getLanguageSearch(String requestData);
 }
