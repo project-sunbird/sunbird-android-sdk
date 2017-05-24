@@ -2,6 +2,8 @@ package org.ekstep.genieservices.commons.utils;
 
 import org.ekstep.genieservices.commons.ILogger;
 
+import javax.management.InstanceNotFoundException;
+
 /**
  * Created on 5/17/2016.
  *
@@ -19,6 +21,14 @@ public class Logger {
     public static void init(ILogger logger) {
         if (INSTANCE == null) {
             INSTANCE = new Logger(logger);
+        }
+    }
+
+    public static boolean isDebugEnabled() {
+        if (INSTANCE != null && INSTANCE.logger != null & INSTANCE.logger.isDebugEnabled()) {
+            return true;
+        } else {
+            return false;
         }
     }
 

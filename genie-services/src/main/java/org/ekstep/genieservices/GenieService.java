@@ -45,6 +45,8 @@ public class GenieService {
             TelemetryLogger.init(new TelemetryServiceImpl(applicationContext, new UserServiceImpl(applicationContext)));
             sService = new GenieService(applicationContext);
         }
+
+        //TODO init the async service here
         return sService;
     }
 
