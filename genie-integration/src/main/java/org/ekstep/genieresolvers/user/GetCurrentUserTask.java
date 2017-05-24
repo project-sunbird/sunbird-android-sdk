@@ -30,17 +30,16 @@ public class GetCurrentUserTask extends BaseTask {
     }
 
     @Override
-    protected String execute() {
+    protected GenieResponse execute() {
         Cursor cursor = contentResolver.query(getUri(), null, null, null, null);
         if (cursor == null || cursor.getCount() == 0) {
-            GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, getErrorMessage(), "No Response for current user!");
-            return GsonUtil.toJson(errorResponse);
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, getErrorMessage(), "No Response for current user!");
         }
 
         GenieResponse successResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.ProviderResolver.SUCCESSFUL);
         // TODO: 23/5/17 Need to send response with the result here and need to check how do we have to send the response
 //        response.setResult(getContent);
-        return GsonUtil.toJson(successResponse);
+        return successResponse;
     }
 
     @Override

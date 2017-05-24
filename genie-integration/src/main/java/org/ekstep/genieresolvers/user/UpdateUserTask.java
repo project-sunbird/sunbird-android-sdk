@@ -32,20 +32,19 @@ public class UpdateUserTask extends BaseTask {
     }
 
     @Override
-    protected String execute() {
+    protected GenieResponse execute() {
         ContentValues profileValues = getContentValues();
         profileValues.put(ServiceConstants.PROFILE, GsonUtil.toJson(profile));
         int response = contentResolver.update(getUri(), profileValues, null, null);
 
         if (response != 1) {
             String logMessage = "Could not update the user!";
-            GenieResponse processing_error = GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, getErrorMessage(), logMessage);
-            return GsonUtil.toJson(processing_error);
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, getErrorMessage(), logMessage);
 
         }
 
         GenieResponse successResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.ProviderResolver.SUCCESSFUL);
-        return GsonUtil.toJson(successResponse);
+        return successResponse;
     }
 
     @Override

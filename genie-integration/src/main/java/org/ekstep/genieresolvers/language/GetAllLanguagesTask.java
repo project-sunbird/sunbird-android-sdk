@@ -38,7 +38,7 @@ public class GetAllLanguagesTask extends BaseTask {
     }
 
     @Override
-    protected String execute() {
+    protected GenieResponse execute() {
         try {
             Cursor cursor = contentResolver.query(getUri(), null, "", null, "");
 
@@ -67,20 +67,18 @@ public class GetAllLanguagesTask extends BaseTask {
         return Uri.parse(authority);
     }
 
-    private String getResponse(List<Language> languages) {
+    private GenieResponse<List<Map<String, Object>>> getResponse(List<Language> languages) {
         Gson gson = new Gson();
-        GenieResponse response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.ProviderResolver.SUCCESSFUL);
+        GenieResponse<List<Map<String, Object>>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.ProviderResolver.SUCCESSFUL);
         String json = gson.toJson(languages);
         Type type = new TypeToken<List<Map<String, Object>>>() {
         }.getType();
         List<Map<String, Object>> results = gson.fromJson(json, type);
         response.setResult(results);
-        return gson.toJson(response);
+        return response;
     }
 
-    private String getErrorResponse(String error, String errorMessage) {
-        Gson gson = new Gson();
-        GenieResponse response = GenieResponseBuilder.getErrorResponse(error, errorMessage, getLogTag());
-        return gson.toJson(response);
+    private GenieResponse<List<Map<String, Object>>> getErrorResponse(String error, String errorMessage) {
+        return GenieResponseBuilder.getErrorResponse(error, errorMessage, getLogTag());
     }
 }

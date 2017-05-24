@@ -7,7 +7,6 @@ import org.ekstep.genieresolvers.BaseTask;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 /**
  * Created on 23/5/17.
@@ -30,18 +29,15 @@ public class DeleteUserTask extends BaseTask {
     }
 
     @Override
-    protected String execute() {
+    protected GenieResponse execute() {
         int response = contentResolver.delete(getUri(), null, new String[]{userId});
 
         if (response != 1) {
             String logMessage = "Could not delete the user!";
-            GenieResponse processing_error = GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, getErrorMessage(), logMessage);
-            return GsonUtil.toJson(processing_error);
-
+           return GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, getErrorMessage(), logMessage);
         }
 
-        GenieResponse successResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.ProviderResolver.SUCCESSFUL);
-        return GsonUtil.toJson(successResponse);
+        return GenieResponseBuilder.getSuccessResponse(ServiceConstants.ProviderResolver.SUCCESSFUL);
     }
 
     @Override

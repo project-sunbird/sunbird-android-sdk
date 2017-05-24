@@ -40,18 +40,17 @@ public class GetRelatedContentTask extends BaseTask {
     }
 
     @Override
-    protected String execute() {
+    protected GenieResponse execute() {
         RelatedContentRequest request = new RelatedContentRequest(userId, contentIdentifiers);
         String requestData = GsonUtil.toJson(request);
         Cursor cursor = contentResolver.query(getUri(), null, requestData, null, null);
         if (cursor == null || cursor.getCount() == 0) {
             String logMessage = "Couldn't get the related content data.";
-            GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR,
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR,
                     getErrorMessage(), logMessage);
-            return GsonUtil.toJson(errorResponse);
         }
         GenieResponse response = getResponse(cursor);
-        return GsonUtil.toJson(response);
+        return response;
     }
 
     @Override

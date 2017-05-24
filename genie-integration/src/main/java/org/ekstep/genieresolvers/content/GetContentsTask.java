@@ -36,18 +36,16 @@ public class GetContentsTask extends BaseTask {
     }
 
     @Override
-    protected String execute() {
-        Gson gson = new Gson();
+    protected GenieResponse execute() {
         Cursor cursor = contentResolver.query(getUri(), null, null, null, "");
         if (cursor == null) {
             String logMessage = "Couldn't get the content list";
-            GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, getErrorMessage(), logMessage);
-            return gson.toJson(errorResponse);
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, getErrorMessage(), logMessage);
         }
         List<Map<String, Object>> contentPath = getPath(cursor);
         GenieResponse response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.ProviderResolver.SUCCESSFUL);
         response.setResult(contentPath);
-        return gson.toJson(response);
+        return response;
     }
 
     @Override

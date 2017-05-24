@@ -27,17 +27,15 @@ public class GetTraversalRuleTask extends BaseTask {
     }
 
     @Override
-    protected String execute() {
-        Gson gson = new Gson();
+    protected GenieResponse execute() {
         Cursor cursor = contentResolver.query(getUri(), null, languageId, null, null);
         if (cursor == null || cursor.getCount() == 0) {
             String logMessage = "Couldn't get the traversal rules";
-            GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR,
+           return GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR,
                     getErrorMessage(), logMessage);
-            return gson.toJson(errorResponse);
         }
         GenieResponse genieResponse = getResponse(cursor);
-        return gson.toJson(genieResponse);
+        return genieResponse;
     }
 
     private GenieResponse<String> getResponse(Cursor cursor) {

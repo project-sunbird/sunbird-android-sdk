@@ -8,7 +8,6 @@ import org.ekstep.genieresolvers.BaseTask;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 /**
  * Created on 23/5/17.
@@ -31,19 +30,18 @@ public class SendFeedbackEventTask extends BaseTask {
     }
 
     @Override
-    protected String execute() {
-        ContentValues event = getContentValues();
+    protected GenieResponse execute() {
+        ContentValues event = new ContentValues();
         event.put("event", feedbackString);
         Uri response = contentResolver.insert(getUri(), event);
         if (response == null) {
             String errorMessage = "Not able to send event";
             String logMessage = "Empty response(URI) when sending feedback event";
-            GenieResponse processing_error = GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, errorMessage, logMessage);
-            return GsonUtil.toJson(processing_error);
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, errorMessage, logMessage);
 
         }
         GenieResponse successResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.ProviderResolver.SUCCESSFUL);
-        return GsonUtil.toJson(successResponse);
+        return successResponse;
     }
 
     @Override
@@ -54,10 +52,6 @@ public class SendFeedbackEventTask extends BaseTask {
     private Uri getUri() {
         String authority = String.format("content://%s.content/feedback", appQualifier);
         return Uri.parse(authority);
-    }
-
-    protected ContentValues getContentValues() {
-        return new ContentValues();
     }
 
 }

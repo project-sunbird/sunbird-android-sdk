@@ -35,28 +35,23 @@ public class CreateUserTask extends BaseTask {
     }
 
     @Override
-    protected String execute() {
-        Gson gson = new Gson();
-        ContentValues profileValues = getContentValues();
+    protected GenieResponse execute() {
+        ContentValues profileValues = new ContentValues();
         profileValues.put(ServiceConstants.PROFILE, GsonUtil.toJson(profile));
         Uri response = contentResolver.insert(getUri(), profileValues);
         if (response == null) {
             String logMessage = "Empty response(URI) when creating Profile";
             GenieResponse processing_error = GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, getErrorMessage(), logMessage);
-            return gson.toJson(processing_error);
+            return processing_error;
 
         }
         GenieResponse successResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.ProviderResolver.SUCCESSFUL);
-        return gson.toJson(successResponse);
+        return successResponse;
     }
 
     @Override
     protected String getErrorMessage() {
         return "Not able to create profile";
-    }
-
-    protected ContentValues getContentValues() {
-        return new ContentValues();
     }
 
     private Uri getUri() {

@@ -33,20 +33,18 @@ public class TelemetryEventTask extends BaseTask {
     }
 
     @Override
-    protected String execute() {
-        Gson gson = new Gson();
+    protected GenieResponse execute() {
         ContentValues event = getContentValues();
         event.put(TelemetryEntry.COLUMN_NAME_EVENT, eventString);
         Uri response = contentResolver.insert(getUri(), event);
         if (response == null) {
             String errorMessage = "Not able to send event";
             String logMessage = "Empty response(URI) when sending telemetry event";
-            GenieResponse processing_error = GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, errorMessage, logMessage);
-            return gson.toJson(processing_error);
-
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, errorMessage, logMessage);
         }
+
         GenieResponse successResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.ProviderResolver.SUCCESSFUL);
-        return gson.toJson(successResponse);
+        return successResponse;
     }
 
     @Override

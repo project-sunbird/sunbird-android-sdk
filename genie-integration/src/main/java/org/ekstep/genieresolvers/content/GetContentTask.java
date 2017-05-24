@@ -4,8 +4,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
-import com.google.gson.Gson;
-
 import org.ekstep.genieresolvers.BaseTask;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
@@ -31,17 +29,16 @@ public class GetContentTask extends BaseTask {
     }
 
     @Override
-    protected String execute() {
+    protected GenieResponse execute() {
         Cursor cursor = contentResolver.query(getUri(), null, null, new String[]{contentId}, "");
         if (cursor == null || cursor.getCount() == 0) {
             String logMessage = String.format("No response for content id:%s", contentId);
-            GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, getErrorMessage(), logMessage);
-            return GsonUtil.toJson(errorResponse);
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, getErrorMessage(), logMessage);
         }
         Map<String, Object> getContent = getPath(cursor);
         GenieResponse response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.ProviderResolver.SUCCESSFUL);
         response.setResult(getContent);
-        return GsonUtil.toJson(response);
+        return response;
     }
 
     private Map<String, Object> getPath(Cursor cursor) {

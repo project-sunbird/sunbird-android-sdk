@@ -28,21 +28,19 @@ public class GetLanguageSearchTask extends BaseTask {
 
     @Override
     protected String getLogTag() {
-        return null;
+        return GetLanguageSearchTask.class.getSimpleName();
     }
 
     @Override
-    protected String execute() {
-        Gson gson = new Gson();
+    protected GenieResponse execute() {
         Cursor cursor = contentResolver.query(getUri(), null, searchRequest, null, "");
         if (cursor == null) {
             String logMessage = "Couldn't get the language search data";
-            GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR,
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR,
                     getErrorMessage(), logMessage);
-            return gson.toJson(errorResponse);
         }
         GenieResponse genieResponse = getResponse(cursor);
-        return gson.toJson(genieResponse);
+        return genieResponse;
     }
 
     private GenieResponse getResponse(Cursor cursor) {
