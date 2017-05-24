@@ -16,6 +16,7 @@ import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
+import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.MasterDataValues;
@@ -36,6 +37,7 @@ import org.ekstep.genieservices.content.chained.ExtractPayloads;
 import org.ekstep.genieservices.content.chained.IChainable;
 import org.ekstep.genieservices.content.chained.ValidateEcar;
 import org.ekstep.genieservices.content.db.model.ContentModel;
+import org.ekstep.genieservices.content.downloadmanager.DownloadService;
 import org.ekstep.genieservices.content.network.ContentSearchAPI;
 import org.ekstep.genieservices.content.network.RecommendedContentAPI;
 import org.ekstep.genieservices.content.network.RelatedContentAPI;
@@ -725,7 +727,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             return response;
         }
 
-        String ext = FileHandler.getFileExt(ecarFilePath);
+        String ext = FileHandler.getFileExtension(ecarFilePath);
         if (!ServiceConstants.FileExtension.CONTENT.equals(ext)) {
             response = GenieResponseBuilder.getErrorResponse(ContentConstants.INVALID_FILE, "content import failed, unsupported file extension", TAG);
             return response;
@@ -744,6 +746,26 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
             return importContentSteps.execute(mAppContext, importContext);
         }
+    }
+
+    @Override
+    public GenieResponse<Void> importContent(boolean isChildContent, List<String> contentIdentifiers) {
+        DownloadService downloadService = new DownloadService(mAppContext);
+
+        for (String contentIdentifier : contentIdentifiers) {
+            Map dataMap = ContentHandler.fetchContentDetails(mAppContext, contentIdentifier);
+            String downloadUrl = ContentHandler.getDownloadUrl(dataMap);
+            if (downloadUrl != null) {
+                downloadUrl = downloadUrl.trim();
+            }
+
+            if (!StringUtil.isNullOrEmpty(downloadUrl) && ServiceConstants.FileExtension.CONTENT.equalsIgnoreCase(FileHandler.getFileExtension(downloadUrl))) {
+                DownloadRequest downloadRequest = new DownloadRequest(contentIdentifier, downloadUrl, ContentConstants.MimeType.ECAR, isChildContent);
+                downloadService.enQueue(downloadRequest);
+            }
+        }
+
+        return null;
     }
 
 }

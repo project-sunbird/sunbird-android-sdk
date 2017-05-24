@@ -132,7 +132,7 @@ public class ContentHandler {
         }.getType();
         Map<String, Object> dataMap = GsonUtil.getGson().fromJson(dataJson, type);
 
-        Object variants = dataMap.get("variants");
+        Object variants = dataMap.get(ContentModel.KEY_VARIANTS);
         if (variants != null) {
             String variantsString;
             if (variants instanceof Map) {
@@ -346,6 +346,35 @@ public class ContentHandler {
                 deleteOrUpdateContent(node, true, level);
             }
         }
+    }
+
+    public static String getDownloadUrl(Map<String, Object> dataMap) {
+        String downloadUrl = null;
+
+        Object variants = dataMap.get(ContentModel.KEY_VARIANTS);
+        if (variants != null) {
+            String variantsString;
+            if (variants instanceof Map) {
+                variantsString = GsonUtil.getGson().toJson(variants);
+            } else {
+                variantsString = (String) variants;
+            }
+
+            variantsString = variantsString.replace("\\", "");
+            ContentVariant contentVariant = GsonUtil.fromJson(variantsString, ContentVariant.class);
+
+            String contentType = (String) dataMap.get(ContentModel.KEY_CONTENT_TYPE);
+            if ((contentVariant.getSpine() != null && !StringUtil.isNullOrEmpty(contentVariant.getSpine().getEcarUrl()))
+                    && (ContentType.TEXTBOOK.getValue().equalsIgnoreCase(contentType)
+                    || ContentType.COLLECTION.getValue().equalsIgnoreCase(contentType))) {
+
+                downloadUrl = contentVariant.getSpine().getEcarUrl();
+            }
+        } else {
+            downloadUrl = (String) dataMap.get(ContentModel.KEY_DOWNLOAD_URL);
+        }
+
+        return downloadUrl;
     }
 
 }

@@ -32,4 +32,6 @@ public interface IContentService {
     GenieResponse<List<Content>> nextContent(List<String> contentIdentifiers);
 
     GenieResponse<Void> importContent(boolean isChildContent, String ecarFilePath);
+
+    GenieResponse<Void> importContent(boolean isChildContent, List<String> contentIdentifiers);
 }

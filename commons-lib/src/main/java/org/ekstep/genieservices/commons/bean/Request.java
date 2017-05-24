@@ -1,9 +1,10 @@
 package org.ekstep.genieservices.commons.bean;
 
 /**
- * Created by swayangjit on 17/5/17.
+ * Created on 17/5/17.
+ *
+ * @author swayangjit
  */
-
 public class Request {
 
     private String url;

@@ -34,6 +34,8 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
     public static final String KEY_PKG_VERSION = "pkgVersion";
     public static final String KEY_CONTENT_TYPE = "contentType";
     public static final String KEY_COMPATIBILITY_LEVEL = "compatibilityLevel";
+    public static final String KEY_VARIANTS = "variants";
+    public static final String KEY_DOWNLOAD_URL = "downloadUrl";
 
     public static final String KEY_CONTENT_METADATA = "contentMetadata";
     public static final String KEY_VIRALITY_METADATA = "virality";

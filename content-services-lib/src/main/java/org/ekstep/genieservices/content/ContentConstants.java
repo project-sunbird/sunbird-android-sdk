@@ -25,6 +25,11 @@ public interface ContentConstants {
 
     interface MimeType {
         String APPLICATION = "application/vnd.android.package-archive";
+
+        String ZIP = "application/zip";
+        String TXT = "text/plain";
+        String ECAR = "application/ecar";
+        String EPAR = "application/epar";
     }
 
     interface State {

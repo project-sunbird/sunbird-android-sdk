@@ -13,12 +13,13 @@ public class DownloadRequest {
     private String name;
     private String mimeType;
     private String filePath;
+    private boolean isChildContent;
 
-
-    public DownloadRequest(String identifier, String downloadUrl, String mimeType) {
+    public DownloadRequest(String identifier, String downloadUrl, String mimeType, boolean isChildContent) {
         this.identifier = identifier;
         this.downloadUrl = downloadUrl;
         this.mimeType = mimeType;
+        this.isChildContent = isChildContent;
     }
 
     public long getDownloadId() {
@@ -55,6 +56,10 @@ public class DownloadRequest {
 
     public void setFilePath(String filePath) {
         this.filePath = filePath;
+    }
+
+    public boolean isChildContent() {
+        return isChildContent;
     }
 
 }

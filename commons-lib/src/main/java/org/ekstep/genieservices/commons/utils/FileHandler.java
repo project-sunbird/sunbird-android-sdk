@@ -41,13 +41,20 @@ public class FileHandler {
         return fileOrDirectory.delete();
     }
 
-    public static String getFileExt(String fileName) {
+    public static String getFileExtension(String fileName) {
         String ext = fileName.substring((fileName.lastIndexOf(".") + 1), fileName.length());
         if (ext.isEmpty()) {
             return "";
         } else {
             return ext.toLowerCase(Locale.US);
         }
+
+        // TODO: 5/23/2017
+//        if (fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0) {
+//            return fileName.substring(fileName.lastIndexOf(".") + 1);
+//        } else {
+//            return "";
+//        }
     }
 
     public static void cp(File src, File dst) throws IOException {
