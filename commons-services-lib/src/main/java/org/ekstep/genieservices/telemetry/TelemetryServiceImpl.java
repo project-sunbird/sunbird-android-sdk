@@ -92,6 +92,8 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         GenieResponse<TelemetryStat> genieResponse=GenieResponseBuilder.getSuccessResponse("Telemetry stat retrieved successfully");
         genieResponse.setResult(new TelemetryStat(unSyncedEventCount,lastSyncTime));
 
+        saveEvent(TelemetryLogger.create(mAppContext, genieResponse, new HashMap(), SERVICE_NAME, "getTelemetryStat@TelemetryServiceImpl", new HashMap()).toString());
+
         return genieResponse;
     }
 

@@ -2,10 +2,13 @@ package org.ekstep.genieservices;
 
 import android.content.Context;
 
+import org.ekstep.genieservices.async.GenieAsyncService;
 import org.ekstep.genieservices.commons.AndroidAppContext;
 import org.ekstep.genieservices.commons.AndroidLogger;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.IDeviceInfo;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
+import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.config.ConfigServiceImpl;
 import org.ekstep.genieservices.content.ContentFeedbackServiceImpl;
@@ -26,6 +29,7 @@ import org.ekstep.genieservices.telemetry.TelemetryServiceImpl;
 public class GenieService {
 
     private static GenieService sService;
+    private static GenieAsyncService sAsyncService;
 
     private AppContext<Context> mAppContext;
     private IConfigService mConfigService;
@@ -45,6 +49,10 @@ public class GenieService {
         return sService;
     }
 
+    public static GenieAsyncService getAsyncService() {
+        return GenieAsyncService.getAsyncService();
+    }
+
     public static GenieService init(Context context, String packageName) {
 
         if (sService == null) {
@@ -54,8 +62,7 @@ public class GenieService {
             DownloadQueueListener.init(applicationContext);
             sService = new GenieService(applicationContext);
         }
-
-        //TODO init the async service here
+        GenieAsyncService.init(sService);
         return sService;
     }
 
@@ -117,5 +124,13 @@ public class GenieService {
 
     public IKeyValueStore getKeyStore() {
         return mAppContext.getKeyValueStore();
+    }
+
+    public IDeviceInfo getDeviceInfo() {
+        return mAppContext.getDeviceInfo();
+    }
+
+    public IConnectionInfo getConnectionInfo() {
+        return mAppContext.getConnectionInfo();
     }
 }
