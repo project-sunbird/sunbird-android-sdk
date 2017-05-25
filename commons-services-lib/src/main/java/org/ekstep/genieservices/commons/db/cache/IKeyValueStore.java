@@ -16,6 +16,8 @@ public interface IKeyValueStore {
 
     void putBoolean(String key, boolean value);
 
+    void putInt(String key, int value);
+
     String getString(String key, String defValue);
 
     long getLong(String key, long defValue);
@@ -23,6 +25,8 @@ public interface IKeyValueStore {
     boolean getBoolean(String key, boolean defValue);
 
     Set<String> getStringSet(String key, Set<String> defValue);
+
+    int getInt(String key, int defValue);
 
     boolean contains(String key);
 

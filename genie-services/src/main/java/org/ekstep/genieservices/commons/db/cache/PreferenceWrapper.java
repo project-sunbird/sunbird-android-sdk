@@ -45,6 +45,12 @@ public class PreferenceWrapper implements IKeyValueStore {
     }
 
     @Override
+    public void putInt(String key, int value) {
+        mPrefsEditor.putInt(key, value);
+        mPrefsEditor.commit();
+    }
+
+    @Override
     public String getString(String key, String defValue) {
         return mSharedPrefs.getString(key, defValue);
     }
@@ -52,6 +58,11 @@ public class PreferenceWrapper implements IKeyValueStore {
     @Override
     public Set<String> getStringSet(String key, Set<String> defValue) {
         return mSharedPrefs.getStringSet(key, defValue);
+    }
+
+    @Override
+    public int getInt(String key, int defValue) {
+        return  mSharedPrefs.getInt(key, defValue);
     }
 
     @Override
