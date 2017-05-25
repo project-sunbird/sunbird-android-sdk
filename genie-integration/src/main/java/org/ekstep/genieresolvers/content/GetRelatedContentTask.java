@@ -68,9 +68,8 @@ public class GetRelatedContentTask extends BaseTask {
     }
 
     private GenieResponse readCursor(Cursor cursor) {
-        Gson gson = new Gson();
         String resultData = cursor.getString(0);
-        GenieResponse response = gson.fromJson(resultData, GenieResponse.class);
+        GenieResponse response = GsonUtil.fromJson(resultData, GenieResponse.class);
         return response;
     }
 

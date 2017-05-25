@@ -80,8 +80,8 @@ public abstract class AbstractUserProvider extends BaseContentProvider {
     }
 
     private String getCompletePath() {
-        String CONTENT_PATH = "profiles";
-        return String.format("%s.%s", getPackageName(), CONTENT_PATH);
+        String UER_PROFILE_PATH = "profiles";
+        return String.format("%s.%s", getPackageName(), UER_PROFILE_PATH);
     }
 
     public abstract String getPackageName();

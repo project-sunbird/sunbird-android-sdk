@@ -19,7 +19,7 @@ public class TaskHandler extends AsyncTask<BaseTask, Void, GenieResponse> {
 
     @Override
     protected GenieResponse doInBackground(BaseTask... params) {
-        GenieResponse response = params[0].execute();
+        GenieResponse response = params[0].perform();
         return response;
     }
 

@@ -94,5 +94,7 @@ public interface ServiceConstants {
         String SUCCESSFUL = "successful";
         String NETWORK_ERROR = "NETWORK_ERROR";
         String NO_INTERNET_CONNECTIVITY_MESSAGE = "no internet connectivity available";
+        String PARTNER_DATA = "partner_data";
+        String PARTNER_CURSOR_KEY = "partner_cursor_key";
     }
 }

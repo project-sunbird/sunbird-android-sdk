@@ -36,7 +36,7 @@ public abstract class AbstractContentProvider extends BaseContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        FeedbackUriHandler feedbackUriHandler = new FeedbackUriHandler(getCompletePath(), getContext(), null, null);
+        FeedbackUriHandler feedbackUriHandler = new FeedbackUriHandler(getCompletePath(), getContext(), null, null, getService());
         Uri responseUri = feedbackUriHandler.insert(uri, values);
 
         if (responseUri != null) {
