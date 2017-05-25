@@ -1,6 +1,5 @@
 package org.ekstep.genieservices;
 
-import android.os.Environment;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.IdlingPolicies;
 import android.support.test.rule.ActivityTestRule;
@@ -18,7 +17,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import static com.jayway.awaitility.Awaitility.await;
-import static java.text.MessageFormat.format;
 
 /**
  * Created by Sneha on 4/27/2017.
