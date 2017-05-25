@@ -1,6 +1,7 @@
 package org.ekstep.genieservices.commons.bean;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created on 5/4/2017.
@@ -20,6 +21,7 @@ public class Content implements Serializable {
     private boolean isUpdateAvailable;
     private ContentFeedback contentFeedback;
     private ContentAccess contentAccess;
+    private List<Content> children;
 
     public String getIdentifier() {
         return identifier;

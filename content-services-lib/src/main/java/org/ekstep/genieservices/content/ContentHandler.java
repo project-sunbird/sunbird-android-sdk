@@ -603,6 +603,32 @@ public class ContentHandler {
         return requestMap;
     }
 
+    public static HashMap<String, Object> getPageAssembleRequest(IUserService userService, String did) {
+        String dlang = "";
+        String uid = "";
+        if (userService != null) {
+            GenieResponse<Profile> profileGenieResponse = userService.getCurrentUser();
+            if (profileGenieResponse.getStatus()) {
+                Profile profile = profileGenieResponse.getResult();
+                uid = profile.getUid();
+                dlang = profile.getLanguage();
+            }
+        }
+
+        HashMap<String, Object> contextMap = new HashMap<>();
+        contextMap.put("did", did);
+        contextMap.put("dlang", dlang);
+        contextMap.put("contentid", "");
+        contextMap.put("uid", uid);
+
+        HashMap<String, Object> requestMap = new HashMap<>();
+        requestMap.put("context", contextMap);
+        // TODO: 5/25/2017 - Uncomment this and add filter request. Reffer PageAssembleAPI in Genie repo.
+//        requestMap.put("filters", getFilterRequest());
+
+        return requestMap;
+    }
+
     public static String getDownloadUrl(Map<String, Object> dataMap) {
         String downloadUrl = null;
 

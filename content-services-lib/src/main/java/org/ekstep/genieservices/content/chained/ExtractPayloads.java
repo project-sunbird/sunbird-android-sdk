@@ -194,7 +194,7 @@ public class ExtractPayloads implements IChainable {
             // Set content visibility
             if (!StringUtil.isNullOrEmpty(objectType) && objectType.equalsIgnoreCase("Library")) {
                 newContentModel.setVisibility(ContentConstants.Visibility.PARENT);
-            } else if (oldContentModel != null) {// TODO: 5/18/2017
+            } else if (oldContentModel != null) {
                 if (importContext.isChildContent()     // If import started from child content then do not update the visibility.
                         || !ContentConstants.Visibility.PARENT.equals(oldContentModel.getVisibility())) {  // If not started from child content then do not shrink visibility.
                     newContentModel.setVisibility(oldContentModel.getVisibility());

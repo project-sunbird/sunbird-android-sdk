@@ -263,9 +263,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 //            }
 //
 //            //Apply Purpose filter
-//            String purpose = partnerInfo.get(Constant.BUNDLE_KEY_PARTNER_PURPOSE);
+//            String audience = partnerInfo.get(Constant.BUNDLE_KEY_PARTNER_PURPOSE);
 //            if (purpose != null) {
-//                applyFilter(MasterDataType.PURPOSE, purpose, filter);
+//                applyFilter(MasterDataType.AUDIENCE, audience, filter);
 //            }
 //        }
 
