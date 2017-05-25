@@ -12,7 +12,6 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.Content;
-import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
@@ -118,8 +117,6 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             criteria = new ContentCriteria();
         }
 
-        List<ContentModel> contentModelListInDB = ContentHandler.getAllLocalContentModel(mAppContext, criteria);
-
         String uid;
         if (!StringUtil.isNullOrEmpty(criteria.getUid())) {
             uid = criteria.getUid();
@@ -127,21 +124,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             uid = ContentHandler.getCurrentUserId(userService);
         }
 
-        // Get the content access for profile.
-        List<ContentAccess> contentAccessList = ContentHandler.getAllContentAccessByUid(userService, uid);
+        List<ContentModel> contentModelListInDB = ContentHandler.getAllLocalContentSortedByContentAccess(mAppContext.getDBSession(), uid, criteria.getContentTypes());
 
         List<Content> contentList = new ArrayList<>();
-        for (ContentAccess contentAccess : contentAccessList) {
-            ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), contentAccess.getIdentifier());
-            if (contentModel != null && contentModelListInDB.contains(contentModel)) {
-                Content c = ContentHandler.convertContentModelToBean(contentModel, criteria.isAttachFeedback(), criteria.isAttachContentAccess(), contentFeedbackService, userService);
-                c.setContentAccess(contentAccess);
-                contentList.add(c);
-                contentModelListInDB.remove(contentModel);
-            }
-        }
-
-        // Add the remaining content into list
         for (ContentModel contentModel : contentModelListInDB) {
             Content c = ContentHandler.convertContentModelToBean(contentModel);
 
@@ -511,18 +496,19 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             String id = (String) map.get("id");
             LinkedTreeMap responseParams = (LinkedTreeMap) map.get("params");
             LinkedTreeMap result = (LinkedTreeMap) map.get("result");
-            String contentDataListString = GsonUtil.toJson(result.get("content"));
 
-            Type type = new TypeToken<List<HashMap<String, Object>>>() {
-            }.getType();
-            List<Map<String, Object>> contentDataList = GsonUtil.getGson().fromJson(contentDataListString, type);
+            List<Map<String, Object>> contentDataList = null;
+            if (result.containsKey("content")) {
+                contentDataList = (List<Map<String, Object>>) result.get("content");
+            }
 
             List<Content> contents = new ArrayList<>();
-            for (Map contentDataMap : contentDataList) {
-                // TODO: 5/15/2017 - Can fetch content from DB and return in response.
-                ContentModel contentModel = ContentModel.build(mAppContext.getDBSession(), contentDataMap, null);
-                Content content = ContentHandler.convertContentModelToBean(contentModel);
-                contents.add(content);
+            if (contentDataList != null) {
+                for (Map contentDataMap : contentDataList) {
+                    ContentModel contentModel = ContentModel.build(mAppContext.getDBSession(), contentDataMap, null);
+                    Content content = ContentHandler.convertContentModelToBean(contentModel);
+                    contents.add(content);
+                }
             }
 
             ContentSearchResult searchResult = new ContentSearchResult();
@@ -570,24 +556,26 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             String id = (String) map.get("id");
             LinkedTreeMap responseParams = (LinkedTreeMap) map.get("params");
             LinkedTreeMap result = (LinkedTreeMap) map.get("result");
-            String contentDataListString = GsonUtil.toJson(result.get("content"));
 
-            Type type = new TypeToken<List<HashMap<String, Object>>>() {
-            }.getType();
-            List<Map<String, Object>> contentDataList = GsonUtil.getGson().fromJson(contentDataListString, type);
+            List<Map<String, Object>> contentDataList = null;
+            if (result.containsKey("content")) {
+                contentDataList = (List<Map<String, Object>>) result.get("content");
+            }
 
-            List<ContentModel> allLocalContentModel = ContentHandler.getAllLocalContentModel(mAppContext, new ContentCriteria());
+            List<ContentModel> allLocalContentModel = ContentHandler.getAllLocalContentModel(mAppContext.getDBSession(), null);
 
             List<Content> contents = new ArrayList<>();
-            for (Map contentDataMap : contentDataList) {
-                ContentModel contentModel = ContentModel.build(mAppContext.getDBSession(), contentDataMap, null);
-                Content content = ContentHandler.convertContentModelToBean(contentModel);
+            if (contentDataList != null) {
+                for (Map contentDataMap : contentDataList) {
+                    ContentModel contentModel = ContentModel.build(mAppContext.getDBSession(), contentDataMap, null);
+                    Content content = ContentHandler.convertContentModelToBean(contentModel);
 
-                if (allLocalContentModel.contains(contentModel)) {
-                    content.setAvailableLocally(true);
+                    if (allLocalContentModel.contains(contentModel)) {
+                        content.setAvailableLocally(true);
+                    }
+
+                    contents.add(content);
                 }
-
-                contents.add(content);
             }
 
             ContentSearchResult searchResult = new ContentSearchResult();

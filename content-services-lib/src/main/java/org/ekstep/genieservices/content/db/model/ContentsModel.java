@@ -35,7 +35,6 @@ public class ContentsModel implements IReadable {
 
     public static ContentsModel find(IDBSession dbSession, String filter) {
         ContentsModel contentsModel = new ContentsModel(dbSession, filter);
-
         dbSession.read(contentsModel);
 
         if (contentsModel.getContentModelList() == null) {
@@ -45,10 +44,8 @@ public class ContentsModel implements IReadable {
         }
     }
 
-    public static ContentsModel find(IDBSession dbSession, String filter, List<String> identifiers, String orderBy) {
-        ContentsModel contentsModel = new ContentsModel(dbSession, filter);
-
-        String query = String.format(Locale.US, "Select * from %s where %s in ('%s') %s %s", contentsModel.getTableName(), ContentEntry.COLUMN_NAME_IDENTIFIER, StringUtil.join("','", identifiers), filter, orderBy);
+    public static ContentsModel findWithCustomQuery(IDBSession dbSession, String query) {
+        ContentsModel contentsModel = new ContentsModel(dbSession, null);
         dbSession.read(contentsModel, query);
 
         if (contentsModel.getContentModelList() == null) {

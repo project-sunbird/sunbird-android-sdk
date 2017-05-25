@@ -8,13 +8,13 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessCriteria;
-import org.ekstep.genieservices.commons.bean.ContentCriteria;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.Variant;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
+import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.contract.ContentEntry;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.DateUtil;
@@ -160,6 +160,16 @@ public class ContentHandler {
         contentData.setVariants(variantList);
     }
 
+    public static String getCurrentUserId(IUserService userService) {
+        if (userService != null) {
+            UserSession userSession = userService.getCurrentUserSession().getResult();
+            if (userSession != null) {
+                return userSession.getUid();
+            }
+        }
+        return null;
+    }
+
     public static ContentFeedback getContentFeedback(IContentFeedbackService contentFeedbackService, String contentIdentifier, String uid) {
         if (contentFeedbackService != null) {
             return contentFeedbackService.getFeedback(uid, contentIdentifier).getResult();
@@ -198,37 +208,23 @@ public class ContentHandler {
         return contentState == ContentConstants.State.ARTIFACT_AVAILABLE;
     }
 
-    public static String getCurrentUserId(IUserService userService) {
-        if (userService != null) {
-            UserSession userSession = userService.getCurrentUserSession().getResult();
-            if (userSession != null) {
-                return userSession.getUid();
-            }
-        }
-        return null;
-    }
+    public static List<ContentModel> getAllLocalContentSortedByContentAccess(IDBSession dbSession, String uid, ContentType[] contentTypes) {
+        String contentTypesStr = getCommaSeparatedContentTypes(contentTypes);
 
-    public static List<ContentModel> getAllLocalContentModel(AppContext appContext, ContentCriteria criteria) {
-        String contentTypes;
-        if (criteria.getContentTypes() != null) {
-            List<String> contentTypeList = new ArrayList<>();
-            for (ContentType contentType : criteria.getContentTypes()) {
-                contentTypeList.add(contentType.getValue());
-            }
-            contentTypes = StringUtil.join("','", contentTypeList);
-        } else {
-            contentTypes = StringUtil.join("','", ContentType.values());
-        }
+        String isContentType = String.format(Locale.US, "c.%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr);
+        String isVisible = String.format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
+        String isArtifactAvailable = String.format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
+        String filter = String.format(Locale.US, "WHERE (%s AND %s AND %s)", isVisible, isArtifactAvailable, isContentType);
 
-        String isContentType = String.format(Locale.US, "%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypes);
-        String isVisible = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
-        // For hiding the non compatible imported content, which visibility is DEFAULT.
-        String isArtifactAvailable = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
+        String orderBy = String.format(Locale.US, "ORDER BY ca.%s desc, c.%s desc, c.%s desc", ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP, ContentEntry.COLUMN_NAME_LOCAL_LAST_UPDATED_ON, ContentEntry.COLUMN_NAME_SERVER_LAST_UPDATED_ON);
 
-        String filter = String.format(Locale.US, " where (%s AND %s AND %s)", isVisible, isArtifactAvailable, isContentType);
+        String query = String.format(Locale.US, "SELECT * FROM  %s c LEFT JOIN %s ca ON c.%s = ca.%s AND ca.%s = '%s' %s %s;",
+                ContentEntry.TABLE_NAME, ContentAccessEntry.TABLE_NAME, ContentEntry.COLUMN_NAME_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_UID, uid,
+                filter, orderBy);
+
 
         List<ContentModel> contentModelListInDB;
-        ContentsModel contentsModel = ContentsModel.find(appContext.getDBSession(), filter);
+        ContentsModel contentsModel = ContentsModel.findWithCustomQuery(dbSession, query);
         if (contentsModel != null) {
             contentModelListInDB = contentsModel.getContentModelList();
         } else {
@@ -236,6 +232,43 @@ public class ContentHandler {
         }
 
         return contentModelListInDB;
+    }
+
+    public static List<ContentModel> getAllLocalContentModel(IDBSession dbSession, ContentType[] contentTypes) {
+        String contentTypesStr = getCommaSeparatedContentTypes(contentTypes);
+
+        String isContentType = String.format(Locale.US, "%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr);
+        String isVisible = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
+        // For hiding the non compatible imported content, which visibility is DEFAULT.
+        String isArtifactAvailable = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
+
+        String filter = String.format(Locale.US, " where (%s AND %s AND %s)", isVisible, isArtifactAvailable, isContentType);
+
+        List<ContentModel> contentModelListInDB;
+        ContentsModel contentsModel = ContentsModel.find(dbSession, filter);
+        if (contentsModel != null) {
+            contentModelListInDB = contentsModel.getContentModelList();
+        } else {
+            contentModelListInDB = new ArrayList<>();
+        }
+
+        return contentModelListInDB;
+    }
+
+    private static String getCommaSeparatedContentTypes(ContentType[] contentTypes) {
+        String contentTypesStr;
+
+        if (contentTypes != null) {
+            List<String> contentTypeList = new ArrayList<>();
+            for (ContentType contentType : contentTypes) {
+                contentTypeList.add(contentType.getValue());
+            }
+            contentTypesStr = StringUtil.join("','", contentTypeList);
+        } else {
+            contentTypesStr = StringUtil.join("','", ContentType.values());
+        }
+
+        return contentTypesStr;
     }
 
     public static List<ContentAccess> getAllContentAccessByUid(IUserService userService, String uid) {
@@ -496,16 +529,17 @@ public class ContentHandler {
                 break;
         }
 
-        List<ContentModel> contentModelList;
-        ContentsModel contentsModel = ContentsModel.find(dbSession, filter, childIdentifiers, orderBy);
+        String query = String.format(Locale.US, "Select * from %s where %s in ('%s') %s %s",
+                ContentEntry.TABLE_NAME, ContentEntry.COLUMN_NAME_IDENTIFIER, StringUtil.join("','", childIdentifiers), filter, orderBy);
+        List<ContentModel> contentModelListInDB;
+        ContentsModel contentsModel = ContentsModel.findWithCustomQuery(dbSession, query);
         if (contentsModel != null) {
-            contentModelList = contentsModel.getContentModelList();
+            contentModelListInDB = contentsModel.getContentModelList();
         } else {
-            contentModelList = new ArrayList<>();
+            contentModelListInDB = new ArrayList<>();
         }
 
-        // Return the childrenInDB
-        return contentModelList;
+        return contentModelListInDB;
     }
 
     public static void deleteAllChild(AppContext appContext, ContentModel contentModel, int level) {
