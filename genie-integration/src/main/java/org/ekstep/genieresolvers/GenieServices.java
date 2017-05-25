@@ -4,6 +4,7 @@ import android.content.Context;
 
 import org.ekstep.genieresolvers.content.ContentService;
 import org.ekstep.genieresolvers.language.LanguageService;
+import org.ekstep.genieresolvers.partner.PartnerService;
 import org.ekstep.genieresolvers.telemetry.TelemetryService;
 import org.ekstep.genieresolvers.user.UserService;
 
@@ -12,31 +13,32 @@ import org.ekstep.genieresolvers.user.UserService;
  * shriharsh
  */
 
-public class GenieResolver {
+public class GenieServices {
 
-    private static GenieResolver sGenieResolver;
+    private static GenieServices sGenieServices;
     private String appQualifier;
     private Context context;
     private UserService mUserService;
     private TelemetryService mTelemetryService;
     private ContentService mContentService;
     private LanguageService mLanguageService;
+    private PartnerService mPartnerService;
 
-    private GenieResolver(Context context, String appQualifier) {
+    private GenieServices(Context context, String appQualifier) {
         this.context = context;
         this.appQualifier = appQualifier;
     }
 
-    public static GenieResolver getGenieResolver() {
-        return sGenieResolver;
+    public static GenieServices getGenieResolver() {
+        return sGenieServices;
     }
 
-    public static GenieResolver init(Context context, String authorityName) {
+    public static GenieServices init(Context context, String authorityName) {
 
-        if (sGenieResolver == null) {
-            sGenieResolver = new GenieResolver(context, authorityName);
+        if (sGenieServices == null) {
+            sGenieServices = new GenieServices(context, authorityName);
         }
-        return sGenieResolver;
+        return sGenieServices;
     }
 
     public UserService getUserService() {
@@ -71,5 +73,12 @@ public class GenieResolver {
         return mLanguageService;
     }
 
+    public PartnerService getPartnerService() {
+        if (mPartnerService == null) {
+            mPartnerService = new PartnerService(context, appQualifier);
+        }
+
+        return mPartnerService;
+    }
 
 }
