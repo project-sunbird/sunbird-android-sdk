@@ -11,6 +11,7 @@ import org.ekstep.genieservices.commons.bean.ContentAccessCriteria;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.Variant;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
@@ -564,6 +565,43 @@ public class ContentHandler {
                 deleteOrUpdateContent(node, true, level);
             }
         }
+    }
+
+    public static HashMap<String, Object> getRecommendedContentRequest(String language, String did) {
+        HashMap<String, Object> contextMap = new HashMap<>();
+        contextMap.put("did", did);
+        contextMap.put("dlang", language);
+
+        HashMap<String, Object> requestMap = new HashMap<>();
+        requestMap.put("context", contextMap);
+        requestMap.put("limit", 10);
+
+        return requestMap;
+    }
+
+    public static HashMap<String, Object> getRelatedContentRequest(IUserService userService, String contentIdentifier, String did) {
+        String dlang = "";
+        String uid = "";
+        if (userService != null) {
+            GenieResponse<Profile> profileGenieResponse = userService.getCurrentUser();
+            if (profileGenieResponse.getStatus()) {
+                Profile profile = profileGenieResponse.getResult();
+                uid = profile.getUid();
+                dlang = profile.getLanguage();
+            }
+        }
+
+        HashMap<String, Object> contextMap = new HashMap<>();
+        contextMap.put("did", did);
+        contextMap.put("dlang", dlang);
+        contextMap.put("contentid", contentIdentifier);
+        contextMap.put("uid", uid);
+
+        HashMap<String, Object> requestMap = new HashMap<>();
+        requestMap.put("context", contextMap);
+        requestMap.put("limit", 10);
+
+        return requestMap;
     }
 
     public static String getDownloadUrl(Map<String, Object> dataMap) {

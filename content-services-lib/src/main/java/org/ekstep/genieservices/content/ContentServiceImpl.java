@@ -487,7 +487,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         String method = "getRecommendedContents@ContentServiceImpl";
 
         GenieResponse<ContentSearchResult> response;
-        RecommendedContentAPI recommendedContentAPI = new RecommendedContentAPI(mAppContext, getRecommendedContentRequest(language));
+        RecommendedContentAPI recommendedContentAPI = new RecommendedContentAPI(mAppContext, ContentHandler.getRecommendedContentRequest(language, mAppContext.getDeviceInfo().getDeviceID()));
         GenieResponse apiResponse = recommendedContentAPI.post();
         if (apiResponse.getStatus()) {
             String body = apiResponse.getResult().toString();
@@ -525,18 +525,6 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         return response;
     }
 
-    private HashMap<String, Object> getRecommendedContentRequest(String language) {
-        HashMap<String, Object> contextMap = new HashMap<>();
-        contextMap.put("did", mAppContext.getDeviceInfo().getDeviceID());
-        contextMap.put("dlang", language);
-
-        HashMap<String, Object> requestMap = new HashMap<>();
-        requestMap.put("context", contextMap);
-        requestMap.put("limit", 10);
-
-        return requestMap;
-    }
-
     @Override
     public GenieResponse<ContentSearchResult> getRelatedContent(String contentIdentifier) {
         // TODO: 5/18/2017 - Telemetry
@@ -547,7 +535,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 //        String method = "getRelatedContent@ContentServiceImpl";
 
         GenieResponse<ContentSearchResult> response;
-        RelatedContentAPI relatedContentAPI = new RelatedContentAPI(mAppContext, getRelatedContentRequest(contentIdentifier));
+        RelatedContentAPI relatedContentAPI = new RelatedContentAPI(mAppContext, ContentHandler.getRelatedContentRequest(userService, contentIdentifier, mAppContext.getDeviceInfo().getDeviceID()));
         GenieResponse apiResponse = relatedContentAPI.post();
         if (apiResponse.getStatus()) {
             String body = apiResponse.getResult().toString();
@@ -590,31 +578,6 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         response = GenieResponseBuilder.getErrorResponse(apiResponse.getError(), (String) apiResponse.getErrorMessages().get(0), TAG);
         return response;
-    }
-
-    private HashMap<String, Object> getRelatedContentRequest(String contentIdentifier) {
-        String dlang = "";
-        String uid = "";
-        if (userService != null) {
-            GenieResponse<Profile> profileGenieResponse = userService.getCurrentUser();
-            if (profileGenieResponse.getStatus()) {
-                Profile profile = profileGenieResponse.getResult();
-                uid = profile.getUid();
-                dlang = profile.getLanguage();
-            }
-        }
-
-        HashMap<String, Object> contextMap = new HashMap<>();
-        contextMap.put("did", mAppContext.getDeviceInfo().getDeviceID());
-        contextMap.put("dlang", dlang);
-        contextMap.put("contentid", contentIdentifier);
-        contextMap.put("uid", uid);
-
-        HashMap<String, Object> requestMap = new HashMap<>();
-        requestMap.put("context", contextMap);
-        requestMap.put("limit", 10);
-
-        return requestMap;
     }
 
     @Override
