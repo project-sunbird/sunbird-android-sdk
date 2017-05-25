@@ -97,7 +97,11 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             ContentHandler.refreshContentDetails(mAppContext, contentIdentifier, contentModelInDB);
         }
 
-        Content content = ContentHandler.convertContentModelToBean(contentModelInDB, true, true, contentFeedbackService, userService);
+        Content content = ContentHandler.convertContentModelToBean(contentModelInDB);
+
+        String uid = ContentHandler.getCurrentUserId(userService);
+        content.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, content.getIdentifier(), uid));
+        content.setContentAccess(ContentHandler.getContentAccess(userService, content.getIdentifier(), uid));
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(content);
@@ -139,7 +143,15 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         // Add the remaining content into list
         for (ContentModel contentModel : contentModelListInDB) {
-            Content c = ContentHandler.convertContentModelToBean(contentModel, criteria.isAttachFeedback(), criteria.isAttachContentAccess(), contentFeedbackService, userService);
+            Content c = ContentHandler.convertContentModelToBean(contentModel);
+
+            if (criteria.isAttachFeedback()) {
+                c.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, c.getIdentifier(), uid));
+            }
+            if (criteria.isAttachContentAccess()) {
+                c.setContentAccess(ContentHandler.getContentAccess(userService, c.getIdentifier(), uid));
+            }
+
             contentList.add(c);
         }
 
@@ -299,7 +311,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             for (Map contentDataMap : contentDataList) {
                 // TODO: 5/15/2017 - Can fetch content from DB and return in response.
                 ContentModel contentModel = ContentModel.build(mAppContext.getDBSession(), contentDataMap, null);
-                Content content = ContentHandler.convertContentModelToBean(contentModel, false, false, contentFeedbackService, userService);
+                Content content = ContentHandler.convertContentModelToBean(contentModel);
                 contents.add(content);
             }
 
@@ -509,7 +521,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             for (Map contentDataMap : contentDataList) {
                 // TODO: 5/15/2017 - Can fetch content from DB and return in response.
                 ContentModel contentModel = ContentModel.build(mAppContext.getDBSession(), contentDataMap, null);
-                Content content = ContentHandler.convertContentModelToBean(contentModel, false, false, contentFeedbackService, userService);
+                Content content = ContentHandler.convertContentModelToBean(contentModel);
                 contents.add(content);
             }
 
@@ -569,7 +581,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             List<Content> contents = new ArrayList<>();
             for (Map contentDataMap : contentDataList) {
                 ContentModel contentModel = ContentModel.build(mAppContext.getDBSession(), contentDataMap, null);
-                Content content = ContentHandler.convertContentModelToBean(contentModel, false, false, contentFeedbackService, userService);
+                Content content = ContentHandler.convertContentModelToBean(contentModel);
 
                 if (allLocalContentModel.contains(contentModel)) {
                     content.setAvailableLocally(true);
@@ -697,7 +709,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 for (String identifier : nextContentIdentifierList) {
                     ContentModel nextContentModel = ContentModel.find(mAppContext.getDBSession(), identifier);
 
-                    Content content = ContentHandler.convertContentModelToBean(nextContentModel, false, false, contentFeedbackService, userService);
+                    Content content = ContentHandler.convertContentModelToBean(nextContentModel);
                     contentList.add(content);
                 }
             }
