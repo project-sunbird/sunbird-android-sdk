@@ -29,35 +29,35 @@ public class GenieAsyncService {
         sGenieAsyncService = new GenieAsyncService();
     }
 
-    public static ConfigService getConfigService() {
+    public ConfigService getConfigService() {
         if (sConfigService == null) {
             sConfigService = new ConfigService(sService);
         }
         return sConfigService;
     }
 
-    public static UserService getUserProfileService() {
+    public UserService getUserProfileService() {
         if (sUserService == null) {
             sUserService = new UserService(sService);
         }
         return sUserService;
     }
 
-    public static SyncService getSyncService() {
+    public SyncService getSyncService() {
         if (sSyncService == null) {
             sSyncService = new SyncService(sService);
         }
         return sSyncService;
     }
 
-    public static TelemetryService getTelemetryService() {
+    public TelemetryService getTelemetryService() {
         if (sTelemetryService == null) {
             sTelemetryService = new TelemetryService(sService);
         }
         return sTelemetryService;
     }
 
-    public static TagService getTagService() {
+    public TagService getTagService() {
         if (sTagService == null) {
             sTagService = new TagService(sService);
         }

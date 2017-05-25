@@ -15,6 +15,7 @@ import org.ekstep.genieservices.content.ContentFeedbackServiceImpl;
 import org.ekstep.genieservices.content.ContentServiceImpl;
 import org.ekstep.genieservices.content.LanguageServiceImpl;
 import org.ekstep.genieservices.content.download.DownloadQueueListener;
+import org.ekstep.genieservices.notification.NotificationServiceImpl;
 import org.ekstep.genieservices.partner.PartnerServiceImpl;
 import org.ekstep.genieservices.profile.UserServiceImpl;
 import org.ekstep.genieservices.telemetry.SyncServiceImpl;
@@ -40,6 +41,7 @@ public class GenieService {
     private IContentFeedbackService mContentFeedbackService;
     private IContentService mContentService;
     private ILanguageService mLanguageService;
+    private INotificationService mNotificationService;
 
     private GenieService(AppContext<Context> applicationContext) {
         this.mAppContext = applicationContext;
@@ -120,6 +122,13 @@ public class GenieService {
             mLanguageService = new LanguageServiceImpl(mAppContext);
         }
         return mLanguageService;
+    }
+
+    public INotificationService getNotificationService() {
+        if (mNotificationService == null) {
+            mNotificationService = new NotificationServiceImpl(mAppContext);
+        }
+        return mNotificationService;
     }
 
     public IKeyValueStore getKeyStore() {
