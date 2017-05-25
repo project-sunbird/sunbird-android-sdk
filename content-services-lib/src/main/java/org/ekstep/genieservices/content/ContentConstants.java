@@ -17,6 +17,7 @@ public interface ContentConstants {
     String UNSUPPORTED_MANIFEST = "UNSUPPORTED_MANIFEST";
     String DRAFT_ECAR_FILE_EXPIRED = "DRAFT_ECAR_FILE_EXPIRED";
     String IMPORT_FILE_EXIST = "IMPORT_FILE_EXIST";
+    String ECAR_CLEANUP_FAILED = "ECAR_CLEANUP_FAILED";
 
     interface Visibility {
         String DEFAULT = "Default";

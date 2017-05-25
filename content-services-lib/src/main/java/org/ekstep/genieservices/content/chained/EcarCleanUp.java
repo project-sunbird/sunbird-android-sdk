@@ -38,7 +38,7 @@ public class EcarCleanUp implements IChainable {
 
     @Override
     public GenieResponse<Void> breakChain() {
-        return GenieResponseBuilder.getErrorResponse(ContentConstants.IMPORT_FAILED, "Import content failed", TAG);
+        return GenieResponseBuilder.getErrorResponse(ContentConstants.ECAR_CLEANUP_FAILED, "Ecar Cleanup failed", TAG);
     }
 
     @Override

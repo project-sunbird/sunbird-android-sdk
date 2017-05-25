@@ -161,7 +161,13 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         switch (levelAndState) {
             case ContentConstants.ChildContents.FIRST_LEVEL_ALL:
-                childContentList = getAllChildContents(content, childContents);
+                if (contentModel.hasChildren()) {
+                    List<ContentModel> contentModelListInDB = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), contentModel.getLocalData(), ContentConstants.ChildContents.FIRST_LEVEL_ALL);
+                    for (ContentModel cm : contentModelListInDB) {
+                        Content c = ContentHandler.convertContentModelToBean(cm);
+                        childContentList.add(c);
+                    }
+                }
                 break;
 
             case ContentConstants.ChildContents.FIRST_LEVEL_DOWNLOADED:
