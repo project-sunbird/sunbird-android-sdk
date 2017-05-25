@@ -3,7 +3,7 @@ package org.ekstep.genieservices.content.chained;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.utils.FileHandler;
+import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.content.ContentConstants;
 import org.ekstep.genieservices.content.bean.ImportContext;
@@ -20,7 +20,7 @@ public class DeviceMemoryCheck implements IChainable {
 
     @Override
     public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
-        long deviceUsableSpace = FileHandler.getFreeUsableSpace(appContext.getPrimaryFilesDir());
+        long deviceUsableSpace = FileUtil.getFreeUsableSpace(appContext.getPrimaryFilesDir());
         long ecarFileSpace = importContext.getEcarFile().length();
         long bufferSize = calculateBufferSize(ecarFileSpace);
         if (deviceUsableSpace < ((ecarFileSpace) + bufferSize)) {

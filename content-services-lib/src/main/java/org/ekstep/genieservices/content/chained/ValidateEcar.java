@@ -8,14 +8,14 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.utils.DateUtil;
-import org.ekstep.genieservices.commons.utils.FileHandler;
+import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.ContentConstants;
 import org.ekstep.genieservices.content.bean.ImportContext;
 import org.ekstep.genieservices.content.db.model.ContentModel;
-import org.ekstep.genieservices.content.utils.ContentHandler;
+import org.ekstep.genieservices.content.ContentHandler;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -34,7 +34,7 @@ public class ValidateEcar implements IChainable {
 
     @Override
     public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
-        String manifestJson = FileHandler.readManifest(importContext.getTmpLocation());
+        String manifestJson = FileUtil.readManifest(importContext.getTmpLocation());
         if (manifestJson == null) {
             return getErrorResponse(importContext, ContentConstants.NO_CONTENT_TO_IMPORT, "Empty ecar, cannot import!");
         }
@@ -108,7 +108,7 @@ public class ValidateEcar implements IChainable {
         if (nextLink != null) {
             return nextLink.execute(appContext, importContext);
         } else {
-            FileHandler.rm(importContext.getTmpLocation());
+            FileUtil.rm(importContext.getTmpLocation());
             return breakChain();
         }
     }
@@ -137,7 +137,7 @@ public class ValidateEcar implements IChainable {
 
     private GenieResponse<Void> getErrorResponse(ImportContext importContext, String error, String errorMessage) {
         Logger.e(TAG, errorMessage);
-        FileHandler.rm(importContext.getTmpLocation());
+        FileUtil.rm(importContext.getTmpLocation());
         return GenieResponseBuilder.getErrorResponse(error, errorMessage, TAG);
     }
 

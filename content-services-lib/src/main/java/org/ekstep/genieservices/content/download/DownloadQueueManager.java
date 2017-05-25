@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.util;
+package org.ekstep.genieservices.content.download;
 
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;

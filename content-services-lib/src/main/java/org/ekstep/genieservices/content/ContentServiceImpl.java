@@ -22,7 +22,7 @@ import org.ekstep.genieservices.commons.bean.MasterDataValues;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
-import org.ekstep.genieservices.commons.utils.FileHandler;
+import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
@@ -36,11 +36,10 @@ import org.ekstep.genieservices.content.chained.ExtractPayloads;
 import org.ekstep.genieservices.content.chained.IChainable;
 import org.ekstep.genieservices.content.chained.ValidateEcar;
 import org.ekstep.genieservices.content.db.model.ContentModel;
-import org.ekstep.genieservices.content.downloadmanager.DownloadService;
+import org.ekstep.genieservices.content.download.DownloadService;
 import org.ekstep.genieservices.content.network.ContentSearchAPI;
 import org.ekstep.genieservices.content.network.RecommendedContentAPI;
 import org.ekstep.genieservices.content.network.RelatedContentAPI;
-import org.ekstep.genieservices.content.utils.ContentHandler;
 
 import java.io.File;
 import java.lang.reflect.Type;
@@ -217,7 +216,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         // TODO: Removing external content code
 //        if (contentModel.isExternalContent()) {
-//            FileHandler.refreshSDCard();
+//            FileUtil.refreshSDCard();
 //        }
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
@@ -690,18 +689,18 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         GenieResponse<Void> response;
 
-        if (!FileHandler.doesFileExists(ecarFilePath)) {
+        if (!FileUtil.doesFileExists(ecarFilePath)) {
             response = GenieResponseBuilder.getErrorResponse(ContentConstants.INVALID_FILE, "content import failed, file doesn't exists", TAG);
             return response;
         }
 
-        String ext = FileHandler.getFileExtension(ecarFilePath);
+        String ext = FileUtil.getFileExtension(ecarFilePath);
         if (!ServiceConstants.FileExtension.CONTENT.equals(ext)) {
             response = GenieResponseBuilder.getErrorResponse(ContentConstants.INVALID_FILE, "content import failed, unsupported file extension", TAG);
             return response;
         } else {
             File ecarFile = new File(ecarFilePath);
-            File tmpLocation = new File(FileHandler.getTmpDir(mAppContext.getPrimaryFilesDir()), UUID.randomUUID().toString());
+            File tmpLocation = new File(FileUtil.getTmpDir(mAppContext.getPrimaryFilesDir()), UUID.randomUUID().toString());
             ImportContext importContext = new ImportContext(ecarFile, tmpLocation);
 
             IChainable importContentSteps = ContentImportStep.initImportContent();
@@ -727,7 +726,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 downloadUrl = downloadUrl.trim();
             }
 
-            if (!StringUtil.isNullOrEmpty(downloadUrl) && ServiceConstants.FileExtension.CONTENT.equalsIgnoreCase(FileHandler.getFileExtension(downloadUrl))) {
+            if (!StringUtil.isNullOrEmpty(downloadUrl) && ServiceConstants.FileExtension.CONTENT.equalsIgnoreCase(FileUtil.getFileExtension(downloadUrl))) {
                 DownloadRequest downloadRequest = new DownloadRequest(contentIdentifier, downloadUrl, ContentConstants.MimeType.ECAR, isChildContent);
                 downloadService.enQueue(downloadRequest);
             }

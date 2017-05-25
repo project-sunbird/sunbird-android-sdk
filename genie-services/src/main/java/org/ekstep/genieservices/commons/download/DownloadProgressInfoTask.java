@@ -9,7 +9,7 @@ import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.commons.bean.DownloadProgress;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.eventbus.EventPublisher;
-import org.ekstep.genieservices.util.DownloadQueueManager;
+import org.ekstep.genieservices.content.download.DownloadQueueManager;
 
 /**
  * Created on 20/5/17.

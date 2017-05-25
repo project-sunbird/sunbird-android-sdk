@@ -14,7 +14,7 @@ import org.ekstep.genieservices.config.ConfigServiceImpl;
 import org.ekstep.genieservices.content.ContentFeedbackServiceImpl;
 import org.ekstep.genieservices.content.ContentServiceImpl;
 import org.ekstep.genieservices.content.LanguageServiceImpl;
-import org.ekstep.genieservices.content.downloadmanager.DownloadQueueListener;
+import org.ekstep.genieservices.content.download.DownloadQueueListener;
 import org.ekstep.genieservices.partner.PartnerServiceImpl;
 import org.ekstep.genieservices.profile.UserServiceImpl;
 import org.ekstep.genieservices.telemetry.SyncServiceImpl;

@@ -1,9 +1,8 @@
-package org.ekstep.genieservices.content.downloadmanager;
+package org.ekstep.genieservices.content.download;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.Request;
-import org.ekstep.genieservices.util.DownloadQueueManager;
 
 import java.util.List;
 

@@ -7,14 +7,14 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.utils.Decompress;
-import org.ekstep.genieservices.commons.utils.FileHandler;
+import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.ContentConstants;
 import org.ekstep.genieservices.content.bean.ImportContext;
 import org.ekstep.genieservices.content.db.model.ContentModel;
-import org.ekstep.genieservices.content.utils.ContentHandler;
+import org.ekstep.genieservices.content.ContentHandler;
 
 import java.io.File;
 import java.io.IOException;
@@ -95,7 +95,7 @@ public class ExtractPayloads implements IChainable {
                     uuid = UUID.randomUUID().toString();
                     // TODO: can remove uuid from destination
                     destination = identifier + "-" + uuid;
-                    payloadDestination = new File(FileHandler.getContentRootDir(appContext.getPrimaryFilesDir()), destination);
+                    payloadDestination = new File(FileUtil.getContentRootDir(appContext.getPrimaryFilesDir()), destination);
                     payloadDestination.mkdirs();
 
                     try {
@@ -149,7 +149,7 @@ public class ExtractPayloads implements IChainable {
                     uuid = UUID.randomUUID().toString();
                     // TODO: can remove uuid from destination
                     destination = identifier + "-" + uuid;
-                    payloadDestination = new File(FileHandler.getContentRootDir(appContext.getPrimaryFilesDir()), destination);
+                    payloadDestination = new File(FileUtil.getContentRootDir(appContext.getPrimaryFilesDir()), destination);
                     payloadDestination.mkdirs();
 
                     // If compatibility level is not in range then do not copy artifact
@@ -242,7 +242,7 @@ public class ExtractPayloads implements IChainable {
             //Delete the content
             if (oldContentPath != null && !isContentExist) {
                 if (!StringUtil.isNullOrEmpty(artifactUrl) && !artifactUrl.contains("." + ServiceConstants.FileExtension.APK)) {
-                    FileHandler.rm(new File(oldContentPath));
+                    FileUtil.rm(new File(oldContentPath));
                 }
             }
         }
@@ -281,10 +281,10 @@ public class ExtractPayloads implements IChainable {
             Logger.d(TAG, "Copy: " + iconSrc + "To: " + iconDestination);
 
             folderContainingFile = asset.substring(0, asset.lastIndexOf("/"));
-            FileHandler.createFolders(payloadDestination.getPath(), folderContainingFile);
+            FileUtil.createFolders(payloadDestination.getPath(), folderContainingFile);
 
             // If source icon is not available then copy assets is failing and throwing exception.
-            FileHandler.cp(iconSrc, iconDestination);
+            FileUtil.cp(iconSrc, iconDestination);
         }
     }
 }

@@ -17,7 +17,7 @@ import org.ekstep.genieservices.commons.bean.DownloadResponse;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.eventbus.EventPublisher;
-import org.ekstep.genieservices.util.DownloadQueueManager;
+import org.ekstep.genieservices.content.download.DownloadQueueManager;
 
 import java.io.FileNotFoundException;
 

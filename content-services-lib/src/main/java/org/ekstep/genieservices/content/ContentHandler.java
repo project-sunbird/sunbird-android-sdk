@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.content.utils;
+package org.ekstep.genieservices.content;
 
 import com.google.gson.reflect.TypeToken;
 
@@ -19,11 +19,10 @@ import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.contract.ContentEntry;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.DateUtil;
-import org.ekstep.genieservices.commons.utils.FileHandler;
+import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
-import org.ekstep.genieservices.content.ContentConstants;
 import org.ekstep.genieservices.content.bean.ContentChild;
 import org.ekstep.genieservices.content.bean.ContentVariant;
 import org.ekstep.genieservices.content.db.model.ContentModel;
@@ -314,7 +313,7 @@ public class ContentHandler {
 
                 // if there are no entry in DB for any content then on this case contentModel.getPath() will be null
                 if (contentModel.getPath() != null) {
-                    FileHandler.rm(new File(contentModel.getPath()), contentModel.getIdentifier());
+                    FileUtil.rm(new File(contentModel.getPath()), contentModel.getIdentifier());
                 }
             }
 
@@ -342,7 +341,7 @@ public class ContentHandler {
 
                 // if there are no entry in DB for any content then on this case contentModel.getPath() will be null
                 if (contentModel.getPath() != null) {
-                    FileHandler.rm(new File(contentModel.getPath()), contentModel.getIdentifier());
+                    FileUtil.rm(new File(contentModel.getPath()), contentModel.getIdentifier());
                 }
             }
 

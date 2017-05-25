@@ -21,7 +21,7 @@ public class Decompress {
         zip = zipFile;
         loc = location;
 
-        FileHandler.createFolders(loc.getPath(), "");
+        FileUtil.createFolders(loc.getPath(), "");
     }
 
     public boolean unzip() {
@@ -33,7 +33,7 @@ public class Decompress {
                 System.out.println(TAG + " Unzipping " + ze.getName());
 
                 if (ze.isDirectory()) {
-                    FileHandler.createFolders(loc.getPath(), ze.getName());
+                    FileUtil.createFolders(loc.getPath(), ze.getName());
                 } else {
                     String relativeFilePath = ze.getName();
                     if (StringUtil.isNullOrEmpty(relativeFilePath)) {
@@ -42,7 +42,7 @@ public class Decompress {
 
                     if (relativeFilePath.contains("/")) {
                         String folderContainingFile = relativeFilePath.substring(0, relativeFilePath.lastIndexOf("/"));
-                        FileHandler.createFolders(loc.getPath(), folderContainingFile);
+                        FileUtil.createFolders(loc.getPath(), folderContainingFile);
                     }
 
                     FileOutputStream fileOutputStream = new FileOutputStream(new File(loc, ze.getName()));
