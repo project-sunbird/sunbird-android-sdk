@@ -10,6 +10,7 @@ import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessCriteria;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
 import org.ekstep.genieservices.commons.bean.ContentData;
+import org.ekstep.genieservices.commons.bean.ContentFeedback;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.Variant;
@@ -93,7 +94,7 @@ public class ContentHandler {
         }).start();
     }
 
-    public static Content convertContentModelToBean(ContentModel contentModel, boolean attachFeedback, boolean attachContentAccess, IContentFeedbackService contentFeedbackService, IUserService userService) {
+    public static Content convertContentModelToBean(ContentModel contentModel) {
         Content content = new Content();
         content.setIdentifier(contentModel.getIdentifier());
 
@@ -128,15 +129,6 @@ public class ContentHandler {
         }
         content.setLastUpdatedTime(contentCreationTime);
 
-        String uid = getCurrentUserId(userService);
-        if (attachFeedback) {
-            addContentFeedback(contentFeedbackService, content, uid);
-        }
-
-        if (attachContentAccess) {
-            addContentAccess(userService, content, uid);
-        }
-
         return content;
     }
 
@@ -168,19 +160,23 @@ public class ContentHandler {
         contentData.setVariants(variantList);
     }
 
-    private static void addContentFeedback(IContentFeedbackService contentFeedbackService, Content content, String uid) {
+    public static ContentFeedback getContentFeedback(IContentFeedbackService contentFeedbackService, String contentIdentifier, String uid) {
         if (contentFeedbackService != null) {
-            content.setContentFeedback(contentFeedbackService.getFeedback(uid, content.getIdentifier()).getResult());
+            return contentFeedbackService.getFeedback(uid, contentIdentifier).getResult();
         }
+
+        return null;
     }
 
-    private static void addContentAccess(IUserService userService, Content content, String uid) {
+    public static ContentAccess getContentAccess(IUserService userService, String contentIdentifier, String uid) {
         if (userService != null) {
-            List<ContentAccess> contentAccessList = getAllContentAccess(userService, uid, content.getIdentifier());
+            List<ContentAccess> contentAccessList = getAllContentAccess(userService, uid, contentIdentifier);
             if (contentAccessList.size() > 0) {
-                content.setContentAccess(contentAccessList.get(0));
+                return contentAccessList.get(0);
             }
         }
+
+        return null;
     }
 
     private static boolean isUpdateAvailable(ContentData serverData, ContentData localData) {
