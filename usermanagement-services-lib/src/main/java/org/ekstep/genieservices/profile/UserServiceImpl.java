@@ -31,6 +31,7 @@ import org.ekstep.genieservices.profile.db.model.ContentAccessModel;
 import org.ekstep.genieservices.profile.db.model.ContentAccessesModel;
 import org.ekstep.genieservices.profile.db.model.UserModel;
 import org.ekstep.genieservices.profile.db.model.UserProfileModel;
+import org.ekstep.genieservices.profile.db.model.UserProfilesModel;
 import org.ekstep.genieservices.profile.db.model.UserSessionModel;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
@@ -88,6 +89,25 @@ public class UserServiceImpl extends BaseService implements IUserService {
         return response;
     }
 
+    @Override
+    public GenieResponse<List<Profile>> getAllUserProfile() {
+
+        UserProfilesModel userProfilesModel=UserProfilesModel.find(mAppContext.getDBSession());
+
+        if(userProfilesModel==null){
+            GenieResponse genieResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.DATA_NOT_FOUND_ERROR, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_PROFILE, TAG, Void.class);
+            TelemetryLogger.logFailure(mAppContext, genieResponse, TAG, "getAllUserProfile@UserServiceImpl", new HashMap(), "Unable to all profiles");
+            return genieResponse;
+        }
+        else{
+            GenieResponse genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, List.class);
+            genieResponse.setResult(userProfilesModel.getProfileList());
+            TelemetryLogger.logSuccess(mAppContext, genieResponse, new HashMap(), TAG, "getAllUserProfile@UserServiceImpl", new HashMap());
+            return genieResponse;
+        }
+
+    }
+
     private void logGEError(GenieResponse response, String id) {
         GEError geError = new GEError(mGameData, response.getError(), id, "", response.getErrorMessages().toString());
         TelemetryLogger.log(geError);
@@ -103,7 +123,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         final UserModel userModel = UserModel.build(dbSession, uid);
 
         final GECreateUser geCreateUser = new GECreateUser(mGameData, uid, mAppContext.getLocationInfo().getLocation());
-        final UserProfileModel profileModel = UserProfileModel.buildUserProfile(dbSession, profile);
+        final UserProfileModel profileModel = UserProfileModel.build(dbSession, profile);
         final GECreateProfile geCreateProfile = new GECreateProfile(mGameData, profile, mAppContext.getLocationInfo().getLocation());
         dbSession.executeInTransaction(new IDBTransaction() {
             @Override
@@ -143,7 +163,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
             return genieResponse;
 
         }
-        UserProfileModel userProfileModel = UserProfileModel.buildUserProfile(mAppContext.getDBSession(), profile);
+        UserProfileModel userProfileModel = UserProfileModel.build(mAppContext.getDBSession(), profile);
         userProfileModel.update();
 
         GEUpdateProfile geUpdateProfile = new GEUpdateProfile(mGameData, profile, mAppContext.getDeviceInfo().getDeviceID());
@@ -177,7 +197,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
             }
         }
         final ContentAccessesModel accessesModel = ContentAccessesModel.findByUid(mAppContext.getDBSession(), uid);
-        final UserProfileModel userProfileModel = UserProfileModel.findUserProfile(mAppContext.getDBSession(), uid);
+        final UserProfileModel userProfileModel = UserProfileModel.find(mAppContext.getDBSession(), uid);
         if (userProfileModel == null) {
             GenieResponse<Void> genieResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROFILE_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_PROFILE, TAG, Void.class);
             TelemetryLogger.logFailure(mAppContext, genieResponse, TAG, "updateUserProfile@deleteUser", params, "Unable to delete profile");
@@ -319,7 +339,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
             userSessionModel = UserSessionModel.findUserSession(mAppContext);
         }
 
-        UserProfileModel userProfileModel = UserProfileModel.findUserProfile(mAppContext.getDBSession(), userSessionModel.getUserSessionBean().getUid());
+        UserProfileModel userProfileModel = UserProfileModel.find(mAppContext.getDBSession(), userSessionModel.getUserSessionBean().getUid());
         Profile profile = null;
         if (userProfileModel == null) {
             profile = new Profile(userSessionModel.getUserSessionBean().getUid());

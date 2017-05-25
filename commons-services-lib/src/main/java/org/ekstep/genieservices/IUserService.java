@@ -28,6 +28,8 @@ public interface IUserService {
      */
     public GenieResponse<Profile> createUserProfile(Profile profile);
 
+    GenieResponse<List<Profile>> getAllUserProfile();
+
     /**
      * This api is used to delete a existing user with a specific uid
      * <p>
