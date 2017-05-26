@@ -11,14 +11,14 @@ public class DownloadRequest {
     private String identifier;
     private String downloadUrl;
     private String name;
-    private String mimeType;
+    private String contentType;
     private String filePath;
     private boolean isChildContent;
 
-    public DownloadRequest(String identifier, String downloadUrl, String mimeType, boolean isChildContent) {
+    public DownloadRequest(String identifier, String downloadUrl, String contentType, boolean isChildContent) {
         this.identifier = identifier;
         this.downloadUrl = downloadUrl;
-        this.mimeType = mimeType;
+        this.contentType = contentType;
         this.isChildContent = isChildContent;
     }
 
@@ -47,7 +47,7 @@ public class DownloadRequest {
     }
 
     public String getMimeType() {
-        return mimeType;
+        return contentType;
     }
 
     public String getFilePath() {

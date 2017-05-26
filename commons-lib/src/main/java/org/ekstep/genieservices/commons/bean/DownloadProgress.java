@@ -11,7 +11,7 @@ public class DownloadProgress {
     private String identifier;
     private int downloadProgress;
 
-    public DownloadProgress(String identifier, long downloadId, int downloadProgress) {
+    public DownloadProgress(long downloadId,String identifier, int downloadProgress) {
         this.identifier = identifier;
         this.downloadId = downloadId;
         this.downloadProgress = downloadProgress;

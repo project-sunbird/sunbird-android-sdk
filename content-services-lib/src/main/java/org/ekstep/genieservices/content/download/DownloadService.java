@@ -28,7 +28,6 @@ public class DownloadService {
             }
         }
 
-        // TODO: 5/22/2017 - Will call startQueue when if there are no download is in progress.
         startQueue();
     }
 
@@ -36,14 +35,9 @@ public class DownloadService {
         List<DownloadRequest> downloadRequestList = mDownloadQueueManager.findAll();
         if (downloadRequestList.size() > 0) {
             DownloadRequest downloadRequest = downloadRequestList.get(0);
-
-            // TODO: 5/23/2017 - Fetch content detail from server.
-
             long downloadId = mAppContext.getDownloadManager().enqueue(new Request(downloadRequest.getDownloadUrl(), downloadRequest.getIdentifier(), downloadRequest.getMimeType()));
-
             mDownloadQueueManager.update(downloadRequest.getIdentifier(), downloadId);
 
-            mAppContext.getDownloadManager().startDownloadProgressTracker();
         }
     }
 }

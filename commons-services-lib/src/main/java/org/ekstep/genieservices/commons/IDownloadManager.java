@@ -1,5 +1,6 @@
 package org.ekstep.genieservices.commons;
 
+import org.ekstep.genieservices.commons.bean.DownloadProgress;
 import org.ekstep.genieservices.commons.bean.Request;
 
 /**
@@ -10,7 +11,7 @@ public interface IDownloadManager {
 
     long enqueue(Request request);
 
-    void startDownloadProgressTracker();
+    DownloadProgress query(long downloadId);
 
     void cancel(long downloadId);
 }
