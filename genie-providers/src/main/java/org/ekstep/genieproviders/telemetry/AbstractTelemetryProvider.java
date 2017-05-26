@@ -53,11 +53,4 @@ public abstract class AbstractTelemetryProvider extends BaseContentProvider {
         String TELEMETRY_PATH = ".telemetry";
         return String.format("%s.%s", getPackageName(), TELEMETRY_PATH);
     }
-
-    public abstract String getPackageName();
-
-    @Override
-    public String getPackage() {
-        return getPackageName();
-    }
 }

@@ -5,10 +5,8 @@ import android.database.Cursor;
 import android.net.Uri;
 
 import org.ekstep.genieresolvers.BaseTask;
-import org.ekstep.genieservices.ServiceConstants;
-import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 /**
  * Created on 23/5/17.
@@ -33,10 +31,10 @@ public class GetCurrentUserTask extends BaseTask {
     protected GenieResponse execute() {
         Cursor cursor = contentResolver.query(getUri(), null, null, null, null);
         if (cursor == null || cursor.getCount() == 0) {
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, getErrorMessage(), "No Response for current user!");
+            return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), "No Response for current user!");
         }
 
-        GenieResponse successResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.ProviderResolver.SUCCESSFUL);
+        GenieResponse successResponse = getSuccessResponse(Constants.SUCCESSFUL);
         // TODO: 23/5/17 Need to send response with the result here and need to check how do we have to send the response
 //        response.setResult(getContent);
         return successResponse;

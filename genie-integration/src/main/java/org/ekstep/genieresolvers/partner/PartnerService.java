@@ -2,6 +2,7 @@ package org.ekstep.genieresolvers.partner;
 
 import android.content.Context;
 
+import org.ekstep.genieresolvers.BaseService;
 import org.ekstep.genieresolvers.BaseTask;
 import org.ekstep.genieresolvers.TaskHandler;
 import org.ekstep.genieservices.commons.IResponseHandler;
@@ -12,7 +13,7 @@ import org.ekstep.genieservices.commons.bean.PartnerData;
  * shriharsh
  */
 
-public class PartnerService {
+public class PartnerService extends BaseService{
 
     private String appQualifier;
     private Context context;
@@ -24,29 +25,21 @@ public class PartnerService {
 
     public void registerPartner(PartnerData partnerData, IResponseHandler responseHandler) {
         RegisterPartnerTask registerPartnerTask = new RegisterPartnerTask(context, appQualifier, partnerData);
-
         createAndExecuteTask(responseHandler, registerPartnerTask);
     }
 
     public void startPartnerSession(PartnerData partnerData, IResponseHandler responseHandler) {
         StartPartnerSessionTask startPartnerSessionTask = new StartPartnerSessionTask(context, appQualifier, partnerData);
-
         createAndExecuteTask(responseHandler, startPartnerSessionTask);
     }
 
     public void endPartnerSession(PartnerData partnerData, IResponseHandler responseHandler) {
         EndPartnerSessionTask endPartnerSessionTask = new EndPartnerSessionTask(context, appQualifier, partnerData);
-
         createAndExecuteTask(responseHandler, endPartnerSessionTask);
     }
 
     public void sendPartnerData(PartnerData partnerData, IResponseHandler responseHandler) {
         SendPartnerDataTask sendPartnerDataTask = new SendPartnerDataTask(context, appQualifier, partnerData);
-
         createAndExecuteTask(responseHandler, sendPartnerDataTask);
-    }
-
-    private void createAndExecuteTask(IResponseHandler responseHandler, BaseTask task) {
-        new TaskHandler(responseHandler).execute(task);
     }
 }

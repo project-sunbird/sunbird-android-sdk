@@ -30,9 +30,6 @@ public interface ServiceConstants {
     String SYNC_PROMPT = "SYNC_PROMPT";
     String CONTENT_API_EXPIRATION_KEY = "content_api_expiration_time";
 
-    /*Key used while creating the user from Provider*/
-    String PROFILE = "profile";
-
     interface PreferenceKey {
         //Sync service pref keys
         String SYNC_CONFIG_SHARED_PREFERENCE_KEY = "syncConfig";
@@ -86,15 +83,5 @@ public interface ServiceConstants {
         String DATA_NOT_FOUND_ERROR = "NO_DATA_FOUND";
         String VALIDATION_ERROR = "VALIDATION_ERROR";
         String DB_ERROR = "DB_ERROR";
-    }
-
-    interface ProviderResolver {
-        String PROCESSING_ERROR = "PROCESSING_ERROR";
-        String GENIE_SERVICE_NOT_INSTALLED = "GENIE_SERVICE_NOT_INSTALLED";
-        String SUCCESSFUL = "successful";
-        String NETWORK_ERROR = "NETWORK_ERROR";
-        String NO_INTERNET_CONNECTIVITY_MESSAGE = "no internet connectivity available";
-        String PARTNER_DATA = "partner_data";
-        String PARTNER_CURSOR_KEY = "partner_cursor_key";
     }
 }

@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 
 import org.ekstep.genieproviders.BaseContentProvider;
 import org.ekstep.genieproviders.IUriHandler;
-import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.PartnerData;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -21,6 +20,8 @@ import java.util.List;
  */
 
 public abstract class AbstractPartnerProvider extends BaseContentProvider {
+
+    private static final String PARTNER_DATA = "partner_data";
 
     @Override
     public boolean onCreate() {
@@ -47,7 +48,7 @@ public abstract class AbstractPartnerProvider extends BaseContentProvider {
 
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
-        PartnerData partnerData = GsonUtil.fromJson(values.getAsString(ServiceConstants.ProviderResolver.PARTNER_DATA), PartnerData.class);
+        PartnerData partnerData = GsonUtil.fromJson(values.getAsString(PARTNER_DATA), PartnerData.class);
         GenieResponse response = getService().getPartnerService().registerPartner(partnerData);
         if (response.getStatus()) {
             return uri;
@@ -68,12 +69,5 @@ public abstract class AbstractPartnerProvider extends BaseContentProvider {
     private String getCompletePath() {
         String PARTNER_PATH = ".partner";
         return String.format("%s.%s", getPackageName(), PARTNER_PATH);
-    }
-
-    public abstract String getPackageName();
-
-    @Override
-    public String getPackage() {
-        return getPackageName();
     }
 }

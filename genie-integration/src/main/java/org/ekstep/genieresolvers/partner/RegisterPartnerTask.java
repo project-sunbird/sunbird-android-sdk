@@ -5,8 +5,7 @@ import android.content.Context;
 import android.net.Uri;
 
 import org.ekstep.genieresolvers.BaseTask;
-import org.ekstep.genieservices.ServiceConstants;
-import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.PartnerData;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -34,16 +33,16 @@ public class RegisterPartnerTask extends BaseTask {
     @Override
     protected GenieResponse execute() {
         ContentValues partnerValues = new ContentValues();
-        partnerValues.put(ServiceConstants.ProviderResolver.PARTNER_DATA, GsonUtil.toJson(partnerData));
+        partnerValues.put(Constants.PARTNER_DATA, GsonUtil.toJson(partnerData));
         Uri response = contentResolver.insert(getUri(), partnerValues);
         if (response == null) {
             String logMessage = "Could not register partner!";
-            GenieResponse processing_error = GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, getErrorMessage(), logMessage);
+            GenieResponse processing_error = getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), logMessage);
             return processing_error;
 
         }
 
-        GenieResponse successResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.ProviderResolver.SUCCESSFUL);
+        GenieResponse successResponse = getSuccessResponse(Constants.SUCCESSFUL);
         return successResponse;
     }
 

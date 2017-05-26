@@ -4,8 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 
 import org.ekstep.genieresolvers.BaseTask;
-import org.ekstep.genieservices.ServiceConstants;
-import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 
 /**
@@ -34,10 +33,10 @@ public class DeleteUserTask extends BaseTask {
 
         if (response != 1) {
             String logMessage = "Could not delete the user!";
-           return GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, getErrorMessage(), logMessage);
+           return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), logMessage);
         }
 
-        return GenieResponseBuilder.getSuccessResponse(ServiceConstants.ProviderResolver.SUCCESSFUL);
+        return getSuccessResponse(Constants.SUCCESSFUL);
     }
 
     @Override

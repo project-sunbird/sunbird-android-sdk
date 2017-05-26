@@ -4,11 +4,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.net.Uri;
 
-import com.google.gson.Gson;
-
 import org.ekstep.genieresolvers.BaseTask;
-import org.ekstep.genieservices.ServiceConstants;
-import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -37,15 +34,15 @@ public class CreateUserTask extends BaseTask {
     @Override
     protected GenieResponse execute() {
         ContentValues profileValues = new ContentValues();
-        profileValues.put(ServiceConstants.PROFILE, GsonUtil.toJson(profile));
+        profileValues.put(Constants.PROFILE, GsonUtil.toJson(profile));
         Uri response = contentResolver.insert(getUri(), profileValues);
         if (response == null) {
             String logMessage = "Empty response(URI) when creating Profile";
-            GenieResponse processing_error = GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, getErrorMessage(), logMessage);
+            GenieResponse processing_error = getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), logMessage);
             return processing_error;
 
         }
-        GenieResponse successResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.ProviderResolver.SUCCESSFUL);
+        GenieResponse successResponse = getSuccessResponse(Constants.SUCCESSFUL);
         return successResponse;
     }
 

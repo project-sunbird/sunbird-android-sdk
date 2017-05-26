@@ -60,10 +60,4 @@ public abstract class AbstractContentProvider extends BaseContentProvider {
         return String.format("%s.%s", getPackageName(), CONTENT_PATH);
     }
 
-    public abstract String getPackageName();
-
-    @Override
-    public String getPackage() {
-        return getPackageName();
-    }
 }

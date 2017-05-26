@@ -7,8 +7,7 @@ import android.net.Uri;
 import com.google.gson.Gson;
 
 import org.ekstep.genieresolvers.BaseTask;
-import org.ekstep.genieservices.ServiceConstants;
-import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 
 public class GetTraversalRuleTask extends BaseTask {
@@ -31,7 +30,7 @@ public class GetTraversalRuleTask extends BaseTask {
         Cursor cursor = contentResolver.query(getUri(), null, languageId, null, null);
         if (cursor == null || cursor.getCount() == 0) {
             String logMessage = "Couldn't get the traversal rules";
-           return GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR,
+           return getErrorResponse(Constants.PROCESSING_ERROR,
                     getErrorMessage(), logMessage);
         }
         GenieResponse genieResponse = getResponse(cursor);

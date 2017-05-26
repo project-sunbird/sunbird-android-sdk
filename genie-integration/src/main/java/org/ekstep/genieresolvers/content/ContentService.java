@@ -2,6 +2,7 @@ package org.ekstep.genieresolvers.content;
 
 import android.content.Context;
 
+import org.ekstep.genieresolvers.BaseService;
 import org.ekstep.genieresolvers.BaseTask;
 import org.ekstep.genieresolvers.TaskHandler;
 import org.ekstep.genieservices.commons.IResponseHandler;
@@ -14,7 +15,7 @@ import java.util.List;
  * shriharsh
  */
 
-public class ContentService {
+public class ContentService extends BaseService{
     private String appQualifier;
     private Context context;
 
@@ -25,29 +26,23 @@ public class ContentService {
 
     public void getContent(String contentId, IResponseHandler responseHandler) {
         GetContentTask getContentTask = new GetContentTask(context, appQualifier, contentId);
-
         createAndExecuteTask(responseHandler, getContentTask);
     }
 
     public void getContents(IResponseHandler responseHandler) {
         GetContentsTask getContentsTask = new GetContentsTask(context, appQualifier);
-
         createAndExecuteTask(responseHandler, getContentsTask);
     }
 
     public void getRelatedContent(List<HashMap<String, Object>> contentIdentifiers, String userId, IResponseHandler responseHandler) {
         GetRelatedContentTask getRelatedContentTask = new GetRelatedContentTask(context, appQualifier, contentIdentifiers, userId);
-
         createAndExecuteTask(responseHandler, getRelatedContentTask);
     }
 
     public void sendFeedback(String feedbackString, IResponseHandler responseHandler) {
         SendFeedbackEventTask sendFeedbackEventTask = new SendFeedbackEventTask(context, appQualifier, feedbackString);
-
         createAndExecuteTask(responseHandler, sendFeedbackEventTask);
     }
 
-    private void createAndExecuteTask(IResponseHandler responseHandler, BaseTask task) {
-        new TaskHandler(responseHandler).execute(task);
-    }
+
 }

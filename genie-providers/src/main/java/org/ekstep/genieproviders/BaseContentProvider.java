@@ -22,13 +22,13 @@ public abstract class BaseContentProvider extends ContentProvider {
         mGenieService = GenieService.getService();
 
         if (mGenieService == null) {
-            mGenieService = GenieService.init(getContext(), getPackage(), "", "");
+            mGenieService = GenieService.init(getContext(), getPackageName(), "", "");
         }
 
         return mGenieService;
     }
 
-    public abstract String getPackage();
+    public abstract String getPackageName();
 
     @Override
     public boolean onCreate() {

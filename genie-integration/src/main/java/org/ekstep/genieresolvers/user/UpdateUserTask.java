@@ -5,8 +5,7 @@ import android.content.Context;
 import android.net.Uri;
 
 import org.ekstep.genieresolvers.BaseTask;
-import org.ekstep.genieservices.ServiceConstants;
-import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -34,16 +33,16 @@ public class UpdateUserTask extends BaseTask {
     @Override
     protected GenieResponse execute() {
         ContentValues profileValues = getContentValues();
-        profileValues.put(ServiceConstants.PROFILE, GsonUtil.toJson(profile));
+        profileValues.put(Constants.PROFILE, GsonUtil.toJson(profile));
         int response = contentResolver.update(getUri(), profileValues, null, null);
 
         if (response != 1) {
             String logMessage = "Could not update the user!";
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, getErrorMessage(), logMessage);
+            return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), logMessage);
 
         }
 
-        GenieResponse successResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.ProviderResolver.SUCCESSFUL);
+        GenieResponse successResponse = getSuccessResponse(Constants.SUCCESSFUL);
         return successResponse;
     }
 

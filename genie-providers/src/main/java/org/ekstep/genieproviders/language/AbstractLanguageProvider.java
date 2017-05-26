@@ -62,11 +62,4 @@ public abstract class AbstractLanguageProvider extends BaseContentProvider {
         String LANGUAGE_PATH = "languages";
         return String.format("%s.%s", getPackageName(), LANGUAGE_PATH);
     }
-
-    public abstract String getPackageName();
-
-    @Override
-    public String getPackage() {
-        return getPackageName();
-    }
 }

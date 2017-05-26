@@ -2,8 +2,7 @@ package org.ekstep.genieresolvers.language;
 
 import android.content.Context;
 
-import org.ekstep.genieresolvers.BaseTask;
-import org.ekstep.genieresolvers.TaskHandler;
+import org.ekstep.genieresolvers.BaseService;
 import org.ekstep.genieservices.commons.IResponseHandler;
 
 /**
@@ -11,7 +10,7 @@ import org.ekstep.genieservices.commons.IResponseHandler;
  * shriharsh
  */
 
-public class LanguageService {
+public class LanguageService extends BaseService {
     private String appQualifier;
     private Context context;
 
@@ -22,24 +21,12 @@ public class LanguageService {
 
     public void getTraversalRule(String languageId, IResponseHandler responseHandler) {
         GetTraversalRuleTask getTraversalRuleTask = new GetTraversalRuleTask(context, appQualifier, languageId);
-
         createAndExecuteTask(responseHandler, getTraversalRuleTask);
-    }
-
-    public void getAllLanguages(IResponseHandler responseHandler) {
-        GetAllLanguagesTask getAllLanguagesTask = new GetAllLanguagesTask(context, appQualifier);
-
-        createAndExecuteTask(responseHandler, getAllLanguagesTask);
     }
 
     public void getLanguageSearch(String searchRequest, IResponseHandler responseHandler) {
         GetLanguageSearchTask getLanguageSearchTask = new GetLanguageSearchTask(context, appQualifier, searchRequest);
-
         createAndExecuteTask(responseHandler, getLanguageSearchTask);
-    }
-
-    private void createAndExecuteTask(IResponseHandler responseHandler, BaseTask task) {
-        new TaskHandler(responseHandler).execute(task);
     }
 
 }

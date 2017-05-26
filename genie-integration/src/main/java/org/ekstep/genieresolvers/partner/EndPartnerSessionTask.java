@@ -5,8 +5,7 @@ import android.database.Cursor;
 import android.net.Uri;
 
 import org.ekstep.genieresolvers.BaseTask;
-import org.ekstep.genieservices.ServiceConstants;
-import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.PartnerData;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -42,10 +41,10 @@ public class EndPartnerSessionTask extends BaseTask {
         GenieResponse response = getResponseFromCursor(cursor);
 
         if (response != null && response.getStatus()) {
-            return GenieResponseBuilder.getSuccessResponse(ServiceConstants.ProviderResolver.SUCCESSFUL);
+            return getSuccessResponse(Constants.SUCCESSFUL);
         }
 
-        return GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, getErrorMessage(), "Unable to end the session!");
+        return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), "Unable to end the session!");
     }
 
 

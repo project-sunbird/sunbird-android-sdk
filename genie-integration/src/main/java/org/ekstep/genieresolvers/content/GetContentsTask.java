@@ -7,8 +7,7 @@ import android.net.Uri;
 import com.google.gson.Gson;
 
 import org.ekstep.genieresolvers.BaseTask;
-import org.ekstep.genieservices.ServiceConstants;
-import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 
 import java.util.ArrayList;
@@ -40,10 +39,10 @@ public class GetContentsTask extends BaseTask {
         Cursor cursor = contentResolver.query(getUri(), null, null, null, "");
         if (cursor == null) {
             String logMessage = "Couldn't get the content list";
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, getErrorMessage(), logMessage);
+            return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), logMessage);
         }
         List<Map<String, Object>> contentPath = getPath(cursor);
-        GenieResponse response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.ProviderResolver.SUCCESSFUL);
+        GenieResponse response = getSuccessResponse(Constants.SUCCESSFUL);
         response.setResult(contentPath);
         return response;
     }

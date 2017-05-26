@@ -4,13 +4,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.net.Uri;
 
-import com.google.gson.Gson;
-
 import org.ekstep.genieresolvers.BaseTask;
-import org.ekstep.genieservices.ServiceConstants;
-import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.db.contract.TelemetryEntry;
 
 /**
  * Created on 23/5/17.
@@ -35,15 +31,15 @@ public class TelemetryEventTask extends BaseTask {
     @Override
     protected GenieResponse execute() {
         ContentValues event = getContentValues();
-        event.put(TelemetryEntry.COLUMN_NAME_EVENT, eventString);
+        event.put(Constants.EVENT, eventString);
         Uri response = contentResolver.insert(getUri(), event);
         if (response == null) {
             String errorMessage = "Not able to send event";
             String logMessage = "Empty response(URI) when sending telemetry event";
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, errorMessage, logMessage);
+            return getErrorResponse(Constants.PROCESSING_ERROR, errorMessage, logMessage);
         }
 
-        GenieResponse successResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.ProviderResolver.SUCCESSFUL);
+        GenieResponse successResponse = getSuccessResponse(Constants.SUCCESSFUL);
         return successResponse;
     }
 

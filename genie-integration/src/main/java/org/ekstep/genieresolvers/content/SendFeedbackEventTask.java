@@ -5,8 +5,7 @@ import android.content.Context;
 import android.net.Uri;
 
 import org.ekstep.genieresolvers.BaseTask;
-import org.ekstep.genieservices.ServiceConstants;
-import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 
 /**
@@ -37,10 +36,10 @@ public class SendFeedbackEventTask extends BaseTask {
         if (response == null) {
             String errorMessage = "Not able to send event";
             String logMessage = "Empty response(URI) when sending feedback event";
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.PROCESSING_ERROR, errorMessage, logMessage);
+            return getErrorResponse(Constants.PROCESSING_ERROR, errorMessage, logMessage);
 
         }
-        GenieResponse successResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.ProviderResolver.SUCCESSFUL);
+        GenieResponse successResponse = getSuccessResponse(Constants.SUCCESSFUL);
         return successResponse;
     }
 

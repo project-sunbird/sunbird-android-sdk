@@ -2,6 +2,7 @@ package org.ekstep.genieresolvers.telemetry;
 
 import android.content.Context;
 
+import org.ekstep.genieresolvers.BaseService;
 import org.ekstep.genieresolvers.BaseTask;
 import org.ekstep.genieresolvers.TaskHandler;
 import org.ekstep.genieservices.commons.IResponseHandler;
@@ -11,7 +12,7 @@ import org.ekstep.genieservices.commons.IResponseHandler;
  * shriharsh
  */
 
-public class TelemetryService {
+public class TelemetryService extends BaseService {
     private String appQualifier;
     private Context context;
 
@@ -24,10 +25,6 @@ public class TelemetryService {
         TelemetryEventTask telemetryEventTask = new TelemetryEventTask(context, appQualifier, eventString);
 
         createAndExecuteTask(responseHandler, telemetryEventTask);
-    }
-
-    private void createAndExecuteTask(IResponseHandler responseHandler, BaseTask task) {
-        new TaskHandler(responseHandler).execute(task);
     }
 
 }
