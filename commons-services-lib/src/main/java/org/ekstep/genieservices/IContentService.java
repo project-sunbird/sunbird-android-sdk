@@ -101,7 +101,7 @@ public interface IContentService {
     GenieResponse<ContentSearchResult> searchContent(ContentSearchCriteria contentSearchCriteria);
 
     /**
-     * This api is used to get the related contents based on the language passed required
+     * This api is used to get the related contents based on the language
      * <p>
      * <p>
      * On successful finding the contents, matching with the language preferred, the response will return status as TRUE and the result set with {@link ContentSearchResult}
