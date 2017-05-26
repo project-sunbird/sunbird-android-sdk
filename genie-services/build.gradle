@@ -48,7 +48,7 @@ android {
         }
         flavor.versionName = versionName;
         variant.outputs.each { output ->
-            output.outputFile = new File(output.outputFile.parent, "genie-sdk-" + versionName + ".aar")
+            output.outputFile = new File(output.outputFile.parent, "genie-services-" + versionName + ".aar")
         }
     }
 }
@@ -80,17 +80,3 @@ def getRepositoryPassword() {
     return hasProperty('nexusPassword') ? nexusPassword : ""
 }
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: "https://platform.ekstep.in/downloads/content/repositories/releases") {
-                authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
-            }
-            pom.project {
-                groupId "org.ekstep.genieservices"
-                artifactId 'genie-sdk'
-                version android.defaultConfig.versionName
-            }
-        }
-    }
-}
