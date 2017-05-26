@@ -6,12 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created on 5/12/2017.
- * * This class implements the criteria that would affect/change a search query. It has
+ * This class implements the criteria that would affect/change a search query. It has
  * options like <b>sort</b>, <b>filter</b>, <b>limit</b>, <b>offset</b> and <b>options</b>
  * which can be used to fine tune a search.
  *
- * @author anil
  * @query - The keywords used for search.
  * @sort - A map of options and the order to sort "asc"/"desc" to arrange the results in desired order.
  * @filter - A map of options which helps to refine the search results as per the need.

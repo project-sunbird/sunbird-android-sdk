@@ -86,7 +86,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         if (contentModelInDB == null) {     // Fetch from server if detail is not available in DB
             Map contentData = ContentHandler.fetchContentDetailsFromServer(mAppContext, contentIdentifier);
             if (contentData == null) {
-                response = GenieResponseBuilder.getErrorResponse(ServiceConstants.NO_DATA_FOUND, "No content found for identifier = " + contentIdentifier, TAG);
+                response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, "No content found for identifier = " + contentIdentifier, TAG);
                 return response;
             }
 
@@ -152,7 +152,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         GenieResponse<List<Content>> response;
         ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), contentIdentifier);
         if (contentModel == null) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.NO_DATA_FOUND, "No content found for identifier = " + contentIdentifier, TAG);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, "No content found for identifier = " + contentIdentifier, TAG);
             return response;
         }
 
@@ -191,7 +191,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), contentIdentifier);
 
         if (contentModel == null) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.NO_DATA_FOUND, "No content found to delete for identifier = " + contentIdentifier, TAG);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, "No content found to delete for identifier = " + contentIdentifier, TAG);
             return response;
         }
 
@@ -690,13 +690,13 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         GenieResponse<Void> response;
 
         if (!FileUtil.doesFileExists(ecarFilePath)) {
-            response = GenieResponseBuilder.getErrorResponse(ContentConstants.INVALID_FILE, "content import failed, file doesn't exists", TAG);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "content import failed, file doesn't exists", TAG);
             return response;
         }
 
         String ext = FileUtil.getFileExtension(ecarFilePath);
         if (!ServiceConstants.FileExtension.CONTENT.equals(ext)) {
-            response = GenieResponseBuilder.getErrorResponse(ContentConstants.INVALID_FILE, "content import failed, unsupported file extension", TAG);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "content import failed, unsupported file extension", TAG);
             return response;
         } else {
             File ecarFile = new File(ecarFilePath);

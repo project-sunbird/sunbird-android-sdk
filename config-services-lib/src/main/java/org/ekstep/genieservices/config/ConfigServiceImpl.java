@@ -72,7 +72,7 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
             TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "getMasterData@ConfigServiceImpl", params);
             return response;
         } else {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR, MasterData.class);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR, MasterData.class);
             TelemetryLogger.logFailure(mAppContext, response, TAG, "getMasterData@ConfigServiceImpl", params, "Unable to get masterdata");
             return response;
         }
@@ -143,7 +143,7 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
             TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "getResourceBundle@ConfigServiceImpl", params);
             return response;
         } else {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR);
             TelemetryLogger.logFailure(mAppContext, response, TAG, "getResourceBundle@ConfigServiceImpl", params, "Unable to get resourcebundle");
             return response;
         }
@@ -217,7 +217,7 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
             TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "getOrdinals@ConfigServiceImpl", params);
             return response;
         } else {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR);
             TelemetryLogger.logFailure(mAppContext, response, TAG, "getOrdinals@ConfigServiceImpl", params, "Unable to get ordinals");
             return response;
         }

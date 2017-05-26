@@ -26,7 +26,8 @@ import static org.ekstep.genieservices.tag.model.TagModel.find;
 
 
 /**
- * Created by swayangjit on 12/5/17.
+ * This class is the implementation of {@link ITagService}
+ *
  */
 
 public class TagServiceImpl extends BaseService implements ITagService {

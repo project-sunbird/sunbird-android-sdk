@@ -6,7 +6,6 @@ package org.ekstep.genieservices;
  * @author swayangjit
  */
 public interface ServiceConstants {
-    String NO_DATA_FOUND = "NO_DATA_FOUND";
     String SERVICE_ERROR = "SERVICE_ERROR";
     String INVALID_JSON = "invalid json";
     String UNABLE_TO_CREATE_ANONYMOUS_USER = "unable to create anonymous user";
@@ -109,6 +108,11 @@ public interface ServiceConstants {
         String MISSING_PARTNER_ID = "MISSING_PARTNER_ID";
         String MISSING_PUBLIC_KEY = "MISSING_PUBLIC_KEY";
         String INVALID_RSA_PUBLIC_KEY = "INVALID_RSA_PUBLIC_KEY";
+
+        //Content
+        String NO_DATA_FOUND = "NO_DATA_FOUND";
+        String INVALID_FILE = "INVALID_FILE";
+
     }
 
     interface ErrorMessage {

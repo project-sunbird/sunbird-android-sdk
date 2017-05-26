@@ -10,9 +10,8 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.content.db.model.ContentFeedbackModel;
 
 /**
- * Created on 5/9/2017.
+ * This is the implementation of the interface {@link IContentFeedbackService}
  *
- * @author anil
  */
 public class ContentFeedbackServiceImpl extends BaseService implements IContentFeedbackService {
 
