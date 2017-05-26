@@ -11,8 +11,8 @@ import java.util.Map;
 public class ContentSearchResult {
 
     private String id;
-    private Map<String, Object> params;
-    private List<Map<String, Object>> facets;
+    private String responseMessageId;
+    private List<ContentSearchFilter> filter;
     private Map<String, Object> request;
     private List<Content> contents;
 
@@ -24,20 +24,20 @@ public class ContentSearchResult {
         this.id = id;
     }
 
-    public Map<String, Object> getParams() {
-        return params;
+    public String getResponseMessageId() {
+        return responseMessageId;
     }
 
-    public void setParams(Map<String, Object> params) {
-        this.params = params;
+    public void setResponseMessageId(String responseMessageId) {
+        this.responseMessageId = responseMessageId;
     }
 
-    public List<Map<String, Object>> getFacets() {
-        return facets;
+    public List<ContentSearchFilter> getFilter() {
+        return filter;
     }
 
-    public void setFacets(List<Map<String, Object>> facets) {
-        this.facets = facets;
+    public void setFilter(List<ContentSearchFilter> filter) {
+        this.filter = filter;
     }
 
     public Map<String, Object> getRequest() {

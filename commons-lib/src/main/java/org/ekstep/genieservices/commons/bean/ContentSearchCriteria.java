@@ -1,9 +1,7 @@
 package org.ekstep.genieservices.commons.bean;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This class implements the criteria that would affect/change a search query. It has
@@ -18,22 +16,20 @@ import java.util.Map;
  * @facets - List of filter options, the result will have all the possible values for each of the options.
  * @options - Other set of conditions in the search.
  */
-public class ContentSearchCriteria {
+public class ContentSearchCriteria implements Serializable {
 
     private static final int DEFAULT_LIMIT = 10;
+
     private String query;
-    private Map<String, String> sort;
-    private List<String> facets;
-    private Map<String, String[]> filter;
+    private List<ContentSearchFilter> filter;
+    private String sortBy;
     private long limit;
-    private boolean importedContentInfo;
+    private String mode;
+    private boolean profileFilter;
 
     public ContentSearchCriteria() {
         limit = DEFAULT_LIMIT;
         query = "";
-        sort = new HashMap<>();
-        filter = new HashMap<>();
-        facets = new ArrayList<>();
     }
 
     public String getQuery() {
@@ -44,28 +40,20 @@ public class ContentSearchCriteria {
         this.query = query;
     }
 
-    public Map<String, String> getSort() {
-        return sort;
-    }
-
-    public void setSort(Map<String, String> sort) {
-        this.sort = sort;
-    }
-
-    public List<String> getFacets() {
-        return facets;
-    }
-
-    public void setFacets(List<String> facets) {
-        this.facets = facets;
-    }
-
-    public Map<String, String[]> getFilter() {
+    public List<ContentSearchFilter> getFilter() {
         return filter;
     }
 
-    public void setFilter(Map<String, String[]> filter) {
+    public void setFilter(List<ContentSearchFilter> filter) {
         this.filter = filter;
+    }
+
+    public String getSortBy() {
+        return sortBy;
+    }
+
+    public void setSortBy(String sortBy) {
+        this.sortBy = sortBy;
     }
 
     public long getLimit() {
@@ -76,11 +64,19 @@ public class ContentSearchCriteria {
         this.limit = limit;
     }
 
-    public boolean isImportedContentInfo() {
-        return importedContentInfo;
+    public String getMode() {
+        return mode;
     }
 
-    public void setImportedContentInfo(boolean importedContentInfo) {
-        this.importedContentInfo = importedContentInfo;
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
+
+    public boolean isProfileFilter() {
+        return profileFilter;
+    }
+
+    public void setProfileFilter(boolean profileFilter) {
+        this.profileFilter = profileFilter;
     }
 }

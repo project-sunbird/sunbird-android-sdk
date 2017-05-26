@@ -2,6 +2,7 @@ package org.ekstep.genieservices.content;
 
 import com.google.gson.reflect.TypeToken;
 
+import org.ekstep.genieservices.IConfigService;
 import org.ekstep.genieservices.IContentFeedbackService;
 import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.commons.AppContext;
@@ -10,11 +11,18 @@ import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessCriteria;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
+import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
+import org.ekstep.genieservices.commons.bean.ContentSearchFilter;
+import org.ekstep.genieservices.commons.bean.FilterValue;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.MasterData;
+import org.ekstep.genieservices.commons.bean.MasterDataValues;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.Variant;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
+import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
+import org.ekstep.genieservices.commons.bean.enums.SortBy;
 import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.contract.ContentEntry;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
@@ -32,6 +40,7 @@ import org.ekstep.genieservices.content.network.ContentDetailsAPI;
 import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -40,6 +49,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Queue;
+import java.util.TreeMap;
 
 import static java.lang.String.valueOf;
 
@@ -564,6 +574,240 @@ public class ContentHandler {
                 deleteOrUpdateContent(node, true, level);
             }
         }
+    }
+
+    public static Map<String, Object> getSearchRequest(IUserService userService, IConfigService configService, ContentSearchCriteria criteria) {
+        HashMap<String, Object> requestMap = new HashMap<>();
+        requestMap.put("query", criteria.getQuery());
+        requestMap.put("filters", getFilterRequest(userService, configService, criteria));
+        requestMap.put("limit", criteria.getLimit());
+        requestMap.put("sort_by", getSortByMap(criteria.getSortBy()));
+        requestMap.put("mode", criteria.getMode());
+        requestMap.put("facets", Arrays.asList("contentType", "domain", "ageGroup", "language", "gradeLevel"));
+
+        return requestMap;
+    }
+
+    private static Map<String, String> getSortByMap(String sortBy) {
+        Map<String, String> sortMap = new HashMap<>();
+
+        if (!StringUtil.isNullOrEmpty(sortBy)) {
+            if (SortBy.NAME.getValue().equals(sortBy)) {
+                sortMap.put("name", "asc");
+            } else if (SortBy.MOST_POPULAR.getValue().equals(sortBy)) {
+                sortMap.put("popularity", "desc");
+            } else if (SortBy.NEWEST.getValue().equals(sortBy)) {
+                sortMap.put("lastPublishedOn", "desc");
+            }
+        }
+
+        return sortMap;
+    }
+
+    private static Map<String, Object> getFilterRequest(IUserService userService, IConfigService configService, ContentSearchCriteria criteria) {
+        Map<String, Object> filterMap = new HashMap<>();
+
+        if (criteria.getFilter() != null) {
+            for (ContentSearchFilter filter : criteria.getFilter()) {
+                List<String> filterValueList = new ArrayList<>();
+                for (FilterValue filterValue : filter.getValues()) {
+                    if (filterValue.isApply()) {
+                        filterValueList.add(filterValue.getName());
+                    }
+                }
+
+                if (!filterValueList.isEmpty()) {
+                    filterMap.put(filter.getName(), filterValueList);
+                }
+            }
+        }
+
+        // Populating implicit search criteria.
+        filterMap.put("compatibilityLevel", getCompatibilityLevel());
+        addFiltersIfNotAvailable(filterMap, "objectType", Collections.singletonList("Content"));
+        addFiltersIfNotAvailable(filterMap, "contentType", Arrays.asList("Story", "Worksheet", "Collection", "Game", "TextBook"));
+        addFiltersIfNotAvailable(filterMap, "status", Collections.singletonList("Live"));
+
+        // TODO: 5/26/2017 - Apply profile specific filter
+//        applyProfileFilter(userService, configService, criteria.isProfileFilter(), filter);
+
+
+        // TODO: 5/26/2017 - Apply partner specific filer
+//        HashMap<String, String> partnerInfo = GsonUtil.fromJson(getSharedPreferenceWrapper().getString(Constants.KEY_PARTNER_INFO, null), HashMap.class);
+//        if (partnerInfo != null) {
+//            //Apply Channel filter
+//            String channel = partnerInfo.get(Constant.BUNDLE_KEY_PARTNER_CHANNEL);
+//            if (channel != null) {
+//                applyFilter(MasterDataType.CHANNEL, channel, filter);
+//            }
+//
+//            //Apply Purpose filter
+//            String audience = partnerInfo.get(Constant.BUNDLE_KEY_PARTNER_PURPOSE);
+//            if (purpose != null) {
+//                applyFilter(MasterDataType.AUDIENCE, audience, filter);
+//            }
+//        }
+
+
+        return filterMap;
+    }
+
+    private static Map<String, Integer> getCompatibilityLevel() {
+        Map<String, Integer> compatibilityLevelMap = new HashMap<>();
+        compatibilityLevelMap.put("max", maxCompatibilityLevel);
+        compatibilityLevelMap.put("min", minCompatibilityLevel);
+        return compatibilityLevelMap;
+    }
+
+    private static void addFiltersIfNotAvailable(Map<String, Object> filterMap, String key, List<String> values) {
+        if (filterMap.isEmpty() || filterMap.get(key) == null) {
+            filterMap.put(key, values);
+        }
+    }
+
+    private static void applyProfileFilter(IUserService userService, IConfigService configService, boolean profileFilter, Map<String, String[]> filter) {
+        if (profileFilter && userService != null) {
+            GenieResponse<Profile> profileResponse = userService.getCurrentUser();
+            if (profileResponse.getStatus()) {
+                Profile currentProfile = profileResponse.getResult();
+
+                // Add age filter
+                applyFilter(configService, MasterDataType.AGEGROUP, String.valueOf(currentProfile.getAge()), filter);
+
+                // Add board filter
+                if (currentProfile.getBoard() != null) {
+                    applyFilter(configService, MasterDataType.BOARD, currentProfile.getBoard(), filter);
+                }
+
+                // Add medium filter
+                if (currentProfile.getMedium() != null) {
+                    applyFilter(configService, MasterDataType.MEDIUM, currentProfile.getMedium(), filter);
+                }
+
+                // Add standard filter
+                applyFilter(configService, MasterDataType.GRADELEVEL, String.valueOf(currentProfile.getStandard()), filter);
+            }
+        }
+    }
+
+    private static void applyFilter(IConfigService configService, MasterDataType masterDataType, String propertyValue, Map<String, String[]> filter) {
+        try {
+
+            if (masterDataType == MasterDataType.AGEGROUP) {
+                masterDataType = MasterDataType.AGE;
+            }
+
+            MasterDataValues masterDataValues = null;
+            if (configService != null) {
+                GenieResponse<MasterData> masterDataResponse = configService.getMasterData(masterDataType);
+
+                MasterData masterData = null;
+                if (masterDataResponse.getStatus()) {
+                    masterData = masterDataResponse.getResult();
+                }
+
+                for (MasterDataValues values : masterData.getValues()) {
+                    if (values.getValue().equals(propertyValue)) {
+                        masterDataValues = values;
+                        break;
+                    }
+                }
+            }
+            // TODO: 5/26/2017 - Uncomment the following and implement with bean
+//            Map termMap = (Map) map.get(propertyValue);
+//
+//            String masterDataTypeValue = masterDataType.getValue();
+//
+//            Set termSet = new HashSet((List) termMap.get(masterDataTypeValue));
+//            if (filter.containsKey(masterDataTypeValue)) {
+//                if (filter.get(masterDataTypeValue) != null) {
+//                    Set set = new HashSet(Arrays.asList(filter.get(masterDataTypeValue)));
+//                    if (set != null && termSet != null) {
+//                        termSet.addAll(set);
+//                    }
+//                }
+//            }
+//
+//            String[] strArr = new String[termSet.size()];
+//            termSet.toArray(strArr);
+//            filter.put(masterDataTypeValue, strArr);
+        } catch (Exception e) {
+            Logger.e(TAG, "Failed to apply filter");
+        }
+    }
+
+    public static List<Map<String, Object>> getSortedFacets(IConfigService configService, List<Map<String, Object>> facets) {
+        if (configService == null || facets == null) {
+            return facets;
+        }
+
+        GenieResponse<Map<String, Object>> ordinalsResponse = configService.getOrdinals();
+        if (ordinalsResponse.getStatus()) {
+
+            Map<String, Object> ordinalsMap = ordinalsResponse.getResult();
+
+            if (ordinalsMap != null) {
+                List<Map<String, Object>> sortedFacetList = new ArrayList<>();
+
+                for (Map<String, Object> facetMap : facets) {
+                    for (String nameKey : facetMap.keySet()) {
+                        if (nameKey.equals("name")) {
+                            String facetName = (String) facetMap.get(nameKey);
+
+                            String facetValuesString = GsonUtil.toJson(facetMap.get("values"));
+                            Type facetType = new TypeToken<List<Map<String, Object>>>() {
+                            }.getType();
+                            List<Map<String, Object>> facetValues = GsonUtil.getGson().fromJson(facetValuesString, facetType);
+
+                            if (ordinalsMap.containsKey(facetName)) {
+                                String dataString = GsonUtil.toJson(ordinalsMap.get(facetName));
+                                Type type = new TypeToken<List<String>>() {
+                                }.getType();
+                                List<String> facetsOrder = GsonUtil.getGson().fromJson(dataString, type);
+
+                                List<Map<String, Object>> valuesList = sortOrder(facetValues, facetsOrder);
+
+                                HashMap<String, Object> map = new HashMap<>();
+                                map.put("name", facetName);
+                                map.put("values", valuesList);
+
+                                sortedFacetList.add(map);
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                return sortedFacetList;
+            }
+        }
+
+        return facets;
+    }
+
+    private static List<Map<String, Object>> sortOrder(List<Map<String, Object>> facetValues, List<String> facetsOrder) {
+        Map<Integer, Map<String, Object>> map = new TreeMap<>();
+
+        for (Map<String, Object> value : facetValues) {
+            String name = (String) value.get("name");
+            int index = indexOf(facetsOrder, name);
+            map.put(index, value);
+        }
+
+        List<Map<String, Object>> valuesList = new ArrayList<>(map.values());
+        return valuesList;
+    }
+
+    private static int indexOf(List<String> responseFacets, String key) {
+        if (!StringUtil.isNullOrEmpty(key)) {
+            for (int i = 0; i < responseFacets.size(); i++) {
+                if (key.equalsIgnoreCase(responseFacets.get(i))) {
+                    return i;
+                }
+            }
+        }
+
+        return -1;
     }
 
     public static HashMap<String, Object> getRecommendedContentRequest(String language, String did) {
