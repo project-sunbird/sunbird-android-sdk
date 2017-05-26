@@ -10,11 +10,23 @@ public class DownloadResponse {
     private long downloadId;
     private String identifier;
     private String filePath;
+    private String mimeType;
+    private boolean status;
 
-    public DownloadResponse(long downloadId, String identifier, String filePath) {
+    public DownloadResponse(boolean status,long downloadId, String identifier, String filePath,String mimeType) {
+        this.status=status;
         this.downloadId = downloadId;
         this.identifier = identifier;
         this.filePath = filePath;
+        this.mimeType = mimeType;
+    }
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
     }
 
     public long getDownloadId() {
@@ -27,6 +39,14 @@ public class DownloadResponse {
 
     public String getFilePath() {
         return filePath;
+    }
+
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public boolean getStatus() {
+        return status;
     }
 
     @Override

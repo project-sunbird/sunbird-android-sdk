@@ -40,7 +40,7 @@ public class MainActivityTest extends GenieServiceTestBase {
     @Test
     public void useAppContext() throws Exception {
 //       activity.getMasterData(MasterDataType.AGE);
-        GenieServiceDBHelper.findEventById("GE_SERVICE_API_CALL");
+//        GenieServiceDBHelper.findEventById("GE_SERVICE_API_CALL");
 
 
     }

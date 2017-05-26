@@ -10,7 +10,7 @@ import org.ekstep.genieservices.commons.IDownloadManager;
 import org.ekstep.genieservices.commons.bean.DownloadProgress;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.Request;
-import org.ekstep.genieservices.content.download.DownloadQueueManager;
+import org.ekstep.genieservices.commons.download.DownloadQueueManager;
 import org.ekstep.genieservices.eventbus.EventPublisher;
 
 import java.util.concurrent.Executors;

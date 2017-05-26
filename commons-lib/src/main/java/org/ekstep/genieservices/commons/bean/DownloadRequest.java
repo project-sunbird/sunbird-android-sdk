@@ -7,18 +7,18 @@ package org.ekstep.genieservices.commons.bean;
  */
 public class DownloadRequest {
 
-    private long downloadId;
+    private long downloadId=-1;
     private String identifier;
     private String downloadUrl;
     private String name;
-    private String contentType;
+    private String mimeType;
     private String filePath;
     private boolean isChildContent;
 
-    public DownloadRequest(String identifier, String downloadUrl, String contentType, boolean isChildContent) {
+    public DownloadRequest(String identifier, String downloadUrl, String mimeType, boolean isChildContent) {
         this.identifier = identifier;
         this.downloadUrl = downloadUrl;
-        this.contentType = contentType;
+        this.mimeType = mimeType;
         this.isChildContent = isChildContent;
     }
 
@@ -47,7 +47,7 @@ public class DownloadRequest {
     }
 
     public String getMimeType() {
-        return contentType;
+        return mimeType;
     }
 
     public String getFilePath() {

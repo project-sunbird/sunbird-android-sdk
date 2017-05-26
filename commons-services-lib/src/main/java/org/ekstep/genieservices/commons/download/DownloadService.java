@@ -1,7 +1,9 @@
-package org.ekstep.genieservices.content.download;
+package org.ekstep.genieservices.commons.download;
 
+import org.ekstep.genieservices.IDownloadService;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
+import org.ekstep.genieservices.commons.bean.DownloadResponse;
 import org.ekstep.genieservices.commons.bean.Request;
 
 import java.util.List;
@@ -11,7 +13,7 @@ import java.util.List;
  *
  * @author swayangjit
  */
-public class DownloadService {
+public class DownloadService implements IDownloadService {
 
     private AppContext mAppContext;
     private DownloadQueueManager mDownloadQueueManager = null;
@@ -21,17 +23,22 @@ public class DownloadService {
         this.mDownloadQueueManager = new DownloadQueueManager(mAppContext.getKeyValueStore());
     }
 
-    public void enQueue(DownloadRequest... downloadRequest) {
+    @Override
+    public void enqueue(DownloadRequest... downloadRequest) {
         if (downloadRequest.length > 0) {
             for (DownloadRequest request : downloadRequest) {
                 mDownloadQueueManager.save(request);
             }
         }
+        List<DownloadRequest> downloadRequestList = mDownloadQueueManager.findAll();
+        if (downloadRequestList.size() > 0 && downloadRequestList.get(0).getDownloadId() == -1) {
+            start();
+        }
 
-        startQueue();
     }
 
-    public void startQueue() {
+    @Override
+    public void start() {
         List<DownloadRequest> downloadRequestList = mDownloadQueueManager.findAll();
         if (downloadRequestList.size() > 0) {
             DownloadRequest downloadRequest = downloadRequestList.get(0);
@@ -39,5 +46,16 @@ public class DownloadService {
             mDownloadQueueManager.update(downloadRequest.getIdentifier(), downloadId);
 
         }
+    }
+
+    @Override
+    public void onDownloadComplete(DownloadResponse downloadResponse) {
+        start();
+    }
+
+    @Override
+    public void onDownloadFailed(DownloadResponse downloadResponse) {
+        mDownloadQueueManager.remove(downloadResponse.getDownloadId());
+        start();
     }
 }

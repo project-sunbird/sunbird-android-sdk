@@ -1,8 +1,12 @@
-package org.ekstep.genieservices.content.download;
+package org.ekstep.genieservices.content;
 
+import org.ekstep.genieservices.IDownloadService;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.DownloadProgress;
+import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.DownloadResponse;
+import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.download.DownloadQueueManager;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.greenrobot.eventbus.EventBus;
@@ -19,14 +23,16 @@ public class DownloadQueueListener {
 
     private static DownloadQueueListener INSTANCE = null;
     private AppContext mAppContext = null;
+    private IDownloadService mDownloadService;
 
-    private DownloadQueueListener(AppContext appContext) {
+    private DownloadQueueListener(AppContext appContext, IDownloadService downloadService) {
         this.mAppContext = appContext;
+        this.mDownloadService = downloadService;
         register();
     }
 
-    public static void init(AppContext context) {
-        INSTANCE = new DownloadQueueListener(context);
+    public static void init(AppContext context, IDownloadService downloadService) {
+        INSTANCE = new DownloadQueueListener(context, downloadService);
     }
 
     public static void destroy() {
@@ -45,15 +51,16 @@ public class DownloadQueueListener {
     public void onDownloadResponse(DownloadResponse downloadResponse) throws InterruptedException {
         Logger.i(TAG, "onDownloadResponse : " + downloadResponse.toString());
         DownloadQueueManager downloadQueueManager = new DownloadQueueManager(mAppContext.getKeyValueStore());
-        DownloadService downloadService = new DownloadService(mAppContext);
-        if (StringUtil.isNullOrEmpty(downloadResponse.getFilePath())) {  // Download failed
-            downloadQueueManager.remove(downloadResponse.getDownloadId());
-            downloadService.startQueue();
-        } else {    // Download success
-            // TODO: 5/22/2017 - Start import and after successful import remove from queue and start next download. Start the Android service to make it async.
-            // Start import - new ContentServiceImpl(appContext).importContent(false,downloadResponse.getFilePath());
-            // Remove from queue after successful import - downloadQueueManager.remove(downloadResponse.getDownloadId());
-            // Start downloading next content after successful import - downloadService.startQueue();
+        DownloadRequest downloadRequest = downloadQueueManager.getRequest(downloadResponse.getDownloadId());
+        downloadResponse.setIdentifier(downloadRequest.getIdentifier());
+        downloadResponse.setMimeType(downloadRequest.getMimeType());
+        if (downloadResponse.getStatus()) {
+            new ContentServiceImpl(mAppContext).importContent(downloadRequest.isChildContent(),downloadResponse.getFilePath());
+            mDownloadService.onDownloadComplete(downloadResponse);
+        } else if (StringUtil.isNullOrEmpty(downloadResponse.getFilePath())) {
+            mDownloadService.onDownloadFailed(downloadResponse);
+        } else {
+            mDownloadService.onDownloadFailed(downloadResponse);
         }
     }
 

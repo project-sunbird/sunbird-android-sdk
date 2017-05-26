@@ -8,16 +8,12 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
-import android.widget.Toast;
 
-import org.ekstep.genieservices.GenieService;
-import org.ekstep.genieservices.R;
-import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.DownloadResponse;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
+import org.ekstep.genieservices.commons.download.DownloadQueueManager;
 import org.ekstep.genieservices.eventbus.EventPublisher;
-import org.ekstep.genieservices.content.download.DownloadQueueManager;
 
 import java.io.FileNotFoundException;
 
@@ -58,26 +54,19 @@ public class DownloadFileReceiver extends BroadcastReceiver {
 
                         String filepath = cursor.getString(cursor.getColumnIndex(android.app.DownloadManager.COLUMN_LOCAL_URI));
                         downloadedFilePath = getRealPathFromURI(context, Uri.parse(filepath));
+
+                        EventPublisher.postDownloadResponse(new DownloadResponse(true, downloadId, null, downloadedFilePath, null));
                     }
                     break;
 
-                case android.app.DownloadManager.ERROR_INSUFFICIENT_SPACE:
-                    Toast.makeText(context, R.string.download_failed_insufficient_space_on_your_device, Toast.LENGTH_LONG).show();
-                    break;
-
-                case android.app.DownloadManager.STATUS_FAILED:
-                    Toast.makeText(context, R.string.download_failed_insufficient_space_on_your_device, Toast.LENGTH_LONG).show();
-                    break;
+//                case android.app.DownloadManager.ERROR_INSUFFICIENT_SPACE:
+//                    Toast.makeText(context, R.string.download_failed_insufficient_space_on_your_device, Toast.LENGTH_LONG).show();
+//                    break;
+//
+//                case android.app.DownloadManager.STATUS_FAILED:
+//                    Toast.makeText(context, R.string.download_failed_insufficient_space_on_your_device, Toast.LENGTH_LONG).show();
+//                    break;
             }
-        }
-
-        DownloadQueueManager downloadQueueManager = new DownloadQueueManager(GenieService.getService().getKeyStore());
-        DownloadRequest downloadRequest = downloadQueueManager.getRequest(downloadId);
-
-        String contentIdentifier = null;
-        if (downloadRequest != null) {
-            contentIdentifier = downloadRequest.getIdentifier();
-            EventPublisher.postDownloadResponse(new DownloadResponse(downloadId, contentIdentifier, downloadedFilePath));
         }
 
 

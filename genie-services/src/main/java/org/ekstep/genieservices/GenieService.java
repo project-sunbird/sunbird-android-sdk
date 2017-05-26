@@ -14,8 +14,8 @@ import org.ekstep.genieservices.config.ConfigServiceImpl;
 import org.ekstep.genieservices.content.ContentFeedbackServiceImpl;
 import org.ekstep.genieservices.content.ContentServiceImpl;
 import org.ekstep.genieservices.content.LanguageServiceImpl;
-import org.ekstep.genieservices.content.download.DownloadQueueListener;
-import org.ekstep.genieservices.content.download.DownloadService;
+import org.ekstep.genieservices.content.DownloadQueueListener;
+import org.ekstep.genieservices.commons.download.DownloadService;
 import org.ekstep.genieservices.notification.NotificationServiceImpl;
 import org.ekstep.genieservices.partner.PartnerServiceImpl;
 import org.ekstep.genieservices.profile.UserServiceImpl;
@@ -62,7 +62,7 @@ public class GenieService {
             AppContext<Context> applicationContext = AndroidAppContext.buildAppContext(context, packageName);
             Logger.init(new AndroidLogger());
             TelemetryLogger.init(new TelemetryServiceImpl(applicationContext, new UserServiceImpl(applicationContext)));
-            DownloadQueueListener.init(applicationContext);
+            DownloadQueueListener.init(applicationContext,new DownloadService(applicationContext));
             sService = new GenieService(applicationContext);
         }
         GenieAsyncService.init(sService);
