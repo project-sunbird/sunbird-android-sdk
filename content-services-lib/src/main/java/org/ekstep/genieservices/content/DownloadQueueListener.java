@@ -5,7 +5,6 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.DownloadProgress;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.DownloadResponse;
-import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.download.DownloadQueueManager;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
@@ -55,7 +54,7 @@ public class DownloadQueueListener {
         downloadResponse.setIdentifier(downloadRequest.getIdentifier());
         downloadResponse.setMimeType(downloadRequest.getMimeType());
         if (downloadResponse.getStatus()) {
-            new ContentServiceImpl(mAppContext).importContent(downloadRequest.isChildContent(),downloadResponse.getFilePath());
+            new ContentServiceImpl(mAppContext).importContent(downloadRequest.isChildContent(), downloadResponse.getFilePath());
             mDownloadService.onDownloadComplete(downloadResponse);
         } else if (StringUtil.isNullOrEmpty(downloadResponse.getFilePath())) {
             mDownloadService.onDownloadFailed(downloadResponse);

@@ -34,7 +34,6 @@ public class DownloadService implements IDownloadService {
         if (downloadRequestList.size() > 0 && downloadRequestList.get(0).getDownloadId() == -1) {
             start();
         }
-
     }
 
     @Override
@@ -44,7 +43,6 @@ public class DownloadService implements IDownloadService {
             DownloadRequest downloadRequest = downloadRequestList.get(0);
             long downloadId = mAppContext.getDownloadManager().enqueue(new Request(downloadRequest.getDownloadUrl(), downloadRequest.getIdentifier(), downloadRequest.getMimeType()));
             mDownloadQueueManager.update(downloadRequest.getIdentifier(), downloadId);
-
         }
     }
 

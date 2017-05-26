@@ -576,6 +576,21 @@ public class ContentHandler {
         }
     }
 
+    public static Map<String, Object> getSearchRequest(List<String> contentIdentifiers) {
+        Map<String, Object> filterMap = new HashMap<>();
+        filterMap.put("compatibilityLevel", getCompatibilityLevel());
+        filterMap.put("identifier", contentIdentifiers);
+        addFiltersIfNotAvailable(filterMap, "objectType", Collections.singletonList("Content"));
+        addFiltersIfNotAvailable(filterMap, "contentType", Arrays.asList("Story", "Worksheet", "Collection", "Game", "TextBook"));
+        addFiltersIfNotAvailable(filterMap, "status", Collections.singletonList("Live"));
+
+        HashMap<String, Object> requestMap = new HashMap<>();
+        requestMap.put("filters", filterMap);
+        requestMap.put("fields", Arrays.asList("downloadUrl", "variants"));
+
+        return requestMap;
+    }
+
     public static Map<String, Object> getSearchRequest(IUserService userService, IConfigService configService, ContentSearchCriteria criteria) {
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("query", criteria.getQuery());

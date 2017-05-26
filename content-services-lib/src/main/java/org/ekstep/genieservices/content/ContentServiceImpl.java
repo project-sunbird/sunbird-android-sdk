@@ -1,7 +1,6 @@
 package org.ekstep.genieservices.content;
 
 import com.google.gson.internal.LinkedTreeMap;
-import com.google.gson.reflect.TypeToken;
 
 import org.ekstep.genieservices.BaseService;
 import org.ekstep.genieservices.IConfigService;
@@ -514,8 +513,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                     .then(new ExtractPayloads())
                     .then(new EcarCleanUp())
                     .then(new AddGeTransferContentImportEvent());
-            GenieResponse<Void> genieResponse=importContentSteps.execute(mAppContext, importContext);
-            if(genieResponse.getStatus()){
+            GenieResponse<Void> genieResponse = importContentSteps.execute(mAppContext, importContext);
+            if (genieResponse.getStatus()) {
                 EventPublisher.postImportSuccessfull(new ImportStatus(null));
             }
             return genieResponse;
@@ -526,20 +525,39 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     public GenieResponse<Void> importContent(boolean isChildContent, List<String> contentIdentifiers) {
         DownloadService downloadService = new DownloadService(mAppContext);
 
-        for (String contentIdentifier : contentIdentifiers) {
-            Map dataMap = ContentHandler.fetchContentDetailsFromServer(mAppContext, contentIdentifier);
-            String downloadUrl = ContentHandler.getDownloadUrl(dataMap);
-            if (downloadUrl != null) {
-                downloadUrl = downloadUrl.trim();
+        ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, ContentHandler.getSearchRequest(contentIdentifiers));
+        GenieResponse apiResponse = contentSearchAPI.post();
+        if (apiResponse.getStatus()) {
+            String body = apiResponse.getResult().toString();
+
+            LinkedTreeMap map = GsonUtil.fromJson(body, LinkedTreeMap.class);
+            LinkedTreeMap result = (LinkedTreeMap) map.get("result");
+
+            List<Map<String, Object>> contentDataList = null;
+            if (result.containsKey("content")) {
+                contentDataList = (List<Map<String, Object>>) result.get("content");
             }
 
-            if (!StringUtil.isNullOrEmpty(downloadUrl) && ServiceConstants.FileExtension.CONTENT.equalsIgnoreCase(FileUtil.getFileExtension(downloadUrl))) {
-                DownloadRequest downloadRequest = new DownloadRequest(contentIdentifier, downloadUrl, ContentConstants.MimeType.ECAR, isChildContent);
-                downloadService.enqueue(downloadRequest);
+            if (contentDataList != null) {
+                DownloadRequest[] downloadRequests = new DownloadRequest[contentDataList.size()];
+                for (int i = 0; i < contentDataList.size(); i++) {
+                    Map dataMap = contentDataList.get(i);
+                    String downloadUrl = ContentHandler.getDownloadUrl(dataMap);
+                    if (downloadUrl != null) {
+                        downloadUrl = downloadUrl.trim();
+                    }
+
+                    if (!StringUtil.isNullOrEmpty(downloadUrl) && ServiceConstants.FileExtension.CONTENT.equalsIgnoreCase(FileUtil.getFileExtension(downloadUrl))) {
+                        DownloadRequest downloadRequest = new DownloadRequest((String) dataMap.get(ContentModel.KEY_IDENTIFIER), downloadUrl, ContentConstants.MimeType.ECAR, isChildContent);
+                        downloadRequests[i] = downloadRequest;
+                    }
+                }
+
+                downloadService.enqueue(downloadRequests);
             }
         }
 
-        return null;
+        return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
     }
 
 }
