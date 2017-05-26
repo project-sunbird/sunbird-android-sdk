@@ -77,9 +77,10 @@ public class DownloadFileReceiver extends BroadcastReceiver {
         String contentIdentifier = null;
         if (downloadRequest != null) {
             contentIdentifier = downloadRequest.getIdentifier();
+            EventPublisher.postDownloadResponse(new DownloadResponse(downloadId, contentIdentifier, downloadedFilePath));
         }
 
-        EventPublisher.postDownloadResponse(new DownloadResponse(downloadId, contentIdentifier, downloadedFilePath));
+
     }
 
     private String getRealPathFromURI(Context context, Uri contentUri) {

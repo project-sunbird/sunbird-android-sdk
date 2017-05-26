@@ -15,7 +15,7 @@ public class GenieAsyncService {
     private static TelemetryService sTelemetryService;
     private static UserService sUserService;
     private static TagService sTagService;
-
+    private static NotificationService sNotificationService;
 
     public static GenieAsyncService getAsyncService() {
         if (sGenieAsyncService == null) {
@@ -63,5 +63,13 @@ public class GenieAsyncService {
         }
         return sTagService;
     }
+
+    public NotificationService getNotificationService() {
+        if (sNotificationService == null) {
+            sNotificationService = new NotificationService(sService);
+        }
+        return sNotificationService;
+    }
+
 
 }

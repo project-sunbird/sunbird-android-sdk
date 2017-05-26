@@ -69,7 +69,7 @@ public class DownloadProgressInfoTask extends AsyncTask<Void, Integer, Void> {
 
     @Override
     protected void onProgressUpdate(Integer... values) {
-        EventPublisher.postDownloadProgress(new DownloadProgress(mDownloadRequest.getIdentifier(), mDownloadRequest.getDownloadId(), values[0]));
+        EventPublisher.postDownloadProgress(new DownloadProgress(mDownloadRequest.getDownloadId(),mDownloadRequest.getIdentifier(), values[0]));
     }
 
 }

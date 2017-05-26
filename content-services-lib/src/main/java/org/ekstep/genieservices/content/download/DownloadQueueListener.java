@@ -44,7 +44,6 @@ public class DownloadQueueListener {
     @Subscribe
     public void onDownloadResponse(DownloadResponse downloadResponse) throws InterruptedException {
         Logger.i(TAG, "onDownloadResponse : " + downloadResponse.toString());
-
         DownloadQueueManager downloadQueueManager = new DownloadQueueManager(mAppContext.getKeyValueStore());
         DownloadService downloadService = new DownloadService(mAppContext);
         if (StringUtil.isNullOrEmpty(downloadResponse.getFilePath())) {  // Download failed
