@@ -17,8 +17,7 @@ public class DeviceInfo implements IDeviceInfo {
     public String getDeviceID() {
         String android_id = null;
         try {
-            android_id = Settings.Secure.getString(context.getContentResolver(),
-                    Settings.Secure.ANDROID_ID);
+            android_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
 
             return sha1(android_id);
         } catch (Exception e) {

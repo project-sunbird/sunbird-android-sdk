@@ -71,23 +71,6 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
         return response;
     }
 
-
-    private void logGEInteractInitiate(String stageId, String subType, InteractionType touchType) {
-        GEInteract geInteract = new GEInteract.Builder(new GameData(mAppContext.getGDataId(), mAppContext.getGDataVersionName())).
-                stageId(stageId).
-                subType(subType).
-                interActionType(touchType).build();
-        TelemetryLogger.log(geInteract);
-    }
-
-    private void logGEInteractSuccess(String stageId, String subType, InteractionType touchType, Map<String, Object> eks) {
-        GEInteract geInteract = new GEInteract.Builder(new GameData(mAppContext.getGDataId(), mAppContext.getGDataVersionName())).
-                stageId(stageId).
-                subType(subType).
-                interActionType(touchType).values(eks).build();
-        TelemetryLogger.log(geInteract);
-    }
-
     private String calculateByteCountInKB(long bytes) {
         try {
             int unit = 1024;

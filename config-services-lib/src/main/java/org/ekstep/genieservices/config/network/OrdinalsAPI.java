@@ -20,9 +20,9 @@ public class OrdinalsAPI extends BaseAPI {
     private static final CharSequence SERVICE_ENDPOINTS = "config";
 
     public OrdinalsAPI(AppContext appContext) {
-        super(appContext, String.format(Locale.US, "%s/%s", String.format(Locale.US, "%s/%s",
-                appContext.getParams().getBaseApiUrl() +
-                        ServiceConstants.API.LP_EXTENSION, SERVICE_ENDPOINTS), ENDPOINT), TAG);
+        super(appContext, String.format(Locale.US, "%s/%s",
+                String.format(Locale.US, appContext.getParams().getBaseApiUrl() + ServiceConstants.API.LP_EXTENSION, SERVICE_ENDPOINTS),
+                ENDPOINT), TAG);
     }
 
     @Override

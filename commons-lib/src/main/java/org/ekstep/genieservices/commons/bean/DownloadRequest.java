@@ -7,7 +7,7 @@ package org.ekstep.genieservices.commons.bean;
  */
 public class DownloadRequest {
 
-    private long downloadId;
+    private long downloadId=-1;
     private String identifier;
     private String downloadUrl;
     private String name;

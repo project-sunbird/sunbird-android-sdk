@@ -19,8 +19,7 @@ public abstract class ContentFeedbackEntry implements BaseColumns {
                 COLUMN_NAME_UID + DbConstants.TEXT_TYPE + " NOT NULL" + DbConstants.COMMA_SEP +
                 COLUMN_NAME_RATING + DbConstants.TEXT_TYPE + " NOT NULL" + DbConstants.COMMA_SEP +
                 COLUMN_NAME_COMMENTS + DbConstants.TEXT_TYPE + " NOT NULL" + DbConstants.COMMA_SEP +
-                COLUMN_NAME_CREATED_AT + DbConstants.INT_TYPE + DbConstants.COMMA_SEP +
-                " UNIQUE (" + COLUMN_NAME_UID + DbConstants.COMMA_SEP + COLUMN_NAME_CONTENT_ID + ") ON CONFLICT REPLACE" +
+                COLUMN_NAME_CREATED_AT + DbConstants.INT_TYPE +
                 " )";
     }
 

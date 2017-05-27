@@ -13,6 +13,7 @@
             <option value="$PROJECT_DIR$/config-services-lib" />
             <option value="$PROJECT_DIR$/content-services-lib" />
             <option value="$PROJECT_DIR$/genie-services" />
+            <option value="$PROJECT_DIR$/notification-services-lib" />
             <option value="$PROJECT_DIR$/partner-services-lib" />
             <option value="$PROJECT_DIR$/usermanagement-services-lib" />
           </set>

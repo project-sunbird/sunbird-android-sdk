@@ -11,9 +11,10 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Created by swayangjit on 8/5/17.
+ * Created on 8/5/17.
+ *
+ * @author swayangjit
  */
-
 public class TelemetrySyncAPI extends BaseAPI {
 
     private static final String TAG = TelemetrySyncAPI.class.getSimpleName();
@@ -21,10 +22,11 @@ public class TelemetrySyncAPI extends BaseAPI {
 
     private byte[] mData;
 
-    public TelemetrySyncAPI(AppContext appContext,byte[] data) {
-        super(appContext, String.format(Locale.US, "%s/telemetry", String.format(Locale.US,
-                appContext.getParams().getBaseApiUrl() + ServiceConstants.API.EP_EXTENSION, SERVICE_ENDPOINTS)), TAG);
-        mData=data;
+    public TelemetrySyncAPI(AppContext appContext, byte[] data) {
+        super(appContext, String.format(Locale.US, "%s/telemetry",
+                String.format(Locale.US, appContext.getParams().getBaseApiUrl() + ServiceConstants.API.EP_EXTENSION, SERVICE_ENDPOINTS)),
+                TAG);
+        mData = data;
     }
 
     @Override

@@ -1,11 +1,11 @@
 package org.ekstep.genieservices;
 
 /**
- * Created by swayangjit on 19/4/17.
+ * Created on 19/4/17.
+ *
+ * @author swayangjit
  */
-
 public interface ServiceConstants {
-    String NO_DATA_FOUND = "NO_DATA_FOUND";
     String SERVICE_ERROR = "SERVICE_ERROR";
     String INVALID_JSON = "invalid json";
     String UNABLE_TO_CREATE_ANONYMOUS_USER = "unable to create anonymous user";
@@ -13,7 +13,6 @@ public interface ServiceConstants {
     String FAILED_RESPONSE = "failed";
     String ERROR_DELETING_A_USER = "Error when deleting user profile";
 
-    int ACCESS_STATUS_VIEWED = 1;
     String INVALID_USER = "INVALID_USER";
     String NO_USER_WITH_SPECIFIED_ID = "There is no user with specified id exists";
     String VALIDATION_ERROR = "VALIDATION_ERROR";
@@ -29,11 +28,27 @@ public interface ServiceConstants {
     String NEVER_SYNCED = "NEVER";
     String SYNC_PROMPT = "SYNC_PROMPT";
 
+    interface FileExtension {
+        String CONTENT = "ecar";
+        String PROFILE = "epar";
+        String TELEMETRY = "gsa";
+        String APK = "apk";
+    }
+
     interface PreferenceKey {
         //Sync service pref keys
         String SYNC_CONFIG_SHARED_PREFERENCE_KEY = "syncConfig";
         String LAST_SYNC_TIME = "lastSyncTime";
         String SYNC_FILE_SIZE = "SYNC_FILE_SIZE";
+
+        //Download queue
+        String DOWNLOAD_QUEUE = "download_queue";
+
+        //Partner
+        String KEY_PARTNER_ID = "partnerid";
+        String KEY_ACTIVE_PARTNER_ID = "partner.activeid";
+        String SHARED_PREF_SESSION_KEY = "partnersessionid";
+        String SHARED_PREF_PARTNERSET_EPOCH = "partnerSET";
     }
 
     interface API {
@@ -82,6 +97,50 @@ public interface ServiceConstants {
         String DATA_NOT_FOUND_ERROR = "NO_DATA_FOUND";
         String VALIDATION_ERROR = "VALIDATION_ERROR";
         String DB_ERROR = "DB_ERROR";
+        String INVALID_PROFILE = "INVALID_PROFILE";
+        String PROFILE_NOT_FOUND = "PROFILE_NOT_FOUND";
+        String INVALID_USER = "INVALID_USER";
+
+        //Partner
+        String UNREGISTERED_PARTNER = "UNREGISTERED_PARTNER";
+        String CATASTROPHIC_FAILURE = "CATASTROPHIC_FAILURE";
+        String ENCRYPTION_FAILURE = "ENCRYPTION_FAILURE";
+        String MISSING_PARTNER_ID = "MISSING_PARTNER_ID";
+        String MISSING_PUBLIC_KEY = "MISSING_PUBLIC_KEY";
+        String INVALID_RSA_PUBLIC_KEY = "INVALID_RSA_PUBLIC_KEY";
+
+        //Content
+        String NO_DATA_FOUND = "NO_DATA_FOUND";
+        String INVALID_FILE = "INVALID_FILE";
+
+    }
+
+    interface ErrorMessage {
+        String UNABLE_TO_FIND_PROFILE = "unable to find profile";
+        String NO_USER_WITH_SPECIFIED_ID = "There is no user with specified id exists";
+    }
+
+    interface ContentAccessStatus {
+        int NOT_PLAYED = 0;
+        int VIEWED = 1;
+        int FULLY_PLAYED = 2;
+    }
+
+    interface ContentStatus {
+        String LIVE = "LIVE";
+        String DRAFT = "DRAFT";
+    }
+
+    interface GeTransferEvent {
+        String TRANSFER_DIRECTION_EXPORT = "EXPORT";
+        String TRANSFER_DIRECTION_IMPORT = "IMPORT";
+        String DATATYPE_TELEMETRY = "TELEMETRY";
+        String DATATYPE_CONTENT = "CONTENT";
+        String DATATYPE_EXPLODED_CONTENT = "EXPLODEDCONTENT";
+        String DATATYPE_PROFILE = "PROFILE";
+        String CONTENT_ITEMS_KEY = "contents";
+        String FILE_SIZE = "FILE_SIZE";
+        String FILE_TYPE = "FILE_TYPE";
     }
 
 }

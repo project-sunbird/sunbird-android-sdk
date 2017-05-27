@@ -2,6 +2,7 @@ package org.ekstep.genieservices.config.db.model;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.BaseColumns;
+import org.ekstep.genieservices.commons.db.contract.OrdinalsEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
@@ -9,7 +10,6 @@ import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.commons.db.contract.OrdinalsEntry;
 
 import java.util.Locale;
 
@@ -103,7 +103,7 @@ public class OrdinalsModel implements IReadable, IWritable, IUpdatable, ICleanab
     @Override
     public ContentValues getFieldsToUpdate() {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(OrdinalsEntry.COLUMN_NAME_ORDINAL_IDENTIFIER, mIdentifier);
+        contentValues.put(OrdinalsEntry.COLUMN_NAME_ORDINAL_JSON, mJson.getBytes());
         return contentValues;
     }
 
@@ -141,8 +141,7 @@ public class OrdinalsModel implements IReadable, IWritable, IUpdatable, ICleanab
 
     @Override
     public String filterForRead() {
-        String selectionCriteria = String.format(Locale.US, "where %s = '%s'", OrdinalsEntry.COLUMN_NAME_ORDINAL_IDENTIFIER, mIdentifier);
-        return selectionCriteria;
+        return String.format(Locale.US, "where %s = '%s'", OrdinalsEntry.COLUMN_NAME_ORDINAL_IDENTIFIER, mIdentifier);
     }
 
     @Override

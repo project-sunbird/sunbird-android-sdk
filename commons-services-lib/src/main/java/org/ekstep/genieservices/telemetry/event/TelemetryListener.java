@@ -11,9 +11,10 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.util.ThrowableFailureEvent;
 
 /**
- * Created by swayangjit on 9/5/17.
+ * Created on 9/5/17.
+ *
+ * @author swayangjit
  */
-
 public class TelemetryListener {
     private static TelemetryListener instance = null;
     private final String TAG = TelemetryListener.class.getSimpleName();

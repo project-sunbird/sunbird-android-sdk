@@ -9,16 +9,67 @@ import org.ekstep.genieservices.GenieService;
 public class GenieAsyncService {
 
     private static GenieService sService;
-    private static ConfigService mConfigService;
+    private static GenieAsyncService sGenieAsyncService;
+    private static ConfigService sConfigService;
+    private static SyncService sSyncService;
+    private static TelemetryService sTelemetryService;
+    private static UserService sUserService;
+    private static TagService sTagService;
+    private static NotificationService sNotificationService;
 
-    public void init(GenieService genieService) {
-        sService = genieService;
-    }
-
-    public static ConfigService getConfigService() {
-        if (mConfigService == null) {
-            mConfigService = new ConfigService(sService);
+    public static GenieAsyncService getAsyncService() {
+        if (sGenieAsyncService == null) {
+            sGenieAsyncService = new GenieAsyncService();
         }
-        return mConfigService;
+        return sGenieAsyncService;
     }
+
+    public static void init(GenieService genieService) {
+        sService = genieService;
+        sGenieAsyncService = new GenieAsyncService();
+    }
+
+    public ConfigService getConfigService() {
+        if (sConfigService == null) {
+            sConfigService = new ConfigService(sService);
+        }
+        return sConfigService;
+    }
+
+    public UserService getUserProfileService() {
+        if (sUserService == null) {
+            sUserService = new UserService(sService);
+        }
+        return sUserService;
+    }
+
+    public SyncService getSyncService() {
+        if (sSyncService == null) {
+            sSyncService = new SyncService(sService);
+        }
+        return sSyncService;
+    }
+
+    public TelemetryService getTelemetryService() {
+        if (sTelemetryService == null) {
+            sTelemetryService = new TelemetryService(sService);
+        }
+        return sTelemetryService;
+    }
+
+    public TagService getTagService() {
+        if (sTagService == null) {
+            sTagService = new TagService(sService);
+        }
+        return sTagService;
+    }
+
+    public NotificationService getNotificationService() {
+        if (sNotificationService == null) {
+            sNotificationService = new NotificationService(sService);
+        }
+        return sNotificationService;
+    }
+
+
 }
