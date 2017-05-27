@@ -13,6 +13,8 @@ public interface IDownloadService {
 
     void start();
 
+    void remove(long downloadId);
+
     void onDownloadComplete(DownloadResponse downloadResponse);
 
     void onDownloadFailed(DownloadResponse downloadResponse);

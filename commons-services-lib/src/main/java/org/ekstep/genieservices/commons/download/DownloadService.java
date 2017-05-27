@@ -47,7 +47,13 @@ public class DownloadService implements IDownloadService {
     }
 
     @Override
+    public void remove(long downloadId) {
+        mAppContext.getDownloadManager().cancel(downloadId);
+    }
+
+    @Override
     public void onDownloadComplete(DownloadResponse downloadResponse) {
+        mDownloadQueueManager.remove(downloadResponse.getDownloadId());
         start();
     }
 

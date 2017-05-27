@@ -55,8 +55,8 @@ public class DownloadFileReceiver extends BroadcastReceiver {
                         String filepath = cursor.getString(cursor.getColumnIndex(android.app.DownloadManager.COLUMN_LOCAL_URI));
                         downloadedFilePath = getRealPathFromURI(context, Uri.parse(filepath));
 
-                        EventPublisher.postDownloadResponse(new DownloadResponse(true, downloadId, null, downloadedFilePath, null));
                     }
+                    EventPublisher.postDownloadResponse(new DownloadResponse(true, downloadId, null, downloadedFilePath, null));
                     break;
 
 //                case android.app.DownloadManager.ERROR_INSUFFICIENT_SPACE:

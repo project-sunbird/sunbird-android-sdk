@@ -55,6 +55,7 @@ public class DownloadQueueListener {
         downloadResponse.setMimeType(downloadRequest.getMimeType());
         if (downloadResponse.getStatus()) {
             new ContentServiceImpl(mAppContext).importContent(downloadRequest.isChildContent(), downloadResponse.getFilePath());
+            mDownloadService.remove(downloadResponse.getDownloadId());
             mDownloadService.onDownloadComplete(downloadResponse);
         } else if (StringUtil.isNullOrEmpty(downloadResponse.getFilePath())) {
             mDownloadService.onDownloadFailed(downloadResponse);

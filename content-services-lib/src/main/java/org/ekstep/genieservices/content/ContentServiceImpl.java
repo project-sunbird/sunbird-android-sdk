@@ -514,9 +514,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                     .then(new EcarCleanUp())
                     .then(new AddGeTransferContentImportEvent());
             GenieResponse<Void> genieResponse = importContentSteps.execute(mAppContext, importContext);
-            if (genieResponse.getStatus()) {
-                EventPublisher.postImportSuccessfull(new ImportStatus(null));
-            }
+//            if (genieResponse.getStatus()) {
+//                EventPublisher.postImportSuccessfull(new ImportStatus(null));
+//            }
             return genieResponse;
         }
     }
