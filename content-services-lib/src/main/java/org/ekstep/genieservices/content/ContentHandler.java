@@ -751,72 +751,85 @@ public class ContentHandler {
         }
     }
 
-    public static List<Map<String, Object>> getSortedFacets(IConfigService configService, List<Map<String, Object>> facets) {
-        if (configService == null || facets == null) {
-            return facets;
+    public static List<ContentSearchFilter> getFilters(IConfigService configService, List<Map<String, Object>> facets, Map<String, Object> appliedFilterMap) {
+        List<ContentSearchFilter> filters = new ArrayList<>();
+
+        if (facets == null) {
+            return filters;
         }
 
-        GenieResponse<Map<String, Object>> ordinalsResponse = configService.getOrdinals();
-        if (ordinalsResponse.getStatus()) {
-
-            Map<String, Object> ordinalsMap = ordinalsResponse.getResult();
-
-            if (ordinalsMap != null) {
-                List<Map<String, Object>> sortedFacetList = new ArrayList<>();
-
-                for (Map<String, Object> facetMap : facets) {
-                    for (String nameKey : facetMap.keySet()) {
-                        if (nameKey.equals("name")) {
-                            String facetName = (String) facetMap.get(nameKey);
-
-                            String facetValuesString = GsonUtil.toJson(facetMap.get("values"));
-                            Type facetType = new TypeToken<List<Map<String, Object>>>() {
-                            }.getType();
-                            List<Map<String, Object>> facetValues = GsonUtil.getGson().fromJson(facetValuesString, facetType);
-
-                            if (ordinalsMap.containsKey(facetName)) {
-                                String dataString = GsonUtil.toJson(ordinalsMap.get(facetName));
-                                Type type = new TypeToken<List<String>>() {
-                                }.getType();
-                                List<String> facetsOrder = GsonUtil.getGson().fromJson(dataString, type);
-
-                                List<Map<String, Object>> valuesList = sortOrder(facetValues, facetsOrder);
-
-                                HashMap<String, Object> map = new HashMap<>();
-                                map.put("name", facetName);
-                                map.put("values", valuesList);
-
-                                sortedFacetList.add(map);
-                            }
-                            break;
-                        }
-                    }
-                }
-
-                return sortedFacetList;
+        Map<String, Object> ordinalsMap = null;
+        if (configService != null) {
+            GenieResponse<Map<String, Object>> ordinalsResponse = configService.getOrdinals();
+            if (ordinalsResponse.getStatus()) {
+                ordinalsMap = ordinalsResponse.getResult();
             }
         }
 
-        return facets;
-    }
+        for (Map<String, Object> facetMap : facets) {
+            ContentSearchFilter filter = new ContentSearchFilter();
+            String facetName = null;
+            if (facetMap.containsKey("name")) {
+                facetName = (String) facetMap.get("name");
+            }
 
-    private static List<Map<String, Object>> sortOrder(List<Map<String, Object>> facetValues, List<String> facetsOrder) {
-        Map<Integer, Map<String, Object>> map = new TreeMap<>();
+            List<Map<String, Object>> facetValues = null;
+            if (facetMap.containsKey("values")) {
+                facetValues = (List<Map<String, Object>>) facetMap.get("values");
+            }
 
-        for (Map<String, Object> value : facetValues) {
-            String name = (String) value.get("name");
-            int index = indexOf(facetsOrder, name);
-            map.put(index, value);
+            List<String> facetOrder = null;
+            if (ordinalsMap != null && ordinalsMap.containsKey(facetName)) {
+                facetOrder = (List<String>) ordinalsMap.get(facetName);
+            }
+
+            List<String> appliedFilter = null;
+            if (appliedFilterMap != null) {
+                appliedFilter = (List<String>) appliedFilterMap.get(facetName);
+            }
+
+            List<FilterValue> values = getSortedFilterValuesWithAppliedFilters(facetValues, facetOrder, appliedFilter);
+
+            if (!StringUtil.isNullOrEmpty(facetName)) {
+                filter.setName(facetName);
+                filter.setValues(values);
+
+                // Set the filter
+                filters.add(filter);
+            }
         }
 
-        List<Map<String, Object>> valuesList = new ArrayList<>(map.values());
+        return filters;
+    }
+
+    private static List<FilterValue> getSortedFilterValuesWithAppliedFilters(List<Map<String, Object>> facetValues, List<String> facetOrder, List<String> appliedFilter) {
+        Map<Integer, FilterValue> map = new TreeMap<>();
+
+        for (Map<String, Object> valueMap : facetValues) {
+            String name = (String) valueMap.get("name");
+            int index = indexOf(facetOrder, name);
+
+            boolean applied = false;
+            if (appliedFilter != null && appliedFilter.contains(name)) {
+                applied = true;
+            }
+
+            FilterValue filterValue = new FilterValue();
+            filterValue.setName(name);
+            filterValue.setApply(applied);
+            filterValue.setCount((Integer) valueMap.get("count"));
+
+            map.put(index, filterValue);
+        }
+
+        List<FilterValue> valuesList = new ArrayList<>(map.values());
         return valuesList;
     }
 
-    private static int indexOf(List<String> responseFacets, String key) {
+    private static int indexOf(List<String> facetsOrder, String key) {
         if (!StringUtil.isNullOrEmpty(key)) {
-            for (int i = 0; i < responseFacets.size(); i++) {
-                if (key.equalsIgnoreCase(responseFacets.get(i))) {
+            for (int i = 0; i < facetsOrder.size(); i++) {
+                if (key.equalsIgnoreCase(facetsOrder.get(i))) {
                     return i;
                 }
             }

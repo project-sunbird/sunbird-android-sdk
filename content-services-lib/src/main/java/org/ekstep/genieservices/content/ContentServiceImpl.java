@@ -16,7 +16,6 @@ import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportStatus;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.download.DownloadService;
 import org.ekstep.genieservices.commons.utils.FileUtil;
@@ -36,7 +35,6 @@ import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.network.ContentSearchAPI;
 import org.ekstep.genieservices.content.network.RecommendedContentAPI;
 import org.ekstep.genieservices.content.network.RelatedContentAPI;
-import org.ekstep.genieservices.eventbus.EventPublisher;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -240,9 +238,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 responseMessageId = (String) responseParams.get("resmsgid");
             }
 
-            List<Map<String, Object>> responseFacets = null;
+            List<Map<String, Object>> facets = null;
             if (result.containsKey("facets")) {
-                responseFacets = (List<Map<String, Object>>) result.get("facets");
+                facets = (List<Map<String, Object>>) result.get("facets");
             }
 
             List<Map<String, Object>> contentDataList = null;
@@ -263,9 +261,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             ContentSearchResult searchResult = new ContentSearchResult();
             searchResult.setId(id);
             searchResult.setResponseMessageId(responseMessageId);
-            // TODO: 5/26/2017  - Facets to Filter
-//            searchResult.setFacets(ContentHandler.getSortedFacets(configService, responseFacets));
-//            searchResult.setFilter();
+            searchResult.setFilter(ContentHandler.getFilters(configService, facets, (Map<String, Object>) requestMap.get("filters")));
             searchResult.setRequest(requestMap);
             searchResult.setContents(contents);
 
