@@ -14,7 +14,6 @@ public class LanguageUriHandlerFactory {
                                                 String selection, GenieService genieService) {
         return Arrays.asList(
                 new LanguageTraversalRuleUriHandler(AUTHORITY, context, selection, genieService),
-                new GetAllLanguagesUriHandler(AUTHORITY, context, selection, genieService),
                 new LanguageSearchUriHandler(AUTHORITY, context, selection, genieService)
         );
     }

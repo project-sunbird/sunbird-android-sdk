@@ -13,9 +13,9 @@ import org.ekstep.genieresolvers.user.UserService;
  * shriharsh
  */
 
-public class GenieServices {
+public class GenieSDK {
 
-    private static GenieServices sGenieServices;
+    private static GenieSDK sGenieSDK;
     private String appQualifier;
     private Context context;
     private UserService mUserService;
@@ -24,21 +24,21 @@ public class GenieServices {
     private LanguageService mLanguageService;
     private PartnerService mPartnerService;
 
-    private GenieServices(Context context, String appQualifier) {
+    private GenieSDK(Context context, String appQualifier) {
         this.context = context;
         this.appQualifier = appQualifier;
     }
 
-    public static GenieServices getGenieResolver() {
-        return sGenieServices;
+    public static GenieSDK getGenieSDK() {
+        return sGenieSDK;
     }
 
-    public static GenieServices init(Context context, String authorityName) {
+    public static GenieSDK init(Context context, String authorityName) {
 
-        if (sGenieServices == null) {
-            sGenieServices = new GenieServices(context, authorityName);
+        if (sGenieSDK == null) {
+            sGenieSDK = new GenieSDK(context, authorityName);
         }
-        return sGenieServices;
+        return sGenieSDK;
     }
 
     public UserService getUserService() {
