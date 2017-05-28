@@ -13,7 +13,7 @@
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/build/classes/main" />
     <output-test url="file://$MODULE_DIR$/build/classes/test" />
     <exclude-output />
@@ -32,5 +32,9 @@
     <orderEntry type="library" exported="" name="gson-2.8.0" level="project" />
     <orderEntry type="library" exported="" name="joda-time-2.8.2" level="project" />
     <orderEntry type="library" exported="" name="eventbus-3.0.0" level="project" />
+    <orderEntry type="library" exported="" name="usermanagement-services-lib.usermanagement-services-0.1.local" level="project" />
+    <orderEntry type="library" exported="" name="usermanagement-services-lib.usermanagement-services-0.1.local" level="project" />
+    <orderEntry type="library" exported="" name="usermanagement-services-lib.usermanagement-services-0.1.local" level="project" />
+    <orderEntry type="library" exported="" name="usermanagement-services-lib.usermanagement-services-0.1.local" level="project" />
   </component>
 </module>
