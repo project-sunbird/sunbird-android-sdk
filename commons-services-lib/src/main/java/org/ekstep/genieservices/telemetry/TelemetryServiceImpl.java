@@ -34,7 +34,7 @@ import java.util.Set;
 
 public class TelemetryServiceImpl extends BaseService implements ITelemetryService {
 
-    private static final String SERVICE_NAME = TelemetryServiceImpl.class.getSimpleName();
+    private static final String TAG = TelemetryServiceImpl.class.getSimpleName();
     private IUserService mUserService=null;
 
     public TelemetryServiceImpl(AppContext appContext, IUserService userService) {
@@ -44,19 +44,18 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
 
     @Override
     public GenieResponse<Void> saveTelemetry(String eventString) {
-        String errorMessage = "Not able to save event";
+        String methodName="saveTelemetry@TelemetryServiceImpl";
         HashMap params = new HashMap();
         params.put("Event", eventString);
-        params.put("logLevel", "3");
+        params.put("logLevel", "2");
 
         try {
             GenieResponse response = saveEvent(eventString);
-            saveEvent(TelemetryLogger.create(mAppContext, response, new HashMap(), SERVICE_NAME, "saveTelemetry@TelemetryServiceImpl", params).toString());
+            saveEvent(TelemetryLogger.create(mAppContext, response, new HashMap(), TAG, methodName, params).toString());
             return response;
         } catch (InvalidDataException e) {
-            String logMessage = "Event save failed" + e.toString();
-            GenieResponse response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.VALIDATION_ERROR, errorMessage, logMessage, Void.class);
-            saveEvent(TelemetryLogger.create(mAppContext, response, new HashMap(), SERVICE_NAME, "saveTelemetry@TelemetryServiceImpl", params).toString());
+            GenieResponse response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.VALIDATION_ERROR, ServiceConstants.ErrorMessage.UNABLE_TO_SAVE_EVENT, TAG, Void.class);
+            saveEvent(TelemetryLogger.create(mAppContext, response, new HashMap(), TAG, methodName, params).toString());
             return response;
         }
 
@@ -69,6 +68,9 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
 
     @Override
     public GenieResponse<TelemetryStat> getTelemetryStat() {
+        String methodName="getTelemetryStat@TelemetryServiceImpl";
+        HashMap params = new HashMap();
+        params.put("logLevel", "2");
 
         String telemetryEventCountQuery="select count(*) from telemetry";
         String processedTelemetryEventCountQuery="select sum(event_count) from processed_telemetry";
@@ -89,10 +91,10 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
 
         IKeyValueStore keyValueStore = mAppContext.getKeyValueStore();
         Long lastSyncTime = keyValueStore.getLong(ServiceConstants.PreferenceKey.LAST_SYNC_TIME, 0L);
-        GenieResponse<TelemetryStat> genieResponse=GenieResponseBuilder.getSuccessResponse("Telemetry stat retrieved successfully");
+        GenieResponse<TelemetryStat> genieResponse=GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         genieResponse.setResult(new TelemetryStat(unSyncedEventCount,lastSyncTime));
 
-        saveEvent(TelemetryLogger.create(mAppContext, genieResponse, new HashMap(), SERVICE_NAME, "getTelemetryStat@TelemetryServiceImpl", new HashMap()).toString());
+        saveEvent(TelemetryLogger.create(mAppContext, genieResponse, new HashMap(), TAG, methodName, params).toString());
 
         return genieResponse;
     }
@@ -103,7 +105,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         decorateEvent(event);
         event.save();
         EventPublisher.postTelemetryEvent(GsonUtil.fromMap(event.getEventMap(),Telemetry.class));
-        Logger.i(SERVICE_NAME, "Event saved successfully");
+        Logger.i(TAG, "Event saved successfully");
         return GenieResponseBuilder.getSuccessResponse("Event Saved Successfully", Void.class);
     }
 

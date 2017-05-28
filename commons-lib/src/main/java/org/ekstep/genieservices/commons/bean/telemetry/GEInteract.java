@@ -158,8 +158,8 @@ public class GEInteract extends Telemetry {
             return this;
         }
 
-        public Builder values(Map<String, Object> map) {
-            this.values.add(map);
+        public Builder values(List<Map<String, Object>> mapList) {
+            this.values.addAll(mapList);
             return this;
         }
 

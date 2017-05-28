@@ -4,7 +4,6 @@ import org.ekstep.genieservices.BaseService;
 import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.CommonConstants;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessCriteria;
@@ -66,43 +65,43 @@ public class UserServiceImpl extends BaseService implements IUserService {
      */
     @Override
     public GenieResponse<Profile> createUserProfile(Profile profile) {
+        String methodName = "createUserProfile@UserServiceImpl";
         HashMap params = new HashMap();
-        params.put("logLevel", CommonConstants.LOG_LEVEL);
+        params.put("logLevel", "2");
 
         GenieResponse<Profile> response;
         if (profile == null) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_PROFILE, "invalid profile", "createUserProfile@UserServiceImpl", Profile.class);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_PROFILE, ServiceConstants.ErrorMessage.INVALID_PROFILE, methodName, Profile.class);
             logGEError(response, "createUserProfile");
-            TelemetryLogger.logFailure(mAppContext, response, TAG, "createUserProfile@UserServiceImpl", params, "Unable to create profile");
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_CREATE_PROFILE);
             return response;
         } else if (profile != null && !profile.isValid()) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.VALIDATION_ERROR, profile.getErrors().toString(), "createUserProfile@UserServiceImpl", Profile.class);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.VALIDATION_ERROR, profile.getErrors().toString(), methodName, Profile.class);
             logGEError(response, "createUserProfile");
-            TelemetryLogger.logFailure(mAppContext, response, TAG, "createUserProfile@UserServiceImpl", params, "Unable to create profile");
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_CREATE_PROFILE);
             return response;
         } else {
             response = saveUserProfile(profile, mAppContext.getDBSession());
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+            return response;
         }
-
-        TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "createUserProfile@UserServiceImpl", params);
-
-        return response;
     }
 
     @Override
     public GenieResponse<List<Profile>> getAllUserProfile() {
+        String methodName = "getAllUserProfile@UserServiceImpl";
+        HashMap params = new HashMap();
+        params.put("logLevel", "1");
+        UserProfilesModel userProfilesModel = UserProfilesModel.find(mAppContext.getDBSession());
 
-        UserProfilesModel userProfilesModel=UserProfilesModel.find(mAppContext.getDBSession());
-
-        if(userProfilesModel==null){
+        if (userProfilesModel == null) {
             GenieResponse genieResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.DATA_NOT_FOUND_ERROR, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_PROFILE, TAG, Void.class);
-            TelemetryLogger.logFailure(mAppContext, genieResponse, TAG, "getAllUserProfile@UserServiceImpl", new HashMap(), "Unable to all profiles");
+            TelemetryLogger.logFailure(mAppContext, genieResponse, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_ALL_PROFILE);
             return genieResponse;
-        }
-        else{
+        } else {
             GenieResponse genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, List.class);
             genieResponse.setResult(userProfilesModel.getProfileList());
-            TelemetryLogger.logSuccess(mAppContext, genieResponse, new HashMap(), TAG, "getAllUserProfile@UserServiceImpl", new HashMap());
+            TelemetryLogger.logSuccess(mAppContext, genieResponse, TAG, methodName, params);
             return genieResponse;
         }
 
@@ -135,7 +134,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
                 return null;
             }
         });
-        GenieResponse<Profile> successResponse = GenieResponseBuilder.getSuccessResponse("", Profile.class);
+        GenieResponse<Profile> successResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         successResponse.setResult(GsonUtil.fromJson(profileModel.getProfile().toString(), Profile.class));
 
         return successResponse;
@@ -149,17 +148,21 @@ public class UserServiceImpl extends BaseService implements IUserService {
     @Override
     public GenieResponse<Profile> updateUserProfile(Profile profile) {
 
+        String methodName = "updateUserProfile@UserServiceImpl";
+        HashMap params = new HashMap();
+        params.put("logLevel", "2");
+
         if (profile == null || StringUtil.isNullOrEmpty(profile.getUid())) {
             GenieResponse<Profile> genieResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROFILE_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_PROFILE, TAG, Profile.class);
             logGEError(genieResponse, "updateUserProfile");
-            TelemetryLogger.logFailure(mAppContext, genieResponse, TAG, "updateUserProfile@UserServiceImpl", new HashMap(), "Unable to update profile");
+            TelemetryLogger.logFailure(mAppContext, genieResponse, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_UPDTAE_PROFILE);
             return genieResponse;
         }
 
         if (!profile.isValid()) {
             GenieResponse<Profile> genieResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.VALIDATION_ERROR, profile.getErrors().toString(), TAG, Profile.class);
             logGEError(genieResponse, "updateUserProfile");
-            TelemetryLogger.logFailure(mAppContext, genieResponse, TAG, "updateUserProfile@UserServiceImpl", new HashMap(), "Unable to update profile");
+            TelemetryLogger.logFailure(mAppContext, genieResponse, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_UPDTAE_PROFILE);
             return genieResponse;
 
         }
@@ -172,7 +175,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         GenieResponse<Profile> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Profile.class);
         response.setResult(profile);
 
-        TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "updateUserProfile@UserServiceImpl", new HashMap());
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
 
         return response;
 
@@ -186,8 +189,10 @@ public class UserServiceImpl extends BaseService implements IUserService {
     @Override
     public GenieResponse<Void> deleteUser(String uid) {
 
+        String methodName = "deleteUser@UserServiceImpl";
         HashMap params = new HashMap();
         params.put("uid", uid);
+        params.put("logLevel", "2");
 
         //get the current user id
         UserSessionModel userSession = UserSessionModel.findUserSession(mAppContext);
@@ -200,7 +205,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         final UserProfileModel userProfileModel = UserProfileModel.find(mAppContext.getDBSession(), uid);
         if (userProfileModel == null) {
             GenieResponse<Void> genieResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROFILE_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_PROFILE, TAG, Void.class);
-            TelemetryLogger.logFailure(mAppContext, genieResponse, TAG, "updateUserProfile@deleteUser", params, "Unable to delete profile");
+            TelemetryLogger.logFailure(mAppContext, genieResponse, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_DELETE_PROFILE);
             return genieResponse;
         } else {
             final UserModel userModel = UserModel.findByUserId(mAppContext.getDBSession(), uid);
@@ -224,7 +229,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
             });
 
             GenieResponse response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
-            TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "deleteUser@UserServiceImpl", params);
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
 
             return response;
         }
@@ -244,14 +249,18 @@ public class UserServiceImpl extends BaseService implements IUserService {
      */
     @Override
     public GenieResponse<String> setAnonymousUser() {
+        String methodName = "setAnonymousUser@UserServiceImpl";
+        HashMap params = new HashMap();
+        params.put("logLevel", "1");
+
         String uid = getAnonymousUser().getResult().getUid();
         setCurrentUser(uid);
         GenieResponse<String> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, String.class);
         response.setResult(uid);
         if (response.getStatus()) {
-            TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "setAnonymousUser@UserServiceImpl", new HashMap());
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         } else {
-            TelemetryLogger.logFailure(mAppContext, response, TAG, "setAnonymousUser@deleteUser", new HashMap(), "Unable to setAnonymous user");
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_SET_ANONYMOUS);
         }
         return response;
     }
@@ -261,6 +270,9 @@ public class UserServiceImpl extends BaseService implements IUserService {
      */
     @Override
     public GenieResponse<Profile> getAnonymousUser() {
+        String methodName = "getAnonymousUser@UserServiceImpl";
+        HashMap params = new HashMap();
+        params.put("logLevel", "1");
         String anonymousUserQuery = "select u.uid from users u left join profiles p on p.uid=u.uid where p.uid is null and u.uid is not null";
         CustomReaderModel customReaderModel = CustomReaderModel.find(mAppContext.getDBSession(), anonymousUserQuery);
 
@@ -276,9 +288,9 @@ public class UserServiceImpl extends BaseService implements IUserService {
         response.setResult(profile);
 
         if (response.getStatus()) {
-            TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "getAnonymousUser@UserServiceImpl", new HashMap());
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         } else {
-            TelemetryLogger.logFailure(mAppContext, response, TAG, "getAnonymousUser@UserServiceImpl", new HashMap(), "Unable to get anonymous user");
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_GET_ANONYMOUS);
         }
         return response;
     }
@@ -290,14 +302,16 @@ public class UserServiceImpl extends BaseService implements IUserService {
      */
     @Override
     public GenieResponse<Void> setCurrentUser(String uid) {
+        String methodName = "setCurrentUser@UserServiceImpl";
         HashMap params = new HashMap();
         params.put("uid", uid);
+        params.put("logLevel", "2");
 
         UserModel userModel = UserModel.findByUserId(mAppContext.getDBSession(), uid);
         if (userModel == null) {
             GenieResponse response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_USER, ServiceConstants.ErrorMessage.NO_USER_WITH_SPECIFIED_ID, TAG, Void.class);
             logGEError(response, "setCurrentUser");
-            TelemetryLogger.logFailure(mAppContext, response, TAG, "setCurrentUser@UserServiceImpl", params, "Unable to get anonymous user");
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_SET_CURRENT_USER);
             return response;
         }
 
@@ -320,7 +334,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         }
         GenieResponse response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
 
-        TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "setCurrentUser@UserServiceImpl", params);
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
 
 
         return response;
@@ -331,6 +345,11 @@ public class UserServiceImpl extends BaseService implements IUserService {
      */
     @Override
     public GenieResponse<Profile> getCurrentUser() {
+
+        String methodName = "getCurrentUser@UserServiceImpl";
+        HashMap params = new HashMap();
+        params.put("logLevel", "1");
+
         UserSessionModel userSessionModel = UserSessionModel.findUserSession(mAppContext);
 
         //This should not happen if the calling app has set an anonymous user during launch. If they have not, we will create and set an anonymous user as the current user.
@@ -346,10 +365,10 @@ public class UserServiceImpl extends BaseService implements IUserService {
         } else {
             profile = userProfileModel.getProfile();
         }
-        GenieResponse<Profile> response = GenieResponseBuilder.getSuccessResponse("", Profile.class);
+        GenieResponse<Profile> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(profile);
 
-        TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "getCurrentUser@UserServiceImpl", new HashMap());
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
 
 
         return response;
@@ -357,6 +376,10 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
     @Override
     public GenieResponse<UserSession> getCurrentUserSession() {
+
+        String methodName = "getCurrentUserSession@UserServiceImpl";
+        HashMap params = new HashMap();
+        params.put("logLevel", "1");
         UserSessionModel userSessionModel = UserSessionModel.findUserSession(mAppContext);
 
         //This should not happen if the calling app has set an anonymous user during launch. If they have not, we will create and set an anonymous user as the current user.
@@ -364,15 +387,20 @@ public class UserServiceImpl extends BaseService implements IUserService {
             setAnonymousUser();
             userSessionModel = UserSessionModel.findUserSession(mAppContext);
         }
-        GenieResponse<UserSession> response = GenieResponseBuilder.getSuccessResponse("");
+        GenieResponse<UserSession> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(userSessionModel.getUserSessionBean());
 
-        TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "getCurrentUserSession@UserServiceImpl", new HashMap());
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;
     }
 
     @Override
     public GenieResponse<List<ContentAccess>> getAllContentAccess(ContentAccessCriteria criteria) {
+
+        String methodName = "getAllContentAccess@UserServiceImpl";
+        HashMap params = new HashMap();
+        params.put("logLevel", "1");
+
         String isContentIdentifier = null;
         String isUid = null;
         String isContentType = null;
@@ -430,7 +458,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         GenieResponse<List<ContentAccess>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(contentAccessList);
 
-        TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "getAllContentAccess@UserServiceImpl", new HashMap());
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
 
 
         return response;
@@ -438,10 +466,19 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
     @Override
     public GenieResponse<Void> setLearnerState(String contentIdentifier, Map<String, Object> learnerState) {
+
+        String methodName = "setLearnerState@UserServiceImpl";
+        HashMap params = new HashMap();
+        params.put("contentIdentifier", contentIdentifier);
+        params.put("learnerState", learnerState);
+        params.put("logLevel", "2");
+
         UserSession userSession = getCurrentUserSession().getResult();
         String uid = userSession.getUid();
         if (StringUtil.isNullOrEmpty(uid)) {
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, "Failed to get the current user id.", TAG);
+            GenieResponse response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROFILE_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_PROFILE, TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_SET_CURRENT_USER);
+            return response;
         }
 
         ContentAccessModel contentAccessModel = ContentAccessModel.build(mAppContext.getDBSession(), uid, contentIdentifier, GsonUtil.toJson(learnerState));
@@ -454,7 +491,10 @@ public class UserServiceImpl extends BaseService implements IUserService {
             contentAccessModel.update();
         }
 
-        return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        GenieResponse genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        TelemetryLogger.logSuccess(mAppContext, genieResponse, TAG, methodName, params);
+
+        return genieResponse;
     }
 
 }
