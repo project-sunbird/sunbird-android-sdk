@@ -44,11 +44,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.TreeMap;
 
 import static java.lang.String.valueOf;
@@ -643,8 +645,7 @@ public class ContentHandler {
         addFiltersIfNotAvailable(filterMap, "contentType", Arrays.asList("Story", "Worksheet", "Collection", "Game", "TextBook"));
         addFiltersIfNotAvailable(filterMap, "status", Collections.singletonList("Live"));
 
-        // TODO: 5/26/2017 - Apply profile specific filter
-//        applyProfileFilter(userService, configService, criteria.isProfileFilter(), filter);
+        applyProfileFilter(userService, configService, criteria, filterMap);
 
 
         // TODO: 5/26/2017 - Apply partner specific filer
@@ -680,72 +681,69 @@ public class ContentHandler {
         }
     }
 
-    private static void applyProfileFilter(IUserService userService, IConfigService configService, boolean profileFilter, Map<String, String[]> filter) {
-        if (profileFilter && userService != null) {
+    private static void applyProfileFilter(IUserService userService, IConfigService configService, ContentSearchCriteria criteria, Map<String, Object> filterMap) {
+        if (criteria.isProfileFilter() && userService != null) {
             GenieResponse<Profile> profileResponse = userService.getCurrentUser();
             if (profileResponse.getStatus()) {
                 Profile currentProfile = profileResponse.getResult();
 
                 // Add age filter
-                applyFilter(configService, MasterDataType.AGEGROUP, String.valueOf(currentProfile.getAge()), filter);
+                applyFilter(configService, MasterDataType.AGEGROUP, String.valueOf(currentProfile.getAge()), filterMap);
 
                 // Add board filter
                 if (currentProfile.getBoard() != null) {
-                    applyFilter(configService, MasterDataType.BOARD, currentProfile.getBoard(), filter);
+                    applyFilter(configService, MasterDataType.BOARD, currentProfile.getBoard(), filterMap);
                 }
 
                 // Add medium filter
                 if (currentProfile.getMedium() != null) {
-                    applyFilter(configService, MasterDataType.MEDIUM, currentProfile.getMedium(), filter);
+                    applyFilter(configService, MasterDataType.MEDIUM, currentProfile.getMedium(), filterMap);
                 }
 
                 // Add standard filter
-                applyFilter(configService, MasterDataType.GRADELEVEL, String.valueOf(currentProfile.getStandard()), filter);
+                applyFilter(configService, MasterDataType.GRADELEVEL, String.valueOf(currentProfile.getStandard()), filterMap);
             }
         }
     }
 
-    private static void applyFilter(IConfigService configService, MasterDataType masterDataType, String propertyValue, Map<String, String[]> filter) {
+    private static void applyFilter(IConfigService configService, MasterDataType masterDataType, String propertyValue, Map<String, Object> filterMap) {
         try {
-
-            if (masterDataType == MasterDataType.AGEGROUP) {
-                masterDataType = MasterDataType.AGE;
-            }
-
-            MasterDataValues masterDataValues = null;
             if (configService != null) {
-                GenieResponse<MasterData> masterDataResponse = configService.getMasterData(masterDataType);
+                String property = masterDataType.getValue();
 
-                MasterData masterData = null;
-                if (masterDataResponse.getStatus()) {
-                    masterData = masterDataResponse.getResult();
+                if (masterDataType == MasterDataType.AGEGROUP) {
+                    masterDataType = MasterDataType.AGE;
                 }
 
-                for (MasterDataValues values : masterData.getValues()) {
-                    if (values.getValue().equals(propertyValue)) {
-                        masterDataValues = values;
-                        break;
+                GenieResponse<MasterData> masterDataResponse = configService.getMasterData(masterDataType);
+
+                if (masterDataResponse.getStatus()) {
+                    MasterData masterData = masterDataResponse.getResult();
+
+                    for (MasterDataValues values : masterData.getValues()) {
+                        if (values.getTelemetry().equals(propertyValue)) {
+                            Map<String, Object> searchMap = values.getSearch();
+                            Map filtersMap = (Map) searchMap.get("filters");
+                            Set termSet = new HashSet((List) filtersMap.get(property));
+
+                            if (filterMap.containsKey(property)) {
+                                if (filterMap.get(property) != null) {
+                                    Set set = new HashSet(Arrays.asList(filterMap.get(property)));
+                                    if (set != null && termSet != null) {
+                                        termSet.addAll(set);
+                                    }
+                                }
+                            }
+
+                            String[] strArr = new String[termSet.size()];
+                            termSet.toArray(strArr);
+                            filterMap.put(property, strArr);
+                            break;
+                        }
                     }
                 }
             }
-            // TODO: 5/26/2017 - Uncomment the following and implement with bean
-//            Map termMap = (Map) map.get(propertyValue);
-//
-//            String masterDataTypeValue = masterDataType.getValue();
-//
-//            Set termSet = new HashSet((List) termMap.get(masterDataTypeValue));
-//            if (filter.containsKey(masterDataTypeValue)) {
-//                if (filter.get(masterDataTypeValue) != null) {
-//                    Set set = new HashSet(Arrays.asList(filter.get(masterDataTypeValue)));
-//                    if (set != null && termSet != null) {
-//                        termSet.addAll(set);
-//                    }
-//                }
-//            }
-//
-//            String[] strArr = new String[termSet.size()];
-//            termSet.toArray(strArr);
-//            filter.put(masterDataTypeValue, strArr);
+
         } catch (Exception e) {
             Logger.e(TAG, "Failed to apply filter");
         }
