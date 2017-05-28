@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import org.ekstep.genieservices.commons.IValidate;
 import org.ekstep.genieservices.commons.bean.validator.DateValidator;
 import org.ekstep.genieservices.commons.bean.validator.StringValidator;
+import org.ekstep.genieservices.commons.utils.DateUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,7 +39,7 @@ public class Profile implements IValidate {
         this.handle = handle;
         this.avatar = avatar;
         this.language = language;
-        this.createdAt = new Date();
+        this.createdAt = DateUtil.now();
     }
 
     public Profile(String handle, String avatar, String language, int standard, String medium) {
@@ -47,7 +48,7 @@ public class Profile implements IValidate {
         this.language = language;
         this.standard = standard;
         this.medium = medium;
-        this.createdAt = new Date();
+        this.createdAt = DateUtil.now();
     }
 
     public String getUid() {

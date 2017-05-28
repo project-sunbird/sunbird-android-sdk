@@ -2,9 +2,9 @@ package org.ekstep.genieservices.commons.db.contract;
 
 import org.ekstep.genieservices.commons.db.BaseColumns;
 import org.ekstep.genieservices.commons.db.DbConstants;
+import org.ekstep.genieservices.commons.utils.DateUtil;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 public abstract class ProfileEntry implements BaseColumns {
@@ -63,7 +63,7 @@ public abstract class ProfileEntry implements BaseColumns {
     }
 
     public static String getUpdateCreatedAtEntry() {
-        return "UPDATE " + TABLE_NAME + " SET " + COLUMN_NAME_CREATED_AT + " = " + (new Date()).getTime() + ";";
+        return "UPDATE " + TABLE_NAME + " SET " + COLUMN_NAME_CREATED_AT + " = " + DateUtil.getEpochTime() + ";";
     }
 
 }

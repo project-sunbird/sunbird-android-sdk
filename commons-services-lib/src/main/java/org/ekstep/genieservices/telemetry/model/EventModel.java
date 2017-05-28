@@ -10,11 +10,11 @@ import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.exception.InvalidDataException;
+import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +72,7 @@ public class EventModel implements IWritable,IReadable {
         contentValues.clear();
         contentValues.put(TelemetryEntry.COLUMN_NAME_EVENT, GsonUtil.toJson(event));
         contentValues.put(TelemetryEntry.COLUMN_NAME_EVENT_TYPE, eventType.toUpperCase());
-        contentValues.put(TelemetryEntry.COLUMN_NAME_TIMESTAMP, new Date().getTime());
+        contentValues.put(TelemetryEntry.COLUMN_NAME_TIMESTAMP, DateUtil.getEpochTime());
         contentValues.put(TelemetryEntry.COLUMN_NAME_PRIORITY, priority.getPriority());
         return contentValues;
     }

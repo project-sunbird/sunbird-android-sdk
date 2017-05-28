@@ -5,6 +5,8 @@ import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.network.IHttpClient;
 
+import java.io.File;
+
 /**
  * Created on 14/4/17.
  *
@@ -19,20 +21,9 @@ public abstract class AppContext<C> {
     private String mGDataId;
     private String mGDataVersionName;
 
-    protected AppContext(C context, String appPackage, String key, String gDataId) {
+    protected AppContext(C context, String appPackage) {
         this.mContext = context;
         this.mAppPackage = appPackage;
-        this.mKey = key;
-        this.mGDataId = gDataId;
-        this.mGDataVersionName = "";
-    }
-
-    public String getGDataId() {
-        return mGDataId;
-    }
-
-    public String getGDataVersionName() {
-        return mGDataVersionName;
     }
 
     public C getContext() {
@@ -66,5 +57,9 @@ public abstract class AppContext<C> {
     public abstract IParams getParams();
 
     public abstract ILocationInfo getLocationInfo();
+
+    public abstract File getPrimaryFilesDir();
+
+    public abstract IDownloadManager getDownloadManager();
 
 }

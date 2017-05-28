@@ -27,12 +27,12 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
         this.dbSession = dbSession;
     }
 
-    public static UserProfileModel buildUserProfile(IDBSession dbSession, Profile profile) {
+    public static UserProfileModel build(IDBSession dbSession, Profile profile) {
         UserProfileModel profileModel = new UserProfileModel(dbSession, profile);
         return profileModel;
     }
 
-    public static UserProfileModel findUserProfile(IDBSession dbSession, String uid) {
+    public static UserProfileModel find(IDBSession dbSession, String uid) {
         Profile profile = new Profile(uid);
         UserProfileModel profileModel = new UserProfileModel(dbSession, profile);
         dbSession.read(profileModel);

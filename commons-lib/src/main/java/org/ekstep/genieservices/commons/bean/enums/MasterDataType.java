@@ -2,7 +2,6 @@ package org.ekstep.genieservices.commons.bean.enums;
 
 /**
  * MasterDataTypes
- *
  */
 public enum MasterDataType {
     SUBJECT("subject"),
@@ -10,7 +9,9 @@ public enum MasterDataType {
     BOARD("board"),
     AGE("age"),
     AGEGROUP("ageGroup"),
-    GRADELEVEL("gradeLevel");
+    GRADELEVEL("gradeLevel"),
+    CHANNEL("channel"),
+    AUDIENCE("audience");
 
     private final String value;
 

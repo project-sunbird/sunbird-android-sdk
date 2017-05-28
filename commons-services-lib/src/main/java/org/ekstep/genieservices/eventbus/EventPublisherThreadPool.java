@@ -6,12 +6,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Created by swayangjit on 26/4/17.
+ * Created on 26/4/17.
+ *
+ * @author swayangjit
  */
-
 public class EventPublisherThreadPool {
 
-    public static final int MAX_THREADS = Runtime.getRuntime().availableProcessors() * 2;
+    private static final int MAX_THREADS = Runtime.getRuntime().availableProcessors() * 2;
 
     private static volatile AsyncExecutor asyncExecutor;
 

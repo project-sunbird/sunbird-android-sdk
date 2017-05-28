@@ -8,9 +8,10 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Created by swayangjit on 23/4/17.
+ * Created on 23/4/17.
+ *
+ * @author swayangjit
  */
-
 public class ResourceBundleAPI extends BaseAPI {
 
     private static final String TAG = "service-RBAPI";
@@ -19,9 +20,9 @@ public class ResourceBundleAPI extends BaseAPI {
 
 
     public ResourceBundleAPI(AppContext appContext) {
-        super(appContext, String.format(Locale.US, "%s/%s", String.format(Locale.US, "%s/%s",
-                appContext.getParams().getBaseApiUrl()
-                        + ServiceConstants.API.LP_EXTENSION, SERVICE_ENDPOINTS), ENDPOINT), TAG);
+        super(appContext, String.format(Locale.US, "%s/%s",
+                String.format(Locale.US, appContext.getParams().getBaseApiUrl() + ServiceConstants.API.LP_EXTENSION, SERVICE_ENDPOINTS),
+                ENDPOINT), TAG);
     }
 
     @Override

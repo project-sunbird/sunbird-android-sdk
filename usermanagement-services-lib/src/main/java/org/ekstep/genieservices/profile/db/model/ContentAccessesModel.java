@@ -1,10 +1,10 @@
 package org.ekstep.genieservices.profile.db.model;
 
+import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,32 +30,24 @@ public class ContentAccessesModel implements IReadable, ICleanable {
     public static ContentAccessesModel find(IDBSession dbSession, String filter) {
         ContentAccessesModel contentAccessesModel = new ContentAccessesModel(dbSession, filter);
         dbSession.read(contentAccessesModel);
-        return contentAccessesModel;
+
+        if (contentAccessesModel.getContentAccessModelList() == null) {
+            return null;
+        } else {
+            return contentAccessesModel;
+        }
     }
 
     public static ContentAccessesModel findByUid(IDBSession dbSession, String uid) {
         String filter = String.format(Locale.US, " where %s = '%s' ", ContentAccessEntry.COLUMN_NAME_UID, uid);
-        ContentAccessesModel contentAccessesModel = new ContentAccessesModel(dbSession, filter);
 
-        dbSession.read(contentAccessesModel);
-
-        if (contentAccessesModel.getContentAccessModelList() == null) {
-            return null;
-        } else {
-            return contentAccessesModel;
-        }
+        return find(dbSession, filter);
     }
 
     public static ContentAccessesModel findByContentIdentifier(IDBSession dbSession, String identifier) {
-        String filter = String.format(Locale.US, " where %s = '%s' ", ContentAccessEntry.COLUMN_NAME_IDENTIFIER, identifier);
-        ContentAccessesModel contentAccessesModel = new ContentAccessesModel(dbSession, filter);
-        dbSession.read(contentAccessesModel);
+        String filter = String.format(Locale.US, " where %s = '%s' ", ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER, identifier);
 
-        if (contentAccessesModel.getContentAccessModelList() == null) {
-            return null;
-        } else {
-            return contentAccessesModel;
-        }
+        return find(dbSession, filter);
     }
 
     public Void delete() {
@@ -69,7 +61,7 @@ public class ContentAccessesModel implements IReadable, ICleanable {
             contentAccessModelList = new ArrayList<>();
 
             do {
-                ContentAccessModel contentAccess = ContentAccessModel.buildContentAccess(mDBSession);
+                ContentAccessModel contentAccess = ContentAccessModel.build();
 
                 contentAccess.readWithoutMoving(resultSet);
 
@@ -87,7 +79,7 @@ public class ContentAccessesModel implements IReadable, ICleanable {
 
     @Override
     public void clean() {
-
+        contentAccessModelList = null;
     }
 
     @Override

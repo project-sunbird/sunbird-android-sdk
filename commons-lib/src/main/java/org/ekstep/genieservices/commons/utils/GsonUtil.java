@@ -27,10 +27,10 @@ public class GsonUtil {
         return getGson().fromJson(json, classOfC);
     }
 
-    public static <T> T fromJson(String json, Class<T> type, String exceptionMessage){
+    public static <T> T fromJson(String json, Class<T> type, String exceptionMessage) {
         try {
             return getGson().fromJson(json, type);
-        }catch (JsonSyntaxException ex){
+        } catch (JsonSyntaxException ex) {
             throw new InvalidDataException(exceptionMessage);
         }
     }

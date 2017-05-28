@@ -1,9 +1,10 @@
 package org.ekstep.genieservices.commons.utils;
 
 /**
- * Created by swayangjit on 18/4/17.
+ * Created on 18/4/17.
+ *
+ * @author swayangjit
  */
-
 public class StringUtil {
 
     /**
@@ -18,13 +19,34 @@ public class StringUtil {
 
     /**
      * Returns a string containing the tokens joined by delimiters.
+     *
      * @param tokens an array objects to be joined. Strings will be formed from
-     *     the objects by calling object.toString().
+     *               the objects by calling object.toString().
+     */
+    public static String join(CharSequence delimiter, Object[] tokens) {
+        StringBuilder sb = new StringBuilder();
+        boolean firstTime = true;
+        for (Object token : tokens) {
+            if (firstTime) {
+                firstTime = false;
+            } else {
+                sb.append(delimiter);
+            }
+            sb.append(token);
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Returns a string containing the tokens joined by delimiters.
+     *
+     * @param tokens an array objects to be joined. Strings will be formed from
+     *               the objects by calling object.toString().
      */
     public static String join(CharSequence delimiter, Iterable tokens) {
         StringBuilder sb = new StringBuilder();
         boolean firstTime = true;
-        for (Object token: tokens) {
+        for (Object token : tokens) {
             if (firstTime) {
                 firstTime = false;
             } else {

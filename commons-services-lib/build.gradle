@@ -5,5 +5,8 @@ dependencies {
     compile 'org.greenrobot:eventbus:3.0.0'
 }
 
+def versionName=rootProject.ext.versionName
+jar.archiveName "commons-services-"+versionName+".jar"
+
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"

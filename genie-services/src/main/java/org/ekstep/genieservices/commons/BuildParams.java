@@ -1,6 +1,7 @@
 package org.ekstep.genieservices.commons;
 
 import org.ekstep.genieservices.Constants;
+import org.ekstep.genieservices.commons.bean.enums.LogLevel;
 import org.ekstep.genieservices.utils.BuildConfigUtil;
 
 /**
@@ -15,6 +16,7 @@ public class BuildParams implements IParams {
     private String password;
     private String versionName;
     private String gId;
+    private int logLevel;
 
     public BuildParams(String packageName) {
         baseApiUrl = BuildConfigUtil.getBuildConfigValue(packageName, Constants.Params.API_BASE_URL);
@@ -22,6 +24,8 @@ public class BuildParams implements IParams {
         password = BuildConfigUtil.getBuildConfigValue(packageName, Constants.Params.API_PASS);
         versionName = BuildConfigUtil.getBuildConfigValue(packageName, Constants.Params.VERSION_NAME);
         gId = BuildConfigUtil.getBuildConfigValue(packageName, Constants.Params.GID);
+        logLevel=LogLevel.getLogLevel(BuildConfigUtil.getBuildConfigValue(packageName, Constants.Params.LOGLEVEL)).getLevel();
+
     }
 
     @Override
@@ -47,5 +51,10 @@ public class BuildParams implements IParams {
     @Override
     public String getGid() {
         return gId;
+    }
+
+    @Override
+    public int getLogLevel() {
+        return logLevel;
     }
 }

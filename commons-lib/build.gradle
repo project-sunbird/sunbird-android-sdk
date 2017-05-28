@@ -5,5 +5,8 @@ dependencies {
     compile 'joda-time:joda-time:2.8.2'
 }
 
+def versionName=rootProject.ext.versionName
+jar.archiveName "commons-"+versionName+".jar"
+
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
