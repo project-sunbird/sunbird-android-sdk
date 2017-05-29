@@ -14,6 +14,7 @@ public class ContentUriHandlerFactory {
                                                 String selection, String[] selectionArgs, GenieService genieService) {
         return Arrays.asList(
                 new ContentUriHandler(AUTHORITY, selectionArgs, genieService),
+                new AllContentsUriHandler(AUTHORITY, selectionArgs, genieService),
                 new FeedbackUriHandler(AUTHORITY,context, selection,selectionArgs, genieService),
                 new RelatedContentUriHandler(AUTHORITY,context,selection,selectionArgs, genieService)
         );

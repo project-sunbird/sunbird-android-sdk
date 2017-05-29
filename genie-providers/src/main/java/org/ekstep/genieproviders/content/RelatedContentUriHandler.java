@@ -50,9 +50,7 @@ public class RelatedContentUriHandler implements IUriHandler {
         MatrixCursor cursor = null;
         if (genieService != null && selectionArgs[0] != null) {
             cursor = getMatrixCursor();
-            Type type = new TypeToken<List<String>>() {
-            }.getType();
-
+            Type type = new TypeToken<List<String>>() {}.getType();
             List<String> contentIdentifiers = GsonUtil.getGson().fromJson(selectionArgs[0], type);
 
             GenieResponse genieResponse = null;

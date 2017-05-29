@@ -1,7 +1,6 @@
-package org.ekstep.genieproviders.language;
+package org.ekstep.genieproviders.content;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
@@ -17,25 +16,23 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 
 import java.util.Locale;
 
-public class LanguageTraversalRuleUriHandler implements IUriHandler {
+public class AllContentsUriHandler implements IUriHandler {
     private String authority;
-    private Context context;
-    private String selection;
+    private String[] contentIdentifier;
     private GenieService genieService;
 
-    public LanguageTraversalRuleUriHandler(String authority, Context context,
-                                           String queryString, GenieService genieService) {
+    public AllContentsUriHandler(String authority, String[] contentIdentifier, GenieService genieService) {
         this.authority = authority;
-        this.context = context;
-        this.selection = queryString;
+        this.contentIdentifier = contentIdentifier;
         this.genieService = genieService;
     }
 
     @Override
     public Cursor process() {
-        MatrixCursor cursor = getMatrixCursor();
+        MatrixCursor cursor = null;
         if (genieService != null) {
-            GenieResponse genieResponse = genieService.getLanguageService().getLanguageTraversalRule(selection);
+            cursor = getMatrixCursor();
+            GenieResponse genieResponse = genieService.getContentService().getAllLocalContent(null);
 
             if (genieResponse != null) {
                 cursor.addRow(new String[]{new Gson().toJson(genieResponse)});
@@ -49,8 +46,7 @@ public class LanguageTraversalRuleUriHandler implements IUriHandler {
 
     @NonNull
     protected GenieResponse getErrorResponse(MatrixCursor cursor) {
-        GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(Constants.NETWORK_ERROR,
-                Constants.NO_INTERNET_CONNECTIVITY_MESSAGE, "Failed");
+        GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(Constants.PROCESSING_ERROR, "Could not find the content", "Failed");
         cursor.addRow(new String[]{new Gson().toJson(errorResponse)});
         return errorResponse;
     }
@@ -62,13 +58,12 @@ public class LanguageTraversalRuleUriHandler implements IUriHandler {
 
     @Override
     public boolean canProcess(Uri uri) {
-        String urlPath = String.format(Locale.US, "content://%s/traversalrule", authority);
-        return uri != null && urlPath.equals(uri.toString());
+        String contentUriWithSlash = String.format(Locale.US, "content://%s/list", authority);
+        return uri != null && (contentUriWithSlash.equals(uri.toString()));
     }
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         return null;
     }
-
 }
