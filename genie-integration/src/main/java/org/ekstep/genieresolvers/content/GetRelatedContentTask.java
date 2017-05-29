@@ -7,10 +7,8 @@ import android.net.Uri;
 import org.ekstep.genieresolvers.BaseTask;
 import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -22,9 +20,9 @@ public class GetRelatedContentTask extends BaseTask {
 
     private String userId;
     private String appQualifier;
-    private List<HashMap<String, Object>> contentIdentifiers;
+    private List<String> contentIdentifiers;
 
-    public GetRelatedContentTask(Context context, String appQualifier, List<HashMap<String, Object>> contentIdentifiers, String userId) {
+    public GetRelatedContentTask(Context context, String appQualifier, List<String> contentIdentifiers, String userId) {
         super(context);
         this.appQualifier = appQualifier;
         this.contentIdentifiers = contentIdentifiers;
@@ -38,8 +36,7 @@ public class GetRelatedContentTask extends BaseTask {
 
     @Override
     protected GenieResponse execute() {
-        RelatedContentRequest request = new RelatedContentRequest(userId, contentIdentifiers);
-        String requestData = GsonUtil.toJson(request);
+        String requestData = GsonUtil.toJson(contentIdentifiers);
         Cursor cursor = contentResolver.query(getUri(), null, requestData, null, null);
         if (cursor == null || cursor.getCount() == 0) {
             String logMessage = "Couldn't get the related content data.";

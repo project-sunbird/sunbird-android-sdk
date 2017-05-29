@@ -16,6 +16,7 @@ import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.download.DownloadService;
 import org.ekstep.genieservices.commons.utils.FileUtil;
@@ -325,7 +326,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<ContentSearchResult> getRelatedContent(String contentIdentifier) {
+    public GenieResponse<RelatedContentResult> getRelatedContent(String contentIdentifier) {
         // TODO: 5/18/2017 - Telemetry
 //        HashMap params = new HashMap();
 //        params.put("uid", uid);
@@ -333,7 +334,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 //        params.put("mode", getNetworkMode());
 //        String method = "getRelatedContent@ContentServiceImpl";
 
-        GenieResponse<ContentSearchResult> response;
+        GenieResponse<RelatedContentResult> response;
         RelatedContentAPI relatedContentAPI = new RelatedContentAPI(mAppContext, ContentHandler.getRelatedContentRequest(userService, contentIdentifier, mAppContext.getDeviceInfo().getDeviceID()));
         GenieResponse apiResponse = relatedContentAPI.post();
         if (apiResponse.getStatus()) {
@@ -370,13 +371,13 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 }
             }
 
-            ContentSearchResult searchResult = new ContentSearchResult();
-            searchResult.setId(id);
-            searchResult.setResponseMessageId(responseMessageId);
-            searchResult.setContents(contents);
+            RelatedContentResult relatedContentResult = new RelatedContentResult();
+            relatedContentResult.setId(id);
+            relatedContentResult.setResponseMessageId(responseMessageId);
+            relatedContentResult.setRelatedContents(contents);
 
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-            response.setResult(searchResult);
+            response.setResult(relatedContentResult);
             return response;
         }
 

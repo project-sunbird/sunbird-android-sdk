@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
+import com.google.gson.Gson;
+
 import org.ekstep.genieresolvers.BaseTask;
 import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -34,38 +36,26 @@ public class GetContentTask extends BaseTask {
             String logMessage = String.format("No response for content id:%s", contentId);
             return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), logMessage);
         }
-        Map<String, Object> getContent = getPath(cursor);
-        GenieResponse response = getSuccessResponse(Constants.SUCCESSFUL);
-        response.setResult(getContent);
-        return response;
+        GenieResponse genieResponse = getResponse(cursor);
+        return genieResponse;
     }
 
-    private Map<String, Object> getPath(Cursor cursor) {
-        HashMap<String, Object> content;
-        cursor.moveToFirst();
-        do {
-            content = readContent(cursor);
-        } while (cursor.moveToNext());
-        cursor.close();
-        return content;
-    }
-
-    private HashMap<String, Object> readContent(Cursor cursor) {
-        HashMap<String, Object> content = new HashMap<>();
-        content.put("identifier", cursor.getString(1));
-        String serverData = cursor.getString(2);
-        HashMap serverJson = GsonUtil.fromJson(serverData, HashMap.class);
-        String localData = cursor.getString(3);
-        boolean hasLocalData = localData != null && !localData.isEmpty();
-        if (hasLocalData) {
-            HashMap localJson = GsonUtil.fromJson(localData, HashMap.class);
-            content.put("localData", localJson);
+    private GenieResponse<String> getResponse(Cursor cursor) {
+        GenieResponse<String> mapData = null;
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                mapData = readCursor(cursor);
+            } while (cursor.moveToNext());
+            cursor.close();
         }
-        content.put("serverData", serverJson);
-        content.put("mimeType", cursor.getString(4));
-        content.put("path", cursor.getString(5));
-        content.put("isAvailable", hasLocalData);
-        return content;
+        return mapData;
+    }
+
+    private GenieResponse<String> readCursor(Cursor cursor) {
+        Gson gson = new Gson();
+        String serverData = cursor.getString(0);
+        GenieResponse<String> response = gson.fromJson(serverData, GenieResponse.class);
+        return response;
     }
 
     @Override

@@ -34,7 +34,7 @@ public class ContentService extends BaseService{
         createAndExecuteTask(responseHandler, getContentsTask);
     }
 
-    public void getRelatedContent(List<HashMap<String, Object>> contentIdentifiers, String userId, IResponseHandler responseHandler) {
+    public void getRelatedContent(List<String> contentIdentifiers, String userId, IResponseHandler responseHandler) {
         GetRelatedContentTask getRelatedContentTask = new GetRelatedContentTask(context, appQualifier, contentIdentifiers, userId);
         createAndExecuteTask(responseHandler, getRelatedContentTask);
     }

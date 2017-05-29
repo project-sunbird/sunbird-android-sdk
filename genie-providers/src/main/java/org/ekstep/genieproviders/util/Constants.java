@@ -6,6 +6,7 @@ package org.ekstep.genieproviders.util;
  */
 
 public interface Constants {
+    String PROCESSING_ERROR = "PROCESSING_ERROR";
     String NETWORK_ERROR = "NETWORK_ERROR";
     String NO_INTERNET_CONNECTIVITY_MESSAGE = "no internet connectivity available";
     String PARTNER_CURSOR_KEY = "partner_cursor_key";

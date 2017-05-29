@@ -35,6 +35,6 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':commons-lib')
     compile project(':commons-services-lib')
-    compile(name:'genie-services-production-debug',ext:'aar')
+    compile(name:'genie-services-0.1.local',ext:'aar')
     compile 'com.android.support:appcompat-v7:25.3.1'
 }

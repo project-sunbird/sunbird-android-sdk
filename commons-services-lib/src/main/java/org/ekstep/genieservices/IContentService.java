@@ -5,6 +5,7 @@ import org.ekstep.genieservices.commons.bean.ContentCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 
 import java.util.List;
 
@@ -132,7 +133,7 @@ public interface IContentService {
      * @param contentIdentifier
      * @return
      */
-    GenieResponse<ContentSearchResult> getRelatedContent(String contentIdentifier);
+    GenieResponse<RelatedContentResult> getRelatedContent(String contentIdentifier);
 
     /**
      * This api is used to get all the next {@link List<Content>} based on the hierarchy of {@link List<String>} identifiers passed
