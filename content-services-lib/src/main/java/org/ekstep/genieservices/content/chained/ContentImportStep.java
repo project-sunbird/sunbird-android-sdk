@@ -24,18 +24,8 @@ public class ContentImportStep {
                 if (nextLink != null) {
                     return nextLink.execute(appContext, importContext);
                 } else {
-                    return breakChain();
+                    return GenieResponseBuilder.getErrorResponse(ContentConstants.IMPORT_FAILED, "Import content failed", TAG);
                 }
-            }
-
-            @Override
-            public Void postExecute() {
-                return null;
-            }
-
-            @Override
-            public GenieResponse<Void> breakChain() {
-                return GenieResponseBuilder.getErrorResponse(ContentConstants.IMPORT_FAILED, "Import content failed", TAG);
             }
 
             @Override

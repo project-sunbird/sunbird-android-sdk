@@ -2,6 +2,7 @@ package org.ekstep.genieservices.content.chained;
 
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.utils.Decompress;
@@ -244,18 +245,8 @@ public class ExtractPayloads implements IChainable {
         if (nextLink != null) {
             return nextLink.execute(appContext, importContext);
         } else {
-            return breakChain();
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, "Import failed.", TAG);
         }
-    }
-
-    @Override
-    public Void postExecute() {
-        return null;
-    }
-
-    @Override
-    public GenieResponse<Void> breakChain() {
-        return null;
     }
 
     @Override

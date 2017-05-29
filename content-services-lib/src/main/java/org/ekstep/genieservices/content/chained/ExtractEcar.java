@@ -28,18 +28,8 @@ public class ExtractEcar implements IChainable {
             importContext.getMetadata().put(ServiceConstants.GeTransferEvent.FILE_SIZE, importContext.getEcarFile().length());
             return nextLink.execute(appContext, importContext);
         } else {
-            return breakChain();
+            return GenieResponseBuilder.getErrorResponse(ContentConstants.IMPORT_FAILED, "Import content failed while extracting ecar.", TAG);
         }
-    }
-
-    @Override
-    public Void postExecute() {
-        return null;
-    }
-
-    @Override
-    public GenieResponse<Void> breakChain() {
-        return GenieResponseBuilder.getErrorResponse(ContentConstants.IMPORT_FAILED, "Import content failed while extracting ecar.", TAG);
     }
 
     @Override
