@@ -6,9 +6,13 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
+import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.telemetry.GEFeedback;
 import org.ekstep.genieservices.commons.utils.StringUtil;
+import org.ekstep.genieservices.content.bean.enums.GEFeedbackContextType;
 import org.ekstep.genieservices.content.db.model.ContentFeedbackModel;
+import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 /**
  * This is the implementation of the interface {@link IContentFeedbackService}
@@ -17,12 +21,16 @@ public class ContentFeedbackServiceImpl extends BaseService implements IContentF
 
     private static final String TAG = ContentFeedbackServiceImpl.class.getSimpleName();
 
+    private GameData mGameData;
+
     public ContentFeedbackServiceImpl(AppContext appContext) {
         super(appContext);
+
+        mGameData = new GameData(mAppContext.getParams().getGid(), mAppContext.getParams().getVersionName());
     }
 
     @Override
-    public GenieResponse<Void> saveFeedback(String uid, String contentIdentifier, String rating, String comments) {
+    public GenieResponse<Void> sendFeedback(String uid, String contentIdentifier, float rating, String comments) {
         if (StringUtil.isNullOrEmpty(contentIdentifier)) {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.VALIDATION_ERROR, ServiceConstants.ErrorMessage.MANDATORY_FIELD_CONTENT_IDENTIFIER, TAG);
         }
@@ -31,9 +39,10 @@ public class ContentFeedbackServiceImpl extends BaseService implements IContentF
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.VALIDATION_ERROR, ServiceConstants.ErrorMessage.MANDATORY_FIELD_UID, TAG);
         }
 
-        // TODO: 5/29/2017 - Save feedback telemetry event here.
+        // TODO: 5/29/2017 - Do we get the stageId as parameter in sendFeedback API.
+        saveContentFeedbackEvent(contentIdentifier, rating, comments, null);
 
-        ContentFeedbackModel contentFeedbackModel = ContentFeedbackModel.build(mAppContext.getDBSession(), uid, contentIdentifier, rating, comments);
+        ContentFeedbackModel contentFeedbackModel = ContentFeedbackModel.build(mAppContext.getDBSession(), uid, contentIdentifier, String.valueOf(rating), comments);
         ContentFeedbackModel contentFeedbackModelInDB = ContentFeedbackModel.find(mAppContext.getDBSession(), uid, contentIdentifier);
         if (contentFeedbackModelInDB == null) {
             contentFeedbackModel.save();
@@ -42,6 +51,11 @@ public class ContentFeedbackServiceImpl extends BaseService implements IContentF
         }
 
         return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+    }
+
+    private void saveContentFeedbackEvent(String contentId, float rating, String comments, String stageId) {
+        GEFeedback geFeedback = new GEFeedback(mGameData, "RATING", contentId, rating, comments, GEFeedbackContextType.CONTENT.getValue(), stageId);
+        TelemetryLogger.log(geFeedback);
     }
 
     @Override

@@ -1,7 +1,5 @@
 package org.ekstep.genieservices.content.chained;
 
-import com.google.gson.reflect.TypeToken;
-
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -12,13 +10,12 @@ import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.ContentConstants;
+import org.ekstep.genieservices.content.ContentHandler;
 import org.ekstep.genieservices.content.bean.ImportContext;
 import org.ekstep.genieservices.content.db.model.ContentModel;
-import org.ekstep.genieservices.content.ContentHandler;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,9 +42,6 @@ public class ExtractPayloads implements IChainable {
         File payloadDestination = null;
         ContentModel newContentModel, oldContentModel;
 
-        Type type = new TypeToken<List<HashMap<String, Object>>>() {
-        }.getType();
-
         for (HashMap<String, Object> item : importContext.getItems()) {
             identifier = (String) item.get("identifier");
             newContentCompatibilityLevel = (item.get(ContentModel.KEY_COMPATIBILITY_LEVEL) != null) ? (Double) item.get(ContentModel.KEY_COMPATIBILITY_LEVEL) : ContentHandler.defaultCompatibilityLevel;
@@ -64,7 +58,7 @@ public class ExtractPayloads implements IChainable {
             String mimeType = (String) item.get("mimeType");
 
             String preRequisitesString = GsonUtil.toJson(item.get("pre_requisites"));
-            List<HashMap> preRequisites = GsonUtil.getGson().fromJson(preRequisitesString, type);
+            List<HashMap<String, Object>> preRequisites = (List<HashMap<String, Object>>) item.get("pre_requisites");
 
             //skip the content if already imported on the same version
             boolean isSkip = false;

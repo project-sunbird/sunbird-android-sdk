@@ -8,16 +8,26 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
  */
 public interface IContentFeedbackService {
 
-    GenieResponse<Void> saveFeedback(String uid, String contentIdentifier, String rating, String comments);
+    /**
+     * This api is used to save the feedback about content.
+     *
+     * @param uid               User id.
+     * @param contentIdentifier Content identifier
+     * @param rating            Rating provided by user
+     * @param comments          Comments provided by user
+     * @return On failing to fetch the data, the response will return status as FALSE with the following error.
+     */
+    GenieResponse<Void> sendFeedback(String uid, String contentIdentifier, float rating, String comments);
 
     /**
      * This api is used to get the feedback about a content.
      * <p>
-     * <p>Response status always be True, with result type as {@link ContentFeedback}, if content has any feedback then the result will not be null,
-     * else it will be null
+     * <p>On successful fetching the data, the response will return status as TRUE and with result type as {@link ContentFeedback}, if content has any feedback then the result will not be null,
+     * <p>
+     * On failing to fetch the data, the response will return status as FALSE with the following error.
      *
-     * @param uid
-     * @param contentIdentifier
+     * @param uid               User id
+     * @param contentIdentifier Content identifier
      * @return {@link GenieResponse<ContentFeedback>}
      */
     GenieResponse<ContentFeedback> getFeedback(String uid, String contentIdentifier);
