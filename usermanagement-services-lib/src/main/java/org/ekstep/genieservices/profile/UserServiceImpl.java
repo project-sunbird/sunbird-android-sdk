@@ -367,7 +367,6 @@ public class UserServiceImpl extends BaseService implements IUserService {
         GenieResponse<UserSession> response = GenieResponseBuilder.getSuccessResponse("");
         response.setResult(userSessionModel.getUserSessionBean());
 
-        TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "getCurrentUserSession@UserServiceImpl", new HashMap());
         return response;
     }
 
