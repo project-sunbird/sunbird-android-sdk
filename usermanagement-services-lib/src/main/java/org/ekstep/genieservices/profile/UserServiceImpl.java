@@ -275,11 +275,11 @@ public class UserServiceImpl extends BaseService implements IUserService {
         GenieResponse response = GenieResponseBuilder.getSuccessResponse("", Profile.class);
         response.setResult(profile);
 
-        if (response.getStatus()) {
-            TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "getAnonymousUser@UserServiceImpl", new HashMap());
-        } else {
-            TelemetryLogger.logFailure(mAppContext, response, TAG, "getAnonymousUser@UserServiceImpl", new HashMap(), "Unable to get anonymous user");
-        }
+//        if (response.getStatus()) {
+//            TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "getAnonymousUser@UserServiceImpl", new HashMap());
+//        } else {
+//            TelemetryLogger.logFailure(mAppContext, response, TAG, "getAnonymousUser@UserServiceImpl", new HashMap(), "Unable to get anonymous user");
+//        }
         return response;
     }
 
