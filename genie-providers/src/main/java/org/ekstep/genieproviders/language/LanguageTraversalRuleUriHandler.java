@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import com.google.gson.Gson;
 
 import org.ekstep.genieproviders.IUriHandler;
+import org.ekstep.genieproviders.util.Constants;
 import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
@@ -50,8 +51,8 @@ public class LanguageTraversalRuleUriHandler implements IUriHandler {
 
     @NonNull
     protected GenieResponse getErrorResponse(MatrixCursor cursor) {
-        GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.ProviderResolver.NETWORK_ERROR,
-                ServiceConstants.ProviderResolver.NO_INTERNET_CONNECTIVITY_MESSAGE, "Failed");
+        GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(Constants.NETWORK_ERROR,
+                Constants.NO_INTERNET_CONNECTIVITY_MESSAGE, "Failed");
         cursor.addRow(new String[]{new Gson().toJson(errorResponse)});
         return errorResponse;
     }

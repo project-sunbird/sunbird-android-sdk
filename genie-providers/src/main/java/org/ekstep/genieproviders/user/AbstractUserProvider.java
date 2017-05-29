@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 
 import org.ekstep.genieproviders.BaseContentProvider;
 import org.ekstep.genieproviders.IUriHandler;
+import org.ekstep.genieproviders.util.Constants;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
@@ -45,7 +46,7 @@ public abstract class AbstractUserProvider extends BaseContentProvider {
 
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
-        Profile profile = GsonUtil.fromJson(values.getAsString(ServiceConstants.PROFILE), Profile.class);
+        Profile profile = GsonUtil.fromJson(values.getAsString(Constants.PROFILE), Profile.class);
         getService().getUserProfileService().createUserProfile(profile);
         return uri;
     }
@@ -67,7 +68,7 @@ public abstract class AbstractUserProvider extends BaseContentProvider {
     @Override
     public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         if (values != null) {
-            Profile profile = GsonUtil.fromJson(values.getAsString(ServiceConstants.PROFILE), Profile.class);
+            Profile profile = GsonUtil.fromJson(values.getAsString(Constants.PROFILE), Profile.class);
             GenieResponse response = getService().getUserProfileService().updateUserProfile(profile);
             if (response.getStatus()) {
                 return 1;
@@ -82,12 +83,5 @@ public abstract class AbstractUserProvider extends BaseContentProvider {
     private String getCompletePath() {
         String UER_PROFILE_PATH = "profiles";
         return String.format("%s.%s", getPackageName(), UER_PROFILE_PATH);
-    }
-
-    public abstract String getPackageName();
-
-    @Override
-    public String getPackage() {
-        return getPackageName();
     }
 }

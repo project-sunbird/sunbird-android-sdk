@@ -7,6 +7,7 @@ import android.database.MatrixCursor;
 import android.net.Uri;
 
 import org.ekstep.genieproviders.IUriHandler;
+import org.ekstep.genieproviders.util.Constants;
 import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -46,7 +47,7 @@ public class EndPartnerUriHandler implements IUriHandler {
     }
 
     private Cursor convertToCursor(GenieResponse response) {
-        String[] partnerColumns = {ServiceConstants.ProviderResolver.PARTNER_CURSOR_KEY};
+        String[] partnerColumns = {Constants.PARTNER_CURSOR_KEY};
         MatrixCursor cursor = new MatrixCursor(partnerColumns);
         return populate(cursor, response);
     }

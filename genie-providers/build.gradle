@@ -36,10 +36,5 @@ dependencies {
     compile project(':commons-lib')
     compile project(':commons-services-lib')
     compile(name:'genie-services-production-debug',ext:'aar')
-
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
     compile 'com.android.support:appcompat-v7:25.3.1'
-    testCompile 'junit:junit:4.12'
 }
