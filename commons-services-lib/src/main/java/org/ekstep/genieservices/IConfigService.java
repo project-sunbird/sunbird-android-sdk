@@ -19,7 +19,7 @@ public interface IConfigService {
      * On successful fetching the data, the response will return status as TRUE and with List<MasterData> in the result
      * <p>
      * <p>
-     * On failing to fetch the data, the response will return status as FALSE and the response will have status as FALSE with the following error.
+     * On failing to fetch the data, the response will return status as FALSE with the following error.
      * <p>NO_DATA_FOUND
      *
      * @return {@link List<MasterData>}
@@ -34,7 +34,7 @@ public interface IConfigService {
      * <p>
      * <p>
      * <p>
-     * On failing to fetch the data, the response will return status as FALSE and the response will have status as FALSE with the following error.
+     * On failing to fetch the data, the response will return status as FALSE with the following error.
      * <p>NO_DATA_FOUND
      *
      * @param type
@@ -50,7 +50,7 @@ public interface IConfigService {
      * On successful fetching the data, the response will return status as TRUE and with result set in Map
      * <p>
      * <p>
-     * On failing to fetch the data, the response will return status as FALSE and the response will have status as FALSE with the following error.
+     * On failing to fetch the data, the response will return status as FALSE with the following error.
      * <p>NO_DATA_FOUND
      *
      * @param languageIdentifier
@@ -65,7 +65,7 @@ public interface IConfigService {
      * On successful fetching the data, the response will return status as TRUE and with result set in Map
      * <p>
      * <p>
-     * On failing to fetch the data, the response will return status as FALSE and the response will have status as FALSE with the following error.
+     * On failing to fetch the data, the response will return status as FALSE with the following error.
      * <p>NO_DATA_FOUND
      *
      * @return

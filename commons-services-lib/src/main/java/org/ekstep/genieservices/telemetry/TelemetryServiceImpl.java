@@ -17,6 +17,7 @@ import org.ekstep.genieservices.commons.utils.ArrayUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
+import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.tag.cache.TelemetryTagCache;
 import org.ekstep.genieservices.eventbus.EventPublisher;
 import org.ekstep.genieservices.telemetry.model.EventModel;
@@ -91,6 +92,8 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         GenieResponse<TelemetryStat> genieResponse=GenieResponseBuilder.getSuccessResponse("Telemetry stat retrieved successfully");
         genieResponse.setResult(new TelemetryStat(unSyncedEventCount,lastSyncTime));
 
+        saveEvent(TelemetryLogger.create(mAppContext, genieResponse, new HashMap(), SERVICE_NAME, "getTelemetryStat@TelemetryServiceImpl", new HashMap()).toString());
+
         return genieResponse;
     }
 
@@ -126,11 +129,10 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         }
 
         //Patch Partner tagss
-        Set<String> values = mAppContext.getKeyValueStore().getStringSet(ServiceConstants.Partner.KEY_PARTNER_ID, null);
+        String values = mAppContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.KEY_ACTIVE_PARTNER_ID, "");
         List<Map<String, Object>> tags = (List<Map<String, Object>>) event.getEventMap().get("tags");
-        if (values != null && !values.isEmpty()) {
-            if (!ArrayUtil.containsMap(tags, ServiceConstants.Partner.KEY_PARTNER_ID))
-                event.addTag(ServiceConstants.Partner.KEY_PARTNER_ID, values);
+        if (!StringUtil.isNullOrEmpty(values) && !ArrayUtil.containsMap(tags, ServiceConstants.Partner.KEY_PARTNER_ID)) {
+            event.addTag(ServiceConstants.Partner.KEY_PARTNER_ID, values);
         }
 
         //Patch Program tags

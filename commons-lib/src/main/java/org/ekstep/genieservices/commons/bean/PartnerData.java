@@ -84,7 +84,7 @@ public class PartnerData implements IValidate {
         return this.partnerID;
     }
 
-    public String getPartnerData() {
+    public String   getPartnerData() {
         return this.partnerData;
     }
 }

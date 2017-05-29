@@ -1,12 +1,18 @@
 package org.ekstep.genieservices;
 
+import org.ekstep.genieservices.commons.bean.ContentAccess;
+import org.ekstep.genieservices.commons.bean.ContentAccessCriteria;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.UserSession;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * This is the interface with all the required APIs to perform necessary operations related to Users
  */
+
 public interface IUserService {
 
     /**
@@ -21,6 +27,8 @@ public interface IUserService {
      * @return {@link GenieResponse<Profile>}
      */
     public GenieResponse<Profile> createUserProfile(Profile profile);
+
+    GenieResponse<List<Profile>> getAllUserProfile();
 
     /**
      * This api is used to delete a existing user with a specific uid
@@ -108,4 +116,12 @@ public interface IUserService {
      * @return
      */
     public GenieResponse<Profile> updateUserProfile(Profile profile);
+
+    /**
+     * @param criteria
+     * @return
+     */
+    public GenieResponse<List<ContentAccess>> getAllContentAccess(ContentAccessCriteria criteria);
+
+    GenieResponse<Void> setLearnerState(String contentIdentifier, Map<String, Object> learnerState);
 }

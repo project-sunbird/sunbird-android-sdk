@@ -27,10 +27,10 @@ public class MainActivity extends Activity{
         setContentView(R.layout.activity_main);
 
 
-        GenieService genieService=GenieService.init(this,getPackageName(),"","org.ekstep");
+        GenieService genieService=GenieService.init(this,getPackageName());
         mConfigService=genieService.getConfigService();
 
-        mAppContext= AndroidAppContext.buildAppContext(getApplicationContext(),getPackageName(),"","org.ekstep");
+        mAppContext= AndroidAppContext.buildAppContext(getApplicationContext(),getPackageName());
         GenieServiceDBHelper.init(mAppContext);
 
         getMasterData(MasterDataType.AGE);

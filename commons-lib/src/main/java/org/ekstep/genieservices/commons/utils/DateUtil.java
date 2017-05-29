@@ -14,14 +14,17 @@ public class DateUtil {
 
     public static final int MILLISECONDS_IN_AN_HOUR = 3600000;
     private static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";
+    private static final String DATETIME_FORMAT_WITHOUTTIMEZONE = "yyyy-MM-dd'T'HH:mm:ss";
     private static final String DATE_FORMAT = "yyyy-MM-dd";
     public static final String DATE_TIME_AM_PM_FORMAT = "dd/MM/yyyy, hh:mma";
 
 
     public static String getCurrentTimestamp() {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern(DATETIME_FORMAT).withLocale(Locale.US);
-        DateTime dateTime = new DateTime();
-        return dateTime.toString(dateTimeFormatter);
+        return format(getEpochTime(), DATETIME_FORMAT);
+    }
+
+    public static Date now() {
+        return new Date();
     }
 
     public static Long getEpochTime() {
@@ -32,12 +35,24 @@ public class DateUtil {
         return DateTimeFormat.forPattern(format).parseDateTime(dateInString);
     }
 
+    public static Long getTime(String date) {
+        DateTime dateTime = parse(date, DATETIME_FORMAT_WITHOUTTIMEZONE);
+        return dateTime.getMillis();
+    }
+
     public static String format(Date date, String format) {
         return DateTimeFormat.forPattern(format).print(date.getTime());
     }
 
     public static String format(long dateTime,String format) {
         return format(new Date(dateTime),format);
+    }
+
+    public static Integer elapsedTimeTillNow(long time) {
+        DateTime parseDateTime = new DateTime(time);
+        DateTime now = DateTime.now();
+        Seconds seconds = Seconds.secondsBetween(parseDateTime, now);
+        return seconds.getSeconds();
     }
 
     public static Integer elapsedTimeTillNow(String dateInString) {
@@ -58,7 +73,7 @@ public class DateUtil {
     }
 
     public static boolean isTodayWithin(String startDate, String endDate) {
-        String today = format(new Date(), DATE_FORMAT);
+        String today = format(new Date().getTime(), DATE_FORMAT);
         return isDateBetween(startDate, endDate, today);
     }
 
@@ -67,6 +82,14 @@ public class DateUtil {
         LocalDate startDateTime = (startDate == null) ? date : parse(startDate, DATE_FORMAT).toLocalDate();
         LocalDate endDateTime = (endDate == null) ? date : parse(endDate, DATE_FORMAT).toLocalDate();
         return date.isAfter(startDateTime) && date.isBefore(endDateTime);
+    }
+
+    public static Long getEpochDiff(long time) {
+        Long length = 0L;
+        if (time != 0L) {
+            length = getEpochTime() - time;
+        }
+        return length;
     }
 
 

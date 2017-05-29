@@ -18,6 +18,6 @@ public class LocationInfo implements ILocationInfo {
     @Override
     public String getLocation() {
         // TODO: 27/4/17 We need to add the logic for sending the location
-        return null;
+        return "";
     }
 }

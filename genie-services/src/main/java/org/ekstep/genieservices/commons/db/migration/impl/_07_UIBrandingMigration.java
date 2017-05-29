@@ -88,11 +88,11 @@ public class _07_UIBrandingMigration extends Migration {
 //            if (content.get("localData") != null) {
 //                contentData = (LinkedTreeMap<String, Object>) content.get("localData");
 //
-//                contentType = (String) contentData.get(CONTENT_TYPE_KEY);
+//                contentType = (String) contentData.get(KEY_CONTENT_TYPE);
 //            } else if (content.get("serverData") != null) {
 //                contentData = (LinkedTreeMap<String, Object>) content.get("serverData");
 //
-//                contentType = (String) contentData.get(CONTENT_TYPE_KEY);
+//                contentType = (String) contentData.get(KEY_CONTENT_TYPE);
 //            }
 //
 //            if (contentType != null) {

@@ -15,5 +15,6 @@ public interface Constants {
         String API_PASS = "API_PASS";
         String API_USER = "API_USER";
         String GID = "GID";
+        String LOGLEVEL = "LOGLEVEL";
     }
 }

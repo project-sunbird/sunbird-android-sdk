@@ -1,5 +1,6 @@
 package org.ekstep.genieservices.partner.db.model;
 
+import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
@@ -13,13 +14,12 @@ import java.util.UUID;
  */
 public class PartnerSessionModel {
 
-    private static final String SHARED_PREF_SESSION_KEY = "partnersessionid";
-    private static final String SHARED_PREF_PARTNERSET_EPOCH = "partnerSET";
-    private static final String SHARED_PREF_PARTNER_ID = "partnerid";
 
     private static final String TAG = PartnerSessionModel.class.getSimpleName();
     private AppContext appContext;
     private String partnerID;
+    private Long epochTime;
+    private String sessionId;
 
     private PartnerSessionModel(AppContext appContext, String partnerID) {
         this.appContext = appContext;
@@ -31,7 +31,7 @@ public class PartnerSessionModel {
         return partnerSessionModel;
     }
 
-    public static PartnerSessionModel findPartnerSession(AppContext appContext) {
+    public static PartnerSessionModel find(AppContext appContext) {
         PartnerSessionModel partnerSessionModel = new PartnerSessionModel(appContext, null);
         partnerSessionModel.read();
         if (StringUtil.isNullOrEmpty(partnerSessionModel.partnerID)) {
@@ -41,33 +41,36 @@ public class PartnerSessionModel {
         }
     }
 
-    public Long getSessionLength() {
-        Long length = 0L;
-        Long t0 = appContext.getKeyValueStore().getLong(SHARED_PREF_PARTNERSET_EPOCH, 0L);
-        if (t0 != 0L) {
-            length = DateUtil.getEpochTime() - t0;
-        }
-        return length;
+    private void read() {
+        this.partnerID = appContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.KEY_ACTIVE_PARTNER_ID, "");
+        this.epochTime = appContext.getKeyValueStore().getLong(ServiceConstants.PreferenceKey.SHARED_PREF_PARTNERSET_EPOCH, 0L);
+        this.sessionId = appContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.SHARED_PREF_SESSION_KEY, "");
     }
 
-    private void read() {
-        this.partnerID = appContext.getKeyValueStore().getString(SHARED_PREF_PARTNER_ID, "");
+
+    public void save() {
+        appContext.getKeyValueStore().putString(ServiceConstants.PreferenceKey.KEY_ACTIVE_PARTNER_ID, partnerID);
+        appContext.getKeyValueStore().putLong(ServiceConstants.PreferenceKey.SHARED_PREF_PARTNERSET_EPOCH, DateUtil.getEpochTime());
+        appContext.getKeyValueStore().putString(ServiceConstants.PreferenceKey.SHARED_PREF_SESSION_KEY, UUID.randomUUID().toString());
+    }
+
+    public void clear() {
+        appContext.getKeyValueStore().remove(ServiceConstants.PreferenceKey.KEY_PARTNER_ID);
+        appContext.getKeyValueStore().putString(ServiceConstants.PreferenceKey.KEY_ACTIVE_PARTNER_ID, "");
+        appContext.getKeyValueStore().remove(ServiceConstants.PreferenceKey.SHARED_PREF_PARTNERSET_EPOCH);
+        appContext.getKeyValueStore().remove(ServiceConstants.PreferenceKey.SHARED_PREF_SESSION_KEY);
     }
 
     public String getPartnerID() {
         return this.partnerID;
     }
 
-    public void startSession() {
-        appContext.getKeyValueStore().putString(SHARED_PREF_PARTNER_ID, partnerID);
-        appContext.getKeyValueStore().putLong(SHARED_PREF_PARTNERSET_EPOCH, DateUtil.getEpochTime());
-        appContext.getKeyValueStore().putString(SHARED_PREF_SESSION_KEY, UUID.randomUUID().toString());
+    public String getPartnerSessionId() {
+        return appContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.SHARED_PREF_SESSION_KEY, "");
     }
 
-    public void endSession() {
-        appContext.getKeyValueStore().putString(SHARED_PREF_PARTNER_ID, "");
-        appContext.getKeyValueStore().remove(SHARED_PREF_PARTNERSET_EPOCH);
-        appContext.getKeyValueStore().remove(SHARED_PREF_SESSION_KEY);
+    public Long getEpochTime() {
+        return epochTime;
     }
 
 }

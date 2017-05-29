@@ -123,4 +123,11 @@ public class PartnerModel implements IWritable, IReadable {
         return "limit 1";
     }
 
+    public String getPartnerID() {
+        return partnerID;
+    }
+
+    public String getPublicKeyId() {
+        return publicKeyId;
+    }
 }
