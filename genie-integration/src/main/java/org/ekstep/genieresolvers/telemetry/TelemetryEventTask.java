@@ -39,8 +39,7 @@ public class TelemetryEventTask extends BaseTask {
             return getErrorResponse(Constants.PROCESSING_ERROR, errorMessage, logMessage);
         }
 
-        GenieResponse successResponse = getSuccessResponse(Constants.SUCCESSFUL);
-        return successResponse;
+        return getSuccessResponse(Constants.SUCCESSFUL);
     }
 
     @Override

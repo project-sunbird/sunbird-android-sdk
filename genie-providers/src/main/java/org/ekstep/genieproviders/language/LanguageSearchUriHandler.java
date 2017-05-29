@@ -3,10 +3,19 @@ package org.ekstep.genieproviders.language;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.net.Uri;
+import android.support.annotation.NonNull;
+
+import com.google.gson.Gson;
 
 import org.ekstep.genieproviders.IUriHandler;
+import org.ekstep.genieproviders.util.Constants;
 import org.ekstep.genieservices.GenieService;
+import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.LanguageSearchRequest;
+import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 import java.util.Locale;
 
@@ -31,8 +40,30 @@ public class LanguageSearchUriHandler implements IUriHandler {
 
     @Override
     public Cursor process() {
-        // TODO: 23/5/17 Need to invoke method from Language Service API and send back the required response
-        return null;
+        MatrixCursor cursor = null;
+        if (genieService != null) {
+            cursor = getMatrixCursor();
+            LanguageSearchRequest request = GsonUtil.fromJson(selection, LanguageSearchRequest.class);
+            GenieResponse genieResponse = genieService.getLanguageService().getLanguageSearch(GsonUtil.toJson(request));
+            if (genieResponse != null) {
+                cursor.addRow(new String[]{new Gson().toJson(genieResponse)});
+            } else {
+                getErrorResponse(cursor);
+            }
+        }
+        return cursor;
+    }
+
+    @NonNull
+    protected GenieResponse getErrorResponse(MatrixCursor cursor) {
+        GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(Constants.PROCESSING_ERROR, "Could not find the language", "Failed");
+        cursor.addRow(new String[]{new Gson().toJson(errorResponse)});
+        return errorResponse;
+    }
+
+    @NonNull
+    protected MatrixCursor getMatrixCursor() {
+        return new MatrixCursor(new String[]{"values"});
     }
 
     @Override

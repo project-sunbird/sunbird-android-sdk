@@ -37,7 +37,7 @@ public class SendPartnerDataUriHandler implements IUriHandler {
     public Cursor process() {
         PartnerData partnerData = GsonUtil.fromJson(selection, PartnerData.class);
         GenieResponse response = genieService.getPartnerService().sendData(partnerData);
-        if (response.getStatus()) {
+        if (response != null) {
             return convertToCursor(response);
         }
 

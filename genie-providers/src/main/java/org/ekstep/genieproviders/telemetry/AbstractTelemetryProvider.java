@@ -36,7 +36,7 @@ public abstract class AbstractTelemetryProvider extends BaseContentProvider {
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
         String eventString = values.getAsString(TelemetryEntry.COLUMN_NAME_EVENT);
         getService().getTelemetryService().saveTelemetry(eventString);
-        return null;
+        return uri;
     }
 
     @Override

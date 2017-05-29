@@ -42,8 +42,7 @@ public class UpdateUserTask extends BaseTask {
 
         }
 
-        GenieResponse successResponse = getSuccessResponse(Constants.SUCCESSFUL);
-        return successResponse;
+        return getSuccessResponse(Constants.SUCCESSFUL);
     }
 
     @Override

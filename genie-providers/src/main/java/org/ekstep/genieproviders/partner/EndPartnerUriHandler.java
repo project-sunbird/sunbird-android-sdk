@@ -39,7 +39,7 @@ public class EndPartnerUriHandler implements IUriHandler {
     public Cursor process() {
         PartnerData partnerData = GsonUtil.fromJson(selection, PartnerData.class);
         GenieResponse response = genieService.getPartnerService().terminatePartnerSession(partnerData);
-        if (response.getStatus()) {
+        if (response != null) {
             return convertToCursor(response);
         }
 

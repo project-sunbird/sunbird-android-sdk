@@ -9,7 +9,6 @@ import android.net.Uri;
 import org.ekstep.genieproviders.IUriHandler;
 import org.ekstep.genieproviders.util.Constants;
 import org.ekstep.genieservices.GenieService;
-import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.PartnerData;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -37,7 +36,7 @@ public class StartPartnerUriHandler implements IUriHandler {
     public Cursor process() {
         PartnerData partnerData = GsonUtil.fromJson(selection, PartnerData.class);
         GenieResponse response = genieService.getPartnerService().startPartnerSession(partnerData);
-        if (response.getStatus()) {
+        if (response != null) {
             return convertToCursor(response);
         }
 

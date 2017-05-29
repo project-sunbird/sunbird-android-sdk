@@ -42,8 +42,7 @@ public class CreateUserTask extends BaseTask {
             return processing_error;
 
         }
-        GenieResponse successResponse = getSuccessResponse(Constants.SUCCESSFUL);
-        return successResponse;
+        return getSuccessResponse(Constants.SUCCESSFUL);
     }
 
     @Override

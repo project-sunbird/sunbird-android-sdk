@@ -12,7 +12,6 @@ import com.google.gson.Gson;
 import org.ekstep.genieproviders.IUriHandler;
 import org.ekstep.genieproviders.util.Constants;
 import org.ekstep.genieservices.GenieService;
-import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 
@@ -36,14 +35,14 @@ public class LanguageTraversalRuleUriHandler implements IUriHandler {
     @Override
     public Cursor process() {
         MatrixCursor cursor = getMatrixCursor();
-//        IConnectionInfo connectionInfo = appContext.getConnectionInfo();
-        // TODO: 16/5/17 TraversalRuleAPI response should be got from Service and the null should be replaced
-        GenieResponse genieResponse = null;
+        if (genieService != null) {
+            GenieResponse genieResponse = genieService.getLanguageService().getLanguageTraversalRule(selection);
 
-        if (genieResponse != null) {
-            cursor.addRow(new String[]{new Gson().toJson(genieResponse)});
-        } else {
-            getErrorResponse(cursor);
+            if (genieResponse != null) {
+                cursor.addRow(new String[]{new Gson().toJson(genieResponse)});
+            } else {
+                getErrorResponse(cursor);
+            }
         }
 
         return cursor;
