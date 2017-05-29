@@ -29,8 +29,8 @@ public class GenieServiceTestActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_genie_services_test);
 
-        mGenieService = GenieService.init(getApplicationContext(), getPackageName(), "", "");
-        mAppContext = AndroidAppContext.buildAppContext(getApplicationContext(), getPackageName(), "", "org.ekstep");
+        mGenieService = GenieService.init(getApplicationContext(), getPackageName());
+        mAppContext = AndroidAppContext.buildAppContext(getApplicationContext(), getPackageName());
         GenieServiceDBHelper.init(mAppContext);
     }
 
