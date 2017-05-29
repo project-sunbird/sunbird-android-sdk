@@ -118,6 +118,9 @@ public interface ServiceConstants {
     interface ErrorMessage {
         String UNABLE_TO_FIND_PROFILE = "unable to find profile";
         String NO_USER_WITH_SPECIFIED_ID = "There is no user with specified id exists";
+        String MANDATORY_FIELD_CONTENT_IDENTIFIER = "Content identifier could not be null or empty.";
+        String MANDATORY_FIELD_UID = "Uid could not be null or empty.";
+        String NO_FEEDBACK = "There is no feedback with specified uid and content identifier.";
     }
 
     interface ContentAccessStatus {

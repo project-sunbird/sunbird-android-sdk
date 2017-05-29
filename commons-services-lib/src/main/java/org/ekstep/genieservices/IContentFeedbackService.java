@@ -8,6 +8,8 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
  */
 public interface IContentFeedbackService {
 
+    GenieResponse<Void> saveFeedback(String uid, String contentIdentifier, String rating, String comments);
+
     /**
      * This api is used to get the feedback about a content.
      * <p>

@@ -37,25 +37,18 @@ public class ContentFeedbackModel implements IWritable, IUpdatable, IReadable {
         this.contentId = contentId;
     }
 
-    // TODO: Reading feedback from TelemetryEvent and initialize model
-//    public ContentFeedback(IDBSession dbSession, TelemetryEvent event) {
-//        if(event == null){
-//            return;
-//        }
-//    this.mDBSession = dbSession;
-//        this.uid = event.uid();
-//        Map<String, Object> eks = (Map<String, Object>) event.edata().get("eks");
-//        this.rating = String.valueOf(eks.get("rating"));
-//        this.comments = (String) eks.get("comments");
-//
-//        Map<String, Object> context = (Map<String, Object>) eks.get("context");
-//        this.contentId = (String) context.get("id");
-//    }
+    private ContentFeedbackModel(IDBSession dbSession, String uid, String contentId, String rating, String comments) {
+        this(dbSession, uid, contentId);
 
-    //    public static ContentFeedbackModel build(IDBSession dbSession, TelemetryEvent event) {
-//        ContentFeedbackModel feedback = new ContentFeedbackModel(dbSession, event);
-//        return feedback;
-//    }
+        this.rating = rating;
+        this.comments = comments;
+    }
+
+    public static ContentFeedbackModel build(IDBSession dbSession, String uid, String contentId, String rating, String comments) {
+        ContentFeedbackModel contentFeedbackModel = new ContentFeedbackModel(dbSession, uid, contentId, rating, comments);
+
+        return contentFeedbackModel;
+    }
 
     public static ContentFeedbackModel build() {
         return new ContentFeedbackModel();
