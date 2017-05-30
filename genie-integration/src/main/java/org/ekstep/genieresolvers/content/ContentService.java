@@ -3,19 +3,15 @@ package org.ekstep.genieresolvers.content;
 import android.content.Context;
 
 import org.ekstep.genieresolvers.BaseService;
-import org.ekstep.genieresolvers.BaseTask;
-import org.ekstep.genieresolvers.TaskHandler;
 import org.ekstep.genieservices.commons.IResponseHandler;
 
-import java.util.HashMap;
 import java.util.List;
 
 /**
  * Created on 24/5/17.
  * shriharsh
  */
-
-public class ContentService extends BaseService{
+public class ContentService extends BaseService {
     private String appQualifier;
     private Context context;
 
@@ -43,6 +39,5 @@ public class ContentService extends BaseService{
         SendFeedbackEventTask sendFeedbackEventTask = new SendFeedbackEventTask(context, appQualifier, feedbackString);
         createAndExecuteTask(responseHandler, sendFeedbackEventTask);
     }
-
 
 }
