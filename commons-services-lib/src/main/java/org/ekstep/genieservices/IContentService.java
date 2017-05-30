@@ -137,7 +137,7 @@ public interface IContentService {
      * @param contentIdentifier
      * @return
      */
-    GenieResponse<ContentSearchResult> getRelatedContent(String contentIdentifier);
+    GenieResponse<RelatedContentResult> getRelatedContent(String contentIdentifier);
 
     /**
      * This api is used to get all the next {@link List<Content>} based on the hierarchy of {@link List<String>} identifiers passed
