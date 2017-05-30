@@ -18,6 +18,7 @@ import org.ekstep.genieservices.commons.bean.FilterValue;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.MasterDataValues;
+import org.ekstep.genieservices.commons.bean.PageAssembleCriteria;
 import org.ekstep.genieservices.commons.bean.PartnerFilter;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.Section;
@@ -903,7 +904,7 @@ public class ContentHandler {
         return requestMap;
     }
 
-    public static List<Section> getSectionsFromPageMap(IDBSession dbSession, Map<String, Object> pageMap) {
+    public static List<Section> getSectionsFromPageMap(IDBSession dbSession, Map<String, Object> pageMap, PageAssembleCriteria pageAssembleCriteria) {
         List<Section> sectionList = new ArrayList<>();
 
         List<Map<String, Object>> sections = (List<Map<String, Object>>) pageMap.get("sections");
@@ -968,6 +969,8 @@ public class ContentHandler {
                         }
 
                         contentSearchCriteria.setFilters(filters);
+                        contentSearchCriteria.setProfileFilter(pageAssembleCriteria.isCurrentProfileFilter());
+                        contentSearchCriteria.setPartnerFilters(pageAssembleCriteria.getPartnerFilters());
                     }
                 }
             }

@@ -16,8 +16,8 @@ import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.PageAssembleCriteria;
 import org.ekstep.genieservices.commons.bean.PageAssembleResult;
-import org.ekstep.genieservices.commons.bean.PartnerFilter;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
@@ -225,16 +225,19 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<PageAssembleResult> getPageAssembleContents(String pageIdentifier, Profile profile, String subject, List<PartnerFilter> partnerFilters) {
-        PageModel pageModelInDB = PageModel.find(mAppContext.getDBSession(), pageIdentifier, profile, subject);
+    public GenieResponse<PageAssembleResult> getPageAssembleContents(PageAssembleCriteria pageAssembleCriteria) {
+        Profile profile = null;
+        if (pageAssembleCriteria.isCurrentProfileFilter()) {
+            profile = ContentHandler.getCurrentProfile(userService);
+        }
+
+        PageModel pageModelInDB = PageModel.find(mAppContext.getDBSession(), pageAssembleCriteria.getPageIdentifier(), profile, pageAssembleCriteria.getSubject());
         if (pageModelInDB != null) {
             // TODO: 5/29/2017 -
         } else {
-            if (profile == null) {
-                profile = ContentHandler.getCurrentProfile(userService);
-            }
+            PageAssembleAPI api = new PageAssembleAPI(mAppContext, pageAssembleCriteria.getPageIdentifier(),
+                    ContentHandler.getPageAssembleRequest(configService, profile, pageAssembleCriteria.getSubject(), pageAssembleCriteria.getPartnerFilters(), mAppContext.getDeviceInfo().getDeviceID()));
 
-            PageAssembleAPI api = new PageAssembleAPI(mAppContext, pageIdentifier, ContentHandler.getPageAssembleRequest(configService, profile, subject, partnerFilters, mAppContext.getDeviceInfo().getDeviceID()));
             GenieResponse apiResponse = api.post();
             if (apiResponse.getStatus()) {
                 String body = apiResponse.getResult().toString();
@@ -255,14 +258,14 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                     Long currentTime = DateUtil.getEpochTime();
                     expiryTime = ttlInMilliSeconds + currentTime;
 
-                    PageModel pageModel = PageModel.build(mAppContext.getDBSession(), pageIdentifier, body, profile, subject, expiryTime);
+                    PageModel pageModel = PageModel.build(mAppContext.getDBSession(), pageAssembleCriteria.getPageIdentifier(), body, profile, pageAssembleCriteria.getSubject(), expiryTime);
                     pageModel.save();
 
                     PageAssembleResult pageAssembleResult = new PageAssembleResult();
-                    pageAssembleResult.setId(pageIdentifier);
+                    pageAssembleResult.setId(pageAssembleCriteria.getPageIdentifier());
                     pageAssembleResult.setResponseMessageId(responseMessageId);
                     if (result.containsKey("page")) {
-                        pageAssembleResult.setSections(ContentHandler.getSectionsFromPageMap(mAppContext.getDBSession(), (Map<String, Object>) result.get("page")));
+                        pageAssembleResult.setSections(ContentHandler.getSectionsFromPageMap(mAppContext.getDBSession(), (Map<String, Object>) result.get("page"), pageAssembleCriteria));
                     }
                 }
             }
