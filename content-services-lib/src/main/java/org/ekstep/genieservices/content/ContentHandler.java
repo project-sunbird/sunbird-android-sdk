@@ -1,5 +1,6 @@
 package org.ekstep.genieservices.content;
 
+import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
 
 import org.ekstep.genieservices.IConfigService;
@@ -19,6 +20,7 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.MasterDataValues;
 import org.ekstep.genieservices.commons.bean.PageAssembleCriteria;
+import org.ekstep.genieservices.commons.bean.PageAssembleResult;
 import org.ekstep.genieservices.commons.bean.PartnerFilter;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.Section;
@@ -39,6 +41,7 @@ import org.ekstep.genieservices.content.bean.ContentChild;
 import org.ekstep.genieservices.content.bean.ContentVariant;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.db.model.ContentsModel;
+import org.ekstep.genieservices.content.db.model.PageModel;
 import org.ekstep.genieservices.content.network.ContentDetailsAPI;
 
 import java.io.File;
@@ -871,7 +874,12 @@ public class ContentHandler {
         return requestMap;
     }
 
-    public static HashMap<String, Object> getPageAssembleRequest(IConfigService configService, Profile profile, String subject, List<PartnerFilter> partnerFilters, String did) {
+    public static boolean dataHasExpired(long ttl) {
+        Long currentTime = DateUtil.getEpochTime();
+        return currentTime > ttl;
+    }
+
+    public static Map<String, Object> getPageAssembleRequest(IConfigService configService, Profile profile, String subject, List<PartnerFilter> partnerFilters, String did) {
         String dlang = "";
         String uid = "";
         if (profile != null) {
@@ -904,7 +912,46 @@ public class ContentHandler {
         return requestMap;
     }
 
-    public static List<Section> getSectionsFromPageMap(IDBSession dbSession, Map<String, Object> pageMap, PageAssembleCriteria pageAssembleCriteria) {
+    public static void savePageDataInDB(IDBSession dbSession, PageAssembleCriteria pageAssembleCriteria, Profile profile, String jsonStr) {
+        if (jsonStr == null) {
+            return;
+        }
+
+        long expiryTime;
+
+        long ttlInMilliSeconds = ContentConstants.CACHE_TIMEOUT_HOME_CONTENT;
+        Long currentTime = DateUtil.getEpochTime();
+        expiryTime = ttlInMilliSeconds + currentTime;
+
+        PageModel pageModel = PageModel.build(dbSession, pageAssembleCriteria.getPageIdentifier(), jsonStr, profile, pageAssembleCriteria.getSubject(), expiryTime);
+        pageModel.save();
+    }
+
+    public static PageAssembleResult getPageAssembleResult(IDBSession dbSession, PageAssembleCriteria pageAssembleCriteria, String jsonStr) {
+        PageAssembleResult pageAssembleResult = null;
+
+        LinkedTreeMap map = GsonUtil.fromJson(jsonStr, LinkedTreeMap.class);
+        LinkedTreeMap responseParams = (LinkedTreeMap) map.get("params");
+        LinkedTreeMap result = (LinkedTreeMap) map.get("result");
+
+        String responseMessageId = null;
+        if (responseParams.containsKey("resmsgid")) {
+            responseMessageId = (String) responseParams.get("resmsgid");
+        }
+
+        if (result != null) {
+            pageAssembleResult = new PageAssembleResult();
+            pageAssembleResult.setId(pageAssembleCriteria.getPageIdentifier());
+            pageAssembleResult.setResponseMessageId(responseMessageId);
+            if (result.containsKey("page")) {
+                pageAssembleResult.setSections(getSectionsFromPageMap(dbSession, (Map<String, Object>) result.get("page"), pageAssembleCriteria));
+            }
+        }
+
+        return pageAssembleResult;
+    }
+
+    private static List<Section> getSectionsFromPageMap(IDBSession dbSession, Map<String, Object> pageMap, PageAssembleCriteria pageAssembleCriteria) {
         List<Section> sectionList = new ArrayList<>();
 
         List<Map<String, Object>> sections = (List<Map<String, Object>>) pageMap.get("sections");

@@ -22,7 +22,6 @@ import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.download.DownloadService;
-import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
@@ -231,47 +230,38 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             profile = ContentHandler.getCurrentProfile(userService);
         }
 
+        String jsonStr = null;
         PageModel pageModelInDB = PageModel.find(mAppContext.getDBSession(), pageAssembleCriteria.getPageIdentifier(), profile, pageAssembleCriteria.getSubject());
         if (pageModelInDB != null) {
-            // TODO: 5/29/2017 -
-        } else {
-            PageAssembleAPI api = new PageAssembleAPI(mAppContext, pageAssembleCriteria.getPageIdentifier(),
-                    ContentHandler.getPageAssembleRequest(configService, profile, pageAssembleCriteria.getSubject(), pageAssembleCriteria.getPartnerFilters(), mAppContext.getDeviceInfo().getDeviceID()));
-
-            GenieResponse apiResponse = api.post();
-            if (apiResponse.getStatus()) {
-                String body = apiResponse.getResult().toString();
-
-                LinkedTreeMap map = GsonUtil.fromJson(body, LinkedTreeMap.class);
-                LinkedTreeMap responseParams = (LinkedTreeMap) map.get("params");
-                LinkedTreeMap result = (LinkedTreeMap) map.get("result");
-
-                String responseMessageId = null;
-                if (responseParams.containsKey("resmsgid")) {
-                    responseMessageId = (String) responseParams.get("resmsgid");
-                }
-
-                if (result != null) {
-                    long expiryTime;
-
-                    long ttlInMilliSeconds = ContentConstants.CACHE_TIMEOUT_HOME_CONTENT;
-                    Long currentTime = DateUtil.getEpochTime();
-                    expiryTime = ttlInMilliSeconds + currentTime;
-
-                    PageModel pageModel = PageModel.build(mAppContext.getDBSession(), pageAssembleCriteria.getPageIdentifier(), body, profile, pageAssembleCriteria.getSubject(), expiryTime);
-                    pageModel.save();
-
-                    PageAssembleResult pageAssembleResult = new PageAssembleResult();
-                    pageAssembleResult.setId(pageAssembleCriteria.getPageIdentifier());
-                    pageAssembleResult.setResponseMessageId(responseMessageId);
-                    if (result.containsKey("page")) {
-                        pageAssembleResult.setSections(ContentHandler.getSectionsFromPageMap(mAppContext.getDBSession(), (Map<String, Object>) result.get("page"), pageAssembleCriteria));
-                    }
-                }
+            if (ContentHandler.dataHasExpired(pageModelInDB.getExpiryTime())) {
+                pageModelInDB.delete();
+            } else {
+                jsonStr = pageModelInDB.getJson();
             }
         }
 
-        return null;
+        if (jsonStr == null) {
+            Map<String, Object> requestMap = ContentHandler.getPageAssembleRequest(configService, profile, pageAssembleCriteria.getSubject(), pageAssembleCriteria.getPartnerFilters(), mAppContext.getDeviceInfo().getDeviceID());
+            PageAssembleAPI api = new PageAssembleAPI(mAppContext, pageAssembleCriteria.getPageIdentifier(), requestMap);
+            GenieResponse apiResponse = api.post();
+            if (apiResponse.getStatus()) {
+                jsonStr = apiResponse.getResult().toString();
+                ContentHandler.savePageDataInDB(mAppContext.getDBSession(), pageAssembleCriteria, profile, jsonStr);
+            } else {
+                return GenieResponseBuilder.getErrorResponse(apiResponse.getError(), (String) apiResponse.getErrorMessages().get(0), TAG);
+            }
+        }
+
+        if (jsonStr != null) {
+            PageAssembleResult pageAssembleResult = ContentHandler.getPageAssembleResult(mAppContext.getDBSession(), pageAssembleCriteria, jsonStr);
+            if (pageAssembleResult != null) {
+                GenieResponse<PageAssembleResult> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+                response.setResult(pageAssembleResult);
+                return response;
+            }
+        }
+
+        return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.DATA_NOT_FOUND_ERROR, ServiceConstants.ErrorMessage.NO_PAGE_ASSEMBLE_DATA, TAG);
     }
 
     @Override

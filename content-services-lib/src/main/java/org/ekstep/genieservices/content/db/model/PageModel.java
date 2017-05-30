@@ -176,6 +176,13 @@ public class PageModel implements IWritable, IUpdatable, IReadable, ICleanable {
 
     @Override
     public void beforeWrite(AppContext context) {
+    }
 
+    public String getJson() {
+        return mJson;
+    }
+
+    public long getExpiryTime() {
+        return mExpiryTime;
     }
 }
