@@ -14,6 +14,7 @@ public class Section implements Serializable {
     private String apiId;
     private Display display;
     private List<Content> contents;
+    private ContentSearchCriteria contentSearchCriteria;
 
     public String getResponseMessageId() {
         return responseMessageId;
@@ -45,5 +46,13 @@ public class Section implements Serializable {
 
     public void setContents(List<Content> contents) {
         this.contents = contents;
+    }
+
+    public ContentSearchCriteria getContentSearchCriteria() {
+        return contentSearchCriteria;
+    }
+
+    public void setContentSearchCriteria(ContentSearchCriteria contentSearchCriteria) {
+        this.contentSearchCriteria = contentSearchCriteria;
     }
 }

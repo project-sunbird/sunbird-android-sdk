@@ -48,6 +48,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -914,12 +915,71 @@ public class ContentHandler {
                 contentDataList = (List<Map<String, Object>>) sectionMap.get("contents");
             }
 
+            ContentSearchCriteria contentSearchCriteria = null;
+            Map<String, Object> searchMap = (Map<String, Object>) sectionMap.get("search");
+            if (searchMap != null) {
+                contentSearchCriteria = new ContentSearchCriteria();
+                if (searchMap.containsKey("query")) {
+                    contentSearchCriteria.setQuery((String) searchMap.get("query"));
+                }
+
+                if (searchMap.containsKey("mode")) {
+                    contentSearchCriteria.setMode((String) searchMap.get("mode"));
+                }
+
+                if (searchMap.containsKey("sort_by")) {
+                    // TODO: 5/30/2017
+                }
+
+                if (searchMap.containsKey("filters")) {
+                    Map<String, String[]> filtersMap = (Map<String, String[]>) searchMap.get("filters");
+                    if (filtersMap != null && !filtersMap.isEmpty()) {
+
+                        List<ContentSearchFilter> filters = new ArrayList<>();
+
+                        Iterator it = filtersMap.entrySet().iterator();
+                        while (it.hasNext()) {
+                            Map.Entry pair = (Map.Entry) it.next();
+                            String key = pair.getKey().toString();
+                            Object value = pair.getValue();
+
+                            if (value instanceof List) {
+                                List<FilterValue> values = new ArrayList<>();
+                                List<String> valueList = (List<String>) value;
+                                for (String v : valueList) {
+                                    FilterValue filterValue = new FilterValue();
+                                    filterValue.setName(v);
+                                    filterValue.setApply(true);
+
+                                    values.add(filterValue);
+                                }
+
+                                ContentSearchFilter contentSearchFilter = new ContentSearchFilter();
+                                contentSearchFilter.setName(key);
+                                contentSearchFilter.setValues(values);
+
+                                filters.add(contentSearchFilter);
+                            } else {
+                                // TODO: 5/30/2017 - handle object filter here.
+//                                key.equals("compatibilityLevel") && key.equals("genieScore")
+//                                String[] stringArray = mFilterMap.get(values.getName());
+//                                filterSet.addAll(Arrays.asList(stringArray));
+                            }
+
+                            it.remove();
+                        }
+
+                        contentSearchCriteria.setFilters(filters);
+                    }
+                }
+            }
+
             Section section = new Section();
             section.setResponseMessageId((String) sectionMap.get("resmsgid"));
             section.setApiId((String) sectionMap.get("apiid"));
             section.setDisplay(GsonUtil.fromMap((Map) sectionMap.get("display"), Display.class));
             section.setContents(convertContentMapListToBeanList(dbSession, contentDataList));
-            // TODO: 5/30/2017 - Set the applied filter to each sections
+            section.setContentSearchCriteria(contentSearchCriteria);
         }
 
         return sectionList;
