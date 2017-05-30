@@ -287,11 +287,11 @@ public class UserServiceImpl extends BaseService implements IUserService {
         GenieResponse response = GenieResponseBuilder.getSuccessResponse("", Profile.class);
         response.setResult(profile);
 
-        if (response.getStatus()) {
-            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
-        } else {
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_GET_ANONYMOUS);
-        }
+//        if (response.getStatus()) {
+//            TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "getAnonymousUser@UserServiceImpl", new HashMap());
+//        } else {
+//            TelemetryLogger.logFailure(mAppContext, response, TAG, "getAnonymousUser@UserServiceImpl", new HashMap(), "Unable to get anonymous user");
+//        }
         return response;
     }
 
@@ -390,7 +390,6 @@ public class UserServiceImpl extends BaseService implements IUserService {
         GenieResponse<UserSession> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(userSessionModel.getUserSessionBean());
 
-        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;
     }
 

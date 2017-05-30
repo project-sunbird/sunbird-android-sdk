@@ -8,8 +8,8 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
-import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.bean.UserSession;
+import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
 import org.ekstep.genieservices.commons.exception.InvalidDataException;
@@ -18,8 +18,8 @@ import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
-import org.ekstep.genieservices.tag.cache.TelemetryTagCache;
 import org.ekstep.genieservices.eventbus.EventPublisher;
+import org.ekstep.genieservices.tag.cache.TelemetryTagCache;
 import org.ekstep.genieservices.telemetry.model.EventModel;
 
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
 
     public TelemetryServiceImpl(AppContext appContext, IUserService userService) {
         super(appContext);
-        this.mUserService=userService;
+        this.mUserService = userService;
     }
 
     @Override
@@ -72,22 +72,22 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         HashMap params = new HashMap();
         params.put("logLevel", "2");
 
-        String telemetryEventCountQuery="select count(*) from telemetry";
-        String processedTelemetryEventCountQuery="select sum(event_count) from processed_telemetry";
-        CustomReaderModel telemetryCountReader=CustomReaderModel.find(mAppContext.getDBSession(),telemetryEventCountQuery);
-        CustomReaderModel processedTelemetryCountReader=CustomReaderModel.find(mAppContext.getDBSession(),processedTelemetryEventCountQuery);
+        String telemetryEventCountQuery = "select count(*) from telemetry";
+        String processedTelemetryEventCountQuery = "select sum(event_count) from processed_telemetry";
+        CustomReaderModel telemetryCountReader = CustomReaderModel.find(mAppContext.getDBSession(), telemetryEventCountQuery);
+        CustomReaderModel processedTelemetryCountReader = CustomReaderModel.find(mAppContext.getDBSession(), processedTelemetryEventCountQuery);
 
-        int telemetryEventCount=0;
-        int processedTelemetryEventCount=0;
-        if(telemetryCountReader!=null){
-            telemetryEventCount=Integer.valueOf(telemetryCountReader.getData());
+        int telemetryEventCount = 0;
+        int processedTelemetryEventCount = 0;
+        if (telemetryCountReader != null) {
+            telemetryEventCount = Integer.valueOf(telemetryCountReader.getData());
         }
 
-        if(processedTelemetryCountReader!=null){
-            processedTelemetryEventCount=Integer.valueOf(processedTelemetryCountReader.getData());
+        if (processedTelemetryCountReader != null) {
+            processedTelemetryEventCount = Integer.valueOf(processedTelemetryCountReader.getData());
         }
 
-        int unSyncedEventCount=telemetryEventCount+processedTelemetryEventCount;
+        int unSyncedEventCount = telemetryEventCount + processedTelemetryEventCount;
 
         IKeyValueStore keyValueStore = mAppContext.getKeyValueStore();
         Long lastSyncTime = keyValueStore.getLong(ServiceConstants.PreferenceKey.LAST_SYNC_TIME, 0L);
@@ -109,10 +109,10 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         return GenieResponseBuilder.getSuccessResponse("Event Saved Successfully", Void.class);
     }
 
-    private void decorateEvent(EventModel event){
+    private void decorateEvent(EventModel event) {
         //TODO Decorate should only patch fields that are not already present.
         //Patch the event with current Sid and Uid
-        if(mUserService!=null){
+        if (mUserService != null) {
             UserSession currentUserSession = mUserService.getCurrentUserSession().getResult();
             if (currentUserSession.isValid()) {
                 event.updateSessionDetails(currentUserSession.getSid(), currentUserSession.getUid());

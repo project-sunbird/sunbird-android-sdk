@@ -14,11 +14,9 @@ import java.util.Map;
 public class GESessionStart extends Telemetry {
 
     private static final String EID = "GE_SESSION_START";
-    private final Map<String, Object> edata;
 
     public GESessionStart(GameData gameData, UserSession session, String loc, String deviceId) {
         super(gameData,EID);
-        edata = new HashMap<>();
         setEks(createEKS(loc));
         setEts(DateUtil.getEpochTime());
         setSid(session.getSid());

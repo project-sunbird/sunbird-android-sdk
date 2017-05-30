@@ -21,6 +21,18 @@ public class ConfigService {
         this.configService = genieService.getConfigService();
     }
 
+    /**
+     * This api is used to get all the platform specific data.
+     * <p>
+     * <p>
+     * On successful fetching the data, the response will return status as TRUE and with List<MasterData> in the result
+     * <p>
+     * <p>
+     * On failing to fetch the data, the response will return status as FALSE with the following error.
+     * <p>NO_DATA_FOUND
+     *
+     * @param responseHandler
+     */
     public void getAllMasterData(IResponseHandler<List<MasterData>> responseHandler) {
         new AsyncHandler<List<MasterData>>(responseHandler).execute(new IPerformable<List<MasterData>>() {
             @Override
@@ -30,6 +42,20 @@ public class ConfigService {
         });
     }
 
+    /**
+     * This api is used to get the specific platform data, selected from any of the {@link MasterDataType}
+     * <p>
+     * <p>
+     * On successful fetching the data, the response will return status as TRUE and with MasterData in the result
+     * <p>
+     * <p>
+     * <p>
+     * On failing to fetch the data, the response will return status as FALSE with the following error.
+     * <p>NO_DATA_FOUND
+     *
+     * @param type
+     * @param responseHandler
+     */
     public void getMasterData(final MasterDataType type, IResponseHandler<MasterData> responseHandler) {
         new AsyncHandler<MasterData>(responseHandler).execute(new IPerformable<MasterData>() {
             @Override
@@ -39,6 +65,20 @@ public class ConfigService {
         });
     }
 
+    /**
+     * This api is used to get the platform specific data, specific to locale chosen.
+     * <p>
+     * <p>
+     * <p>
+     * On successful fetching the data, the response will return status as TRUE and with result set in Map
+     * <p>
+     * <p>
+     * On failing to fetch the data, the response will return status as FALSE with the following error.
+     * <p>NO_DATA_FOUND
+     *
+     * @param languageIdentifier
+     * @param responseHandler
+     */
     public void getResourceBundle(final String languageIdentifier, IResponseHandler<Map<String, Object>> responseHandler) {
         new AsyncHandler<Map<String, Object>>(responseHandler).execute(new IPerformable<Map<String, Object>>() {
             @Override
@@ -48,6 +88,18 @@ public class ConfigService {
         });
     }
 
+    /**
+     * This api is used to get the ordered related data about the platform and other platform parameters.
+     * <p>
+     * <p>
+     * On successful fetching the data, the response will return status as TRUE and with result set in Map
+     * <p>
+     * <p>
+     * On failing to fetch the data, the response will return status as FALSE with the following error.
+     * <p>NO_DATA_FOUND
+     *
+     * @param responseHandler
+     */
     public void getOrdinals(IResponseHandler<Map<String, Object>> responseHandler) {
         new AsyncHandler<Map<String, Object>>(responseHandler).execute(new IPerformable<Map<String, Object>>() {
             @Override

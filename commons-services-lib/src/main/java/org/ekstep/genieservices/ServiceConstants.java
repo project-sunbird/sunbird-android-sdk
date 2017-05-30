@@ -27,6 +27,7 @@ public interface ServiceConstants {
 
     String NEVER_SYNCED = "NEVER";
     String SYNC_PROMPT = "SYNC_PROMPT";
+    String CONTENT_API_EXPIRATION_KEY = "content_api_expiration_time";
 
     interface FileExtension {
         String CONTENT = "ecar";
@@ -166,5 +167,4 @@ public interface ServiceConstants {
         String FILE_SIZE = "FILE_SIZE";
         String FILE_TYPE = "FILE_TYPE";
     }
-
 }
