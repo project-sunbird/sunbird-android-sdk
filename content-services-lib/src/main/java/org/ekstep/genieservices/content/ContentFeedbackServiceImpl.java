@@ -2,6 +2,7 @@ package org.ekstep.genieservices.content;
 
 import org.ekstep.genieservices.BaseService;
 import org.ekstep.genieservices.IContentFeedbackService;
+import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
@@ -21,29 +22,35 @@ public class ContentFeedbackServiceImpl extends BaseService implements IContentF
 
     private static final String TAG = ContentFeedbackServiceImpl.class.getSimpleName();
 
+    private IUserService userService;
     private GameData mGameData;
 
-    public ContentFeedbackServiceImpl(AppContext appContext) {
+    public ContentFeedbackServiceImpl(AppContext appContext, IUserService userService) {
         super(appContext);
 
+        this.userService = userService;
         mGameData = new GameData(mAppContext.getParams().getGid(), mAppContext.getParams().getVersionName());
     }
 
     @Override
-    public GenieResponse<Void> sendFeedback(String uid, String contentIdentifier, float rating, String comments) {
-        if (StringUtil.isNullOrEmpty(contentIdentifier)) {
+    public GenieResponse<Void> sendFeedback(ContentFeedback feedback) {
+        return sendFeedback(feedback, null);
+    }
+
+    @Override
+    public GenieResponse<Void> sendFeedback(ContentFeedback feedback, String stageId) {
+        if (StringUtil.isNullOrEmpty(feedback.getContentId())) {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.VALIDATION_ERROR, ServiceConstants.ErrorMessage.MANDATORY_FIELD_CONTENT_IDENTIFIER, TAG);
         }
 
-        if (StringUtil.isNullOrEmpty(uid)) {
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.VALIDATION_ERROR, ServiceConstants.ErrorMessage.MANDATORY_FIELD_UID, TAG);
-        }
+        String uid = ContentHandler.getCurrentUserId(userService);
 
-        // TODO: 5/29/2017 - Do we get the stageId as parameter in sendFeedback API.
-        saveContentFeedbackEvent(contentIdentifier, rating, comments, null);
+        saveContentFeedbackEvent(feedback, stageId);
 
-        ContentFeedbackModel contentFeedbackModel = ContentFeedbackModel.build(mAppContext.getDBSession(), uid, contentIdentifier, String.valueOf(rating), comments);
-        ContentFeedbackModel contentFeedbackModelInDB = ContentFeedbackModel.find(mAppContext.getDBSession(), uid, contentIdentifier);
+        // Save or update the content feedback in DB.
+        ContentFeedbackModel contentFeedbackModel = ContentFeedbackModel.build(mAppContext.getDBSession(),
+                uid, feedback.getContentId(), String.valueOf(feedback.getRating()), feedback.getComments());
+        ContentFeedbackModel contentFeedbackModelInDB = ContentFeedbackModel.find(mAppContext.getDBSession(), uid, feedback.getContentId());
         if (contentFeedbackModelInDB == null) {
             contentFeedbackModel.save();
         } else {
@@ -53,8 +60,11 @@ public class ContentFeedbackServiceImpl extends BaseService implements IContentF
         return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
     }
 
-    private void saveContentFeedbackEvent(String contentId, float rating, String comments, String stageId) {
-        GEFeedback geFeedback = new GEFeedback(mGameData, "RATING", contentId, rating, comments, GEFeedbackContextType.CONTENT.getValue(), stageId);
+    private void saveContentFeedbackEvent(ContentFeedback feedback, String stageId) {
+        GEFeedback geFeedback = new GEFeedback(mGameData, "RATING",
+                feedback.getContentId(), feedback.getRating(), feedback.getComments(),
+                GEFeedbackContextType.CONTENT.getValue(), stageId);
+
         TelemetryLogger.log(geFeedback);
     }
 
@@ -64,12 +74,12 @@ public class ContentFeedbackServiceImpl extends BaseService implements IContentF
 
         ContentFeedbackModel contentFeedbackModel = ContentFeedbackModel.find(mAppContext.getDBSession(), uid, contentIdentifier);
         if (contentFeedbackModel != null) {
-            ContentFeedback contentFeedback = new ContentFeedback();
+            ContentFeedback contentFeedback = new ContentFeedback(contentFeedbackModel.getCreatedAt());
             contentFeedback.setContentId(contentFeedbackModel.getContentId());
-            contentFeedback.setUid(contentFeedbackModel.getUid());
-            contentFeedback.setRating(contentFeedbackModel.getRating());
+            if (!StringUtil.isNullOrEmpty(contentFeedbackModel.getRating())) {
+                contentFeedback.setRating(Float.valueOf(contentFeedbackModel.getRating()));
+            }
             contentFeedback.setComments(contentFeedbackModel.getComments());
-            contentFeedback.setCreatedAt(contentFeedbackModel.getCreatedAt());
 
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(contentFeedback);

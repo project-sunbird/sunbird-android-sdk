@@ -96,7 +96,7 @@ public class ContentHandler {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Map contentData = ContentHandler.fetchContentDetailsFromServer(appContext, contentIdentifier);
+                Map contentData = fetchContentDetailsFromServer(appContext, contentIdentifier);
 
                 if (contentData != null) {
                     ContentModel contentModel = ContentModel.build(appContext.getDBSession(), contentData, null);
@@ -151,9 +151,7 @@ public class ContentHandler {
     private static void addContentVariants(ContentData contentData, String dataJson) {
         List<Variant> variantList = new ArrayList<>();
 
-        Type type = new TypeToken<List<HashMap<String, Object>>>() {
-        }.getType();
-        Map<String, Object> dataMap = GsonUtil.getGson().fromJson(dataJson, type);
+        Map<String, Object> dataMap = GsonUtil.fromJson(dataJson, Map.class);
 
         Object variants = dataMap.get(ContentModel.KEY_VARIANTS);
         if (variants != null) {
