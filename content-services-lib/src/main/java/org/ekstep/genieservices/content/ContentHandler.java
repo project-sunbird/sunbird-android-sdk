@@ -13,12 +13,14 @@ import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchFilter;
+import org.ekstep.genieservices.commons.bean.Display;
 import org.ekstep.genieservices.commons.bean.FilterValue;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.MasterDataValues;
 import org.ekstep.genieservices.commons.bean.PartnerFilter;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.bean.Section;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.Variant;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
@@ -181,6 +183,17 @@ public class ContentHandler {
             }
         }
         return null;
+    }
+
+    public static Profile getCurrentProfile(IUserService userService) {
+        Profile profile = null;
+        if (userService != null) {
+            GenieResponse<Profile> profileGenieResponse = userService.getCurrentUser();
+            if (profileGenieResponse.getStatus()) {
+                profile = profileGenieResponse.getResult();
+            }
+        }
+        return profile;
     }
 
     public static ContentFeedback getContentFeedback(IContentFeedbackService contentFeedbackService, String contentIdentifier, String uid) {
@@ -647,7 +660,9 @@ public class ContentHandler {
         addFiltersIfNotAvailable(filterMap, "status", Collections.singletonList("Live"));
 
         // Apply profile specific filters
-        applyProfileFilter(userService, configService, criteria.isProfileFilter(), filterMap);
+        if (criteria.isProfileFilter()) {
+            applyProfileFilter(getCurrentProfile(userService), configService, filterMap);
+        }
 
         // Apply partner specific filters
         applyPartnerFilter(configService, criteria.getPartnerFilters(), filterMap);
@@ -668,24 +683,19 @@ public class ContentHandler {
         }
     }
 
-    private static void applyProfileFilter(IUserService userService, IConfigService configService, boolean profileFilter, Map<String, Object> filterMap) {
-        if (profileFilter && userService != null) {
-            GenieResponse<Profile> profileResponse = userService.getCurrentUser();
-            if (profileResponse.getStatus()) {
-                Profile currentProfile = profileResponse.getResult();
+    private static void applyProfileFilter(Profile profile, IConfigService configService, Map<String, Object> filterMap) {
+        if (profile != null) {
+            // Add age filter
+            applyFilter(configService, MasterDataType.AGEGROUP, String.valueOf(profile.getAge()), filterMap);
 
-                // Add age filter
-                applyFilter(configService, MasterDataType.AGEGROUP, String.valueOf(currentProfile.getAge()), filterMap);
+            // Add board filter
+            applyFilter(configService, MasterDataType.BOARD, profile.getBoard(), filterMap);
 
-                // Add board filter
-                applyFilter(configService, MasterDataType.BOARD, currentProfile.getBoard(), filterMap);
+            // Add medium filter
+            applyFilter(configService, MasterDataType.MEDIUM, profile.getMedium(), filterMap);
 
-                // Add medium filter
-                applyFilter(configService, MasterDataType.MEDIUM, currentProfile.getMedium(), filterMap);
-
-                // Add standard filter
-                applyFilter(configService, MasterDataType.GRADELEVEL, String.valueOf(currentProfile.getStandard()), filterMap);
-            }
+            // Add standard filter
+            applyFilter(configService, MasterDataType.GRADELEVEL, String.valueOf(profile.getStandard()), filterMap);
         }
     }
 
@@ -861,16 +871,12 @@ public class ContentHandler {
         return requestMap;
     }
 
-    public static HashMap<String, Object> getPageAssembleRequest(IUserService userService, String did) {
+    public static HashMap<String, Object> getPageAssembleRequest(IConfigService configService, Profile profile, String subject, List<PartnerFilter> partnerFilters, String did) {
         String dlang = "";
         String uid = "";
-        if (userService != null) {
-            GenieResponse<Profile> profileGenieResponse = userService.getCurrentUser();
-            if (profileGenieResponse.getStatus()) {
-                Profile profile = profileGenieResponse.getResult();
-                uid = profile.getUid();
-                dlang = profile.getLanguage();
-            }
+        if (profile != null) {
+            uid = profile.getUid();
+            dlang = profile.getLanguage();
         }
 
         HashMap<String, Object> contextMap = new HashMap<>();
@@ -879,12 +885,56 @@ public class ContentHandler {
         contextMap.put("contentid", "");
         contextMap.put("uid", uid);
 
+        Map<String, Object> filterMap = new HashMap<>();
+        filterMap.put("compatibilityLevel", getCompatibilityLevel());
+
+        // Add subject filter
+        applyFilter(configService, MasterDataType.SUBJECT, subject, filterMap);
+
+        // Apply profile specific filters
+        applyProfileFilter(profile, configService, filterMap);
+
+        // Apply partner specific filters
+        applyPartnerFilter(configService, partnerFilters, filterMap);
+
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("context", contextMap);
-        // TODO: 5/25/2017 - Uncomment this and add filter request. Reffer PageAssembleAPI in Genie repo.
-//        requestMap.put("filters", getFilterRequest());
+        requestMap.put("filters", filterMap);
 
         return requestMap;
+    }
+
+    public static List<Section> getSectionsFromPageMap(IDBSession dbSession, Map<String, Object> pageMap) {
+        List<Section> sectionList = new ArrayList<>();
+
+        List<Map<String, Object>> sections = (List<Map<String, Object>>) pageMap.get("sections");
+        for (Map<String, Object> sectionMap : sections) {
+            List<Map<String, Object>> contentDataList = null;
+            if (sectionMap.containsKey("contents")) {
+                contentDataList = (List<Map<String, Object>>) sectionMap.get("contents");
+            }
+
+            Section section = new Section();
+            section.setResponseMessageId((String) sectionMap.get("resmsgid"));
+            section.setApiId((String) sectionMap.get("apiid"));
+            section.setDisplay(GsonUtil.fromMap((Map) sectionMap.get("display"), Display.class));
+            section.setContents(convertContentMapListToBeanList(dbSession, contentDataList));
+            // TODO: 5/30/2017 - Set the applied filter to each sections
+        }
+
+        return sectionList;
+    }
+
+    public static List<Content> convertContentMapListToBeanList(IDBSession dbSession, List<Map<String, Object>> contentDataList) {
+        List<Content> contents = new ArrayList<>();
+        if (contentDataList != null) {
+            for (Map contentDataMap : contentDataList) {
+                ContentModel contentModel = ContentModel.build(dbSession, contentDataMap, null);
+                Content content = convertContentModelToBean(contentModel);
+                contents.add(content);
+            }
+        }
+        return contents;
     }
 
     public static String getDownloadUrl(Map<String, Object> dataMap) {

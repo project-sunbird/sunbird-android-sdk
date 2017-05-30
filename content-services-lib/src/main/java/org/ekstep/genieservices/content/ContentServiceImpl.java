@@ -16,8 +16,12 @@ import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.PageAssembleResult;
+import org.ekstep.genieservices.commons.bean.PartnerFilter;
+import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.download.DownloadService;
+import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
@@ -32,7 +36,9 @@ import org.ekstep.genieservices.content.chained.ExtractPayloads;
 import org.ekstep.genieservices.content.chained.IChainable;
 import org.ekstep.genieservices.content.chained.ValidateEcar;
 import org.ekstep.genieservices.content.db.model.ContentModel;
+import org.ekstep.genieservices.content.db.model.PageModel;
 import org.ekstep.genieservices.content.network.ContentSearchAPI;
+import org.ekstep.genieservices.content.network.PageAssembleAPI;
 import org.ekstep.genieservices.content.network.RecommendedContentAPI;
 import org.ekstep.genieservices.content.network.RelatedContentAPI;
 
@@ -218,6 +224,53 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
+    public GenieResponse<PageAssembleResult> getPageAssembleContents(String pageIdentifier, Profile profile, String subject, List<PartnerFilter> partnerFilters) {
+        PageModel pageModelInDB = PageModel.find(mAppContext.getDBSession(), pageIdentifier, profile, subject);
+        if (pageModelInDB != null) {
+            // TODO: 5/29/2017 -
+        } else {
+            if (profile == null) {
+                profile = ContentHandler.getCurrentProfile(userService);
+            }
+
+            PageAssembleAPI api = new PageAssembleAPI(mAppContext, pageIdentifier, ContentHandler.getPageAssembleRequest(configService, profile, subject, partnerFilters, mAppContext.getDeviceInfo().getDeviceID()));
+            GenieResponse apiResponse = api.post();
+            if (apiResponse.getStatus()) {
+                String body = apiResponse.getResult().toString();
+
+                LinkedTreeMap map = GsonUtil.fromJson(body, LinkedTreeMap.class);
+                LinkedTreeMap responseParams = (LinkedTreeMap) map.get("params");
+                LinkedTreeMap result = (LinkedTreeMap) map.get("result");
+
+                String responseMessageId = null;
+                if (responseParams.containsKey("resmsgid")) {
+                    responseMessageId = (String) responseParams.get("resmsgid");
+                }
+
+                if (result != null) {
+                    long expiryTime;
+
+                    long ttlInMilliSeconds = ContentConstants.CACHE_TIMEOUT_HOME_CONTENT;
+                    Long currentTime = DateUtil.getEpochTime();
+                    expiryTime = ttlInMilliSeconds + currentTime;
+
+                    PageModel pageModel = PageModel.build(mAppContext.getDBSession(), pageIdentifier, body, profile, subject, expiryTime);
+                    pageModel.save();
+
+                    PageAssembleResult pageAssembleResult = new PageAssembleResult();
+                    pageAssembleResult.setId(pageIdentifier);
+                    pageAssembleResult.setResponseMessageId(responseMessageId);
+                    if (result.containsKey("page")) {
+                        pageAssembleResult.setSections(ContentHandler.getSectionsFromPageMap(mAppContext.getDBSession(), (Map<String, Object>) result.get("page")));
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    @Override
     public GenieResponse<ContentSearchResult> searchContent(ContentSearchCriteria contentSearchCriteria) {
         GenieResponse<ContentSearchResult> response;
 
@@ -248,22 +301,12 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 contentDataList = (List<Map<String, Object>>) result.get("content");
             }
 
-            List<Content> contents = new ArrayList<>();
-            if (contentDataList != null) {
-                for (Map contentDataMap : contentDataList) {
-                    // TODO: 5/15/2017 - Can fetch content from DB and return in response.
-                    ContentModel contentModel = ContentModel.build(mAppContext.getDBSession(), contentDataMap, null);
-                    Content content = ContentHandler.convertContentModelToBean(contentModel);
-                    contents.add(content);
-                }
-            }
-
             ContentSearchResult searchResult = new ContentSearchResult();
             searchResult.setId(id);
             searchResult.setResponseMessageId(responseMessageId);
             searchResult.setFilter(ContentHandler.getFilters(configService, facets, (Map<String, Object>) requestMap.get("filters")));
             searchResult.setRequest(requestMap);
-            searchResult.setContents(contents);
+            searchResult.setContents(ContentHandler.convertContentMapListToBeanList(mAppContext.getDBSession(), contentDataList));
 
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(searchResult);
@@ -301,19 +344,10 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 contentDataList = (List<Map<String, Object>>) result.get("content");
             }
 
-            List<Content> contents = new ArrayList<>();
-            if (contentDataList != null) {
-                for (Map contentDataMap : contentDataList) {
-                    ContentModel contentModel = ContentModel.build(mAppContext.getDBSession(), contentDataMap, null);
-                    Content content = ContentHandler.convertContentModelToBean(contentModel);
-                    contents.add(content);
-                }
-            }
-
             ContentSearchResult searchResult = new ContentSearchResult();
             searchResult.setId(id);
             searchResult.setResponseMessageId(responseMessageId);
-            searchResult.setContents(contents);
+            searchResult.setContents(ContentHandler.convertContentMapListToBeanList(mAppContext.getDBSession(), contentDataList));
 
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(searchResult);
