@@ -16,8 +16,8 @@ import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.PageAssembleCriteria;
-import org.ekstep.genieservices.commons.bean.PageAssembleResult;
+import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
+import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
@@ -224,14 +224,14 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<PageAssembleResult> getPageAssembleContents(PageAssembleCriteria pageAssembleCriteria) {
+    public GenieResponse<ContentListingResult> getContentListing(ContentListingCriteria contentListingCriteria) {
         Profile profile = null;
-        if (pageAssembleCriteria.isCurrentProfileFilter()) {
+        if (contentListingCriteria.isCurrentProfileFilter()) {
             profile = ContentHandler.getCurrentProfile(userService);
         }
 
         String jsonStr = null;
-        PageModel pageModelInDB = PageModel.find(mAppContext.getDBSession(), pageAssembleCriteria.getPageIdentifier(), profile, pageAssembleCriteria.getSubject());
+        PageModel pageModelInDB = PageModel.find(mAppContext.getDBSession(), contentListingCriteria.getPageIdentifier(), profile, contentListingCriteria.getSubject());
         if (pageModelInDB != null) {
             if (ContentHandler.dataHasExpired(pageModelInDB.getExpiryTime())) {
                 pageModelInDB.delete();
@@ -241,22 +241,22 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         }
 
         if (jsonStr == null) {
-            Map<String, Object> requestMap = ContentHandler.getPageAssembleRequest(configService, profile, pageAssembleCriteria.getSubject(), pageAssembleCriteria.getPartnerFilters(), mAppContext.getDeviceInfo().getDeviceID());
-            PageAssembleAPI api = new PageAssembleAPI(mAppContext, pageAssembleCriteria.getPageIdentifier(), requestMap);
+            Map<String, Object> requestMap = ContentHandler.getPageAssembleRequest(configService, profile, contentListingCriteria.getSubject(), contentListingCriteria.getPartnerFilters(), mAppContext.getDeviceInfo().getDeviceID());
+            PageAssembleAPI api = new PageAssembleAPI(mAppContext, contentListingCriteria.getPageIdentifier(), requestMap);
             GenieResponse apiResponse = api.post();
             if (apiResponse.getStatus()) {
                 jsonStr = apiResponse.getResult().toString();
-                ContentHandler.savePageDataInDB(mAppContext.getDBSession(), pageAssembleCriteria, profile, jsonStr);
+                ContentHandler.savePageDataInDB(mAppContext.getDBSession(), contentListingCriteria, profile, jsonStr);
             } else {
                 return GenieResponseBuilder.getErrorResponse(apiResponse.getError(), (String) apiResponse.getErrorMessages().get(0), TAG);
             }
         }
 
         if (jsonStr != null) {
-            PageAssembleResult pageAssembleResult = ContentHandler.getPageAssembleResult(mAppContext.getDBSession(), pageAssembleCriteria, jsonStr);
-            if (pageAssembleResult != null) {
-                GenieResponse<PageAssembleResult> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-                response.setResult(pageAssembleResult);
+            ContentListingResult contentListingResult = ContentHandler.getPageAssembleResult(mAppContext.getDBSession(), contentListingCriteria, jsonStr);
+            if (contentListingResult != null) {
+                GenieResponse<ContentListingResult> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+                response.setResult(contentListingResult);
                 return response;
             }
         }

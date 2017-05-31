@@ -2,11 +2,11 @@ package org.ekstep.genieservices;
 
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
+import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
+import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.PageAssembleCriteria;
-import org.ekstep.genieservices.commons.bean.PageAssembleResult;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 
 import java.util.List;
@@ -87,10 +87,10 @@ public interface IContentService {
     GenieResponse<Void> deleteContent(String contentIdentifier, int level);
 
     /**
-     * @param pageAssembleCriteria
+     * @param contentListingCriteria
      * @return
      */
-    GenieResponse<PageAssembleResult> getPageAssembleContents(PageAssembleCriteria pageAssembleCriteria);
+    GenieResponse<ContentListingResult> getContentListing(ContentListingCriteria contentListingCriteria);
 
     /**
      * This api is used to search for contents with the search criterion mentioned in {@link ContentSearchCriteria}

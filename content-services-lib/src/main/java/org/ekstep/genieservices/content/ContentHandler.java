@@ -19,8 +19,8 @@ import org.ekstep.genieservices.commons.bean.FilterValue;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.MasterDataValues;
-import org.ekstep.genieservices.commons.bean.PageAssembleCriteria;
-import org.ekstep.genieservices.commons.bean.PageAssembleResult;
+import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
+import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.PartnerFilter;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.Section;
@@ -912,7 +912,7 @@ public class ContentHandler {
         return requestMap;
     }
 
-    public static void savePageDataInDB(IDBSession dbSession, PageAssembleCriteria pageAssembleCriteria, Profile profile, String jsonStr) {
+    public static void savePageDataInDB(IDBSession dbSession, ContentListingCriteria contentListingCriteria, Profile profile, String jsonStr) {
         if (jsonStr == null) {
             return;
         }
@@ -923,12 +923,12 @@ public class ContentHandler {
         Long currentTime = DateUtil.getEpochTime();
         expiryTime = ttlInMilliSeconds + currentTime;
 
-        PageModel pageModel = PageModel.build(dbSession, pageAssembleCriteria.getPageIdentifier(), jsonStr, profile, pageAssembleCriteria.getSubject(), expiryTime);
+        PageModel pageModel = PageModel.build(dbSession, contentListingCriteria.getPageIdentifier(), jsonStr, profile, contentListingCriteria.getSubject(), expiryTime);
         pageModel.save();
     }
 
-    public static PageAssembleResult getPageAssembleResult(IDBSession dbSession, PageAssembleCriteria pageAssembleCriteria, String jsonStr) {
-        PageAssembleResult pageAssembleResult = null;
+    public static ContentListingResult getPageAssembleResult(IDBSession dbSession, ContentListingCriteria contentListingCriteria, String jsonStr) {
+        ContentListingResult contentListingResult = null;
 
         LinkedTreeMap map = GsonUtil.fromJson(jsonStr, LinkedTreeMap.class);
         LinkedTreeMap responseParams = (LinkedTreeMap) map.get("params");
@@ -940,18 +940,18 @@ public class ContentHandler {
         }
 
         if (result != null) {
-            pageAssembleResult = new PageAssembleResult();
-            pageAssembleResult.setId(pageAssembleCriteria.getPageIdentifier());
-            pageAssembleResult.setResponseMessageId(responseMessageId);
+            contentListingResult = new ContentListingResult();
+            contentListingResult.setId(contentListingCriteria.getPageIdentifier());
+            contentListingResult.setResponseMessageId(responseMessageId);
             if (result.containsKey("page")) {
-                pageAssembleResult.setSections(getSectionsFromPageMap(dbSession, (Map<String, Object>) result.get("page"), pageAssembleCriteria));
+                contentListingResult.setSections(getSectionsFromPageMap(dbSession, (Map<String, Object>) result.get("page"), contentListingCriteria));
             }
         }
 
-        return pageAssembleResult;
+        return contentListingResult;
     }
 
-    private static List<Section> getSectionsFromPageMap(IDBSession dbSession, Map<String, Object> pageMap, PageAssembleCriteria pageAssembleCriteria) {
+    private static List<Section> getSectionsFromPageMap(IDBSession dbSession, Map<String, Object> pageMap, ContentListingCriteria contentListingCriteria) {
         List<Section> sectionList = new ArrayList<>();
 
         List<Map<String, Object>> sections = (List<Map<String, Object>>) pageMap.get("sections");
@@ -1016,8 +1016,8 @@ public class ContentHandler {
                         }
 
                         contentSearchCriteria.setFilters(filters);
-                        contentSearchCriteria.setProfileFilter(pageAssembleCriteria.isCurrentProfileFilter());
-                        contentSearchCriteria.setPartnerFilters(pageAssembleCriteria.getPartnerFilters());
+                        contentSearchCriteria.setProfileFilter(contentListingCriteria.isCurrentProfileFilter());
+                        contentSearchCriteria.setPartnerFilters(contentListingCriteria.getPartnerFilters());
                     }
                 }
             }

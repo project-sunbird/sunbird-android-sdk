@@ -7,12 +7,11 @@ import java.util.List;
  *
  * @author anil
  */
-public class PageAssembleResult {
+public class ContentListingResult {
 
     private String id;
     private String responseMessageId;
     private List<Section> sections;
-    private List<ContentSearchFilter> filter;
 
     public String getId() {
         return id;

@@ -7,7 +7,7 @@ import java.util.List;
  *
  * @author anil
  */
-public class PageAssembleCriteria {
+public class ContentListingCriteria {
 
     private String pageIdentifier;
     private String subject;
