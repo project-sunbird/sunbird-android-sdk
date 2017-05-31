@@ -14,6 +14,7 @@ public class GenieAsyncService {
     private static SyncService sSyncService;
     private static TelemetryService sTelemetryService;
     private static UserService sUserService;
+    private static ContentService sContentService;
     private static TagService sTagService;
     private static NotificationService sNotificationService;
 
@@ -71,5 +72,11 @@ public class GenieAsyncService {
         return sNotificationService;
     }
 
+    public ContentService getContentService() {
+        if (sContentService == null) {
+            sContentService = new ContentService(sService);
+        }
+        return sContentService;
+    }
 
 }
