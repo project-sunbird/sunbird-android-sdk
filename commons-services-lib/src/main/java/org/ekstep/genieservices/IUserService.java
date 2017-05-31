@@ -118,10 +118,14 @@ public interface IUserService {
     public GenieResponse<Profile> updateUserProfile(Profile profile);
 
     /**
+     * This api gives the status each content of being accessed.
+     * <p>
+     * <p>Response status always be True, with all the contents access state set in result
+     *
      * @param criteria
      * @return
      */
     public GenieResponse<List<ContentAccess>> getAllContentAccess(ContentAccessCriteria criteria);
 
-    GenieResponse<Void> setLearnerState(String contentIdentifier, Map<String, Object> learnerState);
+    public GenieResponse<Void> setLearnerState(String contentIdentifier, Map<String, Object> learnerState);
 }

@@ -4,8 +4,6 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 
-import java.util.HashMap;
-
 /**
  * This is the interface with all the required APIs to perform necessary operations related to Telemetry
  */
@@ -38,6 +36,13 @@ public interface ITelemetryService {
      */
     GenieResponse<Void> saveTelemetry(Telemetry event);
 
+    /**
+     * This api will give the telemetry stats about unsynced events and last sync time in {@link TelemetryStat}
+     * <p>
+     * <p>Response status always be True, with {@link TelemetryStat} set in the result.
+     *
+     * @return
+     */
     GenieResponse<TelemetryStat> getTelemetryStat();
 
 
