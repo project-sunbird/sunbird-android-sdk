@@ -182,5 +182,5 @@ public interface IContentService {
      * @param contentIdentifiers List of identifier which needs to import.
      * @return
      */
-    GenieResponse<Void> importContent(boolean isChildContent, File destinationFolder, List<String> contentIdentifiers);
+    GenieResponse<Void> importContent(boolean isChildContent, List<String> contentIdentifiers, File destinationFolder);
 }

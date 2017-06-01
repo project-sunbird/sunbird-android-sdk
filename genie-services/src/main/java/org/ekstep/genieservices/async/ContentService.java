@@ -10,6 +10,7 @@ import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -37,7 +38,7 @@ public class ContentService {
      * @param contentIdentifier -  identifier of a content
      * @return
      */
-    public void getContentDetails(final String contentIdentifier,IResponseHandler<Content> responseHandler) {
+    public void getContentDetails(final String contentIdentifier, IResponseHandler<Content> responseHandler) {
         new AsyncHandler<Content>(responseHandler).execute(new IPerformable<Content>() {
             @Override
             public GenieResponse<Content> perform() {
@@ -55,7 +56,7 @@ public class ContentService {
      * @param criteria
      * @return
      */
-    public void getAllLocalContent(final ContentCriteria criteria,IResponseHandler<List<Content>> responseHandler) {
+    public void getAllLocalContent(final ContentCriteria criteria, IResponseHandler<List<Content>> responseHandler) {
         new AsyncHandler<List<Content>>(responseHandler).execute(new IPerformable<List<Content>>() {
             @Override
             public GenieResponse<List<Content>> perform() {
@@ -89,11 +90,11 @@ public class ContentService {
      *                          <p>
      * @return {@link List<Content>}
      */
-    public void getChildContents(final String contentIdentifier, final int levelAndState,IResponseHandler<List<Content>> responseHandler) {
+    public void getChildContents(final String contentIdentifier, final int levelAndState, IResponseHandler<List<Content>> responseHandler) {
         new AsyncHandler<List<Content>>(responseHandler).execute(new IPerformable<List<Content>>() {
             @Override
             public GenieResponse<List<Content>> perform() {
-                return contentService.getChildContents(contentIdentifier,levelAndState);
+                return contentService.getChildContents(contentIdentifier, levelAndState);
             }
         });
     }
@@ -112,11 +113,11 @@ public class ContentService {
      * @param level
      * @return
      */
-    public void deleteContent(final String contentIdentifier, final int level,IResponseHandler<Void> responseHandler) {
+    public void deleteContent(final String contentIdentifier, final int level, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
-                return contentService.deleteContent(contentIdentifier,level);
+                return contentService.deleteContent(contentIdentifier, level);
             }
         });
     }
@@ -136,7 +137,7 @@ public class ContentService {
      * @param contentSearchCriteria
      * @return
      */
-    public void searchContent(final ContentSearchCriteria contentSearchCriteria,IResponseHandler<ContentSearchResult> responseHandler) {
+    public void searchContent(final ContentSearchCriteria contentSearchCriteria, IResponseHandler<ContentSearchResult> responseHandler) {
         new AsyncHandler<ContentSearchResult>(responseHandler).execute(new IPerformable<ContentSearchResult>() {
             @Override
             public GenieResponse<ContentSearchResult> perform() {
@@ -160,7 +161,7 @@ public class ContentService {
      * @param language
      * @return
      */
-    public void getRecommendedContent(final String language,IResponseHandler<ContentSearchResult> responseHandler) {
+    public void getRecommendedContent(final String language, IResponseHandler<ContentSearchResult> responseHandler) {
         new AsyncHandler<ContentSearchResult>(responseHandler).execute(new IPerformable<ContentSearchResult>() {
             @Override
             public GenieResponse<ContentSearchResult> perform() {
@@ -185,7 +186,7 @@ public class ContentService {
      * @param contentIdentifier
      * @return
      */
-    public void getRelatedContent(final String contentIdentifier,IResponseHandler<RelatedContentResult> responseHandler) {
+    public void getRelatedContent(final String contentIdentifier, IResponseHandler<RelatedContentResult> responseHandler) {
         new AsyncHandler<RelatedContentResult>(responseHandler).execute(new IPerformable<RelatedContentResult>() {
             @Override
             public GenieResponse<RelatedContentResult> perform() {
@@ -203,7 +204,7 @@ public class ContentService {
      * @param contentIdentifiers
      * @return
      */
-    public void nextContent(final List<String> contentIdentifiers,IResponseHandler<List<Content>> responseHandler) {
+    public void nextContent(final List<String> contentIdentifiers, IResponseHandler<List<Content>> responseHandler) {
         new AsyncHandler<List<Content>>(responseHandler).execute(new IPerformable<List<Content>>() {
             @Override
             public GenieResponse<List<Content>> perform() {
@@ -226,11 +227,11 @@ public class ContentService {
      * @param ecarFilePath
      * @return
      */
-    public void importContent(final boolean isChildContent,final String ecarFilePath,IResponseHandler<Void> responseHandler) {
+    public void importContent(final boolean isChildContent, final String ecarFilePath, final File destinationFolder, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
-                return contentService.importContent(isChildContent,ecarFilePath);
+                return contentService.importContent(isChildContent, ecarFilePath, destinationFolder);
             }
         });
     }
@@ -244,11 +245,11 @@ public class ContentService {
      * @param contentIdentifiers
      * @return
      */
-    public void importContent(final boolean isChildContent,final List<String> contentIdentifiers,IResponseHandler<Void> responseHandler) {
+    public void importContent(final boolean isChildContent, final List<String> contentIdentifiers, final File destinationFolder, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
-                return contentService.importContent(isChildContent,contentIdentifiers);
+                return contentService.importContent(isChildContent, contentIdentifiers, destinationFolder);
             }
         });
     }

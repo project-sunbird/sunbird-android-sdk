@@ -7,6 +7,7 @@ import com.google.gson.JsonSyntaxException;
 
 import org.ekstep.genieservices.commons.exception.InvalidDataException;
 
+import java.lang.reflect.Type;
 import java.util.Map;
 
 /**
@@ -25,6 +26,10 @@ public class GsonUtil {
 
     public static <C> C fromJson(String json, Class<C> classOfC) {
         return getGson().fromJson(json, classOfC);
+    }
+
+    public static <T> T fromJson(String json, Type type) {
+        return (T) getGson().fromJson(json, type);
     }
 
     public static <T> T fromJson(String json, Class<T> type, String exceptionMessage) {
