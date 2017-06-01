@@ -96,7 +96,7 @@ public class ContentHandler {
         return null;
     }
 
-    public static void refreshContentDetails(final AppContext appContext, final String contentIdentifier, final ContentModel existingContentModel) {
+    public static void refreshContentDetailsFromServer(final AppContext appContext, final String contentIdentifier, final ContentModel existingContentModel) {
         new Thread(new Runnable() {
             @Override
             public void run() {
