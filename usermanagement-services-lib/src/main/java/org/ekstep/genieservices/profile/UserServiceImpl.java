@@ -457,7 +457,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         GenieResponse<List<ContentAccess>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(contentAccessList);
 
-        TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "getAllContentAccess@UserServiceImpl", new HashMap());
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, "getAllContentAccess@UserServiceImpl", new HashMap());
 
 
         return response;
