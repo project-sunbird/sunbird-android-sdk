@@ -1,5 +1,7 @@
 package org.ekstep.genieservices.commons.bean;
 
+import org.ekstep.genieservices.commons.bean.enums.ContentAccessStatusType;
+
 import java.io.Serializable;
 import java.util.Map;
 
@@ -10,42 +12,27 @@ import java.util.Map;
  */
 public class ContentAccess implements Serializable {
 
-    private String identifier;
-    private String uid;
     private int status;
-    private String contentType;
     private Map<String, Object> learnerState;
 
-    public String getIdentifier() {
-        return identifier;
-    }
+    public ContentAccessStatusType getStatus() {
+        ContentAccessStatusType contentAccessStatusType;
 
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
-    }
+        switch (status) {
+            case 1:
+                contentAccessStatusType = ContentAccessStatusType.PLAYED;
+                break;
 
-    public String getUid() {
-        return uid;
-    }
+            default:
+                contentAccessStatusType = ContentAccessStatusType.NOT_PLAYED;
+                break;
+        }
 
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-
-    public int getStatus() {
-        return status;
+        return contentAccessStatusType;
     }
 
     public void setStatus(int status) {
         this.status = status;
-    }
-
-    public String getContentType() {
-        return contentType;
-    }
-
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
     }
 
     public Map<String, Object> getLearnerState() {

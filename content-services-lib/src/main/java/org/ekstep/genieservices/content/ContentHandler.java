@@ -214,7 +214,7 @@ public class ContentHandler {
             }
         }
 
-        return null;
+        return new ContentAccess();
     }
 
     private static boolean isUpdateAvailable(ContentData serverData, ContentData localData) {

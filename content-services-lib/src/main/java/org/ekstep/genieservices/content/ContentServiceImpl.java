@@ -96,9 +96,11 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         Content content = ContentHandler.convertContentModelToBean(contentModelInDB);
 
-        String uid = ContentHandler.getCurrentUserId(userService);
-        content.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, content.getIdentifier(), uid));
-        content.setContentAccess(ContentHandler.getContentAccess(userService, content.getIdentifier(), uid));
+        if (content.isAvailableLocally()) {
+            String uid = ContentHandler.getCurrentUserId(userService);
+            content.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, content.getIdentifier(), uid));
+            content.setContentAccess(ContentHandler.getContentAccess(userService, content.getIdentifier(), uid));
+        }
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(content);

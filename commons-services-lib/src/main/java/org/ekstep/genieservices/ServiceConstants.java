@@ -136,25 +136,18 @@ public interface ServiceConstants {
 
         //Config
         String UNABLE_TO_FIND_MASTER_DATA = "Unable to find masterdata";
-        String UNABLE_TO_FIND_RESOURCE_BUNDLE= "Unable to find resourcebundle";
+        String UNABLE_TO_FIND_RESOURCE_BUNDLE = "Unable to find resourcebundle";
         String UNABLE_TO_FIND_ORDINALS = "Unable to find ordinals";
 
         //Tag
-        String TAG_NAME_SHOULD_NOT_BE_EMPTY="Tag name can't be null or empty";
-        String UNABLE_TO_FIND_TAG="Tag name not found";
+        String TAG_NAME_SHOULD_NOT_BE_EMPTY = "Tag name can't be null or empty";
+        String UNABLE_TO_FIND_TAG = "Tag name not found";
 
         //Sync
-        String UNABLE_TO_SYNC="Sync Failed";
+        String UNABLE_TO_SYNC = "Sync Failed";
 
         //Telemetry
-        String UNABLE_TO_SAVE_EVENT="Not able to save event";
-    }
-
-
-    interface ContentAccessStatus {
-        int NOT_PLAYED = 0;
-        int VIEWED = 1;
-        int FULLY_PLAYED = 2;
+        String UNABLE_TO_SAVE_EVENT = "Not able to save event";
     }
 
     interface ContentStatus {

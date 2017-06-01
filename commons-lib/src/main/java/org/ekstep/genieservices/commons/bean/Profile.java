@@ -7,6 +7,7 @@ import org.ekstep.genieservices.commons.bean.validator.DateValidator;
 import org.ekstep.genieservices.commons.bean.validator.StringValidator;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -14,8 +15,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
-public class Profile implements IValidate {
+public class Profile implements Serializable, IValidate {
+
     private String uid;
     private String handle = "";
     private String avatar = "";
@@ -179,11 +182,12 @@ public class Profile implements IValidate {
     }
 
     private void initializeValidation() {
-        HashMap validationStringFields = new HashMap();
+        Map<String, String> validationStringFields = new HashMap<>();
         validationStringFields.put("handle", this.handle);
         validationStringFields.put("avatar", this.avatar);
         validationStringFields.put("language", this.language);
         StringValidator stringValidator = new StringValidator(validationStringFields);
+
         DayMonth dayMonth = new DayMonth(this.day, this.month, this.getYear());
         HashMap validationDateFields = new HashMap();
         validationDateFields.put("daymonth", dayMonth);

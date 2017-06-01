@@ -1,10 +1,14 @@
 package org.ekstep.genieservices.commons.bean;
 
-/**
- * Created by swayangjit on 6/5/17.
- */
+import java.io.Serializable;
 
-public class CoRelation {
+/**
+ * Created on 6/5/17.
+ *
+ * @author swayangjit
+ */
+public class CoRelation implements Serializable {
+
     private String type;    // Used to indicate action that is being correlated
     private String id;      // The correlation ID value
 

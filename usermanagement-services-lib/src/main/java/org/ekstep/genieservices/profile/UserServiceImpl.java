@@ -4,7 +4,6 @@ import org.ekstep.genieservices.BaseService;
 import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.CommonConstants;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessCriteria;
@@ -12,6 +11,7 @@ import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.UserSession;
+import org.ekstep.genieservices.commons.bean.enums.ContentAccessStatusType;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.bean.telemetry.GECreateProfile;
 import org.ekstep.genieservices.commons.bean.telemetry.GECreateUser;
@@ -444,9 +444,6 @@ public class UserServiceImpl extends BaseService implements IUserService {
         if (contentAccessesModel != null) {
             for (ContentAccessModel contentAccessModel : contentAccessesModel.getContentAccessModelList()) {
                 ContentAccess contentAccess = new ContentAccess();
-
-                contentAccess.setIdentifier(contentAccessModel.getIdentifier());
-                contentAccess.setUid(contentAccessModel.getUid());
                 contentAccess.setStatus(contentAccessModel.getStatus());
                 contentAccess.setLearnerState(GsonUtil.fromJson(contentAccessModel.getLearnerStateJson(), Map.class));
 
@@ -458,7 +455,6 @@ public class UserServiceImpl extends BaseService implements IUserService {
         response.setResult(contentAccessList);
 
         TelemetryLogger.logSuccess(mAppContext, response, TAG, "getAllContentAccess@UserServiceImpl", new HashMap());
-
 
         return response;
     }
@@ -483,7 +479,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         ContentAccessModel contentAccessModel = ContentAccessModel.build(mAppContext.getDBSession(), uid, contentIdentifier, GsonUtil.toJson(learnerState));
         ContentAccessModel contentAccessModelInDb = ContentAccessModel.find(mAppContext.getDBSession(), uid, contentIdentifier);
         if (contentAccessModelInDb == null) {
-            contentAccessModel.setStatus(ServiceConstants.ContentAccessStatus.VIEWED);
+            contentAccessModel.setStatus(ContentAccessStatusType.PLAYED.getValue());
             contentAccessModel.save();
         } else {
             contentAccessModel.setStatus(contentAccessModelInDb.getStatus());
