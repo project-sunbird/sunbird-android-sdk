@@ -4,20 +4,16 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.Seconds;
 import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 public class DateUtil {
 
     public static final int MILLISECONDS_IN_AN_HOUR = 3600000;
+    public static final String DATE_TIME_AM_PM_FORMAT = "dd/MM/yyyy, hh:mma";
     private static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";
     private static final String DATETIME_FORMAT_WITHOUTTIMEZONE = "yyyy-MM-dd'T'HH:mm:ss";
     private static final String DATE_FORMAT = "yyyy-MM-dd";
-    public static final String DATE_TIME_AM_PM_FORMAT = "dd/MM/yyyy, hh:mma";
-
 
     public static String getCurrentTimestamp() {
         return format(getEpochTime(), DATETIME_FORMAT);
@@ -92,5 +88,24 @@ public class DateUtil {
         return length;
     }
 
+    public static String formatSecond(double totalSeconds) {
+        long totalTimeSpent = Math.round(totalSeconds);
+        long hours = totalTimeSpent / 3600;
+        long minutes = (totalTimeSpent % 3600) / 60;
+        long seconds = totalTimeSpent % 60;
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+    }
+
+    public static long getTimeDifferenceInHours(long startDate, long stopDate) {
+        long diff = stopDate - startDate;
+        long diffHours = diff / (60 * 60 * 1000);
+        return diffHours;
+    }
+
+    public static long getTimeDifferenceInDays(long startDate, long stopDate) {
+        long diff = stopDate - startDate;
+        long diffDays = diff / (24 * 60 * 60 * 1000);
+        return diffDays;
+    }
 
 }
