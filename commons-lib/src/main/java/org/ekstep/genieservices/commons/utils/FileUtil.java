@@ -111,6 +111,10 @@ public class FileUtil {
         return new File(externalFilesDir.getPath() + "/tmp");
     }
 
+    public static File getContentRootDir(File externalFilesDir) {
+        return new File(externalFilesDir.getPath() + "/content");
+    }
+
     public static String getTmpDirFilePath(File externalFilesDir) {
         File tmpLocation = getTmpDir(externalFilesDir);
         return tmpLocation.getAbsolutePath();
@@ -136,10 +140,6 @@ public class FileUtil {
                 file.delete();
             }
         }
-    }
-
-    public static File getContentRootDir(File externalFilesDir) {
-        return new File(externalFilesDir.getPath() + "/content");
     }
 
     public static void createFolders(String loc, String dir) {
@@ -175,22 +175,6 @@ public class FileUtil {
         return file.getAbsolutePath();
     }
 
-    public static String getExportGenieAPKFilePath(File externalFilesDir) {
-        File file = getTempLocation(externalFilesDir, "Genie.apk");
-        if (file.exists()) {
-            file.delete();
-        }
-        return file.getAbsolutePath();
-    }
-
-    public static String getTempAssetFilePath(File externalFilesDir, String fileExtension) {
-        File file = getTempLocation(externalFilesDir, System.currentTimeMillis() + "." + fileExtension);
-        if (file.exists()) {
-            file.delete();
-        }
-        return file.getAbsolutePath();
-    }
-
     public static boolean doesFileExists(String filePath) {
         File file = new File(filePath);
         return file.exists();
@@ -207,7 +191,7 @@ public class FileUtil {
             is.close();
             json = new String(buffer, "UTF-8");
         } catch (IOException ex) {
-            return null;
+            ex.printStackTrace();
         }
         return json;
     }

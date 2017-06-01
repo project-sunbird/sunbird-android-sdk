@@ -20,7 +20,7 @@ public class DeviceMemoryCheck implements IChainable {
 
     @Override
     public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
-        long deviceUsableSpace = FileUtil.getFreeUsableSpace(appContext.getPrimaryFilesDir());
+        long deviceUsableSpace = FileUtil.getFreeUsableSpace(importContext.getDestinationFolder());
         long ecarFileSpace = importContext.getEcarFile().length();
         long bufferSize = calculateBufferSize(ecarFileSpace);
         if (deviceUsableSpace < ((ecarFileSpace) + bufferSize)) {

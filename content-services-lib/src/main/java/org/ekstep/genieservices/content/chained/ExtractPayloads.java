@@ -90,7 +90,7 @@ public class ExtractPayloads implements IChainable {
                     uuid = UUID.randomUUID().toString();
                     // TODO: can remove uuid from destination
                     destination = identifier + "-" + uuid;
-                    payloadDestination = new File(FileUtil.getContentRootDir(appContext.getPrimaryFilesDir()), destination);
+                    payloadDestination = new File(FileUtil.getContentRootDir(importContext.getDestinationFolder()), destination);
                     payloadDestination.mkdirs();
 
                     try {
@@ -144,7 +144,7 @@ public class ExtractPayloads implements IChainable {
                     uuid = UUID.randomUUID().toString();
                     // TODO: can remove uuid from destination
                     destination = identifier + "-" + uuid;
-                    payloadDestination = new File(FileUtil.getContentRootDir(appContext.getPrimaryFilesDir()), destination);
+                    payloadDestination = new File(FileUtil.getContentRootDir(importContext.getDestinationFolder()), destination);
                     payloadDestination.mkdirs();
 
                     // If compatibility level is not in range then do not copy artifact

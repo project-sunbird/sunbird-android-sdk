@@ -1,5 +1,7 @@
 package org.ekstep.genieservices.commons.bean;
 
+import java.io.File;
+
 /**
  * Created on 17/5/17.
  *
@@ -7,18 +9,19 @@ package org.ekstep.genieservices.commons.bean;
  */
 public class DownloadRequest {
 
-    private long downloadId=-1;
+    private long downloadId = -1;
     private String identifier;
     private String downloadUrl;
     private String name;
     private String mimeType;
-    private String filePath;
+    private File destinationFolder;
     private boolean isChildContent;
 
-    public DownloadRequest(String identifier, String downloadUrl, String mimeType, boolean isChildContent) {
+    public DownloadRequest(String identifier, String downloadUrl, String mimeType, File destinationFolder, boolean isChildContent) {
         this.identifier = identifier;
         this.downloadUrl = downloadUrl;
         this.mimeType = mimeType;
+        this.destinationFolder = destinationFolder;
         this.isChildContent = isChildContent;
     }
 
@@ -50,16 +53,11 @@ public class DownloadRequest {
         return mimeType;
     }
 
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
-    }
-
     public boolean isChildContent() {
         return isChildContent;
     }
 
+    public File getDestinationFolder() {
+        return destinationFolder;
+    }
 }

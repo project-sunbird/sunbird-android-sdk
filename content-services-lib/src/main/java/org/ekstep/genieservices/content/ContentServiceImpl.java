@@ -12,12 +12,12 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
+import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
+import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
-import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
@@ -48,7 +48,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import java.util.UUID;
 
 /**
  * Created on 5/10/2017.
@@ -506,7 +505,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<Void> importContent(boolean isChildContent, String ecarFilePath) {
+    public GenieResponse<Void> importContent(boolean isChildContent, String ecarFilePath, File destinationFolder) {
         // TODO: 5/16/2017 - Telemetry logger
         String method = "importContent@ContentServiceImpl";
         Map<String, Object> params = new HashMap<>();
@@ -526,9 +525,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "content import failed, unsupported file extension", TAG);
             return response;
         } else {
-            File ecarFile = new File(ecarFilePath);
-            File tmpLocation = new File(FileUtil.getTmpDir(mAppContext.getPrimaryFilesDir()), UUID.randomUUID().toString());
-            ImportContext importContext = new ImportContext(ecarFile, tmpLocation);
+            ImportContext importContext = new ImportContext(isChildContent, ecarFilePath, destinationFolder);
 
             IChainable importContentSteps = ContentImportStep.initImportContent();
             importContentSteps.then(new DeviceMemoryCheck())
@@ -546,7 +543,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<Void> importContent(boolean isChildContent, List<String> contentIdentifiers) {
+    public GenieResponse<Void> importContent(boolean isChildContent, File destinationFolder, List<String> contentIdentifiers) {
         DownloadService downloadService = new DownloadService(mAppContext);
 
         ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, ContentHandler.getSearchRequest(contentIdentifiers));
@@ -572,7 +569,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                     }
 
                     if (!StringUtil.isNullOrEmpty(downloadUrl) && ServiceConstants.FileExtension.CONTENT.equalsIgnoreCase(FileUtil.getFileExtension(downloadUrl))) {
-                        DownloadRequest downloadRequest = new DownloadRequest((String) dataMap.get(ContentModel.KEY_IDENTIFIER), downloadUrl, ContentConstants.MimeType.ECAR, isChildContent);
+                        String contentIdentifier = (String) dataMap.get(ContentModel.KEY_IDENTIFIER);
+                        DownloadRequest downloadRequest = new DownloadRequest(contentIdentifier, downloadUrl, ContentConstants.MimeType.ECAR, destinationFolder, isChildContent);
                         downloadRequests[i] = downloadRequest;
                     }
                 }
