@@ -4,6 +4,7 @@ import org.ekstep.genieservices.BaseService;
 import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.CommonConstants;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessCriteria;
@@ -257,11 +258,6 @@ public class UserServiceImpl extends BaseService implements IUserService {
         setCurrentUser(uid);
         GenieResponse<String> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, String.class);
         response.setResult(uid);
-        if (response.getStatus()) {
-            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
-        } else {
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_SET_ANONYMOUS);
-        }
         return response;
     }
 
@@ -270,29 +266,23 @@ public class UserServiceImpl extends BaseService implements IUserService {
      */
     @Override
     public GenieResponse<Profile> getAnonymousUser() {
-        String methodName = "getAnonymousUser@UserServiceImpl";
-        HashMap params = new HashMap();
-        params.put("logLevel", "1");
-        String anonymousUserQuery = "select u.uid from users u left join profiles p on p.uid=u.uid where p.uid is null and u.uid is not null";
-        CustomReaderModel customReaderModel = CustomReaderModel.find(mAppContext.getDBSession(), anonymousUserQuery);
-
-        String uid = null;
-        if (customReaderModel == null) {
+        String uid = getAnonymousUserId();
+        if (uid == null) {
             uid = createAnonymousUser();
-        } else {
-            uid = customReaderModel.getData();
+            GECreateUser geCreateUser = new GECreateUser(mGameData, uid, mAppContext.getLocationInfo().getLocation());
+            TelemetryLogger.log(geCreateUser);
         }
         Profile profile = new Profile(uid);
-
         GenieResponse response = GenieResponseBuilder.getSuccessResponse("", Profile.class);
         response.setResult(profile);
-
-//        if (response.getStatus()) {
-//            TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "getAnonymousUser@UserServiceImpl", new HashMap());
-//        } else {
-//            TelemetryLogger.logFailure(mAppContext, response, TAG, "getAnonymousUser@UserServiceImpl", new HashMap(), "Unable to get anonymous user");
-//        }
         return response;
+    }
+
+
+    private String getAnonymousUserId() {
+        String anonymousUserQuery = "select u.uid from users u left join profiles p on p.uid=u.uid where p.uid is null and u.uid is not null";
+        CustomReaderModel customReaderModel = CustomReaderModel.find(mAppContext.getDBSession(), anonymousUserQuery);
+        return customReaderModel != null ? customReaderModel.getData() : null;
     }
 
     /**
@@ -384,13 +374,23 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
         //This should not happen if the calling app has set an anonymous user during launch. If they have not, we will create and set an anonymous user as the current user.
         if (userSessionModel == null) {
-            setAnonymousUser();
+            initAnonymousUser();
             userSessionModel = UserSessionModel.findUserSession(mAppContext);
         }
         GenieResponse<UserSession> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(userSessionModel.getUserSessionBean());
 
         return response;
+    }
+
+    private void initAnonymousUser() {
+        String uid = getAnonymousUserId();
+        if (uid == null) {
+            uid = createAnonymousUser();
+            setCurrentUser(uid);
+            GECreateUser geCreateUser = new GECreateUser(mGameData, uid, mAppContext.getLocationInfo().getLocation());
+            TelemetryLogger.log(geCreateUser);
+        }
     }
 
     @Override
@@ -457,7 +457,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         GenieResponse<List<ContentAccess>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(contentAccessList);
 
-        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "getAllContentAccess@UserServiceImpl", new HashMap());
 
 
         return response;

@@ -1,9 +1,10 @@
-package org.ekstep.genieservices;
+package org.ekstep.genieservices.async;
 
+import org.ekstep.genieservices.GenieService;
+import org.ekstep.genieservices.IContentService;
+import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
-import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
-import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -12,10 +13,16 @@ import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import java.util.List;
 
 /**
- * This is the interface with all the required APIs for performing content related
- * operations.
+ * Created by swayangjit on 30/5/17.
  */
-public interface IContentService {
+
+public class ContentService {
+
+    private IContentService contentService;
+
+    public ContentService(GenieService genieService) {
+        this.contentService = genieService.getContentService();
+    }
 
     /**
      * This api is used to get the content details about a specific content.
@@ -30,7 +37,14 @@ public interface IContentService {
      * @param contentIdentifier -  identifier of a content
      * @return
      */
-    GenieResponse<Content> getContentDetails(String contentIdentifier);
+    public void getContentDetails(final String contentIdentifier,IResponseHandler<Content> responseHandler) {
+        new AsyncHandler<Content>(responseHandler).execute(new IPerformable<Content>() {
+            @Override
+            public GenieResponse<Content> perform() {
+                return contentService.getContentDetails(contentIdentifier);
+            }
+        });
+    }
 
     /**
      * This api is used to get all the contents.
@@ -41,7 +55,14 @@ public interface IContentService {
      * @param criteria
      * @return
      */
-    GenieResponse<List<Content>> getAllLocalContent(ContentCriteria criteria);
+    public void getAllLocalContent(final ContentCriteria criteria,IResponseHandler<List<Content>> responseHandler) {
+        new AsyncHandler<List<Content>>(responseHandler).execute(new IPerformable<List<Content>>() {
+            @Override
+            public GenieResponse<List<Content>> perform() {
+                return contentService.getAllLocalContent(criteria);
+            }
+        });
+    }
 
     /**
      * This api is used to get the child contents of a particular content, this is used in the case of COLLECTION/TEXTBOOK.
@@ -68,7 +89,14 @@ public interface IContentService {
      *                          <p>
      * @return {@link List<Content>}
      */
-    GenieResponse<List<Content>> getChildContents(String contentIdentifier, int levelAndState);
+    public void getChildContents(final String contentIdentifier, final int levelAndState,IResponseHandler<List<Content>> responseHandler) {
+        new AsyncHandler<List<Content>>(responseHandler).execute(new IPerformable<List<Content>>() {
+            @Override
+            public GenieResponse<List<Content>> perform() {
+                return contentService.getChildContents(contentIdentifier,levelAndState);
+            }
+        });
+    }
 
     /**
      * This api is used to delete a particular content.
@@ -84,13 +112,14 @@ public interface IContentService {
      * @param level
      * @return
      */
-    GenieResponse<Void> deleteContent(String contentIdentifier, int level);
-
-    /**
-     * @param contentListingCriteria
-     * @return
-     */
-    GenieResponse<ContentListingResult> getContentListing(ContentListingCriteria contentListingCriteria);
+    public void deleteContent(final String contentIdentifier, final int level,IResponseHandler<Void> responseHandler) {
+        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return contentService.deleteContent(contentIdentifier,level);
+            }
+        });
+    }
 
     /**
      * This api is used to search for contents with the search criterion mentioned in {@link ContentSearchCriteria}
@@ -107,7 +136,14 @@ public interface IContentService {
      * @param contentSearchCriteria
      * @return
      */
-    GenieResponse<ContentSearchResult> searchContent(ContentSearchCriteria contentSearchCriteria);
+    public void searchContent(final ContentSearchCriteria contentSearchCriteria,IResponseHandler<ContentSearchResult> responseHandler) {
+        new AsyncHandler<ContentSearchResult>(responseHandler).execute(new IPerformable<ContentSearchResult>() {
+            @Override
+            public GenieResponse<ContentSearchResult> perform() {
+                return contentService.searchContent(contentSearchCriteria);
+            }
+        });
+    }
 
     /**
      * This api is used to get the related contents based on the language
@@ -124,7 +160,15 @@ public interface IContentService {
      * @param language
      * @return
      */
-    GenieResponse<ContentSearchResult> getRecommendedContent(String language);
+    public void getRecommendedContent(final String language,IResponseHandler<ContentSearchResult> responseHandler) {
+        new AsyncHandler<ContentSearchResult>(responseHandler).execute(new IPerformable<ContentSearchResult>() {
+            @Override
+            public GenieResponse<ContentSearchResult> perform() {
+                return contentService.getRecommendedContent(language);
+            }
+        });
+    }
+
 
     /**
      * This api is used to get the related contents as similar to the identifier passed.
@@ -141,7 +185,14 @@ public interface IContentService {
      * @param contentIdentifier
      * @return
      */
-    GenieResponse<RelatedContentResult> getRelatedContent(String contentIdentifier);
+    public void getRelatedContent(final String contentIdentifier,IResponseHandler<RelatedContentResult> responseHandler) {
+        new AsyncHandler<RelatedContentResult>(responseHandler).execute(new IPerformable<RelatedContentResult>() {
+            @Override
+            public GenieResponse<RelatedContentResult> perform() {
+                return contentService.getRelatedContent(contentIdentifier);
+            }
+        });
+    }
 
     /**
      * This api is used to get all the next {@link List<Content>} based on the hierarchy of {@link List<String>} identifiers passed
@@ -152,7 +203,14 @@ public interface IContentService {
      * @param contentIdentifiers
      * @return
      */
-    GenieResponse<List<Content>> nextContent(List<String> contentIdentifiers);
+    public void nextContent(final List<String> contentIdentifiers,IResponseHandler<List<Content>> responseHandler) {
+        new AsyncHandler<List<Content>>(responseHandler).execute(new IPerformable<List<Content>>() {
+            @Override
+            public GenieResponse<List<Content>> perform() {
+                return contentService.nextContent(contentIdentifiers);
+            }
+        });
+    }
 
     /**
      * This api is used to import the content from the specified Ecar file path
@@ -168,7 +226,14 @@ public interface IContentService {
      * @param ecarFilePath
      * @return
      */
-    GenieResponse<Void> importContent(boolean isChildContent, String ecarFilePath);
+    public void importContent(final boolean isChildContent,final String ecarFilePath,IResponseHandler<Void> responseHandler) {
+        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return contentService.importContent(isChildContent,ecarFilePath);
+            }
+        });
+    }
 
     /**
      * This api is used to import the group of contents all specified with identifiers in {@link List<String>}
@@ -179,5 +244,13 @@ public interface IContentService {
      * @param contentIdentifiers
      * @return
      */
-    GenieResponse<Void> importContent(boolean isChildContent, List<String> contentIdentifiers);
+    public void importContent(final boolean isChildContent,final List<String> contentIdentifiers,IResponseHandler<Void> responseHandler) {
+        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return contentService.importContent(isChildContent,contentIdentifiers);
+            }
+        });
+    }
+
 }

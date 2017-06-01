@@ -12,9 +12,5 @@ import org.ekstep.genieservices.content.bean.ImportContext;
 public interface IChainable {
     GenieResponse<Void> execute(AppContext appContext, ImportContext importContext);
 
-    Void postExecute();
-
-    GenieResponse<Void> breakChain();
-
     IChainable then(IChainable link);
 }

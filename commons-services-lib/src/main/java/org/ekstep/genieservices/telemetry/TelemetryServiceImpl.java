@@ -110,7 +110,15 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
     }
 
     private void decorateEvent(EventModel event) {
-        //TODO Decorate should only patch fields that are not already present.
+
+        //Patch the event with proper timestamp
+        String version = event.getVersion();
+        if (version.equals("1.0")) {
+            event.updateTs(DateUtil.getCurrentTimestamp());
+        } else if (version.equals("2.0")) {
+            event.updateEts(DateUtil.getEpochTime());
+        }
+
         //Patch the event with current Sid and Uid
         if (mUserService != null) {
             UserSession currentUserSession = mUserService.getCurrentUserSession().getResult();
@@ -122,13 +130,6 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         //Patch the event with did
         event.updateDeviceInfo(mAppContext.getDeviceInfo().getDeviceID());
 
-        //Patch the event with proper timestamp
-        String version = event.getVersion();
-        if (version.equals("1.0")) {
-            event.updateTs(DateUtil.getCurrentTimestamp());
-        } else if (version.equals("2.0")) {
-            event.updateEts(DateUtil.getEpochTime());
-        }
 
         //Patch Partner tagss
         String values = mAppContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.KEY_ACTIVE_PARTNER_ID, "");

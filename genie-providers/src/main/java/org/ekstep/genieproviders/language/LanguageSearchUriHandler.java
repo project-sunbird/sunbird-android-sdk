@@ -13,7 +13,6 @@ import org.ekstep.genieproviders.IUriHandler;
 import org.ekstep.genieproviders.util.Constants;
 import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
-import org.ekstep.genieservices.commons.LanguageSearchRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
@@ -43,8 +42,7 @@ public class LanguageSearchUriHandler implements IUriHandler {
         MatrixCursor cursor = null;
         if (genieService != null) {
             cursor = getMatrixCursor();
-            LanguageSearchRequest request = GsonUtil.fromJson(selection, LanguageSearchRequest.class);
-            GenieResponse genieResponse = genieService.getLanguageService().getLanguageSearch(GsonUtil.toJson(request));
+            GenieResponse genieResponse = genieService.getLanguageService().getLanguageSearch(selection);
             if (genieResponse != null) {
                 cursor.addRow(new String[]{new Gson().toJson(genieResponse)});
             } else {

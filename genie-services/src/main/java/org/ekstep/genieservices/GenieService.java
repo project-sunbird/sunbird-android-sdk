@@ -8,14 +8,14 @@ import org.ekstep.genieservices.commons.AndroidLogger;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IDeviceInfo;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
+import org.ekstep.genieservices.commons.download.DownloadService;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.config.ConfigServiceImpl;
 import org.ekstep.genieservices.content.ContentFeedbackServiceImpl;
 import org.ekstep.genieservices.content.ContentServiceImpl;
-import org.ekstep.genieservices.content.LanguageServiceImpl;
 import org.ekstep.genieservices.content.DownloadQueueListener;
-import org.ekstep.genieservices.commons.download.DownloadService;
+import org.ekstep.genieservices.content.LanguageServiceImpl;
 import org.ekstep.genieservices.notification.NotificationServiceImpl;
 import org.ekstep.genieservices.partner.PartnerServiceImpl;
 import org.ekstep.genieservices.profile.UserServiceImpl;
@@ -62,7 +62,7 @@ public class GenieService {
             AppContext<Context> applicationContext = AndroidAppContext.buildAppContext(context, packageName);
             Logger.init(new AndroidLogger());
             TelemetryLogger.init(new TelemetryServiceImpl(applicationContext, new UserServiceImpl(applicationContext)));
-            DownloadQueueListener.init(applicationContext,new DownloadService(applicationContext));
+            DownloadQueueListener.init(applicationContext, new DownloadService(applicationContext));
             sService = new GenieService(applicationContext);
         }
         GenieAsyncService.init(sService);
@@ -106,7 +106,7 @@ public class GenieService {
 
     public IContentFeedbackService getContentFeedbackService() {
         if (mContentFeedbackService == null) {
-            mContentFeedbackService = new ContentFeedbackServiceImpl(mAppContext);
+            mContentFeedbackService = new ContentFeedbackServiceImpl(mAppContext, getUserProfileService());
         }
         return mContentFeedbackService;
     }
@@ -144,6 +144,8 @@ public class GenieService {
         return mAppContext.getConnectionInfo();
     }
 
-    public DownloadService getDownloadService(){return new DownloadService(mAppContext);}
+    public DownloadService getDownloadService() {
+        return new DownloadService(mAppContext);
+    }
 
 }

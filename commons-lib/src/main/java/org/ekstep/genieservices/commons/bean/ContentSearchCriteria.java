@@ -21,7 +21,8 @@ public class ContentSearchCriteria implements Serializable {
     private static final int DEFAULT_LIMIT = 10;
 
     private String query;
-    private List<ContentSearchFilter> filter;
+    private List<ContentSearchFilter> filters;
+    private List<PartnerFilter> partnerFilters;
     private String sortBy;
     private long limit;
     private String mode;
@@ -40,12 +41,20 @@ public class ContentSearchCriteria implements Serializable {
         this.query = query;
     }
 
-    public List<ContentSearchFilter> getFilter() {
-        return filter;
+    public List<ContentSearchFilter> getFilters() {
+        return filters;
     }
 
-    public void setFilter(List<ContentSearchFilter> filter) {
-        this.filter = filter;
+    public void setFilters(List<ContentSearchFilter> filters) {
+        this.filters = filters;
+    }
+
+    public List<PartnerFilter> getPartnerFilters() {
+        return partnerFilters;
+    }
+
+    public void setPartnerFilters(List<PartnerFilter> partnerFilters) {
+        this.partnerFilters = partnerFilters;
     }
 
     public String getSortBy() {

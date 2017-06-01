@@ -117,9 +117,14 @@ public interface ServiceConstants {
     }
 
     interface ErrorMessage {
-        //Profile
-        String UNABLE_TO_FIND_PROFILE = "Unable to find profile";
+        String UNABLE_TO_FIND_PROFILE = "unable to find profile";
         String NO_USER_WITH_SPECIFIED_ID = "There is no user with specified id exists";
+
+        String MANDATORY_FIELD_CONTENT_IDENTIFIER = "Content identifier could not be null or empty.";
+        String MANDATORY_FIELD_UID = "Uid could not be null or empty.";
+        String NO_FEEDBACK = "There is no feedback with specified uid and content identifier.";
+        String NO_PAGE_ASSEMBLE_DATA = "No data found.";
+
         String UNABLE_TO_CREATE_PROFILE = "Unable to create profile";
         String INVALID_PROFILE = "Invalid profile";
         String UNABLE_TO_FIND_ALL_PROFILE = "Unable to find all profile";
@@ -144,6 +149,7 @@ public interface ServiceConstants {
         //Telemetry
         String UNABLE_TO_SAVE_EVENT="Not able to save event";
     }
+
 
     interface ContentAccessStatus {
         int NOT_PLAYED = 0;

@@ -7,6 +7,8 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.UserSession;
 
+import java.util.List;
+
 /**
  * This class provides all the required APIs to perform necessary operations related to Users on a separate thread
  */
@@ -33,6 +35,25 @@ public class UserService {
             @Override
             public GenieResponse<Profile> perform() {
                 return userService.createUserProfile(profile);
+            }
+        });
+    }
+
+    /**
+     * This api is used to get all user profiles.
+     * <p>
+     * <p>On Successful creation of new profile, the response will return status as TRUE and with successful message
+     * <p>
+     * <p>On failing to get all user profiles, the response will have status as FALSE
+     *
+     * @param profile
+     * @param responseHandler
+     */
+    public void getAllUserProfile(final Profile profile, IResponseHandler<List<Profile>> responseHandler) {
+        new AsyncHandler<List<Profile>>(responseHandler).execute(new IPerformable<List<Profile>>() {
+            @Override
+            public GenieResponse<List<Profile>> perform() {
+                return userService.getAllUserProfile();
             }
         });
     }
