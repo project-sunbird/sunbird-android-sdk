@@ -224,9 +224,7 @@ public class ExtractPayloads implements IChainable {
                 newContentModel.setPath(oldContentPath);
             }
 
-            // TODO: 5/18/2017
-            ContentHandler.addOrUpdateViralityMetadata(newContentModel.getLocalData(), appContext.getDeviceInfo().getDeviceID());
-//            newContentModel.addOrUpdateViralityMetadata(appContext.getDeviceInfo().getDeviceID());
+            ContentHandler.addOrUpdateViralityMetadata(newContentModel, appContext.getDeviceInfo().getDeviceID());
 
             if (oldContentModel == null) {
                 newContentModel.save();

@@ -461,4 +461,8 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
     public Double pkgVersion() {
         return localData != null ? (Double) GsonUtil.fromJson(localData, Map.class).get(KEY_PKG_VERSION) : null;
     }
+
+    public void updateLocalData(String localData) {
+        this.localData = localData;
+    }
 }

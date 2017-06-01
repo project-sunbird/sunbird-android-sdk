@@ -12,6 +12,8 @@ import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessCriteria;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
+import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
+import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchFilter;
 import org.ekstep.genieservices.commons.bean.Display;
@@ -19,8 +21,6 @@ import org.ekstep.genieservices.commons.bean.FilterValue;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.MasterDataValues;
-import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
-import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.PartnerFilter;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.Section;
@@ -60,8 +60,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.TreeMap;
-
-import static java.lang.String.valueOf;
 
 /**
  * Created on 5/23/2017.
@@ -122,7 +120,6 @@ public class ContentHandler {
         if (contentModel.getLocalData() != null) {
             localData = GsonUtil.fromJson(contentModel.getLocalData(), ContentData.class);
         }
-        content.setContentData(localData);
 
         ContentData serverData = null;
         if (contentModel.getServerData() != null) {
@@ -130,8 +127,10 @@ public class ContentHandler {
         }
 
         if (serverData != null) {
+            content.setContentData(serverData);
             addContentVariants(serverData, contentModel.getServerData());
         } else if (localData != null) {
+            content.setContentData(localData);
             addContentVariants(localData, contentModel.getLocalData());
         }
 
@@ -455,53 +454,47 @@ public class ContentHandler {
         return isExist;
     }
 
-    private static boolean contentMetadataAbsent(Map<String, Object> localDataMap) {
+    public static void addOrUpdateViralityMetadata(ContentModel contentModel, String origin) {
+        Map<String, Object> localDataMap = GsonUtil.fromJson(contentModel.getLocalData(), Map.class);
+
+        if (isContentMetadataAbsent(localDataMap)) {
+            Map<String, Object> viralityMetadata = new HashMap<>();
+            viralityMetadata.put(ContentModel.KEY_ORIGIN, origin);
+            viralityMetadata.put(ContentModel.KEY_TRANSFER_COUNT, INITIAL_VALUE_FOR_TRANSFER_COUNT);
+
+            Map<String, Object> contentMetadata = new HashMap<>();
+            contentMetadata.put(ContentModel.KEY_VIRALITY_METADATA, viralityMetadata);
+
+            localDataMap.put(ContentModel.KEY_CONTENT_METADATA, contentMetadata);
+        } else if (isContentMetadataPresentWithoutViralityMetadata(localDataMap)) {
+            Map<String, Object> viralityMetadata = new HashMap<>();
+            viralityMetadata.put(ContentModel.KEY_ORIGIN, origin);
+            viralityMetadata.put(ContentModel.KEY_TRANSFER_COUNT, INITIAL_VALUE_FOR_TRANSFER_COUNT);
+
+            ((Map<String, Object>) localDataMap.get(ContentModel.KEY_CONTENT_METADATA)).put(ContentModel.KEY_VIRALITY_METADATA, viralityMetadata);
+        } else {
+            Map<String, Object> viralityMetadata = (Map<String, Object>) ((Map<String, Object>) localDataMap.get(ContentModel.KEY_CONTENT_METADATA)).get(ContentModel.KEY_VIRALITY_METADATA);
+            viralityMetadata.put(ContentModel.KEY_TRANSFER_COUNT, transferCount(localDataMap) + 1);
+        }
+
+        contentModel.updateLocalData(GsonUtil.toJson(localDataMap));
+    }
+
+    private static boolean isContentMetadataAbsent(Map<String, Object> localDataMap) {
         return localDataMap.get(ContentModel.KEY_CONTENT_METADATA) == null;
     }
 
-    private static boolean contentMetadataPresentWithoutViralityMetadata(Map<String, Object> localDataMap) {
+    private static boolean isContentMetadataPresentWithoutViralityMetadata(Map<String, Object> localDataMap) {
         return localDataMap.get(ContentModel.KEY_CONTENT_METADATA) != null
                 && ((Map<String, Object>) localDataMap.get(ContentModel.KEY_CONTENT_METADATA)).get(ContentModel.KEY_VIRALITY_METADATA) == null;
     }
 
-    private static boolean contentAndViralityMetadataPresent(Map<String, Object> localDataMap) {
-        return localDataMap.get(ContentModel.KEY_CONTENT_METADATA) != null
-                && ((Map<String, Object>) localDataMap.get(ContentModel.KEY_CONTENT_METADATA)).get(ContentModel.KEY_VIRALITY_METADATA) != null;
-    }
-
-    public static int transferCount(Map<String, Object> localDataMap) {
+    private static int transferCount(Map<String, Object> viralityMetadata) {
         try {
-            return Double.valueOf(valueOf(viralityMetadata(localDataMap).get(ContentModel.KEY_TRANSFER_COUNT))).intValue();
+            String transferCount = (String) viralityMetadata.get(ContentModel.KEY_TRANSFER_COUNT);
+            return Double.valueOf(transferCount).intValue();
         } catch (Exception e) {
             return 0;
-        }
-    }
-
-    private static Map<String, Object> viralityMetadata(Map<String, Object> localDataMap) {
-        return contentAndViralityMetadataPresent(localDataMap)
-                ? (Map<String, Object>) ((Map<String, Object>) localDataMap.get(ContentModel.KEY_CONTENT_METADATA)).get(ContentModel.KEY_VIRALITY_METADATA)
-                : new HashMap<String, Object>();
-    }
-
-    public static void addOrUpdateViralityMetadata(String localDataJson, String origin) {
-        Map<String, Object> localDataMap = GsonUtil.fromJson(localDataJson, Map.class);
-
-        if (contentMetadataAbsent(localDataMap)) {
-            Map<String, Object> contentMetadata = new HashMap<>();
-            localDataMap.put(ContentModel.KEY_CONTENT_METADATA, contentMetadata);
-            Map<String, Object> viralityMetadata = new HashMap<>();
-            contentMetadata.put(ContentModel.KEY_VIRALITY_METADATA, viralityMetadata);
-            viralityMetadata.put(ContentModel.KEY_ORIGIN, origin);
-            viralityMetadata.put(ContentModel.KEY_TRANSFER_COUNT, INITIAL_VALUE_FOR_TRANSFER_COUNT);
-        } else if (contentMetadataPresentWithoutViralityMetadata(localDataMap)) {
-            Map<String, Object> virality = new HashMap<>();
-            ((Map<String, Object>) localDataMap.get(ContentModel.KEY_CONTENT_METADATA)).put(ContentModel.KEY_VIRALITY_METADATA, virality);
-            virality.put(ContentModel.KEY_ORIGIN, origin);
-            virality.put(ContentModel.KEY_TRANSFER_COUNT, INITIAL_VALUE_FOR_TRANSFER_COUNT);
-        } else if (contentAndViralityMetadataPresent(localDataMap)) {
-            Map<String, Object> viralityMetadata =
-                    (Map<String, Object>) ((Map<String, Object>) localDataMap.get(ContentModel.KEY_CONTENT_METADATA)).get(ContentModel.KEY_VIRALITY_METADATA);
-            viralityMetadata.put(ContentModel.KEY_TRANSFER_COUNT, transferCount(localDataMap) + 1);
         }
     }
 
