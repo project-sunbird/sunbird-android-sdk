@@ -543,7 +543,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<Void> importContent(boolean isChildContent, File destinationFolder, List<String> contentIdentifiers) {
+    public GenieResponse<Void> importContent(boolean isChildContent, List<String> contentIdentifiers, File destinationFolder) {
         DownloadService downloadService = new DownloadService(mAppContext);
 
         ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, ContentHandler.getSearchRequest(contentIdentifiers));
