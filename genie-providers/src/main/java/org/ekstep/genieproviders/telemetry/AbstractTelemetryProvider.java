@@ -50,7 +50,7 @@ public abstract class AbstractTelemetryProvider extends BaseContentProvider {
     }
 
     private String getCompletePath() {
-        String TELEMETRY_PATH = ".telemetry";
+        String TELEMETRY_PATH = "telemetry";
         return String.format("%s.%s", getPackageName(), TELEMETRY_PATH);
     }
 }

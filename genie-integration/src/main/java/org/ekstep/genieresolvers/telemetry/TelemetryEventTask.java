@@ -52,7 +52,7 @@ public class TelemetryEventTask extends BaseTask {
     }
 
     private Uri getUri() {
-        String authority = String.format("content://%s.telemetry/event", appQualifier);
+        String authority = String.format("content://%s.telemetry", appQualifier);
         return Uri.parse(authority);
     }
 }
