@@ -39,7 +39,7 @@ public class UserProfileTest extends GenieServiceTestBase {
     @Test
     public void shouldCreateUserProfile() {
 
-        Profile profile = new Profile("Happy1 " + UUID.randomUUID().toString(), "@drawable/ic_avatar2", "en");
+        Profile profile = new Profile("Happy1", "@drawable/ic_avatar2", "en");
         profile.setAge(4);
         profile.setDay(12);
         profile.setMonth(11);
@@ -49,7 +49,7 @@ public class UserProfileTest extends GenieServiceTestBase {
         Profile profileinDb = GenieServiceDBHelper.findProfile().get(0);
 
         AssertProfile.verifyProfile(createdProfile, profileinDb);
-
+        AssertProfile.checkIfTelemetryEventIsLogged("GE_CREATE_PROFILE", createdProfile);
     }
 
     /**

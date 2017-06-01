@@ -86,10 +86,9 @@ public class GenieServiceTestBase {
         Assert.assertNotNull(createdProfile);
         Assert.assertTrue(createdProfile.isValid());
         Assert.assertTrue(genieResponse.getStatus());
-        AssertProfile.verifyProfile(profile,genieResponse.getResult());
+        AssertProfile.verifyProfile(profile, genieResponse.getResult());
         return createdProfile;
     }
-
 
 
 }

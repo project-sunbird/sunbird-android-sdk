@@ -115,14 +115,12 @@ public class PartnerServiceTest extends GenieServiceTestBase {
         checkIfTelemetryEventIsLogged("GE_STOP_PARTNER_SESSION");
     }
 
-
     private void checkIfTelemetryEventIsLogged(String telemetryEvent) {
-
-        //TODO : Check if telemetry events are logged.
 
         List<EventModel> eventModelList = GenieServiceDBHelper.findEventById(telemetryEvent);
         Map eventMap = eventModelList.get(0).getEventMap();
 
-        Log.v(TAG, "eventMap getEID() :::: " + eventMap.get("eid"));
+        Assert.assertEquals(telemetryEvent, eventMap.get("eid"));
+        Assert.assertEquals("2.0", eventMap.get("ver"));
     }
 }

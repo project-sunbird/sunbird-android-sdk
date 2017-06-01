@@ -9,6 +9,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.db.contract.ProfileEntry;
 import org.ekstep.genieservices.commons.db.core.impl.SQLiteResultSet;
+import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.telemetry.model.EventModel;
 
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import java.util.List;
  */
 
 public class GenieServiceDBHelper {
+    private final static String TAG = GenieServiceDBHelper.class.getSimpleName();
     public static String GS_DB = "/data/data/org.ekstep.genieservices.test/databases/GenieServices.db";
     private static SQLiteDatabase sSqliteDatabase = null;
     private static GenieServiceDBHelper sGSDBHelper;
@@ -47,8 +49,8 @@ public class GenieServiceDBHelper {
         List<EventModel> events = new ArrayList<>();
         if (cursor != null && cursor.moveToFirst())
             do {
-                EventModel eventModel=EventModel.build(sGSDBHelper.mAppContext.getDBSession());
-                eventModel.readWithoutMoving( new SQLiteResultSet(cursor));
+                EventModel eventModel = EventModel.build(sGSDBHelper.mAppContext.getDBSession());
+                eventModel.readWithoutMoving(new SQLiteResultSet(cursor));
                 events.add(eventModel);
             } while (cursor.moveToNext());
         cursor.close();
@@ -56,13 +58,29 @@ public class GenieServiceDBHelper {
         return events;
     }
 
+    public static ContentModel findContent(String identifier) {
+        Cursor cursor = GenieServiceDBHelper.getDatabase().rawQuery(generateQuery(identifier), null);
+        List<EventModel> events = new ArrayList<>();
+        ContentModel contentModel = ContentModel.build();
+        if (cursor != null && cursor.moveToFirst())
+            do {
+
+                contentModel.readWithoutMoving(new SQLiteResultSet(cursor));
+            } while (cursor.moveToNext());
+        cursor.close();
+
+        return contentModel;
+    }
+
     public static void clearProfileTable() {
 
         try {
-            int count =  GenieServiceDBHelper.getDatabase().delete("profiles", "1", null);
-            Log.v("Count:::::", "" + count);
+//            int count = GenieServiceDBHelper.getDatabase().delete("profiles", "1", null);
+            //            Log.v("Count:::::", "" + count);
+            GenieServiceDBHelper.getDatabase().execSQL("delete * from profiles");
         } catch (SQLiteException e) {
             e.printStackTrace();
+            Log.v(TAG, "error deleting DB entries :: ");
         }
 
     }
@@ -71,7 +89,7 @@ public class GenieServiceDBHelper {
 
         Cursor cursor = GenieServiceDBHelper.getDatabase().rawQuery(generateProfileQuery(), null);
 
-        List<Profile> profiles =null;
+        List<Profile> profiles = null;
 
         if (cursor != null && cursor.moveToFirst())
             do {
@@ -129,6 +147,20 @@ public class GenieServiceDBHelper {
     }
 
     public static String generateQuery(String eid) {
-        return "SELECT * FROM telemetry  where event_type='" + eid + "'";
+        return "SELECT * FROM telemetry where event_type='" + eid + "'";
+    }
+
+    public static String findContentDBEntry(String content_id) {
+        Log.e(TAG, "findContentDBEntry");
+        return "SELECT * FROM content where content_id='" + content_id + "'";
+    }
+
+    public static void clearContentDBEntry() {
+        try {
+            int count = sSqliteDatabase.delete("content", "1", null);
+            Log.v("Count:::::", "" + count);
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        }
     }
 }

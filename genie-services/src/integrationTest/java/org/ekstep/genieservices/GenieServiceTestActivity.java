@@ -5,13 +5,20 @@ import android.os.Bundle;
 
 import org.ekstep.genieservices.commons.AndroidAppContext;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.bean.Content;
+import org.ekstep.genieservices.commons.bean.ContentCriteria;
+import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
+import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.PartnerData;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 
+import java.io.File;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,6 +39,17 @@ public class GenieServiceTestActivity extends Activity {
         mGenieService = GenieService.init(getApplicationContext(), getPackageName());
         mAppContext = AndroidAppContext.buildAppContext(getApplicationContext(), getPackageName());
         GenieServiceDBHelper.init(mAppContext);
+    }
+
+    public boolean isFilePresent(String filePath) {
+        String[] fileList = new File(filePath).list();
+        if (fileList == null) {
+            return false;
+        } else if (fileList.length == 1) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     public GenieResponse<MasterData> getMasterData(MasterDataType masterDataType) {
@@ -133,6 +151,60 @@ public class GenieServiceTestActivity extends Activity {
     public GenieResponse sendData(PartnerData partnerData) {
         idle = false;
         GenieResponse genieResponse = mGenieService.getPartnerService().sendData(partnerData);
+        return genieResponse;
+    }
+
+    public GenieResponse<Void> importContent(boolean hasChildContent, String filepath) {
+        idle = false;
+        GenieResponse genieResponse = mGenieService.getContentService().importContent(hasChildContent, filepath);
+        return genieResponse;
+    }
+
+    public GenieResponse<Void> deleteContent(String contentIdentifier, int level) {
+        idle = false;
+        GenieResponse genieResponse = mGenieService.getContentService().deleteContent(contentIdentifier, level);
+        return genieResponse;
+    }
+
+    public GenieResponse<List<Content>> getAllLocalContent(ContentCriteria contentCriteria) {
+        idle = false;
+        GenieResponse<List<Content>> genieResponse = mGenieService.getContentService().getAllLocalContent(contentCriteria);
+        return genieResponse;
+    }
+
+    public GenieResponse<List<Content>> getChildContents(String contentIdentifier, int levelAndState) {
+        idle = false;
+        GenieResponse genieResponse = mGenieService.getContentService().getChildContents(contentIdentifier, levelAndState);
+        return genieResponse;
+    }
+
+    public GenieResponse<ContentSearchResult> getRecommendedContent(String language) {
+        idle = false;
+        GenieResponse genieResponse = mGenieService.getContentService().getRecommendedContent(language);
+        return genieResponse;
+    }
+
+    public GenieResponse<Content> getContentDetails(String contentIdentifier) {
+        idle = false;
+        GenieResponse genieResponse = mGenieService.getContentService().getContentDetails(contentIdentifier);
+        return genieResponse;
+    }
+
+    public GenieResponse<RelatedContentResult> getRelatedContent(String contentIdentifier) {
+        idle = false;
+        GenieResponse<RelatedContentResult> genieResponse = mGenieService.getContentService().getRelatedContent(contentIdentifier);
+        return genieResponse;
+    }
+
+    public GenieResponse<ContentSearchResult> searchContent(ContentSearchCriteria contentSearchCriteria) {
+        idle = false;
+        GenieResponse genieResponse = mGenieService.getContentService().searchContent(contentSearchCriteria);
+        return genieResponse;
+    }
+
+    public GenieResponse importContent(boolean isChildContent, List<String> contentIdentifiers) {
+        idle = false;
+        GenieResponse genieResponse = mGenieService.getContentService().importContent(isChildContent, contentIdentifiers);
         return genieResponse;
     }
 
