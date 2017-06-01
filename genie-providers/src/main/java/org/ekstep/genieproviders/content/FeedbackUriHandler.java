@@ -10,11 +10,13 @@ import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.commons.utils.Logger;
 
 import java.util.Locale;
 import java.util.Map;
 
 public class FeedbackUriHandler implements IUriHandler {
+    private final String TAG = FeedbackUriHandler.class.getSimpleName();
     private String authority;
     private Context context;
     private GenieService genieService;
@@ -37,6 +39,7 @@ public class FeedbackUriHandler implements IUriHandler {
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         String feedBackString = values.getAsString("event");
+        Logger.i(TAG, "Feedback String - " + feedBackString);
         Map<String, String> feedbackMap = GsonUtil.fromJson(feedBackString, Map.class);
         ContentFeedback contentFeedback = new ContentFeedback();
         contentFeedback.setContentId(feedbackMap.get("contentId"));

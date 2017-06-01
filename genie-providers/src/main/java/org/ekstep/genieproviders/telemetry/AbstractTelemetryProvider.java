@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.ekstep.genieproviders.BaseContentProvider;
+import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.db.contract.TelemetryEntry;
 
 /**
@@ -35,8 +36,11 @@ public abstract class AbstractTelemetryProvider extends BaseContentProvider {
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
         String eventString = values.getAsString(TelemetryEntry.COLUMN_NAME_EVENT);
-        getService().getTelemetryService().saveTelemetry(eventString);
-        return uri;
+        GenieResponse response = getService().getTelemetryService().saveTelemetry(eventString);
+        if (response != null && response.getStatus()) {
+            return uri;
+        }
+        return null;
     }
 
     @Override

@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.ekstep.genieservices.GenieService;
+import org.ekstep.genieservices.commons.utils.Logger;
 
 /**
  * Created on 22/5/17.
@@ -23,6 +24,7 @@ public abstract class BaseContentProvider extends ContentProvider {
 
         if (mGenieService == null) {
             mGenieService = GenieService.init(getContext(), getPackageName());
+            Logger.i("BaseContentProvider", "GenieService is null!");
         }
 
         return mGenieService;

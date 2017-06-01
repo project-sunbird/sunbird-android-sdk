@@ -10,10 +10,10 @@ import android.support.annotation.Nullable;
 import org.ekstep.genieproviders.BaseContentProvider;
 import org.ekstep.genieproviders.IUriHandler;
 import org.ekstep.genieproviders.util.Constants;
-import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.commons.utils.Logger;
 
 import java.util.List;
 
@@ -23,6 +23,8 @@ import java.util.List;
  */
 
 public abstract class AbstractUserProvider extends BaseContentProvider {
+    private final String TAG = AbstractUserProvider.class.getSimpleName();
+
     @Override
     public boolean onCreate() {
         return true;
@@ -30,7 +32,7 @@ public abstract class AbstractUserProvider extends BaseContentProvider {
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        List<CurrentUserUriHandler> handlers = ProfileUriHandlerFactory.uriHandlers(getCompletePath(), getContext(), selection, selectionArgs, getService());
+        List<IUriHandler> handlers = ProfileUriHandlerFactory.uriHandlers(getCompletePath(), getContext(), selection, selectionArgs, getService());
         for (IUriHandler handler : handlers) {
             if (handler.canProcess(uri)) {
                 return handler.process();
@@ -46,16 +48,26 @@ public abstract class AbstractUserProvider extends BaseContentProvider {
 
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
-        Profile profile = GsonUtil.fromJson(values.getAsString(Constants.PROFILE), Profile.class);
-        getService().getUserProfileService().createUserProfile(profile);
-        return uri;
+        if (values != null && values.getAsString(Constants.PROFILE) != null) {
+            Logger.i(TAG, "Inserting profile - " + values.getAsString(Constants.PROFILE));
+            Profile profile = GsonUtil.fromJson(values.getAsString(Constants.PROFILE), Profile.class);
+            GenieResponse response = getService().getUserProfileService().createUserProfile(profile);
+            if (response != null && response.getStatus()) {
+                return uri;
+            }
+
+            return null;
+        }
+        return null;
     }
 
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         if (selectionArgs[0].isEmpty()) {
+            Logger.i(TAG, "Deleting profile - Selection Id is empty");
             return 0;
         } else {
+            Logger.i(TAG, "Deleting profile - Selection Id - " + selectionArgs[0]);
             GenieResponse response = getService().getUserProfileService().deleteUser(selectionArgs[0]);
             if (response.getStatus()) {
                 return 1;
@@ -67,10 +79,10 @@ public abstract class AbstractUserProvider extends BaseContentProvider {
 
     @Override
     public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        if (values != null) {
+        if (values != null && values.getAsString(Constants.PROFILE) != null) {
             Profile profile = GsonUtil.fromJson(values.getAsString(Constants.PROFILE), Profile.class);
             GenieResponse response = getService().getUserProfileService().updateUserProfile(profile);
-            if (response.getStatus()) {
+            if (response != null && response.getStatus()) {
                 return 1;
             }
 
@@ -81,7 +93,7 @@ public abstract class AbstractUserProvider extends BaseContentProvider {
     }
 
     private String getCompletePath() {
-        String UER_PROFILE_PATH = "profiles";
-        return String.format("%s.%s", getPackageName(), UER_PROFILE_PATH);
+        String USER_PROFILE_PATH = "profiles";
+        return String.format("%s.%s", getPackageName(), USER_PROFILE_PATH);
     }
 }

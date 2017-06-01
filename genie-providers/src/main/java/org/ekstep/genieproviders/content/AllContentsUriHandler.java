@@ -34,7 +34,7 @@ public class AllContentsUriHandler implements IUriHandler {
             cursor = getMatrixCursor();
             GenieResponse genieResponse = genieService.getContentService().getAllLocalContent(null);
 
-            if (genieResponse != null) {
+            if (genieResponse != null && genieResponse.getStatus()) {
                 cursor.addRow(new String[]{new Gson().toJson(genieResponse)});
             } else {
                 getErrorResponse(cursor);
@@ -46,7 +46,7 @@ public class AllContentsUriHandler implements IUriHandler {
 
     @NonNull
     protected GenieResponse getErrorResponse(MatrixCursor cursor) {
-        GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(Constants.PROCESSING_ERROR, "Could not find the content", "Failed");
+        GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(Constants.PROCESSING_ERROR, "Could not fetch all contents", AllContentsUriHandler.class.getSimpleName());
         cursor.addRow(new String[]{new Gson().toJson(errorResponse)});
         return errorResponse;
     }

@@ -2,8 +2,6 @@ package org.ekstep.genieservices.commons.utils;
 
 import org.ekstep.genieservices.commons.ILogger;
 
-import javax.management.InstanceNotFoundException;
-
 /**
  * Created on 5/17/2016.
  *

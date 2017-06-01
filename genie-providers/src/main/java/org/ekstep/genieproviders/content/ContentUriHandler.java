@@ -13,10 +13,12 @@ import org.ekstep.genieproviders.util.Constants;
 import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.utils.Logger;
 
 import java.util.Locale;
 
 public class ContentUriHandler implements IUriHandler {
+    private final String TAG = ContentUriHandler.class.getSimpleName();
     private String authority;
     private String[] contentIdentifier;
     private GenieService genieService;
@@ -30,8 +32,9 @@ public class ContentUriHandler implements IUriHandler {
     @Override
     public Cursor process() {
         MatrixCursor cursor = null;
-        if (genieService != null) {
+        if (genieService != null && contentIdentifier[0] != null) {
             cursor = getMatrixCursor();
+            Logger.i(TAG, "Content Identifier - " + contentIdentifier[0]);
             GenieResponse genieResponse = genieService.getContentService().getContentDetails(contentIdentifier[0]);
 
             if (genieResponse != null) {

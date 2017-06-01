@@ -1,9 +1,8 @@
-package org.ekstep.genieresolvers.content;
+package org.ekstep.genieresolvers.user;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.util.Log;
 
 import com.google.gson.Gson;
 
@@ -16,41 +15,29 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
  * shriharsh
  */
 
-public class GetContentsTask extends BaseTask {
+public class GetAllUsersTask extends BaseTask {
 
-    private final String TAG = GetContentsTask.class.getSimpleName();
     private String appQualifier;
 
-    public GetContentsTask(Context context, String appQualifier) {
+    public GetAllUsersTask(Context context, String appQualifier) {
         super(context);
         this.appQualifier = appQualifier;
     }
 
     @Override
     protected String getLogTag() {
-        return GetContentsTask.class.getSimpleName();
+        return GetAllUsersTask.class.getSimpleName();
     }
 
     @Override
     protected GenieResponse execute() {
-        Cursor cursor = contentResolver.query(getUri(), null, null, null, "");
-        if (cursor == null) {
-            Log.e(TAG, "execute: cursor is null!");
-            String logMessage = "Couldn't get the content list";
-            return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), logMessage);
+        Cursor cursor = contentResolver.query(getUri(), null, null, null, null);
+        if (cursor == null || cursor.getCount() == 0) {
+            return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), "No Response for all users!");
         }
+
         GenieResponse genieResponse = getResponse(cursor);
         return genieResponse;
-    }
-
-    @Override
-    protected String getErrorMessage() {
-        return "Couldn't get the content list";
-    }
-
-    private Uri getUri() {
-        String authority = String.format("content://%s.content/list", appQualifier);
-        return Uri.parse(authority);
     }
 
     private GenieResponse<String> getResponse(Cursor cursor) {
@@ -70,4 +57,15 @@ public class GetContentsTask extends BaseTask {
         GenieResponse<String> response = gson.fromJson(serverData, GenieResponse.class);
         return response;
     }
+
+    @Override
+    protected String getErrorMessage() {
+        return "Could not find any current user!";
+    }
+
+    private Uri getUri() {
+        String authority = String.format("content://%s.profiles/allUsers", appQualifier);
+        return Uri.parse(authority);
+    }
+
 }

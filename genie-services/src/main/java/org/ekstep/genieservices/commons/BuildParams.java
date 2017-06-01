@@ -24,7 +24,7 @@ public class BuildParams implements IParams {
         password = BuildConfigUtil.getBuildConfigValue(packageName, Constants.Params.API_PASS);
         versionName = BuildConfigUtil.getBuildConfigValue(packageName, Constants.Params.VERSION_NAME);
         gId = BuildConfigUtil.getBuildConfigValue(packageName, Constants.Params.GID);
-        logLevel=LogLevel.getLogLevel(BuildConfigUtil.getBuildConfigValue(packageName, Constants.Params.LOGLEVEL)).getLevel();
+        logLevel = LogLevel.getLogLevel(BuildConfigUtil.getBuildConfigValue(packageName, Constants.Params.LOGLEVEL)).getLevel();
 
     }
 

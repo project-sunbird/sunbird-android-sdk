@@ -1,4 +1,4 @@
-package org.ekstep.genieproviders.language;
+package org.ekstep.genieproviders.user;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -14,48 +14,44 @@ import org.ekstep.genieproviders.util.Constants;
 import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.utils.Logger;
 
 import java.util.Locale;
 
 /**
- * Created on 23/5/17.
+ * Created on 22/5/17.
  * shriharsh
  */
 
-public class LanguageSearchUriHandler implements IUriHandler {
-    private final String TAG = LanguageSearchUriHandler.class.getSimpleName();
+public class GetAllUsersUriHandler implements IUriHandler {
+
     private String authority;
-    private Context context;
-    private String selection;
     private GenieService genieService;
 
-    public LanguageSearchUriHandler(String authority, Context context, String queryString, GenieService genieService) {
+    public GetAllUsersUriHandler(String authority, Context context, String selection, String[] selectionArgs, GenieService genieService) {
         this.authority = authority;
-        this.context = context;
-        this.selection = queryString;
         this.genieService = genieService;
     }
 
     @Override
     public Cursor process() {
         MatrixCursor cursor = null;
-        if (genieService != null && selection != null) {
+        if (genieService != null) {
             cursor = getMatrixCursor();
-            Logger.i(TAG, "Language Id - " + selection);
-            GenieResponse genieResponse = genieService.getLanguageService().getLanguageSearch(selection);
+            GenieResponse genieResponse = genieService.getUserProfileService().getCurrentUser();
+
             if (genieResponse != null) {
                 cursor.addRow(new String[]{new Gson().toJson(genieResponse)});
             } else {
                 getErrorResponse(cursor);
             }
         }
+
         return cursor;
     }
 
     @NonNull
     protected GenieResponse getErrorResponse(MatrixCursor cursor) {
-        GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(Constants.PROCESSING_ERROR, "Could not find the language", "Failed");
+        GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(Constants.PROCESSING_ERROR, "Could not get all the profiles", "Failed");
         cursor.addRow(new String[]{new Gson().toJson(errorResponse)});
         return errorResponse;
     }
@@ -67,8 +63,8 @@ public class LanguageSearchUriHandler implements IUriHandler {
 
     @Override
     public boolean canProcess(Uri uri) {
-        String urlPath = String.format(Locale.US, "content://%s/langsearch", authority);
-        return uri != null && urlPath.equals(uri.toString());
+        String currentUserUri = String.format(Locale.US, "content://%s/allUsers", authority);
+        return uri != null && (currentUserUri.equals(uri.toString()));
     }
 
     @Override

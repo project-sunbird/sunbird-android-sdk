@@ -14,10 +14,12 @@ import org.ekstep.genieproviders.util.Constants;
 import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.utils.Logger;
 
 import java.util.Locale;
 
 public class LanguageTraversalRuleUriHandler implements IUriHandler {
+    private final String TAG = LanguageTraversalRuleUriHandler.class.getSimpleName();
     private String authority;
     private Context context;
     private String selection;
@@ -34,7 +36,8 @@ public class LanguageTraversalRuleUriHandler implements IUriHandler {
     @Override
     public Cursor process() {
         MatrixCursor cursor = getMatrixCursor();
-        if (genieService != null) {
+        if (genieService != null && selection != null) {
+            Logger.i(TAG, "Language Id - " + selection);
             GenieResponse genieResponse = genieService.getLanguageService().getLanguageTraversalRule(selection);
 
             if (genieResponse != null) {
