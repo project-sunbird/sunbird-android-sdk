@@ -1,5 +1,7 @@
 package org.ekstep.genieservices.userprofile;
 
+import android.util.Log;
+
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.telemetry.model.EventModel;
@@ -7,8 +9,6 @@ import org.junit.Assert;
 
 import java.util.List;
 import java.util.Map;
-
-import static junit.framework.Assert.assertEquals;
 
 /**
  * Created by swayangjit on 21/5/17.
@@ -54,21 +54,28 @@ public class AssertProfile {
     public static void verifyProfileisDeleted() {
         List<Profile> profile = GenieServiceDBHelper.findProfile();
         Assert.assertNull(profile);
-
     }
 
-    public static void checkIfTelemetryEventIsLogged(String telemetryEvent, Profile createdProfile) {
-        List<EventModel> eventModelList = GenieServiceDBHelper.findEventById(telemetryEvent);
+    public static void checkTelemtryEventIsLoggedIn(String telemetryEvent, Profile profile) {
 
+        List<EventModel> eventModelList = GenieServiceDBHelper.findEventById(telemetryEvent);
         Map eventMap = eventModelList.get(0).getEventMap();
+
+        Log.v(TAG, "eventMap createProfile:: " + eventMap);
 
         Map<String, Object> edata = (Map<String, Object>) eventMap.get("edata");
         Map<String, Object> eks = (Map<String, Object>) edata.get("eks");
 
         Assert.assertNotNull(eks);
-        assertEquals(telemetryEvent, eventMap.get("eid"));
-        Assert.assertEquals(createdProfile.isGroupUser(), eks.get("is_group_user"));
-        Assert.assertEquals(createdProfile.getHandle(), eks.get("handle"));
+        Assert.assertEquals(telemetryEvent, eventMap.get("eid"));
+        Assert.assertEquals(profile.getHandle(), eks.get("handle"));
+        Assert.assertEquals(profile.getLanguage(), eks.get("language"));
+    }
 
+    public static void checkTelemetryDataForDeleteProfile(String telemetryEvent) {
+        List<EventModel> eventModelList = GenieServiceDBHelper.findEventById(telemetryEvent);
+        Map eventMap = eventModelList.get(0).getEventMap();
+
+        Log.v(TAG, "eventMap deleteProfile:: " + eventMap);
     }
 }

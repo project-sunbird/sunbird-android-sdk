@@ -49,7 +49,7 @@ public class UserProfileTest extends GenieServiceTestBase {
         Profile profileinDb = GenieServiceDBHelper.findProfile().get(0);
 
         AssertProfile.verifyProfile(createdProfile, profileinDb);
-        AssertProfile.checkIfTelemetryEventIsLogged("GE_CREATE_PROFILE", createdProfile);
+        AssertProfile.checkTelemtryEventIsLoggedIn("GE_CREATE_PROFILE", createdProfile);
     }
 
     /**
@@ -77,6 +77,7 @@ public class UserProfileTest extends GenieServiceTestBase {
         Profile profileinDb = GenieServiceDBHelper.findProfile().get(0);
 
         AssertProfile.verifyProfile(updatedProfile, profileinDb);
+        AssertProfile.checkTelemtryEventIsLoggedIn("GE_UPDATE_PROFILE", updatedProfile);
     }
 
     /**
@@ -117,13 +118,15 @@ public class UserProfileTest extends GenieServiceTestBase {
 
         Profile profile = new Profile("Happy6", "@drawable/ic_avatar2", "en");
         Profile createdProfile = createNewProfile(profile);
+        AssertProfile.checkTelemtryEventIsLoggedIn("GE_CREATE_PROFILE", createdProfile);
 
         GenieResponse response = activity.deleteUserProfile(createdProfile.getUid());
-
         Assert.assertNotNull(response);
         Assert.assertTrue(response.getStatus());
 
         AssertProfile.verifyProfileisDeleted();
+        AssertProfile.checkTelemetryDataForDeleteProfile("GE_DELETE_PROFILE");
+
     }
 
     /**
@@ -177,6 +180,7 @@ public class UserProfileTest extends GenieServiceTestBase {
         Profile profileinDb = GenieServiceDBHelper.findProfile().get(0);
 
         AssertProfile.verifyProfile(createdProfile, profileinDb);
+        AssertProfile.checkTelemtryEventIsLoggedIn("GE_CREATE_PROFILE", createdProfile);
 
     }
 
@@ -196,11 +200,13 @@ public class UserProfileTest extends GenieServiceTestBase {
         final Profile createdProfile = createNewProfile(profile);
         profile.setUid(createdProfile.getUid());
         profile.setHandle("Group88");
+        AssertProfile.checkTelemtryEventIsLoggedIn("GE_CREATE_PROFILE", createdProfile);
 
         GenieResponse<Profile> response = activity.updateUserProfile(profile);
         Profile updatedProfile = response.getResult();
 
         AssertProfile.verifyProfile(profile, updatedProfile);
+        AssertProfile.checkTelemtryEventIsLoggedIn("GE_UPDATE_PROFILE", updatedProfile);
 
         Profile profileinDb = GenieServiceDBHelper.findProfile().get(0);
 
@@ -247,8 +253,9 @@ public class UserProfileTest extends GenieServiceTestBase {
         GenieResponse genieResponse = activity.deleteUserProfile(profile.getUid());
         Assert.assertNotNull(genieResponse);
         Assert.assertTrue(genieResponse.getStatus());
-        AssertProfile.verifyProfileisDeleted();
 
+        AssertProfile.verifyProfileisDeleted();
+        AssertProfile.checkTelemetryDataForDeleteProfile("GE_DELETE_PROFILE");
     }
 
     /**
@@ -302,7 +309,6 @@ public class UserProfileTest extends GenieServiceTestBase {
 
         Assert.assertNotNull(genieResponse);
         Assert.assertFalse(genieResponse.getStatus());
-        AssertProfile.verifyProfileisDeleted();
         Assert.assertEquals("[invalid date, field: -1/12/2017]", genieResponse.getErrorMessages().get(0));
     }
 
@@ -323,7 +329,6 @@ public class UserProfileTest extends GenieServiceTestBase {
 
         Assert.assertNotNull(genieResponse);
         Assert.assertFalse(genieResponse.getStatus());
-        AssertProfile.verifyProfileisDeleted();
         Assert.assertEquals("[invalid date, field: 2/14/2009]", genieResponse.getErrorMessages().get(0));
 
         //TODO verify GE_ERROR event
