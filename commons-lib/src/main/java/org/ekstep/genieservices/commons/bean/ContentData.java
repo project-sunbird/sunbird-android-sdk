@@ -10,7 +10,6 @@ import java.util.List;
  */
 public class ContentData implements Serializable {
 
-    private List<Variant> variantList;
     private String identifier;
     private String name;
     private String appIcon;
@@ -28,7 +27,8 @@ public class ContentData implements Serializable {
     private String expires;
     private String downloadUrl;
     private List<String> language;
-    //    private String osId;
+    private String osId;
+    private List<Variant> variantList;
     //    private ContentMetadata contentMetadata;
 
     public String getIdentifier() {
@@ -97,6 +97,10 @@ public class ContentData implements Serializable {
 
     public List<String> getLanguage() {
         return language;
+    }
+
+    public String getOsId() {
+        return osId;
     }
 
     public List<Variant> getVariants() {
