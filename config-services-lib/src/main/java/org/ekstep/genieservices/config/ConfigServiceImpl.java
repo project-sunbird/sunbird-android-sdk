@@ -49,9 +49,10 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
     @Override
     public GenieResponse<MasterData> getMasterData(MasterDataType type) {
 
+        String methodName="getMasterData@ConfigServiceImpl";
         HashMap params = new HashMap();
         params.put("type", type.getValue());
-        params.put("logLevel", CommonConstants.LOG_LEVEL);
+        params.put("logLevel", "3");
 
         if (getLongFromKeyValueStore(ConfigConstants.PreferenceKey.MASTER_DATA_API_EXPIRATION_KEY) == 0) {
             initializeMasterData();
@@ -67,13 +68,13 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
 
         GenieResponse<MasterData> response;
         if (result != null) {
-            response = GenieResponseBuilder.getSuccessResponse("MasterData retrieved successfully", MasterData.class);
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(masterData);
-            TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "getMasterData@ConfigServiceImpl", params);
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
             return response;
         } else {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR, MasterData.class);
-            TelemetryLogger.logFailure(mAppContext, response, TAG, "getMasterData@ConfigServiceImpl", params, "Unable to get masterdata");
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND,ServiceConstants.ErrorMessage.UNABLE_TO_FIND_MASTER_DATA,TAG, MasterData.class);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_MASTER_DATA);
             return response;
         }
     }
@@ -121,10 +122,11 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
 
     @Override
     public GenieResponse<Map<String, Object>> getResourceBundle(String languageIdentifier) {
+        String methodName="getResourceBundle@ConfigServiceImpl";
         HashMap params = new HashMap();
         params.put("ResourceBundle", languageIdentifier);
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
-        params.put("logLevel", CommonConstants.LOG_LEVEL);
+        params.put("logLevel", "2");
 
         if (getLongFromKeyValueStore(ConfigConstants.PreferenceKey.RESOURCE_BUNDLE_API_EXPIRATION_KEY) == 0) {
             initializeResourceBundle();
@@ -138,13 +140,13 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
 
         GenieResponse<Map<String, Object>> response;
         if (result != null) {
-            response = GenieResponseBuilder.getSuccessResponse("");
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(resourceBundleMap);
-            TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "getResourceBundle@ConfigServiceImpl", params);
+            TelemetryLogger.logSuccess(mAppContext, response, TAG,methodName, params);
             return response;
         } else {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR);
-            TelemetryLogger.logFailure(mAppContext, response, TAG, "getResourceBundle@ConfigServiceImpl", params, "Unable to get resourcebundle");
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_RESOURCE_BUNDLE,TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_RESOURCE_BUNDLE);
             return response;
         }
     }
@@ -196,10 +198,10 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
     }
 
     public GenieResponse<Map<String, Object>> getOrdinals() {
+        String methodName="getOrdinals@ConfigServiceImpl";
         HashMap params = new HashMap();
-        params.put("Ordinals", "Get ordinals");
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
-        params.put("logLevel", CommonConstants.LOG_LEVEL);
+        params.put("logLevel", "2");
 
         if (getLongFromKeyValueStore(ConfigConstants.PreferenceKey.ORDINAL_API_EXPIRATION_KEY) == 0) {
             initializeOrdinalsData();
@@ -212,13 +214,13 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
 
         GenieResponse<Map<String, Object>> response;
         if (ordinalsMap != null) {
-            response = GenieResponseBuilder.getSuccessResponse("");
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(ordinalsMap);
-            TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "getOrdinals@ConfigServiceImpl", params);
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
             return response;
         } else {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, "", ServiceConstants.SERVICE_ERROR);
-            TelemetryLogger.logFailure(mAppContext, response, TAG, "getOrdinals@ConfigServiceImpl", params, "Unable to get ordinals");
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND,ServiceConstants.ErrorMessage.UNABLE_TO_FIND_ORDINALS,TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG,methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_ORDINALS);
             return response;
         }
     }

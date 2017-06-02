@@ -5,8 +5,6 @@ import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.network.IHttpClient;
 
-import java.io.File;
-
 /**
  * Created on 14/4/17.
  *
@@ -57,8 +55,6 @@ public abstract class AppContext<C> {
     public abstract IParams getParams();
 
     public abstract ILocationInfo getLocationInfo();
-
-    public abstract File getPrimaryFilesDir();
 
     public abstract IDownloadManager getDownloadManager();
 

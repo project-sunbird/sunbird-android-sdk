@@ -5,12 +5,12 @@ import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
- * Created by swayangjit on 2/5/17.
+ * Created on 2/5/17.
+ *
+ * @author swayangjit
  */
-
 public class GESessionStart extends Telemetry {
 
     private static final String EID = "GE_SESSION_START";

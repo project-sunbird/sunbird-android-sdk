@@ -39,7 +39,6 @@ public class RegisterPartnerTask extends BaseTask {
             String logMessage = "Could not register partner!";
             GenieResponse processing_error = getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), logMessage);
             return processing_error;
-
         }
 
         GenieResponse successResponse = getSuccessResponse(Constants.SUCCESSFUL);

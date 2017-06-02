@@ -1,10 +1,13 @@
 package org.ekstep.genieservices.commons.bean;
 
-/**
- * Created by swayangjit on 12/5/17.
- */
+import java.io.Serializable;
 
-public class Tag {
+/**
+ * Created on 12/5/17.
+ *
+ * @author swayangjit
+ */
+public class Tag implements Serializable {
 
     private String name;
     private String description;

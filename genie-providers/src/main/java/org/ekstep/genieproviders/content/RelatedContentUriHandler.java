@@ -17,6 +17,7 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.commons.utils.Logger;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -30,7 +31,7 @@ import java.util.Map;
  */
 
 public class RelatedContentUriHandler implements IUriHandler {
-
+    private final String TAG = RelatedContentUriHandler.class.getSimpleName();
     private String selection;
     private String[] selectionArgs;
     private String authority;
@@ -50,7 +51,9 @@ public class RelatedContentUriHandler implements IUriHandler {
         MatrixCursor cursor = null;
         if (genieService != null && selectionArgs[0] != null) {
             cursor = getMatrixCursor();
-            Type type = new TypeToken<List<String>>() {}.getType();
+            Logger.i(TAG, "Content Identifier - " + selectionArgs[0]);
+            Type type = new TypeToken<List<String>>() {
+            }.getType();
             List<String> contentIdentifiers = GsonUtil.getGson().fromJson(selectionArgs[0], type);
 
             GenieResponse genieResponse = null;

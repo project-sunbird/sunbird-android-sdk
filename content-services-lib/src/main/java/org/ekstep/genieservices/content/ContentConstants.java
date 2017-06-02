@@ -1,5 +1,7 @@
 package org.ekstep.genieservices.content;
 
+import org.ekstep.genieservices.commons.utils.DateUtil;
+
 /**
  * Created on 5/4/2017.
  *
@@ -9,6 +11,8 @@ public interface ContentConstants {
 
     String GENIE_EXTRACTED_ECAR_FOLDER_PATH = "/Ekstep/org.ekstep.genieservices";
     String ISO_DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SZZZZZ";
+
+    long CACHE_TIMEOUT_HOME_CONTENT = (24 * DateUtil.MILLISECONDS_IN_AN_HOUR);
 
     String IMPORT_FAILED = "IMPORT_FAILED";
     String IMPORT_FAILED_DEVICE_MEMORY_FULL = "IMPORT_FAILED_DEVICE_MEMORY_FULL";

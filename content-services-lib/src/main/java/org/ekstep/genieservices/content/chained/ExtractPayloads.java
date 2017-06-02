@@ -1,9 +1,8 @@
 package org.ekstep.genieservices.content.chained;
 
-import com.google.gson.reflect.TypeToken;
-
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.utils.Decompress;
@@ -12,13 +11,12 @@ import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.ContentConstants;
+import org.ekstep.genieservices.content.ContentHandler;
 import org.ekstep.genieservices.content.bean.ImportContext;
 import org.ekstep.genieservices.content.db.model.ContentModel;
-import org.ekstep.genieservices.content.ContentHandler;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,9 +43,6 @@ public class ExtractPayloads implements IChainable {
         File payloadDestination = null;
         ContentModel newContentModel, oldContentModel;
 
-        Type type = new TypeToken<List<HashMap<String, Object>>>() {
-        }.getType();
-
         for (HashMap<String, Object> item : importContext.getItems()) {
             identifier = (String) item.get("identifier");
             newContentCompatibilityLevel = (item.get(ContentModel.KEY_COMPATIBILITY_LEVEL) != null) ? (Double) item.get(ContentModel.KEY_COMPATIBILITY_LEVEL) : ContentHandler.defaultCompatibilityLevel;
@@ -64,7 +59,7 @@ public class ExtractPayloads implements IChainable {
             String mimeType = (String) item.get("mimeType");
 
             String preRequisitesString = GsonUtil.toJson(item.get("pre_requisites"));
-            List<HashMap> preRequisites = GsonUtil.getGson().fromJson(preRequisitesString, type);
+            List<HashMap<String, Object>> preRequisites = (List<HashMap<String, Object>>) item.get("pre_requisites");
 
             //skip the content if already imported on the same version
             boolean isSkip = false;
@@ -95,7 +90,7 @@ public class ExtractPayloads implements IChainable {
                     uuid = UUID.randomUUID().toString();
                     // TODO: can remove uuid from destination
                     destination = identifier + "-" + uuid;
-                    payloadDestination = new File(FileUtil.getContentRootDir(appContext.getPrimaryFilesDir()), destination);
+                    payloadDestination = new File(FileUtil.getContentRootDir(importContext.getDestinationFolder()), destination);
                     payloadDestination.mkdirs();
 
                     try {
@@ -149,7 +144,7 @@ public class ExtractPayloads implements IChainable {
                     uuid = UUID.randomUUID().toString();
                     // TODO: can remove uuid from destination
                     destination = identifier + "-" + uuid;
-                    payloadDestination = new File(FileUtil.getContentRootDir(appContext.getPrimaryFilesDir()), destination);
+                    payloadDestination = new File(FileUtil.getContentRootDir(importContext.getDestinationFolder()), destination);
                     payloadDestination.mkdirs();
 
                     // If compatibility level is not in range then do not copy artifact
@@ -229,9 +224,7 @@ public class ExtractPayloads implements IChainable {
                 newContentModel.setPath(oldContentPath);
             }
 
-            // TODO: 5/18/2017
-            ContentHandler.addOrUpdateViralityMetadata(newContentModel.getLocalData(), appContext.getDeviceInfo().getDeviceID());
-//            newContentModel.addOrUpdateViralityMetadata(appContext.getDeviceInfo().getDeviceID());
+            ContentHandler.addOrUpdateViralityMetadata(newContentModel, appContext.getDeviceInfo().getDeviceID());
 
             if (oldContentModel == null) {
                 newContentModel.save();
@@ -250,18 +243,8 @@ public class ExtractPayloads implements IChainable {
         if (nextLink != null) {
             return nextLink.execute(appContext, importContext);
         } else {
-            return breakChain();
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, "Import failed.", TAG);
         }
-    }
-
-    @Override
-    public Void postExecute() {
-        return null;
-    }
-
-    @Override
-    public GenieResponse<Void> breakChain() {
-        return null;
     }
 
     @Override

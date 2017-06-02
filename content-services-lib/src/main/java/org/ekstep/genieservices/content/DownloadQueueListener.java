@@ -51,10 +51,12 @@ public class DownloadQueueListener {
         Logger.i(TAG, "onDownloadResponse : " + downloadResponse.toString());
         DownloadQueueManager downloadQueueManager = new DownloadQueueManager(mAppContext.getKeyValueStore());
         DownloadRequest downloadRequest = downloadQueueManager.getRequest(downloadResponse.getDownloadId());
+
         downloadResponse.setIdentifier(downloadRequest.getIdentifier());
         downloadResponse.setMimeType(downloadRequest.getMimeType());
+
         if (downloadResponse.getStatus()) {
-            new ContentServiceImpl(mAppContext).importContent(downloadRequest.isChildContent(), downloadResponse.getFilePath());
+            new ContentServiceImpl(mAppContext).importContent(downloadRequest.isChildContent(), downloadResponse.getFilePath(), downloadRequest.getDestinationFolder());
             mDownloadService.remove(downloadResponse.getDownloadId());
             mDownloadService.onDownloadComplete(downloadResponse);
         } else if (StringUtil.isNullOrEmpty(downloadResponse.getFilePath())) {

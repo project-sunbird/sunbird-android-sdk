@@ -10,7 +10,6 @@ import java.util.List;
  */
 public class ContentData implements Serializable {
 
-    private List<Variant> variantList;
     private String identifier;
     private String name;
     private String appIcon;
@@ -28,7 +27,9 @@ public class ContentData implements Serializable {
     private String expires;
     private String downloadUrl;
     private List<String> language;
-    //    private String osId;
+    private List<String> gradeLevel;
+    private String osId;
+    private List<Variant> variantList;
     //    private ContentMetadata contentMetadata;
 
     public String getIdentifier() {
@@ -99,6 +100,14 @@ public class ContentData implements Serializable {
         return language;
     }
 
+    public List<String> getGradeLevel() {
+        return gradeLevel;
+    }
+
+    public String getOsId() {
+        return osId;
+    }
+
     public List<Variant> getVariants() {
         return variantList;
     }
@@ -110,15 +119,25 @@ public class ContentData implements Serializable {
     @Override
     public String toString() {
         return "ContentData{" +
-                ", description='" + description + '\'' +
                 ", identifier='" + identifier + '\'' +
                 ", name='" + name + '\'' +
                 ", appIcon='" + appIcon + '\'' +
-                ", downloadUrl='" + downloadUrl + '\'' +
+                ", description='" + description + '\'' +
                 ", pkgVersion='" + pkgVersion + '\'' +
-                ", publisher='" + publisher + '\'' +
-                ", owner='" + owner + '\'' +
+                ", status='" + status + '\'' +
                 ", size='" + size + '\'' +
+                ", owner='" + owner + '\'' +
+                ", subject='" + subject + '\'' +
+                ", publisher='" + publisher + '\'' +
+                ", totalRatings='" + me_totalRatings + '\'' +
+                ", averageRating='" + me_averageRating + '\'' +
+                ", copyright='" + copyright + '\'' +
+                ", license='" + license + '\'' +
+                ", expires='" + expires + '\'' +
+                ", downloadUrl='" + downloadUrl + '\'' +
+                ", language='" + language + '\'' +
+                ", gradeLevel='" + gradeLevel + '\'' +
+                ", osId='" + osId + '\'' +
                 '}';
     }
 

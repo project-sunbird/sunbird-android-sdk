@@ -12,6 +12,7 @@ import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.PartnerData;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.commons.utils.Logger;
 
 import java.util.Locale;
 
@@ -21,7 +22,7 @@ import java.util.Locale;
  */
 
 public class StartPartnerUriHandler implements IUriHandler {
-
+    private final String TAG = StartPartnerUriHandler.class.getSimpleName();
     private String authority;
     private String selection;
     private GenieService genieService;
@@ -34,12 +35,16 @@ public class StartPartnerUriHandler implements IUriHandler {
 
     @Override
     public Cursor process() {
-        PartnerData partnerData = GsonUtil.fromJson(selection, PartnerData.class);
-        GenieResponse response = genieService.getPartnerService().startPartnerSession(partnerData);
-        if (response != null) {
-            return convertToCursor(response);
-        }
+        if (selection != null) {
+            Logger.i(TAG, "Partner Data - " + selection);
+            PartnerData partnerData = GsonUtil.fromJson(selection, PartnerData.class);
+            GenieResponse response = genieService.getPartnerService().startPartnerSession(partnerData);
+            if (response != null) {
+                return convertToCursor(response);
+            }
 
+            return null;
+        }
         return null;
     }
 

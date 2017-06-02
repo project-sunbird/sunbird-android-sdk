@@ -50,7 +50,7 @@ public abstract class AbstractPartnerProvider extends BaseContentProvider {
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
         PartnerData partnerData = GsonUtil.fromJson(values.getAsString(PARTNER_DATA), PartnerData.class);
         GenieResponse response = getService().getPartnerService().registerPartner(partnerData);
-        if (response.getStatus()) {
+        if (response != null && response.getStatus()) {
             return uri;
         }
         return null;

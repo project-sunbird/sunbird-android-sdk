@@ -20,7 +20,7 @@ public class DeviceMemoryCheck implements IChainable {
 
     @Override
     public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
-        long deviceUsableSpace = FileUtil.getFreeUsableSpace(appContext.getPrimaryFilesDir());
+        long deviceUsableSpace = FileUtil.getFreeUsableSpace(importContext.getDestinationFolder());
         long ecarFileSpace = importContext.getEcarFile().length();
         long bufferSize = calculateBufferSize(ecarFileSpace);
         if (deviceUsableSpace < ((ecarFileSpace) + bufferSize)) {
@@ -31,18 +31,8 @@ public class DeviceMemoryCheck implements IChainable {
         if (nextLink != null) {
             return nextLink.execute(appContext, importContext);
         } else {
-            return breakChain();
+            return GenieResponseBuilder.getErrorResponse(ContentConstants.IMPORT_FAILED, "Import content failed", TAG);
         }
-    }
-
-    @Override
-    public Void postExecute() {
-        return null;
-    }
-
-    @Override
-    public GenieResponse<Void> breakChain() {
-        return GenieResponseBuilder.getErrorResponse(ContentConstants.IMPORT_FAILED, "Import content failed", TAG);
     }
 
     @Override

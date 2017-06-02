@@ -16,6 +16,7 @@ import org.ekstep.genieservices.commons.exception.EncryptionException;
 import org.ekstep.genieservices.commons.utils.Base64;
 import org.ekstep.genieservices.commons.utils.Crypto;
 import org.ekstep.genieservices.commons.utils.DateUtil;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.partner.db.model.PartnerModel;
 import org.ekstep.genieservices.partner.db.model.PartnerSessionModel;
@@ -81,7 +82,7 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
                 TelemetryLogger.log(geRegisterPartner);
 
                 response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
-                TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "registerPartner@PartnerServiceImpl", new HashMap());
+                TelemetryLogger.logSuccess(mAppContext, response, TAG, "registerPartner@PartnerServiceImpl", new HashMap());
                 return response;
             } else {
                 String errorMessage = "INVALID_DATA";
@@ -121,6 +122,10 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
 
     @Override
     public GenieResponse<Void> startPartnerSession(PartnerData partnerData) {
+        String methodName= "startPartnerSession@PartnerServiceImpl";
+        HashMap params = new HashMap();
+        params.put("partnerData", GsonUtil.toJson(partnerData));
+        params.put("logLevel", "2");
         Logger.i(TAG, "STARTING Partner Session" + partnerData.getPartnerID());
         GenieResponse<Void> response;
         PartnerModel partnerModel = PartnerModel.findByPartnerId(appContext.getDBSession(), partnerData.getPartnerID());
@@ -139,18 +144,22 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
             TelemetryLogger.log(geStartPartnerSession);
 
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
-            TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "startPartnerSession@PartnerServiceImpl", new HashMap());
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
             return response;
         } else {
             String errorMessage = String.format(Locale.US, "- Session start failed! Partner: %s", partnerData.getPartnerID());
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.UNREGISTERED_PARTNER, errorMessage, TAG, Void.class);
-            TelemetryLogger.logFailure(mAppContext, response, TAG, "startPartnerSession@PartnerServiceImpl", new HashMap(), errorMessage);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName,params, errorMessage);
             return response;
         }
     }
 
     @Override
     public GenieResponse<Void> terminatePartnerSession(PartnerData partnerData) {
+        String methodName= "terminatePartnerSession@PartnerServiceImpl";
+        HashMap params = new HashMap();
+        params.put("partnerData", GsonUtil.toJson(partnerData));
+        params.put("logLevel", "2");
         String partnerID = partnerData.getPartnerID();
         Logger.i(TAG, "TERMINATING Partner Session" + partnerID);
         GenieResponse<Void> response;
@@ -159,18 +168,22 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
         if (partnerModel != null && partnerSessionModel != null && partnerID.equals(partnerSessionModel.getPartnerID())) {
             partnerSessionModel.clear();
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
-            TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "terminatePartnerSession@PartnerServiceImpl", new HashMap());
+            TelemetryLogger.logSuccess(mAppContext, response, TAG,methodName, params);
             return response;
         } else {
             String errorMessage = String.format(Locale.US, "- Session termination failed! Partner: %s", partnerID);
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.UNREGISTERED_PARTNER, errorMessage, TAG, Void.class);
-            TelemetryLogger.logFailure(mAppContext, response, TAG, "terminatePartnerSession@PartnerServiceImpl", new HashMap(), errorMessage);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
             return response;
         }
     }
 
     @Override
     public GenieResponse<String> sendData(PartnerData partnerData) {
+        String methodName= "sendData@PartnerServiceImpl";
+        HashMap params = new HashMap();
+        params.put("partnerData", GsonUtil.toJson(partnerData));
+        params.put("logLevel", "2");
         Logger.i(TAG, "SENDING Partner Data " + partnerData.getPartnerID());
 
         GenieResponse<String> response;
@@ -184,7 +197,7 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
                 TelemetryLogger.log(geSendPartnerData);
                 response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, String.class);
                 response.setResult(data.toString());
-                TelemetryLogger.logSuccess(mAppContext, response, new HashMap(), TAG, "terminatePartnerSession@PartnerServiceImpl", new HashMap());
+                TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
                 return response;
             } catch (EncryptionException e) {
                 List<String> errorMessages = new ArrayList<>();
@@ -192,13 +205,13 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
                 errorMessages.add(errorMessage);
                 String message = String.format(Locale.US, "- Encrypting data failed! Partner: %s", partnerData.getPartnerID());
                 response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.ENCRYPTION_FAILURE, message, TAG, String.class);
-                TelemetryLogger.logFailure(mAppContext, response, TAG, "sendData@PartnerServiceImpl", new HashMap(), message);
+                TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, message);
                 return response;
             }
         } else {
             String errorMessage = String.format(Locale.US, "- Sending data failed! Partner: %s", partnerData.getPartnerID());
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.UNREGISTERED_PARTNER, errorMessage, TAG, String.class);
-            TelemetryLogger.logFailure(mAppContext, response, TAG, "sendData@PartnerServiceImpl", new HashMap(), errorMessage);
+            TelemetryLogger.logFailure(mAppContext, response, TAG,methodName, new HashMap(), errorMessage);
             return response;
         }
     }

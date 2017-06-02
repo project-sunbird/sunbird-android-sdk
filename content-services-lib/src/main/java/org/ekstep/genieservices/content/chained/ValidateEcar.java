@@ -13,9 +13,9 @@ import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.ContentConstants;
+import org.ekstep.genieservices.content.ContentHandler;
 import org.ekstep.genieservices.content.bean.ImportContext;
 import org.ekstep.genieservices.content.db.model.ContentModel;
-import org.ekstep.genieservices.content.ContentHandler;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -108,20 +108,8 @@ public class ValidateEcar implements IChainable {
         if (nextLink != null) {
             return nextLink.execute(appContext, importContext);
         } else {
-            FileUtil.rm(importContext.getTmpLocation());
-            return breakChain();
+            return getErrorResponse(importContext, ContentConstants.IMPORT_FAILED, "Import content failed");
         }
-    }
-
-    @Override
-    public Void postExecute() {
-        return null;
-    }
-
-    @Override
-    public GenieResponse<Void> breakChain() {
-        Logger.e(TAG, "Import content failed");
-        return GenieResponseBuilder.getErrorResponse(ContentConstants.IMPORT_FAILED, "Import content failed", TAG);
     }
 
     @Override

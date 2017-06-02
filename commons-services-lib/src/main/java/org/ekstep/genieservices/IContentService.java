@@ -2,11 +2,14 @@ package org.ekstep.genieservices;
 
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
+import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
+import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -85,6 +88,12 @@ public interface IContentService {
     GenieResponse<Void> deleteContent(String contentIdentifier, int level);
 
     /**
+     * @param contentListingCriteria
+     * @return
+     */
+    GenieResponse<ContentListingResult> getContentListing(ContentListingCriteria contentListingCriteria);
+
+    /**
      * This api is used to search for contents with the search criterion mentioned in {@link ContentSearchCriteria}
      * <p>
      * <p>
@@ -156,20 +165,22 @@ public interface IContentService {
      * On failing to import the content, the response will be with return status as FALSE and wih the following error
      * <p>INVALID_FILE
      *
-     * @param isChildContent
-     * @param ecarFilePath
+     * @param isChildContent    Should be True if importing nested content of any collection/textbook else False.
+     * @param sourceFilePath    Content file path which needs to import.
+     * @param destinationFolder Destination folder where content will import.
      * @return
      */
-    GenieResponse<Void> importContent(boolean isChildContent, String ecarFilePath);
+    GenieResponse<Void> importContent(boolean isChildContent, String sourceFilePath, File destinationFolder);
 
     /**
-     * This api is used to import the group of contents all specified with identifiers in {@link List<String>}
+     * This api is used to download and import the group of contents all specified with identifiers in {@link List<String>}
      * <p>
      * todo this doc is yet to be finished as the implementation part is not yet fully done
      *
-     * @param isChildContent
-     * @param contentIdentifiers
+     * @param isChildContent     Should be True if importing nested content of any collection/textbook else False.
+     * @param destinationFolder  Destination folder where content will import.
+     * @param contentIdentifiers List of identifier which needs to import.
      * @return
      */
-    GenieResponse<Void> importContent(boolean isChildContent, List<String> contentIdentifiers);
+    GenieResponse<Void> importContent(boolean isChildContent, List<String> contentIdentifiers, File destinationFolder);
 }

@@ -1,5 +1,6 @@
 package org.ekstep.genieservices.content;
 
+import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
 
 import org.ekstep.genieservices.IConfigService;
@@ -11,13 +12,18 @@ import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessCriteria;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
+import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
+import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchFilter;
+import org.ekstep.genieservices.commons.bean.Display;
 import org.ekstep.genieservices.commons.bean.FilterValue;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.MasterDataValues;
+import org.ekstep.genieservices.commons.bean.PartnerFilter;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.bean.Section;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.Variant;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
@@ -35,6 +41,7 @@ import org.ekstep.genieservices.content.bean.ContentChild;
 import org.ekstep.genieservices.content.bean.ContentVariant;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.db.model.ContentsModel;
+import org.ekstep.genieservices.content.db.model.PageModel;
 import org.ekstep.genieservices.content.network.ContentDetailsAPI;
 
 import java.io.File;
@@ -44,14 +51,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.TreeMap;
-
-import static java.lang.String.valueOf;
 
 /**
  * Created on 5/23/2017.
@@ -86,11 +94,11 @@ public class ContentHandler {
         return null;
     }
 
-    public static void refreshContentDetails(final AppContext appContext, final String contentIdentifier, final ContentModel existingContentModel) {
+    public static void refreshContentDetailsFromServer(final AppContext appContext, final String contentIdentifier, final ContentModel existingContentModel) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Map contentData = ContentHandler.fetchContentDetailsFromServer(appContext, contentIdentifier);
+                Map contentData = fetchContentDetailsFromServer(appContext, contentIdentifier);
 
                 if (contentData != null) {
                     ContentModel contentModel = ContentModel.build(appContext.getDBSession(), contentData, null);
@@ -112,7 +120,6 @@ public class ContentHandler {
         if (contentModel.getLocalData() != null) {
             localData = GsonUtil.fromJson(contentModel.getLocalData(), ContentData.class);
         }
-        content.setContentData(localData);
 
         ContentData serverData = null;
         if (contentModel.getServerData() != null) {
@@ -120,8 +127,10 @@ public class ContentHandler {
         }
 
         if (serverData != null) {
+            content.setContentData(serverData);
             addContentVariants(serverData, contentModel.getServerData());
         } else if (localData != null) {
+            content.setContentData(localData);
             addContentVariants(localData, contentModel.getLocalData());
         }
 
@@ -145,9 +154,7 @@ public class ContentHandler {
     private static void addContentVariants(ContentData contentData, String dataJson) {
         List<Variant> variantList = new ArrayList<>();
 
-        Type type = new TypeToken<List<HashMap<String, Object>>>() {
-        }.getType();
-        Map<String, Object> dataMap = GsonUtil.getGson().fromJson(dataJson, type);
+        Map<String, Object> dataMap = GsonUtil.fromJson(dataJson, Map.class);
 
         Object variants = dataMap.get(ContentModel.KEY_VARIANTS);
         if (variants != null) {
@@ -180,6 +187,17 @@ public class ContentHandler {
         return null;
     }
 
+    public static Profile getCurrentProfile(IUserService userService) {
+        Profile profile = null;
+        if (userService != null) {
+            GenieResponse<Profile> profileGenieResponse = userService.getCurrentUser();
+            if (profileGenieResponse.getStatus()) {
+                profile = profileGenieResponse.getResult();
+            }
+        }
+        return profile;
+    }
+
     public static ContentFeedback getContentFeedback(IContentFeedbackService contentFeedbackService, String contentIdentifier, String uid) {
         if (contentFeedbackService != null) {
             return contentFeedbackService.getFeedback(uid, contentIdentifier).getResult();
@@ -196,7 +214,7 @@ public class ContentHandler {
             }
         }
 
-        return null;
+        return new ContentAccess();
     }
 
     private static boolean isUpdateAvailable(ContentData serverData, ContentData localData) {
@@ -228,10 +246,9 @@ public class ContentHandler {
 
         String orderBy = String.format(Locale.US, "ORDER BY ca.%s desc, c.%s desc, c.%s desc", ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP, ContentEntry.COLUMN_NAME_LOCAL_LAST_UPDATED_ON, ContentEntry.COLUMN_NAME_SERVER_LAST_UPDATED_ON);
 
-        String query = String.format(Locale.US, "SELECT * FROM  %s c LEFT JOIN %s ca ON c.%s = ca.%s AND ca.%s = '%s' %s %s;",
+        String query = String.format(Locale.US, "SELECT c.* FROM  %s c LEFT JOIN %s ca ON c.%s = ca.%s AND ca.%s = '%s' %s %s;",
                 ContentEntry.TABLE_NAME, ContentAccessEntry.TABLE_NAME, ContentEntry.COLUMN_NAME_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_UID, uid,
                 filter, orderBy);
-
 
         List<ContentModel> contentModelListInDB;
         ContentsModel contentsModel = ContentsModel.findWithCustomQuery(dbSession, query);
@@ -436,53 +453,47 @@ public class ContentHandler {
         return isExist;
     }
 
-    private static boolean contentMetadataAbsent(Map<String, Object> localDataMap) {
+    public static void addOrUpdateViralityMetadata(ContentModel contentModel, String origin) {
+        Map<String, Object> localDataMap = GsonUtil.fromJson(contentModel.getLocalData(), Map.class);
+
+        if (isContentMetadataAbsent(localDataMap)) {
+            Map<String, Object> viralityMetadata = new HashMap<>();
+            viralityMetadata.put(ContentModel.KEY_ORIGIN, origin);
+            viralityMetadata.put(ContentModel.KEY_TRANSFER_COUNT, INITIAL_VALUE_FOR_TRANSFER_COUNT);
+
+            Map<String, Object> contentMetadata = new HashMap<>();
+            contentMetadata.put(ContentModel.KEY_VIRALITY_METADATA, viralityMetadata);
+
+            localDataMap.put(ContentModel.KEY_CONTENT_METADATA, contentMetadata);
+        } else if (isContentMetadataPresentWithoutViralityMetadata(localDataMap)) {
+            Map<String, Object> viralityMetadata = new HashMap<>();
+            viralityMetadata.put(ContentModel.KEY_ORIGIN, origin);
+            viralityMetadata.put(ContentModel.KEY_TRANSFER_COUNT, INITIAL_VALUE_FOR_TRANSFER_COUNT);
+
+            ((Map<String, Object>) localDataMap.get(ContentModel.KEY_CONTENT_METADATA)).put(ContentModel.KEY_VIRALITY_METADATA, viralityMetadata);
+        } else {
+            Map<String, Object> viralityMetadata = (Map<String, Object>) ((Map<String, Object>) localDataMap.get(ContentModel.KEY_CONTENT_METADATA)).get(ContentModel.KEY_VIRALITY_METADATA);
+            viralityMetadata.put(ContentModel.KEY_TRANSFER_COUNT, transferCount(localDataMap) + 1);
+        }
+
+        contentModel.updateLocalData(GsonUtil.toJson(localDataMap));
+    }
+
+    private static boolean isContentMetadataAbsent(Map<String, Object> localDataMap) {
         return localDataMap.get(ContentModel.KEY_CONTENT_METADATA) == null;
     }
 
-    private static boolean contentMetadataPresentWithoutViralityMetadata(Map<String, Object> localDataMap) {
+    private static boolean isContentMetadataPresentWithoutViralityMetadata(Map<String, Object> localDataMap) {
         return localDataMap.get(ContentModel.KEY_CONTENT_METADATA) != null
                 && ((Map<String, Object>) localDataMap.get(ContentModel.KEY_CONTENT_METADATA)).get(ContentModel.KEY_VIRALITY_METADATA) == null;
     }
 
-    private static boolean contentAndViralityMetadataPresent(Map<String, Object> localDataMap) {
-        return localDataMap.get(ContentModel.KEY_CONTENT_METADATA) != null
-                && ((Map<String, Object>) localDataMap.get(ContentModel.KEY_CONTENT_METADATA)).get(ContentModel.KEY_VIRALITY_METADATA) != null;
-    }
-
-    public static int transferCount(Map<String, Object> localDataMap) {
+    private static int transferCount(Map<String, Object> viralityMetadata) {
         try {
-            return Double.valueOf(valueOf(viralityMetadata(localDataMap).get(ContentModel.KEY_TRANSFER_COUNT))).intValue();
+            String transferCount = (String) viralityMetadata.get(ContentModel.KEY_TRANSFER_COUNT);
+            return Double.valueOf(transferCount).intValue();
         } catch (Exception e) {
             return 0;
-        }
-    }
-
-    private static Map<String, Object> viralityMetadata(Map<String, Object> localDataMap) {
-        return contentAndViralityMetadataPresent(localDataMap)
-                ? (Map<String, Object>) ((Map<String, Object>) localDataMap.get(ContentModel.KEY_CONTENT_METADATA)).get(ContentModel.KEY_VIRALITY_METADATA)
-                : new HashMap<String, Object>();
-    }
-
-    public static void addOrUpdateViralityMetadata(String localDataJson, String origin) {
-        Map<String, Object> localDataMap = GsonUtil.fromJson(localDataJson, Map.class);
-
-        if (contentMetadataAbsent(localDataMap)) {
-            Map<String, Object> contentMetadata = new HashMap<>();
-            localDataMap.put(ContentModel.KEY_CONTENT_METADATA, contentMetadata);
-            Map<String, Object> viralityMetadata = new HashMap<>();
-            contentMetadata.put(ContentModel.KEY_VIRALITY_METADATA, viralityMetadata);
-            viralityMetadata.put(ContentModel.KEY_ORIGIN, origin);
-            viralityMetadata.put(ContentModel.KEY_TRANSFER_COUNT, INITIAL_VALUE_FOR_TRANSFER_COUNT);
-        } else if (contentMetadataPresentWithoutViralityMetadata(localDataMap)) {
-            Map<String, Object> virality = new HashMap<>();
-            ((Map<String, Object>) localDataMap.get(ContentModel.KEY_CONTENT_METADATA)).put(ContentModel.KEY_VIRALITY_METADATA, virality);
-            virality.put(ContentModel.KEY_ORIGIN, origin);
-            virality.put(ContentModel.KEY_TRANSFER_COUNT, INITIAL_VALUE_FOR_TRANSFER_COUNT);
-        } else if (contentAndViralityMetadataPresent(localDataMap)) {
-            Map<String, Object> viralityMetadata =
-                    (Map<String, Object>) ((Map<String, Object>) localDataMap.get(ContentModel.KEY_CONTENT_METADATA)).get(ContentModel.KEY_VIRALITY_METADATA);
-            viralityMetadata.put(ContentModel.KEY_TRANSFER_COUNT, transferCount(localDataMap) + 1);
         }
     }
 
@@ -622,8 +633,8 @@ public class ContentHandler {
     private static Map<String, Object> getFilterRequest(IUserService userService, IConfigService configService, ContentSearchCriteria criteria) {
         Map<String, Object> filterMap = new HashMap<>();
 
-        if (criteria.getFilter() != null) {
-            for (ContentSearchFilter filter : criteria.getFilter()) {
+        if (criteria.getFilters() != null) {
+            for (ContentSearchFilter filter : criteria.getFilters()) {
                 List<String> filterValueList = new ArrayList<>();
                 for (FilterValue filterValue : filter.getValues()) {
                     if (filterValue.isApply()) {
@@ -643,26 +654,13 @@ public class ContentHandler {
         addFiltersIfNotAvailable(filterMap, "contentType", Arrays.asList("Story", "Worksheet", "Collection", "Game", "TextBook"));
         addFiltersIfNotAvailable(filterMap, "status", Collections.singletonList("Live"));
 
-        // TODO: 5/26/2017 - Apply profile specific filter
-//        applyProfileFilter(userService, configService, criteria.isProfileFilter(), filter);
+        // Apply profile specific filters
+        if (criteria.isProfileFilter()) {
+            applyProfileFilter(getCurrentProfile(userService), configService, filterMap);
+        }
 
-
-        // TODO: 5/26/2017 - Apply partner specific filer
-//        HashMap<String, String> partnerInfo = GsonUtil.fromJson(getSharedPreferenceWrapper().getString(Constants.KEY_PARTNER_INFO, null), HashMap.class);
-//        if (partnerInfo != null) {
-//            //Apply Channel filter
-//            String channel = partnerInfo.get(Constant.BUNDLE_KEY_PARTNER_CHANNEL);
-//            if (channel != null) {
-//                applyFilter(MasterDataType.CHANNEL, channel, filter);
-//            }
-//
-//            //Apply Purpose filter
-//            String audience = partnerInfo.get(Constant.BUNDLE_KEY_PARTNER_PURPOSE);
-//            if (purpose != null) {
-//                applyFilter(MasterDataType.AUDIENCE, audience, filter);
-//            }
-//        }
-
+        // Apply partner specific filters
+        applyPartnerFilter(configService, criteria.getPartnerFilters(), filterMap);
 
         return filterMap;
     }
@@ -680,74 +678,67 @@ public class ContentHandler {
         }
     }
 
-    private static void applyProfileFilter(IUserService userService, IConfigService configService, boolean profileFilter, Map<String, String[]> filter) {
-        if (profileFilter && userService != null) {
-            GenieResponse<Profile> profileResponse = userService.getCurrentUser();
-            if (profileResponse.getStatus()) {
-                Profile currentProfile = profileResponse.getResult();
+    private static void applyProfileFilter(Profile profile, IConfigService configService, Map<String, Object> filterMap) {
+        if (profile != null) {
+            // Add age filter
+            applyFilter(configService, MasterDataType.AGEGROUP, String.valueOf(profile.getAge()), filterMap);
 
-                // Add age filter
-                applyFilter(configService, MasterDataType.AGEGROUP, String.valueOf(currentProfile.getAge()), filter);
+            // Add board filter
+            applyFilter(configService, MasterDataType.BOARD, profile.getBoard(), filterMap);
 
-                // Add board filter
-                if (currentProfile.getBoard() != null) {
-                    applyFilter(configService, MasterDataType.BOARD, currentProfile.getBoard(), filter);
+            // Add medium filter
+            applyFilter(configService, MasterDataType.MEDIUM, profile.getMedium(), filterMap);
+
+            // Add standard filter
+            applyFilter(configService, MasterDataType.GRADELEVEL, String.valueOf(profile.getStandard()), filterMap);
+        }
+    }
+
+    private static void applyPartnerFilter(IConfigService configService, List<PartnerFilter> partnerFilters, Map<String, Object> filterMap) {
+        if (configService != null && partnerFilters != null && !partnerFilters.isEmpty()) {
+            for (PartnerFilter partnerFilter : partnerFilters) {
+                for (String propertyValue : partnerFilter.getValues()) {
+                    applyFilter(configService, partnerFilter.getMasterDataType(), propertyValue, filterMap);
                 }
-
-                // Add medium filter
-                if (currentProfile.getMedium() != null) {
-                    applyFilter(configService, MasterDataType.MEDIUM, currentProfile.getMedium(), filter);
-                }
-
-                // Add standard filter
-                applyFilter(configService, MasterDataType.GRADELEVEL, String.valueOf(currentProfile.getStandard()), filter);
             }
         }
     }
 
-    private static void applyFilter(IConfigService configService, MasterDataType masterDataType, String propertyValue, Map<String, String[]> filter) {
-        try {
+    private static void applyFilter(IConfigService configService, MasterDataType masterDataType, String propertyValue, Map<String, Object> filterMap) {
+        if (configService != null && propertyValue != null) {
+            String property = masterDataType.getValue();
 
             if (masterDataType == MasterDataType.AGEGROUP) {
                 masterDataType = MasterDataType.AGE;
             }
 
-            MasterDataValues masterDataValues = null;
-            if (configService != null) {
-                GenieResponse<MasterData> masterDataResponse = configService.getMasterData(masterDataType);
+            GenieResponse<MasterData> masterDataResponse = configService.getMasterData(masterDataType);
 
-                MasterData masterData = null;
-                if (masterDataResponse.getStatus()) {
-                    masterData = masterDataResponse.getResult();
-                }
+            if (masterDataResponse.getStatus()) {
+                MasterData masterData = masterDataResponse.getResult();
 
                 for (MasterDataValues values : masterData.getValues()) {
-                    if (values.getValue().equals(propertyValue)) {
-                        masterDataValues = values;
+                    if (values.getTelemetry().equals(propertyValue)) {
+                        Map<String, Object> searchMap = values.getSearch();
+                        Map filtersMap = (Map) searchMap.get("filters");
+                        Set termSet = new HashSet((List) filtersMap.get(property));
+
+                        if (filterMap.containsKey(property)) {
+                            if (filterMap.get(property) != null) {
+                                Set set = new HashSet(Arrays.asList(filterMap.get(property)));
+                                if (set != null && termSet != null) {
+                                    termSet.addAll(set);
+                                }
+                            }
+                        }
+
+                        String[] strArr = new String[termSet.size()];
+                        termSet.toArray(strArr);
+                        filterMap.put(property, strArr);
                         break;
                     }
                 }
             }
-            // TODO: 5/26/2017 - Uncomment the following and implement with bean
-//            Map termMap = (Map) map.get(propertyValue);
-//
-//            String masterDataTypeValue = masterDataType.getValue();
-//
-//            Set termSet = new HashSet((List) termMap.get(masterDataTypeValue));
-//            if (filter.containsKey(masterDataTypeValue)) {
-//                if (filter.get(masterDataTypeValue) != null) {
-//                    Set set = new HashSet(Arrays.asList(filter.get(masterDataTypeValue)));
-//                    if (set != null && termSet != null) {
-//                        termSet.addAll(set);
-//                    }
-//                }
-//            }
-//
-//            String[] strArr = new String[termSet.size()];
-//            termSet.toArray(strArr);
-//            filter.put(masterDataTypeValue, strArr);
-        } catch (Exception e) {
-            Logger.e(TAG, "Failed to apply filter");
         }
     }
 
@@ -875,16 +866,17 @@ public class ContentHandler {
         return requestMap;
     }
 
-    public static HashMap<String, Object> getPageAssembleRequest(IUserService userService, String did) {
+    public static boolean dataHasExpired(long ttl) {
+        Long currentTime = DateUtil.getEpochTime();
+        return currentTime > ttl;
+    }
+
+    public static Map<String, Object> getPageAssembleRequest(IConfigService configService, Profile profile, String subject, List<PartnerFilter> partnerFilters, String did) {
         String dlang = "";
         String uid = "";
-        if (userService != null) {
-            GenieResponse<Profile> profileGenieResponse = userService.getCurrentUser();
-            if (profileGenieResponse.getStatus()) {
-                Profile profile = profileGenieResponse.getResult();
-                uid = profile.getUid();
-                dlang = profile.getLanguage();
-            }
+        if (profile != null) {
+            uid = profile.getUid();
+            dlang = profile.getLanguage();
         }
 
         HashMap<String, Object> contextMap = new HashMap<>();
@@ -893,12 +885,156 @@ public class ContentHandler {
         contextMap.put("contentid", "");
         contextMap.put("uid", uid);
 
+        Map<String, Object> filterMap = new HashMap<>();
+        filterMap.put("compatibilityLevel", getCompatibilityLevel());
+
+        // Add subject filter
+        applyFilter(configService, MasterDataType.SUBJECT, subject, filterMap);
+
+        // Apply profile specific filters
+        applyProfileFilter(profile, configService, filterMap);
+
+        // Apply partner specific filters
+        applyPartnerFilter(configService, partnerFilters, filterMap);
+
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("context", contextMap);
-        // TODO: 5/25/2017 - Uncomment this and add filter request. Reffer PageAssembleAPI in Genie repo.
-//        requestMap.put("filters", getFilterRequest());
+        requestMap.put("filters", filterMap);
 
         return requestMap;
+    }
+
+    public static void savePageDataInDB(IDBSession dbSession, ContentListingCriteria contentListingCriteria, Profile profile, String jsonStr) {
+        if (jsonStr == null) {
+            return;
+        }
+
+        long expiryTime;
+
+        long ttlInMilliSeconds = ContentConstants.CACHE_TIMEOUT_HOME_CONTENT;
+        Long currentTime = DateUtil.getEpochTime();
+        expiryTime = ttlInMilliSeconds + currentTime;
+
+        PageModel pageModel = PageModel.build(dbSession, contentListingCriteria.getPageIdentifier(), jsonStr, profile, contentListingCriteria.getSubject(), expiryTime);
+        pageModel.save();
+    }
+
+    public static ContentListingResult getPageAssembleResult(IDBSession dbSession, ContentListingCriteria contentListingCriteria, String jsonStr) {
+        ContentListingResult contentListingResult = null;
+
+        LinkedTreeMap map = GsonUtil.fromJson(jsonStr, LinkedTreeMap.class);
+        LinkedTreeMap responseParams = (LinkedTreeMap) map.get("params");
+        LinkedTreeMap result = (LinkedTreeMap) map.get("result");
+
+        String responseMessageId = null;
+        if (responseParams.containsKey("resmsgid")) {
+            responseMessageId = (String) responseParams.get("resmsgid");
+        }
+
+        if (result != null) {
+            contentListingResult = new ContentListingResult();
+            contentListingResult.setId(contentListingCriteria.getPageIdentifier());
+            contentListingResult.setResponseMessageId(responseMessageId);
+            if (result.containsKey("page")) {
+                contentListingResult.setSections(getSectionsFromPageMap(dbSession, (Map<String, Object>) result.get("page"), contentListingCriteria));
+            }
+        }
+
+        return contentListingResult;
+    }
+
+    private static List<Section> getSectionsFromPageMap(IDBSession dbSession, Map<String, Object> pageMap, ContentListingCriteria contentListingCriteria) {
+        List<Section> sectionList = new ArrayList<>();
+
+        List<Map<String, Object>> sections = (List<Map<String, Object>>) pageMap.get("sections");
+        for (Map<String, Object> sectionMap : sections) {
+            List<Map<String, Object>> contentDataList = null;
+            if (sectionMap.containsKey("contents")) {
+                contentDataList = (List<Map<String, Object>>) sectionMap.get("contents");
+            }
+
+            ContentSearchCriteria contentSearchCriteria = null;
+            Map<String, Object> searchMap = (Map<String, Object>) sectionMap.get("search");
+            if (searchMap != null) {
+                contentSearchCriteria = new ContentSearchCriteria();
+                if (searchMap.containsKey("query")) {
+                    contentSearchCriteria.setQuery((String) searchMap.get("query"));
+                }
+
+                if (searchMap.containsKey("mode")) {
+                    contentSearchCriteria.setMode((String) searchMap.get("mode"));
+                }
+
+                if (searchMap.containsKey("sort_by")) {
+                    // TODO: 5/30/2017
+                }
+
+                if (searchMap.containsKey("filters")) {
+                    Map<String, String[]> filtersMap = (Map<String, String[]>) searchMap.get("filters");
+                    if (filtersMap != null && !filtersMap.isEmpty()) {
+
+                        List<ContentSearchFilter> filters = new ArrayList<>();
+
+                        Iterator it = filtersMap.entrySet().iterator();
+                        while (it.hasNext()) {
+                            Map.Entry pair = (Map.Entry) it.next();
+                            String key = pair.getKey().toString();
+                            Object value = pair.getValue();
+
+                            if (value instanceof List) {
+                                List<FilterValue> values = new ArrayList<>();
+                                List<String> valueList = (List<String>) value;
+                                for (String v : valueList) {
+                                    FilterValue filterValue = new FilterValue();
+                                    filterValue.setName(v);
+                                    filterValue.setApply(true);
+
+                                    values.add(filterValue);
+                                }
+
+                                ContentSearchFilter contentSearchFilter = new ContentSearchFilter();
+                                contentSearchFilter.setName(key);
+                                contentSearchFilter.setValues(values);
+
+                                filters.add(contentSearchFilter);
+                            } else {
+                                // TODO: 5/30/2017 - handle object filter here.
+//                                key.equals("compatibilityLevel") && key.equals("genieScore")
+//                                String[] stringArray = mFilterMap.get(values.getName());
+//                                filterSet.addAll(Arrays.asList(stringArray));
+                            }
+
+                            it.remove();
+                        }
+
+                        contentSearchCriteria.setFilters(filters);
+                        contentSearchCriteria.setProfileFilter(contentListingCriteria.isCurrentProfileFilter());
+                        contentSearchCriteria.setPartnerFilters(contentListingCriteria.getPartnerFilters());
+                    }
+                }
+            }
+
+            Section section = new Section();
+            section.setResponseMessageId((String) sectionMap.get("resmsgid"));
+            section.setApiId((String) sectionMap.get("apiid"));
+            section.setDisplay(GsonUtil.fromMap((Map) sectionMap.get("display"), Display.class));
+            section.setContents(convertContentMapListToBeanList(dbSession, contentDataList));
+            section.setContentSearchCriteria(contentSearchCriteria);
+        }
+
+        return sectionList;
+    }
+
+    public static List<Content> convertContentMapListToBeanList(IDBSession dbSession, List<Map<String, Object>> contentDataList) {
+        List<Content> contents = new ArrayList<>();
+        if (contentDataList != null) {
+            for (Map contentDataMap : contentDataList) {
+                ContentModel contentModel = ContentModel.build(dbSession, contentDataMap, null);
+                Content content = convertContentModelToBean(contentModel);
+                contents.add(content);
+            }
+        }
+        return contents;
     }
 
     public static String getDownloadUrl(Map<String, Object> dataMap) {

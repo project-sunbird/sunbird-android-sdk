@@ -13,9 +13,8 @@ import org.ekstep.genieproviders.IUriHandler;
 import org.ekstep.genieproviders.util.Constants;
 import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
-import org.ekstep.genieservices.commons.LanguageSearchRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.commons.utils.Logger;
 
 import java.util.Locale;
 
@@ -25,7 +24,7 @@ import java.util.Locale;
  */
 
 public class LanguageSearchUriHandler implements IUriHandler {
-
+    private final String TAG = LanguageSearchUriHandler.class.getSimpleName();
     private String authority;
     private Context context;
     private String selection;
@@ -41,10 +40,10 @@ public class LanguageSearchUriHandler implements IUriHandler {
     @Override
     public Cursor process() {
         MatrixCursor cursor = null;
-        if (genieService != null) {
+        if (genieService != null && selection != null) {
             cursor = getMatrixCursor();
-            LanguageSearchRequest request = GsonUtil.fromJson(selection, LanguageSearchRequest.class);
-            GenieResponse genieResponse = genieService.getLanguageService().getLanguageSearch(GsonUtil.toJson(request));
+            Logger.i(TAG, "Language Id - " + selection);
+            GenieResponse genieResponse = genieService.getLanguageService().getLanguageSearch(selection);
             if (genieResponse != null) {
                 cursor.addRow(new String[]{new Gson().toJson(genieResponse)});
             } else {

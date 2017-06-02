@@ -10,10 +10,16 @@ import java.io.Serializable;
 public class ContentFeedback implements Serializable {
 
     private String contentId;
-    private String uid;
-    private String rating;
+    private float rating;
     private String comments;
     private Long createdAt;
+
+    public ContentFeedback() {
+    }
+
+    public ContentFeedback(Long createdAt) {
+        this.createdAt = createdAt;
+    }
 
     public String getContentId() {
         return contentId;
@@ -23,19 +29,11 @@ public class ContentFeedback implements Serializable {
         this.contentId = contentId;
     }
 
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-
-    public String getRating() {
+    public float getRating() {
         return rating;
     }
 
-    public void setRating(String rating) {
+    public void setRating(float rating) {
         this.rating = rating;
     }
 
@@ -51,7 +49,4 @@ public class ContentFeedback implements Serializable {
         return createdAt;
     }
 
-    public void setCreatedAt(Long createdAt) {
-        this.createdAt = createdAt;
-    }
 }

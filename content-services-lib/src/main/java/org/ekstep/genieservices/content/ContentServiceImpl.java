@@ -12,10 +12,13 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
+import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
+import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.download.DownloadService;
@@ -33,7 +36,9 @@ import org.ekstep.genieservices.content.chained.ExtractPayloads;
 import org.ekstep.genieservices.content.chained.IChainable;
 import org.ekstep.genieservices.content.chained.ValidateEcar;
 import org.ekstep.genieservices.content.db.model.ContentModel;
+import org.ekstep.genieservices.content.db.model.PageModel;
 import org.ekstep.genieservices.content.network.ContentSearchAPI;
+import org.ekstep.genieservices.content.network.PageAssembleAPI;
 import org.ekstep.genieservices.content.network.RecommendedContentAPI;
 import org.ekstep.genieservices.content.network.RelatedContentAPI;
 
@@ -43,7 +48,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import java.util.UUID;
 
 /**
  * Created on 5/10/2017.
@@ -87,14 +91,16 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
             contentModelInDB = ContentModel.build(mAppContext.getDBSession(), contentData, null);
         } else {
-            ContentHandler.refreshContentDetails(mAppContext, contentIdentifier, contentModelInDB);
+            ContentHandler.refreshContentDetailsFromServer(mAppContext, contentIdentifier, contentModelInDB);
         }
 
         Content content = ContentHandler.convertContentModelToBean(contentModelInDB);
 
-        String uid = ContentHandler.getCurrentUserId(userService);
-        content.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, content.getIdentifier(), uid));
-        content.setContentAccess(ContentHandler.getContentAccess(userService, content.getIdentifier(), uid));
+        if (content.isAvailableLocally()) {
+            String uid = ContentHandler.getCurrentUserId(userService);
+            content.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, content.getIdentifier(), uid));
+            content.setContentAccess(ContentHandler.getContentAccess(userService, content.getIdentifier(), uid));
+        }
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(content);
@@ -219,6 +225,47 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
+    public GenieResponse<ContentListingResult> getContentListing(ContentListingCriteria contentListingCriteria) {
+        Profile profile = null;
+        if (contentListingCriteria.isCurrentProfileFilter()) {
+            profile = ContentHandler.getCurrentProfile(userService);
+        }
+
+        String jsonStr = null;
+        PageModel pageModelInDB = PageModel.find(mAppContext.getDBSession(), contentListingCriteria.getPageIdentifier(), profile, contentListingCriteria.getSubject());
+        if (pageModelInDB != null) {
+            if (ContentHandler.dataHasExpired(pageModelInDB.getExpiryTime())) {
+                pageModelInDB.delete();
+            } else {
+                jsonStr = pageModelInDB.getJson();
+            }
+        }
+
+        if (jsonStr == null) {
+            Map<String, Object> requestMap = ContentHandler.getPageAssembleRequest(configService, profile, contentListingCriteria.getSubject(), contentListingCriteria.getPartnerFilters(), mAppContext.getDeviceInfo().getDeviceID());
+            PageAssembleAPI api = new PageAssembleAPI(mAppContext, contentListingCriteria.getPageIdentifier(), requestMap);
+            GenieResponse apiResponse = api.post();
+            if (apiResponse.getStatus()) {
+                jsonStr = apiResponse.getResult().toString();
+                ContentHandler.savePageDataInDB(mAppContext.getDBSession(), contentListingCriteria, profile, jsonStr);
+            } else {
+                return GenieResponseBuilder.getErrorResponse(apiResponse.getError(), (String) apiResponse.getErrorMessages().get(0), TAG);
+            }
+        }
+
+        if (jsonStr != null) {
+            ContentListingResult contentListingResult = ContentHandler.getPageAssembleResult(mAppContext.getDBSession(), contentListingCriteria, jsonStr);
+            if (contentListingResult != null) {
+                GenieResponse<ContentListingResult> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+                response.setResult(contentListingResult);
+                return response;
+            }
+        }
+
+        return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.DATA_NOT_FOUND_ERROR, ServiceConstants.ErrorMessage.NO_PAGE_ASSEMBLE_DATA, TAG);
+    }
+
+    @Override
     public GenieResponse<ContentSearchResult> searchContent(ContentSearchCriteria contentSearchCriteria) {
         GenieResponse<ContentSearchResult> response;
 
@@ -249,22 +296,12 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 contentDataList = (List<Map<String, Object>>) result.get("content");
             }
 
-            List<Content> contents = new ArrayList<>();
-            if (contentDataList != null) {
-                for (Map contentDataMap : contentDataList) {
-                    // TODO: 5/15/2017 - Can fetch content from DB and return in response.
-                    ContentModel contentModel = ContentModel.build(mAppContext.getDBSession(), contentDataMap, null);
-                    Content content = ContentHandler.convertContentModelToBean(contentModel);
-                    contents.add(content);
-                }
-            }
-
             ContentSearchResult searchResult = new ContentSearchResult();
             searchResult.setId(id);
             searchResult.setResponseMessageId(responseMessageId);
             searchResult.setFilter(ContentHandler.getFilters(configService, facets, (Map<String, Object>) requestMap.get("filters")));
             searchResult.setRequest(requestMap);
-            searchResult.setContents(contents);
+            searchResult.setContents(ContentHandler.convertContentMapListToBeanList(mAppContext.getDBSession(), contentDataList));
 
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(searchResult);
@@ -302,19 +339,10 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 contentDataList = (List<Map<String, Object>>) result.get("content");
             }
 
-            List<Content> contents = new ArrayList<>();
-            if (contentDataList != null) {
-                for (Map contentDataMap : contentDataList) {
-                    ContentModel contentModel = ContentModel.build(mAppContext.getDBSession(), contentDataMap, null);
-                    Content content = ContentHandler.convertContentModelToBean(contentModel);
-                    contents.add(content);
-                }
-            }
-
             ContentSearchResult searchResult = new ContentSearchResult();
             searchResult.setId(id);
             searchResult.setResponseMessageId(responseMessageId);
-            searchResult.setContents(contents);
+            searchResult.setContents(ContentHandler.convertContentMapListToBeanList(mAppContext.getDBSession(), contentDataList));
 
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(searchResult);
@@ -479,7 +507,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<Void> importContent(boolean isChildContent, String ecarFilePath) {
+    public GenieResponse<Void> importContent(boolean isChildContent, String ecarFilePath, File destinationFolder) {
         // TODO: 5/16/2017 - Telemetry logger
         String method = "importContent@ContentServiceImpl";
         Map<String, Object> params = new HashMap<>();
@@ -499,9 +527,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "content import failed, unsupported file extension", TAG);
             return response;
         } else {
-            File ecarFile = new File(ecarFilePath);
-            File tmpLocation = new File(FileUtil.getTmpDir(mAppContext.getPrimaryFilesDir()), UUID.randomUUID().toString());
-            ImportContext importContext = new ImportContext(ecarFile, tmpLocation);
+            ImportContext importContext = new ImportContext(isChildContent, ecarFilePath, destinationFolder);
 
             IChainable importContentSteps = ContentImportStep.initImportContent();
             importContentSteps.then(new DeviceMemoryCheck())
@@ -519,7 +545,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<Void> importContent(boolean isChildContent, List<String> contentIdentifiers) {
+    public GenieResponse<Void> importContent(boolean isChildContent, List<String> contentIdentifiers, File destinationFolder) {
         DownloadService downloadService = new DownloadService(mAppContext);
 
         ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, ContentHandler.getSearchRequest(contentIdentifiers));
@@ -545,7 +571,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                     }
 
                     if (!StringUtil.isNullOrEmpty(downloadUrl) && ServiceConstants.FileExtension.CONTENT.equalsIgnoreCase(FileUtil.getFileExtension(downloadUrl))) {
-                        DownloadRequest downloadRequest = new DownloadRequest((String) dataMap.get(ContentModel.KEY_IDENTIFIER), downloadUrl, ContentConstants.MimeType.ECAR, isChildContent);
+                        String contentIdentifier = (String) dataMap.get(ContentModel.KEY_IDENTIFIER);
+                        DownloadRequest downloadRequest = new DownloadRequest(contentIdentifier, downloadUrl, ContentConstants.MimeType.ECAR, destinationFolder, isChildContent);
                         downloadRequests[i] = downloadRequest;
                     }
                 }

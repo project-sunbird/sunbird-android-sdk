@@ -5,20 +5,14 @@ import org.ekstep.genieservices.ISyncService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
-import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.SyncStat;
-import org.ekstep.genieservices.commons.bean.enums.InteractionType;
-import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
-import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.telemetry.model.ProcessedEventModel;
 import org.ekstep.genieservices.telemetry.network.TelemetrySyncAPI;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 /**
  * This is the implementation of the interface {@link ISyncService}
@@ -33,6 +27,7 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
 
     @Override
     public GenieResponse<SyncStat> sync() {
+        String methodName = "sync@SyncServiceImpl";
         HashMap params = new HashMap();
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
 
@@ -51,6 +46,7 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
             if (!response.getStatus()) {
                 String message = getMessage(numberOfSync, numberOfEventsProcessed);
                 response.setMessage(message);
+                TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_SYNC);
                 return response;
             }
 
@@ -62,12 +58,12 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
         }
 
         String fileSize = calculateByteCountInKB(totalByteSize);
-        long syncTime= DateUtil.getEpochTime();
+        long syncTime = DateUtil.getEpochTime();
         mAppContext.getKeyValueStore().putLong(ServiceConstants.PreferenceKey.LAST_SYNC_TIME, syncTime);
         GenieResponse<SyncStat> response = GenieResponseBuilder.getSuccessResponse(getMessage(numberOfSync, numberOfEventsProcessed));
-        SyncStat syncStat=new SyncStat(numberOfEventsProcessed, syncTime, fileSize);
+        SyncStat syncStat = new SyncStat(numberOfEventsProcessed, syncTime, fileSize);
         response.setResult(syncStat);
-
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;
     }
 
@@ -82,10 +78,6 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
 
     private String getMessage(int numberOfSync, int numberOfEventsProcessed) {
         return String.format(Locale.US, "%d events synced in %d sync", numberOfEventsProcessed, numberOfSync);
-    }
-
-    private GenieResponse getErrorResponse(String error, String errorMessages, String message) {
-        return GenieResponseBuilder.getErrorResponse("failed", error, errorMessages, String.class);
     }
 
 }

@@ -8,8 +8,8 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
-import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.bean.UserSession;
+import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
 import org.ekstep.genieservices.commons.exception.InvalidDataException;
@@ -18,8 +18,8 @@ import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
-import org.ekstep.genieservices.tag.cache.TelemetryTagCache;
 import org.ekstep.genieservices.eventbus.EventPublisher;
+import org.ekstep.genieservices.tag.cache.TelemetryTagCache;
 import org.ekstep.genieservices.telemetry.model.EventModel;
 
 import java.util.ArrayList;
@@ -34,29 +34,28 @@ import java.util.Set;
 
 public class TelemetryServiceImpl extends BaseService implements ITelemetryService {
 
-    private static final String SERVICE_NAME = TelemetryServiceImpl.class.getSimpleName();
+    private static final String TAG = TelemetryServiceImpl.class.getSimpleName();
     private IUserService mUserService=null;
 
     public TelemetryServiceImpl(AppContext appContext, IUserService userService) {
         super(appContext);
-        this.mUserService=userService;
+        this.mUserService = userService;
     }
 
     @Override
     public GenieResponse<Void> saveTelemetry(String eventString) {
-        String errorMessage = "Not able to save event";
+        String methodName="saveTelemetry@TelemetryServiceImpl";
         HashMap params = new HashMap();
         params.put("Event", eventString);
-        params.put("logLevel", "3");
+        params.put("logLevel", "2");
 
         try {
             GenieResponse response = saveEvent(eventString);
-            saveEvent(TelemetryLogger.create(mAppContext, response, new HashMap(), SERVICE_NAME, "saveTelemetry@TelemetryServiceImpl", params).toString());
+            saveEvent(TelemetryLogger.create(mAppContext, response, new HashMap(), TAG, methodName, params).toString());
             return response;
         } catch (InvalidDataException e) {
-            String logMessage = "Event save failed" + e.toString();
-            GenieResponse response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.VALIDATION_ERROR, errorMessage, logMessage, Void.class);
-            saveEvent(TelemetryLogger.create(mAppContext, response, new HashMap(), SERVICE_NAME, "saveTelemetry@TelemetryServiceImpl", params).toString());
+            GenieResponse response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.VALIDATION_ERROR, ServiceConstants.ErrorMessage.UNABLE_TO_SAVE_EVENT, TAG, Void.class);
+            saveEvent(TelemetryLogger.create(mAppContext, response, new HashMap(), TAG, methodName, params).toString());
             return response;
         }
 
@@ -69,30 +68,33 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
 
     @Override
     public GenieResponse<TelemetryStat> getTelemetryStat() {
+        String methodName="getTelemetryStat@TelemetryServiceImpl";
+        HashMap params = new HashMap();
+        params.put("logLevel", "2");
 
-        String telemetryEventCountQuery="select count(*) from telemetry";
-        String processedTelemetryEventCountQuery="select sum(event_count) from processed_telemetry";
-        CustomReaderModel telemetryCountReader=CustomReaderModel.find(mAppContext.getDBSession(),telemetryEventCountQuery);
-        CustomReaderModel processedTelemetryCountReader=CustomReaderModel.find(mAppContext.getDBSession(),processedTelemetryEventCountQuery);
+        String telemetryEventCountQuery = "select count(*) from telemetry";
+        String processedTelemetryEventCountQuery = "select sum(event_count) from processed_telemetry";
+        CustomReaderModel telemetryCountReader = CustomReaderModel.find(mAppContext.getDBSession(), telemetryEventCountQuery);
+        CustomReaderModel processedTelemetryCountReader = CustomReaderModel.find(mAppContext.getDBSession(), processedTelemetryEventCountQuery);
 
-        int telemetryEventCount=0;
-        int processedTelemetryEventCount=0;
-        if(telemetryCountReader!=null){
-            telemetryEventCount=Integer.valueOf(telemetryCountReader.getData());
+        int telemetryEventCount = 0;
+        int processedTelemetryEventCount = 0;
+        if (telemetryCountReader != null) {
+            telemetryEventCount = Integer.valueOf(telemetryCountReader.getData());
         }
 
-        if(processedTelemetryCountReader!=null){
-            processedTelemetryEventCount=Integer.valueOf(processedTelemetryCountReader.getData());
+        if (processedTelemetryCountReader != null) {
+            processedTelemetryEventCount = Integer.valueOf(processedTelemetryCountReader.getData());
         }
 
-        int unSyncedEventCount=telemetryEventCount+processedTelemetryEventCount;
+        int unSyncedEventCount = telemetryEventCount + processedTelemetryEventCount;
 
         IKeyValueStore keyValueStore = mAppContext.getKeyValueStore();
         Long lastSyncTime = keyValueStore.getLong(ServiceConstants.PreferenceKey.LAST_SYNC_TIME, 0L);
-        GenieResponse<TelemetryStat> genieResponse=GenieResponseBuilder.getSuccessResponse("Telemetry stat retrieved successfully");
+        GenieResponse<TelemetryStat> genieResponse=GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         genieResponse.setResult(new TelemetryStat(unSyncedEventCount,lastSyncTime));
 
-        saveEvent(TelemetryLogger.create(mAppContext, genieResponse, new HashMap(), SERVICE_NAME, "getTelemetryStat@TelemetryServiceImpl", new HashMap()).toString());
+        saveEvent(TelemetryLogger.create(mAppContext, genieResponse, new HashMap(), TAG, methodName, params).toString());
 
         return genieResponse;
     }
@@ -103,14 +105,22 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         decorateEvent(event);
         event.save();
         EventPublisher.postTelemetryEvent(GsonUtil.fromMap(event.getEventMap(),Telemetry.class));
-        Logger.i(SERVICE_NAME, "Event saved successfully");
+        Logger.i(TAG, "Event saved successfully");
         return GenieResponseBuilder.getSuccessResponse("Event Saved Successfully", Void.class);
     }
 
-    private void decorateEvent(EventModel event){
-        //TODO Decorate should only patch fields that are not already present.
+    private void decorateEvent(EventModel event) {
+
+        //Patch the event with proper timestamp
+        String version = event.getVersion();
+        if (version.equals("1.0")) {
+            event.updateTs(DateUtil.getCurrentTimestamp());
+        } else if (version.equals("2.0")) {
+            event.updateEts(DateUtil.getEpochTime());
+        }
+
         //Patch the event with current Sid and Uid
-        if(mUserService!=null){
+        if (mUserService != null) {
             UserSession currentUserSession = mUserService.getCurrentUserSession().getResult();
             if (currentUserSession.isValid()) {
                 event.updateSessionDetails(currentUserSession.getSid(), currentUserSession.getUid());
@@ -120,13 +130,6 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         //Patch the event with did
         event.updateDeviceInfo(mAppContext.getDeviceInfo().getDeviceID());
 
-        //Patch the event with proper timestamp
-        String version = event.getVersion();
-        if (version.equals("1.0")) {
-            event.updateTs(DateUtil.getCurrentTimestamp());
-        } else if (version.equals("2.0")) {
-            event.updateEts(DateUtil.getEpochTime());
-        }
 
         //Patch Partner tagss
         String values = mAppContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.KEY_ACTIVE_PARTNER_ID, "");

@@ -5,8 +5,8 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.bean.telemetry.GEServiceAPICall;
+import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 
 import java.util.HashMap;
@@ -39,10 +39,10 @@ public class TelemetryLogger {
         }
     }
 
-    public static void logSuccess(AppContext appContext, GenieResponse response, HashMap result, String service, String method, HashMap params) {
+    public static void logSuccess(AppContext appContext, GenieResponse response, String service, String method, HashMap params) {
         int parsedLogLevel = appContext.getParams().getLogLevel();
         if (parsedLogLevel >= appLoggingLevel) {
-            log(appContext, response, service, method, params, result);
+            log(appContext, response, service, method, params, new HashMap());
         } else {
             //No logging as the log level requested was below the app logging level
         }

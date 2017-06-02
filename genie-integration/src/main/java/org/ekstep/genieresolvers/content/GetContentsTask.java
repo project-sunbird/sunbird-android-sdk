@@ -3,17 +3,13 @@ package org.ekstep.genieresolvers.content;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.util.Log;
 
 import com.google.gson.Gson;
 
 import org.ekstep.genieresolvers.BaseTask;
 import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created on 23/5/17.
@@ -22,6 +18,7 @@ import java.util.Map;
 
 public class GetContentsTask extends BaseTask {
 
+    private final String TAG = GetContentsTask.class.getSimpleName();
     private String appQualifier;
 
     public GetContentsTask(Context context, String appQualifier) {
@@ -38,6 +35,7 @@ public class GetContentsTask extends BaseTask {
     protected GenieResponse execute() {
         Cursor cursor = contentResolver.query(getUri(), null, null, null, "");
         if (cursor == null) {
+            Log.e(TAG, "execute: cursor is null!");
             String logMessage = "Couldn't get the content list";
             return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), logMessage);
         }
