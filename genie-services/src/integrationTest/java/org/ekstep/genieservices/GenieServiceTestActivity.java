@@ -156,9 +156,9 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
-    public GenieResponse<Void> importContent(boolean hasChildContent, String filepath) {
+    public GenieResponse<Void> importContent(boolean hasChildContent, String filepath, File destinationFolder) {
         idle = false;
-        GenieResponse genieResponse = mGenieService.getContentService().importContent(hasChildContent, filepath);
+        GenieResponse genieResponse = mGenieService.getContentService().importContent(hasChildContent, filepath, destinationFolder);
         return genieResponse;
     }
 
@@ -204,9 +204,9 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
-    public GenieResponse importContent(boolean isChildContent, List<String> contentIdentifiers) {
+    public GenieResponse importContent(boolean isChildContent, List<String> contentIdentifiers, File destinationFolder) {
         idle = false;
-        GenieResponse genieResponse = mGenieService.getContentService().importContent(isChildContent, contentIdentifiers);
+        GenieResponse genieResponse = mGenieService.getContentService().importContent(isChildContent, contentIdentifiers, destinationFolder);
         return genieResponse;
     }
 

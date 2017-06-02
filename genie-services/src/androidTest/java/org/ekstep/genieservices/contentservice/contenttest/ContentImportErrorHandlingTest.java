@@ -25,7 +25,7 @@ public class ContentImportErrorHandlingTest extends GenieServiceTestBase {
     @Test
     public void importContentFromEcarValidation() {
 
-        GenieResponse<Void> response = activity.importContent(true, "");
+        GenieResponse<Void> response = activity.importContent(true, "",activity.getExternalFilesDir(null));
 
         Assert.assertFalse("false", response.getStatus());
         Assert.assertEquals("INVALID_FILE", response.getError());
@@ -38,7 +38,7 @@ public class ContentImportErrorHandlingTest extends GenieServiceTestBase {
     @Test
     public void shouldNotImportExpiredEcar() {
 
-        GenieResponse<Void> response = activity.importContent(false, EXPIRED_CONTENT_FILEPATH);
+        GenieResponse<Void> response = activity.importContent(false, EXPIRED_CONTENT_FILEPATH,activity.getExternalFilesDir(null));
 
         Log.v(TAG, "shouldNotImportExpiredEcar getError() :: " + response.getError() + "getErrorMessages()" + response.getErrorMessages().get(0));
 
@@ -50,7 +50,7 @@ public class ContentImportErrorHandlingTest extends GenieServiceTestBase {
     @Test
     public void shouldShowOutdatedEcarError() {
 
-        GenieResponse<Void> response = activity.importContent(false, OUTDATED_CONTENT_FILEPATH);
+        GenieResponse<Void> response = activity.importContent(false, OUTDATED_CONTENT_FILEPATH,activity.getExternalFilesDir(null));
 
         Assert.assertFalse("false", response.getStatus());
         Assert.assertEquals("INVALID_FILE", response.getError());
@@ -63,10 +63,10 @@ public class ContentImportErrorHandlingTest extends GenieServiceTestBase {
     @Test
     public void shouldShowAlreadyImportedError() {
 
-        GenieResponse<Void> response = activity.importContent(false, FILEPATH);
+        GenieResponse<Void> response = activity.importContent(false, FILEPATH,activity.getExternalFilesDir(null));
         Assert.assertTrue("true", response.getStatus());
 
-        GenieResponse<Void> genieResponse = activity.importContent(false, FILEPATH);
+        GenieResponse<Void> genieResponse = activity.importContent(false, FILEPATH,activity.getExternalFilesDir(null));
 
         Assert.assertFalse("false", genieResponse.getStatus());
         Assert.assertEquals("The ECAR file is imported already!!!", genieResponse.getErrorMessages().get(0));
@@ -75,7 +75,7 @@ public class ContentImportErrorHandlingTest extends GenieServiceTestBase {
     @Test
     public void test5ShouldNotImportNoManifestEcar() {
 
-        GenieResponse<Void> response = activity.importContent(false, ECAR_NO_MANIFEST_PATH);
+        GenieResponse<Void> response = activity.importContent(false, ECAR_NO_MANIFEST_PATH,activity.getExternalFilesDir(null));
 
         Assert.assertFalse("false", response.getStatus());
         Assert.assertEquals("NO_CONTENT_TO_IMPORT", response.getError());

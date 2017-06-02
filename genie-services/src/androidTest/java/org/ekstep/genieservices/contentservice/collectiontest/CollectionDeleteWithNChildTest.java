@@ -32,7 +32,7 @@ public class CollectionDeleteWithNChildTest extends GenieServiceTestBase {
         GenieServiceDBHelper.clearContentDBEntry();
         String ext = FileUtil.getFileExtension(COLLECTION_FILE_PATH);
 
-        GenieResponse response = activity.importContent(true, COLLECTION_FILE_PATH);
+        GenieResponse response = activity.importContent(true, COLLECTION_FILE_PATH,activity.getExternalFilesDir(null));
         Assert.assertTrue("true", response.getStatus());
         Assert.assertEquals(ServiceConstants.FileExtension.CONTENT, ext);
 

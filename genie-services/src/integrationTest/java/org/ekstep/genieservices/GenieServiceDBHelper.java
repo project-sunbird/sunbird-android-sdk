@@ -133,7 +133,7 @@ public class GenieServiceDBHelper {
 
     public static void clearTelemetryTableEntry() {
         try {
-            int count = sSqliteDatabase.delete("telemetry", "1", null);
+            int count = getDatabase().delete("telemetry", "1", null);
             Log.v("Count:::::", "" + count);
         } catch (SQLiteException e) {
             e.printStackTrace();

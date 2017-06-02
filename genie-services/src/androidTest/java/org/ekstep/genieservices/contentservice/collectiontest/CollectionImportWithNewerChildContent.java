@@ -34,7 +34,7 @@ public class CollectionImportWithNewerChildContent extends GenieServiceTestBase 
 
     private void shouldImportChildContentEcar() {
 
-        GenieResponse genieResponse = activity.importContent(false, CHILD_CONTENT2_FILE_PATH);
+        GenieResponse genieResponse = activity.importContent(false, CHILD_CONTENT2_FILE_PATH,activity.getExternalFilesDir(null));
         Assert.assertEquals("true", genieResponse.getStatus());
         AssertCollection.verifyContentEntryAndVisibility(AssertCollection.CHILD_CONTENT2_ECAR_ID, VISIBILITY_DEFAULT);
 
@@ -43,7 +43,7 @@ public class CollectionImportWithNewerChildContent extends GenieServiceTestBase 
 
     private void shouldImportCollectionEcar() {
 
-        GenieResponse<Void> genieResponse = activity.importContent(true, COLLECTION_FILE_PATH);
+        GenieResponse<Void> genieResponse = activity.importContent(true, COLLECTION_FILE_PATH,activity.getExternalFilesDir(null));
         Assert.assertEquals("true", genieResponse.getStatus());
         AssertCollection.verifyCollectionEntryAndVisibility(AssertCollection.COLLECTION_ECAR_ID, VISIBILITY_DEFAULT);
         AssertCollection.verifyContentEntryAndVisibility(AssertCollection.CHILD_C2_ID, VISIBILITY_DEFAULT);

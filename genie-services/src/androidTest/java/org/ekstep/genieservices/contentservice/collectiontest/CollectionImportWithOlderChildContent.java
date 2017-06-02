@@ -38,7 +38,7 @@ public class CollectionImportWithOlderChildContent extends GenieServiceTestBase 
 
     private void shouldImportChildContentEcar() {
 
-        GenieResponse<Void> genieResponse = activity.importContent(false, CHILD_CONTENT_FILE_PATH);
+        GenieResponse<Void> genieResponse = activity.importContent(false, CHILD_CONTENT_FILE_PATH,activity.getExternalFilesDir(null));
         Assert.assertEquals("true", genieResponse.getStatus());
         AssertCollection.verifyContentEntryAndVisibility(AssertCollection.CHILD_CONTENT_ECAR_ID, VISIBILITY_DEFAULT);
 
@@ -47,7 +47,7 @@ public class CollectionImportWithOlderChildContent extends GenieServiceTestBase 
 
     private void shouldImportCollectionEcar() {
 
-        GenieResponse<Void> genieResponse = activity.importContent(true, COLLECTION_FILE_PATH);
+        GenieResponse<Void> genieResponse = activity.importContent(true, COLLECTION_FILE_PATH,activity.getExternalFilesDir(null));
         Assert.assertEquals("true", genieResponse.getStatus());
         AssertCollection.verifyCollectionEntryAndVisibility(AssertCollection.COLLECTION_ECAR_ID, VISIBILITY_DEFAULT);
         AssertCollection.verifyContentEntryAndVisibility(AssertCollection.CHILD_C4_ID, VISIBILITY_DEFAULT);
