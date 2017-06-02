@@ -3,8 +3,6 @@ package org.ekstep.genieresolvers.user;
 import android.content.Context;
 
 import org.ekstep.genieresolvers.BaseService;
-import org.ekstep.genieresolvers.BaseTask;
-import org.ekstep.genieresolvers.TaskHandler;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.Profile;
 
@@ -13,7 +11,7 @@ import org.ekstep.genieservices.commons.bean.Profile;
  * shriharsh
  */
 
-public class UserService extends BaseService{
+public class UserService extends BaseService {
     private String appQualifier;
     private Context context;
 
@@ -40,5 +38,15 @@ public class UserService extends BaseService{
     public void getCurrentUser(IResponseHandler responseHandler) {
         GetCurrentUserTask getCurrentUserTask = new GetCurrentUserTask(context, appQualifier);
         createAndExecuteTask(responseHandler, getCurrentUserTask);
+    }
+
+    public void getAllUsers(IResponseHandler responseHandler) {
+        GetAllUsersTask getAllUsersTask = new GetAllUsersTask(context, appQualifier);
+        createAndExecuteTask(responseHandler, getAllUsersTask);
+    }
+
+    public void setUser(String userId, IResponseHandler responseHandler) {
+        SetUserTask setUserTask = new SetUserTask(context, appQualifier, userId);
+        createAndExecuteTask(responseHandler, setUserTask);
     }
 }
