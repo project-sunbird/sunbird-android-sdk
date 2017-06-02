@@ -17,4 +17,9 @@ public interface Constants {
         String GID = "GID";
         String LOGLEVEL = "LOGLEVEL";
     }
+
+    interface MimeType {
+        String APK_MIME_TYPE = "application/vnd.android.package-archive";
+        String ECML_MIME_TYPE = "application/vnd.ekstep.ecml-archive";
+    }
 }
