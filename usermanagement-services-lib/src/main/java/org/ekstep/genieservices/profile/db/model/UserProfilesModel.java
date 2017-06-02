@@ -36,7 +36,7 @@ public class UserProfilesModel implements IReadable {
             mUserProfileList = new ArrayList<>();
 
             do {
-                UserProfileModel userProfileModel = UserProfileModel.build(mDBSession, null);
+                UserProfileModel userProfileModel = UserProfileModel.build(mDBSession, new Profile("", "", ""));
 
                 userProfileModel.readWithoutMoving(resultSet);
 

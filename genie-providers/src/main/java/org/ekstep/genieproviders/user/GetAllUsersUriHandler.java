@@ -37,7 +37,7 @@ public class GetAllUsersUriHandler implements IUriHandler {
         MatrixCursor cursor = null;
         if (genieService != null) {
             cursor = getMatrixCursor();
-            GenieResponse genieResponse = genieService.getUserProfileService().getCurrentUser();
+            GenieResponse genieResponse = genieService.getUserProfileService().getAllUserProfile();
 
             if (genieResponse != null) {
                 cursor.addRow(new String[]{new Gson().toJson(genieResponse)});
