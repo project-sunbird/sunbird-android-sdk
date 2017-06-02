@@ -19,7 +19,8 @@ public class ProfileUriHandlerFactory {
                                                 String selection, String[] selectionArgs, GenieService genieService) {
         return Arrays.asList(
                 new CurrentUserUriHandler(AUTHORITY, context, selection, selectionArgs, genieService),
-                new SetUserUriHandler(AUTHORITY, context, selection, selectionArgs, genieService)
+                new SetUserUriHandler(AUTHORITY, context, selection, selectionArgs, genieService),
+                new GetAllUsersUriHandler(AUTHORITY, context, selection, selectionArgs, genieService)
         );
     }
 }
