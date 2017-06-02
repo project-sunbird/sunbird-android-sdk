@@ -50,6 +50,11 @@ public class ContentFeedbackServiceTest extends GenieServiceTestBase {
 
     }
 
+    /**
+     * To create a set the profile as current user
+     *
+     * @return
+     */
     private String createAndSetProfileForGetFeedback() {
 
         Profile profile = new Profile("Happy1", "@drawable/ic_avatar2", "en");
@@ -69,6 +74,11 @@ public class ContentFeedbackServiceTest extends GenieServiceTestBase {
         return uid;
     }
 
+    /**
+     * Should assert the feedback data got in the content details API.
+     *
+     * @param contentFeedback
+     */
     private void shouldAssertFeedbackData(ContentFeedback contentFeedback) {
 
         GenieResponse<Content> genieResponseDetails = activity.getContentDetails(CONTENT_ID);

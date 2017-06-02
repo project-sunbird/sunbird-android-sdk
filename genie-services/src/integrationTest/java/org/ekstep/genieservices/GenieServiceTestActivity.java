@@ -235,6 +235,18 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
+    public GenieResponse<String> getLanguageTraversalRule(String languageId) {
+        idle = false;
+        GenieResponse<String> genieResponse = mGenieService.getLanguageService().getLanguageTraversalRule(languageId);
+        return genieResponse;
+    }
+
+    public GenieResponse getLanguageSearch(String requestData) {
+        idle = false;
+        GenieResponse<String> genieResponse = mGenieService.getLanguageService().getLanguageSearch(requestData);
+        return genieResponse;
+    }
+
     public void setIdle() {
         idle = true;
     }
