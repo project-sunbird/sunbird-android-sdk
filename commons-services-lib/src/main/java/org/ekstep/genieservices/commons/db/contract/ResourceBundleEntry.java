@@ -10,7 +10,7 @@ public abstract class ResourceBundleEntry implements BaseColumns {
     public static final String COLUMN_NAME_BUNDLE_JSON = "bundle_json";
 
     public static final String getCreateEntry() {
-        return "CREATE TABLE IF NOT EXISTS " + ResourceBundleEntry.TABLE_NAME + " (" +
+        return "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
                 _ID + " INTEGER PRIMARY KEY," +
                 COLUMN_NAME_BUNDLE_IDENTIFIER + DbConstants.TEXT_TYPE + ", " +
                 COLUMN_NAME_BUNDLE_JSON + DbConstants.BLOB_TYPE +

@@ -9,7 +9,7 @@ public abstract class UserEntry implements BaseColumns {
     public static final String COLUMN_NAME_UID = "uid";
 
     public static final String getCreateEntry() {
-        return "CREATE TABLE " + UserEntry.TABLE_NAME + " (" +
+        return "CREATE TABLE " + TABLE_NAME + " (" +
                 _ID + " INTEGER PRIMARY KEY," +
                 COLUMN_NAME_UID + DbConstants.TEXT_TYPE +
                 " )";

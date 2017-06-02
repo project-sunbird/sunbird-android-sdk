@@ -39,6 +39,7 @@ public class LanguageServiceImpl extends BaseService implements ILanguageService
 
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(GsonUtil.toJson(result));
+            return response;
         }
 
         response = GenieResponseBuilder.getErrorResponse(apiResponse.getError(), (String) apiResponse.getErrorMessages().get(0), TAG);
@@ -59,6 +60,7 @@ public class LanguageServiceImpl extends BaseService implements ILanguageService
 
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(GsonUtil.toJson(result));
+            return response;
         }
 
         response = GenieResponseBuilder.getErrorResponse(apiResponse.getError(), (String) apiResponse.getErrorMessages().get(0), TAG);
