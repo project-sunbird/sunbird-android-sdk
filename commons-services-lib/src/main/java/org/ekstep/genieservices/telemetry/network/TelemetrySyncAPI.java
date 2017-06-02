@@ -1,7 +1,5 @@
 package org.ekstep.genieservices.telemetry.network;
 
-import com.google.gson.Gson;
-
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.network.BaseAPI;
@@ -23,8 +21,7 @@ public class TelemetrySyncAPI extends BaseAPI {
     private byte[] mData;
 
     public TelemetrySyncAPI(AppContext appContext, byte[] data) {
-        super(appContext, String.format(Locale.US, "%s/telemetry",
-                String.format(Locale.US, appContext.getParams().getBaseApiUrl() + ServiceConstants.API.EP_EXTENSION, SERVICE_ENDPOINTS)),
+        super(appContext, String.format(Locale.US, "%s/telemetry", String.format(Locale.US, appContext.getParams().getBaseApiUrl() + ServiceConstants.API.EP_EXTENSION, SERVICE_ENDPOINTS)),
                 TAG);
         mData = data;
     }
