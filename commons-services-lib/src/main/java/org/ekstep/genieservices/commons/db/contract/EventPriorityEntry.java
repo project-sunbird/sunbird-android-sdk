@@ -10,14 +10,14 @@ public abstract class EventPriorityEntry implements BaseColumns {
     public static final String COLUMN_NAME_PRIORITY = "priority";
 
     public static final String getCreateEntry() {
-        return "CREATE TABLE " + EventPriorityEntry.TABLE_NAME + " (" +
-                EventPriorityEntry._ID + " INTEGER PRIMARY KEY," +
-                EventPriorityEntry.COLUMN_NAME_EVENT + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
-                EventPriorityEntry.COLUMN_NAME_PRIORITY + DbConstants.INT_TYPE +
+        return "CREATE TABLE " + TABLE_NAME + " (" +
+                _ID + " INTEGER PRIMARY KEY," +
+                COLUMN_NAME_EVENT + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
+                COLUMN_NAME_PRIORITY + DbConstants.INT_TYPE +
                 " )";
     }
 
     public static final String getDeleteEntry() {
-        return "DROP TABLE IF EXISTS " + EventPriorityEntry.TABLE_NAME;
+        return "DROP TABLE IF EXISTS " + TABLE_NAME;
     }
 }

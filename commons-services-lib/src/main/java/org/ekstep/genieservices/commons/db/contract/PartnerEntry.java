@@ -19,7 +19,7 @@ public abstract class PartnerEntry implements BaseColumns {
      * @return
      */
     public static final String getCreateEntry() {
-        return "CREATE TABLE " + PartnerEntry.TABLE_NAME + " (" +
+        return "CREATE TABLE " + TABLE_NAME + " (" +
                 _ID + " INTEGER PRIMARY KEY" + DbConstants.COMMA_SEP +
                 COLUMN_NAME_UID + DbConstants.TEXT_TYPE + " UNIQUE NOT NULL" + DbConstants.COMMA_SEP +
                 COLUMN_NAME_KEY + DbConstants.TEXT_TYPE + " NOT NULL" + DbConstants.COMMA_SEP +

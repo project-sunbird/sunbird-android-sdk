@@ -19,7 +19,7 @@ public abstract class NotificationEntry implements BaseColumns {
     public static final String COLUMN_NAME_IS_READ = "is_read";
 
     public static final String getCreateEntry() {
-        return "CREATE TABLE IF NOT EXISTS " + NotificationEntry.TABLE_NAME + " (" +
+        return "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
                 _ID + " INTEGER PRIMARY KEY," +
                 COLUMN_NAME_MESSAGE_ID + DbConstants.INT_TYPE + DbConstants.COMMA_SEP +
                 COLUMN_NAME_EXPIRY_TIME + DbConstants.INT_TYPE + DbConstants.COMMA_SEP +

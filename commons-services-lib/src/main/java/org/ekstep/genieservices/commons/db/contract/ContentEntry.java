@@ -4,6 +4,7 @@ import org.ekstep.genieservices.commons.db.BaseColumns;
 import org.ekstep.genieservices.commons.db.DbConstants;
 
 public abstract class ContentEntry implements BaseColumns {
+
     public static final String TABLE_NAME = "content";
     public static final String COLUMN_NAME_IDENTIFIER = "identifier";
     public static final String COLUMN_NAME_SERVER_DATA = "server_data";

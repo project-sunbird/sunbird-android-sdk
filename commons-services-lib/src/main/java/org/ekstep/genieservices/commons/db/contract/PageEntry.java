@@ -20,7 +20,7 @@ public abstract class PageEntry implements BaseColumns {
     public static final String COLUMN_EXPIRY_TIME = "expiry_time";
 
     public static final String getCreateEntry() {
-        return "CREATE TABLE " + PageEntry.TABLE_NAME + " (" +
+        return "CREATE TABLE " + TABLE_NAME + " (" +
                 _ID + " INTEGER PRIMARY KEY," +
                 COLUMN_NAME_PAGE_IDENTIFIER + DbConstants.TEXT_TYPE + ", " +
                 COLUMN_NAME_PAGE_JSON + DbConstants.TEXT_TYPE +

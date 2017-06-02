@@ -11,11 +11,11 @@ public abstract class ImportedMetadataEntry implements BaseColumns {
     public static final String COLUMN_NAME_COUNT = "count";
 
     public static final String getCreateEntry() {
-        return "CREATE TABLE " + ImportedMetadataEntry.TABLE_NAME + " (" +
-                ImportedMetadataEntry._ID + " INTEGER PRIMARY KEY," +
-                ImportedMetadataEntry.COLUMN_NAME_IMPORTED_ID + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
-                ImportedMetadataEntry.COLUMN_NAME_DEVICE_ID + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
-                ImportedMetadataEntry.COLUMN_NAME_COUNT + DbConstants.INT_TYPE +
+        return "CREATE TABLE " + TABLE_NAME + " (" +
+                _ID + " INTEGER PRIMARY KEY," +
+                COLUMN_NAME_IMPORTED_ID + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
+                COLUMN_NAME_DEVICE_ID + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
+                COLUMN_NAME_COUNT + DbConstants.INT_TYPE +
                 " )";
     }
 
@@ -25,7 +25,7 @@ public abstract class ImportedMetadataEntry implements BaseColumns {
 
 
     public static final String getDeleteEntry() {
-        return "DROP TABLE IF EXISTS " + ImportedMetadataEntry.TABLE_NAME;
+        return "DROP TABLE IF EXISTS " + TABLE_NAME;
     }
 
 }
