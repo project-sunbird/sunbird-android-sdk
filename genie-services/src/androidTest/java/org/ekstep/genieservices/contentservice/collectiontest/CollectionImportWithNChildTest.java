@@ -35,9 +35,8 @@ public class CollectionImportWithNChildTest extends GenieServiceTestBase {
 
         String ext = FileUtil.getFileExtension(EMPTY_COLLECTION_FILEPATH);
 
-        GenieResponse<Void> response = activity.importContent(true, EMPTY_COLLECTION_FILEPATH,activity.getExternalFilesDir(null));
+        GenieResponse<Void> response = activity.importContent(true, EMPTY_COLLECTION_FILEPATH, activity.getExternalFilesDir(null));
 
-        Assert.assertNotNull(response.getResult());
         Assert.assertTrue("true", response.getStatus());
         Assert.assertEquals(ServiceConstants.FileExtension.CONTENT, ext);
 
@@ -50,8 +49,8 @@ public class CollectionImportWithNChildTest extends GenieServiceTestBase {
 
         GenieServiceDBHelper.clearContentDBEntry();
 
-        GenieResponse<Void> response = activity.importContent(true, CONTENT_WITH_CHILD_FILEPATH,activity.getExternalFilesDir(null));
-        Assert.assertEquals("true", response.getStatus());
+        GenieResponse<Void> response = activity.importContent(true, CONTENT_WITH_CHILD_FILEPATH, activity.getExternalFilesDir(null));
+        Assert.assertTrue("true", response.getStatus());
 
         GenieServiceDBHelper.findContentDBEntry(CONTENT_ID_WITH_CHILD);
 

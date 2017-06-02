@@ -7,6 +7,7 @@ import org.ekstep.genieservices.commons.AndroidAppContext;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
+import org.ekstep.genieservices.commons.bean.ContentFeedback;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -207,6 +208,18 @@ public class GenieServiceTestActivity extends Activity {
     public GenieResponse importContent(boolean isChildContent, List<String> contentIdentifiers, File destinationFolder) {
         idle = false;
         GenieResponse genieResponse = mGenieService.getContentService().importContent(isChildContent, contentIdentifiers, destinationFolder);
+        return genieResponse;
+    }
+
+    public GenieResponse sendFeedback(ContentFeedback contentFeedback) {
+        idle = false;
+        GenieResponse genieResponse = mGenieService.getContentFeedbackService().sendFeedback(contentFeedback);
+        return genieResponse;
+    }
+
+    public GenieResponse<ContentFeedback> getFeedback(String uid, String contentIdentifier) {
+        idle = false;
+        GenieResponse<ContentFeedback> genieResponse = mGenieService.getContentFeedbackService().getFeedback(uid, contentIdentifier);
         return genieResponse;
     }
 
