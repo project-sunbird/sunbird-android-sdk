@@ -89,7 +89,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 return response;
             }
 
-            contentModelInDB = ContentModel.build(mAppContext.getDBSession(), contentData, null);
+            contentModelInDB = ContentHandler.convertContentMapToModel(mAppContext.getDBSession(), contentData, null);
         } else {
             ContentHandler.refreshContentDetailsFromServer(mAppContext, contentIdentifier, contentModelInDB);
         }
@@ -161,7 +161,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         switch (levelAndState) {
             case ContentConstants.ChildContents.FIRST_LEVEL_ALL:
-                if (contentModel.hasChildren()) {
+                if (ContentHandler.hasChildren(contentModel.getLocalData())) {
                     List<ContentModel> contentModelListInDB = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), contentModel.getLocalData(), ContentConstants.ChildContents.FIRST_LEVEL_ALL);
                     for (ContentModel cm : contentModelListInDB) {
                         Content c = ContentHandler.convertContentModelToBean(cm);
@@ -203,12 +203,12 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 //        }
 
         //delete or update pre-requisites
-        if (contentModel.hasPreRequisites()) {
+        if (ContentHandler.hasPreRequisites(contentModel.getLocalData())) {
             ContentHandler.deleteAllPreRequisites(mAppContext, contentModel, level);
         }
 
         //delete or update child items
-        if (contentModel.hasChildren()) {
+        if (ContentHandler.hasChildren(contentModel.getLocalData())) {
             ContentHandler.deleteAllChild(mAppContext, contentModel, level);
         }
 
@@ -388,7 +388,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             List<Content> contents = new ArrayList<>();
             if (contentDataList != null) {
                 for (Map contentDataMap : contentDataList) {
-                    ContentModel contentModel = ContentModel.build(mAppContext.getDBSession(), contentDataMap, null);
+                    ContentModel contentModel = ContentHandler.convertContentMapToModel(mAppContext.getDBSession(), contentDataMap, null);
                     Content content = ContentHandler.convertContentModelToBean(contentModel);
 
                     if (allLocalContentModel.contains(contentModel)) {
@@ -430,9 +430,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             ContentModel node;
             while (!stack.isEmpty()) {
                 node = stack.pop();
-                if (node.hasChildren()) {
+                if (ContentHandler.hasChildren(node.getLocalData())) {
                     List<ContentModel> childContents = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), node.getLocalData(), ContentConstants.ChildContents.FIRST_LEVEL_ALL);
-                    // TODO: 5/19/2017 -      List<ContentModel> childContents = node.getSortedChildrenList(dbOperator, CHILD_CONTENTS_FIRST_LEVEL_ALL);
                     stack.addAll(childContents);
 
                     for (ContentModel c : childContents) {
@@ -571,7 +570,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                     }
 
                     if (!StringUtil.isNullOrEmpty(downloadUrl) && ServiceConstants.FileExtension.CONTENT.equalsIgnoreCase(FileUtil.getFileExtension(downloadUrl))) {
-                        String contentIdentifier = (String) dataMap.get(ContentModel.KEY_IDENTIFIER);
+                        String contentIdentifier = (String) dataMap.get(ContentHandler.KEY_IDENTIFIER);
                         DownloadRequest downloadRequest = new DownloadRequest(contentIdentifier, downloadUrl, ContentConstants.MimeType.ECAR, destinationFolder, isChildContent);
                         downloadRequests[i] = downloadRequest;
                     }

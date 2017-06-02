@@ -65,15 +65,15 @@ public class ValidateEcar implements IChainable {
         Logger.d(TAG, items.toString());
 
         for (HashMap<String, Object> item : items) {
-            String identifier = (String) item.get(ContentModel.KEY_IDENTIFIER);
+            String identifier = (String) item.get(ContentHandler.KEY_IDENTIFIER);
             ContentModel oldContentModel = ContentModel.find(appContext.getDBSession(), identifier);
             String oldContentPath = oldContentModel == null ? null : oldContentModel.getPath();
-            ContentModel newContentModel = ContentModel.build(appContext.getDBSession(), item, manifestVersion);
+            ContentModel newContentModel = ContentHandler.convertContentMapToModel(appContext.getDBSession(), item, manifestVersion);
 
             //Draft content expiry .To prevent import of draft content if the expires-date is expired from the current date
             String expiryDate = (String) item.get("expires");
             String status = (String) item.get("status");
-            Double pkgVersion = (Double) item.get(ContentModel.KEY_PKG_VERSION);
+            Double pkgVersion = (Double) item.get(ContentHandler.KEY_PKG_VERSION);
             if (!StringUtil.isNullOrEmpty(expiryDate) && (!StringUtil.isNullOrEmpty(status) && status.equalsIgnoreCase(ServiceConstants.ContentStatus.DRAFT))) {
                 long millis = DateUtil.getTime(expiryDate);
                 if (millis > 0 && System.currentTimeMillis() > millis) {
@@ -94,7 +94,7 @@ public class ValidateEcar implements IChainable {
 //                items.remove(item);
 //                deleteChildItemsIfAny(appContext, items, newContentModel);
                 if (items.size() > 1
-                        && (newContentModel.hasChildren() || newContentModel.hasPreRequisites())) {
+                        && (ContentHandler.hasChildren(newContentModel.getLocalData()) || ContentHandler.hasPreRequisites(newContentModel.getLocalData()))) {
                     return getErrorResponse(importContext, ContentConstants.IMPORT_FILE_EXIST, "The ECAR file is imported already!!!");
                 }
 

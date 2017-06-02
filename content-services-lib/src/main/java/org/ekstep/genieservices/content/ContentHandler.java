@@ -68,7 +68,23 @@ import java.util.TreeMap;
  */
 public class ContentHandler {
 
+    public static final String KEY_IDENTIFIER = "identifier";
+    public static final String KEY_PKG_VERSION = "pkgVersion";
+    public static final String KEY_CONTENT_TYPE = "contentType";
+    public static final String KEY_VARIANTS = "variants";
+    public static final String KEY_DOWNLOAD_URL = "downloadUrl";
+    public static final String KEY_CONTENT_METADATA = "contentMetadata";
+    public static final String KEY_VIRALITY_METADATA = "virality";
+    public static final String KEY_TRANSFER_COUNT = "transferCount";
+    public static final String KEY_ORIGIN = "origin";
+
     private static final String TAG = ContentHandler.class.getSimpleName();
+    private static final String KEY_COMPATIBILITY_LEVEL = "compatibilityLevel";
+    private static final String KEY_MIME_TYPE = "mimeType";
+    private static final String KEY_VISIBILITY = "visibility";
+    private static final String KEY_LAST_UPDATED_ON = "lastUpdatedOn";
+    private static final String KEY_PRE_REQUISITES = "pre_requisites";
+    private static final String KEY_CHILDREN = "children";
 
     private static final int DEFAULT_PACKAGE_VERSION = -1;
     private static final int INITIAL_VALUE_FOR_TRANSFER_COUNT = 0;
@@ -77,6 +93,94 @@ public class ContentHandler {
     public static int maxCompatibilityLevel = 3;
     // TODO: 02-03-2017 : We can remove this later after few release
     public static int defaultCompatibilityLevel = 1;
+
+    public static ContentModel convertContentMapToModel(IDBSession dbSession, Map contentData, String manifestVersion) {
+        String identifier = null;
+        if (contentData.containsKey(KEY_IDENTIFIER)) {
+            identifier = (String) contentData.get(KEY_IDENTIFIER);
+        }
+
+        String localData = null;
+        String serverData = null;
+        String serverLastUpdatedOn = null;
+        if (StringUtil.isNullOrEmpty(manifestVersion)) {
+            serverData = GsonUtil.toJson(contentData);
+            serverLastUpdatedOn = serverLastUpdatedOn(contentData);
+        } else {
+            localData = GsonUtil.toJson(contentData);
+        }
+
+        String mimeType = null;
+        if (contentData.containsKey(KEY_MIME_TYPE)) {
+            mimeType = (String) contentData.get(KEY_MIME_TYPE);
+        }
+
+        String contentType = null;
+        if (contentData.containsKey(KEY_CONTENT_TYPE)) {
+            contentType = (String) contentData.get(KEY_CONTENT_TYPE);
+            if (!StringUtil.isNullOrEmpty(contentType)) {
+                contentType = contentType.toLowerCase();
+            }
+        }
+
+        String visibility;
+        if (contentData.containsKey(KEY_VISIBILITY)) {
+            visibility = (String) contentData.get(KEY_VISIBILITY);
+        } else {
+            visibility = ContentConstants.Visibility.DEFAULT;
+        }
+
+        ContentModel contentModel = ContentModel.build(dbSession, identifier, serverData, serverLastUpdatedOn,
+                manifestVersion, localData, mimeType, contentType, visibility);
+
+        return contentModel;
+    }
+
+    private static String serverLastUpdatedOn(Map serverData) {
+        return (String) serverData.get(KEY_LAST_UPDATED_ON);
+    }
+
+    public static Double pkgVersion(String localData) {
+        return (Double) GsonUtil.fromJson(localData, Map.class).get(KEY_PKG_VERSION);
+    }
+
+    public static boolean hasPreRequisites(String localData) {
+        return GsonUtil.fromJson(localData, Map.class).get(KEY_PRE_REQUISITES) != null;
+    }
+
+    private static List<String> getPreRequisitesIdentifiers(String localData) {
+        List<Map> children = (List) GsonUtil.fromJson(localData, Map.class).get(KEY_PRE_REQUISITES);
+
+        List<String> childIdentifiers = new ArrayList<>();
+        for (Map child : children) {
+            String childIdentifier = (String) child.get(KEY_IDENTIFIER);
+            childIdentifiers.add(childIdentifier);
+        }
+
+        // Return the pre_requisites in DB
+        return childIdentifiers;
+    }
+
+    public static boolean hasChildren(String localData) {
+        return GsonUtil.fromJson(localData, Map.class).get(KEY_CHILDREN) != null;
+    }
+
+    public static List<String> getChildContentsIdentifiers(String localData) {
+        List<Map> children = (List) GsonUtil.fromJson(localData, Map.class).get(KEY_CHILDREN);
+
+        List<String> childIdentifiers = new ArrayList<>();
+        for (Map child : children) {
+            String childIdentifier = (String) child.get(KEY_IDENTIFIER);
+            childIdentifiers.add(childIdentifier);
+        }
+
+        // Return the childrenInDB
+        return childIdentifiers;
+    }
+
+    public static Double getCompatibilityLevel(HashMap<String, Object> contentData) {
+        return (contentData.get(KEY_COMPATIBILITY_LEVEL) != null) ? (Double) contentData.get(KEY_COMPATIBILITY_LEVEL) : defaultCompatibilityLevel;
+    }
 
     public static Map fetchContentDetailsFromServer(AppContext appContext, String contentIdentifier) {
         ContentDetailsAPI api = new ContentDetailsAPI(appContext, contentIdentifier);
@@ -101,7 +205,7 @@ public class ContentHandler {
                 Map contentData = fetchContentDetailsFromServer(appContext, contentIdentifier);
 
                 if (contentData != null) {
-                    ContentModel contentModel = ContentModel.build(appContext.getDBSession(), contentData, null);
+                    ContentModel contentModel = convertContentMapToModel(appContext.getDBSession(), contentData, null);
                     contentModel.setVisibility(existingContentModel.getVisibility());
                     contentModel.addOrUpdateRefCount(existingContentModel.getRefCount());
                     contentModel.addOrUpdateContentState(existingContentModel.getContentState());
@@ -156,7 +260,7 @@ public class ContentHandler {
 
         Map<String, Object> dataMap = GsonUtil.fromJson(dataJson, Map.class);
 
-        Object variants = dataMap.get(ContentModel.KEY_VARIANTS);
+        Object variants = dataMap.get(KEY_VARIANTS);
         if (variants != null) {
             String variantsString;
             if (variants instanceof Map) {
@@ -385,7 +489,7 @@ public class ContentHandler {
     }
 
     public static void deleteAllPreRequisites(AppContext appContext, ContentModel contentModel, int level) {
-        List<String> preRequisitesIdentifier = contentModel.getPreRequisitesIdentifiers();
+        List<String> preRequisitesIdentifier = getPreRequisitesIdentifiers(contentModel.getLocalData());
         ContentsModel contentsModel = ContentsModel.findAllContentsWithIdentifiers(appContext.getDBSession(), preRequisitesIdentifier);
 
         if (contentsModel != null) {
@@ -417,7 +521,7 @@ public class ContentHandler {
             String newVisibility = newContentModel.getVisibility();
 
             if (oldIdentifier.equalsIgnoreCase(newIdentifier) && oldVisibility.equalsIgnoreCase(newVisibility)) {
-                isExist = oldContentModel.pkgVersion() >= newContentModel.pkgVersion();
+                isExist = pkgVersion(oldContentModel.getLocalData()) >= pkgVersion(newContentModel.getLocalData());
             }
         } catch (Exception e) {
             Logger.e(TAG, "isImportFileExist", e);
@@ -443,7 +547,7 @@ public class ContentHandler {
             String oldIdentifier = oldContent.getIdentifier();
             String newIdentifier = newContent.getIdentifier();
             if (oldIdentifier.equalsIgnoreCase(newIdentifier)) {
-                isExist = (oldContent.pkgVersion() >= newContent.pkgVersion()) // If old content's pkgVersion is less than the new content then return false.
+                isExist = (pkgVersion(oldContent.getLocalData()) >= pkgVersion(newContent.getLocalData())) // If old content's pkgVersion is less than the new content then return false.
                         || oldContent.getContentState() == ContentConstants.State.ARTIFACT_AVAILABLE;  // If content_state is other than artifact available then also return  false.
             }
         } catch (Exception e) {
@@ -458,39 +562,39 @@ public class ContentHandler {
 
         if (isContentMetadataAbsent(localDataMap)) {
             Map<String, Object> viralityMetadata = new HashMap<>();
-            viralityMetadata.put(ContentModel.KEY_ORIGIN, origin);
-            viralityMetadata.put(ContentModel.KEY_TRANSFER_COUNT, INITIAL_VALUE_FOR_TRANSFER_COUNT);
+            viralityMetadata.put(KEY_ORIGIN, origin);
+            viralityMetadata.put(KEY_TRANSFER_COUNT, INITIAL_VALUE_FOR_TRANSFER_COUNT);
 
             Map<String, Object> contentMetadata = new HashMap<>();
-            contentMetadata.put(ContentModel.KEY_VIRALITY_METADATA, viralityMetadata);
+            contentMetadata.put(KEY_VIRALITY_METADATA, viralityMetadata);
 
-            localDataMap.put(ContentModel.KEY_CONTENT_METADATA, contentMetadata);
+            localDataMap.put(KEY_CONTENT_METADATA, contentMetadata);
         } else if (isContentMetadataPresentWithoutViralityMetadata(localDataMap)) {
             Map<String, Object> viralityMetadata = new HashMap<>();
-            viralityMetadata.put(ContentModel.KEY_ORIGIN, origin);
-            viralityMetadata.put(ContentModel.KEY_TRANSFER_COUNT, INITIAL_VALUE_FOR_TRANSFER_COUNT);
+            viralityMetadata.put(KEY_ORIGIN, origin);
+            viralityMetadata.put(KEY_TRANSFER_COUNT, INITIAL_VALUE_FOR_TRANSFER_COUNT);
 
-            ((Map<String, Object>) localDataMap.get(ContentModel.KEY_CONTENT_METADATA)).put(ContentModel.KEY_VIRALITY_METADATA, viralityMetadata);
+            ((Map<String, Object>) localDataMap.get(KEY_CONTENT_METADATA)).put(KEY_VIRALITY_METADATA, viralityMetadata);
         } else {
-            Map<String, Object> viralityMetadata = (Map<String, Object>) ((Map<String, Object>) localDataMap.get(ContentModel.KEY_CONTENT_METADATA)).get(ContentModel.KEY_VIRALITY_METADATA);
-            viralityMetadata.put(ContentModel.KEY_TRANSFER_COUNT, transferCount(localDataMap) + 1);
+            Map<String, Object> viralityMetadata = (Map<String, Object>) ((Map<String, Object>) localDataMap.get(KEY_CONTENT_METADATA)).get(KEY_VIRALITY_METADATA);
+            viralityMetadata.put(KEY_TRANSFER_COUNT, transferCount(localDataMap) + 1);
         }
 
         contentModel.updateLocalData(GsonUtil.toJson(localDataMap));
     }
 
     private static boolean isContentMetadataAbsent(Map<String, Object> localDataMap) {
-        return localDataMap.get(ContentModel.KEY_CONTENT_METADATA) == null;
+        return localDataMap.get(KEY_CONTENT_METADATA) == null;
     }
 
     private static boolean isContentMetadataPresentWithoutViralityMetadata(Map<String, Object> localDataMap) {
-        return localDataMap.get(ContentModel.KEY_CONTENT_METADATA) != null
-                && ((Map<String, Object>) localDataMap.get(ContentModel.KEY_CONTENT_METADATA)).get(ContentModel.KEY_VIRALITY_METADATA) == null;
+        return localDataMap.get(KEY_CONTENT_METADATA) != null
+                && ((Map<String, Object>) localDataMap.get(KEY_CONTENT_METADATA)).get(KEY_VIRALITY_METADATA) == null;
     }
 
     private static int transferCount(Map<String, Object> viralityMetadata) {
         try {
-            String transferCount = (String) viralityMetadata.get(ContentModel.KEY_TRANSFER_COUNT);
+            String transferCount = (String) viralityMetadata.get(KEY_TRANSFER_COUNT);
             return Double.valueOf(transferCount).intValue();
         } catch (Exception e) {
             return 0;
@@ -572,8 +676,8 @@ public class ContentHandler {
         while (!queue.isEmpty()) {
             node = queue.remove();
 
-            if (node.hasChildren()) {
-                List<String> childContentsIdentifiers = node.getChildContentsIdentifiers();
+            if (hasChildren(node.getLocalData())) {
+                List<String> childContentsIdentifiers = getChildContentsIdentifiers(node.getLocalData());
                 ContentsModel contentsModel = ContentsModel.findAllContentsWithIdentifiers(appContext.getDBSession(), childContentsIdentifiers);
                 if (contentsModel != null) {
                     queue.addAll(contentsModel.getContentModelList());
@@ -589,7 +693,7 @@ public class ContentHandler {
 
     public static Map<String, Object> getSearchRequest(List<String> contentIdentifiers) {
         Map<String, Object> filterMap = new HashMap<>();
-        filterMap.put("compatibilityLevel", getCompatibilityLevel());
+        filterMap.put("compatibilityLevel", getCompatibilityLevelFilter());
         filterMap.put("identifier", contentIdentifiers);
         addFiltersIfNotAvailable(filterMap, "objectType", Collections.singletonList("Content"));
         addFiltersIfNotAvailable(filterMap, "contentType", Arrays.asList("Story", "Worksheet", "Collection", "Game", "TextBook"));
@@ -649,7 +753,7 @@ public class ContentHandler {
         }
 
         // Populating implicit search criteria.
-        filterMap.put("compatibilityLevel", getCompatibilityLevel());
+        filterMap.put("compatibilityLevel", getCompatibilityLevelFilter());
         addFiltersIfNotAvailable(filterMap, "objectType", Collections.singletonList("Content"));
         addFiltersIfNotAvailable(filterMap, "contentType", Arrays.asList("Story", "Worksheet", "Collection", "Game", "TextBook"));
         addFiltersIfNotAvailable(filterMap, "status", Collections.singletonList("Live"));
@@ -665,7 +769,7 @@ public class ContentHandler {
         return filterMap;
     }
 
-    private static Map<String, Integer> getCompatibilityLevel() {
+    private static Map<String, Integer> getCompatibilityLevelFilter() {
         Map<String, Integer> compatibilityLevelMap = new HashMap<>();
         compatibilityLevelMap.put("max", maxCompatibilityLevel);
         compatibilityLevelMap.put("min", minCompatibilityLevel);
@@ -886,7 +990,7 @@ public class ContentHandler {
         contextMap.put("uid", uid);
 
         Map<String, Object> filterMap = new HashMap<>();
-        filterMap.put("compatibilityLevel", getCompatibilityLevel());
+        filterMap.put("compatibilityLevel", getCompatibilityLevelFilter());
 
         // Add subject filter
         applyFilter(configService, MasterDataType.SUBJECT, subject, filterMap);
@@ -1029,7 +1133,7 @@ public class ContentHandler {
         List<Content> contents = new ArrayList<>();
         if (contentDataList != null) {
             for (Map contentDataMap : contentDataList) {
-                ContentModel contentModel = ContentModel.build(dbSession, contentDataMap, null);
+                ContentModel contentModel = convertContentMapToModel(dbSession, contentDataMap, null);
                 Content content = convertContentModelToBean(contentModel);
                 contents.add(content);
             }
@@ -1040,7 +1144,7 @@ public class ContentHandler {
     public static String getDownloadUrl(Map<String, Object> dataMap) {
         String downloadUrl = null;
 
-        Object variants = dataMap.get(ContentModel.KEY_VARIANTS);
+        Object variants = dataMap.get(KEY_VARIANTS);
         if (variants != null) {
             String variantsString;
             if (variants instanceof Map) {
@@ -1052,7 +1156,7 @@ public class ContentHandler {
             variantsString = variantsString.replace("\\", "");
             ContentVariant contentVariant = GsonUtil.fromJson(variantsString, ContentVariant.class);
 
-            String contentType = (String) dataMap.get(ContentModel.KEY_CONTENT_TYPE);
+            String contentType = (String) dataMap.get(KEY_CONTENT_TYPE);
             if ((contentVariant.getSpine() != null && !StringUtil.isNullOrEmpty(contentVariant.getSpine().getEcarUrl()))
                     && (ContentType.TEXTBOOK.getValue().equalsIgnoreCase(contentType)
                     || ContentType.COLLECTION.getValue().equalsIgnoreCase(contentType))) {
@@ -1060,7 +1164,7 @@ public class ContentHandler {
                 downloadUrl = contentVariant.getSpine().getEcarUrl();
             }
         } else {
-            downloadUrl = (String) dataMap.get(ContentModel.KEY_DOWNLOAD_URL);
+            downloadUrl = (String) dataMap.get(KEY_DOWNLOAD_URL);
         }
 
         return downloadUrl;

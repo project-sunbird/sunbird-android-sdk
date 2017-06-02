@@ -9,17 +9,11 @@ import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.commons.utils.ArrayUtil;
-import org.ekstep.genieservices.commons.utils.GsonUtil;
-import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.ContentConstants;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import static java.lang.String.valueOf;
 
@@ -30,27 +24,9 @@ import static java.lang.String.valueOf;
  */
 public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanable {
 
-    public static final String KEY_IDENTIFIER = "identifier";
-    public static final String KEY_PKG_VERSION = "pkgVersion";
-    public static final String KEY_CONTENT_TYPE = "contentType";
-    public static final String KEY_COMPATIBILITY_LEVEL = "compatibilityLevel";
-    public static final String KEY_VARIANTS = "variants";
-    public static final String KEY_DOWNLOAD_URL = "downloadUrl";
-
-    public static final String KEY_CONTENT_METADATA = "contentMetadata";
-    public static final String KEY_VIRALITY_METADATA = "virality";
-    public static final String KEY_TRANSFER_COUNT = "transferCount";
-    public static final String KEY_ORIGIN = "origin";
-
-    private static final String KEY_MIME_TYPE = "mimeType";
-    private static final String KEY_VISIBILITY = "visibility";
-    private static final String KEY_LAST_UPDATED_ON = "lastUpdatedOn";
-    private static final String KEY_PRE_REQUISITES = "pre_requisites";
-    private static final String KEY_CHILDREN = "children";
-
     private IDBSession mDBSession;
-
     private Long id = -1L;
+
     private String identifier;
     private String serverData;
     private String localData;
@@ -63,10 +39,7 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
     private String contentType;
     private String manifestVersion;
     private String localLastUpdatedTime;
-
-    private boolean isExternalContent;
-
-    private long lastModified;
+    private String serverLastUpdatedOn;
 
     private ContentModel() {
     }
@@ -76,32 +49,16 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         this.identifier = identifier;
     }
 
-    private ContentModel(IDBSession dbSession, Map data, String manifestVersion) {
+    private ContentModel(IDBSession dbSession, String identifier, String serverData, String serverLastUpdatedOn, String manifestVersion, String localData, String mimeType, String contentType, String visibility) {
         this.mDBSession = dbSession;
-
-        if (StringUtil.isNullOrEmpty(manifestVersion)) {
-            this.serverData = GsonUtil.toJson(data);
-        } else {
-            this.manifestVersion = manifestVersion;
-            this.localData = GsonUtil.toJson(data);
-        }
-
-        if (data.containsKey(KEY_IDENTIFIER)) {
-            identifier = (String) data.get(KEY_IDENTIFIER);
-        }
-
-        if (data.containsKey(KEY_MIME_TYPE)) {
-            mimeType = (String) data.get(KEY_MIME_TYPE);
-        }
-
-        if (data.containsKey(KEY_CONTENT_TYPE)) {
-            contentType = (String) data.get(KEY_CONTENT_TYPE);
-            if (!StringUtil.isNullOrEmpty(contentType)) {
-                contentType = contentType.toLowerCase();
-            }
-        }
-
-        visibility = data.containsKey(KEY_VISIBILITY) ? (String) data.get(KEY_VISIBILITY) : ContentConstants.Visibility.DEFAULT;
+        this.identifier = identifier;
+        this.serverData = serverData;
+        this.serverLastUpdatedOn = serverLastUpdatedOn;
+        this.manifestVersion = manifestVersion;
+        this.localData = localData;
+        this.mimeType = mimeType;
+        this.contentType = contentType;
+        this.visibility = visibility;
     }
 
     public static ContentModel find(IDBSession dbSession, Object identifier) {
@@ -119,8 +76,10 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         return new ContentModel();
     }
 
-    public static ContentModel build(IDBSession dbSession, Map data, String manifestVersion) {
-        ContentModel contentModel = new ContentModel(dbSession, data, manifestVersion);
+    public static ContentModel build(IDBSession dbSession, String identifier, String serverData, String serverLastUpdatedOn,
+                                     String manifestVersion, String localData, String mimeType, String contentType, String visibility) {
+        ContentModel contentModel = new ContentModel(dbSession, identifier, serverData, serverLastUpdatedOn,
+                manifestVersion, localData, mimeType, contentType, visibility);
         return contentModel;
     }
 
@@ -132,40 +91,6 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
     public Void update() {
         mDBSession.update(this);
         return null;
-    }
-
-    public boolean hasPreRequisites() {
-        return (localData != null) && (GsonUtil.fromJson(localData, Map.class).get(KEY_PRE_REQUISITES) != null);
-    }
-
-    public List<String> getPreRequisitesIdentifiers() {
-        List<Map> children = (List) GsonUtil.fromJson(localData, Map.class).get(KEY_PRE_REQUISITES);
-
-        List<String> childIdentifiers = new ArrayList<>();
-        for (Map child : children) {
-            String childIdentifier = valueOf(child.get(KEY_IDENTIFIER));
-            childIdentifiers.add(childIdentifier);
-        }
-
-        // Return the pre_requisites in DB
-        return childIdentifiers;
-    }
-
-    public boolean hasChildren() {
-        return (localData != null) && (GsonUtil.fromJson(localData, Map.class).get(KEY_CHILDREN) != null);
-    }
-
-    public List<String> getChildContentsIdentifiers() {
-        List<Map> children = (List) GsonUtil.fromJson(localData, Map.class).get(KEY_CHILDREN);
-
-        List<String> childIdentifiers = new ArrayList<>();
-        for (Map child : children) {
-            String childIdentifier = valueOf(child.get(KEY_IDENTIFIER));
-            childIdentifiers.add(childIdentifier);
-        }
-
-        // Return the childrenInDB
-        return childIdentifiers;
     }
 
     @Override
@@ -181,11 +106,10 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         with(contentValues, ContentEntry.COLUMN_NAME_VISIBILITY, visibility);
         with(contentValues, ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentType);
         with(contentValues, ContentEntry.COLUMN_NAME_LOCAL_LAST_UPDATED_ON, localLastUpdatedOn());
-        with(contentValues, ContentEntry.COLUMN_NAME_SERVER_LAST_UPDATED_ON, serverLastUpdatedOn());
-        with(contentValues, ContentEntry.COLUMN_NAME_INDEX, searchIndex());
-
+        with(contentValues, ContentEntry.COLUMN_NAME_SERVER_LAST_UPDATED_ON, serverLastUpdatedOn);
         contentValues.put(ContentEntry.COLUMN_NAME_REF_COUNT, refCount);
         contentValues.put(ContentEntry.COLUMN_NAME_CONTENT_STATE, contentState);
+//        with(contentValues, ContentEntry.COLUMN_NAME_INDEX, null);
 
         return contentValues;
     }
@@ -217,11 +141,10 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         with(contentValues, ContentEntry.COLUMN_NAME_VISIBILITY, visibility);
         with(contentValues, ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentType);
         with(contentValues, ContentEntry.COLUMN_NAME_LOCAL_LAST_UPDATED_ON, localLastUpdatedOn());
-        with(contentValues, ContentEntry.COLUMN_NAME_SERVER_LAST_UPDATED_ON, serverLastUpdatedOn());
-        with(contentValues, ContentEntry.COLUMN_NAME_INDEX, searchIndex());
-
+        with(contentValues, ContentEntry.COLUMN_NAME_SERVER_LAST_UPDATED_ON, serverLastUpdatedOn);
         contentValues.put(ContentEntry.COLUMN_NAME_REF_COUNT, refCount);
         contentValues.put(ContentEntry.COLUMN_NAME_CONTENT_STATE, contentState);
+//        with(contentValues, ContentEntry.COLUMN_NAME_INDEX, null);
 
         return contentValues;
     }
@@ -271,58 +194,6 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
 
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ContentModel content = (ContentModel) o;
-
-        if (serverData != null ? !serverData.equals(content.serverData) : content.serverData != null) {
-            return false;
-        }
-
-        if (localData != null ? !localData.equals(content.localData) : content.localData != null) {
-            return false;
-        }
-
-        if (!identifier.equals(content.identifier)) {
-            return false;
-        }
-
-        if (mimeType != null ? !mimeType.equals(content.mimeType) : content.mimeType != null) {
-            return false;
-        }
-
-        if (path != null ? !path.equals(content.path) : content.path != null) {
-            return false;
-        }
-
-        if (visibility != null ? !visibility.equals(content.visibility) : content.visibility != null) {
-            return false;
-        }
-
-        if (!id.equals(content.id)) {
-            return false;
-        }
-
-        return !(manifestVersion != null ? !manifestVersion.equals(content.manifestVersion) : content.manifestVersion != null);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = serverData != null ? serverData.hashCode() : 0;
-        result = 31 * result + (localData != null ? localData.hashCode() : 0);
-        result = 31 * result + identifier.hashCode();
-        result = 31 * result + (mimeType != null ? mimeType.hashCode() : 0);
-        result = 31 * result + (path != null ? path.hashCode() : 0);
-        result = 31 * result + (visibility != null ? visibility.hashCode() : 0);
-        result = 31 * result + id.hashCode();
-        result = 31 * result + (manifestVersion != null ? manifestVersion.hashCode() : 0);
-        result = 31 * result + (contentType != null ? contentType.hashCode() : 0);
-        return result;
-    }
-
     public void readWithoutMoving(IResultSet resultSet) {
         id = resultSet.getLong(0);
         identifier = resultSet.getString(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_IDENTIFIER));
@@ -335,13 +206,6 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         contentState = resultSet.getInt(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_CONTENT_STATE));
         contentType = resultSet.getString(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_CONTENT_TYPE));
         localLastUpdatedTime = resultSet.getString(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_LOCAL_LAST_UPDATED_ON));
-
-        // TODO: Needs to remove
-        isExternalContent = isExternalContent(path);
-    }
-
-    private boolean isExternalContent(String path) {
-        return (!StringUtil.isNullOrEmpty(path)) && path.contains(ContentConstants.GENIE_EXTRACTED_ECAR_FOLDER_PATH);
     }
 
     private void with(ContentValues contentValues, String key, String value) {
@@ -358,37 +222,7 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
             lastUpdatedTime = dateFormat.format(new Date());
         }
 
-        if (isExternalContent(path)) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat(ContentConstants.ISO_DATE_TIME_PATTERN, Locale.US);
-            lastUpdatedTime = dateFormat.format(new Date(lastModified));
-        }
-
         return lastUpdatedTime;
-    }
-
-    private String serverLastUpdatedOn() {
-        return serverData != null
-                ? (String) GsonUtil.fromJson(serverData, Map.class).get(KEY_LAST_UPDATED_ON)
-                : null;
-    }
-
-    /**
-     * Search index is the comma separated string of serverData/localData.
-     *
-     * @return comma separated string.
-     */
-    private String searchIndex() {
-        if (ContentConstants.MimeType.APPLICATION.equals(mimeType)) {
-            if (serverData != null) {
-                return ArrayUtil.mapToCommaSeparatedString(GsonUtil.fromJson(serverData, Map.class).values());
-            }
-        } else if (localData != null) {
-            return ArrayUtil.mapToCommaSeparatedString(GsonUtil.fromJson(localData, Map.class).values());
-        } else if (serverData != null) {
-            return ArrayUtil.mapToCommaSeparatedString(GsonUtil.fromJson(serverData, Map.class).values());
-        }
-
-        return null;
     }
 
     public int getRefCount() {
@@ -450,19 +284,60 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         return localLastUpdatedTime;
     }
 
-    public boolean isExternalContent() {
-        return isExternalContent;
-    }
-
-    public void setFileLastModified(long lastModified) {
-        this.lastModified = lastModified;
-    }
-
-    public Double pkgVersion() {
-        return localData != null ? (Double) GsonUtil.fromJson(localData, Map.class).get(KEY_PKG_VERSION) : null;
-    }
-
     public void updateLocalData(String localData) {
         this.localData = localData;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ContentModel content = (ContentModel) o;
+
+        if (serverData != null ? !serverData.equals(content.serverData) : content.serverData != null) {
+            return false;
+        }
+
+        if (localData != null ? !localData.equals(content.localData) : content.localData != null) {
+            return false;
+        }
+
+        if (!identifier.equals(content.identifier)) {
+            return false;
+        }
+
+        if (mimeType != null ? !mimeType.equals(content.mimeType) : content.mimeType != null) {
+            return false;
+        }
+
+        if (path != null ? !path.equals(content.path) : content.path != null) {
+            return false;
+        }
+
+        if (visibility != null ? !visibility.equals(content.visibility) : content.visibility != null) {
+            return false;
+        }
+
+        if (!id.equals(content.id)) {
+            return false;
+        }
+
+        return !(manifestVersion != null ? !manifestVersion.equals(content.manifestVersion) : content.manifestVersion != null);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = serverData != null ? serverData.hashCode() : 0;
+        result = 31 * result + (localData != null ? localData.hashCode() : 0);
+        result = 31 * result + identifier.hashCode();
+        result = 31 * result + (mimeType != null ? mimeType.hashCode() : 0);
+        result = 31 * result + (path != null ? path.hashCode() : 0);
+        result = 31 * result + (visibility != null ? visibility.hashCode() : 0);
+        result = 31 * result + id.hashCode();
+        result = 31 * result + (manifestVersion != null ? manifestVersion.hashCode() : 0);
+        result = 31 * result + (contentType != null ? contentType.hashCode() : 0);
+        return result;
+    }
+
 }
