@@ -35,7 +35,7 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
         int numberOfSync = 0;
         int numberOfEventsProcessed = 0;
 
-        ProcessedEventModel processedEvent = ProcessedEventModel.build(mAppContext.getDBSession());
+        ProcessedEventModel processedEvent = ProcessedEventModel.find(mAppContext.getDBSession());
 
         long totalByteSize = 0;
 
@@ -54,7 +54,7 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
             numberOfEventsProcessed += processedEvent.getNumberOfEvents();
 
             processedEvent.clear();
-            processedEvent = ProcessedEventModel.build(mAppContext.getDBSession());
+            processedEvent = ProcessedEventModel.find(mAppContext.getDBSession());
         }
 
         String fileSize = calculateByteCountInKB(totalByteSize);
