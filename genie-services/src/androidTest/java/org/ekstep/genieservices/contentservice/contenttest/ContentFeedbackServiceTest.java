@@ -19,8 +19,8 @@ import org.junit.runner.RunWith;
  * Created by Sneha on 6/2/2017.
  */
 @RunWith(AndroidJUnit4.class)
-public class ContentFeedbackService extends GenieServiceTestBase {
-    private static final String TAG = ContentFeedbackService.class.getSimpleName();
+public class ContentFeedbackServiceTest extends GenieServiceTestBase {
+    private static final String TAG = ContentFeedbackServiceTest.class.getSimpleName();
     final String CONTENT_ID = "do_30013486";
     private final String CONTENT_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Multiplication2.ecar";
 
