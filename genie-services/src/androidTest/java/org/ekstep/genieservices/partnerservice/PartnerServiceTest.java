@@ -19,7 +19,7 @@ import java.util.Map;
 
 public class PartnerServiceTest extends GenieServiceTestBase {
     private static final String TAG = PartnerServiceTest.class.getSimpleName();
-    private static final String PARTNER_ID = "PARTNER_ID";
+    private static final String PARTNER_ID = "org.sample";
     private static final String PARTNER_DATA = "PARTNER_DATA";
     private String PUBLIC_KEY = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDGdo5VYOK9cTrQQ+ajOxfHMgg/\n" +
             " * TDX77o/eVTUjcErLLYKBQ6qb8t/jCCuRNexIexRBldk4gC9STyuVWN8x2xkSildf\n" +

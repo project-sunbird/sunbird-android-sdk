@@ -14,6 +14,8 @@ import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.PartnerData;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
+import org.ekstep.genieservices.commons.bean.SyncStat;
+import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 
@@ -205,6 +207,18 @@ public class GenieServiceTestActivity extends Activity {
     public GenieResponse importContent(boolean isChildContent, List<String> contentIdentifiers) {
         idle = false;
         GenieResponse genieResponse = mGenieService.getContentService().importContent(isChildContent, contentIdentifiers);
+        return genieResponse;
+    }
+
+    public GenieResponse<TelemetryStat> getTelemetryStat() {
+        idle = false;
+        GenieResponse<TelemetryStat> genieResponse = mGenieService.getTelemetryService().getTelemetryStat();
+        return genieResponse;
+    }
+
+    public GenieResponse<SyncStat> sync() {
+        idle = false;
+        GenieResponse<SyncStat> genieResponse = mGenieService.getSyncService().sync();
         return genieResponse;
     }
 

@@ -75,9 +75,8 @@ public class GenieServiceDBHelper {
     public static void clearProfileTable() {
 
         try {
-//            int count = GenieServiceDBHelper.getDatabase().delete("profiles", "1", null);
-            //            Log.v("Count:::::", "" + count);
-            GenieServiceDBHelper.getDatabase().execSQL("delete * from profiles");
+            int count = GenieServiceDBHelper.getDatabase().delete("profiles", "1", null);
+            Log.v("Count:::::", "" + count);
         } catch (SQLiteException e) {
             e.printStackTrace();
             Log.v(TAG, "error deleting DB entries :: ");
