@@ -10,6 +10,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessCriteria;
+import org.ekstep.genieservices.commons.bean.ContentCriteria;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
@@ -357,7 +358,13 @@ public class ContentHandler {
         return contentState == ContentConstants.State.ARTIFACT_AVAILABLE;
     }
 
-    public static List<ContentModel> getAllLocalContentSortedByContentAccess(IDBSession dbSession, String uid, ContentType[] contentTypes) {
+    public static List<ContentModel> getAllLocalContentSortedByContentAccess(IDBSession dbSession, ContentCriteria criteria) {
+        String uid = null;
+        ContentType[] contentTypes = null;
+        if (criteria != null) {
+            uid = criteria.getUid();
+            contentTypes = criteria.getContentTypes();
+        }
         String contentTypesStr = getCommaSeparatedContentTypes(contentTypes);
 
         String isContentType = String.format(Locale.US, "c.%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr);

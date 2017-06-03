@@ -113,28 +113,18 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         String methodName = "getAllLocalContent@ContentServiceImpl";
 
         GenieResponse<List<Content>> response;
-        if (criteria == null) {
-            criteria = new ContentCriteria();
-        }
 
-        String uid;
-        if (!StringUtil.isNullOrEmpty(criteria.getUid())) {
-            uid = criteria.getUid();
-        } else {
-            uid = ContentHandler.getCurrentUserId(userService);
-        }
-
-        List<ContentModel> contentModelListInDB = ContentHandler.getAllLocalContentSortedByContentAccess(mAppContext.getDBSession(), uid, criteria.getContentTypes());
+        List<ContentModel> contentModelListInDB = ContentHandler.getAllLocalContentSortedByContentAccess(mAppContext.getDBSession(), criteria);
 
         List<Content> contentList = new ArrayList<>();
         for (ContentModel contentModel : contentModelListInDB) {
             Content c = ContentHandler.convertContentModelToBean(contentModel);
 
-            if (criteria.isAttachFeedback()) {
-                c.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, c.getIdentifier(), uid));
+            if (criteria.attachFeedback()) {
+                c.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, c.getIdentifier(), criteria.getUid()));
             }
-            if (criteria.isAttachContentAccess()) {
-                c.setContentAccess(ContentHandler.getContentAccess(userService, c.getIdentifier(), uid));
+            if (criteria.attachContentAccess()) {
+                c.setContentAccess(ContentHandler.getContentAccess(userService, c.getIdentifier(), criteria.getUid()));
             }
 
             contentList.add(c);
