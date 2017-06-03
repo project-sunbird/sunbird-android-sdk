@@ -19,9 +19,9 @@ import java.util.Locale;
  *
  * @author anil
  */
-public class PageModel implements IWritable, IUpdatable, IReadable, ICleanable {
+public class ContentListingModel implements IWritable, IUpdatable, IReadable, ICleanable {
 
-    private static final String TAG = PageModel.class.getSimpleName();
+    private static final String TAG = ContentListingModel.class.getSimpleName();
 
     private Long id = -1L;
     private IDBSession mDBSession;
@@ -35,7 +35,7 @@ public class PageModel implements IWritable, IUpdatable, IReadable, ICleanable {
     private String mSubject;
     private long mExpiryTime;
 
-    private PageModel(IDBSession dbSession, String pageIdentifier, Profile profile, String subject) {
+    private ContentListingModel(IDBSession dbSession, String pageIdentifier, Profile profile, String subject) {
         this.mDBSession = dbSession;
         this.mPageIdentifier = pageIdentifier;
         this.mAge = profile != null ? profile.getAge() : -1;
@@ -45,25 +45,25 @@ public class PageModel implements IWritable, IUpdatable, IReadable, ICleanable {
         this.mSubject = subject != null ? subject : "";
     }
 
-    private PageModel(IDBSession dbSession, String pageIdentifier, String json, Profile profile, String subject, long expiryTime) {
+    private ContentListingModel(IDBSession dbSession, String pageIdentifier, String json, Profile profile, String subject, long expiryTime) {
         this(dbSession, pageIdentifier, profile, subject);
         this.mJson = json;
         this.mExpiryTime = expiryTime;
     }
 
-    public static PageModel build(IDBSession dbSession, String pageIdentifier, String json, Profile profile, String subject, long expiryTime) {
-        PageModel pageModel = new PageModel(dbSession, pageIdentifier, json, profile, subject, expiryTime);
-        return pageModel;
+    public static ContentListingModel build(IDBSession dbSession, String pageIdentifier, String json, Profile profile, String subject, long expiryTime) {
+        ContentListingModel contentListingModel = new ContentListingModel(dbSession, pageIdentifier, json, profile, subject, expiryTime);
+        return contentListingModel;
     }
 
-    public static PageModel find(IDBSession dbSession, String pageIdentifier, Profile profile, String subject) {
-        PageModel pageModel = new PageModel(dbSession, pageIdentifier, profile, subject);
-        dbSession.read(pageModel);
+    public static ContentListingModel find(IDBSession dbSession, String pageIdentifier, Profile profile, String subject) {
+        ContentListingModel contentListingModel = new ContentListingModel(dbSession, pageIdentifier, profile, subject);
+        dbSession.read(contentListingModel);
         // return null if the page json was not found
-        if (pageModel.id == -1) {
+        if (contentListingModel.id == -1) {
             return null;
         } else {
-            return pageModel;
+            return contentListingModel;
         }
     }
 

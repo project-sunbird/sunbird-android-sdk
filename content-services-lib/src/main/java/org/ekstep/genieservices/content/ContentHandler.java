@@ -39,9 +39,9 @@ import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.bean.ContentChild;
 import org.ekstep.genieservices.content.bean.ContentVariant;
+import org.ekstep.genieservices.content.db.model.ContentListingModel;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.db.model.ContentsModel;
-import org.ekstep.genieservices.content.db.model.PageModel;
 import org.ekstep.genieservices.content.network.ContentDetailsAPI;
 
 import java.io.File;
@@ -68,23 +68,24 @@ import java.util.TreeMap;
  */
 public class ContentHandler {
 
-    public static final String KEY_IDENTIFIER = "identifier";
-    public static final String KEY_PKG_VERSION = "pkgVersion";
-    public static final String KEY_CONTENT_TYPE = "contentType";
-    public static final String KEY_VARIANTS = "variants";
-    public static final String KEY_DOWNLOAD_URL = "downloadUrl";
-    public static final String KEY_CONTENT_METADATA = "contentMetadata";
-    public static final String KEY_VIRALITY_METADATA = "virality";
-    public static final String KEY_TRANSFER_COUNT = "transferCount";
-    public static final String KEY_ORIGIN = "origin";
-
     private static final String TAG = ContentHandler.class.getSimpleName();
+
+    private static final String KEY_IDENTIFIER = "identifier";
+    private static final String KEY_PKG_VERSION = "pkgVersion";
+    private static final String KEY_VARIANTS = "variants";
+    private static final String KEY_DOWNLOAD_URL = "downloadUrl";
     private static final String KEY_COMPATIBILITY_LEVEL = "compatibilityLevel";
     private static final String KEY_MIME_TYPE = "mimeType";
     private static final String KEY_VISIBILITY = "visibility";
     private static final String KEY_LAST_UPDATED_ON = "lastUpdatedOn";
     private static final String KEY_PRE_REQUISITES = "pre_requisites";
     private static final String KEY_CHILDREN = "children";
+    private static final String KEY_CONTENT_TYPE = "contentType";
+
+    private static final String KEY_CONTENT_METADATA = "contentMetadata";
+    private static final String KEY_VIRALITY_METADATA = "virality";
+    private static final String KEY_TRANSFER_COUNT = "transferCount";
+    private static final String KEY_ORIGIN = "origin";
 
     private static final int DEFAULT_PACKAGE_VERSION = -1;
     private static final int INITIAL_VALUE_FOR_TRANSFER_COUNT = 0;
@@ -95,10 +96,7 @@ public class ContentHandler {
     public static int defaultCompatibilityLevel = 1;
 
     public static ContentModel convertContentMapToModel(IDBSession dbSession, Map contentData, String manifestVersion) {
-        String identifier = null;
-        if (contentData.containsKey(KEY_IDENTIFIER)) {
-            identifier = (String) contentData.get(KEY_IDENTIFIER);
-        }
+        String identifier = readIdentifier(contentData);
 
         String localData = null;
         String serverData = null;
@@ -136,12 +134,24 @@ public class ContentHandler {
         return contentModel;
     }
 
+    public static String readIdentifier(Map contentData) {
+        if (contentData.containsKey(KEY_IDENTIFIER)) {
+            return (String) contentData.get(KEY_IDENTIFIER);
+        }
+
+        return null;
+    }
+
     private static String serverLastUpdatedOn(Map serverData) {
         return (String) serverData.get(KEY_LAST_UPDATED_ON);
     }
 
-    public static Double pkgVersion(String localData) {
-        return (Double) GsonUtil.fromJson(localData, Map.class).get(KEY_PKG_VERSION);
+    private static Double pkgVersion(String localData) {
+        return readPkgVersion(GsonUtil.fromJson(localData, Map.class));
+    }
+
+    public static Double readPkgVersion(Map contentData) {
+        return (Double) contentData.get(KEY_PKG_VERSION);
     }
 
     public static boolean hasPreRequisites(String localData) {
@@ -153,7 +163,7 @@ public class ContentHandler {
 
         List<String> childIdentifiers = new ArrayList<>();
         for (Map child : children) {
-            String childIdentifier = (String) child.get(KEY_IDENTIFIER);
+            String childIdentifier = readIdentifier(child);
             childIdentifiers.add(childIdentifier);
         }
 
@@ -165,12 +175,12 @@ public class ContentHandler {
         return GsonUtil.fromJson(localData, Map.class).get(KEY_CHILDREN) != null;
     }
 
-    public static List<String> getChildContentsIdentifiers(String localData) {
+    private static List<String> getChildContentsIdentifiers(String localData) {
         List<Map> children = (List) GsonUtil.fromJson(localData, Map.class).get(KEY_CHILDREN);
 
         List<String> childIdentifiers = new ArrayList<>();
         for (Map child : children) {
-            String childIdentifier = (String) child.get(KEY_IDENTIFIER);
+            String childIdentifier = readIdentifier(child);
             childIdentifiers.add(childIdentifier);
         }
 
@@ -321,6 +331,13 @@ public class ContentHandler {
         return new ContentAccess();
     }
 
+    private static List<ContentAccess> getAllContentAccess(IUserService userService, String uid, String contentIdentifier) {
+        ContentAccessCriteria contentAccessCriteria = new ContentAccessCriteria();
+        contentAccessCriteria.setUid(uid);
+        contentAccessCriteria.setContentIdentifier(contentIdentifier);
+        return userService.getAllContentAccess(contentAccessCriteria).getResult();
+    }
+
     private static boolean isUpdateAvailable(ContentData serverData, ContentData localData) {
         float lVersion = DEFAULT_PACKAGE_VERSION;
         float sVersion = DEFAULT_PACKAGE_VERSION;
@@ -400,24 +417,6 @@ public class ContentHandler {
         }
 
         return contentTypesStr;
-    }
-
-    public static List<ContentAccess> getAllContentAccessByUid(IUserService userService, String uid) {
-        List<ContentAccess> contentAccessList;
-        if (userService != null) {
-            contentAccessList = getAllContentAccess(userService, uid, null);
-        } else {
-            contentAccessList = new ArrayList<>();
-        }
-
-        return contentAccessList;
-    }
-
-    private static List<ContentAccess> getAllContentAccess(IUserService userService, String uid, String contentIdentifier) {
-        ContentAccessCriteria contentAccessCriteria = new ContentAccessCriteria();
-        contentAccessCriteria.setUid(uid);
-        contentAccessCriteria.setContentIdentifier(contentIdentifier);
-        return userService.getAllContentAccess(contentAccessCriteria).getResult();
     }
 
     public static void deleteOrUpdateContent(ContentModel contentModel, boolean isChildItems, int level) {
@@ -555,6 +554,33 @@ public class ContentHandler {
         }
 
         return isExist;
+    }
+
+    public static String readOriginFromContentMap(Map contentData) {
+        try {
+            Map contentMetadataMap = (Map) contentData.get(KEY_CONTENT_METADATA);
+            if (contentMetadataMap != null) {
+                Map viralityMetadataMap = (Map) contentMetadataMap.get(KEY_VIRALITY_METADATA);
+                return (String) viralityMetadataMap.get(KEY_ORIGIN);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public static int readTransferCountFromContentMap(Map contentData) {
+        try {
+            Map contentMetadataMap = (Map) contentData.get(KEY_CONTENT_METADATA);
+            if (contentMetadataMap != null) {
+                Map viralityMetadataMap = (Map) contentMetadataMap.get(KEY_VIRALITY_METADATA);
+                String count = (String) viralityMetadataMap.get(KEY_TRANSFER_COUNT);
+                return (int) Double.parseDouble(count);
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     public static void addOrUpdateViralityMetadata(ContentModel contentModel, String origin) {
@@ -975,7 +1001,7 @@ public class ContentHandler {
         return currentTime > ttl;
     }
 
-    public static Map<String, Object> getPageAssembleRequest(IConfigService configService, Profile profile, String subject, List<PartnerFilter> partnerFilters, String did) {
+    public static Map<String, Object> getContentListingRequest(IConfigService configService, Profile profile, String subject, List<PartnerFilter> partnerFilters, String did) {
         String dlang = "";
         String uid = "";
         if (profile != null) {
@@ -1008,7 +1034,7 @@ public class ContentHandler {
         return requestMap;
     }
 
-    public static void savePageDataInDB(IDBSession dbSession, ContentListingCriteria contentListingCriteria, Profile profile, String jsonStr) {
+    public static void saveContentListingDataInDB(IDBSession dbSession, ContentListingCriteria contentListingCriteria, Profile profile, String jsonStr) {
         if (jsonStr == null) {
             return;
         }
@@ -1019,11 +1045,11 @@ public class ContentHandler {
         Long currentTime = DateUtil.getEpochTime();
         expiryTime = ttlInMilliSeconds + currentTime;
 
-        PageModel pageModel = PageModel.build(dbSession, contentListingCriteria.getPageIdentifier(), jsonStr, profile, contentListingCriteria.getSubject(), expiryTime);
-        pageModel.save();
+        ContentListingModel contentListingModel = ContentListingModel.build(dbSession, contentListingCriteria.getPageIdentifier(), jsonStr, profile, contentListingCriteria.getSubject(), expiryTime);
+        contentListingModel.save();
     }
 
-    public static ContentListingResult getPageAssembleResult(IDBSession dbSession, ContentListingCriteria contentListingCriteria, String jsonStr) {
+    public static ContentListingResult getContentListingResult(IDBSession dbSession, ContentListingCriteria contentListingCriteria, String jsonStr) {
         ContentListingResult contentListingResult = null;
 
         LinkedTreeMap map = GsonUtil.fromJson(jsonStr, LinkedTreeMap.class);

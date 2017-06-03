@@ -65,7 +65,7 @@ public class ValidateEcar implements IChainable {
         Logger.d(TAG, items.toString());
 
         for (HashMap<String, Object> item : items) {
-            String identifier = (String) item.get(ContentHandler.KEY_IDENTIFIER);
+            String identifier = ContentHandler.readIdentifier(item);
             ContentModel oldContentModel = ContentModel.find(appContext.getDBSession(), identifier);
             String oldContentPath = oldContentModel == null ? null : oldContentModel.getPath();
             ContentModel newContentModel = ContentHandler.convertContentMapToModel(appContext.getDBSession(), item, manifestVersion);
@@ -73,7 +73,6 @@ public class ValidateEcar implements IChainable {
             //Draft content expiry .To prevent import of draft content if the expires-date is expired from the current date
             String expiryDate = (String) item.get("expires");
             String status = (String) item.get("status");
-            Double pkgVersion = (Double) item.get(ContentHandler.KEY_PKG_VERSION);
             if (!StringUtil.isNullOrEmpty(expiryDate) && (!StringUtil.isNullOrEmpty(status) && status.equalsIgnoreCase(ServiceConstants.ContentStatus.DRAFT))) {
                 long millis = DateUtil.getTime(expiryDate);
                 if (millis > 0 && System.currentTimeMillis() > millis) {
@@ -81,6 +80,7 @@ public class ValidateEcar implements IChainable {
                 }
             }
 
+            Double pkgVersion = ContentHandler.readPkgVersion(item);
             // To check whether the file is already imported or not
             if (ContentConstants.Visibility.DEFAULT.equals(newContentModel.getVisibility()) // Check if visibility is default for new content. // TODO: 5/17/2017 - Is this check really needed?
                     && isDuplicateCheckRequired(pkgVersion, status)     // Check if its draft and pkgVersion is 0.

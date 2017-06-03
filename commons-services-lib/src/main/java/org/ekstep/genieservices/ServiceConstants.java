@@ -123,7 +123,7 @@ public interface ServiceConstants {
         String MANDATORY_FIELD_CONTENT_IDENTIFIER = "Content identifier could not be null or empty.";
         String MANDATORY_FIELD_UID = "Uid could not be null or empty.";
         String NO_FEEDBACK = "There is no feedback with specified uid and content identifier.";
-        String NO_PAGE_ASSEMBLE_DATA = "No data found.";
+        String NO_CONTENT_LISTING_DATA = "No data found.";
 
         String UNABLE_TO_CREATE_PROFILE = "Unable to create profile";
         String INVALID_PROFILE = "Invalid profile";
