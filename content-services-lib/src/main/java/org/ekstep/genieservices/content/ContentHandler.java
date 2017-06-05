@@ -1156,6 +1156,7 @@ public class ContentHandler {
             section.setDisplay(GsonUtil.fromMap((Map) sectionMap.get("display"), Display.class));
             section.setContents(convertContentMapListToBeanList(dbSession, contentDataList));
             section.setContentSearchCriteria(contentSearchCriteria);
+            sectionList.add(section);
         }
 
         return sectionList;

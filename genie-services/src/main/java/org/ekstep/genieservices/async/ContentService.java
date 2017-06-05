@@ -5,9 +5,14 @@ import org.ekstep.genieservices.IContentService;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
+import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
+import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.RecommendedContentCriteria;
+import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
+import org.ekstep.genieservices.commons.bean.RelatedContentCriteria;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 
 import java.io.File;
@@ -158,14 +163,14 @@ public class ContentService {
      * <p>SERVER_ERROR
      * <p>NETWORK_ERROR
      *
-     * @param language
+     * @param recommendedContentCriteria
      * @return
      */
-    public void getRecommendedContent(final String language, IResponseHandler<ContentSearchResult> responseHandler) {
-        new AsyncHandler<ContentSearchResult>(responseHandler).execute(new IPerformable<ContentSearchResult>() {
+    public void getRecommendedContent(final RecommendedContentCriteria recommendedContentCriteria, IResponseHandler<RecommendedContentResult> responseHandler) {
+        new AsyncHandler<RecommendedContentResult>(responseHandler).execute(new IPerformable<RecommendedContentResult>() {
             @Override
-            public GenieResponse<ContentSearchResult> perform() {
-                return contentService.getRecommendedContent(language);
+            public GenieResponse<RecommendedContentResult> perform() {
+                return contentService.getRecommendedContent(recommendedContentCriteria);
             }
         });
     }
@@ -183,14 +188,14 @@ public class ContentService {
      * <p>SERVER_ERROR
      * <p>NETWORK_ERROR
      *
-     * @param contentIdentifier
+     * @param relatedContentCriteria
      * @return
      */
-    public void getRelatedContent(final String contentIdentifier, IResponseHandler<RelatedContentResult> responseHandler) {
+    public void getRelatedContent(final RelatedContentCriteria relatedContentCriteria, IResponseHandler<RelatedContentResult> responseHandler) {
         new AsyncHandler<RelatedContentResult>(responseHandler).execute(new IPerformable<RelatedContentResult>() {
             @Override
             public GenieResponse<RelatedContentResult> perform() {
-                return contentService.getRelatedContent(contentIdentifier);
+                return contentService.getRelatedContent(relatedContentCriteria);
             }
         });
     }
@@ -253,5 +258,15 @@ public class ContentService {
             }
         });
     }
+
+    public void getContentListing(final ContentListingCriteria contentListingCriteria, IResponseHandler<ContentListingResult> responseHandler) {
+        new AsyncHandler<ContentListingResult>(responseHandler).execute(new IPerformable<ContentListingResult>() {
+            @Override
+            public GenieResponse<ContentListingResult> perform() {
+                return contentService.getContentListing(contentListingCriteria);
+            }
+        });
+    }
+
 
 }
