@@ -20,7 +20,7 @@ public class UserService extends BaseService {
         this.appQualifier = appQualifier;
     }
 
-    public void createUser(Profile profile, IResponseHandler responseHandler) {
+    public void createUserProfile(Profile profile, IResponseHandler responseHandler) {
         CreateUserTask createUserTask = new CreateUserTask(context, appQualifier, profile);
         createAndExecuteTask(responseHandler, createUserTask);
     }
@@ -30,7 +30,7 @@ public class UserService extends BaseService {
         createAndExecuteTask(responseHandler, deleteUserTask);
     }
 
-    public void updateUser(Profile profile, IResponseHandler responseHandler) {
+    public void updateUserProfile(Profile profile, IResponseHandler responseHandler) {
         UpdateUserTask updateUserTask = new UpdateUserTask(context, appQualifier, profile);
         createAndExecuteTask(responseHandler, updateUserTask);
     }
@@ -40,13 +40,13 @@ public class UserService extends BaseService {
         createAndExecuteTask(responseHandler, getCurrentUserTask);
     }
 
-    public void getAllUsers(IResponseHandler responseHandler) {
+    public void getAllUserProfile(IResponseHandler responseHandler) {
         GetAllUsersTask getAllUsersTask = new GetAllUsersTask(context, appQualifier);
         createAndExecuteTask(responseHandler, getAllUsersTask);
     }
 
     public void setUser(String userId, IResponseHandler responseHandler) {
-        SetUserTask setUserTask = new SetUserTask(context, appQualifier, userId);
-        createAndExecuteTask(responseHandler, setUserTask);
+        SetCurrentUserTask setCurrentUserTask = new SetCurrentUserTask(context, appQualifier, userId);
+        createAndExecuteTask(responseHandler, setCurrentUserTask);
     }
 }

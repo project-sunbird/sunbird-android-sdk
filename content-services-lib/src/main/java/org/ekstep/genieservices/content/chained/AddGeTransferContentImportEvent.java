@@ -8,16 +8,14 @@ import org.ekstep.genieservices.commons.bean.telemetry.GETransfer;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferContentMap;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
 import org.ekstep.genieservices.commons.utils.StringUtil;
+import org.ekstep.genieservices.content.ContentHandler;
 import org.ekstep.genieservices.content.bean.ImportContext;
-import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static java.lang.String.valueOf;
 
 /**
  * Created on 5/16/2017.
@@ -59,38 +57,15 @@ public class AddGeTransferContentImportEvent implements IChainable {
         List<HashMap> contents = (List<HashMap>) metadata.get(GETransferEventKnowStructure.CONTENT_ITEMS_KEY);
         ArrayList<GETransferContentMap> contentsMetadata = new ArrayList<>();
         metadata.put(GETransferEventKnowStructure.CONTENT_ITEMS_KEY, contentsMetadata);
-        for (HashMap content : contents) {
+
+        for (HashMap contentMap : contents) {
             contentsMetadata.add(GETransferContentMap.createMapForContent(
-                    (String) content.get(ContentModel.KEY_IDENTIFIER),
-                    (Double) content.get(ContentModel.KEY_PKG_VERSION),
-                    readTransferCountFromContent(content),
-                    readOriginFromContent(content)));
+                    ContentHandler.readIdentifier(contentMap),
+                    ContentHandler.readPkgVersion(contentMap),
+                    ContentHandler.readTransferCountFromContentMap(contentMap),
+                    ContentHandler.readOriginFromContentMap(contentMap)));
         }
         return contentsMetadata;
     }
 
-    private String readOriginFromContent(HashMap item) {
-        try {
-            return (String) ((Map) ((Map) item.get(ContentModel.KEY_CONTENT_METADATA))
-                    .get(ContentModel.KEY_VIRALITY_METADATA))
-                    .get(ContentModel.KEY_ORIGIN);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
-
-    private int readTransferCountFromContent(HashMap item) {
-        try {
-            Map<String, Object> objectMap = (Map<String, Object>) item.get(ContentModel.KEY_CONTENT_METADATA);
-            if (objectMap != null) {
-                Map<String, Object> map = (Map<String, Object>) objectMap.get(ContentModel.KEY_VIRALITY_METADATA);
-                String count = valueOf(map.get(ContentModel.KEY_TRANSFER_COUNT));
-                return (int) Double.parseDouble(count);
-            }
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
 }

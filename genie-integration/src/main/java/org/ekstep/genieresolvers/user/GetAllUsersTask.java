@@ -5,10 +5,16 @@ import android.database.Cursor;
 import android.net.Uri;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.ekstep.genieresolvers.BaseTask;
 import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
+
+import java.lang.reflect.Type;
+import java.util.List;
 
 /**
  * Created on 23/5/17.
@@ -40,8 +46,8 @@ public class GetAllUsersTask extends BaseTask {
         return genieResponse;
     }
 
-    private GenieResponse<String> getResponse(Cursor cursor) {
-        GenieResponse<String> mapData = null;
+    private GenieResponse<List<Profile>> getResponse(Cursor cursor) {
+        GenieResponse<List<Profile>> mapData = null;
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 mapData = readCursor(cursor);
@@ -51,10 +57,11 @@ public class GetAllUsersTask extends BaseTask {
         return mapData;
     }
 
-    private GenieResponse<String> readCursor(Cursor cursor) {
+    private GenieResponse<List<Profile>> readCursor(Cursor cursor) {
         Gson gson = new Gson();
         String serverData = cursor.getString(0);
-        GenieResponse<String> response = gson.fromJson(serverData, GenieResponse.class);
+        Type type = new TypeToken<GenieResponse<List<Profile>>>() {}.getType();
+        GenieResponse<List<Profile>> response = GsonUtil.fromJson(serverData,type);
         return response;
     }
 

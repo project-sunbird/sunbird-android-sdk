@@ -45,7 +45,7 @@ public class ExtractPayloads implements IChainable {
 
         for (HashMap<String, Object> item : importContext.getItems()) {
             identifier = (String) item.get("identifier");
-            newContentCompatibilityLevel = (item.get(ContentModel.KEY_COMPATIBILITY_LEVEL) != null) ? (Double) item.get(ContentModel.KEY_COMPATIBILITY_LEVEL) : ContentHandler.defaultCompatibilityLevel;
+            newContentCompatibilityLevel = ContentHandler.getCompatibilityLevel(item);
             artifactUrl = (String) item.get("artifactUrl");
             iconURL = (String) item.get("appIcon");
 
@@ -75,7 +75,7 @@ public class ExtractPayloads implements IChainable {
 
             oldContentModel = ContentModel.find(appContext.getDBSession(), identifier);
             oldContentPath = oldContentModel == null ? null : oldContentModel.getPath();
-            newContentModel = ContentModel.build(appContext.getDBSession(), item, importContext.getManifestVersion());
+            newContentModel = ContentHandler.convertContentMapToModel(appContext.getDBSession(), item, importContext.getManifestVersion());
             boolean isContentExist = ContentHandler.isContentExist(oldContentModel, newContentModel);
 
             //Apk files
@@ -136,7 +136,7 @@ public class ExtractPayloads implements IChainable {
                         item.clear();
                         item.putAll(mapLocalData);
 
-                        newContentModel = ContentModel.build(appContext.getDBSession(), item, importContext.getManifestVersion());
+                        newContentModel = ContentHandler.convertContentMapToModel(appContext.getDBSession(), item, importContext.getManifestVersion());
                         newContentModel.setVisibility(visibility);
                     }
                 } else {

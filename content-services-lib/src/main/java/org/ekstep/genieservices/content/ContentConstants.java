@@ -9,7 +9,6 @@ import org.ekstep.genieservices.commons.utils.DateUtil;
  */
 public interface ContentConstants {
 
-    String GENIE_EXTRACTED_ECAR_FOLDER_PATH = "/Ekstep/org.ekstep.genieservices";
     String ISO_DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SZZZZZ";
 
     long CACHE_TIMEOUT_HOME_CONTENT = (24 * DateUtil.MILLISECONDS_IN_AN_HOUR);

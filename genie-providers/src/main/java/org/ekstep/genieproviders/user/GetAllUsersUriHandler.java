@@ -14,7 +14,9 @@ import org.ekstep.genieproviders.util.Constants;
 import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.Profile;
 
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -37,7 +39,7 @@ public class GetAllUsersUriHandler implements IUriHandler {
         MatrixCursor cursor = null;
         if (genieService != null) {
             cursor = getMatrixCursor();
-            GenieResponse genieResponse = genieService.getUserProfileService().getAllUserProfile();
+            GenieResponse<List<Profile>> genieResponse = genieService.getUserProfileService().getAllUserProfile();
 
             if (genieResponse != null) {
                 cursor.addRow(new String[]{new Gson().toJson(genieResponse)});

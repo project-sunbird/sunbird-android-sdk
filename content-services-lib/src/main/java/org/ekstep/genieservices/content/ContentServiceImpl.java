@@ -35,10 +35,10 @@ import org.ekstep.genieservices.content.chained.ExtractEcar;
 import org.ekstep.genieservices.content.chained.ExtractPayloads;
 import org.ekstep.genieservices.content.chained.IChainable;
 import org.ekstep.genieservices.content.chained.ValidateEcar;
+import org.ekstep.genieservices.content.db.model.ContentListingModel;
 import org.ekstep.genieservices.content.db.model.ContentModel;
-import org.ekstep.genieservices.content.db.model.PageModel;
+import org.ekstep.genieservices.content.network.ContentListingAPI;
 import org.ekstep.genieservices.content.network.ContentSearchAPI;
-import org.ekstep.genieservices.content.network.PageAssembleAPI;
 import org.ekstep.genieservices.content.network.RecommendedContentAPI;
 import org.ekstep.genieservices.content.network.RelatedContentAPI;
 
@@ -89,7 +89,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 return response;
             }
 
-            contentModelInDB = ContentModel.build(mAppContext.getDBSession(), contentData, null);
+            contentModelInDB = ContentHandler.convertContentMapToModel(mAppContext.getDBSession(), contentData, null);
         } else {
             ContentHandler.refreshContentDetailsFromServer(mAppContext, contentIdentifier, contentModelInDB);
         }
@@ -113,28 +113,18 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         String methodName = "getAllLocalContent@ContentServiceImpl";
 
         GenieResponse<List<Content>> response;
-        if (criteria == null) {
-            criteria = new ContentCriteria();
-        }
 
-        String uid;
-        if (!StringUtil.isNullOrEmpty(criteria.getUid())) {
-            uid = criteria.getUid();
-        } else {
-            uid = ContentHandler.getCurrentUserId(userService);
-        }
-
-        List<ContentModel> contentModelListInDB = ContentHandler.getAllLocalContentSortedByContentAccess(mAppContext.getDBSession(), uid, criteria.getContentTypes());
+        List<ContentModel> contentModelListInDB = ContentHandler.getAllLocalContentSortedByContentAccess(mAppContext.getDBSession(), criteria);
 
         List<Content> contentList = new ArrayList<>();
         for (ContentModel contentModel : contentModelListInDB) {
             Content c = ContentHandler.convertContentModelToBean(contentModel);
 
-            if (criteria.isAttachFeedback()) {
-                c.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, c.getIdentifier(), uid));
+            if (criteria.attachFeedback()) {
+                c.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, c.getIdentifier(), criteria.getUid()));
             }
-            if (criteria.isAttachContentAccess()) {
-                c.setContentAccess(ContentHandler.getContentAccess(userService, c.getIdentifier(), uid));
+            if (criteria.attachContentAccess()) {
+                c.setContentAccess(ContentHandler.getContentAccess(userService, c.getIdentifier(), criteria.getUid()));
             }
 
             contentList.add(c);
@@ -161,7 +151,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         switch (levelAndState) {
             case ContentConstants.ChildContents.FIRST_LEVEL_ALL:
-                if (contentModel.hasChildren()) {
+                if (ContentHandler.hasChildren(contentModel.getLocalData())) {
                     List<ContentModel> contentModelListInDB = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), contentModel.getLocalData(), ContentConstants.ChildContents.FIRST_LEVEL_ALL);
                     for (ContentModel cm : contentModelListInDB) {
                         Content c = ContentHandler.convertContentModelToBean(cm);
@@ -203,12 +193,12 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 //        }
 
         //delete or update pre-requisites
-        if (contentModel.hasPreRequisites()) {
+        if (ContentHandler.hasPreRequisites(contentModel.getLocalData())) {
             ContentHandler.deleteAllPreRequisites(mAppContext, contentModel, level);
         }
 
         //delete or update child items
-        if (contentModel.hasChildren()) {
+        if (ContentHandler.hasChildren(contentModel.getLocalData())) {
             ContentHandler.deleteAllChild(mAppContext, contentModel, level);
         }
 
@@ -232,29 +222,29 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         }
 
         String jsonStr = null;
-        PageModel pageModelInDB = PageModel.find(mAppContext.getDBSession(), contentListingCriteria.getPageIdentifier(), profile, contentListingCriteria.getSubject());
-        if (pageModelInDB != null) {
-            if (ContentHandler.dataHasExpired(pageModelInDB.getExpiryTime())) {
-                pageModelInDB.delete();
+        ContentListingModel contentListingModelInDB = ContentListingModel.find(mAppContext.getDBSession(), contentListingCriteria.getPageIdentifier(), profile, contentListingCriteria.getSubject());
+        if (contentListingModelInDB != null) {
+            if (ContentHandler.dataHasExpired(contentListingModelInDB.getExpiryTime())) {
+                contentListingModelInDB.delete();
             } else {
-                jsonStr = pageModelInDB.getJson();
+                jsonStr = contentListingModelInDB.getJson();
             }
         }
 
         if (jsonStr == null) {
-            Map<String, Object> requestMap = ContentHandler.getPageAssembleRequest(configService, profile, contentListingCriteria.getSubject(), contentListingCriteria.getPartnerFilters(), mAppContext.getDeviceInfo().getDeviceID());
-            PageAssembleAPI api = new PageAssembleAPI(mAppContext, contentListingCriteria.getPageIdentifier(), requestMap);
+            Map<String, Object> requestMap = ContentHandler.getContentListingRequest(configService, profile, contentListingCriteria.getSubject(), contentListingCriteria.getPartnerFilters(), mAppContext.getDeviceInfo().getDeviceID());
+            ContentListingAPI api = new ContentListingAPI(mAppContext, contentListingCriteria.getPageIdentifier(), requestMap);
             GenieResponse apiResponse = api.post();
             if (apiResponse.getStatus()) {
                 jsonStr = apiResponse.getResult().toString();
-                ContentHandler.savePageDataInDB(mAppContext.getDBSession(), contentListingCriteria, profile, jsonStr);
+                ContentHandler.saveContentListingDataInDB(mAppContext.getDBSession(), contentListingCriteria, profile, jsonStr);
             } else {
                 return GenieResponseBuilder.getErrorResponse(apiResponse.getError(), (String) apiResponse.getErrorMessages().get(0), TAG);
             }
         }
 
         if (jsonStr != null) {
-            ContentListingResult contentListingResult = ContentHandler.getPageAssembleResult(mAppContext.getDBSession(), contentListingCriteria, jsonStr);
+            ContentListingResult contentListingResult = ContentHandler.getContentListingResult(mAppContext.getDBSession(), contentListingCriteria, jsonStr);
             if (contentListingResult != null) {
                 GenieResponse<ContentListingResult> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
                 response.setResult(contentListingResult);
@@ -262,7 +252,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             }
         }
 
-        return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.DATA_NOT_FOUND_ERROR, ServiceConstants.ErrorMessage.NO_PAGE_ASSEMBLE_DATA, TAG);
+        return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.DATA_NOT_FOUND_ERROR, ServiceConstants.ErrorMessage.NO_CONTENT_LISTING_DATA, TAG);
     }
 
     @Override
@@ -388,7 +378,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             List<Content> contents = new ArrayList<>();
             if (contentDataList != null) {
                 for (Map contentDataMap : contentDataList) {
-                    ContentModel contentModel = ContentModel.build(mAppContext.getDBSession(), contentDataMap, null);
+                    ContentModel contentModel = ContentHandler.convertContentMapToModel(mAppContext.getDBSession(), contentDataMap, null);
                     Content content = ContentHandler.convertContentModelToBean(contentModel);
 
                     if (allLocalContentModel.contains(contentModel)) {
@@ -430,9 +420,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             ContentModel node;
             while (!stack.isEmpty()) {
                 node = stack.pop();
-                if (node.hasChildren()) {
+                if (ContentHandler.hasChildren(node.getLocalData())) {
                     List<ContentModel> childContents = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), node.getLocalData(), ContentConstants.ChildContents.FIRST_LEVEL_ALL);
-                    // TODO: 5/19/2017 -      List<ContentModel> childContents = node.getSortedChildrenList(dbOperator, CHILD_CONTENTS_FIRST_LEVEL_ALL);
                     stack.addAll(childContents);
 
                     for (ContentModel c : childContents) {
@@ -571,7 +560,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                     }
 
                     if (!StringUtil.isNullOrEmpty(downloadUrl) && ServiceConstants.FileExtension.CONTENT.equalsIgnoreCase(FileUtil.getFileExtension(downloadUrl))) {
-                        String contentIdentifier = (String) dataMap.get(ContentModel.KEY_IDENTIFIER);
+                        String contentIdentifier = ContentHandler.readIdentifier(dataMap);
                         DownloadRequest downloadRequest = new DownloadRequest(contentIdentifier, downloadUrl, ContentConstants.MimeType.ECAR, destinationFolder, isChildContent);
                         downloadRequests[i] = downloadRequest;
                     }

@@ -15,13 +15,13 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
  * shriharsh
  */
 
-public class SetUserTask extends BaseTask {
+public class SetCurrentUserTask extends BaseTask {
 
-    private final String TAG = SetUserTask.class.getSimpleName();
+    private final String TAG = SetCurrentUserTask.class.getSimpleName();
     private String appQualifier;
     private String userId;
 
-    public SetUserTask(Context context, String appQualifier, String userId) {
+    public SetCurrentUserTask(Context context, String appQualifier, String userId) {
         super(context);
         this.appQualifier = appQualifier;
         this.userId = userId;
@@ -29,7 +29,7 @@ public class SetUserTask extends BaseTask {
 
     @Override
     protected String getLogTag() {
-        return SetUserTask.class.getSimpleName();
+        return SetCurrentUserTask.class.getSimpleName();
     }
 
     @Override
