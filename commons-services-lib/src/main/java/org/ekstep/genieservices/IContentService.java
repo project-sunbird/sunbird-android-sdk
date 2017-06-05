@@ -7,6 +7,9 @@ import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.RecommendedContentCriteria;
+import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
+import org.ekstep.genieservices.commons.bean.RelatedContentCriteria;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 
 import java.io.File;
@@ -122,10 +125,10 @@ public interface IContentService {
      * <p>SERVER_ERROR
      * <p>NETWORK_ERROR
      *
-     * @param language
+     * @param recommendedContentCriteria
      * @return
      */
-    GenieResponse<ContentSearchResult> getRecommendedContent(String language);
+    GenieResponse<RecommendedContentResult> getRecommendedContent(RecommendedContentCriteria recommendedContentCriteria);
 
     /**
      * This api is used to get the related contents as similar to the identifier passed.
@@ -139,10 +142,10 @@ public interface IContentService {
      * <p>SERVER_ERROR
      * <p>NETWORK_ERROR
      *
-     * @param contentIdentifier
+     * @param relatedContentCriteria
      * @return
      */
-    GenieResponse<RelatedContentResult> getRelatedContent(String contentIdentifier);
+    GenieResponse<RelatedContentResult> getRelatedContent(RelatedContentCriteria relatedContentCriteria);
 
     /**
      * This api is used to get all the next {@link List<Content>} based on the hierarchy of {@link List<String>} identifiers passed

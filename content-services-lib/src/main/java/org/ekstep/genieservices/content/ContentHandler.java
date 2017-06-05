@@ -24,6 +24,8 @@ import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.MasterDataValues;
 import org.ekstep.genieservices.commons.bean.PartnerFilter;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.bean.RecommendedContentCriteria;
+import org.ekstep.genieservices.commons.bean.RelatedContentCriteria;
 import org.ekstep.genieservices.commons.bean.Section;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.Variant;
@@ -966,19 +968,19 @@ public class ContentHandler {
         return -1;
     }
 
-    public static HashMap<String, Object> getRecommendedContentRequest(String language, String did) {
+    public static HashMap<String, Object> getRecommendedContentRequest(RecommendedContentCriteria criteria, String did) {
         HashMap<String, Object> contextMap = new HashMap<>();
         contextMap.put("did", did);
-        contextMap.put("dlang", language);
+        contextMap.put("dlang", criteria.getLanguage());
 
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("context", contextMap);
-        requestMap.put("limit", 10);
+        requestMap.put("limit", criteria.getLimit());
 
         return requestMap;
     }
 
-    public static HashMap<String, Object> getRelatedContentRequest(IUserService userService, String contentIdentifier, String did) {
+    public static HashMap<String, Object> getRelatedContentRequest(IUserService userService, RelatedContentCriteria criteria, String did) {
         String dlang = "";
         String uid = "";
         if (userService != null) {
@@ -993,12 +995,12 @@ public class ContentHandler {
         HashMap<String, Object> contextMap = new HashMap<>();
         contextMap.put("did", did);
         contextMap.put("dlang", dlang);
-        contextMap.put("contentid", contentIdentifier);
+        contextMap.put("contentid", criteria.getContentId());
         contextMap.put("uid", uid);
 
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("context", contextMap);
-        requestMap.put("limit", 10);
+        requestMap.put("limit", criteria.getLimit());
 
         return requestMap;
     }
