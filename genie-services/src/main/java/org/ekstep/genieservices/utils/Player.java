@@ -54,11 +54,11 @@ public class Player {
             }
 
         }
-
+        intent.putExtra("origin", "Genie");
         if (hierarchyList != null && hierarchyList.size() > 0) {
             intent.putExtra("contentExtras", getContentHierarchy(hierarchyList, contentData.getIdentifier(), content.getContentType()));
         }
-        intent.putExtra("appInfo", GsonUtil.toJson(content));
+        intent.putExtra("appInfo", GsonUtil.toJson(contentData));
         intent.putExtra("language_info", GsonUtil.toJson(resourceBundle));
 
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
