@@ -5,7 +5,10 @@ import org.joda.time.LocalDate;
 import org.joda.time.Seconds;
 import org.joda.time.format.DateTimeFormat;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class DateUtil {
 
@@ -106,6 +109,17 @@ public class DateUtil {
         long diff = stopDate - startDate;
         long diffDays = diff / (24 * 60 * 60 * 1000);
         return diffDays;
+    }
+
+    public static Long dateToEpoch(String dateInString) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT, Locale.US);
+            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+            sdf.parse(dateInString).getTime();
+            return sdf.parse(dateInString).getTime();
+        } catch (Exception ex) {
+            return getEpochTime();
+        }
     }
 
 }

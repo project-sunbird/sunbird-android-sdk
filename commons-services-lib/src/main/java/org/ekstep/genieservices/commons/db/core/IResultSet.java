@@ -33,7 +33,7 @@ public interface IResultSet {
 
     /**
      * Move the cursor to the next row.
-     *
+     * <p>
      * <p>This method will return false if the cursor is already past the
      * last entry in the result set.
      *
@@ -117,7 +117,7 @@ public interface IResultSet {
 
     /**
      * Returns the value of the requested column as a byte array.
-     *
+     * <p>
      * <p>The result and whether this method throws an exception when the
      * column value is null or the column type is not a blob type is
      * implementation-defined.
@@ -127,6 +127,13 @@ public interface IResultSet {
      */
     byte[] getBlob(int columnIndex);
 
+    /**
+     * Returns whether the cursor is pointing to the position after the last
+     * row.
+     *
+     * @return whether the cursor is after the last result.
+     */
+    boolean isAfterLast();
 
 
 }
