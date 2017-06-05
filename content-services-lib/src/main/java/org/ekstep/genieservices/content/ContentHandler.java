@@ -1010,31 +1010,28 @@ public class ContentHandler {
         return currentTime > ttl;
     }
 
-    public static Map<String, Object> getContentListingRequest(IConfigService configService, Profile profile, String subject, List<PartnerFilter> partnerFilters, String did) {
-        String dlang = "";
-        String uid = "";
-        if (profile != null) {
-            uid = profile.getUid();
-            dlang = profile.getLanguage();
-        }
-
+    public static Map<String, Object> getContentListingRequest(IConfigService configService, ContentListingCriteria contentListingCriteria, String did) {
         HashMap<String, Object> contextMap = new HashMap<>();
+
+        Profile profile = contentListingCriteria.getProfile();
+        if (profile != null) {
+            contextMap.put("uid", profile.getUid());
+            contextMap.put("dlang", profile.getLanguage());
+        }
         contextMap.put("did", did);
-        contextMap.put("dlang", dlang);
         contextMap.put("contentid", "");
-        contextMap.put("uid", uid);
 
         Map<String, Object> filterMap = new HashMap<>();
         filterMap.put("compatibilityLevel", getCompatibilityLevelFilter());
 
         // Add subject filter
-        applyFilter(configService, MasterDataType.SUBJECT, subject, filterMap);
+        applyFilter(configService, MasterDataType.SUBJECT, contentListingCriteria.getSubject(), filterMap);
 
         // Apply profile specific filters
         applyProfileFilter(profile, configService, filterMap);
 
         // Apply partner specific filters
-        applyPartnerFilter(configService, partnerFilters, filterMap);
+        applyPartnerFilter(configService, contentListingCriteria.getPartnerFilters(), filterMap);
 
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("context", contextMap);
@@ -1054,7 +1051,7 @@ public class ContentHandler {
         Long currentTime = DateUtil.getEpochTime();
         expiryTime = ttlInMilliSeconds + currentTime;
 
-        ContentListingModel contentListingModel = ContentListingModel.build(dbSession, contentListingCriteria.getPageIdentifier(), jsonStr, profile, contentListingCriteria.getSubject(), expiryTime);
+        ContentListingModel contentListingModel = ContentListingModel.build(dbSession, contentListingCriteria.getContentListingId(), jsonStr, profile, contentListingCriteria.getSubject(), expiryTime);
         contentListingModel.save();
     }
 
@@ -1072,7 +1069,7 @@ public class ContentHandler {
 
         if (result != null) {
             contentListingResult = new ContentListingResult();
-            contentListingResult.setId(contentListingCriteria.getPageIdentifier());
+            contentListingResult.setId(contentListingCriteria.getContentListingId());
             contentListingResult.setResponseMessageId(responseMessageId);
             if (result.containsKey("page")) {
                 contentListingResult.setSections(getSectionsFromPageMap(dbSession, (Map<String, Object>) result.get("page"), contentListingCriteria));
@@ -1147,7 +1144,7 @@ public class ContentHandler {
                         }
 
                         contentSearchCriteria.setFilters(filters);
-                        contentSearchCriteria.setProfileFilter(contentListingCriteria.isCurrentProfileFilter());
+                        contentSearchCriteria.setProfileFilter(contentListingCriteria.getProfile() != null);
                         contentSearchCriteria.setPartnerFilters(contentListingCriteria.getPartnerFilters());
                     }
                 }

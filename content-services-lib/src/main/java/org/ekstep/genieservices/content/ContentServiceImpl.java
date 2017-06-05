@@ -220,12 +220,12 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     @Override
     public GenieResponse<ContentListingResult> getContentListing(ContentListingCriteria contentListingCriteria) {
         Profile profile = null;
-        if (contentListingCriteria.isCurrentProfileFilter()) {
+        if (contentListingCriteria.getProfile() == null) {
             profile = ContentHandler.getCurrentProfile(userService);
         }
 
         String jsonStr = null;
-        ContentListingModel contentListingModelInDB = ContentListingModel.find(mAppContext.getDBSession(), contentListingCriteria.getPageIdentifier(), profile, contentListingCriteria.getSubject());
+        ContentListingModel contentListingModelInDB = ContentListingModel.find(mAppContext.getDBSession(), contentListingCriteria.getContentListingId(), profile, contentListingCriteria.getSubject());
         if (contentListingModelInDB != null) {
             if (ContentHandler.dataHasExpired(contentListingModelInDB.getExpiryTime())) {
                 contentListingModelInDB.delete();
@@ -235,8 +235,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         }
 
         if (jsonStr == null) {
-            Map<String, Object> requestMap = ContentHandler.getContentListingRequest(configService, profile, contentListingCriteria.getSubject(), contentListingCriteria.getPartnerFilters(), mAppContext.getDeviceInfo().getDeviceID());
-            ContentListingAPI api = new ContentListingAPI(mAppContext, contentListingCriteria.getPageIdentifier(), requestMap);
+            Map<String, Object> requestMap = ContentHandler.getContentListingRequest(configService, contentListingCriteria, mAppContext.getDeviceInfo().getDeviceID());
+            ContentListingAPI api = new ContentListingAPI(mAppContext, contentListingCriteria.getContentListingId(), requestMap);
             GenieResponse apiResponse = api.post();
             if (apiResponse.getStatus()) {
                 jsonStr = apiResponse.getResult().toString();

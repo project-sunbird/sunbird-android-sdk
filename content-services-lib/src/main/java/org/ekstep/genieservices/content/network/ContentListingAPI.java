@@ -45,7 +45,7 @@ public class ContentListingAPI extends BaseAPI {
         Map<String, Object> request = new HashMap<>();
         request.put("id", pageIdentifier);
         request.put("ver", VERSION);
-        request.put("ts", DateUtil.getEpochTime());
+        request.put("ets", DateUtil.getEpochTime());
         request.put("params", new HashMap<>().put("msgid", UUID.randomUUID()));
         request.put("request", requestMap);
         return GsonUtil.toJson(request);
