@@ -1092,13 +1092,13 @@ public class ContentHandler {
             ContentSearchCriteria contentSearchCriteria = null;
             Map<String, Object> searchMap = (Map<String, Object>) sectionMap.get("search");
             if (searchMap != null) {
-                contentSearchCriteria = new ContentSearchCriteria();
+                ContentSearchCriteria.Builder builder = new ContentSearchCriteria.Builder();
                 if (searchMap.containsKey("query")) {
-                    contentSearchCriteria.setQuery((String) searchMap.get("query"));
+                    builder.query((String) searchMap.get("query"));
                 }
 
                 if (searchMap.containsKey("mode")) {
-                    contentSearchCriteria.setMode((String) searchMap.get("mode"));
+                    builder.mode((String) searchMap.get("mode"));
                 }
 
                 if (searchMap.containsKey("sort_by")) {
@@ -1143,11 +1143,13 @@ public class ContentHandler {
                             it.remove();
                         }
 
-                        contentSearchCriteria.setFilters(filters);
-                        contentSearchCriteria.setProfileFilter(contentListingCriteria.getProfile() != null);
-                        contentSearchCriteria.setPartnerFilters(contentListingCriteria.getPartnerFilters());
+                        builder.applyFilters(filters);
+                        builder.applyCurrentProfile(contentListingCriteria.getProfile() != null);
+                        builder.applyPartnerFilters(contentListingCriteria.getPartnerFilters());
                     }
                 }
+
+                contentSearchCriteria = builder.build();
             }
 
             Section section = new Section();
@@ -1156,6 +1158,7 @@ public class ContentHandler {
             section.setDisplay(GsonUtil.fromMap((Map) sectionMap.get("display"), Display.class));
             section.setContents(convertContentMapListToBeanList(dbSession, contentDataList));
             section.setContentSearchCriteria(contentSearchCriteria);
+
             sectionList.add(section);
         }
 

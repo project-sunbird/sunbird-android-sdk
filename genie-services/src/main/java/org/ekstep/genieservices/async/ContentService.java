@@ -19,9 +19,10 @@ import java.io.File;
 import java.util.List;
 
 /**
- * Created by swayangjit on 30/5/17.
+ * Created on 30/5/17.
+ *
+ * @author swayangjit
  */
-
 public class ContentService {
 
     private IContentService contentService;
@@ -267,6 +268,5 @@ public class ContentService {
             }
         });
     }
-
 
 }
