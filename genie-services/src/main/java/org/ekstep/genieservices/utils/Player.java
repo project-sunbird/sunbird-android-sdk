@@ -9,6 +9,7 @@ import org.ekstep.genieservices.Constants;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentHierarchy;
+import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.ReflectionUtil;
@@ -36,7 +37,15 @@ public class Player {
         ContentData contentData = content.getContentData();
         String osId = contentData.getOsId();
         Intent intent = null;
-        if (content.getMimeType().equalsIgnoreCase(Constants.MimeType.ECML_MIME_TYPE)) {
+        if (content.getMimeType().equalsIgnoreCase(Constants.MimeType.APK_MIME_TYPE)) {
+            if (ContentUtil.isAppInstalled(context, osId)) {
+                intent = manager.getLaunchIntentForPackage(osId);
+            } else {
+                ContentUtil.openPlaystore(context, osId);
+                return;
+            }
+
+        } else if (content.getContentType().equalsIgnoreCase(Constants.MimeType.ECML_MIME_TYPE) && !isCollectionorTextBook(content.getContentType())) {
             if (osId == null || GENIE_QUIZ_APP_PACKAGE.equals(osId) || GENIE_CANVAS_PACKAGE.equals(osId)) {
                 Class<?> className = ReflectionUtil.getClass(GENIE_CANVAS_ACTIVITY);
                 if (className == null) {
@@ -45,15 +54,11 @@ public class Player {
                 }
                 intent = new Intent(context, className);
             }
-        } else if (content.getMimeType().equalsIgnoreCase(Constants.MimeType.APK_MIME_TYPE)) {
-            if (ContentUtil.isAppInstalled(context, osId)) {
-                intent = manager.getLaunchIntentForPackage(osId);
-            } else {
-                ContentUtil.openPlaystore(context, osId);
-                return;
-            }
-
+        } else {
+            Toast.makeText(context, "Content type not supported", Toast.LENGTH_SHORT).show();
+            return;
         }
+
         intent.putExtra("origin", "Genie");
         if (hierarchyList != null && hierarchyList.size() > 0) {
             intent.putExtra("contentExtras", getContentHierarchy(hierarchyList, contentData.getIdentifier(), content.getContentType()));
@@ -74,5 +79,11 @@ public class Player {
         infoList.add(new ContentHierarchy(identifier, contentType));
         Logger.i("ContentHierarchyList", "" + infoList);
         return GsonUtil.toJson(infoList);
+    }
+
+    private static boolean isCollectionorTextBook(String contentType) {
+        return contentType.equalsIgnoreCase(ContentType.COLLECTION.getValue())
+                || contentType.equalsIgnoreCase(ContentType.TEXTBOOK.getValue())
+                || contentType.equalsIgnoreCase(ContentType.TEXTBOOK_UNIT.getValue());
     }
 }
