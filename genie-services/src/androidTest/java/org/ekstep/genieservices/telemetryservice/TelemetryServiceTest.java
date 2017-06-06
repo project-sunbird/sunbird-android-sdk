@@ -2,7 +2,6 @@ package org.ekstep.genieservices.telemetryservice;
 
 import android.util.Log;
 
-import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.commons.bean.GenieResponse;

@@ -7,7 +7,9 @@ import org.ekstep.genieservices.commons.AndroidAppContext;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
+import org.ekstep.genieservices.commons.bean.ContentDeleteCriteria;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
+import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -165,9 +167,9 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
-    public GenieResponse<Void> deleteContent(String contentIdentifier, int level) {
+    public GenieResponse<Void> deleteContent(ContentDeleteCriteria contentDeleteCriteria) {
         idle = false;
-        GenieResponse genieResponse = mGenieService.getContentService().deleteContent(contentIdentifier, level);
+        GenieResponse genieResponse = mGenieService.getContentService().deleteContent(contentDeleteCriteria);
         return genieResponse;
     }
 
@@ -219,9 +221,9 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
-    public GenieResponse<ContentFeedback> getFeedback(String uid, String contentIdentifier) {
+    public GenieResponse<ContentFeedback> getFeedback(ContentFeedbackCriteria contentFeedbackCriteria) {
         idle = false;
-        GenieResponse<ContentFeedback> genieResponse = mGenieService.getContentFeedbackService().getFeedback(uid, contentIdentifier);
+        GenieResponse<ContentFeedback> genieResponse = mGenieService.getContentFeedbackService().getFeedback(contentFeedbackCriteria);
         return genieResponse;
     }
 

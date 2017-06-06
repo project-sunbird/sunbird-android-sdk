@@ -10,6 +10,7 @@ import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
+import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.junit.Test;
@@ -23,7 +24,6 @@ public class ContentFeedbackServiceTest extends GenieServiceTestBase {
     private static final String TAG = ContentFeedbackServiceTest.class.getSimpleName();
     final String CONTENT_ID = "do_30013486";
     private final String CONTENT_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Multiplication2.ecar";
-
 
     @Test
     public void shouldSendFeedbackForContent() {
@@ -44,7 +44,9 @@ public class ContentFeedbackServiceTest extends GenieServiceTestBase {
 
         shouldAssertFeedbackData(contentFeedback);
 
-        GenieResponse<ContentFeedback> genieResponseGetFeedback = activity.getFeedback(uid, CONTENT_ID);
+        ContentFeedbackCriteria.Builder data = new ContentFeedbackCriteria.Builder(uid, CONTENT_ID);
+
+        GenieResponse<ContentFeedback> genieResponseGetFeedback = activity.getFeedback(data.build());
         Log.v(TAG, "genieResponse :: " + genieResponseGetFeedback.getStatus());
         Log.v(TAG, "genieResponse :: " + genieResponseGetFeedback.getErrorMessages().get(0));
 
