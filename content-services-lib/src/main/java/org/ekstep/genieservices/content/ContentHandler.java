@@ -508,11 +508,6 @@ public class ContentHandler {
                 contentState = ContentConstants.State.ARTIFACT_AVAILABLE;
             } else {
                 contentState = ContentConstants.State.ONLY_SPINE;
-
-                // if there are no entry in DB for any content then on this case contentModel.getPath() will be null
-                if (contentModel.getPath() != null) {
-                    FileUtil.rm(new File(contentModel.getPath()), contentModel.getIdentifier());
-                }
             }
 
         } else {
@@ -536,11 +531,6 @@ public class ContentHandler {
                 }
 
                 contentState = ContentConstants.State.ONLY_SPINE;
-
-                // if there are no entry in DB for any content then on this case contentModel.getPath() will be null
-                if (contentModel.getPath() != null) {
-                    FileUtil.rm(new File(contentModel.getPath()), contentModel.getIdentifier());
-                }
             }
 
             refCount = refCount - 1;
@@ -548,6 +538,10 @@ public class ContentHandler {
 
         // if there are no entry in DB for any content then on this case contentModel.getPath() will be null
         if (contentModel.getPath() != null) {
+            if (contentState == ContentConstants.State.ONLY_SPINE) {
+                FileUtil.rm(new File(contentModel.getPath()), contentModel.getIdentifier());
+            }
+
             contentModel.setVisibility(visibility);
             // Update the refCount
             contentModel.addOrUpdateRefCount(refCount);

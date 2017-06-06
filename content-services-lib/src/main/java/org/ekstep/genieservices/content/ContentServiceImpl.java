@@ -12,12 +12,12 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
+import org.ekstep.genieservices.commons.bean.ContentDeleteCriteria;
 import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
-import org.ekstep.genieservices.commons.bean.ContentDeleteCriteria;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
@@ -143,14 +143,14 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<List<Content>> getChildContents(String contentIdentifier, int levelAndState) {
+    public GenieResponse<List<Content>> getChildContents(String contentId, int levelAndState) {
         // TODO: Telemetry logger
         String methodName = "getChildContents@ContentServiceImpl";
 
         GenieResponse<List<Content>> response;
-        ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), contentIdentifier);
+        ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), contentId);
         if (contentModel == null) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, "No content found for identifier = " + contentIdentifier, TAG);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, "No content found for identifier = " + contentId, TAG);
             return response;
         }
 
@@ -193,12 +193,6 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             return response;
         }
 
-        // TODO: Removing external content code
-//        if (contentModel.isExternalContent() && mAppContext.getDeviceInfo().getAndroidSdkVersion() <= mAppContext.getDeviceInfo().getKitkatVersionCode()) {
-//            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, "This content cannot be deleted.", TAG);
-//            return response;
-//        }
-
         //delete or update pre-requisites
         if (ContentHandler.hasPreRequisites(contentModel.getLocalData())) {
             ContentHandler.deleteAllPreRequisites(mAppContext, contentModel, criteria.isChildContent());
@@ -211,11 +205,6 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         //delete or update root item
         ContentHandler.deleteOrUpdateContent(contentModel, false, criteria.isChildContent());
-
-        // TODO: Removing external content code
-//        if (contentModel.isExternalContent()) {
-//            FileUtil.refreshSDCard();
-//        }
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         return response;
