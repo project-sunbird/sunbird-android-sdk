@@ -2,6 +2,7 @@ package org.ekstep.genieservices.content;
 
 import org.ekstep.genieservices.IDownloadService;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.DownloadProgress;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.DownloadResponse;
@@ -56,7 +57,10 @@ public class DownloadQueueListener {
         downloadResponse.setMimeType(downloadRequest.getMimeType());
 
         if (downloadResponse.getStatus()) {
-            new ContentServiceImpl(mAppContext).importContent(downloadRequest.isChildContent(), downloadResponse.getFilePath(), downloadRequest.getDestinationFolder());
+            ContentImportRequest.Builder builder = new ContentImportRequest.Builder(downloadRequest.isChildContent());
+            builder.fromFilePath(downloadResponse.getFilePath())
+                    .toFolder(downloadRequest.getDestinationFolder());
+            new ContentServiceImpl(mAppContext).importContent(builder.build());
             mDownloadService.remove(downloadResponse.getDownloadId());
             mDownloadService.onDownloadComplete(downloadResponse);
         } else if (StringUtil.isNullOrEmpty(downloadResponse.getFilePath())) {
