@@ -310,17 +310,17 @@ public class UserServiceImpl extends BaseService implements IUserService {
         if (session == null) {
             sessionCreationRequired = true;
         } else if (!session.getUserSessionBean().getUid().equals(uid)) {
-            session.endSession();
             GESessionEnd geSessionEnd = new GESessionEnd(mGameData, session.getUserSessionBean(), mAppContext.getDeviceInfo().getDeviceID());
             TelemetryLogger.log(geSessionEnd);
+            session.endSession();
             sessionCreationRequired = true;
         }
 
         if (sessionCreationRequired) {
             UserSessionModel userSessionModel = UserSessionModel.buildUserSession(mAppContext, uid);
             userSessionModel.startSession();
-            GESessionStart geSessionEnd = new GESessionStart(mGameData, userSessionModel.getUserSessionBean(), mAppContext.getLocationInfo().getLocation(), mAppContext.getDeviceInfo().getDeviceID());
-            TelemetryLogger.log(geSessionEnd);
+            GESessionStart geSessionStart = new GESessionStart(mGameData, userSessionModel.getUserSessionBean(), mAppContext.getLocationInfo().getLocation(), mAppContext.getDeviceInfo().getDeviceID());
+            TelemetryLogger.log(geSessionStart);
         }
         GenieResponse response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
 
