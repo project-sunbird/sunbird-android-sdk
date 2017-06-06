@@ -12,6 +12,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
+import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
@@ -101,7 +102,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         if (content.isAvailableLocally()) {
             String uid = ContentHandler.getCurrentUserId(userService);
-            content.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, content.getIdentifier(), uid));
+            ContentFeedbackCriteria.Builder builder = new ContentFeedbackCriteria.Builder(uid, content.getIdentifier());
+            content.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, builder.build()));
             content.setContentAccess(ContentHandler.getContentAccess(userService, content.getIdentifier(), uid));
         }
 
@@ -124,7 +126,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             Content c = ContentHandler.convertContentModelToBean(contentModel);
 
             if (criteria.attachFeedback()) {
-                c.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, c.getIdentifier(), criteria.getUid()));
+                ContentFeedbackCriteria.Builder builder = new ContentFeedbackCriteria.Builder(criteria.getUid(), c.getIdentifier());
+                c.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, builder.build()));
             }
             if (criteria.attachContentAccess()) {
                 c.setContentAccess(ContentHandler.getContentAccess(userService, c.getIdentifier(), criteria.getUid()));

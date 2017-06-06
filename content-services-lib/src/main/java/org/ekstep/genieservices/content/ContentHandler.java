@@ -13,6 +13,7 @@ import org.ekstep.genieservices.commons.bean.ContentAccessCriteria;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
+import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
@@ -371,9 +372,9 @@ public class ContentHandler {
         return profile;
     }
 
-    public static ContentFeedback getContentFeedback(IContentFeedbackService contentFeedbackService, String contentIdentifier, String uid) {
+    public static ContentFeedback getContentFeedback(IContentFeedbackService contentFeedbackService, ContentFeedbackCriteria contentFeedbackCriteria) {
         if (contentFeedbackService != null) {
-            return contentFeedbackService.getFeedback(uid, contentIdentifier).getResult();
+            return contentFeedbackService.getFeedback(contentFeedbackCriteria).getResult();
         }
 
         return null;
@@ -1002,7 +1003,10 @@ public class ContentHandler {
             FilterValue filterValue = new FilterValue();
             filterValue.setName(name);
             filterValue.setApply(applied);
-            filterValue.setCount((Integer) valueMap.get("count"));
+            if (valueMap.containsKey("count")) {
+                Double count = (Double) valueMap.get("count");
+                filterValue.setCount(count.intValue());
+            }
 
             map.put(index, filterValue);
         }
