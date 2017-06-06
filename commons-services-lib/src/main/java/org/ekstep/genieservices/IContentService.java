@@ -58,7 +58,7 @@ public interface IContentService {
      * On failing to fetch the child content details, the response will return status as FALSE with the following error code
      * <p>NO_DATA_FOUND
      *
-     * @param contentIdentifier - identifier of a content
+     * @param contentId - identifier of a content
      * @param levelAndState     - Below are the int flags to be used
      *                          <p>
      *                          <p>
@@ -73,7 +73,7 @@ public interface IContentService {
      *                          <p>
      * @return {@link List<Content>}
      */
-    GenieResponse<List<Content>> getChildContents(String contentIdentifier, int levelAndState);
+    GenieResponse<List<Content>> getChildContents(String contentId, int levelAndState);
 
     /**
      * This api is used to delete a particular content.
