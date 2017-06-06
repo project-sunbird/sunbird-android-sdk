@@ -75,6 +75,12 @@ public class ContentHandler {
 
     private static final String KEY_IDENTIFIER = "identifier";
     private static final String KEY_PKG_VERSION = "pkgVersion";
+    private static final String KEY_ARTIFACT_URL = "artifactUrl";
+    private static final String KEY_APP_ICON = "appIcon";
+    private static final String KEY_POSTER_IMAGE = "posterImage";
+    private static final String KEY_GRAY_SCALE_APP_ICON = "grayScaleAppIcon";
+    private static final String KEY_STATUS = "status";
+    private static final String KEY_OBJECT_TYPE = "objectType";
     private static final String KEY_VARIANTS = "variants";
     private static final String KEY_DOWNLOAD_URL = "downloadUrl";
     private static final String KEY_COMPATIBILITY_LEVEL = "compatibilityLevel";
@@ -111,25 +117,9 @@ public class ContentHandler {
             localData = GsonUtil.toJson(contentData);
         }
 
-        String mimeType = null;
-        if (contentData.containsKey(KEY_MIME_TYPE)) {
-            mimeType = (String) contentData.get(KEY_MIME_TYPE);
-        }
-
-        String contentType = null;
-        if (contentData.containsKey(KEY_CONTENT_TYPE)) {
-            contentType = (String) contentData.get(KEY_CONTENT_TYPE);
-            if (!StringUtil.isNullOrEmpty(contentType)) {
-                contentType = contentType.toLowerCase();
-            }
-        }
-
-        String visibility;
-        if (contentData.containsKey(KEY_VISIBILITY)) {
-            visibility = (String) contentData.get(KEY_VISIBILITY);
-        } else {
-            visibility = ContentConstants.Visibility.DEFAULT;
-        }
+        String mimeType = readMimeType(contentData);
+        String contentType = readContentType(contentData);
+        String visibility = readVisibility(contentData);
 
         ContentModel contentModel = ContentModel.build(dbSession, identifier, serverData, serverLastUpdatedOn,
                 manifestVersion, localData, mimeType, contentType, visibility);
@@ -141,7 +131,77 @@ public class ContentHandler {
         if (contentData.containsKey(KEY_IDENTIFIER)) {
             return (String) contentData.get(KEY_IDENTIFIER);
         }
+        return null;
+    }
 
+    public static String readMimeType(Map contentData) {
+        if (contentData.containsKey(KEY_MIME_TYPE)) {
+            return (String) contentData.get(KEY_MIME_TYPE);
+        }
+        return null;
+    }
+
+    public static String readContentType(Map contentData) {
+        if (contentData.containsKey(KEY_CONTENT_TYPE)) {
+            String contentType = (String) contentData.get(KEY_CONTENT_TYPE);
+            if (!StringUtil.isNullOrEmpty(contentType)) {
+                contentType = contentType.toLowerCase();
+            }
+            return contentType;
+        }
+        return null;
+    }
+
+    public static String readVisibility(Map contentData) {
+        if (contentData.containsKey(KEY_VISIBILITY)) {
+            return (String) contentData.get(KEY_VISIBILITY);
+        }
+        return ContentConstants.Visibility.DEFAULT;
+    }
+
+    public static String readArtifactUrl(Map contentData) {
+        if (contentData.containsKey(KEY_ARTIFACT_URL)) {
+            return (String) contentData.get(KEY_ARTIFACT_URL);
+        }
+        return null;
+    }
+
+    public static String readAppIcon(Map contentData) {
+        if (contentData.containsKey(KEY_APP_ICON)) {
+            return (String) contentData.get(KEY_APP_ICON);
+        }
+        return null;
+    }
+
+    public static String readPosterImage(Map contentData) {
+        if (contentData.containsKey(KEY_POSTER_IMAGE)) {
+            return (String) contentData.get(KEY_POSTER_IMAGE);
+        }
+        return null;
+    }
+
+    public static String readGrayScaleAppIcon(Map contentData) {
+        if (contentData.containsKey(KEY_GRAY_SCALE_APP_ICON)) {
+            return (String) contentData.get(KEY_GRAY_SCALE_APP_ICON);
+        }
+        return null;
+    }
+
+    public static Double readCompatibilityLevel(Map contentData) {
+        return (contentData.get(KEY_COMPATIBILITY_LEVEL) != null) ? (Double) contentData.get(KEY_COMPATIBILITY_LEVEL) : defaultCompatibilityLevel;
+    }
+
+    public static String readStatus(Map contentData) {
+        if (contentData.containsKey(KEY_STATUS)) {
+            return (String) contentData.get(KEY_STATUS);
+        }
+        return null;
+    }
+
+    public static String readObjectType(Map contentData) {
+        if (contentData.containsKey(KEY_OBJECT_TYPE)) {
+            return (String) contentData.get(KEY_OBJECT_TYPE);
+        }
         return null;
     }
 
@@ -189,10 +249,6 @@ public class ContentHandler {
 
         // Return the childrenInDB
         return childIdentifiers;
-    }
-
-    public static Double getCompatibilityLevel(HashMap<String, Object> contentData) {
-        return (contentData.get(KEY_COMPATIBILITY_LEVEL) != null) ? (Double) contentData.get(KEY_COMPATIBILITY_LEVEL) : defaultCompatibilityLevel;
     }
 
     public static Map fetchContentDetailsFromServer(AppContext appContext, String contentIdentifier) {
@@ -430,6 +486,8 @@ public class ContentHandler {
 
     public static void deleteOrUpdateContent(ContentModel contentModel, boolean isChildItems, int level) {
         int refCount = contentModel.getRefCount();
+        int contentState;
+        String visibility = contentModel.getVisibility();
 
         if (level == ContentConstants.Delete.NESTED) {
             // If visibility is Default it means this content was visible in my downloads.
@@ -438,7 +496,7 @@ public class ContentHandler {
                 refCount = refCount - 1;
 
                 // Update visibility
-                contentModel.setVisibility(ContentConstants.Visibility.PARENT);
+                visibility = ContentConstants.Visibility.PARENT;
             }
 
             // Update the contentState
@@ -446,9 +504,9 @@ public class ContentHandler {
             if (ContentType.COLLECTION.getValue().equalsIgnoreCase(contentModel.getContentType())
                     || ContentType.TEXTBOOK.getValue().equalsIgnoreCase(contentModel.getContentType())
                     || ContentType.TEXTBOOK_UNIT.getValue().equalsIgnoreCase(contentModel.getContentType())) {
-                contentModel.addOrUpdateContentState(ContentConstants.State.ARTIFACT_AVAILABLE);
+                contentState = ContentConstants.State.ARTIFACT_AVAILABLE;
             } else {
-                contentModel.addOrUpdateContentState(ContentConstants.State.ONLY_SPINE);
+                contentState = ContentConstants.State.ONLY_SPINE;
 
                 // if there are no entry in DB for any content then on this case contentModel.getPath() will be null
                 if (contentModel.getPath() != null) {
@@ -463,20 +521,20 @@ public class ContentHandler {
                     || ContentType.TEXTBOOK.getValue().equalsIgnoreCase(contentModel.getContentType())
                     || ContentType.TEXTBOOK_UNIT.getValue().equalsIgnoreCase(contentModel.getContentType()))
                     && refCount > 1) {
-                contentModel.addOrUpdateContentState(ContentConstants.State.ARTIFACT_AVAILABLE);
+                contentState = ContentConstants.State.ARTIFACT_AVAILABLE;
             } else if (refCount > 1 && isChildItems) {  //contentModel.isVisibilityDefault() &&
                 // Visibility will remain Default only.
 
-                contentModel.addOrUpdateContentState(ContentConstants.State.ARTIFACT_AVAILABLE);
+                contentState = ContentConstants.State.ARTIFACT_AVAILABLE;
             } else {
 
                 // Set the visibility to Parent so that this content will not visible in My contents / Downloads section.
                 // Update visibility
                 if (ContentConstants.Visibility.DEFAULT.equalsIgnoreCase(contentModel.getVisibility())) {
-                    contentModel.setVisibility(ContentConstants.Visibility.PARENT);
+                    visibility = ContentConstants.Visibility.PARENT;
                 }
 
-                contentModel.addOrUpdateContentState(ContentConstants.State.ONLY_SPINE);
+                contentState = ContentConstants.State.ONLY_SPINE;
 
                 // if there are no entry in DB for any content then on this case contentModel.getPath() will be null
                 if (contentModel.getPath() != null) {
@@ -487,11 +545,13 @@ public class ContentHandler {
             refCount = refCount - 1;
         }
 
-        // Update the refCount
-        contentModel.addOrUpdateRefCount(refCount);
-
         // if there are no entry in DB for any content then on this case contentModel.getPath() will be null
         if (contentModel.getPath() != null) {
+            contentModel.setVisibility(visibility);
+            // Update the refCount
+            contentModel.addOrUpdateRefCount(refCount);
+            contentModel.addOrUpdateContentState(contentState);
+
             contentModel.update();
         }
     }
@@ -541,21 +601,20 @@ public class ContentHandler {
     /**
      * To Check whether the content is exist or not.
      *
-     * @param oldContent Old ContentModel
-     * @param newContent New ContentModel
+     * @param oldContent    Old ContentModel
+     * @param newIdentifier New content identifier
      * @return True - if file exists, False- does not exists
      */
-    public static boolean isContentExist(ContentModel oldContent, ContentModel newContent) {
-        if (oldContent == null || newContent == null) {
+    public static boolean isContentExist(ContentModel oldContent, String newIdentifier, Double newPkgVersion) {
+        if (oldContent == null) {
             return false;
         }
 
         boolean isExist = false;
         try {
             String oldIdentifier = oldContent.getIdentifier();
-            String newIdentifier = newContent.getIdentifier();
             if (oldIdentifier.equalsIgnoreCase(newIdentifier)) {
-                isExist = (pkgVersion(oldContent.getLocalData()) >= pkgVersion(newContent.getLocalData())) // If old content's pkgVersion is less than the new content then return false.
+                isExist = (pkgVersion(oldContent.getLocalData()) >= newPkgVersion) // If old content's pkgVersion is less than the new content then return false.
                         || oldContent.getContentState() == ContentConstants.State.ARTIFACT_AVAILABLE;  // If content_state is other than artifact available then also return  false.
             }
         } catch (Exception e) {
@@ -583,8 +642,8 @@ public class ContentHandler {
             Map contentMetadataMap = (Map) contentData.get(KEY_CONTENT_METADATA);
             if (contentMetadataMap != null) {
                 Map viralityMetadataMap = (Map) contentMetadataMap.get(KEY_VIRALITY_METADATA);
-                String count = (String) viralityMetadataMap.get(KEY_TRANSFER_COUNT);
-                return (int) Double.parseDouble(count);
+                Double count = (Double) viralityMetadataMap.get(KEY_TRANSFER_COUNT);
+                return count.intValue();
             }
         } catch (NumberFormatException e) {
             e.printStackTrace();
@@ -592,9 +651,7 @@ public class ContentHandler {
         return 0;
     }
 
-    public static void addOrUpdateViralityMetadata(ContentModel contentModel, String origin) {
-        Map<String, Object> localDataMap = GsonUtil.fromJson(contentModel.getLocalData(), Map.class);
-
+    public static void addOrUpdateViralityMetadata(Map<String, Object> localDataMap, String origin) {
         if (isContentMetadataAbsent(localDataMap)) {
             Map<String, Object> viralityMetadata = new HashMap<>();
             viralityMetadata.put(KEY_ORIGIN, origin);
@@ -614,8 +671,6 @@ public class ContentHandler {
             Map<String, Object> viralityMetadata = (Map<String, Object>) ((Map<String, Object>) localDataMap.get(KEY_CONTENT_METADATA)).get(KEY_VIRALITY_METADATA);
             viralityMetadata.put(KEY_TRANSFER_COUNT, transferCount(localDataMap) + 1);
         }
-
-        contentModel.updateLocalData(GsonUtil.toJson(localDataMap));
     }
 
     private static boolean isContentMetadataAbsent(Map<String, Object> localDataMap) {

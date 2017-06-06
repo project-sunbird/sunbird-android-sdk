@@ -36,30 +36,28 @@ public class ExtractPayloads implements IChainable {
     @Override
     public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
 
-        String identifier, artifactUrl, iconURL, posterImage, grayScaleAppIcon, uuid, destination, oldContentPath;
-        Double newContentCompatibilityLevel;
+        String identifier, mimeType, contentType, visibility, path;
+        Double compatibilityLevel, pkgVersion;
+        int refCount;
+        int contentState = ContentConstants.State.ONLY_SPINE;
+        String oldContentPath;
+        String artifactUrl, iconURL, posterImage, grayScaleAppIcon, uuid, destination;
         Decompress stage2;
         File payload;
         File payloadDestination = null;
-        ContentModel newContentModel, oldContentModel;
+        ContentModel oldContentModel;
 
         for (HashMap<String, Object> item : importContext.getItems()) {
-            identifier = (String) item.get("identifier");
-            newContentCompatibilityLevel = ContentHandler.getCompatibilityLevel(item);
-            artifactUrl = (String) item.get("artifactUrl");
-            iconURL = (String) item.get("appIcon");
-
-            // TODO: can we remove posterImage
-            posterImage = (String) item.get("posterImage");
-
-            // TODO: can we remove grayScaleAppIcon
-            grayScaleAppIcon = (String) item.get("grayScaleAppIcon");
-
-            String objectType = (String) item.get("objectType");
-            String mimeType = (String) item.get("mimeType");
-
-            String preRequisitesString = GsonUtil.toJson(item.get("pre_requisites"));
-            List<HashMap<String, Object>> preRequisites = (List<HashMap<String, Object>>) item.get("pre_requisites");
+            identifier = ContentHandler.readIdentifier(item);
+            mimeType = ContentHandler.readMimeType(item);
+            contentType = ContentHandler.readContentType(item);
+            visibility = ContentHandler.readVisibility(item);
+            compatibilityLevel = ContentHandler.readCompatibilityLevel(item);
+            pkgVersion = ContentHandler.readPkgVersion(item);
+            artifactUrl = ContentHandler.readArtifactUrl(item);
+            iconURL = ContentHandler.readAppIcon(item);
+            posterImage = ContentHandler.readPosterImage(item);
+            grayScaleAppIcon = ContentHandler.readGrayScaleAppIcon(item);
 
             //skip the content if already imported on the same version
             boolean isSkip = false;
@@ -75,17 +73,17 @@ public class ExtractPayloads implements IChainable {
 
             oldContentModel = ContentModel.find(appContext.getDBSession(), identifier);
             oldContentPath = oldContentModel == null ? null : oldContentModel.getPath();
-            newContentModel = ContentHandler.convertContentMapToModel(appContext.getDBSession(), item, importContext.getManifestVersion());
-            boolean isContentExist = ContentHandler.isContentExist(oldContentModel, newContentModel);
+            boolean isContentExist = ContentHandler.isContentExist(oldContentModel, identifier, pkgVersion);
 
             //Apk files
             if ((!StringUtil.isNullOrEmpty(mimeType) && mimeType.equalsIgnoreCase(ContentConstants.MimeType.APPLICATION)) ||
                     (!StringUtil.isNullOrEmpty(artifactUrl) && artifactUrl.contains("." + ServiceConstants.FileExtension.APK))) {
 
-                String contentPath;
+                List<HashMap<String, Object>> preRequisites = (List<HashMap<String, Object>>) item.get("pre_requisites");
+
                 if (isContentExist) {
                     payloadDestination = null;
-                    contentPath = oldContentPath;
+                    path = oldContentPath;
                 } else {
                     uuid = UUID.randomUUID().toString();
                     // TODO: can remove uuid from destination
@@ -101,43 +99,31 @@ public class ExtractPayloads implements IChainable {
 
                     try {
                         // If compatibility level is not in range then do not copy artifact
-                        if (ContentHandler.isCompatible(newContentCompatibilityLevel)) {
+                        if (ContentHandler.isCompatible(compatibilityLevel)) {
                             copyAssets(importContext.getTmpLocation().getPath(), artifactUrl, payloadDestination);
-
-                            newContentModel.addOrUpdateContentState(ContentConstants.State.ARTIFACT_AVAILABLE);
-                        } else {
-                            newContentModel.addOrUpdateContentState(ContentConstants.State.ONLY_SPINE);
+                            contentState = ContentConstants.State.ARTIFACT_AVAILABLE;
                         }
                     } catch (IOException e) {
                         Logger.e(TAG, "Cannot copy asset!", e);
 
-                        newContentModel.addOrUpdateContentState(ContentConstants.State.ONLY_SPINE);
-                        // TODO: Do we need to break the import here if it's fails here.
-//                            return new Response(Constants.FAILED_RESPONSE, Constants.COPY_FAILED, Arrays.asList("Cannot copy icon!"), "");
+                        contentState = ContentConstants.State.ONLY_SPINE;
                     }
 
-                    contentPath = payloadDestination.getPath();
+                    path = payloadDestination.getPath();
                 }
 
                 // TODO: 5/18/2017 - Revisit this - handling the APK while importing ECAR.
                 //launch system prompt for Install apk...
-//                showInstallAPKPrompt(context, contentPath, artifactUrl, preRequisites);
+//                showInstallAPKPrompt(context, path, artifactUrl, preRequisites);
 
             } else {
-                String status = (String) item.get("status");
-
                 //If the content is exist then copy the old content data and add it into new content.
-                if (isContentExist && (!StringUtil.isNullOrEmpty(status) && !(status.equalsIgnoreCase(ServiceConstants.ContentStatus.DRAFT)))) {
-                    String visibility = newContentModel.getVisibility();
+                if (isContentExist && !(ServiceConstants.ContentStatus.DRAFT.equalsIgnoreCase(ContentHandler.readStatus(item)))) {
                     if (oldContentModel.getVisibility().equalsIgnoreCase(ContentConstants.Visibility.DEFAULT)) {
-                        String oldContentLocalData = oldContentModel.getLocalData();
-                        Map<String, Object> mapLocalData = GsonUtil.fromJson(oldContentLocalData, Map.class);
+                        Map<String, Object> oldContentLocalDataMap = GsonUtil.fromJson(oldContentModel.getLocalData(), Map.class);
 
                         item.clear();
-                        item.putAll(mapLocalData);
-
-                        newContentModel = ContentHandler.convertContentMapToModel(appContext.getDBSession(), item, importContext.getManifestVersion());
-                        newContentModel.setVisibility(visibility);
+                        item.putAll(oldContentLocalDataMap);
                     }
                 } else {
                     isContentExist = false;
@@ -148,30 +134,22 @@ public class ExtractPayloads implements IChainable {
                     payloadDestination.mkdirs();
 
                     // If compatibility level is not in range then do not copy artifact
-                    if (ContentHandler.isCompatible(newContentCompatibilityLevel)) {
+                    if (ContentHandler.isCompatible(compatibilityLevel)) {
+                        boolean unzipSuccess = false;
                         if (!StringUtil.isNullOrEmpty(artifactUrl)) {
                             payload = new File(importContext.getTmpLocation().getPath(), "/" + artifactUrl);
                             stage2 = new Decompress(payload, payloadDestination);
-                            boolean unzipSuccess = stage2.unzip();
-
-                            // Add or update the content_state
-                            if (unzipSuccess) { // If unzip is success it means artifact is available.
-                                newContentModel.addOrUpdateContentState(ContentConstants.State.ARTIFACT_AVAILABLE);
-                            } else {
-                                newContentModel.addOrUpdateContentState(ContentConstants.State.ONLY_SPINE);
-                            }
-                        } else {
-                            if (ContentType.COLLECTION.getValue().equalsIgnoreCase(newContentModel.getContentType())
-                                    || ContentType.TEXTBOOK.getValue().equalsIgnoreCase(newContentModel.getContentType())
-                                    || ContentType.TEXTBOOK_UNIT.getValue().equalsIgnoreCase(newContentModel.getContentType())) {
-
-                                newContentModel.addOrUpdateContentState(ContentConstants.State.ARTIFACT_AVAILABLE);
-                            } else {
-                                newContentModel.addOrUpdateContentState(ContentConstants.State.ONLY_SPINE);
-                            }
+                            unzipSuccess = stage2.unzip();
                         }
-                    } else {
-                        newContentModel.addOrUpdateContentState(ContentConstants.State.ONLY_SPINE);
+
+                        // Add or update the content_state
+                        if (unzipSuccess    // If unzip is success it means artifact is available.
+                                || ContentType.COLLECTION.getValue().equalsIgnoreCase(contentType)
+                                || ContentType.TEXTBOOK.getValue().equalsIgnoreCase(contentType)
+                                || ContentType.TEXTBOOK_UNIT.getValue().equalsIgnoreCase(contentType)) {
+
+                            contentState = ContentConstants.State.ARTIFACT_AVAILABLE;
+                        }
                     }
 
                     try {
@@ -180,51 +158,49 @@ public class ExtractPayloads implements IChainable {
                         copyAssets(importContext.getTmpLocation().getPath(), grayScaleAppIcon, payloadDestination);
                     } catch (IOException e) {
                         Logger.e(TAG, "Cannot copy asset!", e);
-                        // TODO: Can we remove this, if any content folder is not available than complete import is failing
-//                            return new Response(Constants.FAILED_RESPONSE, Constants.COPY_FAILED, Arrays.asList("Cannot copy icon!"), "");
                     }
                 }
             }
 
             // Set content visibility
-            if (!StringUtil.isNullOrEmpty(objectType) && objectType.equalsIgnoreCase("Library")) {
-                newContentModel.setVisibility(ContentConstants.Visibility.PARENT);
+            if ("Library".equalsIgnoreCase(ContentHandler.readObjectType(item))) {
+                visibility = ContentConstants.Visibility.PARENT;
             } else if (oldContentModel != null) {
                 if (importContext.isChildContent()     // If import started from child content then do not update the visibility.
                         || !ContentConstants.Visibility.PARENT.equals(oldContentModel.getVisibility())) {  // If not started from child content then do not shrink visibility.
-                    newContentModel.setVisibility(oldContentModel.getVisibility());
+                    visibility = oldContentModel.getVisibility();
                 }
             }
 
             //add or update the reference count for the content
             if (oldContentModel != null) {
-                int refCount = oldContentModel.getRefCount();
+                refCount = oldContentModel.getRefCount();
 
                 if (!importContext.isChildContent()) {    // If import started from child content then do not update the refCount.
                     // if the content has a 'Default' visibility and update the same content then don't increase the reference count...
-                    if (!(ContentConstants.Visibility.DEFAULT.equals(oldContentModel.getVisibility()) && ContentConstants.Visibility.DEFAULT.equalsIgnoreCase(newContentModel.getVisibility()))) {
+                    if (!(ContentConstants.Visibility.DEFAULT.equals(oldContentModel.getVisibility()) && ContentConstants.Visibility.DEFAULT.equalsIgnoreCase(visibility))) {
                         refCount = refCount + 1;
                     }
                 }
-
-                newContentModel.addOrUpdateRefCount(refCount);
             } else {
-                newContentModel.addOrUpdateRefCount(1);
+                refCount = 1;
             }
 
             // Add or update the content_state. contentState should not update the spine_only when importing the spine content after importing content with artifacts.
-            if (oldContentModel != null && oldContentModel.getContentState() > newContentModel.getContentState()) {
-                newContentModel.addOrUpdateContentState(oldContentModel.getContentState());
+            if (oldContentModel != null && oldContentModel.getContentState() > contentState) {
+                contentState = oldContentModel.getContentState();
             }
 
             //updated the content path if the content is already exists.
             if (payloadDestination != null && !isContentExist) {
-                newContentModel.setPath(payloadDestination.getPath());
+                path = payloadDestination.getPath();
             } else {
-                newContentModel.setPath(oldContentPath);
+                path = oldContentPath;
             }
 
-            ContentHandler.addOrUpdateViralityMetadata(newContentModel, appContext.getDeviceInfo().getDeviceID());
+            ContentHandler.addOrUpdateViralityMetadata(item, appContext.getDeviceInfo().getDeviceID());
+            ContentModel newContentModel = ContentModel.build(appContext.getDBSession(), identifier, importContext.getManifestVersion(), GsonUtil.toJson(item),
+                    mimeType, contentType, visibility, path, refCount, contentState);
 
             if (oldContentModel == null) {
                 newContentModel.save();
