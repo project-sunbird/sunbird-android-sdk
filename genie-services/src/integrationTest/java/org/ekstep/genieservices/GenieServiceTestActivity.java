@@ -14,6 +14,8 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.PartnerData;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.bean.RecommendedContentCriteria;
+import org.ekstep.genieservices.commons.bean.RelatedContentCriteria;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.SyncStat;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
@@ -181,7 +183,7 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
-    public GenieResponse<ContentSearchResult> getRecommendedContent(String language) {
+    public GenieResponse<ContentSearchResult> getRecommendedContent(RecommendedContentCriteria language) {
         idle = false;
         GenieResponse genieResponse = mGenieService.getContentService().getRecommendedContent(language);
         return genieResponse;
@@ -193,7 +195,7 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
-    public GenieResponse<RelatedContentResult> getRelatedContent(String contentIdentifier) {
+    public GenieResponse<RelatedContentResult> getRelatedContent(RelatedContentCriteria contentIdentifier) {
         idle = false;
         GenieResponse<RelatedContentResult> genieResponse = mGenieService.getContentService().getRelatedContent(contentIdentifier);
         return genieResponse;

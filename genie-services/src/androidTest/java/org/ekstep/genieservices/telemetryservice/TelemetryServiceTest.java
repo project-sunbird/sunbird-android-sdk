@@ -57,20 +57,9 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
         Assert.assertEquals(PARTNER_ID, partnerId.get(0));
     }
 
-    /**
-     * Scenario : To save Telemetry details passed to it as {@link Telemetry}
-     * Given : Save telemetry details.
-     * Step 1. Create a user profile and set as current user.
-     * Step 2. Create a GameData Object.
-     * Step 3. Create a Telemetry event ie GECreateProfile by passing GameData and created Profile object to it.
-     * Step 4. Save the telemetry event.
-     * When :
-     * Then : Check if the telemetry event is saved.
-     */
-    @Test
-    public void shouldSaveTelemetryData() {
+    private void savePartnerData(PartnerData partnerData) {
 
-        PartnerData partnerData = new PartnerData("org.ekstep.partner", "1.6", PARTNER_ID, PARTNER_DATA, PUBLIC_KEY);
+        GenieServiceDBHelper.clearPartnerDBEntry();
 
         GenieResponse registerPartnerResponse = activity.registerPartner(partnerData);
         Assert.assertTrue(registerPartnerResponse.getStatus());
@@ -88,6 +77,25 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
     }
 
     /**
+     * Scenario : To save Telemetry details passed to it as {@link Telemetry}
+     * Given : Save telemetry details.
+     * Step 1. Create a user profile and set as current user.
+     * Step 2. Create a GameData Object.
+     * Step 3. Create a Telemetry event ie GECreateProfile by passing GameData and created Profile object to it.
+     * Step 4. Save the telemetry event.
+     * When :
+     * Then : Check if the telemetry event is saved.
+     */
+    @Test
+    public void shouldSaveTelemetryData() {
+
+        PartnerData partnerData = new PartnerData("org.ekstep.partner", "1.6", PARTNER_ID, PARTNER_DATA, PUBLIC_KEY);
+
+        savePartnerData(partnerData);
+
+    }
+
+    /**
      * Scenario : To save Telemetry details passed to it as String.
      * Given : Save telemetry event as String.
      * Step 1. Create a user profile and set as current user.
@@ -99,6 +107,8 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
      */
     @Test
     public void shouldSaveTelemetryDataAsString() {
+
+        GenieServiceDBHelper.clearTelemetryTableEntry();
 
         String eventStrng = "{\n" +
                 "  \"cdata\": [\n" +
@@ -158,23 +168,14 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
 
         PartnerData partnerData = new PartnerData("org.ekstep.partner2", "1.8", PARTNER_ID, PARTNER_DATA, PUBLIC_KEY);
 
-        GenieResponse registerPartnerResponse = activity.registerPartner(partnerData);
-        Assert.assertTrue(registerPartnerResponse.getStatus());
-
-        GenieResponse isRegisteredPartnerResponse = activity.isPartnerRegistered(PARTNER_ID);
-        Assert.assertTrue(isRegisteredPartnerResponse.getStatus());
-
-        GenieResponse startPartnerSession = activity.startPartnerSession(partnerData);
-        Assert.assertTrue(startPartnerSession.getStatus());
-
-        GenieResponse sendDataResponse = activity.sendData(partnerData);
-        Assert.assertTrue(sendDataResponse.getStatus());
-        checkIfTelemetryEventIsLogged("GE_PARTNER_DATA");
+        savePartnerData(partnerData);
 
         GenieResponse<TelemetryStat> telemetryStatGenieResponse = activity.getTelemetryStat();
 
         Assert.assertTrue("true", telemetryStatGenieResponse.getStatus());
         Assert.assertNotNull(telemetryStatGenieResponse.getResult().getUnSyncedEventCount());
+        Assert.assertNotEquals(0, telemetryStatGenieResponse.getResult().getUnSyncedEventCount());
+        Assert.assertNotEquals(0, telemetryStatGenieResponse.getResult().getLastSyncTime());
 
         Log.v(TAG, "telemetryStatGenieResponse status:: " + telemetryStatGenieResponse.getStatus());
         Log.v(TAG, "telemetryStatGenieResponse getUnSyncedEventCount:: " + telemetryStatGenieResponse.getResult().getUnSyncedEventCount());
@@ -184,7 +185,8 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
 
         Assert.assertTrue("true", syncStatGenieResponse.getStatus());
         Assert.assertNotNull(syncStatGenieResponse.getResult().getSyncedEventCount());
-
+        Assert.assertNotEquals(0, syncStatGenieResponse.getResult().getSyncedEventCount());
+        Assert.assertNotEquals(0, syncStatGenieResponse.getResult().getSyncTime());
         Assert.assertEquals(telemetryStatGenieResponse.getResult().getUnSyncedEventCount(), syncStatGenieResponse.getResult().getSyncedEventCount());
 
         Log.v(TAG, "syncStatGenieResponse status:: " + syncStatGenieResponse.getStatus());

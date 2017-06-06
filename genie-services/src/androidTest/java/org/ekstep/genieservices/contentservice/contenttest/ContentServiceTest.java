@@ -13,6 +13,8 @@ import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.RecommendedContentCriteria;
+import org.ekstep.genieservices.commons.bean.RelatedContentCriteria;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.utils.FileUtil;
@@ -118,7 +120,10 @@ public class ContentServiceTest extends GenieServiceTestBase {
      */
     @Test
     public void shouldGetAllRecommendedContent() {
-        GenieResponse<ContentSearchResult> genieResponse = activity.getRecommendedContent("en");
+
+        RecommendedContentCriteria.Builder contentCriteria = new RecommendedContentCriteria.Builder().language("en");
+
+        GenieResponse<ContentSearchResult> genieResponse = activity.getRecommendedContent(contentCriteria.build());
         Assert.assertNotNull(genieResponse.getResult());
         Assert.assertTrue(genieResponse.getStatus());
         Assert.assertEquals("ekstep.analytics.recommendations", genieResponse.getResult().getId());
@@ -129,7 +134,10 @@ public class ContentServiceTest extends GenieServiceTestBase {
      */
     @Test
     public void shouldGetRelatedContent() {
-        GenieResponse<RelatedContentResult> genieResponse = activity.getRelatedContent(CONTENT_ID);
+
+        RelatedContentCriteria.Builder contentCriteria = new RelatedContentCriteria.Builder().contentId(CONTENT_ID);
+
+        GenieResponse<RelatedContentResult> genieResponse = activity.getRelatedContent(contentCriteria.build());
         Assert.assertNotNull(genieResponse.getResult());
         Assert.assertTrue(genieResponse.getStatus());
         Assert.assertEquals("ekstep.analytics.recommendations", genieResponse.getResult().getId());

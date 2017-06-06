@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.contentservice.contenttest;
+package org.ekstep.genieservices.contentservice.contenttest.contentfeedback;
 
 import android.os.Environment;
 import android.support.test.runner.AndroidJUnit4;
@@ -57,6 +57,7 @@ public class ContentFeedbackServiceTest extends GenieServiceTestBase {
      */
     private String createAndSetProfileForGetFeedback() {
 
+        GenieServiceDBHelper.clearProfileTable();
         Profile profile = new Profile("Happy1", "@drawable/ic_avatar2", "en");
         profile.setAge(4);
         profile.setDay(12);

@@ -160,6 +160,17 @@ public class GenieServiceDBHelper {
             Log.v("Count:::::", "" + count);
         } catch (SQLiteException e) {
             e.printStackTrace();
+            Log.v(TAG, "Unable to delete content DB entry");
+        }
+    }
+
+    public static void clearPartnerDBEntry() {
+        try {
+            int count = getDatabase().delete("partners", "1", null);
+            Log.v("Count:::::", "" + count);
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+            Log.v(TAG, "Unable to delete partner DB entry");
         }
     }
 }

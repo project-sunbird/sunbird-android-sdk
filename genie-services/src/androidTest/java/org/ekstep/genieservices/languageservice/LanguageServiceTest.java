@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.contentservice.contenttest;
+package org.ekstep.genieservices.languageservice;
 
 import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
