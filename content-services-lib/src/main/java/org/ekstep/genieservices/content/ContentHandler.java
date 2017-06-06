@@ -485,12 +485,12 @@ public class ContentHandler {
         return contentTypesStr;
     }
 
-    public static void deleteOrUpdateContent(ContentModel contentModel, boolean isChildItems, int level) {
+    public static void deleteOrUpdateContent(ContentModel contentModel, boolean isChildItems, boolean isChildContent) {
         int refCount = contentModel.getRefCount();
         int contentState;
         String visibility = contentModel.getVisibility();
 
-        if (level == ContentConstants.Delete.NESTED) {
+        if (isChildContent) {
             // If visibility is Default it means this content was visible in my downloads.
             // After deleting artifact for this content it should not visible as well so reduce the refCount also for this.
             if (refCount > 1 && ContentConstants.Visibility.DEFAULT.equalsIgnoreCase(contentModel.getVisibility())) {
@@ -557,13 +557,37 @@ public class ContentHandler {
         }
     }
 
-    public static void deleteAllPreRequisites(AppContext appContext, ContentModel contentModel, int level) {
+    public static void deleteAllPreRequisites(AppContext appContext, ContentModel contentModel, boolean isChildContent) {
         List<String> preRequisitesIdentifier = getPreRequisitesIdentifiers(contentModel.getLocalData());
         ContentsModel contentsModel = ContentsModel.findAllContentsWithIdentifiers(appContext.getDBSession(), preRequisitesIdentifier);
 
         if (contentsModel != null) {
             for (ContentModel c : contentsModel.getContentModelList()) {
-                deleteOrUpdateContent(c, true, level);
+                deleteOrUpdateContent(c, true, isChildContent);
+            }
+        }
+    }
+
+    public static void deleteAllChild(AppContext appContext, ContentModel contentModel, boolean isChildContent) {
+        Queue<ContentModel> queue = new LinkedList<>();
+
+        queue.add(contentModel);
+
+        ContentModel node;
+        while (!queue.isEmpty()) {
+            node = queue.remove();
+
+            if (hasChildren(node.getLocalData())) {
+                List<String> childContentsIdentifiers = getChildContentsIdentifiers(node.getLocalData());
+                ContentsModel contentsModel = ContentsModel.findAllContentsWithIdentifiers(appContext.getDBSession(), childContentsIdentifiers);
+                if (contentsModel != null) {
+                    queue.addAll(contentsModel.getContentModelList());
+                }
+            }
+
+            // Deleting only child content
+            if (!contentModel.getIdentifier().equalsIgnoreCase(node.getIdentifier())) {
+                deleteOrUpdateContent(node, true, isChildContent);
             }
         }
     }
@@ -756,30 +780,6 @@ public class ContentHandler {
         }
 
         return contentModelListInDB;
-    }
-
-    public static void deleteAllChild(AppContext appContext, ContentModel contentModel, int level) {
-        Queue<ContentModel> queue = new LinkedList<>();
-
-        queue.add(contentModel);
-
-        ContentModel node;
-        while (!queue.isEmpty()) {
-            node = queue.remove();
-
-            if (hasChildren(node.getLocalData())) {
-                List<String> childContentsIdentifiers = getChildContentsIdentifiers(node.getLocalData());
-                ContentsModel contentsModel = ContentsModel.findAllContentsWithIdentifiers(appContext.getDBSession(), childContentsIdentifiers);
-                if (contentsModel != null) {
-                    queue.addAll(contentsModel.getContentModelList());
-                }
-            }
-
-            // Deleting only child content
-            if (!contentModel.getIdentifier().equalsIgnoreCase(node.getIdentifier())) {
-                deleteOrUpdateContent(node, true, level);
-            }
-        }
     }
 
     public static Map<String, Object> getSearchRequest(List<String> contentIdentifiers) {

@@ -62,8 +62,4 @@ public interface ContentConstants {
 //        int FIRST_LEVEL_TEXTBOOK_UNIT = 3;
     }
 
-    interface Delete {
-        int DEFAULT = 0;
-        int NESTED = 1;
-    }
 }

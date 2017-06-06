@@ -6,6 +6,7 @@ import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
+import org.ekstep.genieservices.commons.bean.ContentDeleteCriteria;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.RecommendedContentCriteria;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
@@ -84,11 +85,10 @@ public interface IContentService {
      * On failing to delete a content, the response will return status as FALSE with the following error code
      * <p>NO_DATA_FOUND
      *
-     * @param contentIdentifier - identifier of a content
-     * @param level
+     * @param contentDeleteCriteria
      * @return
      */
-    GenieResponse<Void> deleteContent(String contentIdentifier, int level);
+    GenieResponse<Void> deleteContent(ContentDeleteCriteria contentDeleteCriteria);
 
     /**
      * @param contentListingCriteria
