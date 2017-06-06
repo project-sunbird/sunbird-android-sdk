@@ -27,7 +27,6 @@ import static org.ekstep.genieservices.tag.model.TagModel.find;
 /**
  * This class is the implementation of {@link ITagService}
  */
-
 public class TagServiceImpl extends BaseService implements ITagService {
 
     private static final String TAG = "TagService";
@@ -35,7 +34,6 @@ public class TagServiceImpl extends BaseService implements ITagService {
     public TagServiceImpl(AppContext appContext) {
         super(appContext);
     }
-
 
     @Override
     public GenieResponse<Void> setTag(Tag tag) {
@@ -75,7 +73,6 @@ public class TagServiceImpl extends BaseService implements ITagService {
 
     @Override
     public GenieResponse<List<Tag>> getTags() {
-
         String methodName = "getTags@TagService";
         HashMap params = new HashMap();
         params.put("logLevel", "2");
@@ -119,12 +116,10 @@ public class TagServiceImpl extends BaseService implements ITagService {
 
     @Override
     public GenieResponse<Void> updateTag(Tag tag) {
-
         String methodName = "updateTag@TagService";
         HashMap params = new HashMap();
         params.put("tag", GsonUtil.toJson(tag));
         params.put("logLevel", "2");
-
 
         GenieResponse<Void> genieResponse;
         if (tag != null && !StringUtil.isNullOrEmpty(tag.getName())) {
@@ -139,6 +134,7 @@ public class TagServiceImpl extends BaseService implements ITagService {
                 } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
                     //This will never occur as the algo and encoding are hardcoded.
                 }
+                // TODO: 6/6/2017 - Needs to revisit update.
                 tagModel = TagModel.build(mAppContext.getDBSession(), tag.getName().trim(), tagHash,
                         tag.getDescription(),
                         tag.getStartDate(),
@@ -152,6 +148,8 @@ public class TagServiceImpl extends BaseService implements ITagService {
             genieResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.VALIDATION_ERROR, ServiceConstants.ErrorMessage.TAG_NAME_SHOULD_NOT_BE_EMPTY, TAG);
             TelemetryLogger.logFailure(mAppContext, genieResponse, TAG, methodName, params, ServiceConstants.ErrorMessage.TAG_NAME_SHOULD_NOT_BE_EMPTY);
         }
+
         return genieResponse;
     }
+
 }

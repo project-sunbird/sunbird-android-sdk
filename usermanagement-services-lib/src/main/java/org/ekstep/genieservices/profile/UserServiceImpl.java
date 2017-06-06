@@ -165,9 +165,9 @@ public class UserServiceImpl extends BaseService implements IUserService {
             logGEError(genieResponse, "updateUserProfile");
             TelemetryLogger.logFailure(mAppContext, genieResponse, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_UPDTAE_PROFILE);
             return genieResponse;
-
         }
         UserProfileModel userProfileModel = UserProfileModel.build(mAppContext.getDBSession(), profile);
+        // TODO: 6/6/2017 - check if profile exists or not before updating.
         userProfileModel.update();
 
         GEUpdateProfile geUpdateProfile = new GEUpdateProfile(mGameData, profile, mAppContext.getDeviceInfo().getDeviceID());

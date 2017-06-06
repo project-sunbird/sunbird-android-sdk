@@ -49,7 +49,8 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         this.identifier = identifier;
     }
 
-    private ContentModel(IDBSession dbSession, String identifier, String serverData, String serverLastUpdatedOn, String manifestVersion, String localData, String mimeType, String contentType, String visibility) {
+    private ContentModel(IDBSession dbSession, String identifier, String serverData, String serverLastUpdatedOn,
+                         String manifestVersion, String localData, String mimeType, String contentType, String visibility) {
         this.mDBSession = dbSession;
         this.identifier = identifier;
         this.serverData = serverData;
@@ -59,6 +60,15 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         this.mimeType = mimeType;
         this.contentType = contentType;
         this.visibility = visibility;
+    }
+
+    private ContentModel(IDBSession dbSession, String identifier, String manifestVersion, String localData,
+                         String mimeType, String contentType, String visibility, String path,
+                         int refCount, int contentState) {
+        this(dbSession, identifier, null, null, manifestVersion, localData, mimeType, contentType, visibility);
+        this.path = path;
+        this.refCount = refCount;
+        this.contentState = contentState;
     }
 
     public static ContentModel find(IDBSession dbSession, Object identifier) {
@@ -80,6 +90,14 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
                                      String manifestVersion, String localData, String mimeType, String contentType, String visibility) {
         ContentModel contentModel = new ContentModel(dbSession, identifier, serverData, serverLastUpdatedOn,
                 manifestVersion, localData, mimeType, contentType, visibility);
+        return contentModel;
+    }
+
+    public static ContentModel build(IDBSession dbSession, String identifier, String manifestVersion, String localData,
+                                     String mimeType, String contentType, String visibility, String path,
+                                     int refCount, int contentState) {
+        ContentModel contentModel = new ContentModel(dbSession, identifier, manifestVersion, localData,
+                mimeType, contentType, visibility, path, refCount, contentState);
         return contentModel;
     }
 
@@ -256,10 +274,6 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         return path;
     }
 
-    public void setPath(String path) {
-        this.path = path;
-    }
-
     public String getVisibility() {
         return visibility;
     }
@@ -282,10 +296,6 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
 
     public String getLocalLastUpdatedTime() {
         return localLastUpdatedTime;
-    }
-
-    public void updateLocalData(String localData) {
-        this.localData = localData;
     }
 
     @Override
