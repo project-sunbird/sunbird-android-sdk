@@ -13,6 +13,7 @@ public class ContentFeedback implements Serializable {
     private float rating;
     private String comments;
     private Long createdAt;
+    private String stageId;
 
     public ContentFeedback() {
     }
@@ -49,4 +50,11 @@ public class ContentFeedback implements Serializable {
         return createdAt;
     }
 
+    public String getStageId() {
+        return stageId;
+    }
+
+    public void setStageId(String stageId) {
+        this.stageId = stageId;
+    }
 }

@@ -7,6 +7,7 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
+import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.telemetry.GEFeedback;
@@ -34,18 +35,13 @@ public class ContentFeedbackServiceImpl extends BaseService implements IContentF
 
     @Override
     public GenieResponse<Void> sendFeedback(ContentFeedback feedback) {
-        return sendFeedback(feedback, null);
-    }
-
-    @Override
-    public GenieResponse<Void> sendFeedback(ContentFeedback feedback, String stageId) {
         if (StringUtil.isNullOrEmpty(feedback.getContentId())) {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.VALIDATION_ERROR, ServiceConstants.ErrorMessage.MANDATORY_FIELD_CONTENT_IDENTIFIER, TAG);
         }
 
         String uid = ContentHandler.getCurrentUserId(userService);
 
-        saveContentFeedbackEvent(feedback, stageId);
+        saveContentFeedbackEvent(feedback);
 
         // Save or update the content feedback in DB.
         ContentFeedbackModel contentFeedbackModel = ContentFeedbackModel.build(mAppContext.getDBSession(),
@@ -60,19 +56,19 @@ public class ContentFeedbackServiceImpl extends BaseService implements IContentF
         return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
     }
 
-    private void saveContentFeedbackEvent(ContentFeedback feedback, String stageId) {
+    private void saveContentFeedbackEvent(ContentFeedback feedback) {
         GEFeedback geFeedback = new GEFeedback(mGameData, "RATING",
                 feedback.getContentId(), feedback.getRating(), feedback.getComments(),
-                GEFeedbackContextType.CONTENT.getValue(), stageId);
+                GEFeedbackContextType.CONTENT.getValue(), feedback.getStageId());
 
         TelemetryLogger.log(geFeedback);
     }
 
     @Override
-    public GenieResponse<ContentFeedback> getFeedback(String uid, String contentIdentifier) {
+    public GenieResponse<ContentFeedback> getFeedback(ContentFeedbackCriteria criteria) {
         GenieResponse<ContentFeedback> response;
 
-        ContentFeedbackModel contentFeedbackModel = ContentFeedbackModel.find(mAppContext.getDBSession(), uid, contentIdentifier);
+        ContentFeedbackModel contentFeedbackModel = ContentFeedbackModel.find(mAppContext.getDBSession(), criteria.getUid(), criteria.getContentId());
         if (contentFeedbackModel != null) {
             ContentFeedback contentFeedback = new ContentFeedback(contentFeedbackModel.getCreatedAt());
             contentFeedback.setContentId(contentFeedbackModel.getContentId());

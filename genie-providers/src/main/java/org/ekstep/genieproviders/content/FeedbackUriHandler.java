@@ -47,8 +47,9 @@ public class FeedbackUriHandler implements IUriHandler {
             contentFeedback.setRating(Float.valueOf(feedbackMap.get("rating")));
         }
         contentFeedback.setComments(feedbackMap.get("comments"));
+        contentFeedback.setStageId(feedbackMap.get("stageId"));
 
-        GenieResponse response = genieService.getContentFeedbackService().sendFeedback(contentFeedback, feedbackMap.get("stageId"));
+        GenieResponse response = genieService.getContentFeedbackService().sendFeedback(contentFeedback);
 
         if (response != null && response.getStatus()) {
             return uri;

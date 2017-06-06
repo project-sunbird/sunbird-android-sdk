@@ -12,10 +12,12 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
+import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
+import org.ekstep.genieservices.commons.bean.ContentDeleteCriteria;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
@@ -101,7 +103,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         if (content.isAvailableLocally()) {
             String uid = ContentHandler.getCurrentUserId(userService);
-            content.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, content.getIdentifier(), uid));
+            ContentFeedbackCriteria.Builder builder = new ContentFeedbackCriteria.Builder(uid, content.getIdentifier());
+            content.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, builder.build()));
             content.setContentAccess(ContentHandler.getContentAccess(userService, content.getIdentifier(), uid));
         }
 
@@ -124,7 +127,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             Content c = ContentHandler.convertContentModelToBean(contentModel);
 
             if (criteria.attachFeedback()) {
-                c.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, c.getIdentifier(), criteria.getUid()));
+                ContentFeedbackCriteria.Builder builder = new ContentFeedbackCriteria.Builder(criteria.getUid(), c.getIdentifier());
+                c.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, builder.build()));
             }
             if (criteria.attachContentAccess()) {
                 c.setContentAccess(ContentHandler.getContentAccess(userService, c.getIdentifier(), criteria.getUid()));
@@ -180,12 +184,12 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<Void> deleteContent(String contentIdentifier, int level) {
+    public GenieResponse<Void> deleteContent(ContentDeleteCriteria criteria) {
         GenieResponse<Void> response;
-        ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), contentIdentifier);
+        ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), criteria.getContentId());
 
         if (contentModel == null) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, "No content found to delete for identifier = " + contentIdentifier, TAG);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, "No content found to delete for identifier = " + criteria.getContentId(), TAG);
             return response;
         }
 
@@ -197,16 +201,16 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         //delete or update pre-requisites
         if (ContentHandler.hasPreRequisites(contentModel.getLocalData())) {
-            ContentHandler.deleteAllPreRequisites(mAppContext, contentModel, level);
+            ContentHandler.deleteAllPreRequisites(mAppContext, contentModel, criteria.isChildContent());
         }
 
         //delete or update child items
         if (ContentHandler.hasChildren(contentModel.getLocalData())) {
-            ContentHandler.deleteAllChild(mAppContext, contentModel, level);
+            ContentHandler.deleteAllChild(mAppContext, contentModel, criteria.isChildContent());
         }
 
         //delete or update root item
-        ContentHandler.deleteOrUpdateContent(contentModel, false, level);
+        ContentHandler.deleteOrUpdateContent(contentModel, false, criteria.isChildContent());
 
         // TODO: Removing external content code
 //        if (contentModel.isExternalContent()) {
