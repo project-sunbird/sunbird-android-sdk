@@ -5,6 +5,7 @@ import org.ekstep.genieservices.IContentService;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
+import org.ekstep.genieservices.commons.bean.ContentDeleteCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
@@ -115,15 +116,14 @@ public class ContentService {
      * On failing to delete a content, the response will return status as FALSE with the following error code
      * <p>NO_DATA_FOUND
      *
-     * @param contentIdentifier - identifier of a content
-     * @param level
+     * @param contentDeleteCriteria
      * @return
      */
-    public void deleteContent(final String contentIdentifier, final int level, IResponseHandler<Void> responseHandler) {
+    public void deleteContent(final ContentDeleteCriteria contentDeleteCriteria, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
-                return contentService.deleteContent(contentIdentifier, level);
+                return contentService.deleteContent(contentDeleteCriteria);
             }
         });
     }
