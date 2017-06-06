@@ -19,24 +19,6 @@ public class LearnerAssessmentData {
     private Long timestamp;
     private String qdesc;
     private String qtitle;
-    private String pass;
-    private String ver;
-
-    public String getVer() {
-        return ver;
-    }
-
-    public void setVer(String ver) {
-        this.ver = ver;
-    }
-
-    public String getPass() {
-        return pass;
-    }
-
-    public void setPass(String pass) {
-        this.pass = pass;
-    }
 
     public Long getId() {
         return id;
