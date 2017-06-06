@@ -16,7 +16,7 @@ import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.RelatedContentCriteria;
+import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 
@@ -59,8 +59,8 @@ public class RelatedContentUriHandler implements IUriHandler {
 
             GenieResponse genieResponse = null;
             if (contentIdentifiers != null && contentIdentifiers.size() == 1) {
-                RelatedContentCriteria criteria = new RelatedContentCriteria.Builder().contentId(contentIdentifiers.get(0)).build();
-                genieResponse = genieService.getContentService().getRelatedContent(criteria);
+                RelatedContentRequest request = new RelatedContentRequest.Builder().contentId(contentIdentifiers.get(0)).build();
+                genieResponse = genieService.getContentService().getRelatedContent(request);
             } else if (contentIdentifiers != null && contentIdentifiers.size() > 1) {
                 // TODO: 29/5/17 NEED TO DECIDE RESULT MAP KEY FOR NEXT CONTENT
                 Map<String, Object> resultMap = new HashMap<>();

@@ -2,18 +2,19 @@ package org.ekstep.genieservices;
 
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
+import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
+import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
+import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
-import org.ekstep.genieservices.commons.bean.ContentDeleteCriteria;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.RecommendedContentCriteria;
+import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
-import org.ekstep.genieservices.commons.bean.RelatedContentCriteria;
+import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 
-import java.io.File;
 import java.util.List;
 
 /**
@@ -32,10 +33,10 @@ public interface IContentService {
      * On failing to fetch the content details, the response will return status as FALSE with the following error code
      * <p>NO_DATA_FOUND
      *
-     * @param contentIdentifier -  identifier of a content
+     * @param contentDetailsRequest
      * @return
      */
-    GenieResponse<Content> getContentDetails(String contentIdentifier);
+    GenieResponse<Content> getContentDetails(ContentDetailsRequest contentDetailsRequest);
 
     /**
      * This api is used to get all the contents.
@@ -58,19 +59,19 @@ public interface IContentService {
      * On failing to fetch the child content details, the response will return status as FALSE with the following error code
      * <p>NO_DATA_FOUND
      *
-     * @param contentId - identifier of a content
-     * @param levelAndState     - Below are the int flags to be used
-     *                          <p>
-     *                          <p>
-     *                          0 - Downloaded or spine both
-     *                          <p>
-     *                          <p>
-     *                          1 - All descendant downloaded contents
-     *                          <p>
-     *                          <p>
-     *                          2 - All descendant spine contents
-     *                          <p>
-     *                          <p>
+     * @param contentId     - identifier of a content
+     * @param levelAndState - Below are the int flags to be used
+     *                      <p>
+     *                      <p>
+     *                      0 - Downloaded or spine both
+     *                      <p>
+     *                      <p>
+     *                      1 - All descendant downloaded contents
+     *                      <p>
+     *                      <p>
+     *                      2 - All descendant spine contents
+     *                      <p>
+     *                      <p>
      * @return {@link List<Content>}
      */
     GenieResponse<List<Content>> getChildContents(String contentId, int levelAndState);
@@ -85,10 +86,10 @@ public interface IContentService {
      * On failing to delete a content, the response will return status as FALSE with the following error code
      * <p>NO_DATA_FOUND
      *
-     * @param contentDeleteCriteria
+     * @param contentDeleteRequest
      * @return
      */
-    GenieResponse<Void> deleteContent(ContentDeleteCriteria contentDeleteCriteria);
+    GenieResponse<Void> deleteContent(ContentDeleteRequest contentDeleteRequest);
 
     /**
      * @param contentListingCriteria
@@ -125,10 +126,10 @@ public interface IContentService {
      * <p>SERVER_ERROR
      * <p>NETWORK_ERROR
      *
-     * @param recommendedContentCriteria
+     * @param recommendedContentRequest
      * @return
      */
-    GenieResponse<RecommendedContentResult> getRecommendedContent(RecommendedContentCriteria recommendedContentCriteria);
+    GenieResponse<RecommendedContentResult> getRecommendedContent(RecommendedContentRequest recommendedContentRequest);
 
     /**
      * This api is used to get the related contents as similar to the identifier passed.
@@ -142,10 +143,10 @@ public interface IContentService {
      * <p>SERVER_ERROR
      * <p>NETWORK_ERROR
      *
-     * @param relatedContentCriteria
+     * @param relatedContentRequest
      * @return
      */
-    GenieResponse<RelatedContentResult> getRelatedContent(RelatedContentCriteria relatedContentCriteria);
+    GenieResponse<RelatedContentResult> getRelatedContent(RelatedContentRequest relatedContentRequest);
 
     /**
      * This api is used to get all the next {@link List<Content>} based on the hierarchy of {@link List<String>} identifiers passed
@@ -159,7 +160,7 @@ public interface IContentService {
     GenieResponse<List<Content>> nextContent(List<String> contentIdentifiers);
 
     /**
-     * This api is used to import the content from the specified Ecar file path
+     * This api is used to import the content.
      * <p>
      * <p>
      * On successful importing the content, the response will return status as TRUE
@@ -168,22 +169,9 @@ public interface IContentService {
      * On failing to import the content, the response will be with return status as FALSE and wih the following error
      * <p>INVALID_FILE
      *
-     * @param isChildContent    Should be True if importing nested content of any collection/textbook else False.
-     * @param sourceFilePath    Content file path which needs to import.
-     * @param destinationFolder Destination folder where content will import.
+     * @param contentImportRequest
      * @return
      */
-    GenieResponse<Void> importContent(boolean isChildContent, String sourceFilePath, File destinationFolder);
+    GenieResponse<Void> importContent(ContentImportRequest contentImportRequest);
 
-    /**
-     * This api is used to download and import the group of contents all specified with identifiers in {@link List<String>}
-     * <p>
-     * todo this doc is yet to be finished as the implementation part is not yet fully done
-     *
-     * @param isChildContent     Should be True if importing nested content of any collection/textbook else False.
-     * @param destinationFolder  Destination folder where content will import.
-     * @param contentIdentifiers List of identifier which needs to import.
-     * @return
-     */
-    GenieResponse<Void> importContent(boolean isChildContent, List<String> contentIdentifiers, File destinationFolder);
 }

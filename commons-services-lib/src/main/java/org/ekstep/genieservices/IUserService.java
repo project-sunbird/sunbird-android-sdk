@@ -1,18 +1,17 @@
 package org.ekstep.genieservices;
 
 import org.ekstep.genieservices.commons.bean.ContentAccess;
-import org.ekstep.genieservices.commons.bean.ContentAccessCriteria;
+import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
+import org.ekstep.genieservices.commons.bean.ContentAccessLearnerState;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.UserSession;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * This is the interface with all the required APIs to perform necessary operations related to Users
  */
-
 public interface IUserService {
 
     /**
@@ -26,8 +25,11 @@ public interface IUserService {
      * @param profile
      * @return {@link GenieResponse<Profile>}
      */
-    public GenieResponse<Profile> createUserProfile(Profile profile);
+    GenieResponse<Profile> createUserProfile(Profile profile);
 
+    /**
+     * @return
+     */
     GenieResponse<List<Profile>> getAllUserProfile();
 
     /**
@@ -42,7 +44,7 @@ public interface IUserService {
      * @param uid
      * @return {@link String}
      */
-    public GenieResponse<Void> deleteUser(String uid);
+    GenieResponse<Void> deleteUser(String uid);
 
     /**
      * This api sets the specific uid passed to it as active current user.
@@ -125,7 +127,11 @@ public interface IUserService {
      * @param criteria
      * @return
      */
-    public GenieResponse<List<ContentAccess>> getAllContentAccess(ContentAccessCriteria criteria);
+    GenieResponse<List<ContentAccess>> getAllContentAccess(ContentAccessFilterCriteria criteria);
 
-    public GenieResponse<Void> setLearnerState(String contentIdentifier, Map<String, Object> learnerState);
+    /**
+     * @param contentAccessLearnerState
+     * @return
+     */
+    GenieResponse<Void> setLearnerState(ContentAccessLearnerState contentAccessLearnerState);
 }

@@ -3,6 +3,7 @@ package org.ekstep.genieservices.async;
 import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.commons.IResponseHandler;
+import org.ekstep.genieservices.commons.bean.ContentAccessLearnerState;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.UserSession;
@@ -45,8 +46,8 @@ public class UserService {
      * <p>On Successful creation of new profile, the response will return status as TRUE and with successful message
      * <p>
      * <p>On failing to get all user profiles, the response will have status as FALSE
-     *
-     t     * @param responseHandler
+     * <p>
+     * t     * @param responseHandler
      */
     public void getAllUserProfile(IResponseHandler<List<Profile>> responseHandler) {
         new AsyncHandler<List<Profile>>(responseHandler).execute(new IPerformable<List<Profile>>() {
@@ -189,6 +190,19 @@ public class UserService {
             @Override
             public GenieResponse<Profile> perform() {
                 return userService.updateUserProfile(profile);
+            }
+        });
+    }
+
+    /**
+     * @param contentAccessLearnerState
+     * @param responseHandler
+     */
+    public void setLearnerState(final ContentAccessLearnerState contentAccessLearnerState, IResponseHandler<Void> responseHandler) {
+        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return userService.setLearnerState(contentAccessLearnerState);
             }
         });
     }

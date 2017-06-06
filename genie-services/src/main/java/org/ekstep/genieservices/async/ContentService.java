@@ -5,18 +5,19 @@ import org.ekstep.genieservices.IContentService;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
-import org.ekstep.genieservices.commons.bean.ContentDeleteCriteria;
+import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
+import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
+import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.RecommendedContentCriteria;
+import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
-import org.ekstep.genieservices.commons.bean.RelatedContentCriteria;
+import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 
-import java.io.File;
 import java.util.List;
 
 /**
@@ -42,14 +43,14 @@ public class ContentService {
      * On failing to fetch the content details, the response will return status as FALSE with the following error code
      * <p>NO_DATA_FOUND
      *
-     * @param contentIdentifier -  identifier of a content
+     * @param contentDetailsRequest
      * @return
      */
-    public void getContentDetails(final String contentIdentifier, IResponseHandler<Content> responseHandler) {
+    public void getContentDetails(final ContentDetailsRequest contentDetailsRequest, IResponseHandler<Content> responseHandler) {
         new AsyncHandler<Content>(responseHandler).execute(new IPerformable<Content>() {
             @Override
             public GenieResponse<Content> perform() {
-                return contentService.getContentDetails(contentIdentifier);
+                return contentService.getContentDetails(contentDetailsRequest);
             }
         });
     }
@@ -116,14 +117,14 @@ public class ContentService {
      * On failing to delete a content, the response will return status as FALSE with the following error code
      * <p>NO_DATA_FOUND
      *
-     * @param contentDeleteCriteria
+     * @param contentDeleteRequest
      * @return
      */
-    public void deleteContent(final ContentDeleteCriteria contentDeleteCriteria, IResponseHandler<Void> responseHandler) {
+    public void deleteContent(final ContentDeleteRequest contentDeleteRequest, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
-                return contentService.deleteContent(contentDeleteCriteria);
+                return contentService.deleteContent(contentDeleteRequest);
             }
         });
     }
@@ -164,14 +165,14 @@ public class ContentService {
      * <p>SERVER_ERROR
      * <p>NETWORK_ERROR
      *
-     * @param recommendedContentCriteria
+     * @param recommendedContentRequest
      * @return
      */
-    public void getRecommendedContent(final RecommendedContentCriteria recommendedContentCriteria, IResponseHandler<RecommendedContentResult> responseHandler) {
+    public void getRecommendedContent(final RecommendedContentRequest recommendedContentRequest, IResponseHandler<RecommendedContentResult> responseHandler) {
         new AsyncHandler<RecommendedContentResult>(responseHandler).execute(new IPerformable<RecommendedContentResult>() {
             @Override
             public GenieResponse<RecommendedContentResult> perform() {
-                return contentService.getRecommendedContent(recommendedContentCriteria);
+                return contentService.getRecommendedContent(recommendedContentRequest);
             }
         });
     }
@@ -189,14 +190,14 @@ public class ContentService {
      * <p>SERVER_ERROR
      * <p>NETWORK_ERROR
      *
-     * @param relatedContentCriteria
+     * @param relatedContentRequest
      * @return
      */
-    public void getRelatedContent(final RelatedContentCriteria relatedContentCriteria, IResponseHandler<RelatedContentResult> responseHandler) {
+    public void getRelatedContent(final RelatedContentRequest relatedContentRequest, IResponseHandler<RelatedContentResult> responseHandler) {
         new AsyncHandler<RelatedContentResult>(responseHandler).execute(new IPerformable<RelatedContentResult>() {
             @Override
             public GenieResponse<RelatedContentResult> perform() {
-                return contentService.getRelatedContent(relatedContentCriteria);
+                return contentService.getRelatedContent(relatedContentRequest);
             }
         });
     }
@@ -229,33 +230,14 @@ public class ContentService {
      * On failing to import the content, the response will be with return status as FALSE and wih the following error
      * <p>INVALID_FILE
      *
-     * @param isChildContent
-     * @param ecarFilePath
+     * @param contentImportRequest
      * @return
      */
-    public void importContent(final boolean isChildContent, final String ecarFilePath, final File destinationFolder, IResponseHandler<Void> responseHandler) {
+    public void importContent(final ContentImportRequest contentImportRequest, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
-                return contentService.importContent(isChildContent, ecarFilePath, destinationFolder);
-            }
-        });
-    }
-
-    /**
-     * This api is used to import the group of contents all specified with identifiers in {@link List<String>}
-     * <p>
-     * todo this doc is yet to be finished as the implementation part is not yet fully done
-     *
-     * @param isChildContent
-     * @param contentIdentifiers
-     * @return
-     */
-    public void importContent(final boolean isChildContent, final List<String> contentIdentifiers, final File destinationFolder, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
-            @Override
-            public GenieResponse<Void> perform() {
-                return contentService.importContent(isChildContent, contentIdentifiers, destinationFolder);
+                return contentService.importContent(contentImportRequest);
             }
         });
     }

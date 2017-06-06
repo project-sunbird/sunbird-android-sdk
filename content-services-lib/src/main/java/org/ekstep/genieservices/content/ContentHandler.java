@@ -9,7 +9,7 @@ import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
-import org.ekstep.genieservices.commons.bean.ContentAccessCriteria;
+import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
@@ -25,8 +25,8 @@ import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.MasterDataValues;
 import org.ekstep.genieservices.commons.bean.PartnerFilter;
 import org.ekstep.genieservices.commons.bean.Profile;
-import org.ekstep.genieservices.commons.bean.RecommendedContentCriteria;
-import org.ekstep.genieservices.commons.bean.RelatedContentCriteria;
+import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
+import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.Section;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.Variant;
@@ -392,10 +392,10 @@ public class ContentHandler {
     }
 
     private static List<ContentAccess> getAllContentAccess(IUserService userService, String uid, String contentIdentifier) {
-        ContentAccessCriteria contentAccessCriteria = new ContentAccessCriteria();
-        contentAccessCriteria.setUid(uid);
-        contentAccessCriteria.setContentIdentifier(contentIdentifier);
-        return userService.getAllContentAccess(contentAccessCriteria).getResult();
+        ContentAccessFilterCriteria.Builder builder = new ContentAccessFilterCriteria.Builder();
+        builder.uid(uid);
+        builder.contentId(contentIdentifier);
+        return userService.getAllContentAccess(builder.build()).getResult();
     }
 
     private static boolean isUpdateAvailable(ContentData serverData, ContentData localData) {
@@ -1021,19 +1021,19 @@ public class ContentHandler {
         return -1;
     }
 
-    public static HashMap<String, Object> getRecommendedContentRequest(RecommendedContentCriteria criteria, String did) {
+    public static HashMap<String, Object> getRecommendedContentRequest(RecommendedContentRequest request, String did) {
         HashMap<String, Object> contextMap = new HashMap<>();
         contextMap.put("did", did);
-        contextMap.put("dlang", criteria.getLanguage());
+        contextMap.put("dlang", request.getLanguage());
 
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("context", contextMap);
-        requestMap.put("limit", criteria.getLimit());
+        requestMap.put("limit", request.getLimit());
 
         return requestMap;
     }
 
-    public static HashMap<String, Object> getRelatedContentRequest(IUserService userService, RelatedContentCriteria criteria, String did) {
+    public static HashMap<String, Object> getRelatedContentRequest(IUserService userService, RelatedContentRequest request, String did) {
         String dlang = "";
         String uid = "";
         if (userService != null) {
@@ -1048,12 +1048,12 @@ public class ContentHandler {
         HashMap<String, Object> contextMap = new HashMap<>();
         contextMap.put("did", did);
         contextMap.put("dlang", dlang);
-        contextMap.put("contentid", criteria.getContentId());
+        contextMap.put("contentid", request.getContentId());
         contextMap.put("uid", uid);
 
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("context", contextMap);
-        requestMap.put("limit", criteria.getLimit());
+        requestMap.put("limit", request.getLimit());
 
         return requestMap;
     }
