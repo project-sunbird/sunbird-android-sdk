@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import org.ekstep.genieresolvers.BaseTask;
 import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 /**
  * Created on 23/5/17.
@@ -52,9 +53,8 @@ public class GetCurrentUserTask extends BaseTask {
     }
 
     private GenieResponse<String> readCursor(Cursor cursor) {
-        Gson gson = new Gson();
         String serverData = cursor.getString(0);
-        GenieResponse<String> response = gson.fromJson(serverData, GenieResponse.class);
+        GenieResponse<String> response = GsonUtil.fromJson(serverData, GenieResponse.class);
         return response;
     }
 

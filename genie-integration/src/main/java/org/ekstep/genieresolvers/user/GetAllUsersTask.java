@@ -58,7 +58,6 @@ public class GetAllUsersTask extends BaseTask {
     }
 
     private GenieResponse<List<Profile>> readCursor(Cursor cursor) {
-        Gson gson = new Gson();
         String serverData = cursor.getString(0);
         Type type = new TypeToken<GenieResponse<List<Profile>>>() {}.getType();
         GenieResponse<List<Profile>> response = GsonUtil.fromJson(serverData,type);

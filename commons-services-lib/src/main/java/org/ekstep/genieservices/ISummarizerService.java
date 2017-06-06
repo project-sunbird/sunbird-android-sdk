@@ -13,7 +13,7 @@ import java.util.Map;
  * shriharsh
  */
 
-public interface ILearnerAssessmentsService {
+public interface ISummarizerService {
 
     GenieResponse<List<LearnerAssessmentSummaryResponse>> getChildSummary(String uid);
 

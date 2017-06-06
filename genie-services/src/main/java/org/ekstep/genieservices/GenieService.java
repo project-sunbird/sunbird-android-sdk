@@ -18,6 +18,7 @@ import org.ekstep.genieservices.content.DownloadQueueListener;
 import org.ekstep.genieservices.content.LanguageServiceImpl;
 import org.ekstep.genieservices.notification.NotificationServiceImpl;
 import org.ekstep.genieservices.partner.PartnerServiceImpl;
+import org.ekstep.genieservices.profile.SummarizerServiceImpl;
 import org.ekstep.genieservices.profile.UserServiceImpl;
 import org.ekstep.genieservices.telemetry.SyncServiceImpl;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
@@ -43,6 +44,7 @@ public class GenieService {
     private IContentService mContentService;
     private ILanguageService mLanguageService;
     private INotificationService mNotificationService;
+    private ISummarizerService mSummarizerService;
 
     private GenieService(AppContext<Context> applicationContext) {
         this.mAppContext = applicationContext;
@@ -130,6 +132,13 @@ public class GenieService {
             mNotificationService = new NotificationServiceImpl(mAppContext);
         }
         return mNotificationService;
+    }
+
+    public ISummarizerService getSummarizerService() {
+        if (mSummarizerService == null) {
+            mSummarizerService = new SummarizerServiceImpl(mAppContext);
+        }
+        return mSummarizerService;
     }
 
     public IKeyValueStore getKeyStore() {

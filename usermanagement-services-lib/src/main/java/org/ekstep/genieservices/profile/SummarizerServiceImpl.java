@@ -1,7 +1,7 @@
 package org.ekstep.genieservices.profile;
 
 import org.ekstep.genieservices.BaseService;
-import org.ekstep.genieservices.ILearnerAssessmentsService;
+import org.ekstep.genieservices.ISummarizerService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
@@ -23,12 +23,12 @@ import java.util.Map;
  * shriharsh
  */
 
-public class LearnerAssessmentsServiceImpl extends BaseService implements ILearnerAssessmentsService {
+public class SummarizerServiceImpl extends BaseService implements ISummarizerService {
 
 
-    private static final String TAG = LearnerAssessmentsServiceImpl.class.getSimpleName();
+    private static final String TAG = SummarizerServiceImpl.class.getSimpleName();
 
-    public LearnerAssessmentsServiceImpl(AppContext appContext) {
+    public SummarizerServiceImpl(AppContext appContext) {
         super(appContext);
     }
 
