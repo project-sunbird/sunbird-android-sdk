@@ -24,6 +24,8 @@ import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.MasterDataValues;
 import org.ekstep.genieservices.commons.bean.PartnerFilter;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.bean.RecommendedContentCriteria;
+import org.ekstep.genieservices.commons.bean.RelatedContentCriteria;
 import org.ekstep.genieservices.commons.bean.Section;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.Variant;
@@ -966,19 +968,19 @@ public class ContentHandler {
         return -1;
     }
 
-    public static HashMap<String, Object> getRecommendedContentRequest(String language, String did) {
+    public static HashMap<String, Object> getRecommendedContentRequest(RecommendedContentCriteria criteria, String did) {
         HashMap<String, Object> contextMap = new HashMap<>();
         contextMap.put("did", did);
-        contextMap.put("dlang", language);
+        contextMap.put("dlang", criteria.getLanguage());
 
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("context", contextMap);
-        requestMap.put("limit", 10);
+        requestMap.put("limit", criteria.getLimit());
 
         return requestMap;
     }
 
-    public static HashMap<String, Object> getRelatedContentRequest(IUserService userService, String contentIdentifier, String did) {
+    public static HashMap<String, Object> getRelatedContentRequest(IUserService userService, RelatedContentCriteria criteria, String did) {
         String dlang = "";
         String uid = "";
         if (userService != null) {
@@ -993,12 +995,12 @@ public class ContentHandler {
         HashMap<String, Object> contextMap = new HashMap<>();
         contextMap.put("did", did);
         contextMap.put("dlang", dlang);
-        contextMap.put("contentid", contentIdentifier);
+        contextMap.put("contentid", criteria.getContentId());
         contextMap.put("uid", uid);
 
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("context", contextMap);
-        requestMap.put("limit", 10);
+        requestMap.put("limit", criteria.getLimit());
 
         return requestMap;
     }
@@ -1008,31 +1010,28 @@ public class ContentHandler {
         return currentTime > ttl;
     }
 
-    public static Map<String, Object> getContentListingRequest(IConfigService configService, Profile profile, String subject, List<PartnerFilter> partnerFilters, String did) {
-        String dlang = "";
-        String uid = "";
-        if (profile != null) {
-            uid = profile.getUid();
-            dlang = profile.getLanguage();
-        }
-
+    public static Map<String, Object> getContentListingRequest(IConfigService configService, ContentListingCriteria contentListingCriteria, String did) {
         HashMap<String, Object> contextMap = new HashMap<>();
+
+        Profile profile = contentListingCriteria.getProfile();
+        if (profile != null) {
+            contextMap.put("uid", profile.getUid());
+            contextMap.put("dlang", profile.getLanguage());
+        }
         contextMap.put("did", did);
-        contextMap.put("dlang", dlang);
         contextMap.put("contentid", "");
-        contextMap.put("uid", uid);
 
         Map<String, Object> filterMap = new HashMap<>();
         filterMap.put("compatibilityLevel", getCompatibilityLevelFilter());
 
         // Add subject filter
-        applyFilter(configService, MasterDataType.SUBJECT, subject, filterMap);
+        applyFilter(configService, MasterDataType.SUBJECT, contentListingCriteria.getSubject(), filterMap);
 
         // Apply profile specific filters
         applyProfileFilter(profile, configService, filterMap);
 
         // Apply partner specific filters
-        applyPartnerFilter(configService, partnerFilters, filterMap);
+        applyPartnerFilter(configService, contentListingCriteria.getPartnerFilters(), filterMap);
 
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("context", contextMap);
@@ -1052,7 +1051,7 @@ public class ContentHandler {
         Long currentTime = DateUtil.getEpochTime();
         expiryTime = ttlInMilliSeconds + currentTime;
 
-        ContentListingModel contentListingModel = ContentListingModel.build(dbSession, contentListingCriteria.getPageIdentifier(), jsonStr, profile, contentListingCriteria.getSubject(), expiryTime);
+        ContentListingModel contentListingModel = ContentListingModel.build(dbSession, contentListingCriteria.getContentListingId(), jsonStr, profile, contentListingCriteria.getSubject(), expiryTime);
         contentListingModel.save();
     }
 
@@ -1070,7 +1069,7 @@ public class ContentHandler {
 
         if (result != null) {
             contentListingResult = new ContentListingResult();
-            contentListingResult.setId(contentListingCriteria.getPageIdentifier());
+            contentListingResult.setId(contentListingCriteria.getContentListingId());
             contentListingResult.setResponseMessageId(responseMessageId);
             if (result.containsKey("page")) {
                 contentListingResult.setSections(getSectionsFromPageMap(dbSession, (Map<String, Object>) result.get("page"), contentListingCriteria));
@@ -1093,13 +1092,13 @@ public class ContentHandler {
             ContentSearchCriteria contentSearchCriteria = null;
             Map<String, Object> searchMap = (Map<String, Object>) sectionMap.get("search");
             if (searchMap != null) {
-                contentSearchCriteria = new ContentSearchCriteria();
+                ContentSearchCriteria.Builder builder = new ContentSearchCriteria.Builder();
                 if (searchMap.containsKey("query")) {
-                    contentSearchCriteria.setQuery((String) searchMap.get("query"));
+                    builder.query((String) searchMap.get("query"));
                 }
 
                 if (searchMap.containsKey("mode")) {
-                    contentSearchCriteria.setMode((String) searchMap.get("mode"));
+                    builder.mode((String) searchMap.get("mode"));
                 }
 
                 if (searchMap.containsKey("sort_by")) {
@@ -1144,11 +1143,13 @@ public class ContentHandler {
                             it.remove();
                         }
 
-                        contentSearchCriteria.setFilters(filters);
-                        contentSearchCriteria.setProfileFilter(contentListingCriteria.isCurrentProfileFilter());
-                        contentSearchCriteria.setPartnerFilters(contentListingCriteria.getPartnerFilters());
+                        builder.applyFilters(filters);
+                        builder.applyCurrentProfile(contentListingCriteria.getProfile() != null);
+                        builder.applyPartnerFilters(contentListingCriteria.getPartnerFilters());
                     }
                 }
+
+                contentSearchCriteria = builder.build();
             }
 
             Section section = new Section();
@@ -1157,6 +1158,8 @@ public class ContentHandler {
             section.setDisplay(GsonUtil.fromMap((Map) sectionMap.get("display"), Display.class));
             section.setContents(convertContentMapListToBeanList(dbSession, contentDataList));
             section.setContentSearchCriteria(contentSearchCriteria);
+
+            sectionList.add(section);
         }
 
         return sectionList;

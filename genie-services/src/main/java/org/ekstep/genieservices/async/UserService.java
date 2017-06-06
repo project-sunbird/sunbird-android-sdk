@@ -46,10 +46,9 @@ public class UserService {
      * <p>
      * <p>On failing to get all user profiles, the response will have status as FALSE
      *
-     * @param profile
-     * @param responseHandler
+     t     * @param responseHandler
      */
-    public void getAllUserProfile(final Profile profile, IResponseHandler<List<Profile>> responseHandler) {
+    public void getAllUserProfile(IResponseHandler<List<Profile>> responseHandler) {
         new AsyncHandler<List<Profile>>(responseHandler).execute(new IPerformable<List<Profile>>() {
             @Override
             public GenieResponse<List<Profile>> perform() {

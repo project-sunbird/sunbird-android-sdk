@@ -9,40 +9,63 @@ import java.util.List;
  */
 public class ContentListingCriteria {
 
-    private String pageIdentifier;
+    private String contentListingId;
     private String subject;
-    private boolean currentProfileFilter;
+    private Profile profile;
     private List<PartnerFilter> partnerFilters;
 
-    public String getPageIdentifier() {
-        return pageIdentifier;
+    private ContentListingCriteria(String contentListingId, String subject, Profile profile, List<PartnerFilter> partnerFilters) {
+        this.contentListingId = contentListingId;
+        this.subject = subject;
+        this.profile = profile;
+        this.partnerFilters = partnerFilters;
     }
 
-    public void setPageIdentifier(String pageIdentifier) {
-        this.pageIdentifier = pageIdentifier;
+    public String getContentListingId() {
+        return contentListingId;
     }
 
     public String getSubject() {
         return subject;
     }
 
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
-    public boolean isCurrentProfileFilter() {
-        return currentProfileFilter;
-    }
-
-    public void setCurrentProfileFilter(boolean currentProfileFilter) {
-        this.currentProfileFilter = currentProfileFilter;
+    public Profile getProfile() {
+        return profile;
     }
 
     public List<PartnerFilter> getPartnerFilters() {
         return partnerFilters;
     }
 
-    public void setPartnerFilters(List<PartnerFilter> partnerFilters) {
-        this.partnerFilters = partnerFilters;
+    public static class Builder {
+
+        private String contentListingId;
+        private String subject;
+        private Profile profile;
+        private List<PartnerFilter> partnerFilters;
+
+        public Builder byId(String contentListingId) {
+            this.contentListingId = contentListingId;
+            return this;
+        }
+
+        public Builder subject(String subject) {
+            this.subject = subject;
+            return this;
+        }
+
+        public Builder profile(Profile profile) {
+            this.profile = profile;
+            return this;
+        }
+
+        public Builder partnerFilters(List<PartnerFilter> partnerFilters) {
+            this.partnerFilters = partnerFilters;
+            return this;
+        }
+
+        public ContentListingCriteria build() {
+            return new ContentListingCriteria(contentListingId, subject, profile, partnerFilters);
+        }
     }
 }

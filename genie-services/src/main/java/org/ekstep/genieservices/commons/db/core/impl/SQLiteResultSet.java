@@ -88,4 +88,9 @@ public class SQLiteResultSet implements IResultSet {
     public byte[] getBlob(int columnIndex) {
         return cursor.getBlob(columnIndex);
     }
+
+    @Override
+    public boolean isAfterLast() {
+        return cursor.isAfterLast();
+    }
 }

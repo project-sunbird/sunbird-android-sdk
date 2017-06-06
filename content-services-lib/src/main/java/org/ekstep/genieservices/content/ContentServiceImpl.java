@@ -19,6 +19,9 @@ import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.bean.RecommendedContentCriteria;
+import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
+import org.ekstep.genieservices.commons.bean.RelatedContentCriteria;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.download.DownloadService;
@@ -217,12 +220,12 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     @Override
     public GenieResponse<ContentListingResult> getContentListing(ContentListingCriteria contentListingCriteria) {
         Profile profile = null;
-        if (contentListingCriteria.isCurrentProfileFilter()) {
+        if (contentListingCriteria.getProfile() == null) {
             profile = ContentHandler.getCurrentProfile(userService);
         }
 
         String jsonStr = null;
-        ContentListingModel contentListingModelInDB = ContentListingModel.find(mAppContext.getDBSession(), contentListingCriteria.getPageIdentifier(), profile, contentListingCriteria.getSubject());
+        ContentListingModel contentListingModelInDB = ContentListingModel.find(mAppContext.getDBSession(), contentListingCriteria.getContentListingId(), profile, contentListingCriteria.getSubject());
         if (contentListingModelInDB != null) {
             if (ContentHandler.dataHasExpired(contentListingModelInDB.getExpiryTime())) {
                 contentListingModelInDB.delete();
@@ -232,8 +235,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         }
 
         if (jsonStr == null) {
-            Map<String, Object> requestMap = ContentHandler.getContentListingRequest(configService, profile, contentListingCriteria.getSubject(), contentListingCriteria.getPartnerFilters(), mAppContext.getDeviceInfo().getDeviceID());
-            ContentListingAPI api = new ContentListingAPI(mAppContext, contentListingCriteria.getPageIdentifier(), requestMap);
+            Map<String, Object> requestMap = ContentHandler.getContentListingRequest(configService, contentListingCriteria, mAppContext.getDeviceInfo().getDeviceID());
+            ContentListingAPI api = new ContentListingAPI(mAppContext, contentListingCriteria.getContentListingId(), requestMap);
             GenieResponse apiResponse = api.post();
             if (apiResponse.getStatus()) {
                 jsonStr = apiResponse.getResult().toString();
@@ -303,13 +306,13 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<ContentSearchResult> getRecommendedContent(String language) {
+    public GenieResponse<RecommendedContentResult> getRecommendedContent(RecommendedContentCriteria criteria) {
 //        HashMap params = new HashMap();
 //        params.put("mode", getNetworkMode());
         String method = "getRecommendedContents@ContentServiceImpl";
 
-        GenieResponse<ContentSearchResult> response;
-        RecommendedContentAPI recommendedContentAPI = new RecommendedContentAPI(mAppContext, ContentHandler.getRecommendedContentRequest(language, mAppContext.getDeviceInfo().getDeviceID()));
+        GenieResponse<RecommendedContentResult> response;
+        RecommendedContentAPI recommendedContentAPI = new RecommendedContentAPI(mAppContext, ContentHandler.getRecommendedContentRequest(criteria, mAppContext.getDeviceInfo().getDeviceID()));
         GenieResponse apiResponse = recommendedContentAPI.post();
         if (apiResponse.getStatus()) {
             String body = apiResponse.getResult().toString();
@@ -329,13 +332,13 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 contentDataList = (List<Map<String, Object>>) result.get("content");
             }
 
-            ContentSearchResult searchResult = new ContentSearchResult();
-            searchResult.setId(id);
-            searchResult.setResponseMessageId(responseMessageId);
-            searchResult.setContents(ContentHandler.convertContentMapListToBeanList(mAppContext.getDBSession(), contentDataList));
+            RecommendedContentResult recommendedContentResult = new RecommendedContentResult();
+            recommendedContentResult.setId(id);
+            recommendedContentResult.setResponseMessageId(responseMessageId);
+            recommendedContentResult.setContents(ContentHandler.convertContentMapListToBeanList(mAppContext.getDBSession(), contentDataList));
 
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-            response.setResult(searchResult);
+            response.setResult(recommendedContentResult);
             return response;
         }
 
@@ -344,7 +347,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<RelatedContentResult> getRelatedContent(String contentIdentifier) {
+    public GenieResponse<RelatedContentResult> getRelatedContent(RelatedContentCriteria criteria) {
         // TODO: 5/18/2017 - Telemetry
 //        HashMap params = new HashMap();
 //        params.put("uid", uid);
@@ -353,7 +356,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 //        String method = "getRelatedContent@ContentServiceImpl";
 
         GenieResponse<RelatedContentResult> response;
-        RelatedContentAPI relatedContentAPI = new RelatedContentAPI(mAppContext, ContentHandler.getRelatedContentRequest(userService, contentIdentifier, mAppContext.getDeviceInfo().getDeviceID()));
+        RelatedContentAPI relatedContentAPI = new RelatedContentAPI(mAppContext, ContentHandler.getRelatedContentRequest(userService, criteria, mAppContext.getDeviceInfo().getDeviceID()));
         GenieResponse apiResponse = relatedContentAPI.post();
         if (apiResponse.getStatus()) {
             String body = apiResponse.getResult().toString();
