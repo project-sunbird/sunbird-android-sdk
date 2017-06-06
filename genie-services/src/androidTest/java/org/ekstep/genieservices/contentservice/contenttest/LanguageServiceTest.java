@@ -15,23 +15,59 @@ import org.junit.runner.RunWith;
  */
 
 @RunWith(AndroidJUnit4.class)
+//TODO check for the requestData from getLanguageSearch()
 public class LanguageServiceTest extends GenieServiceTestBase {
     private final static String TAG = LanguageServiceTest.class.getSimpleName();
 
     @Test
-    public void getLanguageTraversalRule() {
+    public void _1getLanguageTraversalRule() {
         GenieResponse<String> genieResponse = activity.getLanguageTraversalRule("en");
         Assert.assertTrue(genieResponse.getStatus());
         Assert.assertNotNull(genieResponse.getResult());
-        Log.v(TAG, "genieResponse :: " + genieResponse.getStatus());
-        Log.v(TAG, "genieResponse result :: " + genieResponse.getResult());
+        Assert.assertNull(genieResponse.getError());
     }
 
     @Test
-    public void getLanguageSearch() {
+    public void _2getLanguageTraversalRule() {
+        GenieResponse<String> genieResponse = activity.getLanguageTraversalRule("se");
+        Assert.assertTrue(genieResponse.getStatus());
+        Assert.assertNotNull(genieResponse.getResult());
+        Assert.assertNull(genieResponse.getError());
+    }
+
+    @Test
+    public void _3getLanguageTraversalRule() {
         //TODO : check what is the requestData to be passed to getLanguageSearch().
-//        GenieResponse<String> genieResponse = activity.getLanguageSearch();
-//        Log.v(TAG, "genieResponse :: " + genieResponse.getStatus());
+        GenieResponse<String> genieResponse = activity.getLanguageTraversalRule(null);
+        Assert.assertTrue(genieResponse.getStatus());
+        Assert.assertNotNull(genieResponse.getResult());
+        Assert.assertNull(genieResponse.getError());
+    }
+
+    @Test
+    public void _1getLanguageSearch() {
+        GenieResponse<String> genieResponse = activity.getLanguageSearch("stories");
+
+        Log.v(TAG, "getLanguageSearchRequestDataValidation genieResponse :: " + genieResponse.getStatus());
+        Log.v(TAG, "getLanguageSearchRequestDataValidation genieResponse result:: " + genieResponse.getResult());
+    }
+
+    @Test
+    public void _2getLanguageSearch() {
+        GenieResponse<String> genieResponse = activity.getLanguageSearch(null);
+        Assert.assertFalse(genieResponse.getStatus());
+
+        Log.v(TAG, "getLanguageSearchRequestDataValidation genieResponse :: " + genieResponse.getStatus());
+        Log.v(TAG, "getLanguageSearchRequestDataValidation genieResponse result:: " + genieResponse.getError());
+        Log.v(TAG, "getLanguageSearchRequestDataValidation genieResponse result:: " + genieResponse.getErrorMessages().get(0));
+    }
+
+    @Test
+    public void _3getLanguageSearch() {
+        GenieResponse<String> genieResponse = activity.getLanguageSearch("");
+
+        Log.v(TAG, "getLanguageSearch genieResponse :: " + genieResponse.getStatus());
+        Log.v(TAG, "getLanguageSearch genieResponse result:: " + genieResponse.getResult());
     }
 
 }

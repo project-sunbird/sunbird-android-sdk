@@ -39,10 +39,8 @@ public class ContentServiceTest extends GenieServiceTestBase {
 
         String ext = FileUtil.getFileExtension(CONTENT_FILEPATH);
 
-        GenieResponse<Void> response = activity.importContent(false, CONTENT_FILEPATH,activity.getExternalFilesDir(null));
-        Log.v(TAG, "genieresponse :: " + response.getStatus() + "errormsg :: " + response.getErrorMessages().get(0));
+        GenieResponse<Void> response = activity.importContent(false, CONTENT_FILEPATH, activity.getExternalFilesDir(null));
 
-        Assert.assertNotNull(response.getResult());
         Assert.assertTrue("true", response.getStatus());
         Assert.assertEquals(ServiceConstants.FileExtension.CONTENT, ext);
 
@@ -99,6 +97,7 @@ public class ContentServiceTest extends GenieServiceTestBase {
         ContentCriteria.Builder contentCriteria = new ContentCriteria.Builder().contentTypes(new ContentType[]{ContentType.COLLECTION});
 
         GenieResponse<List<Content>> genieResponse = activity.getAllLocalContent(contentCriteria.build());
+        Log.e(TAG, "shouldGetAllLocalContent: result :: " + genieResponse.getResult());
         Assert.assertTrue(genieResponse.getStatus());
     }
 

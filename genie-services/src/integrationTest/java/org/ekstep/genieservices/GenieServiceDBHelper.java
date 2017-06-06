@@ -59,7 +59,7 @@ public class GenieServiceDBHelper {
     }
 
     public static ContentModel findContent(String identifier) {
-        Cursor cursor = GenieServiceDBHelper.getDatabase().rawQuery(generateQuery(identifier), null);
+        Cursor cursor = GenieServiceDBHelper.getDatabase().rawQuery(findContentDBEntry(identifier), null);
         List<EventModel> events = new ArrayList<>();
         ContentModel contentModel = ContentModel.build();
         if (cursor != null && cursor.moveToFirst())
@@ -151,7 +151,7 @@ public class GenieServiceDBHelper {
 
     public static String findContentDBEntry(String content_id) {
         Log.e(TAG, "findContentDBEntry");
-        return "SELECT * FROM content where content_id='" + content_id + "'";
+        return "SELECT * FROM content where identifier='" + content_id + "'";
     }
 
     public static void clearContentDBEntry() {
