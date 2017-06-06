@@ -2,6 +2,7 @@ package org.ekstep.genieservices.telemetryservice;
 
 import android.util.Log;
 
+import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -162,7 +163,7 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
     }
 
     @Test
-    public void shouldShowUnsyncedTelemetry() {
+    public void shoulCheckUnsyncedTelemetryData() {
 
         GenieServiceDBHelper.clearTelemetryTableEntry();
 
@@ -180,6 +181,13 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
         Log.v(TAG, "telemetryStatGenieResponse status:: " + telemetryStatGenieResponse.getStatus());
         Log.v(TAG, "telemetryStatGenieResponse getUnSyncedEventCount:: " + telemetryStatGenieResponse.getResult().getUnSyncedEventCount());
         Log.v(TAG, "telemetryStatGenieResponse getLastSyncTime:: " + telemetryStatGenieResponse.getResult().getLastSyncTime());
+
+
+        shouldCheckSyncedTelemetryData(telemetryStatGenieResponse);
+    }
+
+
+    private void shouldCheckSyncedTelemetryData(GenieResponse<TelemetryStat> telemetryStatGenieResponse) {
 
         GenieResponse<SyncStat> syncStatGenieResponse = activity.sync();
 
