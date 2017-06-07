@@ -22,7 +22,7 @@ public interface IUserService {
      * <p>On failing to delete a user, the response will have status as FALSE with the following error:
      * <p>FAILED - createProfile
      *
-     * @param profile
+     * @param profile - {@link Profile}
      * @return {@link GenieResponse<Profile>}
      */
     GenieResponse<Profile> createUserProfile(Profile profile);
@@ -41,7 +41,7 @@ public interface IUserService {
      * <p>On failing to create new profile, the response will have status as FALSE with the following error:
      * <p>FAILED
      *
-     * @param uid
+     * @param uid - {@link String}
      * @return {@link String}
      */
     GenieResponse<Void> deleteUser(String uid);
@@ -55,7 +55,7 @@ public interface IUserService {
      * <p>On failing to set the uid to current user, the response will have status as FALSE with the following error:
      * <p>INVALID_USER
      *
-     * @param uid
+     * @param uid - {@link String}
      * @return {@link String}
      */
     public GenieResponse<Void> setCurrentUser(String uid);
@@ -100,7 +100,7 @@ public interface IUserService {
      * <p>
      * <p>Their would be no failure case with this api, as it would get anonymous user if exists or a new one will be created and set to active user.
      *
-     * @return
+     * @return {@link GenieResponse<String>}
      */
     public GenieResponse<String> setAnonymousUser();
 
@@ -124,12 +124,19 @@ public interface IUserService {
      * <p>
      * <p>Response status always be True, with all the contents access state set in result
      *
-     * @param criteria
-     * @return
+     * @param criteria - {@link ContentAccessFilterCriteria}
+     * @return {@link GenieResponse<List<ContentAccess>>}
      */
     GenieResponse<List<ContentAccess>> getAllContentAccess(ContentAccessFilterCriteria criteria);
 
     /**
+     * This api is used to the set the state of learner.
+     * <p>
+     * <p> On successful setting the learner state, the response will return status as TRUE
+     * <p>
+     * <p> On failing to set the learner state, the response will have status as FALSE with the following error:
+     * <p>PROFILE_NOT_FOUND
+     *
      * @param contentAccessLearnerState
      * @return
      */

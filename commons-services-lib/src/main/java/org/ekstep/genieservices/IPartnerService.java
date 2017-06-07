@@ -31,7 +31,7 @@ public interface IPartnerService {
      * <p>Response status always be True, with result type as Boolean and will return TRUE if the partner is registered
      * or FALSE if the partner is not registered.
      *
-     * @param partnerID
+     * @param partnerID - {@link String}
      * @return {@link GenieResponse<Boolean>}
      */
     GenieResponse<Boolean> isRegistered(String partnerID);
@@ -45,7 +45,7 @@ public interface IPartnerService {
      * <p>On failing to start the session, the response will have status as FALSE with the following error.
      * <p>UNREGISTERED_PARTNER - Session start failed! Partner: <partnerId> </p>
      *
-     * @param partnerData Required to get the related PartnerData to start the session
+     * @param partnerData - {@link PartnerData} - Required to get the related PartnerData to start the session
      * @return {@link GenieResponse<Void>}
      */
     GenieResponse<Void> startPartnerSession(PartnerData partnerData);
@@ -59,7 +59,7 @@ public interface IPartnerService {
      * <p>On failing to start the session, the response will have status as FALSE with the following error.
      * <p>UNREGISTERED_PARTNER - Session start failed! Partner: <partnerId> </p>
      *
-     * @param partnerData Required to get the related PartnerData to start the session
+     * @param partnerData - {@link PartnerData} - Required to get the related PartnerData to start the session
      * @return {@link GenieResponse<Void>}
      */
     GenieResponse<Void> terminatePartnerSession(PartnerData partnerData);
@@ -73,7 +73,7 @@ public interface IPartnerService {
      * <p>UNREGISTERED_PARTNER - Sending data failed! Partner: <partnerId> </p>
      * <p>ENCRYPTION_FAILURE - Encrypting data failed! Partner: <partnerId> </p>
      *
-     * @param partnerData Required to get the related PartnerData to send
+     * @param partnerData - {@link PartnerData} -  Required to get the related PartnerData to send
      * @return {@link GenieResponse<String>}
      */
     GenieResponse<String> sendData(PartnerData partnerData);

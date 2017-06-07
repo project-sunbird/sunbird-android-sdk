@@ -27,7 +27,7 @@ public interface ISummarizerService {
      * <p>PROCESSING_ERROR
      *
      * @param summaryRequest - {@link SummaryRequest}
-     * @return GenieResponse<List<LearnerAssessmentSummary>> - {@link GenieResponse<List<LearnerAssessmentDetails>>}
+     * @return {@link GenieResponse<List<LearnerAssessmentDetails>>}
      */
     GenieResponse<List<LearnerAssessmentSummary>> getSummary(SummaryRequest summaryRequest);
 
@@ -45,7 +45,7 @@ public interface ISummarizerService {
      *
      *
      * @param summaryRequest - {@link SummaryRequest}
-     * @return GenieResponse<List<LearnerAssessmentDetails>> - {@link GenieResponse<List<LearnerAssessmentDetails>>}
+     * @return {@link GenieResponse<List<LearnerAssessmentDetails>>}
      */
     GenieResponse<List<LearnerAssessmentDetails>> getLearnerAssessmentDetails(SummaryRequest summaryRequest);
 

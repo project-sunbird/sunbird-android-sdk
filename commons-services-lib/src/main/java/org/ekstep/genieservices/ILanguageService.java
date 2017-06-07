@@ -21,8 +21,8 @@ public interface ILanguageService {
      * <p>SERVER_ERROR
      * <p>NETWORK_ERROR
      *
-     * @param languageId
-     * @return
+     * @param languageId - {@link String}
+     * @return {@link GenieResponse<String>}
      */
     GenieResponse<String> getLanguageTraversalRule(String languageId);
 
@@ -38,8 +38,8 @@ public interface ILanguageService {
      * <p>SERVER_ERROR
      * <p>NETWORK_ERROR
      *
-     * @param requestData
-     * @return
+     * @param requestData - {@link String}
+     * @return {@link GenieResponse<String>}
      */
     GenieResponse<String> getLanguageSearch(String requestData);
 }

@@ -22,7 +22,7 @@ public interface IConfigService {
      * On failing to fetch the data, the response will return status as FALSE with the following error.
      * <p>NO_DATA_FOUND
      *
-     * @return {@link List<MasterData>}
+     * @return {@link GenieResponse<List<MasterData>>}
      */
     GenieResponse<List<MasterData>> getAllMasterData();
 
@@ -37,8 +37,8 @@ public interface IConfigService {
      * On failing to fetch the data, the response will return status as FALSE with the following error.
      * <p>NO_DATA_FOUND
      *
-     * @param type
-     * @return {@link MasterData}
+     * @param type - {@link MasterDataType}
+     * @return {@link GenieResponse<MasterData>}
      */
     GenieResponse<MasterData> getMasterData(MasterDataType type);
 
@@ -53,8 +53,8 @@ public interface IConfigService {
      * On failing to fetch the data, the response will return status as FALSE with the following error.
      * <p>NO_DATA_FOUND
      *
-     * @param languageIdentifier
-     * @return {@link Map<String,Object>}
+     * @param languageIdentifier - {@link String}
+     * @return {@link GenieResponse<Map<String, Object>>}
      */
     GenieResponse<Map<String, Object>> getResourceBundle(String languageIdentifier);
 
@@ -68,7 +68,7 @@ public interface IConfigService {
      * On failing to fetch the data, the response will return status as FALSE with the following error.
      * <p>NO_DATA_FOUND
      *
-     * @return
+     * @return {@link GenieResponse<Map<String, Object>>}
      */
     GenieResponse<Map<String, Object>> getOrdinals();
 }

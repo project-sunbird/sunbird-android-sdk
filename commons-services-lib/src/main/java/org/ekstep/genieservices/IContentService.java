@@ -33,8 +33,8 @@ public interface IContentService {
      * On failing to fetch the content details, the response will return status as FALSE with the following error code
      * <p>NO_DATA_FOUND
      *
-     * @param contentDetailsRequest
-     * @return
+     * @param contentDetailsRequest - {@link ContentDetailsRequest}
+     * @return {@link GenieResponse<Content>}
      */
     GenieResponse<Content> getContentDetails(ContentDetailsRequest contentDetailsRequest);
 
@@ -44,8 +44,8 @@ public interface IContentService {
      * <p>
      * Response status will always be TRUE with {@link List<Content>} set in the result.
      *
-     * @param criteria
-     * @return
+     * @param criteria - {@link ContentCriteria}
+     * @return {@link GenieResponse<List<Content>>}
      */
     GenieResponse<List<Content>> getAllLocalContent(ContentCriteria criteria);
 
@@ -59,8 +59,8 @@ public interface IContentService {
      * On failing to fetch the child content details, the response will return status as FALSE with the following error code
      * <p>NO_DATA_FOUND
      *
-     * @param contentId     - identifier of a content
-     * @param levelAndState - Below are the int flags to be used
+     * @param contentId     - {@link String} - identifier of a content
+     * @param levelAndState - {@link int} - Below are the int flags to be used
      *                      <p>
      *                      <p>
      *                      0 - Downloaded or spine both
@@ -72,7 +72,7 @@ public interface IContentService {
      *                      2 - All descendant spine contents
      *                      <p>
      *                      <p>
-     * @return {@link List<Content>}
+     * @return {@link GenieResponse<List<Content>>}
      */
     GenieResponse<List<Content>> getChildContents(String contentId, int levelAndState);
 
@@ -86,14 +86,14 @@ public interface IContentService {
      * On failing to delete a content, the response will return status as FALSE with the following error code
      * <p>NO_DATA_FOUND
      *
-     * @param contentDeleteRequest
-     * @return
+     * @param contentDeleteRequest - {@link ContentDeleteRequest}
+     * @return - {@link GenieResponse<Void>}
      */
     GenieResponse<Void> deleteContent(ContentDeleteRequest contentDeleteRequest);
 
     /**
-     * @param contentListingCriteria
-     * @return
+     * @param contentListingCriteria - {@link ContentListingCriteria}
+     * @return {@link GenieResponse<ContentListingResult>}
      */
     GenieResponse<ContentListingResult> getContentListing(ContentListingCriteria contentListingCriteria);
 
@@ -109,8 +109,8 @@ public interface IContentService {
      * <p>SERVER_ERROR
      * <p>NETWORK_ERROR
      *
-     * @param contentSearchCriteria
-     * @return
+     * @param contentSearchCriteria - {@link ContentSearchCriteria}
+     * @return {@link GenieResponse<ContentSearchResult>}
      */
     GenieResponse<ContentSearchResult> searchContent(ContentSearchCriteria contentSearchCriteria);
 
@@ -126,8 +126,8 @@ public interface IContentService {
      * <p>SERVER_ERROR
      * <p>NETWORK_ERROR
      *
-     * @param recommendedContentRequest
-     * @return
+     * @param recommendedContentRequest - {@link RecommendedContentRequest}
+     * @return {@link GenieResponse<RecommendedContentResult>}
      */
     GenieResponse<RecommendedContentResult> getRecommendedContent(RecommendedContentRequest recommendedContentRequest);
 
@@ -143,8 +143,8 @@ public interface IContentService {
      * <p>SERVER_ERROR
      * <p>NETWORK_ERROR
      *
-     * @param relatedContentRequest
-     * @return
+     * @param relatedContentRequest - {@link RelatedContentResult}
+     * @return - {@link GenieResponse<RelatedContentResult>}
      */
     GenieResponse<RelatedContentResult> getRelatedContent(RelatedContentRequest relatedContentRequest);
 
@@ -154,8 +154,8 @@ public interface IContentService {
      * <p>
      * On successful finding the next list of contents, the response will return status as TRUE and the result will be set with {@link List<Content>}
      *
-     * @param contentIdentifiers
-     * @return
+     * @param contentIdentifiers - {@link List<String>}
+     * @return - {@link GenieResponse<List<Content>>}
      */
     GenieResponse<List<Content>> nextContent(List<String> contentIdentifiers);
 
@@ -169,8 +169,8 @@ public interface IContentService {
      * On failing to import the content, the response will be with return status as FALSE and wih the following error
      * <p>INVALID_FILE
      *
-     * @param contentImportRequest
-     * @return
+     * @param contentImportRequest - {@link ContentImportRequest}
+     * @return - {@link GenieResponse<Void>}
      */
     GenieResponse<Void> importContent(ContentImportRequest contentImportRequest);
 

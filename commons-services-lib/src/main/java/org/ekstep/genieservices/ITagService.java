@@ -21,7 +21,7 @@ public interface ITagService {
      * <p>VALIDATION_ERROR
      *
      * @param tag - {@link Tag} should be passes as parameter
-     * @return
+     * @return {@link GenieResponse<Void>}
      */
     GenieResponse<Void> setTag(Tag tag);
 
@@ -30,7 +30,7 @@ public interface ITagService {
      * <p><p>
      * Response will always have the status set to TRUE and the {@link List<Tag>} will be set in result.
      *
-     * @return
+     * @return {@link GenieResponse<List<Tag>>}
      */
     GenieResponse<List<Tag>> getTags();
 
@@ -42,8 +42,8 @@ public interface ITagService {
      * On failing to delete the tag, the response will have status set to be FALSE, with the following error
      * <p>VALIDATION_ERROR
      *
-     * @param name
-     * @return
+     * @param name - {@link String}
+     * @return {@link GenieResponse<Void>}
      */
     GenieResponse<Void> deleteTag(String name);
 
@@ -55,8 +55,8 @@ public interface ITagService {
      * On failing to update the tag, the response will have status set to be FALSE, with the following error
      * <p>VALIDATION_ERROR
      *
-     * @param tag
-     * @return
+     * @param tag - {@link Tag}
+     * @return {@link GenieResponse<Void>}
      */
     GenieResponse<Void> updateTag(Tag tag);
 }
