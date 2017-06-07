@@ -9,7 +9,7 @@ import com.google.gson.reflect.TypeToken;
 import org.ekstep.genieresolvers.BaseTask;
 import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.LearnerAssessmentData;
+import org.ekstep.genieservices.commons.bean.LearnerAssessmentDetails;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 import java.lang.reflect.Type;
@@ -48,8 +48,8 @@ class LearnerAssessmentTask extends BaseTask {
         return genieResponse;
     }
 
-    private GenieResponse<List<LearnerAssessmentData>> getResponse(Cursor cursor) {
-        GenieResponse<List<LearnerAssessmentData>> response = null;
+    private GenieResponse<List<LearnerAssessmentDetails>> getResponse(Cursor cursor) {
+        GenieResponse<List<LearnerAssessmentDetails>> response = null;
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 response = readCursor(cursor);
@@ -59,11 +59,11 @@ class LearnerAssessmentTask extends BaseTask {
         return response;
     }
 
-    private GenieResponse<List<LearnerAssessmentData>> readCursor(Cursor cursor) {
+    private GenieResponse<List<LearnerAssessmentDetails>> readCursor(Cursor cursor) {
         String result = cursor.getString(0);
-        Type type = new TypeToken<GenieResponse<List<LearnerAssessmentData>>>() {
+        Type type = new TypeToken<GenieResponse<List<LearnerAssessmentDetails>>>() {
         }.getType();
-        GenieResponse<List<LearnerAssessmentData>> response = GsonUtil.fromJson(result, type);
+        GenieResponse<List<LearnerAssessmentDetails>> response = GsonUtil.fromJson(result, type);
         return response;
     }
 

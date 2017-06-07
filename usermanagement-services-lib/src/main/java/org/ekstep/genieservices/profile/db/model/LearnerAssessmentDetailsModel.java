@@ -1,7 +1,8 @@
 package org.ekstep.genieservices.profile.db.model;
 
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.bean.LearnerAssessmentData;
+import org.ekstep.genieservices.commons.SummaryRequest;
+import org.ekstep.genieservices.commons.bean.LearnerAssessmentDetails;
 import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.IReadable;
@@ -18,7 +19,7 @@ import java.util.Locale;
  * shriharsh
  */
 
-public class LearnerAssessmentsModel implements IReadable, IWritable {
+public class LearnerAssessmentDetailsModel implements IReadable, IWritable {
 
     private Long id;
     private String uid;
@@ -33,50 +34,50 @@ public class LearnerAssessmentsModel implements IReadable, IWritable {
     private String qdesc;
     private String qtitle;
     private IDBSession dbSession;
-    private List<LearnerAssessmentData> mAssessmentList;
+    private List<LearnerAssessmentDetails> mAssessmentList;
     private Long insertId;
 
-    private LearnerAssessmentsModel(String uid, String contentId) {
+    private LearnerAssessmentDetailsModel(String uid, String contentId) {
         this.uid = uid;
         this.contentId = contentId;
     }
 
-    private LearnerAssessmentsModel(LearnerAssessmentData learnerAssessmentData) {
-        this.id = learnerAssessmentData.getId();
-        this.uid = learnerAssessmentData.getUid();
-        this.contentId = learnerAssessmentData.getContentId();
-        this.qid = learnerAssessmentData.getQid();
-        this.qindex = learnerAssessmentData.getQindex();
-        this.correct = learnerAssessmentData.getCorrect();
-        this.score = learnerAssessmentData.getScore();
-        this.timespent = learnerAssessmentData.getTimespent();
-        this.timestamp = learnerAssessmentData.getTimestamp();
-        this.res = learnerAssessmentData.getRes();
-        this.qdesc = learnerAssessmentData.getQdesc();
-        this.qtitle = learnerAssessmentData.getQtitle();
+    private LearnerAssessmentDetailsModel(LearnerAssessmentDetails learnerAssessmentDetails) {
+        this.id = learnerAssessmentDetails.getId();
+        this.uid = learnerAssessmentDetails.getUid();
+        this.contentId = learnerAssessmentDetails.getContentId();
+        this.qid = learnerAssessmentDetails.getQid();
+        this.qindex = learnerAssessmentDetails.getQindex();
+        this.correct = learnerAssessmentDetails.getCorrect();
+        this.score = learnerAssessmentDetails.getScore();
+        this.timespent = learnerAssessmentDetails.getTimespent();
+        this.timestamp = learnerAssessmentDetails.getTimestamp();
+        this.res = learnerAssessmentDetails.getRes();
+        this.qdesc = learnerAssessmentDetails.getQdesc();
+        this.qtitle = learnerAssessmentDetails.getQtitle();
     }
 
-    private LearnerAssessmentsModel(IDBSession dbSession, LearnerAssessmentData learnerAssessmentData) {
-        this(learnerAssessmentData);
+    private LearnerAssessmentDetailsModel(IDBSession dbSession, LearnerAssessmentDetails learnerAssessmentDetails) {
+        this(learnerAssessmentDetails);
         this.dbSession = dbSession;
     }
 
-    public static LearnerAssessmentsModel build(IDBSession dbSession, LearnerAssessmentData learnerAssessmentData) {
-        return new LearnerAssessmentsModel(dbSession, learnerAssessmentData);
+    public static LearnerAssessmentDetailsModel build(IDBSession dbSession, LearnerAssessmentDetails learnerAssessmentDetails) {
+        return new LearnerAssessmentDetailsModel(dbSession, learnerAssessmentDetails);
     }
 
-    public static LearnerAssessmentsModel findAllAssessments(IDBSession dbSession) {
-        LearnerAssessmentsModel learnerAssessmentsModel = new LearnerAssessmentsModel(null);
-        dbSession.read(learnerAssessmentsModel);
+    public static LearnerAssessmentDetailsModel findAllAssessments(IDBSession dbSession) {
+        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = new LearnerAssessmentDetailsModel(null);
+        dbSession.read(learnerAssessmentDetailsModel);
 
-        return learnerAssessmentsModel;
+        return learnerAssessmentDetailsModel;
     }
 
-    public static LearnerAssessmentsModel findAssessmentById(IDBSession dbSession, String uid, String contentId) {
-        LearnerAssessmentsModel learnerAssessmentsModel = new LearnerAssessmentsModel(uid, contentId);
-        dbSession.read(learnerAssessmentsModel);
+    public static LearnerAssessmentDetailsModel findAssessmentByRequest(IDBSession dbSession, SummaryRequest summaryRequest) {
+        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = new LearnerAssessmentDetailsModel(summaryRequest.getUid(), summaryRequest.getContentId());
+        dbSession.read(learnerAssessmentDetailsModel);
 
-        return learnerAssessmentsModel;
+        return learnerAssessmentDetailsModel;
     }
 
     @Override
@@ -85,61 +86,61 @@ public class LearnerAssessmentsModel implements IReadable, IWritable {
             mAssessmentList = new ArrayList<>();
 
             do {
-                LearnerAssessmentData learnerAssessmentData = getLearnerAssessmentData(resultSet);
-                mAssessmentList.add(learnerAssessmentData);
+                LearnerAssessmentDetails learnerAssessmentDetails = getLearnerAssessmentData(resultSet);
+                mAssessmentList.add(learnerAssessmentDetails);
             } while (resultSet.moveToNext());
         }
 
         return this;
     }
 
-    private LearnerAssessmentData getLearnerAssessmentData(IResultSet cursor) {
-        LearnerAssessmentData learnerAssessmentData = new LearnerAssessmentData();
+    private LearnerAssessmentDetails getLearnerAssessmentData(IResultSet cursor) {
+        LearnerAssessmentDetails learnerAssessmentDetails = new LearnerAssessmentDetails();
 
-        learnerAssessmentData.setUid(cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_UID)));
+        learnerAssessmentDetails.setUid(cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_UID)));
 
         if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID) != -1) {
-            learnerAssessmentData.setContentId(cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID)));
+            learnerAssessmentDetails.setContentId(cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID)));
         }
 
         if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_QID) != -1) {
-            learnerAssessmentData.setQid(cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_QID)));
+            learnerAssessmentDetails.setQid(cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_QID)));
         }
 
         if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_QINDEX) != -1) {
-            learnerAssessmentData.setQindex(cursor.getDouble(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID)));
+            learnerAssessmentDetails.setQindex(cursor.getDouble(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID)));
         }
 
         if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_CORRECT) != -1) {
-            learnerAssessmentData.setCorrect(cursor.getInt(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_CORRECT)));
+            learnerAssessmentDetails.setCorrect(cursor.getInt(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_CORRECT)));
         }
 
         if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_SCORE) != -1) {
-            learnerAssessmentData.setScore(cursor.getDouble(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_SCORE)));
+            learnerAssessmentDetails.setScore(cursor.getDouble(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_SCORE)));
         }
 
         if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_TIME_SPENT) != -1) {
-            learnerAssessmentData.setTimespent(cursor.getDouble(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_TIME_SPENT)));
+            learnerAssessmentDetails.setTimespent(cursor.getDouble(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_TIME_SPENT)));
         }
 
         if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_RES) != -1) {
-            learnerAssessmentData.setRes(cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_RES)));
+            learnerAssessmentDetails.setRes(cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_RES)));
         }
 
         if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_TIMESTAMP) != -1) {
-            learnerAssessmentData.setTimestamp(cursor.getLong(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_TIMESTAMP)));
+            learnerAssessmentDetails.setTimestamp(cursor.getLong(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_TIMESTAMP)));
         }
 
         if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_QDESC) != -1) {
-            learnerAssessmentData.setQdesc(cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_QDESC)));
+            learnerAssessmentDetails.setQdesc(cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_QDESC)));
         }
 
         if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_QTITLE) != -1) {
-            learnerAssessmentData.setQtitle(cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_QTITLE)));
+            learnerAssessmentDetails.setQtitle(cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_QTITLE)));
         }
 
 
-        return learnerAssessmentData;
+        return learnerAssessmentDetails;
     }
 
     @Override
@@ -199,7 +200,7 @@ public class LearnerAssessmentsModel implements IReadable, IWritable {
         dbSession.create(this);
     }
 
-    public List<LearnerAssessmentData> getAllAssesments() {
+    public List<LearnerAssessmentDetails> getAllAssesments() {
         if (mAssessmentList == null) {
             mAssessmentList = new ArrayList<>();
         }
