@@ -7,20 +7,20 @@ import org.ekstep.genieservices.commons.utils.GsonUtil;
  *
  * @author anil
  */
-public class RecommendedContentCriteria {
+public class RelatedContentRequest {
 
     private static final int DEFAULT_LIMIT = 10;
 
-    private String language;
+    private String contentId;
     private long limit;
 
-    private RecommendedContentCriteria(String language, long limit) {
-        this.language = language;
+    private RelatedContentRequest(String contentId, long limit) {
+        this.contentId = contentId;
         this.limit = limit;
     }
 
-    public String getLanguage() {
-        return language;
+    public String getContentId() {
+        return contentId;
     }
 
     public long getLimit() {
@@ -34,15 +34,15 @@ public class RecommendedContentCriteria {
 
     public static class Builder {
 
-        private String language;
+        private String contentId;
         private long limit;
 
         public Builder() {
             this.limit = DEFAULT_LIMIT;
         }
 
-        public Builder language(String language) {
-            this.language = language;
+        public Builder contentId(String contentId) {
+            this.contentId = contentId;
             return this;
         }
 
@@ -51,8 +51,8 @@ public class RecommendedContentCriteria {
             return this;
         }
 
-        public RecommendedContentCriteria build() {
-            return new RecommendedContentCriteria(language, limit);
+        public RelatedContentRequest build() {
+            return new RelatedContentRequest(contentId, limit);
         }
     }
 }

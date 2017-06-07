@@ -5,12 +5,12 @@ package org.ekstep.genieservices.commons.bean;
  *
  * @author anil
  */
-public class ContentDeleteCriteria {
+public class ContentDeleteRequest {
 
     private String contentId;
     private boolean isChildContent;
 
-    private ContentDeleteCriteria(String contentId, boolean isChildContent) {
+    private ContentDeleteRequest(String contentId, boolean isChildContent) {
         this.contentId = contentId;
         this.isChildContent = isChildContent;
     }
@@ -42,8 +42,8 @@ public class ContentDeleteCriteria {
             return this;
         }
 
-        public ContentDeleteCriteria build() {
-            return new ContentDeleteCriteria(contentId, isChildContent);
+        public ContentDeleteRequest build() {
+            return new ContentDeleteRequest(contentId, isChildContent);
         }
     }
 }

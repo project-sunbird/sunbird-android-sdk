@@ -9,12 +9,9 @@ import com.google.gson.Gson;
 import org.ekstep.genieresolvers.BaseTask;
 import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.utils.GsonUtil;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class GetContentTask extends BaseTask {
+    private static final String TAG = GetContentsTask.class.getSimpleName();
     private String contentId;
     private String appQualifier;
 
@@ -33,8 +30,7 @@ public class GetContentTask extends BaseTask {
     protected GenieResponse execute() {
         Cursor cursor = contentResolver.query(getUri(), null, null, new String[]{contentId}, "");
         if (cursor == null || cursor.getCount() == 0) {
-            String logMessage = String.format("No response for content id:%s", contentId);
-            return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), logMessage);
+            return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), TAG);
         }
         GenieResponse genieResponse = getResponse(cursor);
         return genieResponse;

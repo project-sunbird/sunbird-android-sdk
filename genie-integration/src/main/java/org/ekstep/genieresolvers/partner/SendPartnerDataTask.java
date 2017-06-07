@@ -45,7 +45,7 @@ public class SendPartnerDataTask extends BaseTask {
             return getSuccessResponse(Constants.SUCCESSFUL);
         }
 
-        return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), "Unable to send data!");
+        return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), SendPartnerDataTask.class.getSimpleName());
     }
 
     private GenieResponse getResponseFromCursor(Cursor cursor) {

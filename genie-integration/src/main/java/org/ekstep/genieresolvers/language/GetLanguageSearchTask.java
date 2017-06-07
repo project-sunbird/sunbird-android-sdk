@@ -34,9 +34,8 @@ public class GetLanguageSearchTask extends BaseTask {
     protected GenieResponse execute() {
         Cursor cursor = contentResolver.query(getUri(), null, searchRequest, null, "");
         if (cursor == null) {
-            String logMessage = "Couldn't get the language search data";
             return getErrorResponse(Constants.PROCESSING_ERROR,
-                    getErrorMessage(), logMessage);
+                    getErrorMessage(), GetLanguageSearchTask.class.getSimpleName());
         }
         GenieResponse genieResponse = getResponse(cursor);
         return genieResponse;
@@ -62,7 +61,7 @@ public class GetLanguageSearchTask extends BaseTask {
 
     @Override
     protected String getErrorMessage() {
-        return null;
+        return "Couldn't get the language search data";
     }
 
     private Uri getUri() {

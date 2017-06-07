@@ -37,8 +37,7 @@ public class UpdateUserTask extends BaseTask {
         int response = contentResolver.update(getUri(), profileValues, null, null);
 
         if (response != 1) {
-            String logMessage = "Could not update the user!";
-            return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), logMessage);
+            return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), UpdateUserTask.class.getSimpleName());
 
         }
 
@@ -47,7 +46,7 @@ public class UpdateUserTask extends BaseTask {
 
     @Override
     protected String getErrorMessage() {
-        return null;
+        return "Unable to update the user!";
     }
 
 

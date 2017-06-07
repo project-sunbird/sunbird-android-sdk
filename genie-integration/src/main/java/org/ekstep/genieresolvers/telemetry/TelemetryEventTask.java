@@ -34,9 +34,7 @@ public class TelemetryEventTask extends BaseTask {
         event.put(Constants.EVENT, eventString);
         Uri response = contentResolver.insert(getUri(), event);
         if (response == null) {
-            String errorMessage = "Not able to send event";
-            String logMessage = "Empty response(URI) when sending telemetry event";
-            return getErrorResponse(Constants.PROCESSING_ERROR, errorMessage, logMessage);
+            return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), TelemetryEventTask.class.getSimpleName());
         }
 
         return getSuccessResponse(Constants.SUCCESSFUL);
@@ -44,7 +42,7 @@ public class TelemetryEventTask extends BaseTask {
 
     @Override
     protected String getErrorMessage() {
-        return "event not sent";
+        return "Unsuccessful to send event!";
     }
 
     protected ContentValues getContentValues() {

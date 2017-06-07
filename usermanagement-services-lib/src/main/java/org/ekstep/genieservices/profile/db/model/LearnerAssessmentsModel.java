@@ -8,7 +8,6 @@ import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.commons.utils.DateUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +34,7 @@ public class LearnerAssessmentsModel implements IReadable, IWritable {
     private String qtitle;
     private IDBSession dbSession;
     private List<LearnerAssessmentData> mAssessmentList;
-
+    private Long insertId;
 
     private LearnerAssessmentsModel(String uid, String contentId) {
         this.uid = uid;
@@ -43,21 +42,16 @@ public class LearnerAssessmentsModel implements IReadable, IWritable {
     }
 
     private LearnerAssessmentsModel(LearnerAssessmentData learnerAssessmentData) {
+        this.id = learnerAssessmentData.getId();
         this.uid = learnerAssessmentData.getUid();
         this.contentId = learnerAssessmentData.getContentId();
         this.qid = learnerAssessmentData.getQid();
         this.qindex = learnerAssessmentData.getQindex();
-        String pass = learnerAssessmentData.getPass();
-        this.correct = ("Yes".equalsIgnoreCase(pass) ? 1 : 0);
+        this.correct = learnerAssessmentData.getCorrect();
         this.score = learnerAssessmentData.getScore();
         this.timespent = learnerAssessmentData.getTimespent();
-        if ("2.0".equalsIgnoreCase(learnerAssessmentData.getVer())) {
-            this.timestamp = learnerAssessmentData.getTimestamp();
-            this.res = learnerAssessmentData.getRes();
-        } else {
-            this.timestamp = DateUtil.dateToEpoch(Long.toString(learnerAssessmentData.getTimestamp()));
-            this.res = learnerAssessmentData.getRes();
-        }
+        this.timestamp = learnerAssessmentData.getTimestamp();
+        this.res = learnerAssessmentData.getRes();
         this.qdesc = learnerAssessmentData.getQdesc();
         this.qtitle = learnerAssessmentData.getQtitle();
     }
@@ -167,7 +161,7 @@ public class LearnerAssessmentsModel implements IReadable, IWritable {
 
     @Override
     public void updateId(long id) {
-
+        insertId = id;
     }
 
     @Override
@@ -210,5 +204,9 @@ public class LearnerAssessmentsModel implements IReadable, IWritable {
             mAssessmentList = new ArrayList<>();
         }
         return mAssessmentList;
+    }
+
+    public Long getInsertedId() {
+        return insertId;
     }
 }

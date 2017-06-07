@@ -45,7 +45,7 @@ public class StartPartnerSessionTask extends BaseTask {
             return getSuccessResponse(Constants.SUCCESSFUL);
         }
 
-        return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), "Unable to start the session!");
+        return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), StartPartnerSessionTask.class.getSimpleName());
     }
 
 

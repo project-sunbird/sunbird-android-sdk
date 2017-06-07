@@ -118,6 +118,9 @@ public interface ServiceConstants {
 
     interface ErrorMessage {
         String UNABLE_TO_FIND_PROFILE = "unable to find profile";
+        String UNABLE_TO_FIND_CHILD_SUMMARY = "unable to find child summary";
+        String UNABLE_TO_FIND_CONTENT_SUMMARY = "unable to find content summary";
+        String UNABLE_TO_SAVE_LEARNER_ASSESSMENT = "unable to save learner assessment";
         String NO_USER_WITH_SPECIFIED_ID = "There is no user with specified id exists";
 
         String MANDATORY_FIELD_CONTENT_IDENTIFIER = "Content identifier could not be null or empty.";

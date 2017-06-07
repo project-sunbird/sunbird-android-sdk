@@ -15,6 +15,7 @@ public class DateUtil {
     public static final int MILLISECONDS_IN_AN_HOUR = 3600000;
     public static final String DATE_TIME_AM_PM_FORMAT = "dd/MM/yyyy, hh:mma";
     private static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";
+    private static final String ISO_DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SZZZZZ";
     private static final String DATETIME_FORMAT_WITHOUTTIMEZONE = "yyyy-MM-dd'T'HH:mm:ss";
     private static final String DATE_FORMAT = "yyyy-MM-dd";
 
@@ -35,7 +36,7 @@ public class DateUtil {
     }
 
     public static Long getTime(String date) {
-        DateTime dateTime = parse(date, DATETIME_FORMAT_WITHOUTTIMEZONE);
+        DateTime dateTime = DateTime.parse(date);
         return dateTime.getMillis();
     }
 
@@ -43,8 +44,8 @@ public class DateUtil {
         return DateTimeFormat.forPattern(format).print(date.getTime());
     }
 
-    public static String format(long dateTime,String format) {
-        return format(new Date(dateTime),format);
+    public static String format(long dateTime, String format) {
+        return format(new Date(dateTime), format);
     }
 
     public static Integer elapsedTimeTillNow(long time) {

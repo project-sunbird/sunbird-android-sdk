@@ -36,8 +36,7 @@ public class RegisterPartnerTask extends BaseTask {
         partnerValues.put(Constants.PARTNER_DATA, GsonUtil.toJson(partnerData));
         Uri response = contentResolver.insert(getUri(), partnerValues);
         if (response == null) {
-            String logMessage = "Could not register partner!";
-            GenieResponse processing_error = getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), logMessage);
+            GenieResponse processing_error = getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), RegisterPartnerTask.class.getSimpleName());
             return processing_error;
         }
 

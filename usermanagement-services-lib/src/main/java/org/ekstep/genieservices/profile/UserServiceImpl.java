@@ -6,7 +6,8 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
-import org.ekstep.genieservices.commons.bean.ContentAccessCriteria;
+import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
+import org.ekstep.genieservices.commons.bean.ContentAccessLearnerState;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
@@ -394,7 +395,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     }
 
     @Override
-    public GenieResponse<List<ContentAccess>> getAllContentAccess(ContentAccessCriteria criteria) {
+    public GenieResponse<List<ContentAccess>> getAllContentAccess(ContentAccessFilterCriteria criteria) {
 
         String methodName = "getAllContentAccess@UserServiceImpl";
         HashMap params = new HashMap();
@@ -405,8 +406,8 @@ public class UserServiceImpl extends BaseService implements IUserService {
         String isContentType = null;
 
         if (criteria != null) {
-            if (!StringUtil.isNullOrEmpty(criteria.getContentIdentifier())) {
-                isContentIdentifier = String.format(Locale.US, "%s = '%s'", ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER, criteria.getContentIdentifier());
+            if (!StringUtil.isNullOrEmpty(criteria.getContentId())) {
+                isContentIdentifier = String.format(Locale.US, "%s = '%s'", ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER, criteria.getContentId());
             }
 
             if (!StringUtil.isNullOrEmpty(criteria.getUid())) {
@@ -460,12 +461,12 @@ public class UserServiceImpl extends BaseService implements IUserService {
     }
 
     @Override
-    public GenieResponse<Void> setLearnerState(String contentIdentifier, Map<String, Object> learnerState) {
+    public GenieResponse<Void> setLearnerState(ContentAccessLearnerState contentAccessLearnerState) {
 
         String methodName = "setLearnerState@UserServiceImpl";
         HashMap params = new HashMap();
-        params.put("contentIdentifier", contentIdentifier);
-        params.put("learnerState", learnerState);
+        params.put("contentIdentifier", contentAccessLearnerState.getContentId());
+        params.put("learnerState", contentAccessLearnerState.getLearnerState());
         params.put("logLevel", "2");
 
         UserSession userSession = getCurrentUserSession().getResult();
@@ -476,8 +477,9 @@ public class UserServiceImpl extends BaseService implements IUserService {
             return response;
         }
 
-        ContentAccessModel contentAccessModel = ContentAccessModel.build(mAppContext.getDBSession(), uid, contentIdentifier, GsonUtil.toJson(learnerState));
-        ContentAccessModel contentAccessModelInDb = ContentAccessModel.find(mAppContext.getDBSession(), uid, contentIdentifier);
+        ContentAccessModel contentAccessModel = ContentAccessModel.build(mAppContext.getDBSession(),
+                uid, contentAccessLearnerState.getContentId(), GsonUtil.toJson(contentAccessLearnerState.getLearnerState()));
+        ContentAccessModel contentAccessModelInDb = ContentAccessModel.find(mAppContext.getDBSession(), uid, contentAccessLearnerState.getContentId());
         if (contentAccessModelInDb == null) {
             contentAccessModel.setStatus(ContentAccessStatusType.PLAYED.getValue());
             contentAccessModel.save();

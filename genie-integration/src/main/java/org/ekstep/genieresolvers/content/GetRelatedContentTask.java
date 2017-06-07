@@ -39,9 +39,8 @@ public class GetRelatedContentTask extends BaseTask {
         String requestData = GsonUtil.toJson(contentIdentifiers);
         Cursor cursor = contentResolver.query(getUri(), null, requestData, null, null);
         if (cursor == null || cursor.getCount() == 0) {
-            String logMessage = "Couldn't get the related content data.";
             return getErrorResponse(Constants.PROCESSING_ERROR,
-                    getErrorMessage(), logMessage);
+                    getErrorMessage(), GetRelatedContentTask.class.getSimpleName());
         }
         GenieResponse response = getResponse(cursor);
         return response;
@@ -49,7 +48,7 @@ public class GetRelatedContentTask extends BaseTask {
 
     @Override
     protected String getErrorMessage() {
-        return "Related content is not found with the content-id";
+        return "Related content is not found with the content-ids";
     }
 
     private GenieResponse getResponse(Cursor cursor) {

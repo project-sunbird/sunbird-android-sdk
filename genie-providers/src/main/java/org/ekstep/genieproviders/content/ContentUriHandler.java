@@ -12,6 +12,7 @@ import org.ekstep.genieproviders.IUriHandler;
 import org.ekstep.genieproviders.util.Constants;
 import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.utils.Logger;
 
@@ -35,7 +36,9 @@ public class ContentUriHandler implements IUriHandler {
         if (genieService != null && contentIdentifier[0] != null) {
             cursor = getMatrixCursor();
             Logger.i(TAG, "Content Identifier - " + contentIdentifier[0]);
-            GenieResponse genieResponse = genieService.getContentService().getContentDetails(contentIdentifier[0]);
+            ContentDetailsRequest.Builder builder = new ContentDetailsRequest.Builder();
+            builder.contentId(contentIdentifier[0]);
+            GenieResponse genieResponse = genieService.getContentService().getContentDetails(builder.build());
 
             if (genieResponse != null) {
                 cursor.addRow(new String[]{new Gson().toJson(genieResponse)});

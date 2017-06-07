@@ -29,9 +29,8 @@ public class GetTraversalRuleTask extends BaseTask {
     protected GenieResponse execute() {
         Cursor cursor = contentResolver.query(getUri(), null, languageId, null, null);
         if (cursor == null || cursor.getCount() == 0) {
-            String logMessage = "Couldn't get the traversal rules";
            return getErrorResponse(Constants.PROCESSING_ERROR,
-                    getErrorMessage(), logMessage);
+                    getErrorMessage(), GetTraversalRuleTask.class.getSimpleName());
         }
         GenieResponse genieResponse = getResponse(cursor);
         return genieResponse;

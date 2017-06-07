@@ -4,17 +4,15 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
-import com.google.gson.Gson;
-
 import org.ekstep.genieresolvers.BaseTask;
 import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 /**
  * Created on 23/5/17.
  * shriharsh
  */
-
 public class GetCurrentUserTask extends BaseTask {
 
     private String appQualifier;
@@ -33,7 +31,7 @@ public class GetCurrentUserTask extends BaseTask {
     protected GenieResponse execute() {
         Cursor cursor = contentResolver.query(getUri(), null, null, null, null);
         if (cursor == null || cursor.getCount() == 0) {
-            return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), "No Response for current user!");
+            return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), GetCurrentUserTask.class.getSimpleName());
         }
 
         GenieResponse genieResponse = getResponse(cursor);
@@ -52,9 +50,8 @@ public class GetCurrentUserTask extends BaseTask {
     }
 
     private GenieResponse<String> readCursor(Cursor cursor) {
-        Gson gson = new Gson();
         String serverData = cursor.getString(0);
-        GenieResponse<String> response = gson.fromJson(serverData, GenieResponse.class);
+        GenieResponse<String> response = GsonUtil.fromJson(serverData, GenieResponse.class);
         return response;
     }
 

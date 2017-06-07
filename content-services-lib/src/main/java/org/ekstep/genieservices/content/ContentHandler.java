@@ -9,7 +9,7 @@ import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
-import org.ekstep.genieservices.commons.bean.ContentAccessCriteria;
+import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
@@ -25,8 +25,8 @@ import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.MasterDataValues;
 import org.ekstep.genieservices.commons.bean.PartnerFilter;
 import org.ekstep.genieservices.commons.bean.Profile;
-import org.ekstep.genieservices.commons.bean.RecommendedContentCriteria;
-import org.ekstep.genieservices.commons.bean.RelatedContentCriteria;
+import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
+import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.Section;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.Variant;
@@ -318,7 +318,7 @@ public class ContentHandler {
         long contentCreationTime = 0;
         String localLastUpdatedTime = contentModel.getLocalLastUpdatedTime();
         if (!StringUtil.isNullOrEmpty(localLastUpdatedTime)) {
-            contentCreationTime = DateUtil.getTime(localLastUpdatedTime.substring(0, localLastUpdatedTime.lastIndexOf(".")));
+            contentCreationTime = DateUtil.getTime(localLastUpdatedTime);
         }
         content.setLastUpdatedTime(contentCreationTime);
 
@@ -392,10 +392,10 @@ public class ContentHandler {
     }
 
     private static List<ContentAccess> getAllContentAccess(IUserService userService, String uid, String contentIdentifier) {
-        ContentAccessCriteria contentAccessCriteria = new ContentAccessCriteria();
-        contentAccessCriteria.setUid(uid);
-        contentAccessCriteria.setContentIdentifier(contentIdentifier);
-        return userService.getAllContentAccess(contentAccessCriteria).getResult();
+        ContentAccessFilterCriteria.Builder builder = new ContentAccessFilterCriteria.Builder();
+        builder.uid(uid);
+        builder.contentId(contentIdentifier);
+        return userService.getAllContentAccess(builder.build()).getResult();
     }
 
     private static boolean isUpdateAvailable(ContentData serverData, ContentData localData) {
@@ -553,10 +553,10 @@ public class ContentHandler {
 
     public static void deleteAllPreRequisites(AppContext appContext, ContentModel contentModel, boolean isChildContent) {
         List<String> preRequisitesIdentifier = getPreRequisitesIdentifiers(contentModel.getLocalData());
-        ContentsModel contentsModel = ContentsModel.findAllContentsWithIdentifiers(appContext.getDBSession(), preRequisitesIdentifier);
+        List<ContentModel> contentModelListInDB = findAllContentsWithIdentifiers(appContext.getDBSession(), preRequisitesIdentifier);
 
-        if (contentsModel != null) {
-            for (ContentModel c : contentsModel.getContentModelList()) {
+        if (contentModelListInDB != null) {
+            for (ContentModel c : contentModelListInDB) {
                 deleteOrUpdateContent(c, true, isChildContent);
             }
         }
@@ -573,9 +573,9 @@ public class ContentHandler {
 
             if (hasChildren(node.getLocalData())) {
                 List<String> childContentsIdentifiers = getChildContentsIdentifiers(node.getLocalData());
-                ContentsModel contentsModel = ContentsModel.findAllContentsWithIdentifiers(appContext.getDBSession(), childContentsIdentifiers);
-                if (contentsModel != null) {
-                    queue.addAll(contentsModel.getContentModelList());
+                List<ContentModel> contentModelListInDB = findAllContentsWithIdentifiers(appContext.getDBSession(), childContentsIdentifiers);
+                if (contentModelListInDB != null) {
+                    queue.addAll(contentModelListInDB);
                 }
             }
 
@@ -584,6 +584,18 @@ public class ContentHandler {
                 deleteOrUpdateContent(node, true, isChildContent);
             }
         }
+    }
+
+    private static List<ContentModel> findAllContentsWithIdentifiers(IDBSession dbSession, List<String> identifiers) {
+        String filter = String.format(Locale.US, " where %s in ('%s') ", ContentEntry.COLUMN_NAME_IDENTIFIER, StringUtil.join("','", identifiers));
+
+        List<ContentModel> contentModelListInDB = null;
+        ContentsModel contentsModel = ContentsModel.find(dbSession, filter);
+        if (contentsModel != null) {
+            contentModelListInDB = contentsModel.getContentModelList();
+        }
+
+        return contentModelListInDB;
     }
 
     /**
@@ -661,8 +673,8 @@ public class ContentHandler {
             Map contentMetadataMap = (Map) contentData.get(KEY_CONTENT_METADATA);
             if (contentMetadataMap != null) {
                 Map viralityMetadataMap = (Map) contentMetadataMap.get(KEY_VIRALITY_METADATA);
-                Double count = (Double) viralityMetadataMap.get(KEY_TRANSFER_COUNT);
-                return count.intValue();
+                String count = String.valueOf(viralityMetadataMap.get(KEY_TRANSFER_COUNT));
+                return Integer.valueOf(count);
             }
         } catch (NumberFormatException e) {
             e.printStackTrace();
@@ -1021,19 +1033,19 @@ public class ContentHandler {
         return -1;
     }
 
-    public static HashMap<String, Object> getRecommendedContentRequest(RecommendedContentCriteria criteria, String did) {
+    public static HashMap<String, Object> getRecommendedContentRequest(RecommendedContentRequest request, String did) {
         HashMap<String, Object> contextMap = new HashMap<>();
         contextMap.put("did", did);
-        contextMap.put("dlang", criteria.getLanguage());
+        contextMap.put("dlang", request.getLanguage());
 
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("context", contextMap);
-        requestMap.put("limit", criteria.getLimit());
+        requestMap.put("limit", request.getLimit());
 
         return requestMap;
     }
 
-    public static HashMap<String, Object> getRelatedContentRequest(IUserService userService, RelatedContentCriteria criteria, String did) {
+    public static HashMap<String, Object> getRelatedContentRequest(IUserService userService, RelatedContentRequest request, String did) {
         String dlang = "";
         String uid = "";
         if (userService != null) {
@@ -1048,12 +1060,12 @@ public class ContentHandler {
         HashMap<String, Object> contextMap = new HashMap<>();
         contextMap.put("did", did);
         contextMap.put("dlang", dlang);
-        contextMap.put("contentid", criteria.getContentId());
+        contextMap.put("contentid", request.getContentId());
         contextMap.put("uid", uid);
 
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("context", contextMap);
-        requestMap.put("limit", criteria.getLimit());
+        requestMap.put("limit", request.getLimit());
 
         return requestMap;
     }
