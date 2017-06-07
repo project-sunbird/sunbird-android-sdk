@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.ekstep.genieresolvers.BaseTask;
@@ -59,8 +58,9 @@ public class GetAllUsersTask extends BaseTask {
 
     private GenieResponse<List<Profile>> readCursor(Cursor cursor) {
         String serverData = cursor.getString(0);
-        Type type = new TypeToken<GenieResponse<List<Profile>>>() {}.getType();
-        GenieResponse<List<Profile>> response = GsonUtil.fromJson(serverData,type);
+        Type type = new TypeToken<GenieResponse<List<Profile>>>() {
+        }.getType();
+        GenieResponse<List<Profile>> response = GsonUtil.fromJson(serverData, type);
         return response;
     }
 

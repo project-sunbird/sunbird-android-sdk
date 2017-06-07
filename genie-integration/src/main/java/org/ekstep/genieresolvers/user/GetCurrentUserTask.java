@@ -4,8 +4,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
-import com.google.gson.Gson;
-
 import org.ekstep.genieresolvers.BaseTask;
 import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -15,7 +13,6 @@ import org.ekstep.genieservices.commons.utils.GsonUtil;
  * Created on 23/5/17.
  * shriharsh
  */
-
 public class GetCurrentUserTask extends BaseTask {
 
     private String appQualifier;
