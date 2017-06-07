@@ -553,10 +553,10 @@ public class ContentHandler {
 
     public static void deleteAllPreRequisites(AppContext appContext, ContentModel contentModel, boolean isChildContent) {
         List<String> preRequisitesIdentifier = getPreRequisitesIdentifiers(contentModel.getLocalData());
-        ContentsModel contentsModel = ContentsModel.findAllContentsWithIdentifiers(appContext.getDBSession(), preRequisitesIdentifier);
+        List<ContentModel> contentModelListInDB = findAllContentsWithIdentifiers(appContext.getDBSession(), preRequisitesIdentifier);
 
-        if (contentsModel != null) {
-            for (ContentModel c : contentsModel.getContentModelList()) {
+        if (contentModelListInDB != null) {
+            for (ContentModel c : contentModelListInDB) {
                 deleteOrUpdateContent(c, true, isChildContent);
             }
         }
@@ -573,9 +573,9 @@ public class ContentHandler {
 
             if (hasChildren(node.getLocalData())) {
                 List<String> childContentsIdentifiers = getChildContentsIdentifiers(node.getLocalData());
-                ContentsModel contentsModel = ContentsModel.findAllContentsWithIdentifiers(appContext.getDBSession(), childContentsIdentifiers);
-                if (contentsModel != null) {
-                    queue.addAll(contentsModel.getContentModelList());
+                List<ContentModel> contentModelListInDB = findAllContentsWithIdentifiers(appContext.getDBSession(), childContentsIdentifiers);
+                if (contentModelListInDB != null) {
+                    queue.addAll(contentModelListInDB);
                 }
             }
 
@@ -584,6 +584,18 @@ public class ContentHandler {
                 deleteOrUpdateContent(node, true, isChildContent);
             }
         }
+    }
+
+    private static List<ContentModel> findAllContentsWithIdentifiers(IDBSession dbSession, List<String> identifiers) {
+        String filter = String.format(Locale.US, " where %s in ('%s') ", ContentEntry.COLUMN_NAME_IDENTIFIER, StringUtil.join("','", identifiers));
+
+        List<ContentModel> contentModelListInDB = null;
+        ContentsModel contentsModel = ContentsModel.find(dbSession, filter);
+        if (contentsModel != null) {
+            contentModelListInDB = contentsModel.getContentModelList();
+        }
+
+        return contentModelListInDB;
     }
 
     /**
