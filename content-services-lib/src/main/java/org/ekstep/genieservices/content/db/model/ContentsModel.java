@@ -54,7 +54,7 @@ public class ContentsModel implements IReadable {
             contentModelList = new ArrayList<>();
 
             do {
-                ContentModel content = ContentModel.build();
+                ContentModel content = ContentModel.build(mDBSession);
 
                 content.readWithoutMoving(resultSet);
 
