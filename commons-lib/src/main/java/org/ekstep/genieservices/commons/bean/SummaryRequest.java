@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.commons;
+package org.ekstep.genieservices.commons.bean;
 
 /**
  * Created on 7/6/17.
@@ -30,12 +30,12 @@ public class SummaryRequest {
         public Builder() {
         }
 
-        public Builder contentId(String contentId) {
+        public Builder byContent(String contentId) {
             this.contentId = contentId;
             return this;
         }
 
-        public Builder uid(String uid) {
+        public Builder byUser(String uid) {
             this.uid = uid;
             return this;
         }

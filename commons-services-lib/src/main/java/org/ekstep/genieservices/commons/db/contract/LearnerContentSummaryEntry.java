@@ -17,6 +17,7 @@ public abstract class LearnerContentSummaryEntry implements BaseColumns {
     public static final String COLUMN_NAME_SESSIONS = "sessions";
     public static final String COLUMN_NAME_TOTAL_TS = "total_ts";
     public static final String COLUMN_NAME_LAST_UPDATED_ON = "last_updated_on";
+    public static final String COLUMN_NAME_HIERARCHY_DATA = "h_data";
 
     public static final String getCreateEntry() {
         return "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
@@ -27,7 +28,8 @@ public abstract class LearnerContentSummaryEntry implements BaseColumns {
                 COLUMN_NAME_SESSIONS + DbConstants.INT_TYPE + DbConstants.COMMA_SEP +
                 COLUMN_NAME_TOTAL_TS + DbConstants.INT_TYPE + DbConstants.COMMA_SEP +
                 COLUMN_NAME_LAST_UPDATED_ON + DbConstants.INT_TYPE + DbConstants.COMMA_SEP +
-                " UNIQUE (" + COLUMN_NAME_UID + DbConstants.COMMA_SEP + COLUMN_NAME_CONTENT_ID + ") ON CONFLICT REPLACE" +
+                COLUMN_NAME_HIERARCHY_DATA + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
+                " UNIQUE (" + COLUMN_NAME_UID + DbConstants.COMMA_SEP + COLUMN_NAME_CONTENT_ID + COLUMN_NAME_HIERARCHY_DATA + ") ON CONFLICT REPLACE" +
                 " )";
     }
 

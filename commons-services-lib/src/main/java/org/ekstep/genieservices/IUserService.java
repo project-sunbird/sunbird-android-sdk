@@ -5,6 +5,7 @@ import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentAccessLearnerState;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
 import org.ekstep.genieservices.commons.bean.UserSession;
 
 import java.util.List;
@@ -141,4 +142,12 @@ public interface IUserService {
      * @return
      */
     GenieResponse<Void> setLearnerState(ContentAccessLearnerState contentAccessLearnerState);
+
+    /**
+     * This API is used to import profiles.
+     *
+     * @param profileImportRequest
+     * @return
+     */
+    GenieResponse<Void> importProfile(ProfileImportRequest profileImportRequest);
 }

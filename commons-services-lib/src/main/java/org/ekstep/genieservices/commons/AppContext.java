@@ -38,11 +38,7 @@ public abstract class AppContext<C> {
 
     public abstract IDBSession getDBSession();
 
-    public abstract IDBSession getSummarizerDBSession();
-
     public abstract Void setDBSession(IDBSession session);
-
-    public abstract Void setSummarizerDBSession(IDBSession session);
 
     public abstract IKeyValueStore getKeyValueStore();
 

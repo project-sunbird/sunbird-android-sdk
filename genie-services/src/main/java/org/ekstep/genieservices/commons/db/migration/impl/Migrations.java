@@ -30,8 +30,9 @@ public abstract class Migrations {
 
     public static List<Migration> getSummarizerMigrations() {
         List<Migration> migrations = new ArrayList<>();
+        // TODO: 6/7/2017  - Add this migration in getGeServiceMigrations()
         //add migrations here
-        migrations.add(new _01_CreateQDescAndTitleForAssessmentMigration());
+        migrations.add(new _10_SummarizerMigration());
 
         Collections.sort(migrations);
 

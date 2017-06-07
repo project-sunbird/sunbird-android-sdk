@@ -1,9 +1,9 @@
 package org.ekstep.genieservices;
 
-import org.ekstep.genieservices.commons.SummaryRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentDetails;
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentSummary;
+import org.ekstep.genieservices.commons.bean.SummaryRequest;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 
 import java.util.List;

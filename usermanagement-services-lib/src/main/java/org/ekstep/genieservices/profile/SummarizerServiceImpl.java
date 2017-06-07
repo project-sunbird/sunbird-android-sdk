@@ -5,15 +5,15 @@ import org.ekstep.genieservices.ISummarizerService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
-import org.ekstep.genieservices.commons.SummaryRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentDetails;
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentSummary;
+import org.ekstep.genieservices.commons.bean.SummaryRequest;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
-import org.ekstep.genieservices.profile.db.model.LearnerAssessmentSummaryModel;
 import org.ekstep.genieservices.profile.db.model.LearnerAssessmentDetailsModel;
+import org.ekstep.genieservices.profile.db.model.LearnerAssessmentSummaryModel;
 
 import java.util.HashMap;
 import java.util.List;

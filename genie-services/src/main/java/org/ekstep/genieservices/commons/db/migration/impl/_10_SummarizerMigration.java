@@ -5,15 +5,13 @@ import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
 import org.ekstep.genieservices.commons.db.contract.LearnerContentSummaryEntry;
 import org.ekstep.genieservices.commons.db.migration.Migration;
 
-import java.util.List;
-
-public class _01_CreateQDescAndTitleForAssessmentMigration extends Migration {
+public class _10_SummarizerMigration extends Migration {
 
     //DON'T CHANGE THESE VALUES
-    private static final int MIGRATION_NUMBER = 1;
-    private static final int TARGET_DB_VERSION = 2;
+    private static final int MIGRATION_NUMBER = 10;
+    private static final int TARGET_DB_VERSION = 15;
 
-    public _01_CreateQDescAndTitleForAssessmentMigration() {
+    public _10_SummarizerMigration() {
         super(MIGRATION_NUMBER, TARGET_DB_VERSION);
     }
 
@@ -22,11 +20,6 @@ public class _01_CreateQDescAndTitleForAssessmentMigration extends Migration {
         // COPIED FROM BEFORE MIGRATION
         appContext.getDBSession().execute(LearnerAssessmentsEntry.getCreateEntry());
         appContext.getDBSession().execute(LearnerContentSummaryEntry.getCreateEntry());
-
-        List<String> strings = LearnerAssessmentsEntry.getAlterEntryForQDescAndTitle();
-        for (String query : strings) {
-            appContext.getDBSession().execute(query);
-        }
     }
 
 }
