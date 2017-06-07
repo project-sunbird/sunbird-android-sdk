@@ -41,7 +41,7 @@ class LearnerAssessmentTask extends BaseTask {
     protected GenieResponse execute() {
         Cursor cursor = contentResolver.query(getUri(), null, null, new String[]{uid, contentId}, null);
         if (cursor == null || cursor.getCount() == 0) {
-            return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), "No Response for learners assessments!");
+            return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), LearnerAssessmentTask.class.getSimpleName());
         }
 
         GenieResponse genieResponse = getResponse(cursor);

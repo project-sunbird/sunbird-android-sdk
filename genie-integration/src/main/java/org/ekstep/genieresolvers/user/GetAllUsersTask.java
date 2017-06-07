@@ -38,7 +38,7 @@ public class GetAllUsersTask extends BaseTask {
     protected GenieResponse execute() {
         Cursor cursor = contentResolver.query(getUri(), null, null, null, null);
         if (cursor == null || cursor.getCount() == 0) {
-            return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), "No Response for all users!");
+            return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), GetAllUsersTask.class.getSimpleName());
         }
 
         GenieResponse genieResponse = getResponse(cursor);
@@ -66,7 +66,7 @@ public class GetAllUsersTask extends BaseTask {
 
     @Override
     protected String getErrorMessage() {
-        return "Could not find any current user!";
+        return "Unable to fetch all users!";
     }
 
     private Uri getUri() {

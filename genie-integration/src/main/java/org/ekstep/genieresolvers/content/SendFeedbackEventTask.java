@@ -34,9 +34,7 @@ public class SendFeedbackEventTask extends BaseTask {
         event.put("event", feedbackString);
         Uri response = contentResolver.insert(getUri(), event);
         if (response == null) {
-            String errorMessage = "Not able to send event";
-            String logMessage = "Empty response(URI) when sending feedback event";
-            return getErrorResponse(Constants.PROCESSING_ERROR, errorMessage, logMessage);
+            return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), SendFeedbackEventTask.class.getSimpleName());
 
         }
         GenieResponse successResponse = getSuccessResponse(Constants.SUCCESSFUL);

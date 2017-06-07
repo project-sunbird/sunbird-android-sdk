@@ -37,8 +37,7 @@ public class CreateUserTask extends BaseTask {
         profileValues.put(Constants.PROFILE, GsonUtil.toJson(profile));
         Uri response = contentResolver.insert(getUri(), profileValues);
         if (response == null) {
-            String logMessage = "Empty response(URI) when creating Profile";
-            GenieResponse processing_error = getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), logMessage);
+            GenieResponse processing_error = getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), CreateUserTask.class.getSimpleName());
             return processing_error;
 
         }
@@ -47,7 +46,7 @@ public class CreateUserTask extends BaseTask {
 
     @Override
     protected String getErrorMessage() {
-        return "Not able to create profile";
+        return "Unable to create profile";
     }
 
     private Uri getUri() {

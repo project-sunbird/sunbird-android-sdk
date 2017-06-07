@@ -36,8 +36,7 @@ public class GetContentsTask extends BaseTask {
         Cursor cursor = contentResolver.query(getUri(), null, null, null, "");
         if (cursor == null) {
             Log.e(TAG, "execute: cursor is null!");
-            String logMessage = "Couldn't get the content list";
-            return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), logMessage);
+            return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), GetContentsTask.class.getSimpleName());
         }
         GenieResponse genieResponse = getResponse(cursor);
         return genieResponse;

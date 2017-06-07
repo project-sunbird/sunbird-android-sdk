@@ -31,7 +31,7 @@ public class GetCurrentUserTask extends BaseTask {
     protected GenieResponse execute() {
         Cursor cursor = contentResolver.query(getUri(), null, null, null, null);
         if (cursor == null || cursor.getCount() == 0) {
-            return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), "No Response for current user!");
+            return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), GetCurrentUserTask.class.getSimpleName());
         }
 
         GenieResponse genieResponse = getResponse(cursor);

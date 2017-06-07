@@ -32,8 +32,7 @@ public class DeleteUserTask extends BaseTask {
         int response = contentResolver.delete(getUri(), null, new String[]{userId});
 
         if (response != 1) {
-            String logMessage = "Could not delete the user!";
-           return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), logMessage);
+           return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), DeleteUserTask.class.getSimpleName());
         }
 
         return getSuccessResponse(Constants.SUCCESSFUL);
@@ -41,7 +40,7 @@ public class DeleteUserTask extends BaseTask {
 
     @Override
     protected String getErrorMessage() {
-        return null;
+        return "Unable delete the user!";
     }
 
     private Uri getUri() {

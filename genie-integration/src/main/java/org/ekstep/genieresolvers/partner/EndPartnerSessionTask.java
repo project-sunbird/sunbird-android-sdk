@@ -44,7 +44,7 @@ public class EndPartnerSessionTask extends BaseTask {
             return getSuccessResponse(Constants.SUCCESSFUL);
         }
 
-        return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), "Unable to end the session!");
+        return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), EndPartnerSessionTask.class.getSimpleName());
     }
 
 
