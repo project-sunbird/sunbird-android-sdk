@@ -9,10 +9,8 @@ import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.content.ContentConstants;
+import org.ekstep.genieservices.commons.utils.DateUtil;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
 
 import static java.lang.String.valueOf;
@@ -233,14 +231,10 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
     }
 
     private String localLastUpdatedOn() {
-        String lastUpdatedTime = null;
-
         if (localData != null) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat(ContentConstants.ISO_DATE_TIME_PATTERN, Locale.US);
-            lastUpdatedTime = dateFormat.format(new Date());
+            return DateUtil.getCurrentTimestamp();
         }
-
-        return lastUpdatedTime;
+        return null;
     }
 
     public int getRefCount() {

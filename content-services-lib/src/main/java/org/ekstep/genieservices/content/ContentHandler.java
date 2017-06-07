@@ -318,7 +318,7 @@ public class ContentHandler {
         long contentCreationTime = 0;
         String localLastUpdatedTime = contentModel.getLocalLastUpdatedTime();
         if (!StringUtil.isNullOrEmpty(localLastUpdatedTime)) {
-            contentCreationTime = DateUtil.getTime(localLastUpdatedTime.substring(0, localLastUpdatedTime.lastIndexOf(".")));
+            contentCreationTime = DateUtil.getTime(localLastUpdatedTime);
         }
         content.setLastUpdatedTime(contentCreationTime);
 
@@ -673,8 +673,8 @@ public class ContentHandler {
             Map contentMetadataMap = (Map) contentData.get(KEY_CONTENT_METADATA);
             if (contentMetadataMap != null) {
                 Map viralityMetadataMap = (Map) contentMetadataMap.get(KEY_VIRALITY_METADATA);
-                Double count = (Double) viralityMetadataMap.get(KEY_TRANSFER_COUNT);
-                return count.intValue();
+                String count = String.valueOf(viralityMetadataMap.get(KEY_TRANSFER_COUNT));
+                return Integer.valueOf(count);
             }
         } catch (NumberFormatException e) {
             e.printStackTrace();
