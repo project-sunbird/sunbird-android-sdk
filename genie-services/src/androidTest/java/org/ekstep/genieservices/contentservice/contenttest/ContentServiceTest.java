@@ -11,10 +11,12 @@ import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
+import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
+import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.RecommendedContentCriteria;
+import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
-import org.ekstep.genieservices.commons.bean.RelatedContentCriteria;
+import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.utils.FileUtil;
@@ -55,7 +57,9 @@ public class ContentServiceTest extends GenieServiceTestBase {
     public void shouldImportContentHavingNoChild() {
         String ext = FileUtil.getFileExtension(CONTENT_FILEPATH);
 
-        GenieResponse<Void> response = activity.importContent(false, CONTENT_FILEPATH, activity.getExternalFilesDir(null));
+        ContentImportRequest.Builder importRequest = new ContentImportRequest.Builder(false).fromFilePath(CONTENT_FILEPATH).toFolder(activity.getExternalFilesDir(null));
+
+        GenieResponse<Void> response = activity.importContent(importRequest.build());
         Assert.assertTrue("true", response.getStatus());
         Assert.assertNull(response.getError());
         Assert.assertEquals(ServiceConstants.FileExtension.CONTENT, ext);
@@ -75,7 +79,9 @@ public class ContentServiceTest extends GenieServiceTestBase {
 
         String ext = FileUtil.getFileExtension(CONTENT_WITH_CHILD_FILEPATH);
 
-        GenieResponse<Void> genieResponse = activity.importContent(true, CONTENT_WITH_CHILD_FILEPATH, activity.getExternalFilesDir(null));
+        ContentImportRequest.Builder importRequest = new ContentImportRequest.Builder(true).fromFilePath(CONTENT_WITH_CHILD_FILEPATH).toFolder(activity.getExternalFilesDir(null));
+
+        GenieResponse<Void> genieResponse = activity.importContent(importRequest.build());
         Log.v(TAG, "genieresponse :: " + genieResponse.getStatus());
 
         Assert.assertTrue("true", genieResponse.getStatus());
@@ -94,12 +100,17 @@ public class ContentServiceTest extends GenieServiceTestBase {
     @Test
     public void shouldGetContentDetails() {
 
-        GenieResponse<Void> response = activity.importContent(false, CONTENT_FILEPATH, activity.getExternalFilesDir(null));
+        GenieServiceDBHelper.clearContentDBEntry();
+
+        ContentImportRequest.Builder importRequest = new ContentImportRequest.Builder(false).fromFilePath(CONTENT_FILEPATH).toFolder(activity.getExternalFilesDir(null));
+
+        GenieResponse<Void> response = activity.importContent(importRequest.build());
         Assert.assertTrue("true", response.getStatus());
         Assert.assertNull(response.getError());
 
-        GenieResponse<Content> genieResponseDetails = activity.getContentDetails(CONTENT_ID);
+        ContentDetailsRequest.Builder detailsRequest = new ContentDetailsRequest.Builder().contentId(CONTENT_ID);
 
+        GenieResponse<Content> genieResponseDetails = activity.getContentDetails(detailsRequest.build());
         Assert.assertNotNull(genieResponseDetails.getResult());
         Assert.assertTrue(genieResponseDetails.getResult().isAvailableLocally());
         Assert.assertEquals("worksheet", genieResponseDetails.getResult().getContentType());
@@ -115,11 +126,15 @@ public class ContentServiceTest extends GenieServiceTestBase {
     @Test
     public void _1shouldGetAllLocalContent() {
 
-        GenieResponse<Void> response = activity.importContent(true, CONTENT_WITH_CHILD_FILEPATH, activity.getExternalFilesDir(null));
+        ContentImportRequest.Builder importRequest = new ContentImportRequest.Builder(true).fromFilePath(CONTENT_WITH_CHILD_FILEPATH).toFolder(activity.getExternalFilesDir(null));
+
+        GenieResponse<Void> response = activity.importContent(importRequest.build());
         Assert.assertTrue("true", response.getStatus());
         AssertCollection.verifyCollectionEntryAndVisibility(CONTENT_ID_WITH_CHILD, VISIBILITY_DEFAULT);
 
-        GenieResponse<Void> genieResponse = activity.importContent(false, CONTENT_FILEPATH, activity.getExternalFilesDir(null));
+        ContentImportRequest.Builder importRequest1 = new ContentImportRequest.Builder(false).fromFilePath(CONTENT_FILEPATH).toFolder(activity.getExternalFilesDir(null));
+
+        GenieResponse<Void> genieResponse = activity.importContent(importRequest1.build());
         Assert.assertTrue("true", genieResponse.getStatus());
         AssertCollection.verifyContentEntryAndVisibility(CONTENT_ID, VISIBILITY_DEFAULT);
 
@@ -150,9 +165,9 @@ public class ContentServiceTest extends GenieServiceTestBase {
     @Test
     public void shouldGetAllRecommendedContent() {
 
-        RecommendedContentCriteria.Builder contentCriteria = new RecommendedContentCriteria.Builder().language("en");
+        RecommendedContentRequest.Builder contentRequest = new RecommendedContentRequest.Builder().language("en");
 
-        GenieResponse<RecommendedContentResult> genieResponse = activity.getRecommendedContent(contentCriteria.build());
+        GenieResponse<RecommendedContentResult> genieResponse = activity.getRecommendedContent(contentRequest.build());
         Assert.assertNotNull(genieResponse.getResult());
         Assert.assertTrue(genieResponse.getStatus());
         Assert.assertEquals("ekstep.analytics.recommendations", genieResponse.getResult().getId());
@@ -164,9 +179,9 @@ public class ContentServiceTest extends GenieServiceTestBase {
     @Test
     public void shouldGetRelatedContent() {
 
-        RelatedContentCriteria.Builder contentCriteria = new RelatedContentCriteria.Builder().contentId(CONTENT_ID);
+        RelatedContentRequest.Builder contentRequest = new RelatedContentRequest.Builder().contentId(CONTENT_ID);
 
-        GenieResponse<RelatedContentResult> genieResponse = activity.getRelatedContent(contentCriteria.build());
+        GenieResponse<RelatedContentResult> genieResponse = activity.getRelatedContent(contentRequest.build());
         Assert.assertNotNull(genieResponse.getResult());
         Assert.assertTrue(genieResponse.getStatus());
         Assert.assertEquals("ekstep.analytics.recommendations", genieResponse.getResult().getId());

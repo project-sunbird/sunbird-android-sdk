@@ -8,6 +8,7 @@ import junit.framework.Assert;
 
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
+import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.junit.After;
 import org.junit.Before;
@@ -42,7 +43,10 @@ public class ContentImportErrorHandlingTest extends GenieServiceTestBase {
     @Test
     public void importContentFromEcarValidation() {
 
-        GenieResponse<Void> response = activity.importContent(true, "",activity.getExternalFilesDir(null));
+        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder(true)
+                .fromFilePath("").toFolder(activity.getExternalFilesDir(null));
+
+        GenieResponse<Void> response = activity.importContent(contentImportRequest.build());
 
         Assert.assertFalse("false", response.getStatus());
         Assert.assertEquals("INVALID_FILE", response.getError());
@@ -55,7 +59,10 @@ public class ContentImportErrorHandlingTest extends GenieServiceTestBase {
     @Test
     public void shouldNotImportExpiredEcar() {
 
-        GenieResponse<Void> response = activity.importContent(false, EXPIRED_CONTENT_FILEPATH,activity.getExternalFilesDir(null));
+        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder(false)
+                .fromFilePath(EXPIRED_CONTENT_FILEPATH).toFolder(activity.getExternalFilesDir(null));
+
+        GenieResponse<Void> response = activity.importContent(contentImportRequest.build());
 
         Log.v(TAG, "shouldNotImportExpiredEcar getError() :: " + response.getError() + "getErrorMessages()" + response.getErrorMessages().get(0));
 
@@ -67,7 +74,10 @@ public class ContentImportErrorHandlingTest extends GenieServiceTestBase {
     @Test
     public void shouldShowOutdatedEcarError() {
 
-        GenieResponse<Void> response = activity.importContent(false, OUTDATED_CONTENT_FILEPATH,activity.getExternalFilesDir(null));
+        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder(false)
+                .fromFilePath(OUTDATED_CONTENT_FILEPATH).toFolder(activity.getExternalFilesDir(null));
+
+        GenieResponse<Void> response = activity.importContent(contentImportRequest.build());
 
         Assert.assertFalse("false", response.getStatus());
         Assert.assertEquals("INVALID_FILE", response.getError());
@@ -80,11 +90,13 @@ public class ContentImportErrorHandlingTest extends GenieServiceTestBase {
     @Test
     public void shouldShowAlreadyImportedError() {
 
-        GenieResponse<Void> response = activity.importContent(false, FILEPATH,activity.getExternalFilesDir(null));
+        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder(false)
+                .fromFilePath(FILEPATH).toFolder(activity.getExternalFilesDir(null));
+
+        GenieResponse<Void> response = activity.importContent(contentImportRequest.build());
         Assert.assertTrue("true", response.getStatus());
 
-        GenieResponse<Void> genieResponse = activity.importContent(false, FILEPATH,activity.getExternalFilesDir(null));
-
+        GenieResponse<Void> genieResponse = activity.importContent(contentImportRequest.build());
         Assert.assertFalse("false", genieResponse.getStatus());
         Assert.assertEquals("The ECAR file is imported already!!!", genieResponse.getErrorMessages().get(0));
     }
@@ -92,7 +104,10 @@ public class ContentImportErrorHandlingTest extends GenieServiceTestBase {
     @Test
     public void test5ShouldNotImportNoManifestEcar() {
 
-        GenieResponse<Void> response = activity.importContent(false, ECAR_NO_MANIFEST_PATH,activity.getExternalFilesDir(null));
+        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder(false)
+                .fromFilePath(ECAR_NO_MANIFEST_PATH).toFolder(activity.getExternalFilesDir(null));
+
+        GenieResponse<Void> response = activity.importContent(contentImportRequest.build());
 
         Assert.assertFalse("false", response.getStatus());
         Assert.assertEquals("NO_CONTENT_TO_IMPORT", response.getError());

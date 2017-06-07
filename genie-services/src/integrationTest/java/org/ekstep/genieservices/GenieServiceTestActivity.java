@@ -7,9 +7,11 @@ import org.ekstep.genieservices.commons.AndroidAppContext;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
-import org.ekstep.genieservices.commons.bean.ContentDeleteCriteria;
+import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
+import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
 import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
+import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
@@ -18,9 +20,9 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.PartnerData;
 import org.ekstep.genieservices.commons.bean.Profile;
-import org.ekstep.genieservices.commons.bean.RecommendedContentCriteria;
+import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
-import org.ekstep.genieservices.commons.bean.RelatedContentCriteria;
+import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.SyncStat;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
@@ -164,13 +166,13 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
-    public GenieResponse<Void> importContent(boolean hasChildContent, String filepath, File destinationFolder) {
+    public GenieResponse<Void> importContent(ContentImportRequest contentImportRequest) {
         idle = false;
-        GenieResponse genieResponse = mGenieService.getContentService().importContent(hasChildContent, filepath, destinationFolder);
+        GenieResponse genieResponse = mGenieService.getContentService().importContent(contentImportRequest);
         return genieResponse;
     }
 
-    public GenieResponse<Void> deleteContent(ContentDeleteCriteria contentDeleteCriteria) {
+    public GenieResponse<Void> deleteContent(ContentDeleteRequest contentDeleteCriteria) {
         idle = false;
         GenieResponse genieResponse = mGenieService.getContentService().deleteContent(contentDeleteCriteria);
         return genieResponse;
@@ -206,27 +208,21 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
-    public GenieResponse<RecommendedContentResult> getRecommendedContent(RecommendedContentCriteria language) {
+    public GenieResponse<RecommendedContentResult> getRecommendedContent(RecommendedContentRequest recommendedContentRequest) {
         idle = false;
-        GenieResponse<RecommendedContentResult> genieResponse = mGenieService.getContentService().getRecommendedContent(language);
+        GenieResponse<RecommendedContentResult> genieResponse = mGenieService.getContentService().getRecommendedContent(recommendedContentRequest);
         return genieResponse;
     }
 
-    public GenieResponse<Content> getContentDetails(String contentIdentifier) {
+    public GenieResponse<Content> getContentDetails(ContentDetailsRequest contentDetailsRequest) {
         idle = false;
-        GenieResponse genieResponse = mGenieService.getContentService().getContentDetails(contentIdentifier);
+        GenieResponse genieResponse = mGenieService.getContentService().getContentDetails(contentDetailsRequest);
         return genieResponse;
     }
 
-    public GenieResponse<RelatedContentResult> getRelatedContent(RelatedContentCriteria contentIdentifier) {
+    public GenieResponse<RelatedContentResult> getRelatedContent(RelatedContentRequest contentRequest) {
         idle = false;
-        GenieResponse<RelatedContentResult> genieResponse = mGenieService.getContentService().getRelatedContent(contentIdentifier);
-        return genieResponse;
-    }
-
-    public GenieResponse importContent(boolean isChildContent, List<String> contentIdentifiers, File destinationFolder) {
-        idle = false;
-        GenieResponse genieResponse = mGenieService.getContentService().importContent(isChildContent, contentIdentifiers, destinationFolder);
+        GenieResponse<RelatedContentResult> genieResponse = mGenieService.getContentService().getRelatedContent(contentRequest);
         return genieResponse;
     }
 

@@ -8,6 +8,7 @@ import junit.framework.Assert;
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.ServiceConstants;
+import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.junit.After;
@@ -48,7 +49,10 @@ public class CollectionImportWithNChildTest extends GenieServiceTestBase {
 
         String ext = FileUtil.getFileExtension(EMPTY_COLLECTION_FILEPATH);
 
-        GenieResponse<Void> response = activity.importContent(true, EMPTY_COLLECTION_FILEPATH, activity.getExternalFilesDir(null));
+        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder(true)
+                .fromFilePath(EMPTY_COLLECTION_FILEPATH).toFolder(activity.getExternalFilesDir(null));
+
+        GenieResponse<Void> response = activity.importContent(contentImportRequest.build());
 
         Assert.assertTrue("true", response.getStatus());
         Assert.assertEquals(ServiceConstants.FileExtension.CONTENT, ext);
@@ -60,7 +64,11 @@ public class CollectionImportWithNChildTest extends GenieServiceTestBase {
     @Test
     public void shouldImportCollectionWithNChild() {
 
-        GenieResponse<Void> response = activity.importContent(true, CONTENT_WITH_CHILD_FILEPATH, activity.getExternalFilesDir(null));
+        GenieServiceDBHelper.clearContentDBEntry();
+
+        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder(true)
+                .fromFilePath(CONTENT_WITH_CHILD_FILEPATH).toFolder(activity.getExternalFilesDir(null));
+        GenieResponse<Void> response = activity.importContent(contentImportRequest.build());
         Assert.assertTrue("true", response.getStatus());
         AssertCollection.verifyCollectionEntryAndVisibility(CONTENT_ID_WITH_CHILD, VISIBILITY_DEFAULT);
 

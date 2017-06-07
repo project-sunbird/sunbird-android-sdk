@@ -61,7 +61,7 @@ public class GenieServiceDBHelper {
     public static ContentModel findContent(String identifier) {
         Cursor cursor = GenieServiceDBHelper.getDatabase().rawQuery(findContentDBEntry(identifier), null);
         List<EventModel> events = new ArrayList<>();
-        ContentModel contentModel = ContentModel.build();
+        ContentModel contentModel = ContentModel.build(sGSDBHelper.mAppContext.getDBSession());
         if (cursor != null && cursor.moveToFirst())
             do {
 

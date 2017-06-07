@@ -6,6 +6,7 @@ import android.support.test.runner.AndroidJUnit4;
 import junit.framework.Assert;
 
 import org.ekstep.genieservices.GenieServiceTestBase;
+import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,7 +39,10 @@ public class CollectionImportWithOlderChildContent extends GenieServiceTestBase 
 
     private void shouldImportChildContentEcar() {
 
-        GenieResponse<Void> genieResponse = activity.importContent(false, CHILD_CONTENT_FILE_PATH,activity.getExternalFilesDir(null));
+        ContentImportRequest.Builder importRequestBuilder = new ContentImportRequest.Builder(false)
+                .fromFilePath(CHILD_CONTENT_FILE_PATH).toFolder(activity.getExternalFilesDir(null));
+
+        GenieResponse<Void> genieResponse = activity.importContent(importRequestBuilder.build());
         Assert.assertEquals("true", genieResponse.getStatus());
         AssertCollection.verifyContentEntryAndVisibility(AssertCollection.CHILD_CONTENT_ECAR_ID, VISIBILITY_DEFAULT);
 
@@ -47,7 +51,10 @@ public class CollectionImportWithOlderChildContent extends GenieServiceTestBase 
 
     private void shouldImportCollectionEcar() {
 
-        GenieResponse<Void> genieResponse = activity.importContent(true, COLLECTION_FILE_PATH,activity.getExternalFilesDir(null));
+        ContentImportRequest.Builder importRequestBuilder = new ContentImportRequest.Builder(true)
+                .fromFilePath(COLLECTION_FILE_PATH).toFolder(activity.getExternalFilesDir(null));
+
+        GenieResponse<Void> genieResponse = activity.importContent(importRequestBuilder.build());
         Assert.assertEquals("true", genieResponse.getStatus());
         AssertCollection.verifyCollectionEntryAndVisibility(AssertCollection.COLLECTION_ECAR_ID, VISIBILITY_DEFAULT);
         AssertCollection.verifyContentEntryAndVisibility(AssertCollection.CHILD_C4_ID, VISIBILITY_DEFAULT);

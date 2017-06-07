@@ -9,8 +9,10 @@ import junit.framework.Assert;
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.commons.bean.Content;
+import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
 import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
+import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.junit.Test;
@@ -29,9 +31,12 @@ public class ContentFeedbackServiceTest extends GenieServiceTestBase {
     public void shouldSendFeedbackForContent() {
 
         GenieServiceDBHelper.clearContentDBEntry();
+
         String uid = createAndSetProfileForGetFeedback();
 
-        GenieResponse genieResponse = activity.importContent(false, CONTENT_FILEPATH, activity.getExternalFilesDir(null));
+        ContentImportRequest.Builder importRequest = new ContentImportRequest.Builder(false).fromFilePath(CONTENT_FILEPATH).toFolder(activity.getExternalFilesDir(null));
+
+        GenieResponse genieResponse = activity.importContent(importRequest.build());
         Assert.assertTrue("true", genieResponse.getStatus());
 
         ContentFeedback contentFeedback = new ContentFeedback();
@@ -84,7 +89,9 @@ public class ContentFeedbackServiceTest extends GenieServiceTestBase {
      */
     private void shouldAssertFeedbackData(ContentFeedback contentFeedback) {
 
-        GenieResponse<Content> genieResponseDetails = activity.getContentDetails(CONTENT_ID);
+        ContentDetailsRequest.Builder detailsRequest = new ContentDetailsRequest.Builder().contentId(CONTENT_ID);
+
+        GenieResponse<Content> genieResponseDetails = activity.getContentDetails(detailsRequest.build());
 
         Assert.assertTrue("true", genieResponseDetails.getStatus());
         Assert.assertEquals("worksheet", genieResponseDetails.getResult().getContentType());

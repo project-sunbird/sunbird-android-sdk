@@ -8,7 +8,8 @@ import junit.framework.Assert;
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.ServiceConstants;
-import org.ekstep.genieservices.commons.bean.ContentDeleteCriteria;
+import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
+import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.junit.After;
@@ -30,24 +31,16 @@ public class CollectionDeleteWithNChildTest extends GenieServiceTestBase {
     private static final String CONTENT_ID = "do_30019820";
     private static final String COLLECTION_FILE_PATH = Environment.getExternalStorageDirectory().toString() + "/Download/Times_Tables_2_to_10.ecar";
 
-    @Before
-    public void setup() throws IOException {
-        super.setup();
-        activity = rule.getActivity();
-        GenieServiceDBHelper.clearContentDBEntry();
-    }
-
-    @After
-    public void tearDown() throws IOException {
-        super.tearDown();
-    }
-
     @Test
     public void shouldDeleteCollectionWithNChildTest() {
 
+        GenieServiceDBHelper.clearContentDBEntry();
+
         String ext = FileUtil.getFileExtension(COLLECTION_FILE_PATH);
 
-        GenieResponse response = activity.importContent(true, COLLECTION_FILE_PATH, activity.getExternalFilesDir(null));
+        ContentImportRequest.Builder importRequest = new ContentImportRequest.Builder(true).fromFilePath(COLLECTION_FILE_PATH).toFolder(activity.getExternalFilesDir(null));
+
+        GenieResponse response = activity.importContent(importRequest.build());
         Assert.assertTrue("true", response.getStatus());
         Assert.assertEquals(ServiceConstants.FileExtension.CONTENT, ext);
 
@@ -64,7 +57,7 @@ public class CollectionDeleteWithNChildTest extends GenieServiceTestBase {
         AssertCollection.verifyContentEntryAndVisibility(AssertCollection.CHILD_C9_ID, VISIBILITY_PARENT);
         AssertCollection.verifyContentEntryAndVisibility(AssertCollection.CHILD_C10_ID, VISIBILITY_PARENT);
 
-        ContentDeleteCriteria.Builder contentDelete = new ContentDeleteCriteria.Builder(CONTENT_ID, true);
+        ContentDeleteRequest.Builder contentDelete = new ContentDeleteRequest.Builder(CONTENT_ID, false);
 
         GenieResponse genieResponse = activity.deleteContent(contentDelete.build());
         Assert.assertTrue("true", genieResponse.getStatus());
