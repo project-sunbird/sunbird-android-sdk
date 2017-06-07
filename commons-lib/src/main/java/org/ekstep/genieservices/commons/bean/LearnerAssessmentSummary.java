@@ -5,7 +5,7 @@ package org.ekstep.genieservices.commons.bean;
  * shriharsh
  */
 
-public class LearnerAssessmentSummaryResponse {
+public class LearnerAssessmentSummary {
     private String uid;
     private String content_id;
     private int noOfQuestions;

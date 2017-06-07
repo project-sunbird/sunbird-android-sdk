@@ -1,6 +1,6 @@
 package org.ekstep.genieservices.profile.db.model;
 
-import org.ekstep.genieservices.commons.bean.LearnerAssessmentSummaryResponse;
+import org.ekstep.genieservices.commons.bean.LearnerAssessmentSummary;
 import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
@@ -22,7 +22,7 @@ public class LearnerAssessmentSummaryModel implements IReadable {
     private Integer noOfQuestions;
     private Integer correctAnswers;
     private Double totalTimespent;
-    private List<LearnerAssessmentSummaryResponse> assessmentMap;
+    private List<LearnerAssessmentSummary> assessmentMap;
 
     private LearnerAssessmentSummaryModel(IDBSession dbSession) {
         assessmentMap = new ArrayList<>();
@@ -54,31 +54,31 @@ public class LearnerAssessmentSummaryModel implements IReadable {
     public IReadable read(IResultSet cursor) {
         if (cursor != null && cursor.moveToFirst()) {
             do {
-                LearnerAssessmentSummaryResponse learnerAssessmentSummaryResponse = readCursorData(cursor);
-                assessmentMap.add(learnerAssessmentSummaryResponse);
+                LearnerAssessmentSummary learnerAssessmentSummary = readCursorData(cursor);
+                assessmentMap.add(learnerAssessmentSummary);
             } while (cursor.moveToNext());
         }
         return this;
     }
 
-    private LearnerAssessmentSummaryResponse readCursorData(IResultSet cursor) {
-        LearnerAssessmentSummaryResponse learnerAssessmentSummaryResponse = new LearnerAssessmentSummaryResponse();
+    private LearnerAssessmentSummary readCursorData(IResultSet cursor) {
+        LearnerAssessmentSummary learnerAssessmentSummary = new LearnerAssessmentSummary();
         this.uid = cursor.getString(0);
-        learnerAssessmentSummaryResponse.setUid(this.uid);
+        learnerAssessmentSummary.setUid(this.uid);
 
         this.contentId = cursor.getString(1);
-        learnerAssessmentSummaryResponse.setContent_id(this.contentId);
+        learnerAssessmentSummary.setContent_id(this.contentId);
 
         this.noOfQuestions = cursor.getInt(2);
-        learnerAssessmentSummaryResponse.setNoOfQuestions(this.noOfQuestions);
+        learnerAssessmentSummary.setNoOfQuestions(this.noOfQuestions);
 
         this.correctAnswers = cursor.getInt(3);
-        learnerAssessmentSummaryResponse.setCorrectAnswers(this.correctAnswers);
+        learnerAssessmentSummary.setCorrectAnswers(this.correctAnswers);
 
         this.totalTimespent = cursor.getDouble(4);
-        learnerAssessmentSummaryResponse.setTotalTimespent(this.totalTimespent);
+        learnerAssessmentSummary.setTotalTimespent(this.totalTimespent);
 
-        return learnerAssessmentSummaryResponse;
+        return learnerAssessmentSummary;
     }
 
     @Override
@@ -106,7 +106,7 @@ public class LearnerAssessmentSummaryModel implements IReadable {
         return "";
     }
 
-    public List<LearnerAssessmentSummaryResponse> getAssessmentMap() {
+    public List<LearnerAssessmentSummary> getAssessmentMap() {
         if (assessmentMap == null) {
             assessmentMap = new ArrayList<>();
         }

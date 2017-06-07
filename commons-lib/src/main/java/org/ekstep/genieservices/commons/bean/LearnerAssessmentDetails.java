@@ -5,7 +5,7 @@ package org.ekstep.genieservices.commons.bean;
  * shriharsh
  */
 
-public class LearnerAssessmentData {
+public class LearnerAssessmentDetails {
 
     private Long id;
     private String uid;

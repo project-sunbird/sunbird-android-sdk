@@ -28,7 +28,8 @@ public class ContentFeedbackModel implements IWritable, IUpdatable, IReadable {
     private String comments = "";
     private Long createdAt;
 
-    private ContentFeedbackModel() {
+    private ContentFeedbackModel(IDBSession dbSession) {
+        this.mDBSession = dbSession;
     }
 
     private ContentFeedbackModel(IDBSession dbSession, String uid, String contentId) {
@@ -46,12 +47,11 @@ public class ContentFeedbackModel implements IWritable, IUpdatable, IReadable {
 
     public static ContentFeedbackModel build(IDBSession dbSession, String uid, String contentId, String rating, String comments) {
         ContentFeedbackModel contentFeedbackModel = new ContentFeedbackModel(dbSession, uid, contentId, rating, comments);
-
         return contentFeedbackModel;
     }
 
-    public static ContentFeedbackModel build() {
-        return new ContentFeedbackModel();
+    public static ContentFeedbackModel build(IDBSession dbSession) {
+        return new ContentFeedbackModel(dbSession);
     }
 
     public static ContentFeedbackModel find(IDBSession dbSession, String uid, String contentId) {

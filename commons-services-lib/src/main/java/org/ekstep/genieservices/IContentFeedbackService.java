@@ -12,8 +12,8 @@ public interface IContentFeedbackService {
     /**
      * This api is used to save the feedback about content.
      *
-     * @param contentFeedback {@link ContentFeedback}
-     * @return On failing to fetch the data, the response will return status as FALSE with the following error.
+     * @param contentFeedback - {@link ContentFeedback}
+     * @return {@link GenieResponse<Void>} On failing to fetch the data, the response will return status as FALSE with the following error.
      */
     GenieResponse<Void> sendFeedback(ContentFeedback contentFeedback);
 
@@ -24,7 +24,7 @@ public interface IContentFeedbackService {
      * <p>
      * On failing to fetch the data, the response will return status as FALSE with the following error.
      *
-     * @param contentFeedbackCriteria
+     * @param contentFeedbackCriteria - {@link ContentFeedbackCriteria}
      * @return {@link GenieResponse<ContentFeedback>}
      */
     GenieResponse<ContentFeedback> getFeedback(ContentFeedbackCriteria contentFeedbackCriteria);

@@ -29,7 +29,8 @@ public class ContentAccessModel implements IWritable, IReadable, IUpdatable {
     private String learnerStateJson;
     private Long epochTimestamp;
 
-    private ContentAccessModel() {
+    private ContentAccessModel(IDBSession dbSession) {
+        this.mDBSession = dbSession;
     }
 
     private ContentAccessModel(IDBSession dbSession, String uid, String identifier) {
@@ -49,8 +50,8 @@ public class ContentAccessModel implements IWritable, IReadable, IUpdatable {
         this.contentType = contentType;
     }
 
-    public static ContentAccessModel build() {
-        return new ContentAccessModel();
+    public static ContentAccessModel build(IDBSession dbSession) {
+        return new ContentAccessModel(dbSession);
     }
 
     public static ContentAccessModel build(IDBSession dbSession, String uid, String identifier, int status, String contentType) {

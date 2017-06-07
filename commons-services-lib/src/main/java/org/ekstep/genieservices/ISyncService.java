@@ -23,7 +23,7 @@ public interface ISyncService {
      * <p> AUTHENTICATION_ERROR
      * <p> VALIDATION_ERROR
      *
-     * @return {@link GenieResponse<Map>}
+     * @return {@link GenieResponse<SyncStat>}
      */
     GenieResponse<SyncStat> sync();
 

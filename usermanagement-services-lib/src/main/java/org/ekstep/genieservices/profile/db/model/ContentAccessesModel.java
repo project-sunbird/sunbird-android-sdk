@@ -61,7 +61,7 @@ public class ContentAccessesModel implements IReadable, ICleanable {
             contentAccessModelList = new ArrayList<>();
 
             do {
-                ContentAccessModel contentAccess = ContentAccessModel.build();
+                ContentAccessModel contentAccess = ContentAccessModel.build(mDBSession);
 
                 contentAccess.readWithoutMoving(resultSet);
 

@@ -34,7 +34,7 @@ public abstract class AbstractSummarizerProvider extends BaseContentProvider {
 
             String uid = selectionArgs[0];
             String contentId = selectionArgs[1];
-            genieResponse = getService().getSummarizerService().getLearnerAssessmentSummary(uid, contentId);
+            genieResponse = getService().getSummarizerService().getLearnerAssessmentDetails(uid, contentId);
 
             if (genieResponse != null && genieResponse.getStatus()) {
                 cursor.addRow(new String[]{new Gson().toJson(genieResponse)});

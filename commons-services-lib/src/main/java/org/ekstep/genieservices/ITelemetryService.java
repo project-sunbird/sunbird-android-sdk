@@ -18,7 +18,7 @@ public interface ITelemetryService {
      * <p>On failing to save the telemetry details, the response will return status as FALSE and the error be the following:
      * <p>PROCESSING_ERROR
      *
-     * @param eventString
+     * @param eventString - {@link String}
      * @return {@link GenieResponse<Void>}
      */
     GenieResponse<Void> saveTelemetry(String eventString);
@@ -31,7 +31,7 @@ public interface ITelemetryService {
      * <p>On failing to save the telemetry details, the response will return status as FALSE and the error be the following:
      * <p>PROCESSING_ERROR
      *
-     * @param event
+     * @param event - {@link Telemetry}
      * @return {@link GenieResponse<Void>}
      */
     GenieResponse<Void> saveTelemetry(Telemetry event);
@@ -41,7 +41,7 @@ public interface ITelemetryService {
      * <p>
      * <p>Response status always be True, with {@link TelemetryStat} set in the result.
      *
-     * @return
+     * @return {@link GenieResponse<TelemetryStat>}
      */
     GenieResponse<TelemetryStat> getTelemetryStat();
 
