@@ -9,8 +9,6 @@ import org.ekstep.genieservices.commons.utils.DateUtil;
  */
 public interface ContentConstants {
 
-    String ISO_DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SZZZZZ";
-
     long CACHE_TIMEOUT_HOME_CONTENT = (24 * DateUtil.MILLISECONDS_IN_AN_HOUR);
 
     String IMPORT_FAILED = "IMPORT_FAILED";

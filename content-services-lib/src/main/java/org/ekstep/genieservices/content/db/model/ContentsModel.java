@@ -4,7 +4,6 @@ import org.ekstep.genieservices.commons.db.contract.ContentEntry;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,12 +24,6 @@ public class ContentsModel implements IReadable {
     private ContentsModel(IDBSession dbSession, String filter) {
         this.mDBSession = dbSession;
         this.filterCondition = filter;
-    }
-
-    public static ContentsModel findAllContentsWithIdentifiers(IDBSession dbSession, List<String> identifiers) {
-        String filter = String.format(Locale.US, " where %s in ('%s') ", ContentEntry.COLUMN_NAME_IDENTIFIER, StringUtil.join("','", identifiers));
-
-        return find(dbSession, filter);
     }
 
     public static ContentsModel find(IDBSession dbSession, String filter) {

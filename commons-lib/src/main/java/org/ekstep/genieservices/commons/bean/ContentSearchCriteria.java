@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class ContentSearchCriteria implements Serializable {
 
-    private static final int DEFAULT_LIMIT = 10;
+    private static final int DEFAULT_LIMIT = 100;
 
     private String query;
     private List<ContentSearchFilter> filters;
