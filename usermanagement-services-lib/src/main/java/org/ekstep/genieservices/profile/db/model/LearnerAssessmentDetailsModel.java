@@ -209,7 +209,7 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable {
         dbSession.create(this);
     }
 
-    public List<LearnerAssessmentDetails> getAllAssesments() {
+    public List<LearnerAssessmentDetails> getAllAssessments() {
         if (mAssessmentList == null) {
             mAssessmentList = new ArrayList<>();
         }

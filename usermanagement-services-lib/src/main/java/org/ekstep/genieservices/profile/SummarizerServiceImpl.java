@@ -64,13 +64,13 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         HashMap params = new HashMap();
         params.put("logLevel", "2");
         LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.findAssessmentByRequest(mAppContext.getDBSession(), summaryRequest);
-        if (learnerAssessmentDetailsModel.getAllAssesments().size() == 0) {
+        if (learnerAssessmentDetailsModel.getAllAssessments().size() == 0) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROCESSING_ERROR, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_SUMMARY, TAG);
             return response;
         }
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-        response.setResult(learnerAssessmentDetailsModel.getAllAssesments());
+        response.setResult(learnerAssessmentDetailsModel.getAllAssessments());
         return response;
     }
 
