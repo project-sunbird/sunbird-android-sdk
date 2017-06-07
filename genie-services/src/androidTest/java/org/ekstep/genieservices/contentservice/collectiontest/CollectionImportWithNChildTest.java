@@ -10,8 +10,12 @@ import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.utils.FileUtil;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.io.IOException;
 
 /**
  * Created by Sneha on 5/30/2017.
@@ -27,11 +31,20 @@ public class CollectionImportWithNChildTest extends GenieServiceTestBase {
     private final String CONTENT_WITH_CHILD_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Times_Tables_2_to_10.ecar";
     private final String EMPTY_COLLECTION_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Empty_Collection.ecar";
 
+    @Before
+    public void setup() throws IOException {
+        super.setup();
+        activity = rule.getActivity();
+        GenieServiceDBHelper.clearContentDBEntry();
+    }
+
+    @After
+    public void tearDown() throws IOException {
+        super.tearDown();
+    }
+
     @Test
     public void shouldImportEmptyCollection() {
-
-        //check clearContentDBEntry() is correct.
-        GenieServiceDBHelper.clearContentDBEntry();
 
         String ext = FileUtil.getFileExtension(EMPTY_COLLECTION_FILEPATH);
 
@@ -40,17 +53,16 @@ public class CollectionImportWithNChildTest extends GenieServiceTestBase {
         Assert.assertTrue("true", response.getStatus());
         Assert.assertEquals(ServiceConstants.FileExtension.CONTENT, ext);
 
-        AssertCollection.verifyEmptyCollectionEntry(CONTENT_ID);
+        AssertCollection.verifyNoChildContentEntry(CONTENT_ID);
         GenieServiceDBHelper.findContentDBEntry(CONTENT_ID);
     }
 
     @Test
     public void shouldImportCollectionWithNChild() {
 
-        GenieServiceDBHelper.clearContentDBEntry();
-
         GenieResponse<Void> response = activity.importContent(true, CONTENT_WITH_CHILD_FILEPATH, activity.getExternalFilesDir(null));
         Assert.assertTrue("true", response.getStatus());
+        AssertCollection.verifyCollectionEntryAndVisibility(CONTENT_ID_WITH_CHILD, VISIBILITY_DEFAULT);
 
         GenieServiceDBHelper.findContentDBEntry(CONTENT_ID_WITH_CHILD);
 

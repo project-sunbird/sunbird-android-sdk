@@ -50,7 +50,7 @@ public class AssertCollection extends GenieServiceTestBase {
     public static final String CHILD_APK_CONTENT_ID_TFT = "air.edu.washington.cs.treefrog";
     public static final String CHILD_APK_CONTENT_ID_TAKE_OFF = "org.ekstep.delta";
 
-    public static void verifyEmptyCollectionEntry(String identifier) {
+    public static void verifyNoChildContentEntry(String identifier) {
         ContentModel content = GenieServiceDBHelper.findContent(identifier);
         Assert.assertNotNull(content);
         Assert.assertFalse(ContentHandler.hasChildren(content.getLocalData()));
@@ -60,7 +60,7 @@ public class AssertCollection extends GenieServiceTestBase {
 
         ContentModel content = GenieServiceDBHelper.findContent(identifier);
         Assert.assertNotNull(content);
-        Assert.assertFalse(ContentHandler.hasChildren(content.getLocalData()));
+        Assert.assertTrue(ContentHandler.hasChildren(content.getLocalData()));
         Assert.assertTrue(content.getVisibility().equalsIgnoreCase(visibility));
     }
 

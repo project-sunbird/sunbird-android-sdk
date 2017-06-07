@@ -10,6 +10,8 @@ import org.ekstep.genieservices.commons.bean.ContentCriteria;
 import org.ekstep.genieservices.commons.bean.ContentDeleteCriteria;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
 import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
+import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
+import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -17,6 +19,7 @@ import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.PartnerData;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.RecommendedContentCriteria;
+import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
 import org.ekstep.genieservices.commons.bean.RelatedContentCriteria;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.SyncStat;
@@ -185,9 +188,27 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
-    public GenieResponse<ContentSearchResult> getRecommendedContent(RecommendedContentCriteria language) {
+    public GenieResponse<List<Content>> nextContent(List<String> identifiers) {
         idle = false;
-        GenieResponse genieResponse = mGenieService.getContentService().getRecommendedContent(language);
+        GenieResponse<List<Content>> genieResponse = mGenieService.getContentService().nextContent(identifiers);
+        return genieResponse;
+    }
+
+    public GenieResponse<ContentSearchResult> searchContent(ContentSearchCriteria contentSearchCriteria) {
+        idle = false;
+        GenieResponse<ContentSearchResult> genieResponse = mGenieService.getContentService().searchContent(contentSearchCriteria);
+        return genieResponse;
+    }
+
+    public GenieResponse<ContentListingResult> getContentListing(ContentListingCriteria contentListingCriteria) {
+        idle = false;
+        GenieResponse<ContentListingResult> genieResponse = mGenieService.getContentService().getContentListing(contentListingCriteria);
+        return genieResponse;
+    }
+
+    public GenieResponse<RecommendedContentResult> getRecommendedContent(RecommendedContentCriteria language) {
+        idle = false;
+        GenieResponse<RecommendedContentResult> genieResponse = mGenieService.getContentService().getRecommendedContent(language);
         return genieResponse;
     }
 
@@ -200,12 +221,6 @@ public class GenieServiceTestActivity extends Activity {
     public GenieResponse<RelatedContentResult> getRelatedContent(RelatedContentCriteria contentIdentifier) {
         idle = false;
         GenieResponse<RelatedContentResult> genieResponse = mGenieService.getContentService().getRelatedContent(contentIdentifier);
-        return genieResponse;
-    }
-
-    public GenieResponse<ContentSearchResult> searchContent(ContentSearchCriteria contentSearchCriteria) {
-        idle = false;
-        GenieResponse genieResponse = mGenieService.getContentService().searchContent(contentSearchCriteria);
         return genieResponse;
     }
 

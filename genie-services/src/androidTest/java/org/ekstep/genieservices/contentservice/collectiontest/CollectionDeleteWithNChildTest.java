@@ -11,8 +11,12 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.ContentDeleteCriteria;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.utils.FileUtil;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.io.IOException;
 
 /**
  * Created by Sneha on 5/30/2017.
@@ -26,11 +30,21 @@ public class CollectionDeleteWithNChildTest extends GenieServiceTestBase {
     private static final String CONTENT_ID = "do_30019820";
     private static final String COLLECTION_FILE_PATH = Environment.getExternalStorageDirectory().toString() + "/Download/Times_Tables_2_to_10.ecar";
 
+    @Before
+    public void setup() throws IOException {
+        super.setup();
+        activity = rule.getActivity();
+        GenieServiceDBHelper.clearContentDBEntry();
+    }
+
+    @After
+    public void tearDown() throws IOException {
+        super.tearDown();
+    }
 
     @Test
     public void shouldDeleteCollectionWithNChildTest() {
 
-        GenieServiceDBHelper.clearContentDBEntry();
         String ext = FileUtil.getFileExtension(COLLECTION_FILE_PATH);
 
         GenieResponse response = activity.importContent(true, COLLECTION_FILE_PATH, activity.getExternalFilesDir(null));

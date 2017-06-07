@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.contentservice.contenttest.contentfeedback;
+package org.ekstep.genieservices.contentfeedback;
 
 import android.os.Environment;
 import android.support.test.runner.AndroidJUnit4;

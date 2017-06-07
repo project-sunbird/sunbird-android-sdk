@@ -6,10 +6,15 @@ import android.util.Log;
 
 import junit.framework.Assert;
 
+import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.io.IOException;
 
 /**
  * Created by Sneha on 5/29/2017.
@@ -21,6 +26,18 @@ public class ContentImportErrorHandlingTest extends GenieServiceTestBase {
     private final String FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Multiplication2.ecar";
     private final String EXPIRED_CONTENT_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/lesson_expired.ecar";
     private final String OUTDATED_CONTENT_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/hawa_v1.0.ecar.ecar";
+
+    @Before
+    public void setup() throws IOException {
+        super.setup();
+        activity = rule.getActivity();
+        GenieServiceDBHelper.clearContentDBEntry();
+    }
+
+    @After
+    public void tearDown() throws IOException {
+        super.tearDown();
+    }
 
     @Test
     public void importContentFromEcarValidation() {
@@ -43,7 +60,7 @@ public class ContentImportErrorHandlingTest extends GenieServiceTestBase {
         Log.v(TAG, "shouldNotImportExpiredEcar getError() :: " + response.getError() + "getErrorMessages()" + response.getErrorMessages().get(0));
 
         Assert.assertFalse("false", response.getStatus());
-        Assert.assertEquals("INVALID_FILE", response.getError());
+        Assert.assertEquals("DRAFT_ECAR_FILE_EXPIRED", response.getError());
         Assert.assertEquals("The ECAR file is expired!!!", response.getErrorMessages().get(0));
     }
 
