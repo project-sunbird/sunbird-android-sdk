@@ -63,7 +63,7 @@ public class ContentFeedbacksModel implements IReadable, ICleanable {
             contentFeedbackModelList = new ArrayList<>();
 
             do {
-                ContentFeedbackModel contentFeedback = ContentFeedbackModel.build();
+                ContentFeedbackModel contentFeedback = ContentFeedbackModel.build(mDBSession);
 
                 contentFeedback.readWithoutMoving(resultSet);
 

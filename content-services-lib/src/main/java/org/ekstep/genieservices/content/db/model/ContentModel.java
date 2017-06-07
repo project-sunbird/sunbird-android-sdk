@@ -39,7 +39,8 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
     private String localLastUpdatedTime;
     private String serverLastUpdatedOn;
 
-    private ContentModel() {
+    private ContentModel(IDBSession dbSession) {
+        this.mDBSession = dbSession;
     }
 
     private ContentModel(IDBSession dbSession, String identifier) {
@@ -80,8 +81,8 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         }
     }
 
-    public static ContentModel build() {
-        return new ContentModel();
+    public static ContentModel build(IDBSession dbSession) {
+        return new ContentModel(dbSession);
     }
 
     public static ContentModel build(IDBSession dbSession, String identifier, String serverData, String serverLastUpdatedOn,
