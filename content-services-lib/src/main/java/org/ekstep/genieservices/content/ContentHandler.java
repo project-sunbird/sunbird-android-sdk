@@ -163,9 +163,14 @@ public class ContentHandler {
     }
 
     public static String readAudience(Map contentData) {
-        ArrayList<String> audienceList = null;
+        List<String> audienceList = null;
         if (contentData.containsKey(AUDIENCE_KEY)) {
-            audienceList = (ArrayList<String>) contentData.get(AUDIENCE_KEY);
+            Object o = contentData.get(AUDIENCE_KEY);
+            if (o instanceof String) {
+                audienceList = Collections.singletonList((String) o);
+            } else {
+                audienceList = (ArrayList<String>) contentData.get(AUDIENCE_KEY);
+            }
         }
         if (audienceList == null) {
             audienceList = new ArrayList<>();
