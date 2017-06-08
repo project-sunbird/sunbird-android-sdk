@@ -167,7 +167,8 @@ public class ContentHandler {
         if (contentData.containsKey(AUDIENCE_KEY)) {
             Object o = contentData.get(AUDIENCE_KEY);
             if (o instanceof String) {
-                audienceList = (ArrayList<String>) Collections.singletonList((String) o);
+                audienceList = new ArrayList<>();
+                audienceList.add((String) o);
             } else {
                 audienceList = (ArrayList<String>) contentData.get(AUDIENCE_KEY);
             }
