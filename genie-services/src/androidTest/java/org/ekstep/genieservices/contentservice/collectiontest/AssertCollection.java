@@ -1,14 +1,15 @@
 package org.ekstep.genieservices.contentservice.collectiontest;
 
-import android.util.Log;
-
 import junit.framework.Assert;
 
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestActivity;
 import org.ekstep.genieservices.GenieServiceTestBase;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.content.ContentHandler;
 import org.ekstep.genieservices.content.db.model.ContentModel;
+
+import java.util.Map;
 
 /**
  * Created by GoodWorkLabs on 08-09-2016.
@@ -77,12 +78,11 @@ public class AssertCollection extends GenieServiceTestBase {
 
         ContentModel content = GenieServiceDBHelper.findContent(identifier);
         Assert.assertNotNull(content);
+        Assert.assertTrue(refCount == content.getRefCount());
 
-        Log.e("AssertCollection", "verifyContentVersionToBeUpdated: refCount :: " + refCount);
-        Log.e("AssertCollection", "verifyContentVersionToBeUpdated: refCountInDB :: " + content.getRefCount());
-//        Assert.assertTrue(refCount == content.getRefCount());
-        //TODO :: check what has to passed to readPkgVersion()
-//        Assert.assertTrue(ContentHandler.readPkgVersion(content.getLocalData()==version));
+        Map mapData = GsonUtil.fromJson(content.getLocalData(), Map.class);
+        Double pkgVersion = (Double) mapData.get("pkgVersion");
+        Assert.assertTrue(version == pkgVersion);
     }
 
     public static void verifyContentIsDeleted(String identifier, GenieServiceTestActivity activity, String contentPath) {

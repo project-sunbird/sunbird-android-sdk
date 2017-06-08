@@ -76,7 +76,7 @@ public class CollectionImportWithNChildTest extends GenieServiceTestBase {
                 .fromFilePath(CONTENT_WITH_CHILD_FILEPATH).toFolder(activity.getExternalFilesDir(null));
 
         GenieResponse<Void> response = activity.importContent(contentImportRequest.build());
-        Assert.assertTrue("true", response.getStatus());
+        Assert.assertTrue(response.getStatus());
 
         AssertCollection.verifyCollectionEntryAndVisibility(CONTENT_ID_WITH_CHILD, VISIBILITY_DEFAULT);
         GenieServiceDBHelper.findContentDBEntry(CONTENT_ID_WITH_CHILD);
