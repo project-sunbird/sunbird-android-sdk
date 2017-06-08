@@ -219,7 +219,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         }
 
         String jsonStr = null;
-        ContentListingModel contentListingModelInDB = ContentListingModel.find(mAppContext.getDBSession(), contentListingCriteria.getContentListingId(), profile, contentListingCriteria.getSubject());
+        // TODO: 6/8/2017 - Read the channel and audience from partnerFilters in criteria and make the comma seperated string and pass in find
+        ContentListingModel contentListingModelInDB = ContentListingModel.find(mAppContext.getDBSession(), contentListingCriteria.getContentListingId(),
+                profile, contentListingCriteria.getSubject(), null, null);
         if (contentListingModelInDB != null) {
             if (ContentHandler.dataHasExpired(contentListingModelInDB.getExpiryTime())) {
                 contentListingModelInDB.delete();

@@ -19,6 +19,7 @@ public abstract class ContentEntry implements BaseColumns {
     public static final String COLUMN_NAME_REF_COUNT = "ref_count";
     public static final String COLUMN_NAME_CONTENT_STATE = "content_state"; // 0 - Seen but not available (only serverData will be available), 1 - Only spine, 2 - Artifact available
     public static final String COLUMN_NAME_CONTENT_TYPE = "content_type";   // Content type could be story, worksheet, game, collection, textbook.
+    public static final String COLUMN_NAME_AUDIENCE = "audience";   // learner or instructor
 
     public static final String getCreateEntry() {
         return "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
@@ -46,6 +47,10 @@ public abstract class ContentEntry implements BaseColumns {
 
     public static String getAlterEntryForContentType() {
         return "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_NAME_CONTENT_TYPE + DbConstants.TEXT_TYPE + ";";
+    }
+
+    public static String getAlterEntryForAudience() {
+        return "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_NAME_AUDIENCE + DbConstants.TEXT_TYPE + " DEFAULT 'learner';";
     }
 
     public static final String getDeleteEntry() {
