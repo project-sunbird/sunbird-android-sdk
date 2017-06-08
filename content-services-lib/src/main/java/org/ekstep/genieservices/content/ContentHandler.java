@@ -424,7 +424,7 @@ public class ContentHandler {
             uid = criteria.getUid();
             contentTypes = criteria.getContentTypes();
         }
-        String contentTypesStr = getCommaSeparatedContentTypes(contentTypes);
+        String contentTypesStr = ContentType.getCommaSeparatedContentTypes(contentTypes);
 
         String isContentType = String.format(Locale.US, "c.%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr);
         String isVisible = String.format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
@@ -449,7 +449,7 @@ public class ContentHandler {
     }
 
     public static List<ContentModel> getAllLocalContentModel(IDBSession dbSession, ContentType[] contentTypes) {
-        String contentTypesStr = getCommaSeparatedContentTypes(contentTypes);
+        String contentTypesStr = ContentType.getCommaSeparatedContentTypes(contentTypes);
 
         String isContentType = String.format(Locale.US, "%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr);
         String isVisible = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
@@ -467,22 +467,6 @@ public class ContentHandler {
         }
 
         return contentModelListInDB;
-    }
-
-    private static String getCommaSeparatedContentTypes(ContentType[] contentTypes) {
-        String contentTypesStr;
-
-        if (contentTypes != null) {
-            List<String> contentTypeList = new ArrayList<>();
-            for (ContentType contentType : contentTypes) {
-                contentTypeList.add(contentType.getValue());
-            }
-            contentTypesStr = StringUtil.join("','", contentTypeList);
-        } else {
-            contentTypesStr = StringUtil.join("','", ContentType.values());
-        }
-
-        return contentTypesStr;
     }
 
     public static void deleteOrUpdateContent(ContentModel contentModel, boolean isChildItems, boolean isChildContent) {
