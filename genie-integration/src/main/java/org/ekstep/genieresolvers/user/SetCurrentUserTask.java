@@ -5,10 +5,14 @@ import android.database.Cursor;
 import android.net.Uri;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.ekstep.genieresolvers.BaseTask;
 import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+
+import java.lang.reflect.Type;
+import java.util.Map;
 
 /**
  * Created on 23/5/17.
@@ -33,18 +37,17 @@ public class SetCurrentUserTask extends BaseTask {
     }
 
     @Override
-    protected GenieResponse execute() {
+    protected GenieResponse<Map> execute() {
         Cursor cursor = contentResolver.query(getUri(), null, userId, null, null);
         if (cursor == null || cursor.getCount() == 0) {
             return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), TAG);
         }
 
-        GenieResponse genieResponse = getResponse(cursor);
-        return genieResponse;
+        return getResponse(cursor);
     }
 
-    private GenieResponse<String> getResponse(Cursor cursor) {
-        GenieResponse<String> mapData = null;
+    private GenieResponse<Map> getResponse(Cursor cursor) {
+        GenieResponse<Map> mapData = null;
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 mapData = readCursor(cursor);
@@ -54,10 +57,12 @@ public class SetCurrentUserTask extends BaseTask {
         return mapData;
     }
 
-    private GenieResponse<String> readCursor(Cursor cursor) {
+    private GenieResponse<Map> readCursor(Cursor cursor) {
         Gson gson = new Gson();
         String serverData = cursor.getString(0);
-        GenieResponse<String> response = gson.fromJson(serverData, GenieResponse.class);
+        Type type = new TypeToken<GenieResponse<Map>>() {
+        }.getType();
+        GenieResponse<Map> response = gson.fromJson(serverData, type);
         return response;
     }
 

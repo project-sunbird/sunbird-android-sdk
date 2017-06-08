@@ -10,6 +10,8 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
+import java.util.Map;
+
 /**
  * Created on 23/5/17.
  * shriharsh
@@ -32,13 +34,12 @@ public class CreateUserTask extends BaseTask {
     }
 
     @Override
-    protected GenieResponse execute() {
+    protected GenieResponse<Map> execute() {
         ContentValues profileValues = new ContentValues();
         profileValues.put(Constants.PROFILE, GsonUtil.toJson(profile));
         Uri response = contentResolver.insert(getUri(), profileValues);
         if (response == null) {
-            GenieResponse processing_error = getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), CreateUserTask.class.getSimpleName());
-            return processing_error;
+            return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), CreateUserTask.class.getSimpleName());
 
         }
         return getSuccessResponse(Constants.SUCCESSFUL);

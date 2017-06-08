@@ -10,6 +10,8 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
+import java.util.Map;
+
 /**
  * Created on 23/5/17.
  * shriharsh
@@ -31,7 +33,7 @@ public class UpdateUserTask extends BaseTask {
     }
 
     @Override
-    protected GenieResponse execute() {
+    protected GenieResponse<Map> execute() {
         ContentValues profileValues = getContentValues();
         profileValues.put(Constants.PROFILE, GsonUtil.toJson(profile));
         int response = contentResolver.update(getUri(), profileValues, null, null);

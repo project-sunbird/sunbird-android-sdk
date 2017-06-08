@@ -4,12 +4,16 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
+import com.google.gson.reflect.TypeToken;
+
 import org.ekstep.genieresolvers.BaseTask;
 import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
+import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created on 23/5/17.
@@ -35,15 +39,14 @@ public class GetRelatedContentTask extends BaseTask {
     }
 
     @Override
-    protected GenieResponse execute() {
+    protected GenieResponse<Map> execute() {
         String requestData = GsonUtil.toJson(contentIdentifiers);
         Cursor cursor = contentResolver.query(getUri(), null, requestData, null, null);
         if (cursor == null || cursor.getCount() == 0) {
             return getErrorResponse(Constants.PROCESSING_ERROR,
                     getErrorMessage(), GetRelatedContentTask.class.getSimpleName());
         }
-        GenieResponse response = getResponse(cursor);
-        return response;
+        return getResponse(cursor);
     }
 
     @Override
@@ -51,8 +54,8 @@ public class GetRelatedContentTask extends BaseTask {
         return "Related content is not found with the content-ids";
     }
 
-    private GenieResponse getResponse(Cursor cursor) {
-        GenieResponse mapData = null;
+    private GenieResponse<Map> getResponse(Cursor cursor) {
+        GenieResponse<Map> mapData = null;
         if (cursor != null && cursor.moveToFirst()) {
             mapData = readCursor(cursor);
             cursor.close();
@@ -62,7 +65,9 @@ public class GetRelatedContentTask extends BaseTask {
 
     private GenieResponse readCursor(Cursor cursor) {
         String resultData = cursor.getString(0);
-        GenieResponse response = GsonUtil.fromJson(resultData, GenieResponse.class);
+        Type type = new TypeToken<GenieResponse<Map>>() {
+        }.getType();
+        GenieResponse response = GsonUtil.fromJson(resultData, type);
         return response;
     }
 

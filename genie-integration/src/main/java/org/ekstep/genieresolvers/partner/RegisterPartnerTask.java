@@ -10,6 +10,8 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.PartnerData;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
+import java.util.Map;
+
 /**
  * Created on 24/5/17.
  * shriharsh
@@ -31,17 +33,15 @@ public class RegisterPartnerTask extends BaseTask {
     }
 
     @Override
-    protected GenieResponse execute() {
+    protected GenieResponse<Map> execute() {
         ContentValues partnerValues = new ContentValues();
         partnerValues.put(Constants.PARTNER_DATA, GsonUtil.toJson(partnerData));
         Uri response = contentResolver.insert(getUri(), partnerValues);
         if (response == null) {
-            GenieResponse processing_error = getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), RegisterPartnerTask.class.getSimpleName());
-            return processing_error;
+            return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), RegisterPartnerTask.class.getSimpleName());
         }
 
-        GenieResponse successResponse = getSuccessResponse(Constants.SUCCESSFUL);
-        return successResponse;
+        return getSuccessResponse(Constants.SUCCESSFUL);
     }
 
     @Override
