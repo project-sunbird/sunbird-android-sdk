@@ -162,16 +162,6 @@ public class ExtractPayloads implements IChainable {
                 }
             }
 
-            // Set content visibility
-            if ("Library".equalsIgnoreCase(ContentHandler.readObjectType(item))) {
-                visibility = ContentConstants.Visibility.PARENT;
-            } else if (oldContentModel != null) {
-                if (importContext.isChildContent()     // If import started from child content then do not update the visibility.
-                        || !ContentConstants.Visibility.PARENT.equals(oldContentModel.getVisibility())) {  // If not started from child content then do not shrink visibility.
-                    visibility = oldContentModel.getVisibility();
-                }
-            }
-
             //add or update the reference count for the content
             if (oldContentModel != null) {
                 refCount = oldContentModel.getRefCount();
@@ -184,6 +174,16 @@ public class ExtractPayloads implements IChainable {
                 }
             } else {
                 refCount = 1;
+            }
+
+            // Set content visibility
+            if ("Library".equalsIgnoreCase(ContentHandler.readObjectType(item))) {
+                visibility = ContentConstants.Visibility.PARENT;
+            } else if (oldContentModel != null) {
+                if (importContext.isChildContent()     // If import started from child content then do not update the visibility.
+                        || !ContentConstants.Visibility.PARENT.equals(oldContentModel.getVisibility())) {  // If not started from child content then do not shrink visibility.
+                    visibility = oldContentModel.getVisibility();
+                }
             }
 
             // Add or update the content_state. contentState should not update the spine_only when importing the spine content after importing content with artifacts.

@@ -21,7 +21,6 @@ import org.ekstep.genieservices.telemetry.event.TelemetryListener;
 public class AndroidAppContext extends AppContext<Context> {
 
     private IDBSession mDBSession;
-    private IDBSession mSummarizerDBSession;
     private IConnectionInfo mConnectionInfo;
     private IHttpClient mHttpClient;
     private IKeyValueStore mKeyValueOperation;
@@ -38,7 +37,6 @@ public class AndroidAppContext extends AppContext<Context> {
         AndroidAppContext appContext = new AndroidAppContext(context, appPackage);
         appContext.setParams(new BuildParams(appPackage));
         appContext.setDBSession(ServiceDbHelper.getGSDBSession(appContext));
-        appContext.setSummarizerDBSession(ServiceDbHelper.getSummarizerDBSession(appContext));
         appContext.setConnectionInfo(new AndroidNetworkConnectivity(appContext));
         appContext.setHttpClient(new AndroidHttpClient(new BasicAuthenticator(appContext.getParams().getUserName(), appContext.getParams().getPassword())));
         appContext.setKeyValueStore(new PreferenceWrapper(context, Constants.SHARED_PREFERENCE_NAME));
@@ -64,8 +62,9 @@ public class AndroidAppContext extends AppContext<Context> {
     }
 
     @Override
-    public IDBSession getSummarizerDBSession() {
-        return mSummarizerDBSession;
+    public Void setDBSession(IDBSession dbSession) {
+        this.mDBSession = dbSession;
+        return null;
     }
 
     @Override
@@ -102,18 +101,6 @@ public class AndroidAppContext extends AppContext<Context> {
 
     private void setParams(IParams params) {
         this.mParams = params;
-    }
-
-    @Override
-    public Void setDBSession(IDBSession dbSession) {
-        this.mDBSession = dbSession;
-        return null;
-    }
-
-    @Override
-    public Void setSummarizerDBSession(IDBSession dbSession) {
-        this.mSummarizerDBSession = dbSession;
-        return null;
     }
 
     @Override

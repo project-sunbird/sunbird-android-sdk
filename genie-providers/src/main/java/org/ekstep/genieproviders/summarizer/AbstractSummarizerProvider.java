@@ -12,6 +12,7 @@ import org.ekstep.genieproviders.content.AllContentsUriHandler;
 import org.ekstep.genieproviders.util.Constants;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.SummaryRequest;
 
 /**
  * Created on 6/6/17.
@@ -34,7 +35,10 @@ public abstract class AbstractSummarizerProvider extends BaseContentProvider {
 
             String uid = selectionArgs[0];
             String contentId = selectionArgs[1];
-            genieResponse = getService().getSummarizerService().getLearnerAssessmentDetails(uid, contentId);
+            SummaryRequest.Builder summaryRequestBuilder = new SummaryRequest.Builder();
+            summaryRequestBuilder.contentId(contentId);
+            summaryRequestBuilder.uid(uid);
+            genieResponse = getService().getSummarizerService().getLearnerAssessmentDetails(summaryRequestBuilder.build());
 
             if (genieResponse != null && genieResponse.getStatus()) {
                 cursor.addRow(new String[]{new Gson().toJson(genieResponse)});

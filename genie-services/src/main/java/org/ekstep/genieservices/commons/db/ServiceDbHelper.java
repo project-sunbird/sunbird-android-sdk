@@ -20,7 +20,6 @@ import java.util.List;
 public class ServiceDbHelper extends SQLiteOpenHelper {
 
     private static ServiceDbHelper mGSDBInstance;
-    private static ServiceDbHelper mSummarizerDBInstance;
     private final List<Migration> migrations;
     private AppContext mAppContext;
     private IDBSessionHandler handler;
@@ -45,20 +44,6 @@ public class ServiceDbHelper extends SQLiteOpenHelper {
             };
         }
         return new SQLiteSession(appContext, mGSDBInstance.getWritableDatabase());
-    }
-
-    public static synchronized IDBSession getSummarizerDBSession(AppContext<Context> appContext) {
-        if (mSummarizerDBInstance == null) {
-            mSummarizerDBInstance = new ServiceDbHelper(appContext, new SummarizerDBContext());
-            mSummarizerDBInstance.handler = new IDBSessionHandler() {
-                @Override
-                public Void setDBSession(AppContext<Context> appContext, SQLiteDatabase database) {
-                    appContext.setSummarizerDBSession(new SQLiteSession(appContext, database));
-                    return null;
-                }
-            };
-        }
-        return new SQLiteSession(appContext, mSummarizerDBInstance.getWritableDatabase());
     }
 
     @Override

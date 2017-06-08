@@ -45,6 +45,11 @@ public class Telemetry {
         }
     }
 
+
+    public List<CoRelation> getCdata() {
+        return cdata;
+    }
+
     public void addTag(Map<String, Object> map) {
         this.tags.add(map);
     }

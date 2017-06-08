@@ -12,6 +12,7 @@ public class ContentDetailsRequest {
 
 
     private ContentDetailsRequest(String contentId) {
+        this.contentId = contentId;
     }
 
     public String getContentId() {

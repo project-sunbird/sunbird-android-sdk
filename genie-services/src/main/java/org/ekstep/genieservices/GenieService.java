@@ -25,9 +25,11 @@ import org.ekstep.genieservices.telemetry.TelemetryLogger;
 import org.ekstep.genieservices.telemetry.TelemetryServiceImpl;
 
 /**
- * Created on 4/14/2017.
- *
- * @author anil
+ * {@link GenieService} is the entry point and the point of contact to interact with all the services of the GenieService sdk.
+ * <p>
+ * Initially, the application integrating GenieService has to initialize the sdk using "init" method y passing in the
+ * {@link Context} and package name of the integrating application. And then it can call "getService()" to access the
+ * instance of GenieService every time, whenever needed.
  */
 public class GenieService {
 
@@ -71,6 +73,14 @@ public class GenieService {
         return sService;
     }
 
+    /**
+     * This api gets the {@link ConfigServiceImpl}, when accessed in the below way
+     * <p>
+     * getService().getConfigService()
+     * <p><p>
+     *
+     * @return {@link IConfigService}
+     */
     public IConfigService getConfigService() {
         if (mConfigService == null) {
             mConfigService = new ConfigServiceImpl(mAppContext);
@@ -78,6 +88,14 @@ public class GenieService {
         return mConfigService;
     }
 
+    /**
+     * This api gets the {@link UserServiceImpl}, when accessed in the below way
+     * <p>
+     * getService().getUserProfileService()
+     * <p><p>
+     *
+     * @return {@link IUserService}
+     */
     public IUserService getUserProfileService() {
         if (mUserService == null) {
             mUserService = new UserServiceImpl(mAppContext);
@@ -85,6 +103,14 @@ public class GenieService {
         return mUserService;
     }
 
+    /**
+     * This api gets the {@link TelemetryServiceImpl}, when accessed in the below way
+     * <p>
+     * getService().getTelemetryService()
+     * <p><p>
+     *
+     * @return {@link ITelemetryService}
+     */
     public ITelemetryService getTelemetryService() {
         if (mTelemetryService == null) {
             mTelemetryService = new TelemetryServiceImpl(mAppContext, getUserProfileService());
@@ -92,6 +118,14 @@ public class GenieService {
         return mTelemetryService;
     }
 
+    /**
+     * This api gets the {@link SyncServiceImpl}, when accessed in the below way
+     * <p>
+     * getService().getSyncService()
+     * <p><p>
+     *
+     * @return {@link ISyncService}
+     */
     public ISyncService getSyncService() {
         if (mSyncService == null) {
             mSyncService = new SyncServiceImpl(mAppContext);
@@ -99,6 +133,14 @@ public class GenieService {
         return mSyncService;
     }
 
+    /**
+     * This api gets the {@link PartnerServiceImpl}, when accessed in the below way
+     * <p>
+     * getService().getPartnerService()
+     * <p><p>
+     *
+     * @return {@link IPartnerService}
+     */
     public IPartnerService getPartnerService() {
         if (mPartnerService == null) {
             mPartnerService = new PartnerServiceImpl(mAppContext);
@@ -106,6 +148,14 @@ public class GenieService {
         return mPartnerService;
     }
 
+    /**
+     * This api gets the {@link ContentFeedbackServiceImpl}, when accessed in the below way
+     * <p>
+     * getService().getContentFeedbackService()
+     * <p><p>
+     *
+     * @return {@link IContentFeedbackService}
+     */
     public IContentFeedbackService getContentFeedbackService() {
         if (mContentFeedbackService == null) {
             mContentFeedbackService = new ContentFeedbackServiceImpl(mAppContext, getUserProfileService());
@@ -113,6 +163,14 @@ public class GenieService {
         return mContentFeedbackService;
     }
 
+    /**
+     * This api gets the {@link ContentServiceImpl}, when accessed in the below way
+     * <p>
+     * getService().getContentService()
+     * <p><p>
+     *
+     * @return {@link IContentService}
+     */
     public IContentService getContentService() {
         if (mContentService == null) {
             mContentService = new ContentServiceImpl(mAppContext, getUserProfileService(), getContentFeedbackService(), getConfigService());
@@ -120,6 +178,14 @@ public class GenieService {
         return mContentService;
     }
 
+    /**
+     * This api gets the {@link LanguageServiceImpl}, when accessed in the below way
+     * <p>
+     * getService().getLanguageService()
+     * <p><p>
+     *
+     * @return {@link ILanguageService}
+     */
     public ILanguageService getLanguageService() {
         if (mLanguageService == null) {
             mLanguageService = new LanguageServiceImpl(mAppContext);
@@ -127,6 +193,14 @@ public class GenieService {
         return mLanguageService;
     }
 
+    /**
+     * This api gets the {@link NotificationServiceImpl}, when accessed in the below way
+     * <p>
+     * getService().getNotificationService()
+     * <p><p>
+     *
+     * @return {@link INotificationService}
+     */
     public INotificationService getNotificationService() {
         if (mNotificationService == null) {
             mNotificationService = new NotificationServiceImpl(mAppContext);
@@ -134,6 +208,14 @@ public class GenieService {
         return mNotificationService;
     }
 
+    /**
+     * This api gets the {@link SummarizerServiceImpl}, when accessed in the below way
+     * <p>
+     * getService().getSummarizerService()
+     * <p><p>
+     *
+     * @return {@link ISummarizerService}
+     */
     public ISummarizerService getSummarizerService() {
         if (mSummarizerService == null) {
             mSummarizerService = new SummarizerServiceImpl(mAppContext);
@@ -141,18 +223,38 @@ public class GenieService {
         return mSummarizerService;
     }
 
+    /**
+     * This api gets the {@link IKeyValueStore} set in the {@link AndroidAppContext}
+     *
+     * @return
+     */
     public IKeyValueStore getKeyStore() {
         return mAppContext.getKeyValueStore();
     }
 
+    /**
+     * This api gets the {@link IDeviceInfo} set in the {@link AndroidAppContext}
+     *
+     * @return
+     */
     public IDeviceInfo getDeviceInfo() {
         return mAppContext.getDeviceInfo();
     }
 
+    /**
+     * This api gets the {@link IConnectionInfo} set in the {@link AndroidAppContext}
+     *
+     * @return
+     */
     public IConnectionInfo getConnectionInfo() {
         return mAppContext.getConnectionInfo();
     }
 
+    /**
+     * This api gets the {@link IDownloadService} set in the {@link AndroidAppContext}
+     *
+     * @return
+     */
     public DownloadService getDownloadService() {
         return new DownloadService(mAppContext);
     }

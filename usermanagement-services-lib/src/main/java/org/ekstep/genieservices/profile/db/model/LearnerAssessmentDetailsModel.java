@@ -1,7 +1,6 @@
 package org.ekstep.genieservices.profile.db.model;
 
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.SummaryRequest;
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentDetails;
 import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
@@ -12,7 +11,6 @@ import org.ekstep.genieservices.commons.db.operations.IDBSession;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Created on 4/6/17.
@@ -21,28 +19,33 @@ import java.util.Locale;
 
 public class LearnerAssessmentDetailsModel implements IReadable, IWritable {
 
-    private Long id;
+    private Long id = -1L;
     private String uid;
     private String contentId;
     private String qid;
     private Double qindex;
     private Integer correct;
     private Double score;
+    private Double maxScore;
     private Double timespent;
     private String res;
     private Long timestamp;
     private String qdesc;
     private String qtitle;
+    private String hierarchyData;
     private IDBSession dbSession;
     private List<LearnerAssessmentDetails> mAssessmentList;
     private Long insertId;
+    private String filter;
 
-    private LearnerAssessmentDetailsModel(String uid, String contentId) {
-        this.uid = uid;
-        this.contentId = contentId;
+    private LearnerAssessmentDetailsModel(IDBSession dbSession, String filter) {
+        this.dbSession = dbSession;
+        this.filter = filter;
     }
 
-    private LearnerAssessmentDetailsModel(LearnerAssessmentDetails learnerAssessmentDetails) {
+    private LearnerAssessmentDetailsModel(IDBSession dbSession, LearnerAssessmentDetails learnerAssessmentDetails) {
+        this.dbSession = dbSession;
+
         this.id = learnerAssessmentDetails.getId();
         this.uid = learnerAssessmentDetails.getUid();
         this.contentId = learnerAssessmentDetails.getContentId();
@@ -55,29 +58,23 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable {
         this.res = learnerAssessmentDetails.getRes();
         this.qdesc = learnerAssessmentDetails.getQdesc();
         this.qtitle = learnerAssessmentDetails.getQtitle();
-    }
-
-    private LearnerAssessmentDetailsModel(IDBSession dbSession, LearnerAssessmentDetails learnerAssessmentDetails) {
-        this(learnerAssessmentDetails);
-        this.dbSession = dbSession;
+        this.maxScore = learnerAssessmentDetails.getMaxScore();
+        this.hierarchyData = learnerAssessmentDetails.getHierarchyData();
     }
 
     public static LearnerAssessmentDetailsModel build(IDBSession dbSession, LearnerAssessmentDetails learnerAssessmentDetails) {
         return new LearnerAssessmentDetailsModel(dbSession, learnerAssessmentDetails);
     }
 
-    public static LearnerAssessmentDetailsModel findAllAssessments(IDBSession dbSession) {
-        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = new LearnerAssessmentDetailsModel(null);
+    public static LearnerAssessmentDetailsModel find(IDBSession dbSession, String filter) {
+        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = new LearnerAssessmentDetailsModel(dbSession, filter);
         dbSession.read(learnerAssessmentDetailsModel);
 
-        return learnerAssessmentDetailsModel;
-    }
-
-    public static LearnerAssessmentDetailsModel findAssessmentByRequest(IDBSession dbSession, SummaryRequest summaryRequest) {
-        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = new LearnerAssessmentDetailsModel(summaryRequest.getUid(), summaryRequest.getContentId());
-        dbSession.read(learnerAssessmentDetailsModel);
-
-        return learnerAssessmentDetailsModel;
+        if (learnerAssessmentDetailsModel.mAssessmentList == null) {
+            return null;
+        } else {
+            return learnerAssessmentDetailsModel;
+        }
     }
 
     @Override
@@ -107,7 +104,7 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable {
             learnerAssessmentDetails.setQid(cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_QID)));
         }
 
-        if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_QINDEX) != -1) {
+        if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_Q_INDEX) != -1) {
             learnerAssessmentDetails.setQindex(cursor.getDouble(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID)));
         }
 
@@ -131,12 +128,20 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable {
             learnerAssessmentDetails.setTimestamp(cursor.getLong(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_TIMESTAMP)));
         }
 
-        if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_QDESC) != -1) {
-            learnerAssessmentDetails.setQdesc(cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_QDESC)));
+        if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_Q_DESC) != -1) {
+            learnerAssessmentDetails.setQdesc(cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_Q_DESC)));
         }
 
-        if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_QTITLE) != -1) {
-            learnerAssessmentDetails.setQtitle(cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_QTITLE)));
+        if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_Q_TITLE) != -1) {
+            learnerAssessmentDetails.setQtitle(cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_Q_TITLE)));
+        }
+
+        if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA) != -1) {
+            learnerAssessmentDetails.setHierarchyData(cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA)));
+        }
+
+        if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_MAX_SCORE) != -1) {
+            learnerAssessmentDetails.setMaxScore(cursor.getDouble(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_MAX_SCORE)));
         }
 
 
@@ -149,14 +154,16 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable {
         values.put(LearnerAssessmentsEntry.COLUMN_NAME_UID, this.uid);
         values.put(LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID, this.contentId);
         values.put(LearnerAssessmentsEntry.COLUMN_NAME_QID, this.qid);
-        values.put(LearnerAssessmentsEntry.COLUMN_NAME_QINDEX, this.qindex);
+        values.put(LearnerAssessmentsEntry.COLUMN_NAME_Q_INDEX, this.qindex);
         values.put(LearnerAssessmentsEntry.COLUMN_NAME_CORRECT, this.correct);
         values.put(LearnerAssessmentsEntry.COLUMN_NAME_SCORE, this.score);
+        values.put(LearnerAssessmentsEntry.COLUMN_NAME_MAX_SCORE, this.maxScore);
         values.put(LearnerAssessmentsEntry.COLUMN_NAME_TIME_SPENT, this.timespent);
         values.put(LearnerAssessmentsEntry.COLUMN_NAME_RES, this.res);
         values.put(LearnerAssessmentsEntry.COLUMN_NAME_TIMESTAMP, this.timestamp);
-        values.put(LearnerAssessmentsEntry.COLUMN_NAME_QDESC, this.qdesc);
-        values.put(LearnerAssessmentsEntry.COLUMN_NAME_QTITLE, this.qtitle);
+        values.put(LearnerAssessmentsEntry.COLUMN_NAME_Q_DESC, this.qdesc);
+        values.put(LearnerAssessmentsEntry.COLUMN_NAME_Q_TITLE, this.qtitle);
+        values.put(LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA, this.hierarchyData);
         return values;
     }
 
@@ -177,18 +184,18 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable {
 
     @Override
     public String orderBy() {
-        return "order by " + LearnerAssessmentsEntry.COLUMN_NAME_QINDEX;
+        return "order by " + LearnerAssessmentsEntry.COLUMN_NAME_Q_INDEX;
     }
 
     @Override
     public String filterForRead() {
-        return String.format(Locale.US, "where %s = ? and %s = ? ", LearnerAssessmentsEntry.COLUMN_NAME_UID, LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID);
+        return filter;
 
     }
 
     @Override
     public String[] selectionArgsForFilter() {
-        return new String[]{uid, contentId};
+        return null;
     }
 
     @Override
@@ -200,10 +207,7 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable {
         dbSession.create(this);
     }
 
-    public List<LearnerAssessmentDetails> getAllAssesments() {
-        if (mAssessmentList == null) {
-            mAssessmentList = new ArrayList<>();
-        }
+    public List<LearnerAssessmentDetails> getAllAssessments() {
         return mAssessmentList;
     }
 

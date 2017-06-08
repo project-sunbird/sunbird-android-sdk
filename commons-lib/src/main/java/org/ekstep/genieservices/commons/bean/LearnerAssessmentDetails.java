@@ -19,6 +19,24 @@ public class LearnerAssessmentDetails {
     private Long timestamp;
     private String qdesc;
     private String qtitle;
+    private Double maxScore;
+    private String hierarchyData;
+
+    public Double getMaxScore() {
+        return maxScore;
+    }
+
+    public void setMaxScore(Double maxScore) {
+        this.maxScore = maxScore;
+    }
+
+    public String getHierarchyData() {
+        return hierarchyData;
+    }
+
+    public void setHierarchyData(String hierarchyData) {
+        this.hierarchyData = hierarchyData;
+    }
 
     public Long getId() {
         return id;

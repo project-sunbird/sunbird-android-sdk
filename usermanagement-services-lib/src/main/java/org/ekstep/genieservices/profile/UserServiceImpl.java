@@ -11,6 +11,7 @@ import org.ekstep.genieservices.commons.bean.ContentAccessLearnerState;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.enums.ContentAccessStatusType;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
@@ -492,6 +493,11 @@ public class UserServiceImpl extends BaseService implements IUserService {
         TelemetryLogger.logSuccess(mAppContext, genieResponse, TAG, methodName, params);
 
         return genieResponse;
+    }
+
+    @Override
+    public GenieResponse<Void> importProfile(ProfileImportRequest profileImportRequest) {
+        return null;
     }
 
 }

@@ -13,7 +13,7 @@ import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
 import org.ekstep.genieservices.commons.exception.InvalidDataException;
-import org.ekstep.genieservices.commons.utils.ArrayUtil;
+import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
@@ -134,7 +134,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         //Patch Partner tagss
         String values = mAppContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.KEY_ACTIVE_PARTNER_ID, "");
         List<Map<String, Object>> tags = (List<Map<String, Object>>) event.getEventMap().get("tags");
-        if (!StringUtil.isNullOrEmpty(values) && !ArrayUtil.containsMap(tags, ServiceConstants.Partner.KEY_PARTNER_ID)) {
+        if (!StringUtil.isNullOrEmpty(values) && !CollectionUtil.containsMap(tags, ServiceConstants.Partner.KEY_PARTNER_ID)) {
             event.addTag(ServiceConstants.Partner.KEY_PARTNER_ID, values);
         }
 
