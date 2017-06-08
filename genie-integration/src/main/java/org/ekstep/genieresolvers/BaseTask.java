@@ -53,16 +53,11 @@ public abstract class BaseTask {
     protected abstract String getErrorMessage();
 
     protected GenieResponse<Map> perform() {
-        try {
-            contentResolver = context.getContentResolver();
-            if (contentResolver == null) {
-                String errorMessage = "Not able to resolve content provider, " + getErrorMessage();
-                return getErrorResponse(Constants.PROCESSING_ERROR, errorMessage, BaseTask.class.getSimpleName());
-            }
-            return execute();
-        } catch (IllegalArgumentException e) {
-            String errorMessage = "Latest Genie is not installed";
+        contentResolver = context.getContentResolver();
+        if (contentResolver == null) {
+            String errorMessage = "Not able to resolve content provider, " + getErrorMessage();
             return getErrorResponse(Constants.PROCESSING_ERROR, errorMessage, BaseTask.class.getSimpleName());
         }
+        return execute();
     }
 }
