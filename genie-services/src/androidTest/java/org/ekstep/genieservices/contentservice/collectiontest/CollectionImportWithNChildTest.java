@@ -2,13 +2,16 @@ package org.ekstep.genieservices.contentservice.collectiontest;
 
 import android.os.Environment;
 import android.support.test.runner.AndroidJUnit4;
+import android.util.Log;
 
 import junit.framework.Assert;
 
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.ServiceConstants;
+import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
+import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.junit.After;
@@ -17,14 +20,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Sneha on 5/30/2017.
  */
 @RunWith(AndroidJUnit4.class)
 public class CollectionImportWithNChildTest extends GenieServiceTestBase {
+    public static final String CHILD_C2_ID = "do_30013486";
+    public static final String CHILD_C3_ID = "do_30013497";
     private static final String TAG = CollectionImportWithNChildTest.class.getSimpleName();
-
     private static final String VISIBILITY_PARENT = "parent";
     private static final String VISIBILITY_DEFAULT = "default";
     final String CONTENT_ID = "do_20045823";
@@ -68,10 +74,11 @@ public class CollectionImportWithNChildTest extends GenieServiceTestBase {
 
         ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder(true)
                 .fromFilePath(CONTENT_WITH_CHILD_FILEPATH).toFolder(activity.getExternalFilesDir(null));
+
         GenieResponse<Void> response = activity.importContent(contentImportRequest.build());
         Assert.assertTrue("true", response.getStatus());
-        AssertCollection.verifyCollectionEntryAndVisibility(CONTENT_ID_WITH_CHILD, VISIBILITY_DEFAULT);
 
+        AssertCollection.verifyCollectionEntryAndVisibility(CONTENT_ID_WITH_CHILD, VISIBILITY_DEFAULT);
         GenieServiceDBHelper.findContentDBEntry(CONTENT_ID_WITH_CHILD);
 
         AssertCollection.verifyCollectionEntryAndVisibility(AssertCollection.COLLECTION_ECAR_ID, VISIBILITY_DEFAULT);
@@ -85,5 +92,59 @@ public class CollectionImportWithNChildTest extends GenieServiceTestBase {
         AssertCollection.verifyContentEntryAndVisibility(AssertCollection.CHILD_C9_ID, VISIBILITY_PARENT);
         AssertCollection.verifyContentEntryAndVisibility(AssertCollection.CHILD_C10_ID, VISIBILITY_PARENT);
 
+    }
+
+    @Test
+    public void shouldGetChildContents() {
+
+        GenieServiceDBHelper.clearContentDBEntry();
+
+        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder(true)
+                .fromFilePath(CONTENT_WITH_CHILD_FILEPATH).toFolder(activity.getExternalFilesDir(null));
+
+        GenieResponse<Void> response = activity.importContent(contentImportRequest.build());
+        Assert.assertTrue("true", response.getStatus());
+        AssertCollection.verifyCollectionEntryAndVisibility(CONTENT_ID_WITH_CHILD, VISIBILITY_DEFAULT);
+        GenieServiceDBHelper.findContentDBEntry(CONTENT_ID_WITH_CHILD);
+
+        GenieResponse<List<Content>> listGenieResponse = activity.getChildContents(CONTENT_ID_WITH_CHILD, 0);
+        Assert.assertTrue(listGenieResponse.getStatus());
+        Assert.assertNotNull(listGenieResponse.getResult());
+        Assert.assertEquals(9, listGenieResponse.getResult().size());
+
+        Assert.assertEquals(AssertCollection.CHILD_C2_ID, listGenieResponse.getResult().get(0).getIdentifier());
+        Assert.assertEquals(AssertCollection.CHILD_C3_ID, listGenieResponse.getResult().get(1).getIdentifier());
+        Assert.assertEquals(AssertCollection.CHILD_C4_ID, listGenieResponse.getResult().get(2).getIdentifier());
+        Assert.assertEquals(AssertCollection.CHILD_C5_ID, listGenieResponse.getResult().get(3).getIdentifier());
+        Assert.assertEquals(AssertCollection.CHILD_C6_ID, listGenieResponse.getResult().get(4).getIdentifier());
+        Assert.assertEquals(AssertCollection.CHILD_C7_ID, listGenieResponse.getResult().get(5).getIdentifier());
+        Assert.assertEquals(AssertCollection.CHILD_C8_ID, listGenieResponse.getResult().get(6).getIdentifier());
+        Assert.assertEquals(AssertCollection.CHILD_C9_ID, listGenieResponse.getResult().get(7).getIdentifier());
+        Assert.assertEquals(AssertCollection.CHILD_C10_ID, listGenieResponse.getResult().get(8).getIdentifier());
+
+    }
+
+    @Test
+    public void shouldCheckForNextContent() {
+        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder(true)
+                .fromFilePath(CONTENT_WITH_CHILD_FILEPATH).toFolder(activity.getExternalFilesDir(null));
+
+        GenieResponse<Void> response = activity.importContent(contentImportRequest.build());
+        Assert.assertTrue("true", response.getStatus());
+        AssertCollection.verifyCollectionEntryAndVisibility(CONTENT_ID_WITH_CHILD, VISIBILITY_DEFAULT);
+
+        List<String> identifiers = new ArrayList<>();
+        identifiers.add(CONTENT_ID_WITH_CHILD);
+        identifiers.add(CHILD_C2_ID);
+
+        GenieResponse<List<Content>> genieResponse = activity.nextContent(identifiers);
+        Assert.assertTrue("true", genieResponse.getStatus());
+        Assert.assertEquals(2, genieResponse.getResult().size());
+
+        String parentIdentifier = (genieResponse.getResult().get(0)).getIdentifier();
+        String childContentIdentifier = (genieResponse.getResult().get(1)).getIdentifier();
+
+        Assert.assertEquals(CONTENT_ID_WITH_CHILD, parentIdentifier);
+        Assert.assertEquals(AssertCollection.CHILD_C3_ID, childContentIdentifier);
     }
 }

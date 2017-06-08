@@ -11,8 +11,10 @@ import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
+import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
+import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
@@ -185,5 +187,29 @@ public class ContentServiceTest extends GenieServiceTestBase {
         Assert.assertNotNull(genieResponse.getResult());
         Assert.assertTrue(genieResponse.getStatus());
         Assert.assertEquals("ekstep.analytics.recommendations", genieResponse.getResult().getId());
+    }
+
+    @Test
+    public void shouldDeleteContent() {
+
+        ContentImportRequest.Builder importRequest = new ContentImportRequest.Builder(false)
+                .fromFilePath(CONTENT_FILEPATH).toFolder(activity.getExternalFilesDir(null));
+        GenieResponse<Void> response = activity.importContent(importRequest.build());
+        Assert.assertTrue("true", response.getStatus());
+
+        ContentDeleteRequest.Builder detailsRequest = new ContentDeleteRequest.Builder(CONTENT_ID, false);
+
+        GenieResponse genieResponse = activity.deleteContent(detailsRequest.build());
+        Assert.assertTrue(genieResponse.getStatus());
+        AssertCollection.verifyContentIsDeleted(CONTENT_ID, activity, CONTENT_FILEPATH);
+    }
+
+    @Test
+    public void shouldSearchContent() {
+
+        ContentSearchCriteria.Builder searchCriteria = new ContentSearchCriteria.Builder().query("collection").limit(1);
+
+        GenieResponse response = activity.searchContent(searchCriteria.build());
+        Log.v(TAG, "searchContent response :: " + response.getResult());
     }
 }

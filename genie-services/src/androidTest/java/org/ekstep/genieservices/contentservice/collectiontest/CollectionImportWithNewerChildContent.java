@@ -2,14 +2,20 @@ package org.ekstep.genieservices.contentservice.collectiontest;
 
 import android.os.Environment;
 import android.support.test.runner.AndroidJUnit4;
+import android.util.Log;
 
 import junit.framework.Assert;
 
+import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
+import org.ekstep.genieservices.commons.bean.Content;
+import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import static org.ekstep.genieservices.contentservice.collectiontest.AssertCollection.CHILD_CONTENT2_ECAR_ID;
 
 /**
  * Created by Sneha on 5/30/2017.
@@ -28,6 +34,8 @@ public class CollectionImportWithNewerChildContent extends GenieServiceTestBase 
     @Test
     public void testShouldImportContentAndCollection() {
 
+        GenieServiceDBHelper.clearContentDBEntry();
+
         shouldImportChildContentEcar();
 
         shouldImportCollectionEcar();
@@ -39,7 +47,7 @@ public class CollectionImportWithNewerChildContent extends GenieServiceTestBase 
                 .fromFilePath(CHILD_CONTENT2_FILE_PATH).toFolder(activity.getExternalFilesDir(null));
 
         GenieResponse genieResponse = activity.importContent(importRequestBuilder.build());
-        Assert.assertEquals("true", genieResponse.getStatus());
+        Assert.assertTrue("true", genieResponse.getStatus());
         AssertCollection.verifyContentEntryAndVisibility(AssertCollection.CHILD_CONTENT2_ECAR_ID, VISIBILITY_DEFAULT);
 
         AssertCollection.verifyContentVersionToBeUpdated(AssertCollection.CHILD_CONTENT2_ECAR_ID, 2.0, 1);
@@ -47,15 +55,23 @@ public class CollectionImportWithNewerChildContent extends GenieServiceTestBase 
 
     private void shouldImportCollectionEcar() {
 
-        ContentImportRequest.Builder importRequestBuilder = new ContentImportRequest.Builder(true)
+        ContentImportRequest.Builder importRequestBuilder = new ContentImportRequest.Builder(false)
                 .fromFilePath(COLLECTION_FILE_PATH).toFolder(activity.getExternalFilesDir(null));
 
         GenieResponse<Void> genieResponse = activity.importContent(importRequestBuilder.build());
-        Assert.assertEquals("true", genieResponse.getStatus());
+        Assert.assertTrue("true", genieResponse.getStatus());
         AssertCollection.verifyCollectionEntryAndVisibility(AssertCollection.COLLECTION_ECAR_ID, VISIBILITY_DEFAULT);
         AssertCollection.verifyContentEntryAndVisibility(AssertCollection.CHILD_C2_ID, VISIBILITY_DEFAULT);
-
-        AssertCollection.verifyContentEntryAndVisibility(AssertCollection.CHILD_CONTENT2_ECAR_ID, VISIBILITY_DEFAULT);
         AssertCollection.verifyContentVersionToBeUpdated(AssertCollection.CHILD_C2_ID, 3.0, 2);
+
+        ContentDetailsRequest.Builder contentDetailsRequest = new ContentDetailsRequest.Builder().contentId(AssertCollection.CHILD_CONTENT2_ECAR_ID);
+
+        //check for the updated version
+        GenieResponse<Content> contentDetailsResponse = activity.getContentDetails(contentDetailsRequest.build());
+        Assert.assertTrue(contentDetailsResponse.getStatus());
+        Log.e("CollectionImportWithNewerChildContent", "contentStatus: " + contentDetailsResponse.getStatus());
+        String updatedVersion = contentDetailsResponse.getResult().getContentData().getPkgVersion();
+        Log.e("CollectionImportWithNewerChildContent", "shouldImportCollectionEcar: " + updatedVersion);
+        Assert.assertEquals("3.0", updatedVersion);
     }
 }
