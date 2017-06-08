@@ -9,7 +9,7 @@ import java.util.Map;
  *
  * @author swayangjit
  */
-public class ArrayUtil {
+public class CollectionUtil {
 
     public static boolean isEmpty(Object[] array) {
         return array == null || array.length == 0;
@@ -55,4 +55,9 @@ public class ArrayUtil {
 
         return false;
     }
+
+    public static boolean isNullOrEmpty(Collection<?> collection) {
+        return collection == null || collection.isEmpty();
+    }
+
 }

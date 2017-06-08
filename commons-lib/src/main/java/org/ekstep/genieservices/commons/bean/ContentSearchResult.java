@@ -1,5 +1,6 @@
 package org.ekstep.genieservices.commons.bean;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -8,7 +9,7 @@ import java.util.Map;
  *
  * @author anil
  */
-public class ContentSearchResult {
+public class ContentSearchResult implements Serializable {
 
     private String id;
     private String responseMessageId;

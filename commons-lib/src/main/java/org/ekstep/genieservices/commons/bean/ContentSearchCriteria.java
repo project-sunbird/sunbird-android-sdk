@@ -54,6 +54,10 @@ public class ContentSearchCriteria implements Serializable {
         return sortBy;
     }
 
+    public void setSortBy(String sortBy) {
+        this.sortBy = sortBy;
+    }
+
     public long getLimit() {
         return limit;
     }
@@ -64,6 +68,10 @@ public class ContentSearchCriteria implements Serializable {
 
     public boolean isProfileFilter() {
         return profileFilter;
+    }
+
+    public void setFilter(List<ContentSearchFilter> filters) {
+        this.filters = filters;
     }
 
     public static class Builder {

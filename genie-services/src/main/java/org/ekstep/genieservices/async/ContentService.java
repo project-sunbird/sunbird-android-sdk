@@ -1,12 +1,15 @@
 package org.ekstep.genieservices.async;
 
 import org.ekstep.genieservices.GenieService;
+import org.ekstep.genieservices.IContentFeedbackService;
 import org.ekstep.genieservices.IContentService;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
+import org.ekstep.genieservices.commons.bean.ContentFeedback;
+import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingResult;
@@ -28,9 +31,11 @@ import java.util.List;
 public class ContentService {
 
     private IContentService contentService;
+    private IContentFeedbackService contentFeedbackService;
 
     public ContentService(GenieService genieService) {
         this.contentService = genieService.getContentService();
+        this.contentFeedbackService = genieService.getContentFeedbackService();
     }
 
     /**
@@ -247,6 +252,24 @@ public class ContentService {
             @Override
             public GenieResponse<ContentListingResult> perform() {
                 return contentService.getContentListing(contentListingCriteria);
+            }
+        });
+    }
+
+    public void sendFeedback(final ContentFeedback contentFeedback, IResponseHandler<Void> responseHandler) {
+        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return contentFeedbackService.sendFeedback(contentFeedback);
+            }
+        });
+    }
+
+    public void getFeedback(final ContentFeedbackCriteria contentFeedbackCriteria, IResponseHandler<ContentFeedback> responseHandler) {
+        new AsyncHandler<ContentFeedback>(responseHandler).execute(new IPerformable<ContentFeedback>() {
+            @Override
+            public GenieResponse<ContentFeedback> perform() {
+                return contentFeedbackService.getFeedback(contentFeedbackCriteria);
             }
         });
     }
