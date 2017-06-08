@@ -1,5 +1,7 @@
 package org.ekstep.genieservices.commons.bean;
 
+import org.ekstep.genieservices.commons.utils.StringUtil;
+
 /**
  * Created on 6/6/2017.
  *
@@ -27,22 +29,24 @@ public class ContentDeleteRequest {
         private String contentId;
         private boolean isChildContent;
 
-        public Builder(String contentId, boolean isChildContent) {
-            this.contentId = contentId;
-            this.isChildContent = isChildContent;
-        }
-
         public Builder contentId(String contentId) {
+            if (StringUtil.isNullOrEmpty(contentId)) {
+                throw new IllegalArgumentException("Illegal contentId");
+            }
             this.contentId = contentId;
             return this;
         }
 
-        public Builder childContent(boolean isChildContent) {
+        public Builder isChildContent(boolean isChildContent) {
             this.isChildContent = isChildContent;
             return this;
         }
 
         public ContentDeleteRequest build() {
+            if (StringUtil.isNullOrEmpty(contentId)) {
+                throw new IllegalStateException("contentId required.");
+            }
+
             return new ContentDeleteRequest(contentId, isChildContent);
         }
     }

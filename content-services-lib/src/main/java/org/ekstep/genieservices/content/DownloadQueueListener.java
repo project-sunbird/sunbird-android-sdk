@@ -57,9 +57,10 @@ public class DownloadQueueListener {
         downloadResponse.setMimeType(downloadRequest.getMimeType());
 
         if (downloadResponse.getStatus()) {
-            ContentImportRequest.Builder builder = new ContentImportRequest.Builder(downloadRequest.isChildContent());
+            ContentImportRequest.Builder builder = new ContentImportRequest.Builder();
             builder.fromFilePath(downloadResponse.getFilePath())
-                    .toFolder(downloadRequest.getDestinationFolder());
+                    .toFolder(downloadRequest.getDestinationFolder())
+                    .isChildContent(downloadRequest.isChildContent());
             new ContentServiceImpl(mAppContext).importContent(builder.build());
             mDownloadService.remove(downloadResponse.getDownloadId());
             mDownloadService.onDownloadComplete(downloadResponse);
