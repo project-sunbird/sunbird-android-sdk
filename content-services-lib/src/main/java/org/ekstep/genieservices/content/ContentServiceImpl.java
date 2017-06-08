@@ -493,28 +493,28 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<Void> importContent(ContentImportRequest contentImportRequest) {
+    public GenieResponse<Void> importContent(ContentImportRequest importRequest) {
         // TODO: 5/16/2017 - Telemetry logger
         String method = "importContent@ContentServiceImpl";
         Map<String, Object> params = new HashMap<>();
-        params.put("importContent", contentImportRequest.getSourceFilePath());
-        params.put("isChildContent", contentImportRequest.isChildContent());
+        params.put("importContent", importRequest.getSourceFilePath());
+        params.put("isChildContent", importRequest.isChildContent());
         params.put("logLevel", "2");
 
         GenieResponse<Void> response;
 
-        if (!StringUtil.isNullOrEmpty(contentImportRequest.getSourceFilePath())) {   // Import from file
-            if (!FileUtil.doesFileExists(contentImportRequest.getSourceFilePath())) {
+        if (!StringUtil.isNullOrEmpty(importRequest.getSourceFilePath())) {   // Import from file
+            if (!FileUtil.doesFileExists(importRequest.getSourceFilePath())) {
                 response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "content import failed, file doesn't exists", TAG);
                 return response;
             }
 
-            String ext = FileUtil.getFileExtension(contentImportRequest.getSourceFilePath());
+            String ext = FileUtil.getFileExtension(importRequest.getSourceFilePath());
             if (!ServiceConstants.FileExtension.CONTENT.equals(ext)) {
                 response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "content import failed, unsupported file extension", TAG);
                 return response;
             } else {
-                ImportContext importContext = new ImportContext(contentImportRequest.isChildContent(), contentImportRequest.getSourceFilePath(), contentImportRequest.getDestinationFolder());
+                ImportContext importContext = new ImportContext(importRequest.isChildContent(), importRequest.getSourceFilePath(), importRequest.getDestinationFolder());
 
                 IChainable importContentSteps = ContentImportStep.initImportContent();
                 importContentSteps.then(new DeviceMemoryCheck())
@@ -532,7 +532,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         } else {    // Download and then import
             DownloadService downloadService = new DownloadService(mAppContext);
 
-            ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, ContentHandler.getSearchRequest(contentImportRequest.getContentIds()));
+            ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, ContentHandler.getSearchRequest(importRequest.getContentIds()));
             GenieResponse apiResponse = contentSearchAPI.post();
             if (apiResponse.getStatus()) {
                 String body = apiResponse.getResult().toString();
@@ -557,7 +557,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                         if (!StringUtil.isNullOrEmpty(downloadUrl) && ServiceConstants.FileExtension.CONTENT.equalsIgnoreCase(FileUtil.getFileExtension(downloadUrl))) {
                             String contentIdentifier = ContentHandler.readIdentifier(dataMap);
                             DownloadRequest downloadRequest = new DownloadRequest(contentIdentifier, downloadUrl,
-                                    ContentConstants.MimeType.ECAR, contentImportRequest.getDestinationFolder(), contentImportRequest.isChildContent());
+                                    ContentConstants.MimeType.ECAR, importRequest.getDestinationFolder(), importRequest.isChildContent());
                             downloadRequests[i] = downloadRequest;
                         }
                     }
