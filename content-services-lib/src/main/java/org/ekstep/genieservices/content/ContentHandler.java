@@ -163,11 +163,11 @@ public class ContentHandler {
     }
 
     public static String readAudience(Map contentData) {
-        List<String> audienceList = null;
+        ArrayList<String> audienceList = null;
         if (contentData.containsKey(AUDIENCE_KEY)) {
             Object o = contentData.get(AUDIENCE_KEY);
             if (o instanceof String) {
-                audienceList = Collections.singletonList((String) o);
+                audienceList = (ArrayList<String>) Collections.singletonList((String) o);
             } else {
                 audienceList = (ArrayList<String>) contentData.get(AUDIENCE_KEY);
             }
