@@ -45,7 +45,7 @@ public class Player {
                 return;
             }
 
-        } else if (content.getContentType().equalsIgnoreCase(Constants.MimeType.ECML_MIME_TYPE) && !isCollectionorTextBook(content.getContentType())) {
+        } else if (content.getMimeType().equalsIgnoreCase(Constants.MimeType.ECML_MIME_TYPE) && !isCollectionorTextBook(content.getContentType())) {
             if (osId == null || GENIE_QUIZ_APP_PACKAGE.equals(osId) || GENIE_CANVAS_PACKAGE.equals(osId)) {
                 Class<?> className = ReflectionUtil.getClass(GENIE_CANVAS_ACTIVITY);
                 if (className == null) {
