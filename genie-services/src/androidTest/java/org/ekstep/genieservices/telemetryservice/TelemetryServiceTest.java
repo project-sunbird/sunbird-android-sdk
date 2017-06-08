@@ -194,6 +194,7 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
         Assert.assertNotNull(syncStatGenieResponse.getResult().getSyncedEventCount());
         Assert.assertNotEquals(0, syncStatGenieResponse.getResult().getSyncedEventCount());
         Assert.assertNotEquals(0, syncStatGenieResponse.getResult().getSyncTime());
+
         Assert.assertEquals(telemetryStatGenieResponse.getResult().getUnSyncedEventCount(), syncStatGenieResponse.getResult().getSyncedEventCount());
 
         Log.v(TAG, "syncStatGenieResponse status:: " + syncStatGenieResponse.getStatus());

@@ -61,6 +61,8 @@ public class PartnerServiceTest extends GenieServiceTestBase {
 
         GenieResponse terminatePartnerSession = activity.terminatePartnerSession(partnerData);
         Assert.assertTrue(terminatePartnerSession.getStatus());
+
+        //TODO : GE_STOP_PARTNER_SESSION FAILS.
         checkIfTelemetryEventIsLogged("GE_STOP_PARTNER_SESSION");
     }
 

@@ -2,7 +2,6 @@ package org.ekstep.genieservices.contentfeedback;
 
 import android.os.Environment;
 import android.support.test.runner.AndroidJUnit4;
-import android.util.Log;
 
 import junit.framework.Assert;
 
@@ -27,37 +26,8 @@ public class ContentFeedbackServiceTest extends GenieServiceTestBase {
     final String CONTENT_ID = "do_30013486";
     private final String CONTENT_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Multiplication2.ecar";
 
-    @Test
-    public void shouldSendFeedbackForContent() {
-
-        GenieServiceDBHelper.clearContentDBEntry();
-
-        String uid = createAndSetProfileForGetFeedback();
-
-        ContentImportRequest.Builder importRequest = new ContentImportRequest.Builder(false).fromFilePath(CONTENT_FILEPATH).toFolder(activity.getExternalFilesDir(null));
-
-        GenieResponse genieResponse = activity.importContent(importRequest.build());
-        Assert.assertTrue("true", genieResponse.getStatus());
-
-        ContentFeedback contentFeedback = new ContentFeedback();
-        contentFeedback.setComments("Great content");
-        contentFeedback.setContentId(CONTENT_ID);
-        contentFeedback.setRating(3);
-
-        GenieResponse genieResponseSendFeedback = activity.sendFeedback(contentFeedback);
-        Assert.assertTrue("true", genieResponseSendFeedback.getStatus());
-
-        shouldAssertFeedbackData(contentFeedback);
-
-        ContentFeedbackCriteria.Builder data = new ContentFeedbackCriteria.Builder(uid, CONTENT_ID);
-
-        GenieResponse<ContentFeedback> genieResponseGetFeedback = activity.getFeedback(data.build());
-        Log.v(TAG, "genieResponse :: " + genieResponseGetFeedback.getStatus());
-        Log.v(TAG, "genieResponse :: " + genieResponseGetFeedback.getErrorMessages().get(0));
-
-    }
-
     /**
+     * TODO : sendFeedback() and getFeedback() as 2 different methods.
      * To create a set the profile as current user
      *
      * @return
@@ -73,13 +43,51 @@ public class ContentFeedbackServiceTest extends GenieServiceTestBase {
         Profile createdProfile = createNewProfile(profile);
 
         GenieResponse responseSetCurrentUser = activity.setCurrentUser(createdProfile.getUid());
-        Assert.assertTrue("true", responseSetCurrentUser.getStatus());
+        Assert.assertTrue(responseSetCurrentUser.getStatus());
 
         GenieResponse<Profile> responseGetCurrentUser = activity.getCurrentUser();
-        Assert.assertTrue("true", responseGetCurrentUser.getStatus());
+        Assert.assertTrue(responseGetCurrentUser.getStatus());
         String uid = responseGetCurrentUser.getResult().getUid();
 
         return uid;
+    }
+
+    @Test
+    public void shouldSendFeedbackForContent() {
+
+        GenieServiceDBHelper.clearContentDBEntry();
+
+        String uid = createAndSetProfileForGetFeedback();
+
+        ContentImportRequest.Builder importRequest = new ContentImportRequest.Builder(false).fromFilePath(CONTENT_FILEPATH).toFolder(activity.getExternalFilesDir(null));
+
+        GenieResponse genieResponse = activity.importContent(importRequest.build());
+        Assert.assertTrue(genieResponse.getStatus());
+
+        ContentFeedback contentFeedback = new ContentFeedback();
+        contentFeedback.setComments("Great content");
+        contentFeedback.setContentId(CONTENT_ID);
+        contentFeedback.setRating(3);
+
+        GenieResponse genieResponseSendFeedback = activity.sendFeedback(contentFeedback);
+        Assert.assertTrue(genieResponseSendFeedback.getStatus());
+
+        shouldAssertFeedbackData(contentFeedback);
+
+        ContentFeedbackCriteria.Builder data = new ContentFeedbackCriteria.Builder(uid, CONTENT_ID);
+
+        GenieResponse<ContentFeedback> genieResponseGetFeedback = activity.getFeedback(data.build());
+        Assert.assertTrue(genieResponseGetFeedback.getStatus());
+        ContentFeedback getFeedback = genieResponseGetFeedback.getResult();
+
+        assertGetFeedbackData(contentFeedback, getFeedback);
+
+    }
+
+    private void assertGetFeedbackData(ContentFeedback contentFeedback, ContentFeedback getFeedback) {
+        Assert.assertEquals(contentFeedback.getContentId(), getFeedback.getContentId());
+        Assert.assertEquals(contentFeedback.getRating(), getFeedback.getRating());
+        Assert.assertEquals(contentFeedback.getComments(), getFeedback.getComments());
     }
 
     /**

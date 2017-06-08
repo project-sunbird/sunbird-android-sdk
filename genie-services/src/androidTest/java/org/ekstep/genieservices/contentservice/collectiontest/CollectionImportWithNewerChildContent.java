@@ -15,8 +15,6 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.ekstep.genieservices.contentservice.collectiontest.AssertCollection.CHILD_CONTENT2_ECAR_ID;
-
 /**
  * Created by Sneha on 5/30/2017.
  */
@@ -26,10 +24,12 @@ public class CollectionImportWithNewerChildContent extends GenieServiceTestBase 
     private static final String VISIBILITY_PARENT = "parent";
     private static final String VISIBILITY_DEFAULT = "default";
     private static final String COLLECTION_FILE_PATH = Environment.getExternalStorageDirectory().toString() + "/Download/Times_Tables_2_to_10.ecar";
-    private static final String CHILD_CONTENT2_FILE_PATH = Environment.getExternalStorageDirectory().toString() + "/Download/Multiplication2.ecar";
+    private static final String CHILD_CONTENT2_FILE_PATH = Environment.getExternalStorageDirectory().toString() + "/Download/multiplication_2_v1.ecar";
 
-    /**
-     * In this test we first import older content C1(c1 v2.0) then Collection C (C1 v 3.0)
+    /**TODO In this test we first,
+     * 1. Import older content C1(c1 v1.0) (child version is manually changed/downgraded from v2 to v1)
+     * 2. Then Collection C (C1 v2.0)
+     * 3. Older content version is not upgrading.
      */
     @Test
     public void testShouldImportContentAndCollection() {
@@ -49,8 +49,16 @@ public class CollectionImportWithNewerChildContent extends GenieServiceTestBase 
         GenieResponse genieResponse = activity.importContent(importRequestBuilder.build());
         Assert.assertTrue("true", genieResponse.getStatus());
         AssertCollection.verifyContentEntryAndVisibility(AssertCollection.CHILD_CONTENT2_ECAR_ID, VISIBILITY_DEFAULT);
+        AssertCollection.verifyContentVersionToBeUpdated(AssertCollection.CHILD_CONTENT2_ECAR_ID, 1.0, 1);
 
-        AssertCollection.verifyContentVersionToBeUpdated(AssertCollection.CHILD_CONTENT2_ECAR_ID, 2.0, 1);
+        //remove it later after testing for version
+        ContentDetailsRequest.Builder contentId = new ContentDetailsRequest.Builder()
+                .contentId(AssertCollection.CHILD_CONTENT2_ECAR_ID);
+        GenieResponse<Content> contentDetailsResponse = activity.getContentDetails(contentId.build());
+        Assert.assertTrue(contentDetailsResponse.getStatus());
+        Log.e("TAG", "content status :: " + contentDetailsResponse.getStatus());
+        String updatedVersion = contentDetailsResponse.getResult().getContentData().getPkgVersion();
+        Log.e("TAG", "content version :: " + updatedVersion);
     }
 
     private void shouldImportCollectionEcar() {
@@ -62,16 +70,25 @@ public class CollectionImportWithNewerChildContent extends GenieServiceTestBase 
         Assert.assertTrue("true", genieResponse.getStatus());
         AssertCollection.verifyCollectionEntryAndVisibility(AssertCollection.COLLECTION_ECAR_ID, VISIBILITY_DEFAULT);
         AssertCollection.verifyContentEntryAndVisibility(AssertCollection.CHILD_C2_ID, VISIBILITY_DEFAULT);
-        AssertCollection.verifyContentVersionToBeUpdated(AssertCollection.CHILD_C2_ID, 3.0, 2);
+        AssertCollection.verifyContentVersionToBeUpdated(AssertCollection.CHILD_C2_ID, 2.0, 2);
 
-        ContentDetailsRequest.Builder contentDetailsRequest = new ContentDetailsRequest.Builder().contentId(AssertCollection.CHILD_CONTENT2_ECAR_ID);
+        ContentDetailsRequest.Builder collectionRequest = new ContentDetailsRequest.Builder()
+                .contentId(AssertCollection.COLLECTION_ECAR_ID);
+        GenieResponse<Content> collectionDetailsResponse = activity.getContentDetails(collectionRequest.build());
+        Assert.assertTrue(collectionDetailsResponse.getStatus());
+        Log.e("TAG", "collection status " + collectionDetailsResponse.getStatus());
+        String collectionVersion = collectionDetailsResponse.getResult().getContentData().getPkgVersion();
+        Log.e("TAG", "collection version " + collectionVersion);
 
-        //check for the updated version
+        //updated content check
+        ContentDetailsRequest.Builder contentDetailsRequest = new ContentDetailsRequest.Builder()
+                .contentId(AssertCollection.CHILD_CONTENT2_ECAR_ID);
         GenieResponse<Content> contentDetailsResponse = activity.getContentDetails(contentDetailsRequest.build());
         Assert.assertTrue(contentDetailsResponse.getStatus());
-        Log.e("CollectionImportWithNewerChildContent", "contentStatus: " + contentDetailsResponse.getStatus());
-        String updatedVersion = contentDetailsResponse.getResult().getContentData().getPkgVersion();
-        Log.e("CollectionImportWithNewerChildContent", "shouldImportCollectionEcar: " + updatedVersion);
-        Assert.assertEquals("3.0", updatedVersion);
+        Log.e("TAG", "updated content status " + contentDetailsResponse.getStatus());
+        String updatedContentVersion = contentDetailsResponse.getResult().getContentData().getPkgVersion();
+        Log.e("TAG", "updated content version " + updatedContentVersion);
+
+        Assert.assertEquals(collectionVersion, updatedContentVersion);
     }
 }

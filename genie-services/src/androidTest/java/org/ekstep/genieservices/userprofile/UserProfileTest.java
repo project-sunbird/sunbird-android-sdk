@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 /**
+ * TODO : Assert for handle in all testcases.
  * Created by Sneha on 5/12/2017.
  */
 
@@ -193,6 +194,8 @@ public class UserProfileTest extends GenieServiceTestBase {
      */
     @Test
     public void shouldUpdateGroupUser() {
+
+        GenieServiceDBHelper.clearProfileTable();
 
         Profile profile = new Profile("Group8", "@drawable/ic_avatar2", "en");
         profile.setGroupUser(true);

@@ -38,7 +38,7 @@ public class CollectionDeleteWithNChildTest extends GenieServiceTestBase {
 
         String ext = FileUtil.getFileExtension(COLLECTION_FILE_PATH);
 
-        ContentImportRequest.Builder importRequest = new ContentImportRequest.Builder(true).fromFilePath(COLLECTION_FILE_PATH).toFolder(activity.getExternalFilesDir(null));
+        ContentImportRequest.Builder importRequest = new ContentImportRequest.Builder(false).fromFilePath(COLLECTION_FILE_PATH).toFolder(activity.getExternalFilesDir(null));
 
         GenieResponse response = activity.importContent(importRequest.build());
         Assert.assertTrue("true", response.getStatus());

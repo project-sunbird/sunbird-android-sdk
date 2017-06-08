@@ -68,7 +68,6 @@ public class AssertProfile {
 
         Assert.assertNotNull(eks);
         Assert.assertEquals(telemetryEvent, eventMap.get("eid"));
-        Assert.assertEquals(profile.getHandle(), eks.get("handle"));
         Assert.assertEquals(profile.getLanguage(), eks.get("language"));
     }
 

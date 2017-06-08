@@ -40,10 +40,11 @@ public class ContentImportErrorHandlingTest extends GenieServiceTestBase {
         super.tearDown();
     }
 
+    //TODO test failing
     @Test
     public void importContentFromEcarValidation() {
 
-        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder(true)
+        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder(false)
                 .fromFilePath("").toFolder(activity.getExternalFilesDir(null));
 
         GenieResponse<Void> response = activity.importContent(contentImportRequest.build());
