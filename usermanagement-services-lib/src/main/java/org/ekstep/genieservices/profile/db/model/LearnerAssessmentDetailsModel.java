@@ -2,7 +2,6 @@ package org.ekstep.genieservices.profile.db.model;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentDetails;
-import org.ekstep.genieservices.commons.bean.SummaryRequest;
 import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.IReadable;
@@ -12,7 +11,6 @@ import org.ekstep.genieservices.commons.db.operations.IDBSession;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Created on 4/6/17.
@@ -21,7 +19,7 @@ import java.util.Locale;
 
 public class LearnerAssessmentDetailsModel implements IReadable, IWritable {
 
-    private Long id;
+    private Long id = -1L;
     private String uid;
     private String contentId;
     private String qid;
@@ -38,13 +36,16 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable {
     private IDBSession dbSession;
     private List<LearnerAssessmentDetails> mAssessmentList;
     private Long insertId;
+    private String filter;
 
-    private LearnerAssessmentDetailsModel(String uid, String contentId) {
-        this.uid = uid;
-        this.contentId = contentId;
+    private LearnerAssessmentDetailsModel(IDBSession dbSession, String filter) {
+        this.dbSession = dbSession;
+        this.filter = filter;
     }
 
-    private LearnerAssessmentDetailsModel(LearnerAssessmentDetails learnerAssessmentDetails) {
+    private LearnerAssessmentDetailsModel(IDBSession dbSession, LearnerAssessmentDetails learnerAssessmentDetails) {
+        this.dbSession = dbSession;
+
         this.id = learnerAssessmentDetails.getId();
         this.uid = learnerAssessmentDetails.getUid();
         this.contentId = learnerAssessmentDetails.getContentId();
@@ -57,29 +58,23 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable {
         this.res = learnerAssessmentDetails.getRes();
         this.qdesc = learnerAssessmentDetails.getQdesc();
         this.qtitle = learnerAssessmentDetails.getQtitle();
-    }
-
-    private LearnerAssessmentDetailsModel(IDBSession dbSession, LearnerAssessmentDetails learnerAssessmentDetails) {
-        this(learnerAssessmentDetails);
-        this.dbSession = dbSession;
+        this.maxScore = learnerAssessmentDetails.getMaxScore();
+        this.hierarchyData = learnerAssessmentDetails.getHierarchyData();
     }
 
     public static LearnerAssessmentDetailsModel build(IDBSession dbSession, LearnerAssessmentDetails learnerAssessmentDetails) {
         return new LearnerAssessmentDetailsModel(dbSession, learnerAssessmentDetails);
     }
 
-    public static LearnerAssessmentDetailsModel findAllAssessments(IDBSession dbSession) {
-        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = new LearnerAssessmentDetailsModel(null);
+    public static LearnerAssessmentDetailsModel find(IDBSession dbSession, String filter) {
+        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = new LearnerAssessmentDetailsModel(dbSession, filter);
         dbSession.read(learnerAssessmentDetailsModel);
 
-        return learnerAssessmentDetailsModel;
-    }
-
-    public static LearnerAssessmentDetailsModel findAssessmentByRequest(IDBSession dbSession, SummaryRequest summaryRequest) {
-        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = new LearnerAssessmentDetailsModel(summaryRequest.getUid(), summaryRequest.getContentId());
-        dbSession.read(learnerAssessmentDetailsModel);
-
-        return learnerAssessmentDetailsModel;
+        if (learnerAssessmentDetailsModel.mAssessmentList == null) {
+            return null;
+        } else {
+            return learnerAssessmentDetailsModel;
+        }
     }
 
     @Override
@@ -142,8 +137,11 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable {
         }
 
         if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA) != -1) {
-            // TODO: 6/7/2017
-//            learnerAssessmentDetails.setQtitle(cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA)));
+            learnerAssessmentDetails.setHierarchyData(cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA)));
+        }
+
+        if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_MAX_SCORE) != -1) {
+            learnerAssessmentDetails.setMaxScore(cursor.getDouble(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_MAX_SCORE)));
         }
 
 
@@ -191,13 +189,13 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable {
 
     @Override
     public String filterForRead() {
-        return String.format(Locale.US, "where %s = ? and %s = ? ", LearnerAssessmentsEntry.COLUMN_NAME_UID, LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID);
+        return filter;
 
     }
 
     @Override
     public String[] selectionArgsForFilter() {
-        return new String[]{uid, contentId};
+        return null;
     }
 
     @Override
@@ -210,9 +208,6 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable {
     }
 
     public List<LearnerAssessmentDetails> getAllAssessments() {
-        if (mAssessmentList == null) {
-            mAssessmentList = new ArrayList<>();
-        }
         return mAssessmentList;
     }
 

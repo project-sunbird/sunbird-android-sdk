@@ -30,12 +30,12 @@ public class SummaryRequest {
         public Builder() {
         }
 
-        public Builder byContent(String contentId) {
+        public Builder contentId(String contentId) {
             this.contentId = contentId;
             return this;
         }
 
-        public Builder byUser(String uid) {
+        public Builder uid(String uid) {
             this.uid = uid;
             return this;
         }

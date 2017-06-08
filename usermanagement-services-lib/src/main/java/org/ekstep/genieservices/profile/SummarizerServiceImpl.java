@@ -5,23 +5,27 @@ import org.ekstep.genieservices.ISummarizerService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.bean.CoRelation;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentDetails;
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentSummary;
 import org.ekstep.genieservices.commons.bean.SummaryRequest;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
+import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.profile.db.model.LearnerAssessmentDetailsModel;
 import org.ekstep.genieservices.profile.db.model.LearnerAssessmentSummaryModel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
  * This class is the implementation of {@link ISummarizerService}
- *
  */
 public class SummarizerServiceImpl extends BaseService implements ISummarizerService {
 
@@ -40,14 +44,14 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         HashMap params = new HashMap();
         params.put("logLevel", "2");
 
-        if (summaryRequest.getUid() != null){
+        if (summaryRequest.getUid() != null) {
             learnerAssessmentSummaryModel = LearnerAssessmentSummaryModel.findChildProgressSummary(mAppContext.getDBSession(), summaryRequest.getUid());
-        }else if(summaryRequest.getContentId() != null){
+        } else if (summaryRequest.getContentId() != null) {
             learnerAssessmentSummaryModel = LearnerAssessmentSummaryModel.findContentProgressSummary(mAppContext.getDBSession(), summaryRequest.getContentId());
         }
 
         //if the assembleMap list size is 0 then their was some error
-        if (learnerAssessmentSummaryModel.getAssessmentMap().size() == 0) {
+        if (learnerAssessmentSummaryModel == null) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROCESSING_ERROR, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_SUMMARY, TAG);
             return response;
         }
@@ -63,8 +67,13 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         String methodName = "getLearnerAssessmentDetails@LearnerAssessmentsServiceImpl";
         HashMap params = new HashMap();
         params.put("logLevel", "2");
-        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.findAssessmentByRequest(mAppContext.getDBSession(), summaryRequest);
-        if (learnerAssessmentDetailsModel.getAllAssessments().size() == 0) {
+
+        String filter = String.format(Locale.US, "where %s = %s and %s = %s and %s = %s", LearnerAssessmentsEntry.COLUMN_NAME_UID, summaryRequest.getUid(),
+                LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID, summaryRequest.getContentId(),
+                LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA, null);
+
+        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.find(mAppContext.getDBSession(), filter);
+        if (learnerAssessmentDetailsModel == null) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROCESSING_ERROR, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_SUMMARY, TAG);
             return response;
         }
@@ -114,6 +123,15 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         }
         learnerAssessmentDetails.setQdesc((String) eks.get("qdesc"));
         learnerAssessmentDetails.setQtitle((String) eks.get("qtitle"));
+        learnerAssessmentDetails.setMaxScore((Double) eks.get("maxscore"));
+
+        if (telemetry.getCdata() != null) {
+            List<String> idList = new ArrayList<>();
+            for (CoRelation eachCdataValue : telemetry.getCdata()) {
+                idList.add(eachCdataValue.getId());
+            }
+            learnerAssessmentDetails.setHierarchyData(StringUtil.join(",", idList));
+        }
         return learnerAssessmentDetails;
     }
 
