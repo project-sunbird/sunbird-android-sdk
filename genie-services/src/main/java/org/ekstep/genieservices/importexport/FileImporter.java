@@ -8,15 +8,12 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
-import org.ekstep.genieservices.commons.db.contract.MetaEntry;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDataSource;
 import org.ekstep.genieservices.commons.db.operations.impl.SQLiteDataSource;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -39,7 +36,7 @@ public class FileImporter {
     public GenieResponse<Void> importFile(ProfileImportRequest importRequest) {
         GenieResponse<Void> response;
         if (!FileUtil.doesFileExists(importRequest.getSourceFilePath())) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Profile import failed, file doesn't exists", TAG);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Import failed, file doesn't exists", TAG);
             return response;
         }
 
@@ -49,10 +46,13 @@ public class FileImporter {
             return response;
         } else {
             IDBSession dbSession = dataSource.getImportDataSource(importRequest.getSourceFilePath());
-            Map<String, Object> metadata = getMetadata(dbSession);
-            List<String> importTypes = getImportTypes(metadata);
-            if (importTypes != null && importTypes.contains(ServiceConstants.EXPORT_TYPE_PROFILE)) {
-                return userService.importProfile(dbSession, metadata);
+            MetadataModel metadataModel = MetadataModel.findAll(dbSession);
+            if (metadataModel != null) {
+                Map<String, Object> metadata = metadataModel.getMetadata();
+                List<String> importTypes = getImportTypes(metadata);
+                if (importTypes != null && importTypes.contains(ServiceConstants.EXPORT_TYPE_PROFILE)) {
+                    return userService.importProfile(dbSession, metadata);
+                }
             }
 
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Profile import failed, metadata.", TAG);
@@ -60,16 +60,8 @@ public class FileImporter {
         }
     }
 
-    private Map<String, Object> getMetadata(IDBSession dbSession) {
-        String query = String.format(Locale.US, "select * from %s", MetaEntry.TABLE_NAME);
-        Cursor cursor = dbSession.rawQuery(query, null);
-        HashMap<String, String> metadata = new HashMap<>();
-        readMetadata(cursor, metadata);
-        sqLiteDatabase.close();
-        return metadata;
-    }
-
     private List<String> getImportTypes(Map<String, Object> metadata) {
         return (List<String>) metadata.get(ServiceConstants.EXPORT_TYPES);
     }
+
 }

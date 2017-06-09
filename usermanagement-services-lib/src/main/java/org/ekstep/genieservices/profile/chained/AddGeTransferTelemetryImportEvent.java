@@ -6,6 +6,7 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.profile.db.model.ImportedMetadataListModel;
 
 /**
  * Created on 6/8/2017.
@@ -19,11 +20,13 @@ public class AddGeTransferTelemetryImportEvent implements IChainable {
 
     @Override
     public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
-        if (nextLink != null) {
-            return nextLink.execute(appContext, importContext);
-        } else {
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "Import profile failed.", TAG);
+
+        ImportedMetadataListModel importedMetadataListModel = ImportedMetadataListModel.findAll(appContext.getDBSession());
+        if (importedMetadataListModel != null) {
+            // TODO: 6/9/2017  
         }
+
+        return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "Import profile failed.", TAG);
     }
 
     @Override
