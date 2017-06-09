@@ -30,7 +30,7 @@ import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
-import org.ekstep.genieservices.profile.chained.AddGeTransferTelemetryImportEvent;
+import org.ekstep.genieservices.profile.chained.AddGeTransferProfileImportEvent;
 import org.ekstep.genieservices.profile.chained.ProfileImportStep;
 import org.ekstep.genieservices.profile.chained.TransportProfiles;
 import org.ekstep.genieservices.profile.chained.TransportSummarizer;
@@ -502,7 +502,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
                 .then(new TransportUser())
                 .then(new TransportSummarizer())
                 .then(new UpdateImportedMetadata())
-                .then(new AddGeTransferTelemetryImportEvent());
+                .then(new AddGeTransferProfileImportEvent());
 
         return profileImportSteps.execute(mAppContext, importContext);
     }
