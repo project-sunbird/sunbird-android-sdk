@@ -20,9 +20,11 @@ import org.ekstep.genieservices.notification.NotificationServiceImpl;
 import org.ekstep.genieservices.partner.PartnerServiceImpl;
 import org.ekstep.genieservices.profile.SummarizerServiceImpl;
 import org.ekstep.genieservices.profile.UserServiceImpl;
+import org.ekstep.genieservices.profile.event.SummaryListener;
 import org.ekstep.genieservices.telemetry.SyncServiceImpl;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 import org.ekstep.genieservices.telemetry.TelemetryServiceImpl;
+import org.ekstep.genieservices.telemetry.event.TelemetryListener;
 import org.ekstep.genieservices.utils.ContentPlayer;
 
 /**
@@ -69,6 +71,9 @@ public class GenieService {
             ContentPlayer.init(applicationContext.getParams().getQualifier());
             TelemetryLogger.init(new TelemetryServiceImpl(applicationContext, new UserServiceImpl(applicationContext)));
             DownloadQueueListener.init(applicationContext, new DownloadService(applicationContext));
+            //initializing event bus for Telemetry
+            TelemetryListener.init(applicationContext);
+            SummaryListener.init(applicationContext);
             sService = new GenieService(applicationContext);
         }
         GenieAsyncService.init(sService);

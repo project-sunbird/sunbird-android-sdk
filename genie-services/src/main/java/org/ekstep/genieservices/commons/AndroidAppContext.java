@@ -42,7 +42,6 @@ public class AndroidAppContext extends AppContext<Context> {
         appContext.setKeyValueStore(new PreferenceWrapper(context, Constants.SHARED_PREFERENCE_NAME));
         appContext.setDeviceInfo(new DeviceInfo(context));
         appContext.setLocationInfo(new LocationInfo(context));
-        TelemetryListener.init(appContext);
         appContext.setDownloadManager(new DownloadManager(context));
         return appContext;
     }
