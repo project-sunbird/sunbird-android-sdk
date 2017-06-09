@@ -26,31 +26,6 @@ public class ContentFeedbackServiceTest extends GenieServiceTestBase {
     final String CONTENT_ID = "do_30013486";
     private final String CONTENT_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Multiplication2.ecar";
 
-    /**
-     * TODO : sendFeedback() and getFeedback() as 2 different methods.
-     * To create a set the profile as current user
-     *
-     * @return
-     */
-    private String createAndSetProfileForGetFeedback() {
-
-        GenieServiceDBHelper.clearProfileTable();
-        Profile profile = new Profile("Happy1", "@drawable/ic_avatar2", "en");
-        profile.setAge(4);
-        profile.setDay(12);
-        profile.setMonth(11);
-
-        Profile createdProfile = createNewProfile(profile);
-
-        GenieResponse responseSetCurrentUser = activity.setCurrentUser(createdProfile.getUid());
-        Assert.assertTrue(responseSetCurrentUser.getStatus());
-
-        GenieResponse<Profile> responseGetCurrentUser = activity.getCurrentUser();
-        Assert.assertTrue(responseGetCurrentUser.getStatus());
-        String uid = responseGetCurrentUser.getResult().getUid();
-
-        return uid;
-    }
 
     @Test
     public void shouldSendFeedbackForContent() {
@@ -111,6 +86,26 @@ public class ContentFeedbackServiceTest extends GenieServiceTestBase {
         Assert.assertEquals(contentFeedback.getContentId(), genieResponseDetails.getResult().getContentFeedback().getContentId());
         Assert.assertEquals(contentFeedback.getRating(), genieResponseDetails.getResult().getContentFeedback().getRating());
         Assert.assertNotNull(genieResponseDetails.getResult().getContentFeedback().getCreatedAt());
+    }
+
+    private String createAndSetProfileForGetFeedback() {
+
+        GenieServiceDBHelper.clearProfileTable();
+        Profile profile = new Profile("Happy1", "@drawable/ic_avatar2", "en");
+        profile.setAge(4);
+        profile.setDay(12);
+        profile.setMonth(11);
+
+        Profile createdProfile = createNewProfile(profile);
+
+        GenieResponse responseSetCurrentUser = activity.setCurrentUser(createdProfile.getUid());
+        Assert.assertTrue(responseSetCurrentUser.getStatus());
+
+        GenieResponse<Profile> responseGetCurrentUser = activity.getCurrentUser();
+        Assert.assertTrue(responseGetCurrentUser.getStatus());
+        String uid = responseGetCurrentUser.getResult().getUid();
+
+        return uid;
     }
 
 }

@@ -31,10 +31,20 @@ public class CollectionDeleteWithNChildTest extends GenieServiceTestBase {
     private static final String CONTENT_ID = "do_30019820";
     private static final String COLLECTION_FILE_PATH = Environment.getExternalStorageDirectory().toString() + "/Download/Times_Tables_2_to_10.ecar";
 
+    @Before
+    public void setup() throws IOException {
+        super.setup();
+        activity = rule.getActivity();
+        GenieServiceDBHelper.clearContentDBEntry();
+    }
+
+    @After
+    public void tearDown() throws IOException {
+        super.tearDown();
+    }
+
     @Test
     public void shouldDeleteCollectionWithNChildTest() {
-
-        GenieServiceDBHelper.clearContentDBEntry();
 
         String ext = FileUtil.getFileExtension(COLLECTION_FILE_PATH);
 

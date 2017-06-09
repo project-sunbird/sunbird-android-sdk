@@ -15,7 +15,6 @@ import org.junit.runner.RunWith;
  */
 
 @RunWith(AndroidJUnit4.class)
-//TODO check for the requestData from getLanguageSearch()
 public class LanguageServiceTest extends GenieServiceTestBase {
     private final static String TAG = LanguageServiceTest.class.getSimpleName();
 
