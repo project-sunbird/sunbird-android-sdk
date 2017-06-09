@@ -16,6 +16,7 @@ import org.ekstep.genieservices.content.ContentFeedbackServiceImpl;
 import org.ekstep.genieservices.content.ContentServiceImpl;
 import org.ekstep.genieservices.content.DownloadQueueListener;
 import org.ekstep.genieservices.content.LanguageServiceImpl;
+import org.ekstep.genieservices.importexport.FileImporter;
 import org.ekstep.genieservices.notification.NotificationServiceImpl;
 import org.ekstep.genieservices.partner.PartnerServiceImpl;
 import org.ekstep.genieservices.profile.SummarizerServiceImpl;
@@ -91,12 +92,12 @@ public class GenieService {
     /**
      * This api gets the {@link UserServiceImpl}, when accessed in the below way
      * <p>
-     * getService().getUserProfileService()
+     * getService().getUserService()
      * <p><p>
      *
      * @return {@link IUserService}
      */
-    public IUserService getUserProfileService() {
+    public IUserService getUserService() {
         if (mUserService == null) {
             mUserService = new UserServiceImpl(mAppContext);
         }
@@ -113,7 +114,7 @@ public class GenieService {
      */
     public ITelemetryService getTelemetryService() {
         if (mTelemetryService == null) {
-            mTelemetryService = new TelemetryServiceImpl(mAppContext, getUserProfileService());
+            mTelemetryService = new TelemetryServiceImpl(mAppContext, getUserService());
         }
         return mTelemetryService;
     }
@@ -158,7 +159,7 @@ public class GenieService {
      */
     public IContentFeedbackService getContentFeedbackService() {
         if (mContentFeedbackService == null) {
-            mContentFeedbackService = new ContentFeedbackServiceImpl(mAppContext, getUserProfileService());
+            mContentFeedbackService = new ContentFeedbackServiceImpl(mAppContext, getUserService());
         }
         return mContentFeedbackService;
     }
@@ -173,7 +174,7 @@ public class GenieService {
      */
     public IContentService getContentService() {
         if (mContentService == null) {
-            mContentService = new ContentServiceImpl(mAppContext, getUserProfileService(), getContentFeedbackService(), getConfigService());
+            mContentService = new ContentServiceImpl(mAppContext, getUserService(), getContentFeedbackService(), getConfigService());
         }
         return mContentService;
     }
@@ -257,6 +258,10 @@ public class GenieService {
      */
     public DownloadService getDownloadService() {
         return new DownloadService(mAppContext);
+    }
+
+    public FileImporter getFileImporter() {
+        return new FileImporter(mAppContext, getUserService());
     }
 
 }

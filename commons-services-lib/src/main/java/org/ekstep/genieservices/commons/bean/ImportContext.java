@@ -83,4 +83,7 @@ public class ImportContext {
         return isChildContent;
     }
 
+    public IDBSession getDBSession() {
+        return dbSession;
+    }
 }

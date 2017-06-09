@@ -28,6 +28,7 @@ public class UpdateImportedMetadata implements IChainable {
 
     @Override
     public IChainable then(IChainable link) {
-        return null;
+        nextLink = link;
+        return link;
     }
 }

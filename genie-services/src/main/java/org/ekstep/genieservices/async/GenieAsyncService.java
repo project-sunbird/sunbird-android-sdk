@@ -3,9 +3,10 @@ package org.ekstep.genieservices.async;
 import org.ekstep.genieservices.GenieService;
 
 /**
- * Created by mathew on 22/5/17.
+ * Created on 22/5/17.
+ *
+ * @author mathew
  */
-
 public class GenieAsyncService {
 
     private static GenieService sService;
@@ -37,7 +38,7 @@ public class GenieAsyncService {
         return sConfigService;
     }
 
-    public UserService getUserProfileService() {
+    public UserService getUserService() {
         if (sUserService == null) {
             sUserService = new UserService(sService);
         }

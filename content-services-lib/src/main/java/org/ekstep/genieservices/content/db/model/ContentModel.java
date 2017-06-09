@@ -144,7 +144,6 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         if (resultSet != null && resultSet.moveToFirst()) {
             readWithoutMoving(resultSet);
         }
-
         return this;
     }
 

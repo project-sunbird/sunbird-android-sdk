@@ -6,7 +6,9 @@ import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.ContentAccessLearnerState;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
 import org.ekstep.genieservices.commons.bean.UserSession;
+import org.ekstep.genieservices.importexport.FileImporter;
 
 import java.util.List;
 
@@ -14,10 +16,13 @@ import java.util.List;
  * This class provides all the required APIs to perform necessary operations related to Users on a separate thread
  */
 public class UserService {
+
     private IUserService userService;
+    private FileImporter fileImporter;
 
     public UserService(GenieService genieService) {
-        this.userService = genieService.getUserProfileService();
+        this.userService = genieService.getUserService();
+        fileImporter = genieService.getFileImporter();
     }
 
     /**
@@ -203,6 +208,15 @@ public class UserService {
             @Override
             public GenieResponse<Void> perform() {
                 return userService.setLearnerState(contentAccessLearnerState);
+            }
+        });
+    }
+
+    public void importProfile(final ProfileImportRequest profileImportRequest, IResponseHandler<Void> responseHandler) {
+        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return fileImporter.importFile(profileImportRequest);
             }
         });
     }
