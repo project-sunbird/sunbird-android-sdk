@@ -13,7 +13,6 @@ import org.ekstep.genieservices.commons.db.operations.IDataSource;
 import org.ekstep.genieservices.commons.db.operations.impl.SQLiteDataSource;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,22 +45,14 @@ public class FileImporter {
             return response;
         } else {
             IDBSession dbSession = dataSource.getImportDataSource(importRequest.getSourceFilePath());
+            // TODO: 6/9/2017 Can be moved to validate metadata
             MetadataModel metadataModel = MetadataModel.findAll(dbSession);
+            Map<String, Object> metadata = null;
             if (metadataModel != null) {
-                Map<String, Object> metadata = metadataModel.getMetadata();
-                List<String> importTypes = getImportTypes(metadata);
-                if (importTypes != null && importTypes.contains(ServiceConstants.EXPORT_TYPE_PROFILE)) {
-                    return userService.importProfile(dbSession, metadata);
-                }
+                metadata = metadataModel.getMetadata();
             }
-
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Profile import failed, metadata.", TAG);
-            return response;
+            return userService.importProfile(dbSession, metadata);
         }
-    }
-
-    private List<String> getImportTypes(Map<String, Object> metadata) {
-        return (List<String>) metadata.get(ServiceConstants.EXPORT_TYPES);
     }
 
 }
