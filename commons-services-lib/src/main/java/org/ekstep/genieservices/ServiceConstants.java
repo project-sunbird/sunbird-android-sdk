@@ -25,9 +25,13 @@ public interface ServiceConstants {
     /* Key Constants for all the key value store */
     String KEY_USER_SESSION = "session";
 
-    String NEVER_SYNCED = "NEVER";
-    String SYNC_PROMPT = "SYNC_PROMPT";
-    String CONTENT_API_EXPIRATION_KEY = "content_api_expiration_time";
+    String EXPORT_ID = "export_id";
+    String DID = "did";
+    String EVENTS_COUNT = "events_count";
+    String PROFILES_COUNT = "profiles_count";
+    String EXPORT_TYPES = "types";
+    String EXPORT_TYPE_TELEMETRY = "telemetry";
+    String EXPORT_TYPE_PROFILE = "userprofile";
 
     interface FileExtension {
         String CONTENT = "ecar";

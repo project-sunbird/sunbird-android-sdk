@@ -28,10 +28,6 @@ public class FileImporter {
 
     private static final String TAG = FileImporter.class.getSimpleName();
 
-    private static final String EXPORT_TYPES = "types";
-    private static final String EXPORT_TYPE_TELEMETRY = "telemetry";
-    private static final String EXPORT_TYPE_PROFILE = "userprofile";
-
     private IUserService userService;
     private IDataSource dataSource;
 
@@ -55,7 +51,7 @@ public class FileImporter {
             IDBSession dbSession = dataSource.getImportDataSource(importRequest.getSourceFilePath());
             Map<String, Object> metadata = getMetadata(dbSession);
             List<String> importTypes = getImportTypes(metadata);
-            if (importTypes != null && importTypes.contains(EXPORT_TYPE_PROFILE)) {
+            if (importTypes != null && importTypes.contains(ServiceConstants.EXPORT_TYPE_PROFILE)) {
                 return userService.importProfile(dbSession, metadata);
             }
 
@@ -74,6 +70,6 @@ public class FileImporter {
     }
 
     private List<String> getImportTypes(Map<String, Object> metadata) {
-        return (List<String>) metadata.get(EXPORT_TYPES);
+        return (List<String>) metadata.get(ServiceConstants.EXPORT_TYPES);
     }
 }

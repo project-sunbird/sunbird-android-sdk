@@ -5,6 +5,7 @@ import org.ekstep.genieservices.commons.db.contract.ImportedMetadataEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
+import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 
@@ -15,13 +16,17 @@ import java.util.Locale;
  *
  * @author anil
  */
-public class ImportedMetadataModel implements IWritable, IReadable {
+public class ImportedMetadataModel implements IWritable, IReadable, IUpdatable {
 
     private IDBSession dbSession;
     private Long id;
     private String importedId;
     private String deviceId;
     private int count;
+
+    private ImportedMetadataModel(IDBSession dbSession) {
+        this.dbSession = dbSession;
+    }
 
     private ImportedMetadataModel(IDBSession dbSession, String importedId, String deviceId) {
         this.dbSession = dbSession;
@@ -45,12 +50,21 @@ public class ImportedMetadataModel implements IWritable, IReadable {
         }
     }
 
+    public static ImportedMetadataModel build(IDBSession dbSession) {
+        return new ImportedMetadataModel(dbSession);
+    }
+
     public static ImportedMetadataModel build(IDBSession dbSession, String importedId, String deviceId, int count) {
         return new ImportedMetadataModel(dbSession, importedId, deviceId, count);
     }
 
     public Void save() {
         dbSession.create(this);
+        return null;
+    }
+
+    public Void update() {
+        dbSession.update(this);
         return null;
     }
 
@@ -62,7 +76,7 @@ public class ImportedMetadataModel implements IWritable, IReadable {
         return this;
     }
 
-    private void readWithoutMoving(IResultSet resultSet) {
+    public void readWithoutMoving(IResultSet resultSet) {
         id = resultSet.getLong(0);
         importedId = resultSet.getString(resultSet.getColumnIndex(ImportedMetadataEntry.COLUMN_NAME_IMPORTED_ID));
         deviceId = resultSet.getString(resultSet.getColumnIndex(ImportedMetadataEntry.COLUMN_NAME_DEVICE_ID));
@@ -106,8 +120,22 @@ public class ImportedMetadataModel implements IWritable, IReadable {
     }
 
     @Override
+    public ContentValues getFieldsToUpdate() {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(ImportedMetadataEntry.COLUMN_NAME_COUNT, count);
+        return contentValues;
+    }
+
+    @Override
     public String getTableName() {
         return ImportedMetadataEntry.TABLE_NAME;
+    }
+
+    @Override
+    public String updateBy() {
+        return String.format(Locale.US, "where %s = '%s' AND %s = '%s'",
+                ImportedMetadataEntry.COLUMN_NAME_IMPORTED_ID, importedId,
+                ImportedMetadataEntry.COLUMN_NAME_DEVICE_ID, deviceId);
     }
 
     @Override
