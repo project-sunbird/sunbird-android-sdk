@@ -21,21 +21,33 @@ import java.util.Map;
  * Created by swayangjit on 1/6/17.
  */
 
-public class Player {
-    private static final String TAG = Player.class.getSimpleName();
+public class ContentPlayer {
+
+    private static final String TAG = ContentPlayer.class.getSimpleName();
     private static final String GENIE_CANVAS_PACKAGE = "org.ekstep.geniecanvas";
     private static final String GENIE_QUIZ_APP_PACKAGE = "org.ekstep.quiz.app";
     private static final String GENIE_CANVAS_ACTIVITY = "org.ekstep.geniecanvas.MainActivity";
+    private static ContentPlayer sContentPlayer;
+    private String mQualifier;
 
-    public static void play(Context context, Content content, Map<String, Object> resourceBundle) {
-        play(context, content, null, resourceBundle);
+    private ContentPlayer(String qualifier) {
+        this.mQualifier = qualifier;
     }
 
-    public static void play(Context context, Content content, ArrayList<ContentHierarchy> hierarchyList, Map<String, Object> resourceBundle) {
-        PackageManager manager = context.getPackageManager();
+    public static void init(String qualifier) {
+        if (sContentPlayer == null) {
+            sContentPlayer = new ContentPlayer(qualifier);
+        }
+    }
 
+    public static void play(Context context, Content content, Map<String, Object> resourceBundle) {
+        PackageManager manager = context.getPackageManager();
         ContentData contentData = content.getContentData();
         String osId = contentData.getOsId();
+        if (sContentPlayer.mQualifier == null) {
+            Toast.makeText(context, "App qualifier not found", Toast.LENGTH_SHORT).show();
+            return;
+        }
         Intent intent = null;
         if (content.getMimeType().equalsIgnoreCase(Constants.MimeType.APK_MIME_TYPE)) {
             if (ContentUtil.isAppInstalled(context, osId)) {
@@ -60,12 +72,14 @@ public class Player {
         }
 
         intent.putExtra("origin", "Genie");
-        if (hierarchyList != null && hierarchyList.size() > 0) {
-            intent.putExtra("contentExtras", getContentHierarchy(hierarchyList, contentData.getIdentifier(), content.getContentType()));
-        }
+//        if (hierarchyList != null && hierarchyList.size() > 0) {
+//            intent.putExtra("contentExtras", getContentHierarchy(hierarchyList, contentData.getIdentifier(), content.getContentType()));
+//        }
+        // TODO: 9/6/17 This will be updated when content child will be done
+        intent.putExtra("contentExtras", new ArrayList<>());
         intent.putExtra("appInfo", GsonUtil.toJson(contentData));
-        intent.putExtra("language_info", GsonUtil.toJson(resourceBundle));
-
+        intent.putExtra("languageInfo", GsonUtil.toJson(resourceBundle));
+        intent.putExtra("appQualifier", sContentPlayer.mQualifier);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
 
         context.startActivity(intent);

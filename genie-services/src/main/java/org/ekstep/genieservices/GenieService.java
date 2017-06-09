@@ -23,6 +23,7 @@ import org.ekstep.genieservices.profile.UserServiceImpl;
 import org.ekstep.genieservices.telemetry.SyncServiceImpl;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 import org.ekstep.genieservices.telemetry.TelemetryServiceImpl;
+import org.ekstep.genieservices.utils.ContentPlayer;
 
 /**
  * {@link GenieService} is the entry point and the point of contact to interact with all the services of the GenieService sdk.
@@ -65,6 +66,7 @@ public class GenieService {
         if (sService == null) {
             AppContext<Context> applicationContext = AndroidAppContext.buildAppContext(context, packageName);
             Logger.init(new AndroidLogger());
+            ContentPlayer.init(applicationContext.getParams().getQualifier());
             TelemetryLogger.init(new TelemetryServiceImpl(applicationContext, new UserServiceImpl(applicationContext)));
             DownloadQueueListener.init(applicationContext, new DownloadService(applicationContext));
             sService = new GenieService(applicationContext);

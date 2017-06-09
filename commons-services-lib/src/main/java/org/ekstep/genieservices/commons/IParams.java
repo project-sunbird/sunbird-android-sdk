@@ -17,4 +17,6 @@ public interface IParams {
      String getGid();
 
      int getLogLevel();
+
+     String getQualifier();
 }
