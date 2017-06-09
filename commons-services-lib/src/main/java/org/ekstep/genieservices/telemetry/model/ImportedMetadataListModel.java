@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.profile.db.model;
+package org.ekstep.genieservices.telemetry.model;
 
 import org.ekstep.genieservices.commons.db.contract.ImportedMetadataEntry;
 import org.ekstep.genieservices.commons.db.core.IReadable;

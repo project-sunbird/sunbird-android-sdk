@@ -1,17 +1,18 @@
 package org.ekstep.genieservices.telemetry.model;
 
+import org.ekstep.genieservices.commons.db.contract.TelemetryProcessedEntry;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.commons.db.contract.TelemetryProcessedEntry;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by swayangjit on 26/4/17.
+ * Created on 26/4/17.
+ *
+ * @author swayangjit
  */
-
 public class ProcessedEventsModel implements IReadable {
 
     private List<ProcessedEventModel> processedEvents;

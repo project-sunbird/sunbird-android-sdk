@@ -6,7 +6,7 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.chained.IChainable;
-import org.ekstep.genieservices.profile.db.model.ImportedMetadataModel;
+import org.ekstep.genieservices.telemetry.model.ImportedMetadataModel;
 
 import java.util.List;
 import java.util.Map;
