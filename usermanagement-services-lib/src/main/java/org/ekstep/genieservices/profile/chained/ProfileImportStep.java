@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.content.chained;
+package org.ekstep.genieservices.profile.chained;
 
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
@@ -12,11 +12,11 @@ import org.ekstep.genieservices.commons.chained.IChainable;
  *
  * @author anil
  */
-public class ContentImportStep {
+public class ProfileImportStep {
 
-    private static final String TAG = ContentImportStep.class.getSimpleName();
+    private static final String TAG = ProfileImportStep.class.getSimpleName();
 
-    public static IChainable initImportContent() {
+    public static IChainable initImport() {
         return new IChainable() {
             private IChainable nextLink;
 
@@ -25,7 +25,7 @@ public class ContentImportStep {
                 if (nextLink != null) {
                     return nextLink.execute(appContext, importContext);
                 } else {
-                    return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "Import content failed", TAG);
+                    return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "Import profile failed", TAG);
                 }
             }
 

@@ -10,8 +10,8 @@ import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentAccessLearnerState;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.Profile;
-import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.enums.ContentAccessStatusType;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
@@ -22,6 +22,7 @@ import org.ekstep.genieservices.commons.bean.telemetry.GEError;
 import org.ekstep.genieservices.commons.bean.telemetry.GESessionEnd;
 import org.ekstep.genieservices.commons.bean.telemetry.GESessionStart;
 import org.ekstep.genieservices.commons.bean.telemetry.GEUpdateProfile;
+import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
@@ -29,6 +30,13 @@ import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
+import org.ekstep.genieservices.profile.chained.AddGeTransferTelemetryImportEvent;
+import org.ekstep.genieservices.profile.chained.ProfileImportStep;
+import org.ekstep.genieservices.profile.chained.TransportProfiles;
+import org.ekstep.genieservices.profile.chained.TransportSummarizer;
+import org.ekstep.genieservices.profile.chained.TransportUser;
+import org.ekstep.genieservices.profile.chained.UpdateImportedMetadata;
+import org.ekstep.genieservices.profile.chained.ValidateMetadata;
 import org.ekstep.genieservices.profile.db.model.ContentAccessModel;
 import org.ekstep.genieservices.profile.db.model.ContentAccessesModel;
 import org.ekstep.genieservices.profile.db.model.UserModel;
@@ -486,36 +494,17 @@ public class UserServiceImpl extends BaseService implements IUserService {
     }
 
     @Override
-    public GenieResponse<Void> importProfile(ProfileImportRequest importRequest) {
-        GenieResponse<Void> response;
+    public GenieResponse<Void> importProfile(IDBSession dbSession, Map<String, Object> metadata) {
+        ImportContext importContext = new ImportContext(dbSession, metadata);
+        IChainable profileImportSteps = ProfileImportStep.initImport();
+        profileImportSteps.then(new ValidateMetadata())
+                .then(new TransportProfiles())
+                .then(new TransportUser())
+                .then(new TransportSummarizer())
+                .then(new UpdateImportedMetadata())
+                .then(new AddGeTransferTelemetryImportEvent());
 
-//        if (!FileUtil.doesFileExists(importRequest.getSourceFilePath())) {
-//            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Profile import failed, file doesn't exists", TAG);
-//            return response;
-//        }
-//
-//        String ext = FileUtil.getFileExtension(importRequest.getSourceFilePath());
-//        if (!ServiceConstants.FileExtension.PROFILE.equals(ext)) {
-//            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Profile import failed, unsupported file extension", TAG);
-//            return response;
-//        } else {
-//            ImportContext importContext = new ImportContext(importRequest.isChildContent(), importRequest.getSourceFilePath(), importRequest.getDestinationFolder());
-//
-//            IChainable importContentSteps = ContentImportStep.initImportContent();
-//            importContentSteps.then(new DeviceMemoryCheck())
-//                    .then(new ExtractEcar())
-//                    .then(new ValidateEcar())
-//                    .then(new ExtractPayloads())
-//                    .then(new EcarCleanUp())
-//                    .then(new AddGeTransferContentImportEvent());
-//            GenieResponse<Void> genieResponse = importContentSteps.execute(mAppContext, importContext);
-////            if (genieResponse.getStatus()) {
-////                EventPublisher.postImportSuccessfull(new ImportStatus(null));
-////            }
-//            return genieResponse;
-//        }
-
-        return null;
+        return profileImportSteps.execute(mAppContext, importContext);
     }
 
 }

@@ -5,10 +5,11 @@ import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentAccessLearnerState;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
-import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
 import org.ekstep.genieservices.commons.bean.UserSession;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * This is the interface with all the required APIs to perform necessary operations related to Users
@@ -146,8 +147,9 @@ public interface IUserService {
     /**
      * This API is used to import profiles.
      *
-     * @param profileImportRequest
+     * @param dbSession
+     * @param metadata
      * @return
      */
-    GenieResponse<Void> importProfile(ProfileImportRequest profileImportRequest);
+    GenieResponse<Void> importProfile(IDBSession dbSession, Map<String, Object> metadata);
 }

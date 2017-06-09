@@ -101,6 +101,7 @@ public interface ServiceConstants {
         String INVALID_PROFILE = "INVALID_PROFILE";
         String PROFILE_NOT_FOUND = "PROFILE_NOT_FOUND";
         String INVALID_USER = "INVALID_USER";
+        String IMPORT_FAILED = "IMPORT_FAILED";
 
         //Partner
         String UNREGISTERED_PARTNER = "UNREGISTERED_PARTNER";

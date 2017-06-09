@@ -4,12 +4,13 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransfer;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferContentMap;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
+import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.ContentHandler;
-import org.ekstep.genieservices.content.bean.ImportContext;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.util.ArrayList;

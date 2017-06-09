@@ -14,9 +14,10 @@ import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import java.util.Locale;
 
 /**
- * Created by swayangjit on 26/4/17.
+ * Created on 26/4/17.
+ *
+ * @author swayangjit
  */
-
 public class ProcessedEventModel implements IWritable, ICleanable, IReadable {
 
     private String msgId;
@@ -50,7 +51,7 @@ public class ProcessedEventModel implements IWritable, ICleanable, IReadable {
     }
 
     public static ProcessedEventModel build(IDBSession dbSession, String msgId, byte[] data, int numberOfEvents, int priority) {
-        return new ProcessedEventModel(dbSession, msgId, data, numberOfEvents, priority, new ContentValues());
+        return new ProcessedEventModel(dbSession, msgId, data, numberOfEvents, priority);
     }
 
     public static ProcessedEventModel find(IDBSession dbSesion) {
@@ -97,8 +98,7 @@ public class ProcessedEventModel implements IWritable, ICleanable, IReadable {
 
     @Override
     public String selectionToClean() {
-        String selectionBy = String.format(Locale.US, "WHERE _id = %d", id);
-        return selectionBy;
+        return String.format(Locale.US, "WHERE _id = %d", id);
     }
 
     @Override

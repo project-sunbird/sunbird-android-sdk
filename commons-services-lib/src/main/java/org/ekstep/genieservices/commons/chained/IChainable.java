@@ -1,8 +1,8 @@
-package org.ekstep.genieservices.content.chained;
+package org.ekstep.genieservices.commons.chained;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.content.bean.ImportContext;
+import org.ekstep.genieservices.commons.bean.ImportContext;
 
 /**
  * Created on 5/16/2017.

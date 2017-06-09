@@ -23,7 +23,6 @@ public abstract class ImportedMetadataEntry implements BaseColumns {
         return "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_NAME_COUNT + " INTEGER NULL;";
     }
 
-
     public static final String getDeleteEntry() {
         return "DROP TABLE IF EXISTS " + TABLE_NAME;
     }
