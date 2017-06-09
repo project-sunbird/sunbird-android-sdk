@@ -32,8 +32,8 @@ public class SummaryHandler {
 
     private static void processOEEnd(Telemetry event, AppContext appContext) {
         Logger.i(TAG, "Process OE END");
-//        SummarizerServiceImpl summarizerService = new SummarizerServiceImpl(appContext);
-//        summarizerService.saveLearnerAssessmentDetails(event);
+        SummarizerServiceImpl summarizerService = new SummarizerServiceImpl(appContext);
+        summarizerService.saveLearnerContentSummaryDetails(event);
     }
 
 }

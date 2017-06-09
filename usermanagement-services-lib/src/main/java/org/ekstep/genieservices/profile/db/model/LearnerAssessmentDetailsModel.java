@@ -37,7 +37,6 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
     private String hierarchyData;
     private IDBSession dbSession;
     private List<LearnerAssessmentDetails> mAssessmentList;
-    private Long insertId;
     private String filter;
 
     private LearnerAssessmentDetailsModel(IDBSession dbSession, String filter) {
@@ -171,7 +170,7 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
 
     @Override
     public void updateId(long id) {
-        insertId = id;
+        this.id = id;
     }
 
     @Override
@@ -242,6 +241,6 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
     }
 
     public Long getInsertedId() {
-        return insertId;
+        return this.id;
     }
 }
