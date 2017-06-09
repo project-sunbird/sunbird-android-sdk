@@ -21,6 +21,7 @@ import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
+import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
@@ -28,6 +29,8 @@ import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
+import org.ekstep.genieservices.commons.bean.enums.InteractionType;
+import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
 import org.ekstep.genieservices.commons.download.DownloadService;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -48,6 +51,7 @@ import org.ekstep.genieservices.content.network.ContentListingAPI;
 import org.ekstep.genieservices.content.network.ContentSearchAPI;
 import org.ekstep.genieservices.content.network.RecommendedContentAPI;
 import org.ekstep.genieservices.content.network.RelatedContentAPI;
+import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -496,7 +500,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
     @Override
     public GenieResponse<Void> importContent(ContentImportRequest importRequest) {
-        // TODO: 5/16/2017 - Telemetry logger
+
         String method = "importContent@ContentServiceImpl";
         Map<String, Object> params = new HashMap<>();
         params.put("importContent", importRequest.getSourceFilePath());
@@ -518,6 +522,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             } else {
                 ImportContext importContext = new ImportContext(importRequest.isChildContent(), importRequest.getSourceFilePath(), importRequest.getDestinationFolder());
 
+                // TODO: 6/8/2017 - Add identifier in the GE_INTERACT event
+                buildInitiateEvent();
+
                 IChainable importContentSteps = ContentImportStep.initImportContent();
                 importContentSteps.then(new DeviceMemoryCheck())
                         .then(new ExtractEcar())
@@ -526,9 +533,12 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                         .then(new EcarCleanUp())
                         .then(new AddGeTransferContentImportEvent());
                 GenieResponse<Void> genieResponse = importContentSteps.execute(mAppContext, importContext);
-//            if (genieResponse.getStatus()) {
+                if (genieResponse.getStatus()) {
+                    // TODO: 6/8/2017 - Add identifier in the GE_INTERACT event
+                    buildSuccessEvent();
 //                EventPublisher.postImportSuccessfull(new ImportStatus(null));
-//            }
+
+                }
                 return genieResponse;
             }
         } else {    // Download and then import
@@ -571,5 +581,25 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         }
     }
+
+    private void buildInitiateEvent() {
+        GEInteract geInteract = new GEInteract.Builder(new GameData(mAppContext.getParams().getGid(), mAppContext.getParams().getVersionName())).
+                stageId(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID).
+                subType(ServiceConstants.Telemetry.CONTENT_IMPORT_INITIATED_SUB_TYPE).
+                interActionType(InteractionType.TOUCH).
+                build();
+        TelemetryLogger.log(geInteract);
+
+    }
+
+    private void buildSuccessEvent() {
+        GEInteract geInteract = new GEInteract.Builder(new GameData(mAppContext.getParams().getGid(), mAppContext.getParams().getVersionName())).
+                stageId(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID).
+                subType(ServiceConstants.Telemetry.CONTENT_IMPORT_SUCCESS_SUB_TYPE).
+                interActionType(InteractionType.OTHER).
+                build();
+        TelemetryLogger.log(geInteract);
+    }
+
 
 }
