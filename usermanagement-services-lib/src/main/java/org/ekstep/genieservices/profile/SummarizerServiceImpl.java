@@ -68,9 +68,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         HashMap params = new HashMap();
         params.put("logLevel", "2");
 
-        String filter = String.format(Locale.US, "where %s = %s and %s = %s and %s = %s", LearnerAssessmentsEntry.COLUMN_NAME_UID, summaryRequest.getUid(),
-                LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID, summaryRequest.getContentId(),
-                LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA, null);
+        String filter = getFilter(null, summaryRequest.getUid(), summaryRequest.getContentId(), null);
 
         LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.find(mAppContext.getDBSession(), filter);
         if (learnerAssessmentDetailsModel == null) {
@@ -83,6 +81,22 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         return response;
     }
 
+    private String getFilter(String qid, String uid, String contentId, String hierarchyData) {
+        String isQid = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_QID, qid);
+        String isUid = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_UID, uid);
+        String isContentId = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID, contentId);
+        String isHData = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA, hierarchyData);
+
+        String filter;
+        if (StringUtil.isNullOrEmpty(qid)) {
+            filter = String.format(Locale.US, "where %s AND %s AND %s", isUid, isContentId, isHData);
+        } else {
+            filter = String.format(Locale.US, "where %s AND %s AND %s AND %s", isUid, isContentId, isHData, isQid);
+        }
+        return filter;
+    }
+
+
     @Override
     public GenieResponse<Void> saveLearnerAssessmentDetails(Telemetry telemetry) {
         GenieResponse<Void> response;
@@ -91,7 +105,15 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         params.put("logLevel", "2");
         LearnerAssessmentDetails learnerAssessmentDetails = mapTelemtryToLearnerAssessmentData(telemetry);
         LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.build(mAppContext.getDBSession(), learnerAssessmentDetails);
-        learnerAssessmentDetailsModel.save();
+
+        String filter = getFilter(learnerAssessmentDetails.getQid(), learnerAssessmentDetails.getUid(), learnerAssessmentDetails.getContentId(), learnerAssessmentDetails.getHierarchyData());
+
+        //check if the learner assessment already exists
+        if (LearnerAssessmentDetailsModel.find(mAppContext.getDBSession(), filter) == null){
+            learnerAssessmentDetailsModel.save();
+        }else{
+            learnerAssessmentDetailsModel.update();
+        }
 
         if (learnerAssessmentDetailsModel.getInsertedId() == -1) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROCESSING_ERROR, ServiceConstants.ErrorMessage.UNABLE_TO_SAVE_LEARNER_ASSESSMENT, TAG);
