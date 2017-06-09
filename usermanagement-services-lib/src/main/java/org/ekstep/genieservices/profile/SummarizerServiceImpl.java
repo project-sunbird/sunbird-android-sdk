@@ -85,7 +85,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         String isQid = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_QID, qid);
         String isUid = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_UID, uid);
         String isContentId = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID, contentId);
-        String isHData = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA, hierarchyData);
+        String isHData = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA, hierarchyData == null ? "" : hierarchyData);
 
         String filter;
         if (StringUtil.isNullOrEmpty(qid)) {
@@ -109,9 +109,9 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         String filter = getFilter(learnerAssessmentDetails.getQid(), learnerAssessmentDetails.getUid(), learnerAssessmentDetails.getContentId(), learnerAssessmentDetails.getHierarchyData());
 
         //check if the learner assessment already exists
-        if (LearnerAssessmentDetailsModel.find(mAppContext.getDBSession(), filter) == null){
+        if (LearnerAssessmentDetailsModel.find(mAppContext.getDBSession(), filter) == null) {
             learnerAssessmentDetailsModel.save();
-        }else{
+        } else {
             learnerAssessmentDetailsModel.update();
         }
 
