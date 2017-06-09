@@ -63,11 +63,9 @@ public class GetRelatedContentTask extends BaseTask {
         return mapData;
     }
 
-    private GenieResponse readCursor(Cursor cursor) {
+    private GenieResponse<Map> readCursor(Cursor cursor) {
         String resultData = cursor.getString(0);
-        Type type = new TypeToken<GenieResponse<Map>>() {
-        }.getType();
-        GenieResponse response = GsonUtil.fromJson(resultData, type);
+        GenieResponse response = GsonUtil.fromJson(resultData, GenieResponse.class);
         return response;
     }
 

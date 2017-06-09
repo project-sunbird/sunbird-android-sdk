@@ -5,13 +5,11 @@ import android.database.Cursor;
 import android.net.Uri;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import org.ekstep.genieresolvers.BaseTask;
 import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 
-import java.lang.reflect.Type;
 import java.util.Map;
 
 /**
@@ -60,9 +58,7 @@ public class SetCurrentUserTask extends BaseTask {
     private GenieResponse<Map> readCursor(Cursor cursor) {
         Gson gson = new Gson();
         String serverData = cursor.getString(0);
-        Type type = new TypeToken<GenieResponse<Map>>() {
-        }.getType();
-        GenieResponse<Map> response = gson.fromJson(serverData, type);
+        GenieResponse<Map> response = gson.fromJson(serverData, GenieResponse.class);
         return response;
     }
 

@@ -23,7 +23,6 @@ public class TelemetryService extends BaseService {
 
     public void saveTelemetryEvent(String eventString, IResponseHandler responseHandler) {
         TelemetryEventTask telemetryEventTask = new TelemetryEventTask(context, appQualifier, eventString);
-
         createAndExecuteTask(responseHandler, telemetryEventTask);
     }
 
