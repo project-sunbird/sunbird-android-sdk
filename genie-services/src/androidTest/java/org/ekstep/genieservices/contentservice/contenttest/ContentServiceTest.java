@@ -15,6 +15,7 @@ import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
+import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
@@ -22,6 +23,7 @@ import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.utils.FileUtil;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.contentservice.collectiontest.AssertCollection;
 import org.junit.After;
 import org.junit.Before;
@@ -30,6 +32,7 @@ import org.junit.runner.RunWith;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Sneha on 5/31/2017.
@@ -164,7 +167,6 @@ public class ContentServiceTest extends GenieServiceTestBase {
      * TODO :: Test case fails
      * Any other assertions
      * In the result get recommended list comes as null.
-     *
      */
     @Test
     public void shouldGetAllRecommendedContent() {
@@ -211,9 +213,13 @@ public class ContentServiceTest extends GenieServiceTestBase {
     @Test
     public void shouldSearchContent() {
 
-        ContentSearchCriteria.Builder searchCriteria = new ContentSearchCriteria.Builder().query("collection").limit(1);
+        ContentSearchCriteria.Builder searchCriteria = new ContentSearchCriteria.Builder().query("collection").limit(10);
 
-        GenieResponse response = activity.searchContent(searchCriteria.build());
-        Log.v(TAG, "searchContent response :: " + response.getResult());
+        GenieResponse<ContentSearchResult> response = activity.searchContent(searchCriteria.build());
+        Assert.assertTrue(response.getStatus());
+        Assert.assertNotNull(response.getResult().getContents());
+        Assert.assertEquals("collection", response.getResult().getRequest().get("query"));
+        Map responseObj = GsonUtil.fromMap(response.getResult().getRequest(), Map.class);
+        Assert.assertEquals(10.0, responseObj.get("limit"));
     }
 }
