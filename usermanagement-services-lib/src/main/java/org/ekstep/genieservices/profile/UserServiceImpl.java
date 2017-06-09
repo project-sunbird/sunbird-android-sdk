@@ -96,18 +96,14 @@ public class UserServiceImpl extends BaseService implements IUserService {
         HashMap params = new HashMap();
         params.put("logLevel", "1");
         UserProfilesModel userProfilesModel = UserProfilesModel.find(mAppContext.getDBSession());
-
+        GenieResponse genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, List.class);
         if (userProfilesModel == null) {
-            GenieResponse genieResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.DATA_NOT_FOUND_ERROR, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_PROFILE, TAG, Void.class);
-            TelemetryLogger.logFailure(mAppContext, genieResponse, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_ALL_PROFILE);
-            return genieResponse;
+            genieResponse.setResult(new ArrayList<Profile>());
         } else {
-            GenieResponse genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, List.class);
             genieResponse.setResult(userProfilesModel.getProfileList());
-            TelemetryLogger.logSuccess(mAppContext, genieResponse, TAG, methodName, params);
-            return genieResponse;
         }
-
+        TelemetryLogger.logSuccess(mAppContext, genieResponse, TAG, methodName, params);
+        return genieResponse;
     }
 
     private void logGEError(GenieResponse response, String id) {
