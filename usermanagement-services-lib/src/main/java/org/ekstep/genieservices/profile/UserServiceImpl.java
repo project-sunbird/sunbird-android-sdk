@@ -35,8 +35,8 @@ import org.ekstep.genieservices.profile.chained.ProfileImportStep;
 import org.ekstep.genieservices.profile.chained.TransportProfiles;
 import org.ekstep.genieservices.profile.chained.TransportSummarizer;
 import org.ekstep.genieservices.profile.chained.TransportUser;
-import org.ekstep.genieservices.profile.chained.UpdateImportedMetadata;
-import org.ekstep.genieservices.profile.chained.ValidateMetadata;
+import org.ekstep.genieservices.profile.chained.UpdateImportedProfileMetadata;
+import org.ekstep.genieservices.profile.chained.ValidateProfileMetadata;
 import org.ekstep.genieservices.profile.db.model.ContentAccessModel;
 import org.ekstep.genieservices.profile.db.model.ContentAccessesModel;
 import org.ekstep.genieservices.profile.db.model.UserModel;
@@ -486,11 +486,11 @@ public class UserServiceImpl extends BaseService implements IUserService {
     public GenieResponse<Void> importProfile(IDBSession dbSession, Map<String, Object> metadata) {
         ImportContext importContext = new ImportContext(dbSession, metadata);
         IChainable profileImportSteps = ProfileImportStep.initImport();
-        profileImportSteps.then(new ValidateMetadata())
+        profileImportSteps.then(new ValidateProfileMetadata())
                 .then(new TransportProfiles())
                 .then(new TransportUser())
                 .then(new TransportSummarizer())
-                .then(new UpdateImportedMetadata())
+                .then(new UpdateImportedProfileMetadata())
                 .then(new AddGeTransferProfileImportEvent());
 
         return profileImportSteps.execute(mAppContext, importContext);

@@ -16,9 +16,9 @@ import java.util.Map;
  *
  * @author anil
  */
-public class ValidateMetadata implements IChainable {
+public class ValidateProfileMetadata implements IChainable {
 
-    private static final String TAG = ValidateMetadata.class.getSimpleName();
+    private static final String TAG = ValidateProfileMetadata.class.getSimpleName();
     private IChainable nextLink;
 
     @Override
@@ -34,6 +34,8 @@ public class ValidateMetadata implements IChainable {
                 if (importedMetadataModel != null) {
                     return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "This data has already been imported.", TAG);
                 }
+            } else {
+                return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "Profile event import failed, type mismatch.", TAG);
             }
         } else {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "Profile import failed, metadata validation failed.", TAG);

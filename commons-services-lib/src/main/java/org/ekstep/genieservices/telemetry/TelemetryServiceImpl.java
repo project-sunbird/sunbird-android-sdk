@@ -26,8 +26,8 @@ import org.ekstep.genieservices.tag.cache.TelemetryTagCache;
 import org.ekstep.genieservices.telemetry.chained.AddGeTransferTelemetryImportEvent;
 import org.ekstep.genieservices.telemetry.chained.TelemetryImportStep;
 import org.ekstep.genieservices.telemetry.chained.TransportProcessedEventsImportEvent;
-import org.ekstep.genieservices.telemetry.chained.UpdateImportedMetadata;
-import org.ekstep.genieservices.telemetry.chained.ValidateMetadata;
+import org.ekstep.genieservices.telemetry.chained.UpdateImportedTelemetryMetadata;
+import org.ekstep.genieservices.telemetry.chained.ValidateTelemetryMetadata;
 import org.ekstep.genieservices.telemetry.model.EventModel;
 
 import java.util.ArrayList;
@@ -158,9 +158,9 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
     public GenieResponse<Void> importTelemetry(IDBSession dbSession, Map<String, Object> metadata) {
         ImportContext importContext = new ImportContext(dbSession, metadata);
         IChainable telemetryImportSteps = TelemetryImportStep.initImport();
-        telemetryImportSteps.then(new ValidateMetadata())
+        telemetryImportSteps.then(new ValidateTelemetryMetadata())
                 .then(new TransportProcessedEventsImportEvent())
-                .then(new UpdateImportedMetadata())
+                .then(new UpdateImportedTelemetryMetadata())
                 .then(new AddGeTransferTelemetryImportEvent());
 
         return telemetryImportSteps.execute(mAppContext, importContext);

@@ -16,17 +16,16 @@ import java.util.Map;
  *
  * @author anil
  */
-public class ValidateMetadata implements IChainable {
+public class ValidateTelemetryMetadata implements IChainable {
 
-    private static final String TAG = ValidateMetadata.class.getSimpleName();
+    private static final String TAG = ValidateTelemetryMetadata.class.getSimpleName();
     private IChainable nextLink;
 
     @Override
     public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
-
         if (importContext.getMetadata() != null && !importContext.getMetadata().isEmpty()) {
             List<String> importTypes = getImportTypes(importContext.getMetadata());
-            if (importTypes != null && importTypes.contains(ServiceConstants.EXPORT_TYPE_PROFILE)) {
+            if (importTypes != null && importTypes.contains(ServiceConstants.EXPORT_TYPE_TELEMETRY)) {
                 String importId = (String) importContext.getMetadata().get(ServiceConstants.EXPORT_ID);
                 String did = (String) importContext.getMetadata().get(ServiceConstants.DID);
 
@@ -34,15 +33,17 @@ public class ValidateMetadata implements IChainable {
                 if (importedMetadataModel != null) {
                     return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "This data has already been imported.", TAG);
                 }
+            } else {
+                return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "Telemetry event import failed, type mismatch.", TAG);
             }
         } else {
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "Profile import failed, metadata validation failed.", TAG);
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "Telemetry event import failed, metadata validation failed.", TAG);
         }
 
         if (nextLink != null) {
             return nextLink.execute(appContext, importContext);
         } else {
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "Import profile failed.", TAG);
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "Import telemetry failed.", TAG);
         }
     }
 
@@ -55,4 +56,5 @@ public class ValidateMetadata implements IChainable {
     private List<String> getImportTypes(Map<String, Object> metadata) {
         return (List<String>) metadata.get(ServiceConstants.EXPORT_TYPES);
     }
+
 }

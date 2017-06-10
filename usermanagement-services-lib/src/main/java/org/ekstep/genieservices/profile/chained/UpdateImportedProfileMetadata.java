@@ -13,9 +13,9 @@ import org.ekstep.genieservices.telemetry.model.ImportedMetadataModel;
  *
  * @author anil
  */
-public class UpdateImportedMetadata implements IChainable {
+public class UpdateImportedProfileMetadata implements IChainable {
 
-    private static final String TAG = UpdateImportedMetadata.class.getSimpleName();
+    private static final String TAG = UpdateImportedProfileMetadata.class.getSimpleName();
     private IChainable nextLink;
 
     @Override
