@@ -44,7 +44,7 @@ import java.util.Set;
 public class TelemetryServiceImpl extends BaseService implements ITelemetryService {
 
     private static final String TAG = TelemetryServiceImpl.class.getSimpleName();
-    private IUserService mUserService = null;
+    private IUserService mUserService;
 
     public TelemetryServiceImpl(AppContext appContext, IUserService userService) {
         super(appContext);
@@ -58,15 +58,15 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         params.put("Event", eventString);
         params.put("logLevel", "2");
 
+        GenieResponse<Void> response;
         try {
-            GenieResponse response = saveEvent(eventString);
-            saveEvent(TelemetryLogger.create(mAppContext, response, new HashMap(), TAG, methodName, params).toString());
-            return response;
+            response = saveEvent(eventString);
         } catch (InvalidDataException e) {
-            GenieResponse response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.VALIDATION_ERROR, ServiceConstants.ErrorMessage.UNABLE_TO_SAVE_EVENT, TAG, Void.class);
-            saveEvent(TelemetryLogger.create(mAppContext, response, new HashMap(), TAG, methodName, params).toString());
-            return response;
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.VALIDATION_ERROR, ServiceConstants.ErrorMessage.UNABLE_TO_SAVE_EVENT, TAG, Void.class);
         }
+
+        saveEvent(TelemetryLogger.create(mAppContext, response, new HashMap(), TAG, methodName, params).toString());
+        return response;
     }
 
     @Override
@@ -103,11 +103,10 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         genieResponse.setResult(new TelemetryStat(unSyncedEventCount, lastSyncTime));
 
         saveEvent(TelemetryLogger.create(mAppContext, genieResponse, new HashMap(), TAG, methodName, params).toString());
-
         return genieResponse;
     }
 
-    private GenieResponse saveEvent(String eventString) {
+    private GenieResponse<Void> saveEvent(String eventString) {
         EventModel event = EventModel.build(mAppContext.getDBSession(), eventString);
         decorateEvent(event);
         event.save();
@@ -117,7 +116,6 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
     }
 
     private void decorateEvent(EventModel event) {
-
         //Patch the event with proper timestamp
         String version = event.getVersion();
         if (version.equals("1.0")) {
@@ -136,7 +134,6 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
 
         //Patch the event with did
         event.updateDeviceInfo(mAppContext.getDeviceInfo().getDeviceID());
-
 
         //Patch Partner tagss
         String values = mAppContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.KEY_ACTIVE_PARTNER_ID, "");

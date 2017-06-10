@@ -35,7 +35,7 @@ public class UpdateImportedProfileMetadata implements IChainable {
         if (nextLink != null) {
             return nextLink.execute(appContext, importContext);
         } else {
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "Import profile failed.", TAG);
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "Data has been imported, but failed to update meta data.", TAG);
         }
     }
 

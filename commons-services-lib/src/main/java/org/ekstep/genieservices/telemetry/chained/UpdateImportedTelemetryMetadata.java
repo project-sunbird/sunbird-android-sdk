@@ -23,7 +23,7 @@ public class UpdateImportedTelemetryMetadata implements IChainable {
 
         String importId = (String) importContext.getMetadata().get(ServiceConstants.EXPORT_ID);
         String did = (String) importContext.getMetadata().get(ServiceConstants.DID);
-        int count = (int) importContext.getMetadata().get(ServiceConstants.PROFILES_COUNT);
+        int count = (int) importContext.getMetadata().get(ServiceConstants.EVENTS_COUNT);
 
         ImportedMetadataModel importedMetadataModel = ImportedMetadataModel.build(appContext.getDBSession(), importId, did, count);
         if (ImportedMetadataModel.find(appContext.getDBSession(), importId, did) == null) {
@@ -35,7 +35,7 @@ public class UpdateImportedTelemetryMetadata implements IChainable {
         if (nextLink != null) {
             return nextLink.execute(appContext, importContext);
         } else {
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "Import profile failed.", TAG);
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "Data has been imported, but failed to update meta data.", TAG);
         }
     }
 
