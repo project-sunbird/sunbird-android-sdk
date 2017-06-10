@@ -21,6 +21,7 @@ import org.ekstep.genieservices.partner.PartnerServiceImpl;
 import org.ekstep.genieservices.profile.SummarizerServiceImpl;
 import org.ekstep.genieservices.profile.UserServiceImpl;
 import org.ekstep.genieservices.profile.event.SummaryListener;
+import org.ekstep.genieservices.tag.TagServiceImpl;
 import org.ekstep.genieservices.telemetry.SyncServiceImpl;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 import org.ekstep.genieservices.telemetry.TelemetryServiceImpl;
@@ -50,6 +51,7 @@ public class GenieService {
     private ILanguageService mLanguageService;
     private INotificationService mNotificationService;
     private ISummarizerService mSummarizerService;
+    private ITagService mTagService;
 
     private GenieService(AppContext<Context> applicationContext) {
         this.mAppContext = applicationContext;
@@ -216,6 +218,21 @@ public class GenieService {
     }
 
     /**
+     * This api gets the {@link TagServiceImpl}, when accessed in the below way
+     * <p>
+     * getService().getTagService()
+     * <p><p>
+     *
+     * @return {@link ITagService}
+     */
+    public ITagService getTagService() {
+        if (mTagService == null) {
+            mTagService = new TagServiceImpl(mAppContext);
+        }
+        return mTagService;
+    }
+
+    /**
      * This api gets the {@link SummarizerServiceImpl}, when accessed in the below way
      * <p>
      * getService().getSummarizerService()
@@ -229,6 +246,7 @@ public class GenieService {
         }
         return mSummarizerService;
     }
+
 
     /**
      * This api gets the {@link IKeyValueStore} set in the {@link AndroidAppContext}

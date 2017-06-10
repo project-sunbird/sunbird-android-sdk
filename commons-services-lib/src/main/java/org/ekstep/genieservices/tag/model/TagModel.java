@@ -118,17 +118,17 @@ public class TagModel implements IReadable, IWritable, ICleanable, IUpdatable {
 
     @Override
     public String orderBy() {
-        return TelemetryTagEntry.COLUMN_NAME_NAME;
+        return "";
     }
 
     @Override
     public String filterForRead() {
-        return String.format(Locale.US, "where %s = %s", TelemetryTagEntry.COLUMN_NAME_NAME);
+        return String.format(Locale.US, "where %s = '%s'", TelemetryTagEntry.COLUMN_NAME_NAME, this.name);
     }
 
     @Override
     public String[] selectionArgsForFilter() {
-        return new String[]{name};
+        return null;
     }
 
     @Override

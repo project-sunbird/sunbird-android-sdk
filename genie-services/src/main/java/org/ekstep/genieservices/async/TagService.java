@@ -16,7 +16,7 @@ public class TagService {
     private ITagService tagService;
 
     public TagService(GenieService genieService) {
-        //this.tagService = genieService.getTagService();
+        this.tagService = genieService.getTagService();
     }
 
     /**
