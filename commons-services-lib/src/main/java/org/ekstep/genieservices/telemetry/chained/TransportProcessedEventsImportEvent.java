@@ -6,6 +6,8 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.telemetry.model.ProcessedEventModel;
+import org.ekstep.genieservices.telemetry.model.ProcessedEventsModel;
 
 /**
  * Created on 6/8/2017.
@@ -19,6 +21,13 @@ public class TransportProcessedEventsImportEvent implements IChainable {
 
     @Override
     public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
+        ProcessedEventsModel processedEventsModel = ProcessedEventsModel.find(importContext.getDBSession());
+        if (processedEventsModel != null) {
+            for (ProcessedEventModel model : processedEventsModel.getProcessedEventList()) {
+                ProcessedEventModel processedEventModel = ProcessedEventModel.build(appContext.getDBSession(), model.getMsgId(), model.getData(), model.getNumberOfEvents(), model.getPriority());
+                processedEventModel.save();
+            }
+        }
 
         if (nextLink != null) {
             return nextLink.execute(appContext, importContext);
@@ -29,6 +38,7 @@ public class TransportProcessedEventsImportEvent implements IChainable {
 
     @Override
     public IChainable then(IChainable link) {
-        return null;
+        nextLink = link;
+        return link;
     }
 }

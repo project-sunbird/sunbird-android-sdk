@@ -39,7 +39,7 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
 
         long totalByteSize = 0;
 
-        while (!processedEvent.isEmpty()) {
+        while (!isEmpty(processedEvent)) {
             totalByteSize = totalByteSize + processedEvent.getData().length;
             GenieResponse response = new TelemetrySyncAPI(mAppContext, processedEvent.getData()).post();
 
@@ -78,6 +78,10 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
 
     private String getMessage(int numberOfSync, int numberOfEventsProcessed) {
         return String.format(Locale.US, "%d events synced in %d sync", numberOfEventsProcessed, numberOfSync);
+    }
+
+    private boolean isEmpty(ProcessedEventModel processedEvent) {
+        return processedEvent.getNumberOfEvents() == 0 || processedEvent.getData() == null || processedEvent.getData().length == 0;
     }
 
 }
