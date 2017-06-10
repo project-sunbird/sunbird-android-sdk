@@ -26,7 +26,7 @@ public class AddGeTransferTelemetryImportEvent implements IChainable {
             // TODO: 6/9/2017  
         }
 
-        return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "Import profile failed.", TAG);
+        return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "Import telemetry event failed.", TAG);
     }
 
     @Override

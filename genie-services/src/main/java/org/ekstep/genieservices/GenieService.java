@@ -261,7 +261,7 @@ public class GenieService {
     }
 
     public FileImporter getFileImporter() {
-        return new FileImporter(mAppContext, getUserService());
+        return new FileImporter(mAppContext, getUserService(), getTelemetryService());
     }
 
 }

@@ -2,6 +2,7 @@ package org.ekstep.genieservices.importexport;
 
 import android.content.Context;
 
+import org.ekstep.genieservices.ITelemetryService;
 import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
@@ -25,10 +26,12 @@ public class FileImporter {
     private static final String TAG = FileImporter.class.getSimpleName();
 
     private IUserService userService;
+    private ITelemetryService telemetryService;
     private IDataSource dataSource;
 
-    public FileImporter(AppContext<Context> appContext, IUserService userService) {
+    public FileImporter(AppContext<Context> appContext, IUserService userService, ITelemetryService telemetryService) {
         this.userService = userService;
+        this.telemetryService = telemetryService;
         dataSource = new SQLiteDataSource(appContext);
     }
 
@@ -40,19 +43,26 @@ public class FileImporter {
         }
 
         String ext = FileUtil.getFileExtension(importRequest.getSourceFilePath());
-        if (!ServiceConstants.FileExtension.PROFILE.equals(ext)) {
+        if (ServiceConstants.FileExtension.PROFILE.equals(ext)) {
+            IDBSession dbSession = dataSource.getImportDataSource(importRequest.getSourceFilePath());
+            return userService.importProfile(dbSession, getMetadata(dbSession));
+        } else if (ServiceConstants.FileExtension.TELEMETRY.equals(ext)) {
+            IDBSession dbSession = dataSource.getImportDataSource(importRequest.getSourceFilePath());
+            return telemetryService.importTelemetry(dbSession, getMetadata(dbSession));
+        } else {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Profile import failed, unsupported file extension", TAG);
             return response;
-        } else {
-            IDBSession dbSession = dataSource.getImportDataSource(importRequest.getSourceFilePath());
-            // TODO: 6/9/2017 Can be moved to validate metadata
-            MetadataModel metadataModel = MetadataModel.findAll(dbSession);
-            Map<String, Object> metadata = null;
-            if (metadataModel != null) {
-                metadata = metadataModel.getMetadata();
-            }
-            return userService.importProfile(dbSession, metadata);
         }
+    }
+
+    // TODO: 6/9/2017 Can be moved to validate metadata
+    private Map<String, Object> getMetadata(IDBSession dbSession) {
+        MetadataModel metadataModel = MetadataModel.findAll(dbSession);
+        Map<String, Object> metadata = null;
+        if (metadataModel != null) {
+            metadata = metadataModel.getMetadata();
+        }
+        return metadata;
     }
 
 }
