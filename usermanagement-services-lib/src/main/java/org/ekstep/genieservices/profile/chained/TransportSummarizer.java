@@ -58,7 +58,7 @@ public class TransportSummarizer implements IChainable {
     }
 
     private boolean isTableExist(IDBSession dbSession, String tableName) {
-        String tableQuery = String.format(Locale.US, "select name from sqlite_master where type='table' AND name='%s'", tableName);
+        String tableQuery = String.format(Locale.US, "select name from sqlite_master where type='%s' AND name='%s'", "table", tableName);
         CustomReaderModel customReaderModel = CustomReaderModel.find(dbSession, tableQuery);
         return customReaderModel != null;
     }
