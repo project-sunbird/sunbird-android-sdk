@@ -30,18 +30,17 @@ import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
-import org.ekstep.genieservices.profile.chained.AddGeTransferProfileImportEvent;
-import org.ekstep.genieservices.profile.chained.TransportProfiles;
-import org.ekstep.genieservices.profile.chained.TransportSummarizer;
-import org.ekstep.genieservices.profile.chained.TransportUser;
-import org.ekstep.genieservices.profile.chained.UpdateImportedProfileMetadata;
-import org.ekstep.genieservices.profile.chained.ValidateProfileMetadata;
 import org.ekstep.genieservices.profile.chained.export.AddEventForExport;
-import org.ekstep.genieservices.profile.chained.export.CleanCurrentDatabase;
 import org.ekstep.genieservices.profile.chained.export.CleanupExportedFile;
 import org.ekstep.genieservices.profile.chained.export.CopyDatabase;
 import org.ekstep.genieservices.profile.chained.export.CreateMetadata;
 import org.ekstep.genieservices.profile.chained.export.RemoveExportFile;
+import org.ekstep.genieservices.profile.chained.imports.AddGeTransferProfileImportEvent;
+import org.ekstep.genieservices.profile.chained.imports.TransportProfiles;
+import org.ekstep.genieservices.profile.chained.imports.TransportSummarizer;
+import org.ekstep.genieservices.profile.chained.imports.TransportUser;
+import org.ekstep.genieservices.profile.chained.imports.UpdateImportedProfileMetadata;
+import org.ekstep.genieservices.profile.chained.imports.ValidateProfileMetadata;
 import org.ekstep.genieservices.profile.db.model.ContentAccessModel;
 import org.ekstep.genieservices.profile.db.model.ContentAccessesModel;
 import org.ekstep.genieservices.profile.db.model.UserModel;
@@ -513,6 +512,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "File already exists.", TAG);
         }
 
+        // TODO: 6/12/2017 - For profile export do we need to process events?
         EventProcessorFactory.processEvents(mAppContext);
 
         ImportContext importContext = new ImportContext(destinationDB, metadata);
@@ -520,7 +520,6 @@ public class UserServiceImpl extends BaseService implements IUserService {
         CopyDatabase copyDatabase = new CopyDatabase(sourceDBFilePath, destinationDBFilePath);
         copyDatabase.then(new CreateMetadata(destinationDBFilePath, userIds))
                 .then(new CleanupExportedFile(destinationDBFilePath, userIds))
-                .then(new CleanCurrentDatabase())
                 .then(new AddEventForExport())
                 .then(new RemoveExportFile());
 

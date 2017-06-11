@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.telemetry.chained;
+package org.ekstep.genieservices.telemetry.chained.imports;
 
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;

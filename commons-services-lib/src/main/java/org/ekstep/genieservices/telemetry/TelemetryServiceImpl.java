@@ -23,11 +23,11 @@ import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.eventbus.EventPublisher;
 import org.ekstep.genieservices.tag.cache.TelemetryTagCache;
-import org.ekstep.genieservices.telemetry.chained.AddGeTransferTelemetryImportEvent;
-import org.ekstep.genieservices.telemetry.chained.TelemetryImportStep;
-import org.ekstep.genieservices.telemetry.chained.TransportProcessedEventsImportEvent;
-import org.ekstep.genieservices.telemetry.chained.UpdateImportedTelemetryMetadata;
-import org.ekstep.genieservices.telemetry.chained.ValidateTelemetryMetadata;
+import org.ekstep.genieservices.telemetry.chained.imports.AddGeTransferTelemetryImportEvent;
+import org.ekstep.genieservices.telemetry.chained.imports.TelemetryImportStep;
+import org.ekstep.genieservices.telemetry.chained.imports.TransportProcessedEventsImportEvent;
+import org.ekstep.genieservices.telemetry.chained.imports.UpdateImportedTelemetryMetadata;
+import org.ekstep.genieservices.telemetry.chained.imports.ValidateTelemetryMetadata;
 import org.ekstep.genieservices.telemetry.model.EventModel;
 
 import java.util.ArrayList;

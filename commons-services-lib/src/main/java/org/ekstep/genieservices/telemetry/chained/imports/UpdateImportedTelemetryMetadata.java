@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.profile.chained;
+package org.ekstep.genieservices.telemetry.chained.imports;
 
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
@@ -13,9 +13,9 @@ import org.ekstep.genieservices.telemetry.model.ImportedMetadataModel;
  *
  * @author anil
  */
-public class UpdateImportedProfileMetadata implements IChainable {
+public class UpdateImportedTelemetryMetadata implements IChainable {
 
-    private static final String TAG = UpdateImportedProfileMetadata.class.getSimpleName();
+    private static final String TAG = UpdateImportedTelemetryMetadata.class.getSimpleName();
     private IChainable nextLink;
 
     @Override
@@ -23,7 +23,7 @@ public class UpdateImportedProfileMetadata implements IChainable {
 
         String importId = (String) importContext.getMetadata().get(ServiceConstants.EXPORT_ID);
         String did = (String) importContext.getMetadata().get(ServiceConstants.DID);
-        int count = (int) importContext.getMetadata().get(ServiceConstants.PROFILES_COUNT);
+        int count = (int) importContext.getMetadata().get(ServiceConstants.EVENTS_COUNT);
 
         ImportedMetadataModel importedMetadataModel = ImportedMetadataModel.build(appContext.getDBSession(), importId, did, count);
         if (ImportedMetadataModel.find(appContext.getDBSession(), importId, did) == null) {

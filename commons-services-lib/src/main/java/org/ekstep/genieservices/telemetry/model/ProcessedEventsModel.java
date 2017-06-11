@@ -1,6 +1,7 @@
 package org.ekstep.genieservices.telemetry.model;
 
 import org.ekstep.genieservices.commons.db.contract.TelemetryProcessedEntry;
+import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
@@ -13,7 +14,7 @@ import java.util.List;
  *
  * @author swayangjit
  */
-public class ProcessedEventsModel implements IReadable {
+public class ProcessedEventsModel implements IReadable, ICleanable {
 
     private IDBSession dBSession;
     private List<ProcessedEventModel> processedEventList;
@@ -33,6 +34,15 @@ public class ProcessedEventsModel implements IReadable {
         }
     }
 
+    public static ProcessedEventsModel build(IDBSession dbSession) {
+        return new ProcessedEventsModel(dbSession);
+    }
+
+    public Void deleteAll() {
+        dBSession.clean(this);
+        return null;
+    }
+
     @Override
     public IReadable read(IResultSet resultSet) {
         if (resultSet != null && resultSet.moveToFirst()) {
@@ -49,6 +59,16 @@ public class ProcessedEventsModel implements IReadable {
     @Override
     public String getTableName() {
         return TelemetryProcessedEntry.TABLE_NAME;
+    }
+
+    @Override
+    public void clean() {
+
+    }
+
+    @Override
+    public String selectionToClean() {
+        return "";
     }
 
     @Override

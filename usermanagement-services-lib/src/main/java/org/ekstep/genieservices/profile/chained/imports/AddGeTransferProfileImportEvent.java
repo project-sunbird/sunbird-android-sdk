@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.profile.chained;
+package org.ekstep.genieservices.profile.chained.imports;
 
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
