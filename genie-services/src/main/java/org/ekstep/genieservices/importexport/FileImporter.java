@@ -13,6 +13,7 @@ import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDataSource;
 import org.ekstep.genieservices.commons.db.operations.impl.SQLiteDataSource;
 import org.ekstep.genieservices.commons.utils.FileUtil;
+import org.ekstep.genieservices.importexport.db.model.MetadataModel;
 
 import java.util.Map;
 

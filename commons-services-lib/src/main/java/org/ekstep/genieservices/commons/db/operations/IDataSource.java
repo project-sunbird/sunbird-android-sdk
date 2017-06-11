@@ -7,4 +7,6 @@ package org.ekstep.genieservices.commons.db.operations;
  */
 public interface IDataSource {
     IDBSession getImportDataSource(String filePath);
+
+    IDBSession getExportDataSource(String filePath);
 }

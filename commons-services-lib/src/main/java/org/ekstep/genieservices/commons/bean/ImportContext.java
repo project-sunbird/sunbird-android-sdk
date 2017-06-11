@@ -27,10 +27,7 @@ public class ImportContext {
     private Map<String, Object> metadata;
     private IDBSession dbSession;
 
-    public ImportContext() {
-    }
-
-    // Used for import
+    // Used for import/export
     public ImportContext(IDBSession dbSession, Map<String, Object> metadata) {
         this.dbSession = dbSession;
         this.metadata = metadata;

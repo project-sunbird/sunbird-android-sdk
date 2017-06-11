@@ -25,4 +25,10 @@ public class SQLiteDataSource implements IDataSource {
         SQLiteDatabase database = SQLiteDatabase.openDatabase(filePath, null, SQLiteDatabase.OPEN_READONLY);
         return new SQLiteSession(appContext, database);
     }
+
+    @Override
+    public IDBSession getExportDataSource(String filePath) {
+        SQLiteDatabase database = SQLiteDatabase.openDatabase(filePath, null, SQLiteDatabase.OPEN_READWRITE);
+        return new SQLiteSession(appContext, database);
+    }
 }
