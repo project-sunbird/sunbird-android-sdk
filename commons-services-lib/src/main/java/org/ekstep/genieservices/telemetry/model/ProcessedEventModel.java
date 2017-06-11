@@ -61,7 +61,7 @@ public class ProcessedEventModel implements IWritable, ICleanable, IReadable {
         dbSession.create(this);
     }
 
-    public int clear() {
+    public int delete() {
         int eventExported = this.numberOfEvents;
         dbSession.clean(this);
         return eventExported;

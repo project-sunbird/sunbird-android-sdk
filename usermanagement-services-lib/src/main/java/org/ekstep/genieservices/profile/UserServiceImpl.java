@@ -22,21 +22,27 @@ import org.ekstep.genieservices.commons.bean.telemetry.GEError;
 import org.ekstep.genieservices.commons.bean.telemetry.GESessionEnd;
 import org.ekstep.genieservices.commons.bean.telemetry.GESessionStart;
 import org.ekstep.genieservices.commons.bean.telemetry.GEUpdateProfile;
-import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.commons.utils.DateUtil;
+import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.profile.chained.AddGeTransferProfileImportEvent;
-import org.ekstep.genieservices.profile.chained.ProfileImportStep;
 import org.ekstep.genieservices.profile.chained.TransportProfiles;
 import org.ekstep.genieservices.profile.chained.TransportSummarizer;
 import org.ekstep.genieservices.profile.chained.TransportUser;
 import org.ekstep.genieservices.profile.chained.UpdateImportedProfileMetadata;
 import org.ekstep.genieservices.profile.chained.ValidateProfileMetadata;
+import org.ekstep.genieservices.profile.chained.export.AddEventForExport;
+import org.ekstep.genieservices.profile.chained.export.CleanCurrentDatabase;
+import org.ekstep.genieservices.profile.chained.export.CleanupExportedFile;
+import org.ekstep.genieservices.profile.chained.export.CopyDatabase;
+import org.ekstep.genieservices.profile.chained.export.CreateMetadata;
+import org.ekstep.genieservices.profile.chained.export.CreateSummarizerData;
+import org.ekstep.genieservices.profile.chained.export.RemoveExportFile;
 import org.ekstep.genieservices.profile.db.model.ContentAccessModel;
 import org.ekstep.genieservices.profile.db.model.ContentAccessesModel;
 import org.ekstep.genieservices.profile.db.model.UserModel;
@@ -44,7 +50,9 @@ import org.ekstep.genieservices.profile.db.model.UserProfileModel;
 import org.ekstep.genieservices.profile.db.model.UserProfilesModel;
 import org.ekstep.genieservices.profile.db.model.UserSessionModel;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
+import org.ekstep.genieservices.telemetry.processors.EventProcessorFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -485,15 +493,40 @@ public class UserServiceImpl extends BaseService implements IUserService {
     @Override
     public GenieResponse<Void> importProfile(IDBSession dbSession, Map<String, Object> metadata) {
         ImportContext importContext = new ImportContext(dbSession, metadata);
-        IChainable profileImportSteps = ProfileImportStep.initImport();
-        profileImportSteps.then(new ValidateProfileMetadata())
-                .then(new TransportProfiles())
+
+        ValidateProfileMetadata validateProfileMetadata = new ValidateProfileMetadata();
+        validateProfileMetadata.then(new TransportProfiles())
                 .then(new TransportUser())
                 .then(new TransportSummarizer())
                 .then(new UpdateImportedProfileMetadata())
                 .then(new AddGeTransferProfileImportEvent());
 
-        return profileImportSteps.execute(mAppContext, importContext);
+        return validateProfileMetadata.execute(mAppContext, importContext);
     }
+
+    @Override
+    public GenieResponse<Void> exportProfile(List<String> userIds, File destinationFolder, String sourceDBFilePath, String destinationDBFilePath, IDBSession destinationDB, Map<String, Object> metadata) {
+        HashMap<String, Object> exportDataMap = new HashMap<>();
+        exportDataMap.put(ServiceConstants.UNCOMPRESSED_SOURCE_LOCATION, FileUtil.getTempLocation(destinationFolder));
+        exportDataMap.put(ServiceConstants.EXPORTED_EPAR_DESTINATION_LOCATION, destinationDBFilePath);
+
+        if (FileUtil.doesFileExists(destinationDBFilePath)) {
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "File already exists.", TAG);
+        }
+
+        EventProcessorFactory.processEvents(mAppContext);
+
+        ImportContext importContext = new ImportContext();
+        CopyDatabase copyDatabase = new CopyDatabase(sourceDBFilePath, destinationDBFilePath);
+        copyDatabase.then(new CreateSummarizerData())
+                .then(new CreateMetadata())
+                .then(new CleanupExportedFile())
+                .then(new CleanCurrentDatabase())
+                .then(new AddEventForExport())
+                .then(new RemoveExportFile());
+
+        return copyDatabase.execute(mAppContext, importContext);
+    }
+
 
 }

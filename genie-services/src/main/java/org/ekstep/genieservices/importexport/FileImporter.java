@@ -32,7 +32,7 @@ public class FileImporter {
     public FileImporter(AppContext<Context> appContext, IUserService userService, ITelemetryService telemetryService) {
         this.userService = userService;
         this.telemetryService = telemetryService;
-        dataSource = new SQLiteDataSource(appContext);
+        this.dataSource = new SQLiteDataSource(appContext);
     }
 
     public GenieResponse<Void> importFile(ProfileImportRequest importRequest) {

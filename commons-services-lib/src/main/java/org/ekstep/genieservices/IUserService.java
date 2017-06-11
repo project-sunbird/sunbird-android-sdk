@@ -8,6 +8,7 @@ import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -152,4 +153,13 @@ public interface IUserService {
      * @return
      */
     GenieResponse<Void> importProfile(IDBSession dbSession, Map<String, Object> metadata);
+
+    /**
+     * This API is used to export profiles.
+     *
+     * @param userIds
+     * @return
+     */
+    GenieResponse<Void> exportProfile(List<String> userIds, File destinationFolder, String sourceDBFilePath, String destinationDBFilePath, IDBSession destinationDB, Map<String, Object> metadata);
+
 }

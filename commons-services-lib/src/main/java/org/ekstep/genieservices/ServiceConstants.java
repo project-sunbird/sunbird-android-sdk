@@ -25,6 +25,7 @@ public interface ServiceConstants {
     /* Key Constants for all the key value store */
     String KEY_USER_SESSION = "session";
 
+    String VERSION = "version";
     String EXPORT_ID = "export_id";
     String DID = "did";
     String EVENTS_COUNT = "events_count";
@@ -32,6 +33,10 @@ public interface ServiceConstants {
     String EXPORT_TYPES = "types";
     String EXPORT_TYPE_TELEMETRY = "telemetry";
     String EXPORT_TYPE_PROFILE = "userprofile";
+    // Used in export
+    String EXPORTED_ECAR_DESTINATION_LOCATION = "ecarLocation";
+    String EXPORTED_EPAR_DESTINATION_LOCATION = "eparLocation";
+    String UNCOMPRESSED_SOURCE_LOCATION = "location";
 
     interface FileExtension {
         String CONTENT = "ecar";
@@ -105,6 +110,7 @@ public interface ServiceConstants {
         String INVALID_PROFILE = "INVALID_PROFILE";
         String PROFILE_NOT_FOUND = "PROFILE_NOT_FOUND";
         String INVALID_USER = "INVALID_USER";
+        String EXPORT_FAILED = "EXPORT_FAILED";
         String IMPORT_FAILED = "IMPORT_FAILED";
 
         //Partner

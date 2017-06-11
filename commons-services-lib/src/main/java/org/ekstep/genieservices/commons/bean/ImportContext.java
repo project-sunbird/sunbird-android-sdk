@@ -20,13 +20,17 @@ public class ImportContext {
     private File ecarFile;
     private File tmpLocation;
     private File destinationFolder;
-    private Map<String, Object> metadata;
     private List<String> skippedItemsIdentifier;
     private String manifestVersion;
     private List<HashMap<String, Object>> items;
     private boolean isChildContent;
+    private Map<String, Object> metadata;
     private IDBSession dbSession;
 
+    public ImportContext() {
+    }
+
+    // Used for import
     public ImportContext(IDBSession dbSession, Map<String, Object> metadata) {
         this.dbSession = dbSession;
         this.metadata = metadata;
