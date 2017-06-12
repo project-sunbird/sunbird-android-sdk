@@ -28,6 +28,7 @@ public class CopyDatabase implements IChainable {
     public CopyDatabase(String sourceDB, String destinationDB, IDataSource dataSource) {
         this.sourceDB = sourceDB;
         this.destinationDB = destinationDB;
+        this.dataSource = dataSource;
     }
 
     @Override
