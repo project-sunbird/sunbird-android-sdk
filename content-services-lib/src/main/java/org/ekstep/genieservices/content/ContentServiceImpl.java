@@ -23,6 +23,7 @@ import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.HierarchyInfo;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
@@ -159,8 +160,11 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             return response;
         }
 
+        List<HierarchyInfo> hierarchyInfoList = new ArrayList<>();
+
+
         //check and fetch all childrens of this content
-        List<Content> childrenList = checkAndFetchChildrenOfContent(contentModel);
+        List<Content> childrenList = checkAndFetchChildrenOfContent(contentModel, hierarchyInfoList);
 
 //        List<Content> childContentList = new ArrayList<>();
 //
@@ -195,22 +199,31 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         return response;
     }
 
-    private List<Content> checkAndFetchChildrenOfContent(ContentModel contentModel) {
+    private List<Content> checkAndFetchChildrenOfContent(ContentModel contentModel, List<HierarchyInfo> hierarchyInfoList) {
         List<Content> contentList = new ArrayList<>();
 
         // check if the content model has immediate children
         if (ContentHandler.hasChildren(contentModel.getLocalData())) {
+
+            //add hierarchy info
+            HierarchyInfo hierarchyInfo = new HierarchyInfo();
+            hierarchyInfo.setContentType(contentModel.getContentType());
+            hierarchyInfo.setIdentifier(contentModel.getIdentifier());
+            hierarchyInfoList.add(hierarchyInfo);
+
             //get all the children
             List<ContentModel> contentModelList = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), contentModel.getLocalData(), ContentConstants.ChildContents.FIRST_LEVEL_ALL);
 
             //check for null and size more than 0
             if (contentModelList != null) {
                 for (ContentModel perContentModel : contentModelList) {
+                    Content perContent = ContentHandler.convertContentModelToBean(perContentModel);
+                    perContent.setChildrenHierarchyInfo(hierarchyInfoList);
                     //add this content to the list
-                    contentList.add(ContentHandler.convertContentModelToBean(perContentModel));
+                    contentList.add(perContent);
 
                     //recurse again on this content
-                    checkAndFetchChildrenOfContent(perContentModel);
+                    checkAndFetchChildrenOfContent(perContentModel, hierarchyInfoList);
                 }
             }
         }
