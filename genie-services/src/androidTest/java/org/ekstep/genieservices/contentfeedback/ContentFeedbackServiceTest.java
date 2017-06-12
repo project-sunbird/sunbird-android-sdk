@@ -34,7 +34,7 @@ public class ContentFeedbackServiceTest extends GenieServiceTestBase {
 
         String uid = createAndSetProfileForGetFeedback();
 
-        ContentImportRequest.Builder importRequest = new ContentImportRequest.Builder(false).fromFilePath(CONTENT_FILEPATH).toFolder(activity.getExternalFilesDir(null));
+        ContentImportRequest.Builder importRequest = new ContentImportRequest.Builder().isChildContent(false).fromFilePath(CONTENT_FILEPATH).toFolder(activity.getExternalFilesDir(null));
 
         GenieResponse genieResponse = activity.importContent(importRequest.build());
         Assert.assertTrue(genieResponse.getStatus());

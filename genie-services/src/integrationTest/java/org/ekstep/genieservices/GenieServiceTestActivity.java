@@ -184,9 +184,9 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
-    public GenieResponse<List<Content>> getChildContents(String contentIdentifier, int levelAndState) {
+    public GenieResponse<Content> getChildContents(String contentIdentifier, int levelAndState) {
         idle = false;
-        GenieResponse<List<Content>> genieResponse = mGenieService.getContentService().getChildContents(contentIdentifier, levelAndState);
+        GenieResponse<Content> genieResponse = mGenieService.getContentService().getChildContents(contentIdentifier, levelAndState);
         return genieResponse;
     }
 
