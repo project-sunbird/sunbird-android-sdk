@@ -7,7 +7,7 @@ import java.util.Map;
  *
  * @author anil
  */
-public class ContentAccessLearnerState {
+public class ContentLearnerState {
 
     private String contentId;
     private Map<String, Object> learnerState;

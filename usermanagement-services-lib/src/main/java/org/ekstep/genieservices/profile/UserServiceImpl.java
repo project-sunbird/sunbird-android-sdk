@@ -7,7 +7,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
-import org.ekstep.genieservices.commons.bean.ContentAccessLearnerState;
+import org.ekstep.genieservices.commons.bean.ContentLearnerState;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
@@ -452,11 +452,11 @@ public class UserServiceImpl extends BaseService implements IUserService {
     }
 
     @Override
-    public GenieResponse<Void> setLearnerState(ContentAccessLearnerState contentAccessLearnerState) {
+    public GenieResponse<Void> setLearnerState(ContentLearnerState contentLearnerState) {
         String methodName = "setLearnerState@UserServiceImpl";
         HashMap params = new HashMap();
-        params.put("contentIdentifier", contentAccessLearnerState.getContentId());
-        params.put("learnerState", contentAccessLearnerState.getLearnerState());
+        params.put("contentIdentifier", contentLearnerState.getContentId());
+        params.put("learnerState", contentLearnerState.getLearnerState());
         params.put("logLevel", "2");
 
         GenieResponse<Void> response;
@@ -470,8 +470,8 @@ public class UserServiceImpl extends BaseService implements IUserService {
         }
 
         ContentAccessModel contentAccessModel = ContentAccessModel.build(mAppContext.getDBSession(),
-                uid, contentAccessLearnerState.getContentId(), GsonUtil.toJson(contentAccessLearnerState.getLearnerState()));
-        ContentAccessModel contentAccessModelInDb = ContentAccessModel.find(mAppContext.getDBSession(), uid, contentAccessLearnerState.getContentId());
+                uid, contentLearnerState.getContentId(), GsonUtil.toJson(contentLearnerState.getLearnerState()));
+        ContentAccessModel contentAccessModelInDb = ContentAccessModel.find(mAppContext.getDBSession(), uid, contentLearnerState.getContentId());
         if (contentAccessModelInDb == null) {
             contentAccessModel.setStatus(ContentAccessStatusType.PLAYED.getValue());
             contentAccessModel.save();

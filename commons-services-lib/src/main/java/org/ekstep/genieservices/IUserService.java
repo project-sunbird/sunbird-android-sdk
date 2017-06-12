@@ -2,7 +2,7 @@ package org.ekstep.genieservices;
 
 import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
-import org.ekstep.genieservices.commons.bean.ContentAccessLearnerState;
+import org.ekstep.genieservices.commons.bean.ContentLearnerState;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.UserSession;
@@ -140,10 +140,10 @@ public interface IUserService {
      * <p> On failing to set the learner state, the response will have status as FALSE with the following error:
      * <p>PROFILE_NOT_FOUND
      *
-     * @param contentAccessLearnerState
+     * @param contentLearnerState
      * @return
      */
-    GenieResponse<Void> setLearnerState(ContentAccessLearnerState contentAccessLearnerState);
+    GenieResponse<Void> setLearnerState(ContentLearnerState contentLearnerState);
 
     /**
      * This API is used to import profiles.
