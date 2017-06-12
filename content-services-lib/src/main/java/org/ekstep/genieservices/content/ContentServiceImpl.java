@@ -110,7 +110,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             String uid = ContentHandler.getCurrentUserId(userService);
             ContentFeedbackCriteria.Builder builder = new ContentFeedbackCriteria.Builder();
             builder.byUser(uid)
-                    .byContent(content.getIdentifier());
+                    .forContent(content.getIdentifier());
             content.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, builder.build()));
             content.setContentAccess(ContentHandler.getContentAccess(userService, content.getIdentifier(), uid));
         }
@@ -136,7 +136,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             if (criteria.attachFeedback()) {
                 ContentFeedbackCriteria.Builder builder = new ContentFeedbackCriteria.Builder();
                 builder.byUser(criteria.getUid())
-                        .byContent(c.getIdentifier());
+                        .forContent(c.getIdentifier());
                 c.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, builder.build()));
             }
             if (criteria.attachContentAccess()) {

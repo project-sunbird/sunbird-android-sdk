@@ -32,7 +32,7 @@ public class ContentFeedbackCriteria {
             return this;
         }
 
-        public Builder byContent(String contentId) {
+        public Builder forContent(String contentId) {
             this.contentId = contentId;
             return this;
         }
