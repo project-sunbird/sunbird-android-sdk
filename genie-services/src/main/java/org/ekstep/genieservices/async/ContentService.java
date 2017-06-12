@@ -103,10 +103,10 @@ public class ContentService {
      *                          <p>
      * @return {@link List<Content>}
      */
-    public void getChildContents(final String contentIdentifier, final int levelAndState, IResponseHandler<List<Content>> responseHandler) {
-        new AsyncHandler<List<Content>>(responseHandler).execute(new IPerformable<List<Content>>() {
+    public void getChildContents(final String contentIdentifier, final int levelAndState, IResponseHandler<Content> responseHandler) {
+        new AsyncHandler<Content>(responseHandler).execute(new IPerformable<Content>() {
             @Override
-            public GenieResponse<List<Content>> perform() {
+            public GenieResponse<Content> perform() {
                 return contentService.getChildContents(contentIdentifier, levelAndState);
             }
         });

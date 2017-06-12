@@ -110,4 +110,13 @@ public class Content implements Serializable {
     public void setContentAccess(ContentAccess contentAccess) {
         this.contentAccess = contentAccess;
     }
+
+    public List<Content> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<Content> children) {
+        this.children = children;
+    }
+
 }
