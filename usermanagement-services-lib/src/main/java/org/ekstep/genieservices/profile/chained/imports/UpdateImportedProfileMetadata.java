@@ -23,7 +23,7 @@ public class UpdateImportedProfileMetadata implements IChainable {
 
         String importId = (String) importContext.getMetadata().get(ServiceConstants.EXPORT_ID);
         String did = (String) importContext.getMetadata().get(ServiceConstants.DID);
-        int count = (int) importContext.getMetadata().get(ServiceConstants.PROFILES_COUNT);
+        int count = Integer.valueOf((String) importContext.getMetadata().get(ServiceConstants.PROFILES_COUNT));
 
         ImportedMetadataModel importedMetadataModel = ImportedMetadataModel.build(appContext.getDBSession(), importId, did, count);
         if (ImportedMetadataModel.find(appContext.getDBSession(), importId, did) == null) {
