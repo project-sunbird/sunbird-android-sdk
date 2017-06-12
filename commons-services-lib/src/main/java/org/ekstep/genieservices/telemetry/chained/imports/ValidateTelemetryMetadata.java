@@ -6,8 +6,10 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.telemetry.model.ImportedMetadataModel;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +56,8 @@ public class ValidateTelemetryMetadata implements IChainable {
     }
 
     private List<String> getImportTypes(Map<String, Object> metadata) {
-        return (List<String>) metadata.get(ServiceConstants.EXPORT_TYPES);
+        String importedDataType = (String) metadata.get(ServiceConstants.EXPORT_TYPES);
+        return Arrays.asList(GsonUtil.fromJson(importedDataType, String[].class));
     }
 
 }

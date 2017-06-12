@@ -19,7 +19,7 @@ import java.util.Locale;
 public class ImportedMetadataModel implements IWritable, IReadable, IUpdatable {
 
     private IDBSession dbSession;
-    private Long id;
+    private Long id = -1L;
     private String importedId;
     private String deviceId;
     private int count;
