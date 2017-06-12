@@ -14,15 +14,15 @@ public abstract class LearnerAssessmentsEntry implements BaseColumns {
     public static final String COLUMN_NAME_UID = "uid";
     public static final String COLUMN_NAME_CONTENT_ID = "content_id";
     public static final String COLUMN_NAME_QID = "qid";
-    public static final String COLUMN_NAME_Q_INDEX = "q_index";
+    public static final String COLUMN_NAME_Q_INDEX = "qindex";
     public static final String COLUMN_NAME_CORRECT = "correct";
     public static final String COLUMN_NAME_SCORE = "score";
     public static final String COLUMN_NAME_MAX_SCORE = "max_score";
     public static final String COLUMN_NAME_TIME_SPENT = "time_spent";
     public static final String COLUMN_NAME_RES = "res";
     public static final String COLUMN_NAME_TIMESTAMP = "timestamp";
-    public static final String COLUMN_NAME_Q_DESC = "q_desc";
-    public static final String COLUMN_NAME_Q_TITLE = "q_title";
+    public static final String COLUMN_NAME_Q_DESC = "qdesc";
+    public static final String COLUMN_NAME_Q_TITLE = "qtitle";
     public static final String COLUMN_NAME_HIERARCHY_DATA = "h_data";
 
     public static final String getCreateEntry() {
