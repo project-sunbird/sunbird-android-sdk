@@ -48,7 +48,6 @@ import org.ekstep.genieservices.profile.db.model.UserProfileModel;
 import org.ekstep.genieservices.profile.db.model.UserProfilesModel;
 import org.ekstep.genieservices.profile.db.model.UserSessionModel;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
-import org.ekstep.genieservices.telemetry.processors.EventProcessorFactory;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -509,9 +508,6 @@ public class UserServiceImpl extends BaseService implements IUserService {
         if (FileUtil.doesFileExists(destinationDBFilePath)) {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "File already exists.", TAG);
         }
-
-        // TODO: 6/12/2017 - For profile export do we need to process events?
-        EventProcessorFactory.processEvents(mAppContext);
 
         ImportContext importContext = new ImportContext(null, metadata);
 
