@@ -142,4 +142,16 @@ public class ImportedMetadataModel implements IWritable, IReadable, IUpdatable {
     public void beforeWrite(AppContext context) {
 
     }
+
+    public String getImportedId() {
+        return importedId;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public int getCount() {
+        return count;
+    }
 }

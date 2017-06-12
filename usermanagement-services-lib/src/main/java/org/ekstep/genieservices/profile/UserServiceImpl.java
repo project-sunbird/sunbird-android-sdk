@@ -34,7 +34,6 @@ import org.ekstep.genieservices.profile.chained.export.AddEventForExport;
 import org.ekstep.genieservices.profile.chained.export.CleanupExportedFile;
 import org.ekstep.genieservices.profile.chained.export.CopyDatabase;
 import org.ekstep.genieservices.profile.chained.export.CreateMetadata;
-import org.ekstep.genieservices.profile.chained.export.RemoveExportFile;
 import org.ekstep.genieservices.profile.chained.imports.AddGeTransferProfileImportEvent;
 import org.ekstep.genieservices.profile.chained.imports.TransportProfiles;
 import org.ekstep.genieservices.profile.chained.imports.TransportSummarizer;
@@ -520,8 +519,10 @@ public class UserServiceImpl extends BaseService implements IUserService {
         CopyDatabase copyDatabase = new CopyDatabase(sourceDBFilePath, destinationDBFilePath);
         copyDatabase.then(new CreateMetadata(destinationDBFilePath, userIds))
                 .then(new CleanupExportedFile(destinationDBFilePath, userIds))
-                .then(new AddEventForExport())
-                .then(new RemoveExportFile());
+                .then(new AddEventForExport(destinationDBFilePath));
+
+        // TODO: 6/12/2017 - if export failed.
+//                .then(new RemoveExportFile(destinationDBFilePath));
 
         return copyDatabase.execute(mAppContext, importContext);
     }
