@@ -72,9 +72,9 @@ public interface IContentService {
      *                      2 - All descendant spine contents
      *                      <p>
      *                      <p>
-     * @return {@link GenieResponse<List<Content>>}
+     * @return {@link GenieResponse<Content>}
      */
-    GenieResponse<List<Content>> getChildContents(String contentId, int levelAndState);
+    GenieResponse<Content> getChildContents(String contentId, int levelAndState);
 
     /**
      * This api is used to delete a particular content.

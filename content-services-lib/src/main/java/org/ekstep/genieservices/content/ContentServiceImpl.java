@@ -148,44 +148,74 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<List<Content>> getChildContents(String contentId, int levelAndState) {
+    public GenieResponse<Content> getChildContents(String contentId, int levelAndState) {
         // TODO: Telemetry logger
         String methodName = "getChildContents@ContentServiceImpl";
 
-        GenieResponse<List<Content>> response;
+        GenieResponse<Content> response;
         ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), contentId);
         if (contentModel == null) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, "No content found for identifier = " + contentId, TAG);
             return response;
         }
 
-        List<Content> childContentList = new ArrayList<>();
+        //check and fetch all childrens of this content
+        List<Content> childrenList = checkAndFetchChildrenOfContent(contentModel);
 
-        switch (levelAndState) {
-            case ContentConstants.ChildContents.FIRST_LEVEL_ALL:
-                if (ContentHandler.hasChildren(contentModel.getLocalData())) {
-                    List<ContentModel> contentModelListInDB = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), contentModel.getLocalData(), ContentConstants.ChildContents.FIRST_LEVEL_ALL);
-                    for (ContentModel cm : contentModelListInDB) {
-                        Content c = ContentHandler.convertContentModelToBean(cm);
-                        childContentList.add(c);
-                    }
+//        List<Content> childContentList = new ArrayList<>();
+//
+//        switch (levelAndState) {
+//            case ContentConstants.ChildContents.FIRST_LEVEL_ALL:
+//                if (ContentHandler.hasChildren(contentModel.getLocalData())) {
+//                    List<ContentModel> contentModelListInDB = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), contentModel.getLocalData(), ContentConstants.ChildContents.FIRST_LEVEL_ALL);
+//                    for (ContentModel cm : contentModelListInDB) {
+//                        Content c = ContentHandler.convertContentModelToBean(cm);
+//                        childContentList.add(c);
+//                    }
+//                }
+//                break;
+//
+//            case ContentConstants.ChildContents.FIRST_LEVEL_DOWNLOADED:
+////  TODO:              childContentList = populateChildren(content, childContents);
+//                break;
+//
+//            case ContentConstants.ChildContents.FIRST_LEVEL_SPINE:
+////   TODO:             childContentList = populateChildren(content, childContents);
+//                break;
+//
+//            default:
+//        }
+
+        Content content = ContentHandler.convertContentModelToBean(contentModel);
+        if (childrenList != null) {
+            content.setChildren(childrenList);
+        }
+        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        response.setResult(content);
+        return response;
+    }
+
+    private List<Content> checkAndFetchChildrenOfContent(ContentModel contentModel) {
+        List<Content> contentList = new ArrayList<>();
+
+        // check if the content model has immediate children
+        if (ContentHandler.hasChildren(contentModel.getLocalData())) {
+            //get all the children
+            List<ContentModel> contentModelList = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), contentModel.getLocalData(), ContentConstants.ChildContents.FIRST_LEVEL_ALL);
+
+            //check for null and size more than 0
+            if (contentModelList != null) {
+                for (ContentModel perContentModel : contentModelList) {
+                    //add this content to the list
+                    contentList.add(ContentHandler.convertContentModelToBean(perContentModel));
+
+                    //recurse again on this content
+                    checkAndFetchChildrenOfContent(perContentModel);
                 }
-                break;
-
-            case ContentConstants.ChildContents.FIRST_LEVEL_DOWNLOADED:
-//  TODO:              childContentList = populateChildren(content, childContents);
-                break;
-
-            case ContentConstants.ChildContents.FIRST_LEVEL_SPINE:
-//   TODO:             childContentList = populateChildren(content, childContents);
-                break;
-
-            default:
+            }
         }
 
-        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-        response.setResult(childContentList);
-        return response;
+        return contentList;
     }
 
     @Override
