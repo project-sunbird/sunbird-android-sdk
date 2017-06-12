@@ -16,6 +16,7 @@ import org.ekstep.genieservices.content.ContentFeedbackServiceImpl;
 import org.ekstep.genieservices.content.ContentServiceImpl;
 import org.ekstep.genieservices.content.DownloadQueueListener;
 import org.ekstep.genieservices.content.LanguageServiceImpl;
+import org.ekstep.genieservices.importexport.FileExporter;
 import org.ekstep.genieservices.importexport.FileImporter;
 import org.ekstep.genieservices.notification.NotificationServiceImpl;
 import org.ekstep.genieservices.partner.PartnerServiceImpl;
@@ -287,6 +288,10 @@ public class GenieService {
 
     public FileImporter getFileImporter() {
         return new FileImporter(mAppContext);
+    }
+
+    public FileExporter getFileExporter() {
+        return new FileExporter(mAppContext);
     }
 
 }

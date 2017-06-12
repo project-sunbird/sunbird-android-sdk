@@ -9,6 +9,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.bean.ProfileExportRequest;
 import org.ekstep.genieservices.commons.db.GSDBContext;
 import org.ekstep.genieservices.commons.db.IDBContext;
 import org.ekstep.genieservices.commons.db.operations.IDataSource;
@@ -34,31 +35,30 @@ public class FileExporter {
     private static final String TAG = FileExporter.class.getSimpleName();
 
     private AppContext<Context> appContext;
-    private IUserService userService;
-    private ITelemetryService telemetryService;
     private IDataSource dataSource;
 
-    public FileExporter(AppContext<Context> appContext, IUserService userService, ITelemetryService telemetryService) {
+    public FileExporter(AppContext<Context> appContext) {
         this.appContext = appContext;
-        this.userService = userService;
-        this.telemetryService = telemetryService;
         this.dataSource = new SQLiteDataSource(appContext);
     }
 
-    public GenieResponse<Void> exportFile(List<String> userIds, File destinationFolder) {
-        GenieResponse<Void> response;
-
-        if (userIds != null && userIds.size() > 0) {
+    public GenieResponse<Void> exportProfile(ProfileExportRequest exportRequest, IUserService userService) {
+        if (exportRequest.getUserIds() != null && exportRequest.getUserIds().size() > 0) {
             // Read the first profile and get the temp location path
-            String destinationDBFilePath = getEparFilePath(userIds, destinationFolder);
+            String destinationDBFilePath = getEparFilePath(exportRequest.getUserIds(), exportRequest.getDestinationFolder());
 
             IDBContext dbContext = new GSDBContext();
             String sourceDBFilePath = appContext.getContext().getDatabasePath(dbContext.getDBName()).getPath();
 
-            return userService.exportProfile(userIds, destinationFolder, sourceDBFilePath, destinationDBFilePath, dataSource.getExportDataSource(destinationDBFilePath), getMetadata(dbContext));
+            return userService.exportProfile(exportRequest.getUserIds(), exportRequest.getDestinationFolder(), sourceDBFilePath,
+                    destinationDBFilePath, dataSource.getExportDataSource(destinationDBFilePath), getMetadata(dbContext));
         } else {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "There are no profile to export.", TAG);
         }
+    }
+
+    public GenieResponse<Void> exportTelemetry(File destinationFolder, ITelemetryService telemetryService) {
+        return null;
     }
 
     private String getEparFilePath(List<String> userIds, File destinationFolder) {

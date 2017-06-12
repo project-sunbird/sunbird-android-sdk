@@ -7,7 +7,9 @@ import org.ekstep.genieservices.commons.bean.ContentLearnerState;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportRequest;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.bean.ProfileExportRequest;
 import org.ekstep.genieservices.commons.bean.UserSession;
+import org.ekstep.genieservices.importexport.FileExporter;
 import org.ekstep.genieservices.importexport.FileImporter;
 
 import java.util.List;
@@ -19,10 +21,12 @@ public class UserService {
 
     private IUserService userService;
     private FileImporter fileImporter;
+    private FileExporter fileExporter;
 
     public UserService(GenieService genieService) {
         this.userService = genieService.getUserService();
         this.fileImporter = genieService.getFileImporter();
+        this.fileExporter = genieService.getFileExporter();
     }
 
     /**
@@ -217,6 +221,15 @@ public class UserService {
             @Override
             public GenieResponse<Void> perform() {
                 return fileImporter.importProfile(importRequest, userService);
+            }
+        });
+    }
+
+    public void exportProfile(final ProfileExportRequest profileExportRequest, IResponseHandler<Void> responseHandler) {
+        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return fileExporter.exportProfile(profileExportRequest, userService);
             }
         });
     }
