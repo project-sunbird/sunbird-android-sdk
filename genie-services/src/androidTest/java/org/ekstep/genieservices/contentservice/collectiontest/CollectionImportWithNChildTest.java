@@ -12,6 +12,7 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.HierarchyInfo;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.junit.After;
 import org.junit.Before;
@@ -108,21 +109,26 @@ public class CollectionImportWithNChildTest extends GenieServiceTestBase {
         AssertCollection.verifyCollectionEntryAndVisibility(CONTENT_ID_WITH_CHILD, VISIBILITY_DEFAULT);
         GenieServiceDBHelper.findContentDBEntry(CONTENT_ID_WITH_CHILD);
 
-        GenieResponse<Content> listGenieResponse = activity.getChildContents(CONTENT_ID_WITH_CHILD, 0);
-        Assert.assertTrue(listGenieResponse.getStatus());
-        Assert.assertNotNull(listGenieResponse.getResult());
-        Assert.assertEquals(9, listGenieResponse.getResult().getChildren().size());
+        GenieResponse<Content> content = activity.getChildContents(CONTENT_ID_WITH_CHILD, 0);
+        Assert.assertTrue(content.getStatus());
+        Assert.assertNotNull(content.getResult());
+        Assert.assertEquals(9, content.getResult().getChildren().size());
 
-        Assert.assertEquals(AssertCollection.CHILD_C2_ID, listGenieResponse.getResult().getChildren().get(0).getIdentifier());
-        Assert.assertEquals(AssertCollection.CHILD_C3_ID, listGenieResponse.getResult().getChildren().get(1).getIdentifier());
-        Assert.assertEquals(AssertCollection.CHILD_C4_ID, listGenieResponse.getResult().getChildren().get(2).getIdentifier());
-        Assert.assertEquals(AssertCollection.CHILD_C5_ID, listGenieResponse.getResult().getChildren().get(3).getIdentifier());
-        Assert.assertEquals(AssertCollection.CHILD_C6_ID, listGenieResponse.getResult().getChildren().get(4).getIdentifier());
-        Assert.assertEquals(AssertCollection.CHILD_C7_ID, listGenieResponse.getResult().getChildren().get(5).getIdentifier());
-        Assert.assertEquals(AssertCollection.CHILD_C8_ID, listGenieResponse.getResult().getChildren().get(6).getIdentifier());
-        Assert.assertEquals(AssertCollection.CHILD_C9_ID, listGenieResponse.getResult().getChildren().get(7).getIdentifier());
-        Assert.assertEquals(AssertCollection.CHILD_C10_ID, listGenieResponse.getResult().getChildren().get(8).getIdentifier());
+        Assert.assertEquals(AssertCollection.CHILD_C2_ID, content.getResult().getChildren().get(0).getIdentifier());
+        Assert.assertEquals(AssertCollection.CHILD_C3_ID, content.getResult().getChildren().get(1).getIdentifier());
+        Assert.assertEquals(AssertCollection.CHILD_C4_ID, content.getResult().getChildren().get(2).getIdentifier());
+        Assert.assertEquals(AssertCollection.CHILD_C5_ID, content.getResult().getChildren().get(3).getIdentifier());
+        Assert.assertEquals(AssertCollection.CHILD_C6_ID, content.getResult().getChildren().get(4).getIdentifier());
+        Assert.assertEquals(AssertCollection.CHILD_C7_ID, content.getResult().getChildren().get(5).getIdentifier());
+        Assert.assertEquals(AssertCollection.CHILD_C8_ID, content.getResult().getChildren().get(6).getIdentifier());
+        Assert.assertEquals(AssertCollection.CHILD_C9_ID, content.getResult().getChildren().get(7).getIdentifier());
+        Assert.assertEquals(AssertCollection.CHILD_C10_ID, content.getResult().getChildren().get(8).getIdentifier());
 
+        //assert for the parent in hierarcy
+        List<HierarchyInfo> hierarchyInfoList = content.getResult().getChildren().get(0).getChildrenHierarchyInfo();
+        Assert.assertEquals(1, hierarchyInfoList.size());
+        Assert.assertEquals(CONTENT_ID_WITH_CHILD, hierarchyInfoList.get(0).getIdentifier());
+        Assert.assertEquals(content.getResult().getContentType(), hierarchyInfoList.get(0).getContentType());
     }
 
     @Test
