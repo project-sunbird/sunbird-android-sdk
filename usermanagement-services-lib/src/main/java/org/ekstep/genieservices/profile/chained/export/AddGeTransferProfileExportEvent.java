@@ -10,6 +10,7 @@ import org.ekstep.genieservices.commons.bean.telemetry.GETransfer;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferMap;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.telemetry.TelemetryLogger;
 import org.ekstep.genieservices.telemetry.model.ImportedMetadataListModel;
 import org.ekstep.genieservices.telemetry.model.ImportedMetadataModel;
 
@@ -22,14 +23,14 @@ import java.util.List;
  *
  * @author anil
  */
-public class AddEventForExport implements IChainable {
+public class AddGeTransferProfileExportEvent implements IChainable {
 
-    private static final String TAG = AddEventForExport.class.getSimpleName();
+    private static final String TAG = AddGeTransferProfileExportEvent.class.getSimpleName();
     private IChainable nextLink;
 
     private String destinationDBFilePath;
 
-    public AddEventForExport(String destinationDBFilePath) {
+    public AddGeTransferProfileExportEvent(String destinationDBFilePath) {
         this.destinationDBFilePath = destinationDBFilePath;
     }
 
@@ -49,11 +50,10 @@ public class AddEventForExport implements IChainable {
             ArrayList<GETransferMap> contents = new ArrayList<>();
             for (ImportedMetadataModel importedMetadataModel : importedMetadataModelList) {
                 aggregateCount += importedMetadataModel.getCount();
-                contents.add(
-                        GETransferMap.createMapForTelemetry(importedMetadataModel.getDeviceId(),
+                contents.add(GETransferMap.createMapForTelemetry(importedMetadataModel.getDeviceId(),
                                 importedMetadataModel.getImportedId(), importedMetadataModel.getCount()));
             }
-            aggregateCount += (int) importContext.getMetadata().get(ServiceConstants.PROFILES_COUNT);
+            aggregateCount += Integer.valueOf(importContext.getMetadata().get(ServiceConstants.PROFILES_COUNT).toString());
             GETransferEventKnowStructure eks = new GETransferEventKnowStructure(
                     GETransferEventKnowStructure.TRANSFER_DIRECTION_EXPORT,
                     GETransferEventKnowStructure.DATATYPE_PROFILE,
@@ -61,10 +61,8 @@ public class AddEventForExport implements IChainable {
                     new File(destinationDBFilePath).length(),
                     contents);
             GETransfer geTransfer = new GETransfer(new GameData(appContext.getParams().getGid(), appContext.getParams().getVersionName()), eks);
+            TelemetryLogger.log(geTransfer);
 
-            // TODO: 6/12/2017
-//            Telemetry telemetry = new Telemetry(context);
-//            telemetry.storeEvent(GsonUtil.toJson(geTransfer));
         } catch (NumberFormatException ex) {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, ex.getMessage(), TAG);
         }

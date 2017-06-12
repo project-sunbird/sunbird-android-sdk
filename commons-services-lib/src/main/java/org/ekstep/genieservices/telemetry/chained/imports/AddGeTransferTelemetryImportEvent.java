@@ -12,6 +12,7 @@ import org.ekstep.genieservices.commons.bean.telemetry.GETransferMap;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.LongUtil;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
+import org.ekstep.genieservices.telemetry.model.ImportedMetadataListModel;
 import org.ekstep.genieservices.telemetry.model.ImportedMetadataModel;
 
 import java.util.ArrayList;
@@ -29,28 +30,23 @@ public class AddGeTransferTelemetryImportEvent implements IChainable {
     @Override
     public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
 
-
         try {
-            String importId = (String) importContext.getMetadata().get(ServiceConstants.EXPORT_ID);
-            String did = (String) importContext.getMetadata().get(ServiceConstants.DID);
+            ImportedMetadataListModel importedMetadataListModel = ImportedMetadataListModel.findAll(appContext.getDBSession());
 
-            ImportedMetadataModel importedMetadataModel = ImportedMetadataModel.find(appContext.getDBSession(), importId, did);
-
-
-            if (importedMetadataModel != null) {
+            if (importedMetadataListModel != null) {
                 int aggregateCount = 0;
                 ArrayList<GETransferMap> transferMapList = new ArrayList<>();
-                aggregateCount += importedMetadataModel.getCount();
-                transferMapList.add(GETransferMap.createMapForTelemetry(importedMetadataModel.getDeviceId(),
-                        importedMetadataModel.getImportedId(), importedMetadataModel.getCount()));
+                for (ImportedMetadataModel importMetadata : importedMetadataListModel.getImportedMetadataModelList()) {
+                    aggregateCount += importMetadata.getCount();
+                    transferMapList.add(GETransferMap.createMapForTelemetry(importMetadata.getDeviceId(),
+                            importMetadata.getImportedId(), importMetadata.getCount()));
+                }
                 GETransferEventKnowStructure eks = new GETransferEventKnowStructure(
                         GETransferEventKnowStructure.TRANSFER_DIRECTION_IMPORT,
                         GETransferEventKnowStructure.DATATYPE_TELEMETRY,
                         aggregateCount,
                         LongUtil.tryParseToLong((String) importContext.getMetadata().get(GETransferEventKnowStructure.FILE_SIZE), 0),
                         transferMapList);
-
-                importedMetadataModel.clear();
 
                 GETransfer geTransfer = new GETransfer(new GameData(appContext.getParams().getGid(), appContext.getParams().getVersionName()), eks);
                 TelemetryLogger.log(geTransfer);

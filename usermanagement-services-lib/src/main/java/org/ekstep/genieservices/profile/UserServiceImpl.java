@@ -31,7 +31,7 @@ import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
-import org.ekstep.genieservices.profile.chained.export.AddEventForExport;
+import org.ekstep.genieservices.profile.chained.export.AddGeTransferProfileExportEvent;
 import org.ekstep.genieservices.profile.chained.export.CleanupExportedFile;
 import org.ekstep.genieservices.profile.chained.export.CopyDatabase;
 import org.ekstep.genieservices.profile.chained.export.CreateMetadata;
@@ -518,7 +518,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         CopyDatabase copyDatabase = new CopyDatabase(sourceDBFilePath, destinationDBFilePath, dataSource);
         copyDatabase.then(new CreateMetadata(destinationDBFilePath, userIds))
                 .then(new CleanupExportedFile(destinationDBFilePath, userIds))
-                .then(new AddEventForExport(destinationDBFilePath));
+                .then(new AddGeTransferProfileExportEvent(destinationDBFilePath));
 
         // TODO: 6/12/2017 - if export failed.
 //                .then(new RemoveExportFile(destinationDBFilePath));
