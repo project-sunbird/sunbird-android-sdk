@@ -162,6 +162,11 @@ public interface ServiceConstants {
 
         //Telemetry
         String UNABLE_TO_SAVE_EVENT = "Not able to save event";
+
+        //Import
+        String IMPORT_PROFILE_FAILED = "Import profile failed.";
+        String IMPORT_CONTENT_FAILED = "Import content failed.";
+        String IMPORT_TELEMETRY_FAILED = "Import telemetry failed.";
     }
 
     interface ContentStatus {

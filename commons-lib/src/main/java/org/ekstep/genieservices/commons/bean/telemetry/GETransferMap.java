@@ -4,32 +4,32 @@ package org.ekstep.genieservices.commons.bean.telemetry;
  * Created by swayangjit on 2/5/17.
  */
 
-public class GETransferContentMap {
+public class GETransferMap {
     private String identifier;
     private Double pkgVersion;
     private int transferCount;
     private String origin;
     private String transferId;
 
-    private GETransferContentMap(String identifier, Double pkgVersion, int transferCount, String origin) {
+    private GETransferMap(String identifier, Double pkgVersion, int transferCount, String origin) {
         this.identifier = identifier;
         this.pkgVersion = pkgVersion;
         this.transferCount = transferCount;
         this.origin = origin;
     }
 
-    private GETransferContentMap(String origin, String transferId, int transferCount) {
+    private GETransferMap(String origin, String transferId, int transferCount) {
         this.origin = origin;
         this.transferId = transferId;
         this.transferCount = transferCount;
     }
 
-    public static GETransferContentMap createMapForContent(String identifier, Double pkgVersion, int transferCount, String origin) {
-        return new GETransferContentMap(identifier, pkgVersion, transferCount, origin);
+    public static GETransferMap createMapForContent(String identifier, Double pkgVersion, int transferCount, String origin) {
+        return new GETransferMap(identifier, pkgVersion, transferCount, origin);
     }
 
-    public static GETransferContentMap createMapForTelemetry(String origin, String importedId, int count) {
-        return new GETransferContentMap(origin, importedId, count);
+    public static GETransferMap createMapForTelemetry(String origin, String importedId, int count) {
+        return new GETransferMap(origin, importedId, count);
     }
 
     public String identifier() {

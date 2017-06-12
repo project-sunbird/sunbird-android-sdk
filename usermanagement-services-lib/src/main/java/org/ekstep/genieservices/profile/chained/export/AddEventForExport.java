@@ -7,8 +7,8 @@ import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransfer;
-import org.ekstep.genieservices.commons.bean.telemetry.GETransferContentMap;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
+import org.ekstep.genieservices.commons.bean.telemetry.GETransferMap;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.telemetry.model.ImportedMetadataListModel;
 import org.ekstep.genieservices.telemetry.model.ImportedMetadataModel;
@@ -46,11 +46,11 @@ public class AddEventForExport implements IChainable {
                 importedMetadataModelList = new ArrayList<>();
             }
 
-            ArrayList<GETransferContentMap> contents = new ArrayList<>();
+            ArrayList<GETransferMap> contents = new ArrayList<>();
             for (ImportedMetadataModel importedMetadataModel : importedMetadataModelList) {
                 aggregateCount += importedMetadataModel.getCount();
                 contents.add(
-                        GETransferContentMap.createMapForTelemetry(importedMetadataModel.getDeviceId(),
+                        GETransferMap.createMapForTelemetry(importedMetadataModel.getDeviceId(),
                                 importedMetadataModel.getImportedId(), importedMetadataModel.getCount()));
             }
             aggregateCount += (int) importContext.getMetadata().get(ServiceConstants.PROFILES_COUNT);

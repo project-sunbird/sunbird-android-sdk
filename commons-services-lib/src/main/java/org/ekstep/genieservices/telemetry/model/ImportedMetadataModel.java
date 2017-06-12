@@ -3,6 +3,7 @@ package org.ekstep.genieservices.telemetry.model;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.contract.ImportedMetadataEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
+import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IUpdatable;
@@ -16,7 +17,7 @@ import java.util.Locale;
  *
  * @author anil
  */
-public class ImportedMetadataModel implements IWritable, IReadable, IUpdatable {
+public class ImportedMetadataModel implements IWritable, IReadable, IUpdatable, ICleanable {
 
     private IDBSession dbSession;
     private Long id = -1L;
@@ -65,6 +66,11 @@ public class ImportedMetadataModel implements IWritable, IReadable, IUpdatable {
 
     public Void update() {
         dbSession.update(this);
+        return null;
+    }
+
+    public Void clear() {
+        dbSession.clean(this);
         return null;
     }
 
@@ -129,6 +135,18 @@ public class ImportedMetadataModel implements IWritable, IReadable, IUpdatable {
     @Override
     public String getTableName() {
         return ImportedMetadataEntry.TABLE_NAME;
+    }
+
+    @Override
+    public void clean() {
+
+    }
+
+    @Override
+    public String selectionToClean() {
+        return String.format(Locale.US, "where %s = '%s' AND %s = '%s'",
+                ImportedMetadataEntry.COLUMN_NAME_IMPORTED_ID, importedId,
+                ImportedMetadataEntry.COLUMN_NAME_DEVICE_ID, deviceId);
     }
 
     @Override

@@ -3,10 +3,18 @@ package org.ekstep.genieservices.telemetry.chained.imports;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
+import org.ekstep.genieservices.commons.bean.telemetry.GETransfer;
+import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
+import org.ekstep.genieservices.commons.bean.telemetry.GETransferMap;
 import org.ekstep.genieservices.commons.chained.IChainable;
-import org.ekstep.genieservices.telemetry.model.ImportedMetadataListModel;
+import org.ekstep.genieservices.commons.utils.LongUtil;
+import org.ekstep.genieservices.telemetry.TelemetryLogger;
+import org.ekstep.genieservices.telemetry.model.ImportedMetadataModel;
+
+import java.util.ArrayList;
 
 /**
  * Created on 6/8/2017.
@@ -21,12 +29,38 @@ public class AddGeTransferTelemetryImportEvent implements IChainable {
     @Override
     public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
 
-        ImportedMetadataListModel importedMetadataListModel = ImportedMetadataListModel.findAll(appContext.getDBSession());
-        if (importedMetadataListModel != null) {
-            // TODO: 6/9/2017  
+
+        try {
+            String importId = (String) importContext.getMetadata().get(ServiceConstants.EXPORT_ID);
+            String did = (String) importContext.getMetadata().get(ServiceConstants.DID);
+
+            ImportedMetadataModel importedMetadataModel = ImportedMetadataModel.find(appContext.getDBSession(), importId, did);
+
+
+            if (importedMetadataModel != null) {
+                int aggregateCount = 0;
+                ArrayList<GETransferMap> transferMapList = new ArrayList<>();
+                aggregateCount += importedMetadataModel.getCount();
+                transferMapList.add(GETransferMap.createMapForTelemetry(importedMetadataModel.getDeviceId(),
+                        importedMetadataModel.getImportedId(), importedMetadataModel.getCount()));
+                GETransferEventKnowStructure eks = new GETransferEventKnowStructure(
+                        GETransferEventKnowStructure.TRANSFER_DIRECTION_IMPORT,
+                        GETransferEventKnowStructure.DATATYPE_TELEMETRY,
+                        aggregateCount,
+                        LongUtil.tryParseToLong((String) importContext.getMetadata().get(GETransferEventKnowStructure.FILE_SIZE), 0),
+                        transferMapList);
+
+                importedMetadataModel.clear();
+
+                GETransfer geTransfer = new GETransfer(new GameData(appContext.getParams().getGid(), appContext.getParams().getVersionName()), eks);
+                TelemetryLogger.log(geTransfer);
+                return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+            }
+        } catch (NumberFormatException ex) {
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, ServiceConstants.ErrorMessage.IMPORT_TELEMETRY_FAILED, TAG);
         }
 
-        return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "Import telemetry event failed.", TAG);
+        return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, ServiceConstants.ErrorMessage.IMPORT_TELEMETRY_FAILED, TAG);
     }
 
     @Override
