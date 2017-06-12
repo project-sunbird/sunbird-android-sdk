@@ -19,7 +19,7 @@ public class Content implements Serializable {
     private Long lastUpdatedTime;
     private boolean isAvailableLocally;
     private boolean isUpdateAvailable;
-    private ContentFeedback contentFeedback;
+    private List<ContentFeedback> contentFeedback;
     private ContentAccess contentAccess;
     private List<Content> children;
 
@@ -95,11 +95,11 @@ public class Content implements Serializable {
         isUpdateAvailable = updateAvailable;
     }
 
-    public ContentFeedback getContentFeedback() {
+    public List<ContentFeedback> getContentFeedback() {
         return contentFeedback;
     }
 
-    public void setContentFeedback(ContentFeedback contentFeedback) {
+    public void setContentFeedback(List<ContentFeedback> contentFeedback) {
         this.contentFeedback = contentFeedback;
     }
 

@@ -108,7 +108,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         if (content.isAvailableLocally()) {
             String uid = ContentHandler.getCurrentUserId(userService);
-            ContentFeedbackCriteria.Builder builder = new ContentFeedbackCriteria.Builder(uid, content.getIdentifier());
+            ContentFeedbackCriteria.Builder builder = new ContentFeedbackCriteria.Builder();
+            builder.byUser(uid)
+                    .byContent(content.getIdentifier());
             content.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, builder.build()));
             content.setContentAccess(ContentHandler.getContentAccess(userService, content.getIdentifier(), uid));
         }
@@ -132,7 +134,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             Content c = ContentHandler.convertContentModelToBean(contentModel);
 
             if (criteria.attachFeedback()) {
-                ContentFeedbackCriteria.Builder builder = new ContentFeedbackCriteria.Builder(criteria.getUid(), c.getIdentifier());
+                ContentFeedbackCriteria.Builder builder = new ContentFeedbackCriteria.Builder();
+                builder.byUser(criteria.getUid())
+                        .byContent(c.getIdentifier());
                 c.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, builder.build()));
             }
             if (criteria.attachContentAccess()) {

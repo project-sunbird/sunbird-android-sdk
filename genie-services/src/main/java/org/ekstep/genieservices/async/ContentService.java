@@ -265,10 +265,10 @@ public class ContentService {
         });
     }
 
-    public void getFeedback(final ContentFeedbackCriteria contentFeedbackCriteria, IResponseHandler<ContentFeedback> responseHandler) {
-        new AsyncHandler<ContentFeedback>(responseHandler).execute(new IPerformable<ContentFeedback>() {
+    public void getFeedback(final ContentFeedbackCriteria contentFeedbackCriteria, IResponseHandler<List<ContentFeedback>> responseHandler) {
+        new AsyncHandler<List<ContentFeedback>>(responseHandler).execute(new IPerformable<List<ContentFeedback>>() {
             @Override
-            public GenieResponse<ContentFeedback> perform() {
+            public GenieResponse<List<ContentFeedback>> perform() {
                 return contentFeedbackService.getFeedback(contentFeedbackCriteria);
             }
         });

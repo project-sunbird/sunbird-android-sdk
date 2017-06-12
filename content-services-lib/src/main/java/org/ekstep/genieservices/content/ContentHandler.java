@@ -395,7 +395,7 @@ public class ContentHandler {
         return profile;
     }
 
-    public static ContentFeedback getContentFeedback(IContentFeedbackService contentFeedbackService, ContentFeedbackCriteria contentFeedbackCriteria) {
+    public static List<ContentFeedback> getContentFeedback(IContentFeedbackService contentFeedbackService, ContentFeedbackCriteria contentFeedbackCriteria) {
         if (contentFeedbackService != null) {
             return contentFeedbackService.getFeedback(contentFeedbackCriteria).getResult();
         }
