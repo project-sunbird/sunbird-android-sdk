@@ -1,6 +1,7 @@
 package org.ekstep.genieservices.content;
 
 import com.google.gson.internal.LinkedTreeMap;
+import com.google.gson.reflect.TypeToken;
 
 import org.ekstep.genieservices.BaseService;
 import org.ekstep.genieservices.IConfigService;
@@ -12,6 +13,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
+import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
@@ -53,6 +55,7 @@ import org.ekstep.genieservices.content.network.RecommendedContentAPI;
 import org.ekstep.genieservices.content.network.RelatedContentAPI;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -290,9 +293,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 facets = (List<Map<String, Object>>) result.get("facets");
             }
 
-            List<Map<String, Object>> contentDataList = null;
+            String contentDataList = null;
             if (result.containsKey("content")) {
-                contentDataList = (List<Map<String, Object>>) result.get("content");
+                contentDataList = (String) result.get("content");
             }
 
             ContentSearchResult searchResult = new ContentSearchResult();
@@ -300,7 +303,13 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             searchResult.setResponseMessageId(responseMessageId);
             searchResult.setFilter(ContentHandler.getFilters(configService, facets, (Map<String, Object>) requestMap.get("filters")));
             searchResult.setRequest(requestMap);
-            searchResult.setContents(ContentHandler.convertContentMapListToBeanList(mAppContext.getDBSession(), contentDataList));
+
+            if (!StringUtil.isNullOrEmpty(contentDataList)) {
+                Type type = new TypeToken<List<ContentData>>() {
+                }.getType();
+                List<ContentData> contentData = GsonUtil.getGson().fromJson(contentDataList, type);
+                searchResult.setContentDataList(contentData);
+            }
 
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(searchResult);

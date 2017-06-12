@@ -1158,9 +1158,9 @@ public class ContentHandler {
 
         List<Map<String, Object>> sections = (List<Map<String, Object>>) pageMap.get("sections");
         for (Map<String, Object> sectionMap : sections) {
-            List<Map<String, Object>> contentDataList = null;
+            String contentDataList = null;
             if (sectionMap.containsKey("contents")) {
-                contentDataList = (List<Map<String, Object>>) sectionMap.get("contents");
+                contentDataList = (String) sectionMap.get("contents");
             }
 
             ContentSearchCriteria contentSearchCriteria = null;
@@ -1230,7 +1230,13 @@ public class ContentHandler {
             section.setResponseMessageId((String) sectionMap.get("resmsgid"));
             section.setApiId((String) sectionMap.get("apiid"));
             section.setDisplay(GsonUtil.fromMap((Map) sectionMap.get("display"), Display.class));
-            section.setContents(convertContentMapListToBeanList(dbSession, contentDataList));
+
+            if (!StringUtil.isNullOrEmpty(contentDataList)) {
+                Type type = new TypeToken<List<ContentData>>() {
+                }.getType();
+                List<ContentData> contentData = GsonUtil.getGson().fromJson(contentDataList, type);
+                section.setContentDataList(contentData);
+            }
             section.setContentSearchCriteria(contentSearchCriteria);
 
             sectionList.add(section);
