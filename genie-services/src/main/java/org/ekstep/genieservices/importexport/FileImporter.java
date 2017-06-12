@@ -8,7 +8,7 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
+import org.ekstep.genieservices.commons.bean.ImportRequest;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDataSource;
 import org.ekstep.genieservices.commons.db.operations.impl.SQLiteDataSource;
@@ -36,7 +36,7 @@ public class FileImporter {
         this.dataSource = new SQLiteDataSource(appContext);
     }
 
-    public GenieResponse<Void> importFile(ProfileImportRequest importRequest) {
+    public GenieResponse<Void> importFile(ImportRequest importRequest) {
         GenieResponse<Void> response;
         if (!FileUtil.doesFileExists(importRequest.getSourceFilePath())) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Import failed, file doesn't exists", TAG);

@@ -7,11 +7,11 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
  *
  * @author anil
  */
-public class ProfileImportRequest {
+public class ImportRequest {
 
     private String sourceFilePath;
 
-    private ProfileImportRequest(String sourceFilePath) {
+    private ImportRequest(String sourceFilePath) {
         this.sourceFilePath = sourceFilePath;
     }
 
@@ -33,12 +33,12 @@ public class ProfileImportRequest {
             return this;
         }
 
-        public ProfileImportRequest build() {
+        public ImportRequest build() {
             if (sourceFilePath == null) {
                 throw new IllegalStateException("filePath required.");
             }
 
-            return new ProfileImportRequest(sourceFilePath);
+            return new ImportRequest(sourceFilePath);
         }
     }
 }

@@ -5,8 +5,8 @@ import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.ContentAccessLearnerState;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.ImportRequest;
 import org.ekstep.genieservices.commons.bean.Profile;
-import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.importexport.FileImporter;
 
@@ -22,7 +22,7 @@ public class UserService {
 
     public UserService(GenieService genieService) {
         this.userService = genieService.getUserService();
-        fileImporter = genieService.getFileImporter();
+        this.fileImporter = genieService.getFileImporter();
     }
 
     /**
@@ -212,11 +212,11 @@ public class UserService {
         });
     }
 
-    public void importProfile(final ProfileImportRequest profileImportRequest, IResponseHandler<Void> responseHandler) {
+    public void importProfile(final ImportRequest importRequest, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
-                return fileImporter.importFile(profileImportRequest);
+                return fileImporter.importFile(importRequest);
             }
         });
     }
