@@ -96,18 +96,14 @@ public class UserServiceImpl extends BaseService implements IUserService {
         HashMap params = new HashMap();
         params.put("logLevel", "1");
         UserProfilesModel userProfilesModel = UserProfilesModel.find(mAppContext.getDBSession());
-
+        GenieResponse genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, List.class);
         if (userProfilesModel == null) {
-            GenieResponse genieResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.DATA_NOT_FOUND_ERROR, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_PROFILE, TAG, Void.class);
-            TelemetryLogger.logFailure(mAppContext, genieResponse, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_ALL_PROFILE);
-            return genieResponse;
+            genieResponse.setResult(new ArrayList<Profile>());
         } else {
-            GenieResponse genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, List.class);
             genieResponse.setResult(userProfilesModel.getProfileList());
-            TelemetryLogger.logSuccess(mAppContext, genieResponse, TAG, methodName, params);
-            return genieResponse;
         }
-
+        TelemetryLogger.logSuccess(mAppContext, genieResponse, TAG, methodName, params);
+        return genieResponse;
     }
 
     private void logGEError(GenieResponse response, String id) {
@@ -415,17 +411,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
                 isUid = String.format(Locale.US, "%s = '%s'", ContentAccessEntry.COLUMN_NAME_UID, criteria.getUid());
             }
 
-            String contentTypes;
-            if (criteria.getContentTypes() != null) {
-                List<String> contentTypeList = new ArrayList<>();
-                for (ContentType contentType : criteria.getContentTypes()) {
-                    contentTypeList.add(contentType.getValue());
-                }
-                contentTypes = StringUtil.join("','", contentTypeList);
-            } else {
-                contentTypes = StringUtil.join("','", ContentType.values());
-            }
-            isContentType = String.format(Locale.US, "%s in ('%s')", ContentAccessEntry.COLUMN_NAME_CONTENT_TYPE, contentTypes);
+            isContentType = String.format(Locale.US, "%s in ('%s')", ContentAccessEntry.COLUMN_NAME_CONTENT_TYPE, ContentType.getCommaSeparatedContentTypes(criteria.getContentTypes()));
         }
 
         String filter = null;
@@ -456,7 +442,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         GenieResponse<List<ContentAccess>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(contentAccessList);
 
-        TelemetryLogger.logSuccess(mAppContext, response, TAG, "getAllContentAccess@UserServiceImpl", new HashMap());
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
 
         return response;
     }
@@ -496,7 +482,35 @@ public class UserServiceImpl extends BaseService implements IUserService {
     }
 
     @Override
-    public GenieResponse<Void> importProfile(ProfileImportRequest profileImportRequest) {
+    public GenieResponse<Void> importProfile(ProfileImportRequest importRequest) {
+        GenieResponse<Void> response;
+
+//        if (!FileUtil.doesFileExists(importRequest.getSourceFilePath())) {
+//            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Profile import failed, file doesn't exists", TAG);
+//            return response;
+//        }
+//
+//        String ext = FileUtil.getFileExtension(importRequest.getSourceFilePath());
+//        if (!ServiceConstants.FileExtension.PROFILE.equals(ext)) {
+//            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Profile import failed, unsupported file extension", TAG);
+//            return response;
+//        } else {
+//            ImportContext importContext = new ImportContext(importRequest.isChildContent(), importRequest.getSourceFilePath(), importRequest.getDestinationFolder());
+//
+//            IChainable importContentSteps = ContentImportStep.initImportContent();
+//            importContentSteps.then(new DeviceMemoryCheck())
+//                    .then(new ExtractEcar())
+//                    .then(new ValidateEcar())
+//                    .then(new ExtractPayloads())
+//                    .then(new EcarCleanUp())
+//                    .then(new AddGeTransferContentImportEvent());
+//            GenieResponse<Void> genieResponse = importContentSteps.execute(mAppContext, importContext);
+////            if (genieResponse.getStatus()) {
+////                EventPublisher.postImportSuccessfull(new ImportStatus(null));
+////            }
+//            return genieResponse;
+//        }
+
         return null;
     }
 

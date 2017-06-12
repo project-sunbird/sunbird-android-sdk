@@ -9,11 +9,10 @@ import com.google.gson.reflect.TypeToken;
 import org.ekstep.genieresolvers.BaseTask;
 import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.LearnerAssessmentDetails;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 import java.lang.reflect.Type;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Created on 6/6/17.
@@ -38,18 +37,17 @@ class LearnerAssessmentTask extends BaseTask {
     }
 
     @Override
-    protected GenieResponse execute() {
+    protected GenieResponse<Map> execute() {
         Cursor cursor = contentResolver.query(getUri(), null, null, new String[]{uid, contentId}, null);
         if (cursor == null || cursor.getCount() == 0) {
             return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), LearnerAssessmentTask.class.getSimpleName());
         }
 
-        GenieResponse genieResponse = getResponse(cursor);
-        return genieResponse;
+        return getResponse(cursor);
     }
 
-    private GenieResponse<List<LearnerAssessmentDetails>> getResponse(Cursor cursor) {
-        GenieResponse<List<LearnerAssessmentDetails>> response = null;
+    private GenieResponse<Map> getResponse(Cursor cursor) {
+        GenieResponse<Map> response = null;
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 response = readCursor(cursor);
@@ -59,11 +57,9 @@ class LearnerAssessmentTask extends BaseTask {
         return response;
     }
 
-    private GenieResponse<List<LearnerAssessmentDetails>> readCursor(Cursor cursor) {
+    private GenieResponse<Map> readCursor(Cursor cursor) {
         String result = cursor.getString(0);
-        Type type = new TypeToken<GenieResponse<List<LearnerAssessmentDetails>>>() {
-        }.getType();
-        GenieResponse<List<LearnerAssessmentDetails>> response = GsonUtil.fromJson(result, type);
+        GenieResponse<Map> response = GsonUtil.fromJson(result, GenieResponse.class);
         return response;
     }
 

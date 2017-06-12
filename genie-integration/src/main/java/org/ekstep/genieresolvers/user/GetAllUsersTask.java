@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
+import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
 
 import org.ekstep.genieresolvers.BaseTask;
@@ -14,6 +15,7 @@ import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created on 23/5/17.
@@ -35,18 +37,17 @@ public class GetAllUsersTask extends BaseTask {
     }
 
     @Override
-    protected GenieResponse execute() {
+    protected GenieResponse<Map> execute() {
         Cursor cursor = contentResolver.query(getUri(), null, null, null, null);
         if (cursor == null || cursor.getCount() == 0) {
             return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), GetAllUsersTask.class.getSimpleName());
         }
 
-        GenieResponse genieResponse = getResponse(cursor);
-        return genieResponse;
+        return getResponse(cursor);
     }
 
-    private GenieResponse<List<Profile>> getResponse(Cursor cursor) {
-        GenieResponse<List<Profile>> mapData = null;
+    private GenieResponse<Map> getResponse(Cursor cursor) {
+        GenieResponse<Map> mapData = null;
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 mapData = readCursor(cursor);
@@ -56,11 +57,9 @@ public class GetAllUsersTask extends BaseTask {
         return mapData;
     }
 
-    private GenieResponse<List<Profile>> readCursor(Cursor cursor) {
+    private GenieResponse<Map> readCursor(Cursor cursor) {
         String serverData = cursor.getString(0);
-        Type type = new TypeToken<GenieResponse<List<Profile>>>() {
-        }.getType();
-        GenieResponse<List<Profile>> response = GsonUtil.fromJson(serverData, type);
+        GenieResponse<Map> response = GsonUtil.fromJson(serverData, GenieResponse.class);
         return response;
     }
 

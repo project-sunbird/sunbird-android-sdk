@@ -1,13 +1,13 @@
 package org.ekstep.genieservices.profile.db.model;
 
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.db.contract.UserEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.commons.db.contract.UserEntry;
 
 import java.util.Locale;
 import java.util.UUID;
@@ -63,10 +63,6 @@ public class UserModel implements IWritable, IReadable, ICleanable {
     public void readAfterMoving(IResultSet cursor) {
         id = cursor.getLong(0);
         uid = cursor.getString(1);
-    }
-
-    public boolean exists() {
-        return (uid != null && !uid.isEmpty());
     }
 
     @Override

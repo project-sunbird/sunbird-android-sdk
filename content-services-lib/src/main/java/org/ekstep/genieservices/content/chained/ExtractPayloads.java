@@ -36,7 +36,7 @@ public class ExtractPayloads implements IChainable {
     @Override
     public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
 
-        String identifier, mimeType, contentType, visibility, path;
+        String identifier, mimeType, contentType, visibility, audience, path;
         Double compatibilityLevel, pkgVersion;
         int refCount;
         int contentState = ContentConstants.State.ONLY_SPINE;
@@ -52,6 +52,7 @@ public class ExtractPayloads implements IChainable {
             mimeType = ContentHandler.readMimeType(item);
             contentType = ContentHandler.readContentType(item);
             visibility = ContentHandler.readVisibility(item);
+            audience = ContentHandler.readAudience(item);
             compatibilityLevel = ContentHandler.readCompatibilityLevel(item);
             pkgVersion = ContentHandler.readPkgVersion(item);
             artifactUrl = ContentHandler.readArtifactUrl(item);
@@ -200,7 +201,7 @@ public class ExtractPayloads implements IChainable {
 
             ContentHandler.addOrUpdateViralityMetadata(item, appContext.getDeviceInfo().getDeviceID());
             ContentModel newContentModel = ContentModel.build(appContext.getDBSession(), identifier, importContext.getManifestVersion(), GsonUtil.toJson(item),
-                    mimeType, contentType, visibility, path, refCount, contentState);
+                    mimeType, contentType, visibility, path, refCount, contentState, audience);
 
             if (oldContentModel == null) {
                 newContentModel.save();

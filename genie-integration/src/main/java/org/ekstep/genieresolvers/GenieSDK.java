@@ -5,6 +5,7 @@ import android.content.Context;
 import org.ekstep.genieresolvers.content.ContentService;
 import org.ekstep.genieresolvers.language.LanguageService;
 import org.ekstep.genieresolvers.partner.PartnerService;
+import org.ekstep.genieresolvers.summarizer.SummarizerService;
 import org.ekstep.genieresolvers.telemetry.TelemetryService;
 import org.ekstep.genieresolvers.user.UserService;
 
@@ -23,6 +24,7 @@ public class GenieSDK {
     private ContentService mContentService;
     private LanguageService mLanguageService;
     private PartnerService mPartnerService;
+    private SummarizerService mSummarizerService;
 
     private GenieSDK(Context context, String appQualifier) {
         this.context = context;
@@ -79,6 +81,14 @@ public class GenieSDK {
         }
 
         return mPartnerService;
+    }
+
+    public SummarizerService getSummarizerService() {
+        if (mSummarizerService == null) {
+            mSummarizerService = new SummarizerService(context, appQualifier);
+        }
+
+        return mSummarizerService;
     }
 
 }

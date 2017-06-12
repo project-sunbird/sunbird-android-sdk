@@ -17,6 +17,7 @@ public class GenieAsyncService {
     private static ContentService sContentService;
     private static TagService sTagService;
     private static NotificationService sNotificationService;
+    private static SummarizerService sSummarizerService;
 
     public static GenieAsyncService getAsyncService() {
         if (sGenieAsyncService == null) {
@@ -77,6 +78,13 @@ public class GenieAsyncService {
             sContentService = new ContentService(sService);
         }
         return sContentService;
+    }
+
+    public SummarizerService getSummarizerService() {
+        if (sSummarizerService == null) {
+            sSummarizerService = new SummarizerService(sService);
+        }
+        return sSummarizerService;
     }
 
 }

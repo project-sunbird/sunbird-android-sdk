@@ -51,9 +51,9 @@ public abstract class AbstractUserProvider extends BaseContentProvider {
         if (values != null && values.getAsString(Constants.PROFILE) != null) {
             Logger.i(TAG, "Inserting profile - " + values.getAsString(Constants.PROFILE));
             Profile profile = GsonUtil.fromJson(values.getAsString(Constants.PROFILE), Profile.class);
-            GenieResponse response = getService().getUserProfileService().createUserProfile(profile);
-            if (response != null && response.getStatus()) {
-                return uri;
+            GenieResponse<Profile> response = getService().getUserProfileService().createUserProfile(profile);
+            if (response != null && response.getStatus() && response.getResult() != null) {
+                return Uri.parse(response.getResult().getUid());
             }
 
             return null;

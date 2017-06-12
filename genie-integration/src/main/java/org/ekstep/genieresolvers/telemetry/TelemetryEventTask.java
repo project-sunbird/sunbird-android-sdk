@@ -8,6 +8,8 @@ import org.ekstep.genieresolvers.BaseTask;
 import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 
+import java.util.Map;
+
 /**
  * Created on 23/5/17.
  * shriharsh
@@ -29,7 +31,7 @@ public class TelemetryEventTask extends BaseTask {
     }
 
     @Override
-    protected GenieResponse execute() {
+    protected GenieResponse<Map> execute() {
         ContentValues event = getContentValues();
         event.put(Constants.EVENT, eventString);
         Uri response = contentResolver.insert(getUri(), event);

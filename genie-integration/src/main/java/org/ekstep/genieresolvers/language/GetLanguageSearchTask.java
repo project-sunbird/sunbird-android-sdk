@@ -5,10 +5,15 @@ import android.database.Cursor;
 import android.net.Uri;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.ekstep.genieresolvers.BaseTask;
 import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
+
+import java.lang.reflect.Type;
+import java.util.Map;
 
 /**
  * Created on 23/5/17.
@@ -31,18 +36,17 @@ public class GetLanguageSearchTask extends BaseTask {
     }
 
     @Override
-    protected GenieResponse execute() {
+    protected GenieResponse<Map> execute() {
         Cursor cursor = contentResolver.query(getUri(), null, searchRequest, null, "");
         if (cursor == null) {
             return getErrorResponse(Constants.PROCESSING_ERROR,
                     getErrorMessage(), GetLanguageSearchTask.class.getSimpleName());
         }
-        GenieResponse genieResponse = getResponse(cursor);
-        return genieResponse;
+        return getResponse(cursor);
     }
 
-    private GenieResponse getResponse(Cursor cursor) {
-        GenieResponse mapData = null;
+    private GenieResponse<Map> getResponse(Cursor cursor) {
+        GenieResponse<Map> mapData = null;
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 mapData = readCursor(cursor);
@@ -52,10 +56,9 @@ public class GetLanguageSearchTask extends BaseTask {
         return mapData;
     }
 
-    private GenieResponse readCursor(Cursor cursor) {
-        Gson gson = new Gson();
+    private GenieResponse<Map> readCursor(Cursor cursor) {
         String serverData = cursor.getString(0);
-        GenieResponse response = gson.fromJson(serverData, GenieResponse.class);
+        GenieResponse<Map> response = GsonUtil.fromJson(serverData, GenieResponse.class);
         return response;
     }
 

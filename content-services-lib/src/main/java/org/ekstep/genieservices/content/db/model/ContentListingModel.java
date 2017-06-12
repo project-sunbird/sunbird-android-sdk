@@ -34,8 +34,10 @@ public class ContentListingModel implements IWritable, IUpdatable, IReadable, IC
     private String mBoard;
     private String mSubject;
     private long mExpiryTime;
+    private String channelStr;
+    private String audienceStr;
 
-    private ContentListingModel(IDBSession dbSession, String pageIdentifier, Profile profile, String subject) {
+    private ContentListingModel(IDBSession dbSession, String pageIdentifier, Profile profile, String subject, String channelStr, String audienceStr) {
         this.mDBSession = dbSession;
         this.mPageIdentifier = pageIdentifier;
         this.mAge = profile != null ? profile.getAge() : -1;
@@ -43,21 +45,23 @@ public class ContentListingModel implements IWritable, IUpdatable, IReadable, IC
         this.mMedium = (profile != null && profile.getMedium() != null) ? profile.getMedium() : "";
         this.mBoard = (profile != null && profile.getBoard() != null) ? profile.getBoard() : "";
         this.mSubject = subject != null ? subject : "";
+        this.channelStr = channelStr;
+        this.audienceStr = audienceStr;
     }
 
-    private ContentListingModel(IDBSession dbSession, String pageIdentifier, String json, Profile profile, String subject, long expiryTime) {
-        this(dbSession, pageIdentifier, profile, subject);
+    private ContentListingModel(IDBSession dbSession, String pageIdentifier, String json, Profile profile, String subject, String channelStr, String audienceStr, long expiryTime) {
+        this(dbSession, pageIdentifier, profile, subject, channelStr, audienceStr);
         this.mJson = json;
         this.mExpiryTime = expiryTime;
     }
 
-    public static ContentListingModel build(IDBSession dbSession, String pageIdentifier, String json, Profile profile, String subject, long expiryTime) {
-        ContentListingModel contentListingModel = new ContentListingModel(dbSession, pageIdentifier, json, profile, subject, expiryTime);
+    public static ContentListingModel build(IDBSession dbSession, String pageIdentifier, String json, Profile profile, String subject, String channelStr, String audienceStr, long expiryTime) {
+        ContentListingModel contentListingModel = new ContentListingModel(dbSession, pageIdentifier, json, profile, subject, channelStr, audienceStr, expiryTime);
         return contentListingModel;
     }
 
-    public static ContentListingModel find(IDBSession dbSession, String pageIdentifier, Profile profile, String subject) {
-        ContentListingModel contentListingModel = new ContentListingModel(dbSession, pageIdentifier, profile, subject);
+    public static ContentListingModel find(IDBSession dbSession, String pageIdentifier, Profile profile, String subject, String channelStr, String audienceStr) {
+        ContentListingModel contentListingModel = new ContentListingModel(dbSession, pageIdentifier, profile, subject, channelStr, audienceStr);
         dbSession.read(contentListingModel);
         // return null if the page json was not found
         if (contentListingModel.id == -1) {
@@ -103,13 +107,15 @@ public class ContentListingModel implements IWritable, IUpdatable, IReadable, IC
     public String filterForRead() {
         Logger.i(TAG, String.format("SEARCH page: %s", mPageIdentifier));
 
-        String selectionCriteria = String.format(Locale.US, "%s = '%s' AND %s = %d  AND %s = %d  AND %s = '%s'  AND %s = '%s' AND %s = '%s'",
+        String selectionCriteria = String.format(Locale.US, "%s = '%s' AND %s = %d  AND %s = %d  AND %s = '%s'  AND %s = '%s' AND %s = '%s' AND %s = '%s' AND %s = '%s'",
                 PageEntry.COLUMN_NAME_PAGE_IDENTIFIER, mPageIdentifier,
                 PageEntry.COLUMN_NAME_AGE, mAge,
                 PageEntry.COLUMN_NAME_STANDARD, mStandard,
                 PageEntry.COLUMN_NAME_MEDIUM, mMedium,
                 PageEntry.COLUMN_NAME_BOARD, mBoard,
-                PageEntry.COLUMN_NAME_SUBJECT, mSubject);
+                PageEntry.COLUMN_NAME_SUBJECT, mSubject,
+                PageEntry.COLUMN_NAME_CHANNEL, channelStr,
+                PageEntry.COLUMN_NAME_AUDIENCE, audienceStr);
 
         Logger.i(TAG, String.format("SEARCH page: %s", selectionCriteria));
         return String.format(Locale.US, " where %s", selectionCriteria);
@@ -160,6 +166,8 @@ public class ContentListingModel implements IWritable, IUpdatable, IReadable, IC
         contentValues.put(PageEntry.COLUMN_NAME_MEDIUM, mMedium);
         contentValues.put(PageEntry.COLUMN_NAME_BOARD, mBoard);
         contentValues.put(PageEntry.COLUMN_NAME_SUBJECT, mSubject);
+        contentValues.put(PageEntry.COLUMN_NAME_CHANNEL, channelStr);
+        contentValues.put(PageEntry.COLUMN_NAME_AUDIENCE, audienceStr);
 
         return contentValues;
     }

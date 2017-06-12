@@ -6,18 +6,20 @@ import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
+import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created on 4/6/17.
  * shriharsh
  */
 
-public class LearnerAssessmentDetailsModel implements IReadable, IWritable {
+public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpdatable {
 
     private Long id = -1L;
     private String uid;
@@ -35,7 +37,6 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable {
     private String hierarchyData;
     private IDBSession dbSession;
     private List<LearnerAssessmentDetails> mAssessmentList;
-    private Long insertId;
     private String filter;
 
     private LearnerAssessmentDetailsModel(IDBSession dbSession, String filter) {
@@ -169,12 +170,36 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable {
 
     @Override
     public void updateId(long id) {
-        insertId = id;
+        this.id = id;
+    }
+
+    @Override
+    public ContentValues getFieldsToUpdate() {
+        ContentValues values = new ContentValues();
+        values.put(LearnerAssessmentsEntry.COLUMN_NAME_QID, this.qid);
+        values.put(LearnerAssessmentsEntry.COLUMN_NAME_Q_INDEX, this.qindex);
+        values.put(LearnerAssessmentsEntry.COLUMN_NAME_CORRECT, this.correct);
+        values.put(LearnerAssessmentsEntry.COLUMN_NAME_SCORE, this.score);
+        values.put(LearnerAssessmentsEntry.COLUMN_NAME_MAX_SCORE, this.maxScore);
+        values.put(LearnerAssessmentsEntry.COLUMN_NAME_TIME_SPENT, this.timespent);
+        values.put(LearnerAssessmentsEntry.COLUMN_NAME_RES, this.res);
+        values.put(LearnerAssessmentsEntry.COLUMN_NAME_TIMESTAMP, this.timestamp);
+        values.put(LearnerAssessmentsEntry.COLUMN_NAME_Q_DESC, this.qdesc);
+        values.put(LearnerAssessmentsEntry.COLUMN_NAME_Q_TITLE, this.qtitle);
+        values.put(LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA, this.hierarchyData);
+        return values;
     }
 
     @Override
     public String getTableName() {
         return LearnerAssessmentsEntry.TABLE_NAME;
+    }
+
+    @Override
+    public String updateBy() {
+        return String.format(Locale.US, "%s = %s and %s = %s and %s = %s", LearnerAssessmentsEntry.COLUMN_NAME_UID, this.uid,
+                LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID, this.contentId,
+                LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA, this.hierarchyData);
     }
 
     @Override
@@ -207,11 +232,15 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable {
         dbSession.create(this);
     }
 
+    public void update() {
+        dbSession.update(this);
+    }
+
     public List<LearnerAssessmentDetails> getAllAssessments() {
         return mAssessmentList;
     }
 
     public Long getInsertedId() {
-        return insertId;
+        return this.id;
     }
 }

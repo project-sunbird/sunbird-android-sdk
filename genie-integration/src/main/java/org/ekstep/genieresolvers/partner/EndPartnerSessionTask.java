@@ -4,11 +4,16 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
+import com.google.gson.reflect.TypeToken;
+
 import org.ekstep.genieresolvers.BaseTask;
 import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.PartnerData;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
+
+import java.lang.reflect.Type;
+import java.util.Map;
 
 /**
  * Created on 25/5/17.
@@ -36,7 +41,7 @@ public class EndPartnerSessionTask extends BaseTask {
     }
 
     @Override
-    protected GenieResponse execute() {
+    protected GenieResponse<Map> execute() {
         Cursor cursor = contentResolver.query(getUri(), null, GsonUtil.toJson(partnerData), null, "");
         GenieResponse response = getResponseFromCursor(cursor);
 
@@ -48,7 +53,7 @@ public class EndPartnerSessionTask extends BaseTask {
     }
 
 
-    private GenieResponse getResponseFromCursor(Cursor cursor) {
+    private GenieResponse<Map> getResponseFromCursor(Cursor cursor) {
         GenieResponse response = null;
         if (cursor != null && cursor.moveToFirst()) {
             String resultData = cursor.getString(0);

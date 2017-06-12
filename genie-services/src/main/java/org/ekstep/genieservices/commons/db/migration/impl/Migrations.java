@@ -21,18 +21,8 @@ public abstract class Migrations {
         migrations.add(new _05_CreateRefCountContentMigration());
         migrations.add(new _06_CreateContentFeedbackMigration());
         migrations.add(new _07_UIBrandingMigration());
-        migrations.add(new _08_DeleteGameAndLanguageEntryMigration());
-
-        Collections.sort(migrations);
-
-        return migrations;
-    }
-
-    public static List<Migration> getSummarizerMigrations() {
-        List<Migration> migrations = new ArrayList<>();
-        // TODO: 6/7/2017  - Add this migration in getGeServiceMigrations()
-        //add migrations here
-        migrations.add(new _10_SummarizerMigration());
+        migrations.add(new _08_PartnerFilterMigration());
+        migrations.add(new _09_SdkMigration());
 
         Collections.sort(migrations);
 

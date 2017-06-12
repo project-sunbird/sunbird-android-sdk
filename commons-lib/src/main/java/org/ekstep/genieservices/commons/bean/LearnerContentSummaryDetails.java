@@ -5,9 +5,8 @@ package org.ekstep.genieservices.commons.bean;
  * shriharsh
  */
 
-public class LearnerSummaryData {
+public class LearnerContentSummaryDetails {
 
-    private Long id;
     private String uid;
     private String contentId;
     private Double avgts;
@@ -17,22 +16,7 @@ public class LearnerSummaryData {
     private Double timespent;
     private Long timestamp;
     private String ver;
-
-    public String getVer() {
-        return ver;
-    }
-
-    public void setVer(String ver) {
-        this.ver = ver;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+    private String hierarchyData;
 
     public String getUid() {
         return uid;
@@ -96,5 +80,21 @@ public class LearnerSummaryData {
 
     public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getVer() {
+        return ver;
+    }
+
+    public void setVer(String ver) {
+        this.ver = ver;
+    }
+
+    public String getHierarchyData() {
+        return hierarchyData;
+    }
+
+    public void setHierarchyData(String hierarchyData) {
+        this.hierarchyData = hierarchyData;
     }
 }

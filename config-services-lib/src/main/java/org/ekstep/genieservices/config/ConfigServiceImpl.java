@@ -6,7 +6,6 @@ import org.ekstep.genieservices.BaseService;
 import org.ekstep.genieservices.IConfigService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.CommonConstants;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MasterData;
@@ -52,7 +51,7 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
         String methodName="getMasterData@ConfigServiceImpl";
         HashMap params = new HashMap();
         params.put("type", type.getValue());
-        params.put("logLevel", "3");
+        params.put("logLevel", "2");
 
         if (getLongFromKeyValueStore(ConfigConstants.PreferenceKey.MASTER_DATA_API_EXPIRATION_KEY) == 0) {
             initializeMasterData();

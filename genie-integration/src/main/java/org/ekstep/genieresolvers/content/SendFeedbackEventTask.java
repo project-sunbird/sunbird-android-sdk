@@ -8,6 +8,8 @@ import org.ekstep.genieresolvers.BaseTask;
 import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 
+import java.util.Map;
+
 /**
  * Created on 23/5/17.
  * shriharsh
@@ -29,7 +31,7 @@ public class SendFeedbackEventTask extends BaseTask {
     }
 
     @Override
-    protected GenieResponse execute() {
+    protected GenieResponse<Map> execute() {
         ContentValues event = new ContentValues();
         event.put("event", feedbackString);
         Uri response = contentResolver.insert(getUri(), event);
@@ -37,8 +39,7 @@ public class SendFeedbackEventTask extends BaseTask {
             return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), SendFeedbackEventTask.class.getSimpleName());
 
         }
-        GenieResponse successResponse = getSuccessResponse(Constants.SUCCESSFUL);
-        return successResponse;
+        return getSuccessResponse(Constants.SUCCESSFUL);
     }
 
     @Override

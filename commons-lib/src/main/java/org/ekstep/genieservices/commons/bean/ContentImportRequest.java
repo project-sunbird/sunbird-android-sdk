@@ -1,5 +1,7 @@
 package org.ekstep.genieservices.commons.bean;
 
+import org.ekstep.genieservices.commons.utils.StringUtil;
+
 import java.io.File;
 import java.util.List;
 
@@ -47,15 +49,16 @@ public class ContentImportRequest {
         /**
          * @param isChildContent Should be True if importing nested content of any collection/textbook else False.
          */
-        public Builder(boolean isChildContent) {
+        public Builder isChildContent(boolean isChildContent) {
             this.isChildContent = isChildContent;
+            return this;
         }
 
         /**
          * Content file path which needs to import
          */
         public Builder fromFilePath(String filePath) {
-            if (filePath == null) {
+            if (StringUtil.isNullOrEmpty(filePath)) {
                 throw new IllegalArgumentException("Illegal filePath: " + filePath);
             }
             this.sourceFilePath = filePath;
@@ -86,7 +89,7 @@ public class ContentImportRequest {
                 throw new IllegalStateException("To folder required.");
             }
 
-            if (sourceFilePath == null && contentIds == null) {
+            if (StringUtil.isNullOrEmpty(sourceFilePath) && contentIds == null) {
                 throw new IllegalStateException("Provide either fromFilePath or contentIds.");
             }
 

@@ -7,6 +7,8 @@ import org.ekstep.genieresolvers.BaseTask;
 import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 
+import java.util.Map;
+
 /**
  * Created on 23/5/17.
  * shriharsh
@@ -28,7 +30,7 @@ public class DeleteUserTask extends BaseTask {
     }
 
     @Override
-    protected GenieResponse execute() {
+    protected GenieResponse<Map> execute() {
         int response = contentResolver.delete(getUri(), null, new String[]{userId});
 
         if (response != 1) {

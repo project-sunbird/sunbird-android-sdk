@@ -67,7 +67,7 @@ public abstract class AbstractPartnerProvider extends BaseContentProvider {
     }
 
     private String getCompletePath() {
-        String PARTNER_PATH = ".partner";
+        String PARTNER_PATH = "partner";
         return String.format("%s.%s", getPackageName(), PARTNER_PATH);
     }
 }

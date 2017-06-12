@@ -87,6 +87,7 @@ public class ContentHandler {
     private static final String KEY_COMPATIBILITY_LEVEL = "compatibilityLevel";
     private static final String KEY_MIME_TYPE = "mimeType";
     private static final String KEY_VISIBILITY = "visibility";
+    private static final Object AUDIENCE_KEY = "audience";
     private static final String KEY_LAST_UPDATED_ON = "lastUpdatedOn";
     private static final String KEY_PRE_REQUISITES = "pre_requisites";
     private static final String KEY_CHILDREN = "children";
@@ -121,9 +122,10 @@ public class ContentHandler {
         String mimeType = readMimeType(contentData);
         String contentType = readContentType(contentData);
         String visibility = readVisibility(contentData);
+        String audience = readAudience(contentData);
 
         ContentModel contentModel = ContentModel.build(dbSession, identifier, serverData, serverLastUpdatedOn,
-                manifestVersion, localData, mimeType, contentType, visibility);
+                manifestVersion, localData, mimeType, contentType, visibility, audience);
 
         return contentModel;
     }
@@ -158,6 +160,27 @@ public class ContentHandler {
             return (String) contentData.get(KEY_VISIBILITY);
         }
         return ContentConstants.Visibility.DEFAULT;
+    }
+
+    public static String readAudience(Map contentData) {
+        ArrayList<String> audienceList = null;
+        if (contentData.containsKey(AUDIENCE_KEY)) {
+            Object o = contentData.get(AUDIENCE_KEY);
+            if (o instanceof String) {
+                audienceList = new ArrayList<>();
+                audienceList.add((String) o);
+            } else {
+                audienceList = (ArrayList<String>) contentData.get(AUDIENCE_KEY);
+            }
+        }
+        if (audienceList == null) {
+            audienceList = new ArrayList<>();
+        }
+        if (audienceList.isEmpty()) {
+            audienceList.add("learner");
+        }
+        Collections.sort(audienceList);
+        return StringUtil.join(",", audienceList);
     }
 
     public static String readArtifactUrl(Map contentData) {
@@ -424,7 +447,7 @@ public class ContentHandler {
             uid = criteria.getUid();
             contentTypes = criteria.getContentTypes();
         }
-        String contentTypesStr = getCommaSeparatedContentTypes(contentTypes);
+        String contentTypesStr = ContentType.getCommaSeparatedContentTypes(contentTypes);
 
         String isContentType = String.format(Locale.US, "c.%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr);
         String isVisible = String.format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
@@ -449,7 +472,7 @@ public class ContentHandler {
     }
 
     public static List<ContentModel> getAllLocalContentModel(IDBSession dbSession, ContentType[] contentTypes) {
-        String contentTypesStr = getCommaSeparatedContentTypes(contentTypes);
+        String contentTypesStr = ContentType.getCommaSeparatedContentTypes(contentTypes);
 
         String isContentType = String.format(Locale.US, "%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr);
         String isVisible = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
@@ -467,22 +490,6 @@ public class ContentHandler {
         }
 
         return contentModelListInDB;
-    }
-
-    private static String getCommaSeparatedContentTypes(ContentType[] contentTypes) {
-        String contentTypesStr;
-
-        if (contentTypes != null) {
-            List<String> contentTypeList = new ArrayList<>();
-            for (ContentType contentType : contentTypes) {
-                contentTypeList.add(contentType.getValue());
-            }
-            contentTypesStr = StringUtil.join("','", contentTypeList);
-        } else {
-            contentTypesStr = StringUtil.join("','", ContentType.values());
-        }
-
-        return contentTypesStr;
     }
 
     public static void deleteOrUpdateContent(ContentModel contentModel, boolean isChildItems, boolean isChildContent) {
@@ -1116,7 +1123,9 @@ public class ContentHandler {
         Long currentTime = DateUtil.getEpochTime();
         expiryTime = ttlInMilliSeconds + currentTime;
 
-        ContentListingModel contentListingModel = ContentListingModel.build(dbSession, contentListingCriteria.getContentListingId(), jsonStr, profile, contentListingCriteria.getSubject(), expiryTime);
+        // TODO: 6/8/2017 - Read the channel and audience from partnerFilters in criteria and make the comma seperated string and pass in build
+        ContentListingModel contentListingModel = ContentListingModel.build(dbSession, contentListingCriteria.getContentListingId(),
+                jsonStr, profile, contentListingCriteria.getSubject(), null, null, expiryTime);
         contentListingModel.save();
     }
 

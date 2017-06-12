@@ -29,7 +29,7 @@ public abstract class LearnerContentSummaryEntry implements BaseColumns {
                 COLUMN_NAME_TOTAL_TS + DbConstants.INT_TYPE + DbConstants.COMMA_SEP +
                 COLUMN_NAME_LAST_UPDATED_ON + DbConstants.INT_TYPE + DbConstants.COMMA_SEP +
                 COLUMN_NAME_HIERARCHY_DATA + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
-                " UNIQUE (" + COLUMN_NAME_UID + DbConstants.COMMA_SEP + COLUMN_NAME_CONTENT_ID + COLUMN_NAME_HIERARCHY_DATA + ") ON CONFLICT REPLACE" +
+                " UNIQUE (" + COLUMN_NAME_UID + DbConstants.COMMA_SEP + COLUMN_NAME_CONTENT_ID + DbConstants.COMMA_SEP + COLUMN_NAME_HIERARCHY_DATA + ") ON CONFLICT REPLACE" +
                 " )";
     }
 
