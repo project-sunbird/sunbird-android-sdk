@@ -26,20 +26,16 @@ public class FileImporter {
 
     private static final String TAG = FileImporter.class.getSimpleName();
 
-    private IUserService userService;
-    private ITelemetryService telemetryService;
     private IDataSource dataSource;
 
-    public FileImporter(AppContext<Context> appContext, IUserService userService, ITelemetryService telemetryService) {
-        this.userService = userService;
-        this.telemetryService = telemetryService;
+    public FileImporter(AppContext<Context> appContext) {
         this.dataSource = new SQLiteDataSource(appContext);
     }
 
-    public GenieResponse<Void> importFile(ImportRequest importRequest) {
+    public GenieResponse<Void> importProfile(ImportRequest importRequest, IUserService userService) {
         GenieResponse<Void> response;
         if (!FileUtil.doesFileExists(importRequest.getSourceFilePath())) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Import failed, file doesn't exists", TAG);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Profile import failed, file doesn't exists", TAG);
             return response;
         }
 
@@ -47,11 +43,25 @@ public class FileImporter {
         if (ServiceConstants.FileExtension.PROFILE.equals(ext)) {
             IDBSession dbSession = dataSource.getImportDataSource(importRequest.getSourceFilePath());
             return userService.importProfile(dbSession, getMetadata(dbSession));
-        } else if (ServiceConstants.FileExtension.TELEMETRY.equals(ext)) {
+        } else {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Profile import failed, unsupported file extension", TAG);
+            return response;
+        }
+    }
+
+    public GenieResponse<Void> importTelemetry(ImportRequest importRequest, ITelemetryService telemetryService) {
+        GenieResponse<Void> response;
+        if (!FileUtil.doesFileExists(importRequest.getSourceFilePath())) {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Telemetry event import failed, file doesn't exists", TAG);
+            return response;
+        }
+
+        String ext = FileUtil.getFileExtension(importRequest.getSourceFilePath());
+        if (ServiceConstants.FileExtension.TELEMETRY.equals(ext)) {
             IDBSession dbSession = dataSource.getImportDataSource(importRequest.getSourceFilePath());
             return telemetryService.importTelemetry(dbSession, getMetadata(dbSession));
         } else {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Profile import failed, unsupported file extension", TAG);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Telemetry event import failed, unsupported file extension", TAG);
             return response;
         }
     }

@@ -216,7 +216,7 @@ public class UserService {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
-                return fileImporter.importFile(importRequest);
+                return fileImporter.importProfile(importRequest, userService);
             }
         });
     }
