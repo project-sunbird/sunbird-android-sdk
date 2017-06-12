@@ -226,10 +226,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
     @Override
     public GenieResponse<ContentListingResult> getContentListing(ContentListingCriteria contentListingCriteria) {
-        Profile profile = null;
-        if (contentListingCriteria.getProfile() == null) {
-            profile = ContentHandler.getCurrentProfile(userService);
-        }
+        Profile profile = contentListingCriteria.getProfile();
 
         String jsonStr = null;
         // TODO: 6/8/2017 - Read the channel and audience from partnerFilters in criteria and make the comma seperated string and pass in find
