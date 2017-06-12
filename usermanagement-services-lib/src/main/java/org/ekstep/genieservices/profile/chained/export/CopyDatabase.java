@@ -6,6 +6,7 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.commons.db.operations.IDataSource;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 
 import java.io.IOException;
@@ -22,8 +23,9 @@ public class CopyDatabase implements IChainable {
 
     private String sourceDB;
     private String destinationDB;
+    private IDataSource dataSource;
 
-    public CopyDatabase(String sourceDB, String destinationDB) {
+    public CopyDatabase(String sourceDB, String destinationDB, IDataSource dataSource) {
         this.sourceDB = sourceDB;
         this.destinationDB = destinationDB;
     }
@@ -36,6 +38,9 @@ public class CopyDatabase implements IChainable {
             e.printStackTrace();
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, e.getMessage(), TAG);
         }
+
+        // Set the external DB.
+        importContext.setDbSession(dataSource.getExportDataSource(destinationDB));
 
         if (nextLink != null) {
             return nextLink.execute(appContext, importContext);

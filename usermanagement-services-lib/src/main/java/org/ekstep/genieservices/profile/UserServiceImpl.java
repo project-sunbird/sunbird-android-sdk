@@ -26,6 +26,7 @@ import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
+import org.ekstep.genieservices.commons.db.operations.IDataSource;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -500,7 +501,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     }
 
     @Override
-    public GenieResponse<Void> exportProfile(List<String> userIds, File destinationFolder, String sourceDBFilePath, String destinationDBFilePath, IDBSession destinationDB, Map<String, Object> metadata) {
+    public GenieResponse<Void> exportProfile(List<String> userIds, File destinationFolder, String sourceDBFilePath, String destinationDBFilePath, IDataSource dataSource, Map<String, Object> metadata) {
         HashMap<String, Object> exportDataMap = new HashMap<>();
         exportDataMap.put(ServiceConstants.UNCOMPRESSED_SOURCE_LOCATION, FileUtil.getTempLocation(destinationFolder));
         exportDataMap.put(ServiceConstants.EXPORTED_EPAR_DESTINATION_LOCATION, destinationDBFilePath);
@@ -512,9 +513,9 @@ public class UserServiceImpl extends BaseService implements IUserService {
         // TODO: 6/12/2017 - For profile export do we need to process events?
         EventProcessorFactory.processEvents(mAppContext);
 
-        ImportContext importContext = new ImportContext(destinationDB, metadata);
+        ImportContext importContext = new ImportContext(null, metadata);
 
-        CopyDatabase copyDatabase = new CopyDatabase(sourceDBFilePath, destinationDBFilePath);
+        CopyDatabase copyDatabase = new CopyDatabase(sourceDBFilePath, destinationDBFilePath, dataSource);
         copyDatabase.then(new CreateMetadata(destinationDBFilePath, userIds))
                 .then(new CleanupExportedFile(destinationDBFilePath, userIds))
                 .then(new AddEventForExport(destinationDBFilePath));

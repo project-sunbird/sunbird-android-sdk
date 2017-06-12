@@ -51,7 +51,7 @@ public class FileExporter {
             String sourceDBFilePath = appContext.getContext().getDatabasePath(dbContext.getDBName()).getPath();
 
             return userService.exportProfile(exportRequest.getUserIds(), exportRequest.getDestinationFolder(), sourceDBFilePath,
-                    destinationDBFilePath, dataSource.getExportDataSource(destinationDBFilePath), getMetadata(dbContext));
+                    destinationDBFilePath, dataSource, getMetadata(dbContext));
         } else {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "There are no profile to export.", TAG);
         }

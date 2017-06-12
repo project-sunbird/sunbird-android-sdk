@@ -7,6 +7,7 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.commons.db.operations.IDataSource;
 
 import java.io.File;
 import java.util.List;
@@ -160,6 +161,6 @@ public interface IUserService {
      * @param userIds
      * @return
      */
-    GenieResponse<Void> exportProfile(List<String> userIds, File destinationFolder, String sourceDBFilePath, String destinationDBFilePath, IDBSession destinationDB, Map<String, Object> metadata);
+    GenieResponse<Void> exportProfile(List<String> userIds, File destinationFolder, String sourceDBFilePath, String destinationDBFilePath, IDataSource dataSource, Map<String, Object> metadata);
 
 }

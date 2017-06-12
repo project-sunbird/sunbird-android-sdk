@@ -87,4 +87,8 @@ public class ImportContext {
     public IDBSession getDBSession() {
         return dbSession;
     }
+
+    public void setDbSession(IDBSession dbSession) {
+        this.dbSession = dbSession;
+    }
 }
