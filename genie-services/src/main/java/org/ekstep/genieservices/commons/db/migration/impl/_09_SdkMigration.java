@@ -4,7 +4,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.contract.GameEntry;
 import org.ekstep.genieservices.commons.db.contract.LanguageEntry;
 import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
-import org.ekstep.genieservices.commons.db.contract.LearnerContentSummaryEntry;
+import org.ekstep.genieservices.commons.db.contract.LearnerSummaryEntry;
 import org.ekstep.genieservices.commons.db.migration.Migration;
 
 public class _09_SdkMigration extends Migration {
@@ -26,7 +26,7 @@ public class _09_SdkMigration extends Migration {
 
         // Summarizer related tables
         appContext.getDBSession().execute(LearnerAssessmentsEntry.getCreateEntry());
-        appContext.getDBSession().execute(LearnerContentSummaryEntry.getCreateEntry());
+        appContext.getDBSession().execute(LearnerSummaryEntry.getCreateEntry());
     }
 
 }
