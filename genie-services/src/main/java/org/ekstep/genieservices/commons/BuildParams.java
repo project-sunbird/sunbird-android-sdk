@@ -17,6 +17,7 @@ public class BuildParams implements IParams {
     private String versionName;
     private String gId;
     private int logLevel;
+    private String qualifier;
 
     public BuildParams(String packageName) {
         baseApiUrl = BuildConfigUtil.getBuildConfigValue(packageName, Constants.Params.API_BASE_URL);
@@ -25,6 +26,7 @@ public class BuildParams implements IParams {
         versionName = BuildConfigUtil.getBuildConfigValue(packageName, Constants.Params.VERSION_NAME);
         gId = BuildConfigUtil.getBuildConfigValue(packageName, Constants.Params.GID);
         logLevel = LogLevel.getLogLevel(BuildConfigUtil.getBuildConfigValue(packageName, Constants.Params.LOGLEVEL)).getLevel();
+        qualifier = BuildConfigUtil.getBuildConfigValue(packageName, Constants.Params.APP_QUALIFIER);
 
     }
 
@@ -56,5 +58,10 @@ public class BuildParams implements IParams {
     @Override
     public int getLogLevel() {
         return logLevel;
+    }
+
+    @Override
+    public String getQualifier() {
+        return qualifier;
     }
 }

@@ -6,6 +6,7 @@ import org.ekstep.genieresolvers.BaseService;
 import org.ekstep.genieservices.commons.IResponseHandler;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created on 24/5/17.
@@ -20,22 +21,22 @@ public class ContentService extends BaseService {
         this.appQualifier = appQualifier;
     }
 
-    public void getContent(String contentId, IResponseHandler responseHandler) {
+    public void getContent(String contentId, IResponseHandler<Map> responseHandler) {
         GetContentTask getContentTask = new GetContentTask(context, appQualifier, contentId);
         createAndExecuteTask(responseHandler, getContentTask);
     }
 
-    public void getContents(IResponseHandler responseHandler) {
+    public void getContents(IResponseHandler<Map> responseHandler) {
         GetContentsTask getContentsTask = new GetContentsTask(context, appQualifier);
         createAndExecuteTask(responseHandler, getContentsTask);
     }
 
-    public void getRelatedContent(List<String> contentIdentifiers, String userId, IResponseHandler responseHandler) {
+    public void getRelatedContent(List<String> contentIdentifiers, String userId, IResponseHandler<Map> responseHandler) {
         GetRelatedContentTask getRelatedContentTask = new GetRelatedContentTask(context, appQualifier, contentIdentifiers, userId);
         createAndExecuteTask(responseHandler, getRelatedContentTask);
     }
 
-    public void sendFeedback(String feedbackString, IResponseHandler responseHandler) {
+    public void sendFeedback(String feedbackString, IResponseHandler<Map> responseHandler) {
         SendFeedbackEventTask sendFeedbackEventTask = new SendFeedbackEventTask(context, appQualifier, feedbackString);
         createAndExecuteTask(responseHandler, sendFeedbackEventTask);
     }

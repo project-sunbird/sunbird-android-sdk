@@ -109,18 +109,14 @@ public class UserServiceImpl extends BaseService implements IUserService {
         HashMap params = new HashMap();
         params.put("logLevel", "1");
         UserProfilesModel userProfilesModel = UserProfilesModel.find(mAppContext.getDBSession());
-
-        GenieResponse<List<Profile>> response;
+        GenieResponse genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, List.class);
         if (userProfilesModel == null) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.DATA_NOT_FOUND_ERROR, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_PROFILE, TAG);
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_ALL_PROFILE);
-            return response;
+            genieResponse.setResult(new ArrayList<Profile>());
         } else {
-            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-            response.setResult(userProfilesModel.getProfileList());
-            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
-            return response;
+            genieResponse.setResult(userProfilesModel.getProfileList());
         }
+        TelemetryLogger.logSuccess(mAppContext, genieResponse, TAG, methodName, params);
+        return genieResponse;
     }
 
     private void logGEError(GenieResponse response, String id) {
@@ -449,7 +445,9 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
         GenieResponse<List<ContentAccess>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(contentAccessList);
-        TelemetryLogger.logSuccess(mAppContext, response, TAG, "getAllContentAccess@UserServiceImpl", new HashMap());
+
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+
         return response;
     }
 

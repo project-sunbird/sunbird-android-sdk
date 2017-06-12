@@ -57,9 +57,7 @@ public class StartPartnerSessionTask extends BaseTask {
         GenieResponse response = null;
         if (cursor != null && cursor.moveToFirst()) {
             String resultData = cursor.getString(0);
-            Type type = new TypeToken<GenieResponse<Map>>() {
-            }.getType();
-            response = GsonUtil.fromJson(resultData, type);
+            response = GsonUtil.fromJson(resultData, GenieResponse.class);
             cursor.close();
         }
 

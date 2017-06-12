@@ -72,11 +72,11 @@ public class ContentData implements Serializable {
         return publisher;
     }
 
-    public String getMe_totalRatings() {
+    public String getTotalRatings() {
         return me_totalRatings;
     }
 
-    public String getMe_averageRating() {
+    public String getAverageRating() {
         return me_averageRating;
     }
 

@@ -92,7 +92,8 @@ public interface ServiceConstants {
     }
 
     interface Telemetry {
-        String CONTENT_IMPORT_SUB_TYPE = "ContentImport";
+        String CONTENT_IMPORT_INITIATED_SUB_TYPE = "ContentImport-Initiated";
+        String CONTENT_IMPORT_SUCCESS_SUB_TYPE = "ContentImport-Success";
         String CONTENT_IMPORT_STAGE_ID = "ImportContent";
         String AUTO_SYNC_SUB_TYPE_INITIATED = "AutoSync-Initiated";
         String AUTO_SYNC_SUB_TYPE_SUCCESS = "AutoSync-Success";

@@ -40,7 +40,14 @@ public class TelemetryLogger {
     }
 
     public static void logSuccess(AppContext appContext, GenieResponse response, String service, String method, HashMap params) {
-        int parsedLogLevel = appContext.getParams().getLogLevel();
+        appLoggingLevel = appContext.getParams().getLogLevel();
+        int parsedLogLevel = 3;
+        if (params != null & params.get("logLevel") != null) {
+            try {
+                parsedLogLevel = Integer.valueOf(params.get("logLevel").toString());
+            } catch (Exception ex) {
+            }
+        }
         if (parsedLogLevel >= appLoggingLevel) {
             log(appContext, response, service, method, params, new HashMap());
         } else {

@@ -61,12 +61,13 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         GenieResponse<Void> response;
         try {
             response = saveEvent(eventString);
+//            saveEvent(TelemetryLogger.create(mAppContext, response, new HashMap(), TAG, methodName, params).toString());
+            return response;
         } catch (InvalidDataException e) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.VALIDATION_ERROR, ServiceConstants.ErrorMessage.UNABLE_TO_SAVE_EVENT, TAG, Void.class);
+            saveEvent(TelemetryLogger.create(mAppContext, response, new HashMap(), TAG, methodName, params).toString());
+            return response;
         }
-
-        saveEvent(TelemetryLogger.create(mAppContext, response, new HashMap(), TAG, methodName, params).toString());
-        return response;
     }
 
     @Override

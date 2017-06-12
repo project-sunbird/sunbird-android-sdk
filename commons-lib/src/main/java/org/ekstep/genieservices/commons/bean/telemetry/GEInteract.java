@@ -3,6 +3,7 @@ package org.ekstep.genieservices.commons.bean.telemetry;
 import org.ekstep.genieservices.commons.bean.CoRelation;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
+import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
@@ -37,38 +38,17 @@ public class GEInteract extends Telemetry {
 
     protected HashMap<String, Object> createEKS(String stageId, String type, String subType, String extType, List positionList, List<Map<String, Object>> valueList, String id, String tid, String uri) {
         HashMap<String, Object> eks = new HashMap<>();
-        if(!StringUtil.isNullOrEmpty(extType)){
-            eks.put("extype",extType);
-        }
 
-        if(!StringUtil.isNullOrEmpty(id)){
-            eks.put("id",id);
-        }
-
-        if(positionList!=null && !positionList.isEmpty()){
-            eks.put("pos",positionList);
-        }
-
-        if(!StringUtil.isNullOrEmpty(stageId)){
-            eks.put("stageId",stageId);
-        }
-
-        if(!StringUtil.isNullOrEmpty(subType)){
-            eks.put("subtype",subType);
-        }
-
-        if(!StringUtil.isNullOrEmpty(tid)){
-            eks.put("tid",tid);
-        }
+        eks.put("extype", !StringUtil.isNullOrEmpty(extType) ? extType : "");
+        eks.put("id", !StringUtil.isNullOrEmpty(id) ? id : "");
+        eks.put("pos", !CollectionUtil.isNullOrEmpty(positionList) ? positionList : new ArrayList<>());
+        eks.put("stageid", !StringUtil.isNullOrEmpty(stageId) ? stageId : "");
+        eks.put("subtype", !StringUtil.isNullOrEmpty(subType) ? subType : "");
+        eks.put("tid", !StringUtil.isNullOrEmpty(tid) ? tid : "");
         eks.put("type", type);
+        eks.put("uri", !StringUtil.isNullOrEmpty(uri) ? uri : "");
+        eks.put("values", !CollectionUtil.isNullOrEmpty(valueList) ? valueList : new ArrayList<>());
 
-        if(!StringUtil.isNullOrEmpty(uri)){
-            eks.put("uri",uri);
-        }
-
-        if(valueList!=null && !valueList.isEmpty()){
-            eks.put("values",valueList);
-        }
         return eks;
     }
 

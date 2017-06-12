@@ -70,9 +70,7 @@ public class GetContentsTask extends BaseTask {
 
     private GenieResponse<Map> readCursor(Cursor cursor) {
         String serverData = cursor.getString(0);
-        Type type = new TypeToken<GenieResponse<Map>>() {
-        }.getType();
-        GenieResponse<Map> response = GsonUtil.fromJson(serverData, type);
+        GenieResponse<Map> response = GsonUtil.fromJson(serverData, GenieResponse.class);
         return response;
     }
 }

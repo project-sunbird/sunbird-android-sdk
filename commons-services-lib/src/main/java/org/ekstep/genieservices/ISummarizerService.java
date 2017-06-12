@@ -51,5 +51,7 @@ public interface ISummarizerService {
 
     GenieResponse<Void> saveLearnerAssessmentDetails(Telemetry telemetry);
 
+    GenieResponse<Void> saveLearnerContentSummaryDetails(Telemetry telemetry);
+
 
 }

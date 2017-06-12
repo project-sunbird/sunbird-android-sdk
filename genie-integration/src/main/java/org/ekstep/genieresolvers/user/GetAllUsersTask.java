@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
+import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
 
 import org.ekstep.genieresolvers.BaseTask;
@@ -58,9 +59,7 @@ public class GetAllUsersTask extends BaseTask {
 
     private GenieResponse<Map> readCursor(Cursor cursor) {
         String serverData = cursor.getString(0);
-        Type type = new TypeToken<GenieResponse<Map>>() {
-        }.getType();
-        GenieResponse<Map> response = GsonUtil.fromJson(serverData, type);
+        GenieResponse<Map> response = GsonUtil.fromJson(serverData, GenieResponse.class);
         return response;
     }
 

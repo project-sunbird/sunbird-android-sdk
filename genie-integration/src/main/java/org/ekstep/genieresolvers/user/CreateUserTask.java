@@ -42,7 +42,11 @@ public class CreateUserTask extends BaseTask {
             return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), CreateUserTask.class.getSimpleName());
 
         }
-        return getSuccessResponse(Constants.SUCCESSFUL);
+        //Send the uuid back to the caller
+        String uuid = response.toString();
+        GenieResponse successResponse = getSuccessResponse(Constants.SUCCESSFUL);
+        successResponse.setResult(uuid);
+        return successResponse;
     }
 
     @Override

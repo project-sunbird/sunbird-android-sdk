@@ -9,6 +9,7 @@ import org.ekstep.genieservices.commons.bean.CoRelation;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentDetails;
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentSummary;
+import org.ekstep.genieservices.commons.bean.LearnerContentSummaryDetails;
 import org.ekstep.genieservices.commons.bean.SummaryRequest;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
@@ -17,6 +18,7 @@ import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.profile.db.model.LearnerAssessmentDetailsModel;
 import org.ekstep.genieservices.profile.db.model.LearnerAssessmentSummaryModel;
+import org.ekstep.genieservices.profile.db.model.LearnerContentSummaryModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,9 +70,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         HashMap params = new HashMap();
         params.put("logLevel", "2");
 
-        String filter = String.format(Locale.US, "where %s = %s and %s = %s and %s = %s", LearnerAssessmentsEntry.COLUMN_NAME_UID, summaryRequest.getUid(),
-                LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID, summaryRequest.getContentId(),
-                LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA, null);
+        String filter = getFilterForLearnerAssessmentDetails(null, summaryRequest.getUid(), summaryRequest.getContentId(), null);
 
         LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.find(mAppContext.getDBSession(), filter);
         if (learnerAssessmentDetailsModel == null) {
@@ -83,6 +83,22 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         return response;
     }
 
+    private String getFilterForLearnerAssessmentDetails(String qid, String uid, String contentId, String hierarchyData) {
+        String isQid = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_QID, qid);
+        String isUid = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_UID, uid);
+        String isContentId = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID, contentId);
+        String isHData = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA, hierarchyData == null ? "" : hierarchyData);
+
+        String filter;
+        if (StringUtil.isNullOrEmpty(qid)) {
+            filter = String.format(Locale.US, "where %s AND %s AND %s", isUid, isContentId, isHData);
+        } else {
+            filter = String.format(Locale.US, "where %s AND %s AND %s AND %s", isUid, isContentId, isHData, isQid);
+        }
+        return filter;
+    }
+
+
     @Override
     public GenieResponse<Void> saveLearnerAssessmentDetails(Telemetry telemetry) {
         GenieResponse<Void> response;
@@ -91,7 +107,15 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         params.put("logLevel", "2");
         LearnerAssessmentDetails learnerAssessmentDetails = mapTelemtryToLearnerAssessmentData(telemetry);
         LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.build(mAppContext.getDBSession(), learnerAssessmentDetails);
-        learnerAssessmentDetailsModel.save();
+
+        String filter = getFilterForLearnerAssessmentDetails(learnerAssessmentDetails.getQid(), learnerAssessmentDetails.getUid(), learnerAssessmentDetails.getContentId(), learnerAssessmentDetails.getHierarchyData());
+
+        //check if the learner assessment already exists
+        if (LearnerAssessmentDetailsModel.find(mAppContext.getDBSession(), filter) == null) {
+            learnerAssessmentDetailsModel.save();
+        } else {
+            learnerAssessmentDetailsModel.update();
+        }
 
         if (learnerAssessmentDetailsModel.getInsertedId() == -1) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROCESSING_ERROR, ServiceConstants.ErrorMessage.UNABLE_TO_SAVE_LEARNER_ASSESSMENT, TAG);
@@ -102,11 +126,70 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         return response;
     }
 
+    @Override
+    public GenieResponse<Void> saveLearnerContentSummaryDetails(Telemetry telemetry) {
+        GenieResponse<Void> response;
+        String methodName = "saveLearnerContentSummaryDetails@LearnerAssessmentsServiceImpl";
+        HashMap params = new HashMap();
+        params.put("logLevel", "2");
+        LearnerContentSummaryDetails learnerContentSummaryDetails = mapTelemtryToLearnerContentSummaryDeatils(telemetry);
+        LearnerContentSummaryModel learnerContentSummaryModel;
+
+        LearnerContentSummaryModel learnerContentSummaryModelInDB = LearnerContentSummaryModel.find(mAppContext.getDBSession(), learnerContentSummaryDetails.getUid(), learnerContentSummaryDetails.getContentId(),
+                learnerContentSummaryDetails.getHierarchyData() == null ? "" : learnerContentSummaryDetails.getHierarchyData());
+
+        //Check if the learner content summary already exists
+        if (learnerContentSummaryModelInDB == null) {
+            learnerContentSummaryDetails.setAvgts(learnerContentSummaryDetails.getTimespent());
+            learnerContentSummaryDetails.setSessions(1);
+            learnerContentSummaryDetails.setTotalts(learnerContentSummaryDetails.getTimespent());
+            learnerContentSummaryDetails.setLastUpdated(learnerContentSummaryDetails.getTimestamp());
+            //save with new details
+            learnerContentSummaryModel = LearnerContentSummaryModel.build(mAppContext.getDBSession(), learnerContentSummaryDetails);
+            learnerContentSummaryModel.save();
+
+        } else {
+            if (learnerContentSummaryModelInDB.getTimespent() != null) {
+                learnerContentSummaryDetails.setSessions(learnerContentSummaryModelInDB.getSessions() + 1);
+                learnerContentSummaryDetails.setTotalts(learnerContentSummaryModelInDB.getTotalts() + learnerContentSummaryModelInDB.getTimespent());
+                learnerContentSummaryDetails.setAvgts(learnerContentSummaryModelInDB.getTotalts() / learnerContentSummaryModelInDB.getSessions());
+                learnerContentSummaryDetails.setLastUpdated(learnerContentSummaryModelInDB.getTimestamp());
+                //update with new details
+                learnerContentSummaryModel = LearnerContentSummaryModel.build(mAppContext.getDBSession(), learnerContentSummaryDetails);
+                learnerContentSummaryModel.update();
+            }
+        }
+
+        return null;
+    }
+
+    private LearnerContentSummaryDetails mapTelemtryToLearnerContentSummaryDeatils(Telemetry telemetry) {
+        LearnerContentSummaryDetails learnerContentSummaryDetails = new LearnerContentSummaryDetails();
+        learnerContentSummaryDetails.setUid(telemetry.getUid());
+        learnerContentSummaryDetails.setContentId(telemetry.getGdata().getId());
+        Map<String, Object> eks = (Map<String, Object>) telemetry.getEData().get("eks");
+        learnerContentSummaryDetails.setTimespent((Double) eks.get("length"));
+        if ("2.0".equalsIgnoreCase(telemetry.getVer())) {
+            learnerContentSummaryDetails.setTimestamp((Long) telemetry.getEts());
+        } else {
+            learnerContentSummaryDetails.setTimestamp(DateUtil.dateToEpoch(telemetry.getTs()));
+        }
+
+        if (telemetry.getCdata() != null) {
+            List<String> idList = new ArrayList<>();
+            for (CoRelation eachCdataValue : telemetry.getCdata()) {
+                idList.add(eachCdataValue.getId());
+            }
+            learnerContentSummaryDetails.setHierarchyData(StringUtil.join(",", idList));
+        }
+
+        return learnerContentSummaryDetails;
+    }
+
     private LearnerAssessmentDetails mapTelemtryToLearnerAssessmentData(Telemetry telemetry) {
         LearnerAssessmentDetails learnerAssessmentDetails = new LearnerAssessmentDetails();
         learnerAssessmentDetails.setUid(telemetry.getUid());
         learnerAssessmentDetails.setContentId(telemetry.getGdata().getId());
-        ;
         Map<String, Object> eks = (Map<String, Object>) telemetry.getEData().get("eks");
         learnerAssessmentDetails.setQid((String) eks.get("qid"));
         learnerAssessmentDetails.setQindex((Double) eks.get("qindex"));
