@@ -1,5 +1,6 @@
 package org.ekstep.genieservices;
 
+import org.ekstep.genieservices.commons.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
@@ -59,22 +60,10 @@ public interface IContentService {
      * On failing to fetch the child content details, the response will return status as FALSE with the following error code
      * <p>NO_DATA_FOUND
      *
-     * @param contentId     - {@link String} - identifier of a content
-     * @param levelAndState - {@link int} - Below are the int flags to be used
-     *                      <p>
-     *                      <p>
-     *                      0 - Downloaded or spine both
-     *                      <p>
-     *                      <p>
-     *                      1 - All descendant downloaded contents
-     *                      <p>
-     *                      <p>
-     *                      2 - All descendant spine contents
-     *                      <p>
-     *                      <p>
+     * @param childContentRequest - {@link ChildContentRequest}
      * @return {@link GenieResponse<Content>}
      */
-    GenieResponse<Content> getChildContents(String contentId, int levelAndState);
+    GenieResponse<Content> getChildContents(ChildContentRequest childContentRequest);
 
     /**
      * This api is used to delete a particular content.
