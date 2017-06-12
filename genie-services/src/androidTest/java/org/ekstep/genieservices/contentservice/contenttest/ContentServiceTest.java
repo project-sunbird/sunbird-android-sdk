@@ -62,7 +62,7 @@ public class ContentServiceTest extends GenieServiceTestBase {
     public void shouldImportContentHavingNoChild() {
         String ext = FileUtil.getFileExtension(CONTENT_FILEPATH);
 
-        ContentImportRequest.Builder importRequest = new ContentImportRequest.Builder(false).fromFilePath(CONTENT_FILEPATH).toFolder(activity.getExternalFilesDir(null));
+        ContentImportRequest.Builder importRequest = new ContentImportRequest.Builder().isChildContent(false).fromFilePath(CONTENT_FILEPATH).toFolder(activity.getExternalFilesDir(null));
 
         GenieResponse<Void> response = activity.importContent(importRequest.build());
         Assert.assertTrue("true", response.getStatus());
@@ -84,7 +84,7 @@ public class ContentServiceTest extends GenieServiceTestBase {
 
         String ext = FileUtil.getFileExtension(CONTENT_WITH_CHILD_FILEPATH);
 
-        ContentImportRequest.Builder importRequest = new ContentImportRequest.Builder(true).fromFilePath(CONTENT_WITH_CHILD_FILEPATH).toFolder(activity.getExternalFilesDir(null));
+        ContentImportRequest.Builder importRequest = new ContentImportRequest.Builder().isChildContent(true).fromFilePath(CONTENT_WITH_CHILD_FILEPATH).toFolder(activity.getExternalFilesDir(null));
 
         GenieResponse<Void> genieResponse = activity.importContent(importRequest.build());
         Log.v(TAG, "genieresponse :: " + genieResponse.getStatus());
@@ -107,7 +107,7 @@ public class ContentServiceTest extends GenieServiceTestBase {
 
         GenieServiceDBHelper.clearContentDBEntry();
 
-        ContentImportRequest.Builder importRequest = new ContentImportRequest.Builder(false).fromFilePath(CONTENT_FILEPATH).toFolder(activity.getExternalFilesDir(null));
+        ContentImportRequest.Builder importRequest = new ContentImportRequest.Builder().isChildContent(false).fromFilePath(CONTENT_FILEPATH).toFolder(activity.getExternalFilesDir(null));
 
         GenieResponse<Void> response = activity.importContent(importRequest.build());
         Assert.assertTrue("true", response.getStatus());
@@ -131,13 +131,13 @@ public class ContentServiceTest extends GenieServiceTestBase {
     @Test
     public void _1shouldGetAllLocalContent() {
 
-        ContentImportRequest.Builder importRequest = new ContentImportRequest.Builder(true).fromFilePath(CONTENT_WITH_CHILD_FILEPATH).toFolder(activity.getExternalFilesDir(null));
+        ContentImportRequest.Builder importRequest = new ContentImportRequest.Builder().isChildContent(true).fromFilePath(CONTENT_WITH_CHILD_FILEPATH).toFolder(activity.getExternalFilesDir(null));
 
         GenieResponse<Void> response = activity.importContent(importRequest.build());
         Assert.assertTrue("true", response.getStatus());
         AssertCollection.verifyCollectionEntryAndVisibility(CONTENT_ID_WITH_CHILD, VISIBILITY_DEFAULT);
 
-        ContentImportRequest.Builder importRequest1 = new ContentImportRequest.Builder(false).fromFilePath(CONTENT_FILEPATH).toFolder(activity.getExternalFilesDir(null));
+        ContentImportRequest.Builder importRequest1 = new ContentImportRequest.Builder().isChildContent(false).fromFilePath(CONTENT_FILEPATH).toFolder(activity.getExternalFilesDir(null));
 
         GenieResponse<Void> genieResponse = activity.importContent(importRequest1.build());
         Assert.assertTrue("true", genieResponse.getStatus());
@@ -198,12 +198,12 @@ public class ContentServiceTest extends GenieServiceTestBase {
     @Test
     public void shouldDeleteContent() {
 
-        ContentImportRequest.Builder importRequest = new ContentImportRequest.Builder(false)
+        ContentImportRequest.Builder importRequest = new ContentImportRequest.Builder().isChildContent(false)
                 .fromFilePath(CONTENT_FILEPATH).toFolder(activity.getExternalFilesDir(null));
         GenieResponse<Void> response = activity.importContent(importRequest.build());
         Assert.assertTrue("true", response.getStatus());
 
-        ContentDeleteRequest.Builder detailsRequest = new ContentDeleteRequest.Builder(CONTENT_ID, false);
+        ContentDeleteRequest.Builder detailsRequest = new ContentDeleteRequest.Builder().contentId(CONTENT_ID).isChildContent(false);
 
         GenieResponse genieResponse = activity.deleteContent(detailsRequest.build());
         Assert.assertTrue(genieResponse.getStatus());

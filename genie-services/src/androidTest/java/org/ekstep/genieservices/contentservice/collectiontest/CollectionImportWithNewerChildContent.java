@@ -43,7 +43,7 @@ public class CollectionImportWithNewerChildContent extends GenieServiceTestBase 
 
     private void shouldImportChildContentEcar() {
 
-        ContentImportRequest.Builder importRequestBuilder = new ContentImportRequest.Builder(false)
+        ContentImportRequest.Builder importRequestBuilder = new ContentImportRequest.Builder().isChildContent(false)
                 .fromFilePath(CHILD_CONTENT2_FILE_PATH).toFolder(activity.getExternalFilesDir(null));
 
         GenieResponse genieResponse = activity.importContent(importRequestBuilder.build());
@@ -63,7 +63,7 @@ public class CollectionImportWithNewerChildContent extends GenieServiceTestBase 
 
     private void shouldImportCollectionEcar() {
 
-        ContentImportRequest.Builder importRequestBuilder = new ContentImportRequest.Builder(false)
+        ContentImportRequest.Builder importRequestBuilder = new ContentImportRequest.Builder().isChildContent(false)
                 .fromFilePath(COLLECTION_FILE_PATH).toFolder(activity.getExternalFilesDir(null));
 
         GenieResponse<Void> genieResponse = activity.importContent(importRequestBuilder.build());

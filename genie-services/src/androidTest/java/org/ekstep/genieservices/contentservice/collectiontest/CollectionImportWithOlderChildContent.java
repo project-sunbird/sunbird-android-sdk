@@ -45,7 +45,7 @@ public class CollectionImportWithOlderChildContent extends GenieServiceTestBase 
 
     private void shouldImportChildContentEcar() {
 
-        ContentImportRequest.Builder importRequestBuilder = new ContentImportRequest.Builder(false)
+        ContentImportRequest.Builder importRequestBuilder = new ContentImportRequest.Builder().isChildContent(false)
                 .fromFilePath(CHILD_CONTENT_FILE_PATH).toFolder(activity.getExternalFilesDir(null));
 
         //import newer version content.
@@ -63,7 +63,7 @@ public class CollectionImportWithOlderChildContent extends GenieServiceTestBase 
 
     private void shouldImportCollectionEcar() {
 
-        ContentImportRequest.Builder importRequestBuilder = new ContentImportRequest.Builder(false)
+        ContentImportRequest.Builder importRequestBuilder = new ContentImportRequest.Builder().isChildContent(false)
                 .fromFilePath(COLLECTION_FILE_PATH).toFolder(activity.getExternalFilesDir(null));
 
         //import collection

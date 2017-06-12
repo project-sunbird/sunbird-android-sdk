@@ -39,7 +39,7 @@ public class ContentUpdateAndReferenceCountCheck extends GenieServiceTestBase {
         GenieServiceDBHelper.clearContentDBEntry();
 
         //import collection
-        ContentImportRequest.Builder collectionImportRequest = new ContentImportRequest.Builder(false).fromFilePath(COLLECTION_FILE_PATH).toFolder(activity.getExternalFilesDir(null));
+        ContentImportRequest.Builder collectionImportRequest = new ContentImportRequest.Builder().isChildContent(false).fromFilePath(COLLECTION_FILE_PATH).toFolder(activity.getExternalFilesDir(null));
         GenieResponse<Void> genieImportResponse = activity.importContent(collectionImportRequest.build());
 
         //check for reference count for c4 child
@@ -49,7 +49,7 @@ public class ContentUpdateAndReferenceCountCheck extends GenieServiceTestBase {
         Assert.assertEquals(1, detailsResponse.getResult().getReferenceCount());
 
         //import newer version of c4 content.
-        ContentImportRequest.Builder importRequestBuilder = new ContentImportRequest.Builder(false).fromFilePath(CHILD_CONTENT_FILE_PATH).toFolder(activity.getExternalFilesDir(null));
+        ContentImportRequest.Builder importRequestBuilder = new ContentImportRequest.Builder().isChildContent(false).fromFilePath(CHILD_CONTENT_FILE_PATH).toFolder(activity.getExternalFilesDir(null));
         GenieResponse<Void> genieResponse = activity.importContent(importRequestBuilder.build());
         Assert.assertTrue(genieResponse.getStatus());
 
@@ -60,7 +60,7 @@ public class ContentUpdateAndReferenceCountCheck extends GenieServiceTestBase {
         Assert.assertEquals(2, contentDetailsResponse.getResult().getReferenceCount());
 
         //delete content
-        ContentDeleteRequest.Builder deleteRequest = new ContentDeleteRequest.Builder(AssertCollection.CHILD_C4_ID, true);
+        ContentDeleteRequest.Builder deleteRequest = new ContentDeleteRequest.Builder().contentId(AssertCollection.CHILD_C4_ID).isChildContent(true);
         GenieResponse deleteResponse = activity.deleteContent(deleteRequest.build());
         Assert.assertTrue(deleteResponse.getStatus());
 

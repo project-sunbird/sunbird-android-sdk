@@ -2,7 +2,6 @@ package org.ekstep.genieservices.contentservice.collectiontest;
 
 import android.os.Environment;
 import android.support.test.runner.AndroidJUnit4;
-import android.util.Log;
 
 import junit.framework.Assert;
 
@@ -11,7 +10,6 @@ import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
-import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.junit.After;
@@ -55,7 +53,7 @@ public class CollectionImportWithNChildTest extends GenieServiceTestBase {
 
         String ext = FileUtil.getFileExtension(EMPTY_COLLECTION_FILEPATH);
 
-        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder(true)
+        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder().isChildContent(true)
                 .fromFilePath(EMPTY_COLLECTION_FILEPATH).toFolder(activity.getExternalFilesDir(null));
 
         GenieResponse<Void> response = activity.importContent(contentImportRequest.build());
@@ -72,7 +70,7 @@ public class CollectionImportWithNChildTest extends GenieServiceTestBase {
 
         GenieServiceDBHelper.clearContentDBEntry();
 
-        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder(true)
+        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder().isChildContent(true)
                 .fromFilePath(CONTENT_WITH_CHILD_FILEPATH).toFolder(activity.getExternalFilesDir(null));
 
         GenieResponse<Void> response = activity.importContent(contentImportRequest.build());
@@ -99,7 +97,7 @@ public class CollectionImportWithNChildTest extends GenieServiceTestBase {
 
         GenieServiceDBHelper.clearContentDBEntry();
 
-        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder(true)
+        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder().isChildContent(false)
                 .fromFilePath(CONTENT_WITH_CHILD_FILEPATH).toFolder(activity.getExternalFilesDir(null));
 
         GenieResponse<Void> response = activity.importContent(contentImportRequest.build());
@@ -126,7 +124,7 @@ public class CollectionImportWithNChildTest extends GenieServiceTestBase {
 
     @Test
     public void shouldCheckForNextContent() {
-        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder(true)
+        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder().isChildContent(true)
                 .fromFilePath(CONTENT_WITH_CHILD_FILEPATH).toFolder(activity.getExternalFilesDir(null));
 
         GenieResponse<Void> response = activity.importContent(contentImportRequest.build());

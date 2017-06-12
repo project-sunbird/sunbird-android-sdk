@@ -44,7 +44,7 @@ public class ContentImportErrorHandlingTest extends GenieServiceTestBase {
     @Test
     public void importContentFromEcarValidation() {
 
-        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder(false)
+        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder().isChildContent(false)
                 .fromFilePath("").toFolder(activity.getExternalFilesDir(null));
 
         GenieResponse<Void> response = activity.importContent(contentImportRequest.build());
@@ -60,7 +60,7 @@ public class ContentImportErrorHandlingTest extends GenieServiceTestBase {
     @Test
     public void shouldNotImportExpiredEcar() {
 
-        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder(false)
+        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder().isChildContent(false)
                 .fromFilePath(EXPIRED_CONTENT_FILEPATH).toFolder(activity.getExternalFilesDir(null));
 
         GenieResponse<Void> response = activity.importContent(contentImportRequest.build());
@@ -75,7 +75,7 @@ public class ContentImportErrorHandlingTest extends GenieServiceTestBase {
     @Test
     public void shouldShowOutdatedEcarError() {
 
-        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder(false)
+        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder().isChildContent(false)
                 .fromFilePath(OUTDATED_CONTENT_FILEPATH).toFolder(activity.getExternalFilesDir(null));
 
         GenieResponse<Void> response = activity.importContent(contentImportRequest.build());
@@ -91,7 +91,7 @@ public class ContentImportErrorHandlingTest extends GenieServiceTestBase {
     @Test
     public void shouldShowAlreadyImportedError() {
 
-        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder(false)
+        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder().isChildContent(false)
                 .fromFilePath(FILEPATH).toFolder(activity.getExternalFilesDir(null));
 
         GenieResponse<Void> response = activity.importContent(contentImportRequest.build());
@@ -105,7 +105,7 @@ public class ContentImportErrorHandlingTest extends GenieServiceTestBase {
     @Test
     public void test5ShouldNotImportNoManifestEcar() {
 
-        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder(false)
+        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder().isChildContent(false)
                 .fromFilePath(ECAR_NO_MANIFEST_PATH).toFolder(activity.getExternalFilesDir(null));
 
         GenieResponse<Void> response = activity.importContent(contentImportRequest.build());
