@@ -9,7 +9,7 @@ import org.ekstep.genieservices.IContentService;
 import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.ChildContentRequest;
+import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;

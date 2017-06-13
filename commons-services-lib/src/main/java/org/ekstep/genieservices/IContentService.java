@@ -1,6 +1,6 @@
 package org.ekstep.genieservices;
 
-import org.ekstep.genieservices.commons.ChildContentRequest;
+import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
