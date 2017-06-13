@@ -2,7 +2,7 @@ package org.ekstep.genieservices;
 
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
-import org.ekstep.genieservices.commons.bean.ContentCriteria;
+import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
@@ -46,10 +46,10 @@ public interface IContentService {
      * <p>
      * Response status will always be TRUE with {@link List<Content>} set in the result.
      *
-     * @param criteria - {@link ContentCriteria}
+     * @param criteria - {@link ContentFilterCriteria}
      * @return {@link GenieResponse<List<Content>>}
      */
-    GenieResponse<List<Content>> getAllLocalContent(ContentCriteria criteria);
+    GenieResponse<List<Content>> getAllLocalContent(ContentFilterCriteria criteria);
 
     /**
      * This api is used to get the child contents of a particular content, this is used in the case of COLLECTION/TEXTBOOK.

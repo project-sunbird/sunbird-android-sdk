@@ -10,7 +10,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
-import org.ekstep.genieservices.commons.bean.ContentCriteria;
+import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
 import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
@@ -416,8 +416,8 @@ public class ContentHandler {
 
     private static List<ContentAccess> getAllContentAccess(IUserService userService, String uid, String contentIdentifier) {
         ContentAccessFilterCriteria.Builder builder = new ContentAccessFilterCriteria.Builder();
-        builder.uid(uid);
-        builder.contentId(contentIdentifier);
+        builder.byUser(uid);
+        builder.forContent(contentIdentifier);
         return userService.getAllContentAccess(builder.build()).getResult();
     }
 
@@ -440,7 +440,7 @@ public class ContentHandler {
         return contentState == ContentConstants.State.ARTIFACT_AVAILABLE;
     }
 
-    public static List<ContentModel> getAllLocalContentSortedByContentAccess(IDBSession dbSession, ContentCriteria criteria) {
+    public static List<ContentModel> getAllLocalContentSortedByContentAccess(IDBSession dbSession, ContentFilterCriteria criteria) {
         String uid = null;
         ContentType[] contentTypes = null;
         if (criteria != null) {

@@ -6,7 +6,7 @@ import org.ekstep.genieservices.IContentService;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
-import org.ekstep.genieservices.commons.bean.ContentCriteria;
+import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
@@ -70,7 +70,7 @@ public class ContentService {
      * @param criteria
      * @return
      */
-    public void getAllLocalContent(final ContentCriteria criteria, IResponseHandler<List<Content>> responseHandler) {
+    public void getAllLocalContent(final ContentFilterCriteria criteria, IResponseHandler<List<Content>> responseHandler) {
         new AsyncHandler<List<Content>>(responseHandler).execute(new IPerformable<List<Content>>() {
             @Override
             public GenieResponse<List<Content>> perform() {

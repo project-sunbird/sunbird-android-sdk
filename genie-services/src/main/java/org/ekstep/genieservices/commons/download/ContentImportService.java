@@ -25,13 +25,12 @@ public class ContentImportService extends Service {
         String localFilePath = intent.getStringExtra(ServiceConstants.BUNDLE_KEY_LOCAL_FILE_PATH);
 
         IContentService contentService = GenieService.getService().getContentService();
-        EcarImportRequest ecarImportRequest = new EcarImportRequest.Builder().fromFilePath(localFilePath).childContent().build();
         EcarImportRequest.Builder builder = new EcarImportRequest.Builder();
         if (isChild) {
-            builder.childContent();
+            builder.isChildContent();
         }
         builder.fromFilePath(localFilePath);
-        builder.build();
+        EcarImportRequest ecarImportRequest = builder.build();
 
         GenieResponse<Void> genieResponse = contentService.importEcar(ecarImportRequest);
         if (genieResponse.getStatus()) {

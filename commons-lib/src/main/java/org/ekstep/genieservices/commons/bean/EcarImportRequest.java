@@ -39,7 +39,7 @@ public class EcarImportRequest {
         /**
          * Method to indicate that the file being imported is a child content
          */
-        public Builder childContent() {
+        public Builder isChildContent() {
             this.isChildContent = true;
             return this;
         }

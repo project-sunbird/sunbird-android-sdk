@@ -36,12 +36,12 @@ public class ContentAccessFilterCriteria {
         private String uid;
         private ContentType[] contentTypes;
 
-        public Builder contentId(String contentId) {
+        public Builder forContent(String contentId) {
             this.contentId = contentId;
             return this;
         }
 
-        public Builder uid(String uid) {
+        public Builder byUser(String uid) {
             this.uid = uid;
             return this;
         }
