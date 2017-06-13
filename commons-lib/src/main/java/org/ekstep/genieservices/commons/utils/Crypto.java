@@ -24,18 +24,21 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public class Crypto {
+    public static final String AES = "AES";
+    public static final String CIPHER_AES = "AES/CBC/PKCS7Padding";
     private static final String ALGO = "RSA";
     private static final String CIPHER_ALGO = "RSA/ECB/PKCS1Padding";
     private static final String TAG = "org.ekstep.genieservices.util-Crypto";
-    public static final String AES = "AES";
-    public static final String CIPHER_AES = "AES/CBC/PKCS7Padding";
 
     public static String checksum(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         MessageDigest md = null;
         md = MessageDigest.getInstance("SHA-1");
-        md.update(text.getBytes("iso-8859-1"), 0, text.length());
         byte[] sha1hash = md.digest();
-        return sha1hash.toString();
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < sha1hash.length; i++) {
+            sb.append(Integer.toString((sha1hash[i] & 0xff) + 0x100, 16).substring(1));
+        }
+        return sb.toString();
     }
 
     public static SecretKey generateAESKey() throws NoSuchAlgorithmException {
@@ -45,7 +48,7 @@ public class Crypto {
         return secretKey;
     }
 
-    public static String encryptWithAES(String plainText,SecretKey secretKey, IvParameterSpec iv)
+    public static String encryptWithAES(String plainText, SecretKey secretKey, IvParameterSpec iv)
             throws
             NoSuchPaddingException,
             NoSuchAlgorithmException,
@@ -54,7 +57,7 @@ public class Crypto {
             IllegalBlockSizeException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
         Cipher cipher = Cipher.getInstance(CIPHER_AES);
         byte[] plainTextByte = plainText.getBytes("UTF-8");
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey,iv);
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, iv);
         byte[] encryptedBytes = cipher.doFinal(plainTextByte);
         String encryptedText = Base64.encodeToString(encryptedBytes, Base64.DEFAULT);
         return encryptedText;
@@ -62,13 +65,13 @@ public class Crypto {
 
     public static String encryptWithPublic(byte[] testString, String publicKey)
             throws
-                InvalidKeyException,
-                InvalidKeySpecException,
-                UnsupportedEncodingException,
-                BadPaddingException,
-                IllegalBlockSizeException,
-                NoSuchAlgorithmException,
-                NoSuchPaddingException {
+            InvalidKeyException,
+            InvalidKeySpecException,
+            UnsupportedEncodingException,
+            BadPaddingException,
+            IllegalBlockSizeException,
+            NoSuchAlgorithmException,
+            NoSuchPaddingException {
         String temp = new String(publicKey);
         temp = temp.replace("-----BEGIN PUBLIC KEY-----\n", "");
         temp = temp.replace("-----END PUBLIC KEY-----", "");
@@ -77,16 +80,16 @@ public class Crypto {
         KeyFactory kf = KeyFactory.getInstance(ALGO);
         PublicKey _public_key = kf.generatePublic(X509publicKey);
         Cipher cipher = Cipher.getInstance(CIPHER_ALGO);
-        cipher.init(Cipher.ENCRYPT_MODE,_public_key);
+        cipher.init(Cipher.ENCRYPT_MODE, _public_key);
 //        byte[] stringBytes = testString.getBytes("UTF-8");
         byte[] encryptedBytes = cipher.doFinal(testString);
-        String  encryptedData = Base64.encodeToString(encryptedBytes, Base64.DEFAULT);
+        String encryptedData = Base64.encodeToString(encryptedBytes, Base64.DEFAULT);
         return encryptedData;
     }
 
     public static byte[] encryptSecretKeyWithRSAPublic(SecretKey skey, PublicKey pubicKey) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, pubicKey );
+        cipher.init(Cipher.ENCRYPT_MODE, pubicKey);
         byte[] key = cipher.doFinal(skey.getEncoded());
         return key;
     }
@@ -108,18 +111,18 @@ public class Crypto {
         KeyFactory kf = KeyFactory.getInstance(ALGO);
         PublicKey _public_key = kf.generatePublic(X509publicKey);
         Cipher cipher = Cipher.getInstance(CIPHER_ALGO);
-        cipher.init(Cipher.ENCRYPT_MODE,_public_key);
+        cipher.init(Cipher.ENCRYPT_MODE, _public_key);
         byte[] stringBytes = testString.getBytes("UTF-8");
         byte[] encryptedBytes = cipher.doFinal(stringBytes);
-        String  encryptedData = Base64.encodeToString(encryptedBytes, Base64.DEFAULT);
+        String encryptedData = Base64.encodeToString(encryptedBytes, Base64.DEFAULT);
         return encryptedData;
     }
 
     public static String decrypt(byte[] encrypted, PrivateKey key) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, UnsupportedEncodingException, BadPaddingException, IllegalBlockSizeException {
         Cipher cipher = Cipher.getInstance(CIPHER_ALGO);
-        cipher.init(Cipher.DECRYPT_MODE,key);
+        cipher.init(Cipher.DECRYPT_MODE, key);
         byte[] decryptedBytes = cipher.doFinal(encrypted);
-        String  decryptedData = Base64.encodeToString(decryptedBytes, Base64.DEFAULT);
+        String decryptedData = Base64.encodeToString(decryptedBytes, Base64.DEFAULT);
         return decryptedData;
     }
 
@@ -161,7 +164,7 @@ public class Crypto {
         Cipher cipher = Cipher.getInstance(CIPHER_AES);
         byte[] ivBytes = Base64.decode(ivString.getBytes("UTF-8"), Base64.DEFAULT);
         IvParameterSpec ivSpec = new IvParameterSpec(ivBytes);
-        cipher.init(Cipher.DECRYPT_MODE, secretKey,ivSpec);
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, ivSpec);
         byte[] decryptedBytes = cipher.doFinal(encryptedDataBytes);
         String decryptedText = new String(decryptedBytes);
         return decryptedText;
@@ -175,4 +178,4 @@ public class Crypto {
         return new IvParameterSpec(realIV);
     }
 
- }
+}

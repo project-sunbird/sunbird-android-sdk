@@ -3,16 +3,14 @@ package org.ekstep.genieservices.commons.bean;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
 /**
- * Created on 6/6/2017.
- *
- * @author anil
+ * Created on 12/6/17.
+ * shriharsh
  */
-public class ContentDetailsRequest {
 
+public class ChildContentRequest {
     private String contentId;
-//    private boolean updated or cached;
 
-    private ContentDetailsRequest(String contentId) {
+    private ChildContentRequest(String contentId) {
         this.contentId = contentId;
     }
 
@@ -23,7 +21,7 @@ public class ContentDetailsRequest {
     public static class Builder {
         private String contentId;
 
-        public Builder contentId(String contentId) {
+        public ChildContentRequest.Builder contentId(String contentId) {
             if (StringUtil.isNullOrEmpty(contentId)) {
                 throw new IllegalArgumentException("contentId required.");
             }
@@ -31,11 +29,11 @@ public class ContentDetailsRequest {
             return this;
         }
 
-        public ContentDetailsRequest build() {
+        public ChildContentRequest build() {
             if (StringUtil.isNullOrEmpty(contentId)) {
                 throw new IllegalStateException("contentId required.");
             }
-            return new ContentDetailsRequest(contentId);
+            return new ChildContentRequest(contentId);
         }
     }
 }
