@@ -12,6 +12,7 @@ public interface ServiceConstants {
     String SUCCESS_RESPONSE = "successful";
     String FAILED_RESPONSE = "failed";
     String ERROR_DELETING_A_USER = "Error when deleting user profile";
+    String FAILED_TO_ADD_UPDATE_NOTIFICATION = "Failed to add/update  notification";
 
     String INVALID_USER = "INVALID_USER";
     String NO_USER_WITH_SPECIFIED_ID = "There is no user with specified id exists";

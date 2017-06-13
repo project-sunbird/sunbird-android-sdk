@@ -1,6 +1,9 @@
 package org.ekstep.genieservices;
 
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.Notification;
+
+import java.util.List;
 
 /**
  * This is the interface with all the required APIs to perform necessary operations related to Notifications.
@@ -13,7 +16,9 @@ public interface INotificationService {
      *
      * @return
      */
-    GenieResponse<Void> addNotification();
+    GenieResponse<Void> addNotification(String notificationJson);
+
+    // GenieResponse<Void> addNotification();
 
     /**
      * This api updates the status of all notifications.
@@ -35,7 +40,8 @@ public interface INotificationService {
      *
      * @return
      */
-    GenieResponse<Void> getUnreadNotificationCount();
+    GenieResponse<Integer> getUnreadNotificationCount();
+//    GenieResponse<Void> getUnreadNotificationCount();
 
     /**
      * This api deletes the specific notification.
@@ -50,5 +56,6 @@ public interface INotificationService {
      *
      * @return
      */
-    GenieResponse<Void> getAllNotifications();
+    GenieResponse<List<Notification>> getAllNotifications();
+    // GenieResponse<Void> getAllNotifications();
 }

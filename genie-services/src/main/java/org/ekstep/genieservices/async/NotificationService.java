@@ -4,6 +4,9 @@ import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.INotificationService;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.Notification;
+
+import java.util.List;
 
 /**
  * This class provides all the required APIs to perform necessary operations related to Notifications on a separate thread.
@@ -21,11 +24,11 @@ public class NotificationService {
      *
      * @param responseHandler
      */
-    public void addNotification(IResponseHandler<Void> responseHandler) {
+    public void addNotification(final String notificationJson, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
-                return notificationService.addNotification();
+                return notificationService.addNotification(notificationJson);
             }
         });
     }
@@ -79,12 +82,28 @@ public class NotificationService {
      *
      * @param responseHandler
      */
-    public void getAllNotifications(IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+    public void getUnreadNotificationCount(IResponseHandler<Integer> responseHandler) {
+        new AsyncHandler<Integer>(responseHandler).execute(new IPerformable<Integer>() {
             @Override
-            public GenieResponse<Void> perform() {
+            public GenieResponse<Integer> perform() {
+                return notificationService.getUnreadNotificationCount();
+            }
+        });
+    }
+
+
+    /**
+     * This api gets all the notifications.
+     *
+     * @param responseHandler
+     */
+    public void getAllNotifications(IResponseHandler<List<Notification>> responseHandler) {
+        new AsyncHandler<List<Notification>>(responseHandler).execute(new IPerformable<List<Notification>>() {
+            @Override
+            public GenieResponse<List<Notification>> perform() {
                 return notificationService.getAllNotifications();
             }
         });
     }
+
 }
