@@ -20,6 +20,7 @@ public class DownloadRequest {
     private long createdAt;
     private boolean isChildContent;
 
+
     public DownloadRequest(String identifier, String downloadUrl, String mimeType, String destinationFolder, boolean isChildContent) {
         this.identifier = identifier;
         this.downloadUrl = downloadUrl;

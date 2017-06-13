@@ -34,7 +34,7 @@ public class AndroidAppContext extends AppContext<Context> {
 
     public static AppContext buildAppContext(Context context, String appPackage) {
         AndroidAppContext appContext = new AndroidAppContext(context, appPackage);
-        appContext.setParams(new BuildParams(appPackage));
+        appContext.setParams(new BuildParams(context, appPackage));
         appContext.setDBSession(ServiceDbHelper.getGSDBSession(appContext));
         appContext.setConnectionInfo(new AndroidNetworkConnectivity(appContext));
         appContext.setHttpClient(new AndroidHttpClient(new BasicAuthenticator(appContext.getParams().getUserName(), appContext.getParams().getPassword())));

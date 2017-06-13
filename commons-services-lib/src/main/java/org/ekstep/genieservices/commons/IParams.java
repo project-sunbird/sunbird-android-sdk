@@ -19,4 +19,6 @@ public interface IParams {
      int getLogLevel();
 
      String getQualifier();
+
+     String getProfilePath();
 }

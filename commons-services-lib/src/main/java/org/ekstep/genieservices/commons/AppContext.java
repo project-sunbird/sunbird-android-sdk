@@ -15,9 +15,6 @@ public abstract class AppContext<C> {
     private C mContext;
 
     private String mAppPackage;
-    private String mKey;
-    private String mGDataId;
-    private String mGDataVersionName;
 
     protected AppContext(C context, String appPackage) {
         this.mContext = context;
@@ -26,14 +23,6 @@ public abstract class AppContext<C> {
 
     public C getContext() {
         return mContext;
-    }
-
-    public String getAppPackage() {
-        return mAppPackage;
-    }
-
-    public String getKey() {
-        return mKey;
     }
 
     public abstract IDBSession getDBSession();

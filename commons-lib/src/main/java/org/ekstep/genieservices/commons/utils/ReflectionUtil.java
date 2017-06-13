@@ -26,4 +26,16 @@ public class ReflectionUtil {
         }
         return null;
     }
+
+    public static <T> T getInstance(Class<T> classInstance) {
+        T instance = null;
+        if (classInstance != null) {
+            try {
+                instance = classInstance.newInstance();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        return instance;
+    }
 }

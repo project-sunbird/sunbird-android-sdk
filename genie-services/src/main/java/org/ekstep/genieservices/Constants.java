@@ -17,6 +17,7 @@ public interface Constants {
         String GID = "GID";
         String LOGLEVEL = "LOGLEVEL";
         String APP_QUALIFIER = "QUALIFIER";
+        String PROFILE_CONFIG = "PROFILE_CONFIG";
     }
 
     interface MimeType {
