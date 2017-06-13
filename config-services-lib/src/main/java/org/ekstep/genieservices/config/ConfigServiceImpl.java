@@ -28,7 +28,6 @@ import java.util.Map;
 
 /**
  * This is the implementation of the interface {@link IConfigService}
- *
  */
 public class ConfigServiceImpl extends BaseService implements IConfigService {
 
@@ -48,7 +47,7 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
     @Override
     public GenieResponse<MasterData> getMasterData(MasterDataType type) {
 
-        String methodName="getMasterData@ConfigServiceImpl";
+        String methodName = "getMasterData@ConfigServiceImpl";
         HashMap params = new HashMap();
         params.put("type", type.getValue());
         params.put("logLevel", "2");
@@ -72,7 +71,7 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
             return response;
         } else {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND,ServiceConstants.ErrorMessage.UNABLE_TO_FIND_MASTER_DATA,TAG, MasterData.class);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_MASTER_DATA, TAG, MasterData.class);
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_MASTER_DATA);
             return response;
         }
@@ -121,7 +120,7 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
 
     @Override
     public GenieResponse<Map<String, Object>> getResourceBundle(String languageIdentifier) {
-        String methodName="getResourceBundle@ConfigServiceImpl";
+        String methodName = "getResourceBundle@ConfigServiceImpl";
         HashMap params = new HashMap();
         params.put("ResourceBundle", languageIdentifier);
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
@@ -141,10 +140,10 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
         if (result != null) {
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(resourceBundleMap);
-            TelemetryLogger.logSuccess(mAppContext, response, TAG,methodName, params);
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
             return response;
         } else {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_RESOURCE_BUNDLE,TAG);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_RESOURCE_BUNDLE, TAG);
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_RESOURCE_BUNDLE);
             return response;
         }
@@ -197,7 +196,7 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
     }
 
     public GenieResponse<Map<String, Object>> getOrdinals() {
-        String methodName="getOrdinals@ConfigServiceImpl";
+        String methodName = "getOrdinals@ConfigServiceImpl";
         HashMap params = new HashMap();
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
         params.put("logLevel", "2");
@@ -218,8 +217,8 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
             return response;
         } else {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND,ServiceConstants.ErrorMessage.UNABLE_TO_FIND_ORDINALS,TAG);
-            TelemetryLogger.logFailure(mAppContext, response, TAG,methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_ORDINALS);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_ORDINALS, TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_ORDINALS);
             return response;
         }
     }

@@ -7,11 +7,14 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
+import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.exception.InvalidDataException;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
@@ -20,6 +23,11 @@ import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.eventbus.EventPublisher;
 import org.ekstep.genieservices.tag.cache.TelemetryTagCache;
+import org.ekstep.genieservices.telemetry.chained.imports.AddGeTransferTelemetryImportEvent;
+import org.ekstep.genieservices.telemetry.chained.imports.TelemetryImportStep;
+import org.ekstep.genieservices.telemetry.chained.imports.TransportProcessedEventsImportEvent;
+import org.ekstep.genieservices.telemetry.chained.imports.UpdateImportedTelemetryMetadata;
+import org.ekstep.genieservices.telemetry.chained.imports.ValidateTelemetryMetadata;
 import org.ekstep.genieservices.telemetry.model.EventModel;
 
 import java.util.ArrayList;
@@ -29,13 +37,14 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by swayangjit on 26/4/17.
+ * Created on 26/4/17.
+ *
+ * @author swayangjit
  */
-
 public class TelemetryServiceImpl extends BaseService implements ITelemetryService {
 
     private static final String TAG = TelemetryServiceImpl.class.getSimpleName();
-    private IUserService mUserService=null;
+    private IUserService mUserService;
 
     public TelemetryServiceImpl(AppContext appContext, IUserService userService) {
         super(appContext);
@@ -44,21 +53,21 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
 
     @Override
     public GenieResponse<Void> saveTelemetry(String eventString) {
-        String methodName="saveTelemetry@TelemetryServiceImpl";
+        String methodName = "saveTelemetry@TelemetryServiceImpl";
         HashMap params = new HashMap();
         params.put("Event", eventString);
         params.put("logLevel", "2");
 
+        GenieResponse<Void> response;
         try {
-            GenieResponse response = saveEvent(eventString);
+            response = saveEvent(eventString);
 //            saveEvent(TelemetryLogger.create(mAppContext, response, new HashMap(), TAG, methodName, params).toString());
             return response;
         } catch (InvalidDataException e) {
-            GenieResponse response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.VALIDATION_ERROR, ServiceConstants.ErrorMessage.UNABLE_TO_SAVE_EVENT, TAG, Void.class);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.VALIDATION_ERROR, ServiceConstants.ErrorMessage.UNABLE_TO_SAVE_EVENT, TAG, Void.class);
             saveEvent(TelemetryLogger.create(mAppContext, response, new HashMap(), TAG, methodName, params).toString());
             return response;
         }
-
     }
 
     @Override
@@ -68,7 +77,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
 
     @Override
     public GenieResponse<TelemetryStat> getTelemetryStat() {
-        String methodName="getTelemetryStat@TelemetryServiceImpl";
+        String methodName = "getTelemetryStat@TelemetryServiceImpl";
         HashMap params = new HashMap();
         params.put("logLevel", "2");
 
@@ -91,26 +100,23 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
 
         IKeyValueStore keyValueStore = mAppContext.getKeyValueStore();
         Long lastSyncTime = keyValueStore.getLong(ServiceConstants.PreferenceKey.LAST_SYNC_TIME, 0L);
-        GenieResponse<TelemetryStat> genieResponse=GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-        genieResponse.setResult(new TelemetryStat(unSyncedEventCount,lastSyncTime));
+        GenieResponse<TelemetryStat> genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        genieResponse.setResult(new TelemetryStat(unSyncedEventCount, lastSyncTime));
 
         saveEvent(TelemetryLogger.create(mAppContext, genieResponse, new HashMap(), TAG, methodName, params).toString());
-
         return genieResponse;
     }
 
-
-    private GenieResponse saveEvent(String eventString) {
+    private GenieResponse<Void> saveEvent(String eventString) {
         EventModel event = EventModel.build(mAppContext.getDBSession(), eventString);
         decorateEvent(event);
         event.save();
-        EventPublisher.postTelemetryEvent(GsonUtil.fromMap(event.getEventMap(),Telemetry.class));
+        EventPublisher.postTelemetryEvent(GsonUtil.fromMap(event.getEventMap(), Telemetry.class));
         Logger.i(TAG, "Event saved successfully");
         return GenieResponseBuilder.getSuccessResponse("Event Saved Successfully", Void.class);
     }
 
     private void decorateEvent(EventModel event) {
-
         //Patch the event with proper timestamp
         String version = event.getVersion();
         if (version.equals("1.0")) {
@@ -130,7 +136,6 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         //Patch the event with did
         event.updateDeviceInfo(mAppContext.getDeviceInfo().getDeviceID());
 
-
         //Patch Partner tagss
         String values = mAppContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.KEY_ACTIVE_PARTNER_ID, "");
         List<Map<String, Object>> tags = (List<Map<String, Object>>) event.getEventMap().get("tags");
@@ -145,7 +150,18 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
             tagList.add(tag);
         }
         event.addTag("genie", tagList);
+    }
 
+    @Override
+    public GenieResponse<Void> importTelemetry(IDBSession dbSession, Map<String, Object> metadata) {
+        ImportContext importContext = new ImportContext(dbSession, metadata);
+        IChainable telemetryImportSteps = TelemetryImportStep.initImport();
+        telemetryImportSteps.then(new ValidateTelemetryMetadata())
+                .then(new TransportProcessedEventsImportEvent())
+                .then(new UpdateImportedTelemetryMetadata())
+                .then(new AddGeTransferTelemetryImportEvent());
+
+        return telemetryImportSteps.execute(mAppContext, importContext);
     }
 
 }

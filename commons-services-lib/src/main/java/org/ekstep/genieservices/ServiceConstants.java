@@ -25,9 +25,18 @@ public interface ServiceConstants {
     /* Key Constants for all the key value store */
     String KEY_USER_SESSION = "session";
 
-    String NEVER_SYNCED = "NEVER";
-    String SYNC_PROMPT = "SYNC_PROMPT";
-    String CONTENT_API_EXPIRATION_KEY = "content_api_expiration_time";
+    String VERSION = "version";
+    String EXPORT_ID = "export_id";
+    String DID = "did";
+    String EVENTS_COUNT = "events_count";
+    String PROFILES_COUNT = "profiles_count";
+    String EXPORT_TYPES = "types";
+    String EXPORT_TYPE_TELEMETRY = "telemetry";
+    String EXPORT_TYPE_PROFILE = "userprofile";
+    // Used in export
+    String EXPORTED_ECAR_DESTINATION_LOCATION = "ecarLocation";
+    String EXPORTED_EPAR_DESTINATION_LOCATION = "eparLocation";
+    String UNCOMPRESSED_SOURCE_LOCATION = "location";
 
     interface FileExtension {
         String CONTENT = "ecar";
@@ -99,6 +108,8 @@ public interface ServiceConstants {
         String INVALID_PROFILE = "INVALID_PROFILE";
         String PROFILE_NOT_FOUND = "PROFILE_NOT_FOUND";
         String INVALID_USER = "INVALID_USER";
+        String EXPORT_FAILED = "EXPORT_FAILED";
+        String IMPORT_FAILED = "IMPORT_FAILED";
 
         //Partner
         String UNREGISTERED_PARTNER = "UNREGISTERED_PARTNER";
@@ -149,6 +160,11 @@ public interface ServiceConstants {
 
         //Telemetry
         String UNABLE_TO_SAVE_EVENT = "Not able to save event";
+
+        //Import
+        String IMPORT_PROFILE_FAILED = "Import profile failed.";
+        String IMPORT_CONTENT_FAILED = "Import content failed.";
+        String IMPORT_TELEMETRY_FAILED = "Import telemetry failed.";
     }
 
     interface ContentStatus {

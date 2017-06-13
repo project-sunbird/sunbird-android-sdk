@@ -1,6 +1,7 @@
 package org.ekstep.genieservices.content;
 
 import com.google.gson.internal.LinkedTreeMap;
+import com.google.gson.reflect.TypeToken;
 
 import org.ekstep.genieservices.BaseService;
 import org.ekstep.genieservices.IConfigService;
@@ -10,10 +11,11 @@ import org.ekstep.genieservices.IDownloadService;
 import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
+import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
@@ -27,6 +29,7 @@ import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
+import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
@@ -35,18 +38,17 @@ import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
+import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
-import org.ekstep.genieservices.content.bean.ImportContext;
 import org.ekstep.genieservices.content.chained.AddGeTransferContentImportEvent;
 import org.ekstep.genieservices.content.chained.ContentImportStep;
 import org.ekstep.genieservices.content.chained.DeviceMemoryCheck;
 import org.ekstep.genieservices.content.chained.EcarCleanUp;
 import org.ekstep.genieservices.content.chained.ExtractEcar;
 import org.ekstep.genieservices.content.chained.ExtractPayloads;
-import org.ekstep.genieservices.content.chained.IChainable;
 import org.ekstep.genieservices.content.chained.ValidateEcar;
 import org.ekstep.genieservices.content.db.model.ContentListingModel;
 import org.ekstep.genieservices.content.db.model.ContentModel;
@@ -57,6 +59,7 @@ import org.ekstep.genieservices.content.network.RelatedContentAPI;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.io.File;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -87,7 +90,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         this.userService = userService;
         this.contentFeedbackService = contentFeedbackService;
         this.configService = configService;
-        this.downloadService  = downloadService;
+        this.downloadService = downloadService;
     }
 
     @Override
@@ -114,9 +117,16 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         if (content.isAvailableLocally()) {
             String uid = ContentHandler.getCurrentUserId(userService);
-            ContentFeedbackCriteria.Builder builder = new ContentFeedbackCriteria.Builder(uid, content.getIdentifier());
-            content.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, builder.build()));
-            content.setContentAccess(ContentHandler.getContentAccess(userService, content.getIdentifier(), uid));
+            if (contentDetailsRequest.isAttachFeedback()) {
+                ContentFeedbackCriteria.Builder builder = new ContentFeedbackCriteria.Builder();
+                builder.byUser(uid)
+                        .forContent(content.getIdentifier());
+                content.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, builder.build()));
+            }
+
+            if (contentDetailsRequest.isAttachContentAccess()) {
+                content.setContentAccess(ContentHandler.getContentAccess(userService, content.getIdentifier(), uid));
+            }
         }
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
@@ -138,7 +148,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             Content c = ContentHandler.convertContentModelToBean(contentModel);
 
             if (criteria.attachFeedback()) {
-                ContentFeedbackCriteria.Builder builder = new ContentFeedbackCriteria.Builder(criteria.getUid(), c.getIdentifier());
+                ContentFeedbackCriteria.Builder builder = new ContentFeedbackCriteria.Builder();
+                builder.byUser(criteria.getUid())
+                        .forContent(c.getIdentifier());
                 c.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, builder.build()));
             }
             if (criteria.attachContentAccess()) {
@@ -239,10 +251,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
     @Override
     public GenieResponse<ContentListingResult> getContentListing(ContentListingCriteria contentListingCriteria) {
-        Profile profile = null;
-        if (contentListingCriteria.getProfile() == null) {
-            profile = ContentHandler.getCurrentProfile(userService);
-        }
+        Profile profile = contentListingCriteria.getProfile();
 
         String jsonStr = null;
         // TODO: 6/8/2017 - Read the channel and audience from partnerFilters in criteria and make the comma seperated string and pass in find
@@ -306,9 +315,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 facets = (List<Map<String, Object>>) result.get("facets");
             }
 
-            List<Map<String, Object>> contentDataList = null;
+            String contentDataList = null;
             if (result.containsKey("content")) {
-                contentDataList = (List<Map<String, Object>>) result.get("content");
+                contentDataList = (String) result.get("content");
             }
 
             ContentSearchResult searchResult = new ContentSearchResult();
@@ -316,7 +325,13 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             searchResult.setResponseMessageId(responseMessageId);
             searchResult.setFilter(ContentHandler.getFilters(configService, facets, (Map<String, Object>) requestMap.get("filters")));
             searchResult.setRequest(requestMap);
-            searchResult.setContents(ContentHandler.convertContentMapListToBeanList(mAppContext.getDBSession(), contentDataList));
+
+            if (!StringUtil.isNullOrEmpty(contentDataList)) {
+                Type type = new TypeToken<List<ContentData>>() {
+                }.getType();
+                List<ContentData> contentData = GsonUtil.getGson().fromJson(contentDataList, type);
+                searchResult.setContentDataList(contentData);
+            }
 
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(searchResult);
@@ -618,7 +633,6 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 interActionType(InteractionType.TOUCH).
                 build();
         TelemetryLogger.log(geInteract);
-
     }
 
     private void buildSuccessEvent() {
@@ -629,6 +643,5 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 build();
         TelemetryLogger.log(geInteract);
     }
-
 
 }

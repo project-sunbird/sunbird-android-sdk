@@ -3,6 +3,9 @@ package org.ekstep.genieservices;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
+
+import java.util.Map;
 
 /**
  * This is the interface with all the required APIs to perform necessary operations related to Telemetry
@@ -45,5 +48,13 @@ public interface ITelemetryService {
      */
     GenieResponse<TelemetryStat> getTelemetryStat();
 
+    /**
+     * This API is used to import telemetry.
+     *
+     * @param dbSession
+     * @param metadata
+     * @return
+     */
+    GenieResponse<Void> importTelemetry(IDBSession dbSession, Map<String, Object> metadata);
 
 }

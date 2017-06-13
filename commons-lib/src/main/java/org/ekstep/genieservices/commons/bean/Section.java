@@ -13,7 +13,7 @@ public class Section implements Serializable {
     private String responseMessageId;
     private String apiId;
     private Display display;
-    private List<Content> contents;
+    private List<ContentData> contentDataList;
     private ContentSearchCriteria contentSearchCriteria;
 
     public String getResponseMessageId() {
@@ -40,12 +40,12 @@ public class Section implements Serializable {
         this.display = display;
     }
 
-    public List<Content> getContents() {
-        return contents;
+    public List<ContentData> getContentDataList() {
+        return contentDataList;
     }
 
-    public void setContents(List<Content> contents) {
-        this.contents = contents;
+    public void setContentDataList(List<ContentData> contentDataList) {
+        this.contentDataList = contentDataList;
     }
 
     public ContentSearchCriteria getContentSearchCriteria() {

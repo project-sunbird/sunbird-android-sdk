@@ -5,9 +5,10 @@ import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 
 /**
- * Created by swayangjit on 16/5/17.
+ * Created on 16/5/17.
+ *
+ * @author swayangjit
  */
-
 public class CustomReaderModel implements IReadable {
 
     private IDBSession dbSession;
@@ -22,13 +23,19 @@ public class CustomReaderModel implements IReadable {
     public static CustomReaderModel find(IDBSession dbSession, String query) {
         CustomReaderModel customReaderModel = new CustomReaderModel(dbSession, query);
         dbSession.read(customReaderModel, query);
-        return customReaderModel.data != null ? customReaderModel : null;
+
+        if (customReaderModel.data == null) {
+            return null;
+        } else {
+            return customReaderModel;
+        }
     }
 
     @Override
     public IReadable read(IResultSet cursor) {
-        if (cursor != null && cursor.moveToFirst())
+        if (cursor != null && cursor.moveToFirst()) {
             data = cursor.getString(0);
+        }
         return this;
     }
 
@@ -57,7 +64,7 @@ public class CustomReaderModel implements IReadable {
         return null;
     }
 
-    public String getData(){
+    public String getData() {
         return data;
     }
 }

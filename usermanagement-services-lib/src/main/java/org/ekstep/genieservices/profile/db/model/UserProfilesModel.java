@@ -11,9 +11,10 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Created by swayangjit on 24/5/17.
+ * Created on 24/5/17.
+ *
+ * @author swayangjit
  */
-
 public class UserProfilesModel implements IReadable {
 
     private IDBSession mDBSession;
@@ -26,8 +27,11 @@ public class UserProfilesModel implements IReadable {
     public static UserProfilesModel find(IDBSession dbSession) {
         UserProfilesModel userProfilesModel = new UserProfilesModel(dbSession);
         dbSession.read(userProfilesModel);
-        return userProfilesModel.getProfileList() != null ? userProfilesModel : null;
-
+        if (userProfilesModel.getProfileList() == null) {
+            return null;
+        } else {
+            return userProfilesModel;
+        }
     }
 
     @Override
@@ -61,7 +65,6 @@ public class UserProfilesModel implements IReadable {
     public String filterForRead() {
         return "";
     }
-
 
     @Override
     public String[] selectionArgsForFilter() {

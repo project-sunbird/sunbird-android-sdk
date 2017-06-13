@@ -15,7 +15,7 @@ public class ContentSearchResult implements Serializable {
     private String responseMessageId;
     private List<ContentSearchFilter> filter;
     private Map<String, Object> request;
-    private List<Content> contents;
+    private List<ContentData> contentDataList;
 
     public String getId() {
         return id;
@@ -49,11 +49,11 @@ public class ContentSearchResult implements Serializable {
         this.request = request;
     }
 
-    public List<Content> getContents() {
-        return contents;
+    public List<ContentData> getContentDataList() {
+        return contentDataList;
     }
 
-    public void setContents(List<Content> contents) {
-        this.contents = contents;
+    public void setContentDataList(List<ContentData> contentDataList) {
+        this.contentDataList = contentDataList;
     }
 }

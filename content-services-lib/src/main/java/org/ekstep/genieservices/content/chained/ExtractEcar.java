@@ -4,9 +4,9 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.ImportContext;
+import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.Decompress;
-import org.ekstep.genieservices.content.ContentConstants;
-import org.ekstep.genieservices.content.bean.ImportContext;
 
 /**
  * Created on 5/16/2017.
@@ -28,7 +28,7 @@ public class ExtractEcar implements IChainable {
             importContext.getMetadata().put(ServiceConstants.GeTransferEvent.FILE_SIZE, importContext.getEcarFile().length());
             return nextLink.execute(appContext, importContext);
         } else {
-            return GenieResponseBuilder.getErrorResponse(ContentConstants.IMPORT_FAILED, "Import content failed while extracting ecar.", TAG);
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "Import content failed while extracting ecar.", TAG);
         }
     }
 

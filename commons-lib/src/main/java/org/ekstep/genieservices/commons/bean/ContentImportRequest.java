@@ -1,8 +1,5 @@
 package org.ekstep.genieservices.commons.bean;
 
-import org.ekstep.genieservices.commons.utils.StringUtil;
-
-import java.io.File;
 import java.util.List;
 
 /**

@@ -4,17 +4,22 @@ import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.ITelemetryService;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.ImportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
+import org.ekstep.genieservices.importexport.FileImporter;
 
 /**
  * This class provides all the required APIs to perform necessary operations related to Telemetry on a separate thread
  */
 public class TelemetryService {
+
     private ITelemetryService telemetryService;
+    private FileImporter fileImporter;
 
     public TelemetryService(GenieService genieService) {
         this.telemetryService = genieService.getTelemetryService();
+        this.fileImporter = genieService.getFileImporter();
     }
 
     /**
@@ -69,6 +74,15 @@ public class TelemetryService {
             @Override
             public GenieResponse<TelemetryStat> perform() {
                 return telemetryService.getTelemetryStat();
+            }
+        });
+    }
+
+    public void importTelemetry(final ImportRequest importRequest, IResponseHandler<Void> responseHandler) {
+        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return fileImporter.importTelemetry(importRequest, telemetryService);
             }
         });
     }

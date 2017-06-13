@@ -11,7 +11,6 @@ import android.provider.MediaStore;
 import org.ekstep.genieservices.commons.IDownloadManager;
 import org.ekstep.genieservices.commons.bean.DownloadProgress;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
-import org.ekstep.genieservices.commons.bean.Request;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 
 import java.io.FileNotFoundException;

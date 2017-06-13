@@ -13,9 +13,10 @@ import java.util.Locale;
 import java.util.UUID;
 
 public class UserModel implements IWritable, IReadable, ICleanable {
-    private String uid;
+
     private Long id = -1L;
     private IDBSession dbSession;
+    private String uid;
 
     private UserModel(IDBSession dbSession, String uid) {
         this.dbSession = dbSession;
@@ -44,8 +45,14 @@ public class UserModel implements IWritable, IReadable, ICleanable {
         }
     }
 
-    public String getUid() {
-        return uid;
+    public Void save() {
+        dbSession.create(this);
+        return null;
+    }
+
+    public Void delete() {
+        dbSession.clean(this);
+        return null;
     }
 
     @Override
@@ -60,15 +67,16 @@ public class UserModel implements IWritable, IReadable, ICleanable {
         this.id = id;
     }
 
-    public void readAfterMoving(IResultSet cursor) {
-        id = cursor.getLong(0);
-        uid = cursor.getString(1);
+    public void readWithoutMoving(IResultSet resultSet) {
+        id = resultSet.getLong(0);
+        uid = resultSet.getString(resultSet.getColumnIndex(UserEntry.COLUMN_NAME_UID));
     }
 
     @Override
     public IReadable read(IResultSet cursor) {
-        if (cursor != null && cursor.moveToFirst())
-            readAfterMoving(cursor);
+        if (cursor != null && cursor.moveToFirst()) {
+            readWithoutMoving(cursor);
+        }
         return this;
     }
 
@@ -102,57 +110,18 @@ public class UserModel implements IWritable, IReadable, ICleanable {
         return "limit 1";
     }
 
-    public void save() {
-        dbSession.create(this);
-
-                //TODO: THe below telemetry logging should be part of the service and not in the model. Model should only handle DB interactions
-//        GECreateUser geCreateUser = generateGeCreateUserEvent(gameID, gameVersion, location, deviceInfo);
-//        Set<String> hashedGenieTags = TelemetryTagCache.activeTags(dbOperator, context);
-//        Event userEvent = new Event(geCreateUser.getEID(), hashedGenieTags).withEvent(geCreateUser.toString());
-//        tasks.add(new Writer(userEvent));
-
-//        if (profile != null) {
-//            profile.setUid(uid);
-//            ProfileDTO profileDTO = new ProfileDTO(profile);
-//            tasks.add(new Writer(profileDTO));
-//            GECreateProfile geCreateProfile = generateGeCreateProfileEvent(gameID, gameVersion, location, deviceInfo);
-//            Event profileEvent = new Event(geCreateProfile.getEID(), hashedGenieTags).withEvent(geCreateProfile.toString());
-//            tasks.add(new Writer(profileEvent));
-//        }
-//        dbOperator.executeInOneTransaction(tasks);
-    }
-
-//    @NonNull
-//    protected GECreateProfile generateGeCreateProfileEvent(String gameID, String gameVersion, String location, DeviceInfo deviceInfo) {
-//        GECreateProfile geCreateProfile = new GECreateProfile(gameID, gameVersion, profile, location);
-//        geCreateProfile.setDid(deviceInfo.getDeviceID());
-//        geCreateProfile.setTs(TimeUtil.getCurrentTimestamp());
-//        return geCreateProfile;
-//    }
-
-//    @NonNull
-//    protected GECreateUser generateGeCreateUserEvent(String gameID, String gameVersion, String location, DeviceInfo deviceInfo) {
-//        GECreateUser geCreateUser = new GECreateUser(gameID, gameVersion, this.getUid(), location);
-//        geCreateUser.setDid(deviceInfo.getDeviceID());
-//        geCreateUser.setTs(TimeUtil.getCurrentTimestamp());
-//        return geCreateUser;
-//    }
-
-    public void delete() {
-        dbSession.clean(this);
-    }
-
     @Override
     public void clean() {
         id = -1L;
         uid = null;
     }
 
-
     @Override
     public String selectionToClean() {
-        return String.format(Locale.US, "where %s = '%s'", UserEntry.COLUMN_NAME_UID, getUid());
+        return String.format(Locale.US, "where %s = '%s'", UserEntry.COLUMN_NAME_UID, uid);
     }
 
-
+    public String getUid() {
+        return uid;
+    }
 }

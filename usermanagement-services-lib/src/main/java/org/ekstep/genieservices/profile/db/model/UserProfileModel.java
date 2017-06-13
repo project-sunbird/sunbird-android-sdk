@@ -44,12 +44,22 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
         }
     }
 
-    public long getId() {
-        return id;
-    }
-
     public Profile getProfile() {
         return profile;
+    }
+
+    public void update() {
+        dbSession.update(this);
+    }
+
+    public Void save() {
+        dbSession.create(this);
+        return null;
+    }
+
+    public Void delete() {
+        dbSession.clean(this);
+        return null;
     }
 
     @Override
@@ -176,20 +186,6 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
     @Override
     public String updateBy() {
         return String.format(Locale.US, "uid = '%s'", profile.getUid());
-    }
-
-    public void update() {
-        dbSession.update(this);
-    }
-
-    public Void save() {
-        dbSession.create(this);
-        return null;
-    }
-
-    public Void delete() {
-        dbSession.clean(this);
-        return null;
     }
 
     private void populateContentValues(ContentValues contentValues) {

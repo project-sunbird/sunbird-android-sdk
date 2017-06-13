@@ -7,7 +7,7 @@ package org.ekstep.genieservices.commons.bean.enums;
  */
 public enum SortBy {
 
-    RELEVANT("relevant"), NAME("name"), MOST_POPULAR("most_popular"), NEWEST("newest");
+    RELEVANT("relevant"), NAME("name"), MOST_POPULAR("most_popular"), NEWEST("newest"), GENIE_SCORE("");
 
     private String value;
 

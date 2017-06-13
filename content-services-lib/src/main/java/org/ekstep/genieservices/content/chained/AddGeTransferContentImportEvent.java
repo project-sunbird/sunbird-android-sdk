@@ -1,15 +1,17 @@
 package org.ekstep.genieservices.content.chained;
 
+import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransfer;
-import org.ekstep.genieservices.commons.bean.telemetry.GETransferContentMap;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
+import org.ekstep.genieservices.commons.bean.telemetry.GETransferMap;
+import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.ContentHandler;
-import org.ekstep.genieservices.content.bean.ImportContext;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.util.ArrayList;
@@ -45,7 +47,7 @@ public class AddGeTransferContentImportEvent implements IChainable {
 
         GETransfer geTransfer = new GETransfer(new GameData(appContext.getParams().getGid(), appContext.getParams().getVersionName()), eks);
         TelemetryLogger.log(geTransfer);
-        return GenieResponseBuilder.getSuccessResponse("Successfully imported");
+        return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
     }
 
     @Override
@@ -53,13 +55,13 @@ public class AddGeTransferContentImportEvent implements IChainable {
         return link;
     }
 
-    private List<GETransferContentMap> buildContentsMetadata(Map<String, Object> metadata) {
+    private List<GETransferMap> buildContentsMetadata(Map<String, Object> metadata) {
         List<HashMap> contents = (List<HashMap>) metadata.get(GETransferEventKnowStructure.CONTENT_ITEMS_KEY);
-        ArrayList<GETransferContentMap> contentsMetadata = new ArrayList<>();
+        ArrayList<GETransferMap> contentsMetadata = new ArrayList<>();
         metadata.put(GETransferEventKnowStructure.CONTENT_ITEMS_KEY, contentsMetadata);
 
         for (HashMap contentMap : contents) {
-            contentsMetadata.add(GETransferContentMap.createMapForContent(
+            contentsMetadata.add(GETransferMap.createMapForContent(
                     ContentHandler.readIdentifier(contentMap),
                     ContentHandler.readPkgVersion(contentMap),
                     ContentHandler.readTransferCountFromContentMap(contentMap),

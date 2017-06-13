@@ -395,7 +395,7 @@ public class ContentHandler {
         return profile;
     }
 
-    public static ContentFeedback getContentFeedback(IContentFeedbackService contentFeedbackService, ContentFeedbackCriteria contentFeedbackCriteria) {
+    public static List<ContentFeedback> getContentFeedback(IContentFeedbackService contentFeedbackService, ContentFeedbackCriteria contentFeedbackCriteria) {
         if (contentFeedbackService != null) {
             return contentFeedbackService.getFeedback(contentFeedbackCriteria).getResult();
         }
@@ -1158,9 +1158,9 @@ public class ContentHandler {
 
         List<Map<String, Object>> sections = (List<Map<String, Object>>) pageMap.get("sections");
         for (Map<String, Object> sectionMap : sections) {
-            List<Map<String, Object>> contentDataList = null;
+            String contentDataList = null;
             if (sectionMap.containsKey("contents")) {
-                contentDataList = (List<Map<String, Object>>) sectionMap.get("contents");
+                contentDataList = (String) sectionMap.get("contents");
             }
 
             ContentSearchCriteria contentSearchCriteria = null;
@@ -1230,7 +1230,13 @@ public class ContentHandler {
             section.setResponseMessageId((String) sectionMap.get("resmsgid"));
             section.setApiId((String) sectionMap.get("apiid"));
             section.setDisplay(GsonUtil.fromMap((Map) sectionMap.get("display"), Display.class));
-            section.setContents(convertContentMapListToBeanList(dbSession, contentDataList));
+
+            if (!StringUtil.isNullOrEmpty(contentDataList)) {
+                Type type = new TypeToken<List<ContentData>>() {
+                }.getType();
+                List<ContentData> contentData = GsonUtil.getGson().fromJson(contentDataList, type);
+                section.setContentDataList(contentData);
+            }
             section.setContentSearchCriteria(contentSearchCriteria);
 
             sectionList.add(section);
@@ -1254,29 +1260,30 @@ public class ContentHandler {
     public static String getDownloadUrl(Map<String, Object> dataMap) {
         String downloadUrl = null;
 
-        Object variants = dataMap.get(KEY_VARIANTS);
-        if (variants != null) {
-            String variantsString;
-            if (variants instanceof Map) {
-                variantsString = GsonUtil.getGson().toJson(variants);
-            } else {
-                variantsString = (String) variants;
+        String contentType = (String) dataMap.get(KEY_CONTENT_TYPE);
+        if ((ContentType.TEXTBOOK.getValue().equalsIgnoreCase(contentType)
+                || ContentType.COLLECTION.getValue().equalsIgnoreCase(contentType))) {
+            Object variants = dataMap.get(KEY_VARIANTS);
+            if (variants != null) {
+                String variantsString;
+                if (variants instanceof Map) {
+                    variantsString = GsonUtil.getGson().toJson(variants);
+                } else {
+                    variantsString = (String) variants;
+                }
+
+                variantsString = variantsString.replace("\\", "");
+                ContentVariant contentVariant = GsonUtil.fromJson(variantsString, ContentVariant.class);
+
+                if ((contentVariant.getSpine() != null && !StringUtil.isNullOrEmpty(contentVariant.getSpine().getEcarUrl()))) {
+                    downloadUrl = contentVariant.getSpine().getEcarUrl();
+                }
             }
-
-            variantsString = variantsString.replace("\\", "");
-            ContentVariant contentVariant = GsonUtil.fromJson(variantsString, ContentVariant.class);
-
-            String contentType = (String) dataMap.get(KEY_CONTENT_TYPE);
-            if ((contentVariant.getSpine() != null && !StringUtil.isNullOrEmpty(contentVariant.getSpine().getEcarUrl()))
-                    && (ContentType.TEXTBOOK.getValue().equalsIgnoreCase(contentType)
-                    || ContentType.COLLECTION.getValue().equalsIgnoreCase(contentType))) {
-
-                downloadUrl = contentVariant.getSpine().getEcarUrl();
-            }
-        } else {
-            downloadUrl = (String) dataMap.get(KEY_DOWNLOAD_URL);
         }
 
+        if (!StringUtil.isNullOrEmpty(downloadUrl)) {
+            downloadUrl = (String) dataMap.get(KEY_DOWNLOAD_URL);
+        }
         return downloadUrl;
     }
 

@@ -27,17 +27,12 @@ public class ContentFeedbackCriteria {
         private String uid;
         private String contentId;
 
-        public Builder(String uid, String contentId) {
-            this.uid = uid;
-            this.contentId = contentId;
-        }
-
-        public Builder uid(String uid) {
+        public Builder byUser(String uid) {
             this.uid = uid;
             return this;
         }
 
-        public Builder contentId(String contentId) {
+        public Builder forContent(String contentId) {
             this.contentId = contentId;
             return this;
         }

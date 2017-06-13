@@ -54,43 +54,43 @@ public class GenieServiceTestActivity extends Activity {
 
     public GenieResponse<Profile> createUserProfile(Profile userProfile) {
         idle = false;
-        GenieResponse<Profile> genieResponse = mGenieService.getUserProfileService().createUserProfile(userProfile);
+        GenieResponse<Profile> genieResponse = mGenieService.getUserService().createUserProfile(userProfile);
         return genieResponse;
     }
 
     public GenieResponse deleteUserProfile(String uid) {
         idle = false;
-        GenieResponse genieResponse = mGenieService.getUserProfileService().deleteUser(uid);
+        GenieResponse genieResponse = mGenieService.getUserService().deleteUser(uid);
         return genieResponse;
     }
 
     public GenieResponse<Profile> getAnonymousUser() {
         idle = false;
-        GenieResponse<Profile> genieResponse = mGenieService.getUserProfileService().getAnonymousUser();
+        GenieResponse<Profile> genieResponse = mGenieService.getUserService().getAnonymousUser();
         return genieResponse;
     }
 
     public GenieResponse<String> setAnonymousUser() {
         idle = false;
-        GenieResponse<String> genieResponse = mGenieService.getUserProfileService().setAnonymousUser();
+        GenieResponse<String> genieResponse = mGenieService.getUserService().setAnonymousUser();
         return genieResponse;
     }
 
     public GenieResponse<Profile> getCurrentUser() {
         idle = false;
-        GenieResponse<Profile> genieResponse = mGenieService.getUserProfileService().getCurrentUser();
+        GenieResponse<Profile> genieResponse = mGenieService.getUserService().getCurrentUser();
         return genieResponse;
     }
 
     public GenieResponse setCurrentUser(String uid) {
         idle = false;
-        GenieResponse genieResponse = mGenieService.getUserProfileService().setCurrentUser(uid);
+        GenieResponse genieResponse = mGenieService.getUserService().setCurrentUser(uid);
         return genieResponse;
     }
 
     public GenieResponse<Profile> updateUserProfile(Profile profile) {
         idle = false;
-        GenieResponse<Profile> genieResponse = mGenieService.getUserProfileService().updateUserProfile(profile);
+        GenieResponse<Profile> genieResponse = mGenieService.getUserService().updateUserProfile(profile);
         return genieResponse;
     }
 

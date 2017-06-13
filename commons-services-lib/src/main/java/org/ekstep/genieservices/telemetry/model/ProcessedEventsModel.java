@@ -1,45 +1,56 @@
 package org.ekstep.genieservices.telemetry.model;
 
+import org.ekstep.genieservices.commons.db.contract.TelemetryProcessedEntry;
+import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.commons.db.contract.TelemetryProcessedEntry;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by swayangjit on 26/4/17.
+ * Created on 26/4/17.
+ *
+ * @author swayangjit
  */
+public class ProcessedEventsModel implements IReadable, ICleanable {
 
-public class ProcessedEventsModel implements IReadable {
-
-    private List<ProcessedEventModel> processedEvents;
-    private IDBSession mDBSession;
+    private IDBSession dBSession;
+    private List<ProcessedEventModel> processedEventList;
 
     private ProcessedEventsModel(IDBSession dbSession) {
-        this.mDBSession = dbSession;
-        this.processedEvents = new ArrayList<>();
-    }
-
-    private ProcessedEventsModel(IDBSession dbSession, List<ProcessedEventModel> processedEvents) {
-        this.mDBSession = dbSession;
-        this.processedEvents = processedEvents;
+        this.dBSession = dbSession;
     }
 
     public static ProcessedEventsModel find(IDBSession dbSession) {
-        ProcessedEventsModel processedEvents = new ProcessedEventsModel(dbSession);
-        dbSession.read(processedEvents);
-        return processedEvents;
+        ProcessedEventsModel model = new ProcessedEventsModel(dbSession);
+        dbSession.read(model);
+
+        if (model.processedEventList == null) {
+            return null;
+        } else {
+            return model;
+        }
+    }
+
+    public static ProcessedEventsModel build(IDBSession dbSession) {
+        return new ProcessedEventsModel(dbSession);
+    }
+
+    public Void deleteAll() {
+        dBSession.clean(this);
+        return null;
     }
 
     @Override
     public IReadable read(IResultSet resultSet) {
         if (resultSet != null && resultSet.moveToFirst()) {
+            processedEventList = new ArrayList<>();
             do {
-                ProcessedEventModel processedEvent = ProcessedEventModel.build(mDBSession);
+                ProcessedEventModel processedEvent = ProcessedEventModel.build(dBSession);
                 processedEvent.readWithoutMoving(resultSet);
-                processedEvents.add(processedEvent);
+                processedEventList.add(processedEvent);
             } while (resultSet.moveToNext());
         }
         return this;
@@ -48,6 +59,16 @@ public class ProcessedEventsModel implements IReadable {
     @Override
     public String getTableName() {
         return TelemetryProcessedEntry.TABLE_NAME;
+    }
+
+    @Override
+    public void clean() {
+
+    }
+
+    @Override
+    public String selectionToClean() {
+        return "";
     }
 
     @Override
@@ -70,18 +91,8 @@ public class ProcessedEventsModel implements IReadable {
         return "";
     }
 
-    public List<ProcessedEventModel> getAllProcessedEvents() {
-        return processedEvents;
+    public List<ProcessedEventModel> getProcessedEventList() {
+        return processedEventList;
     }
 
-    public int getTotalEvents() {
-        int totalEvents = 0;
-        List<ProcessedEventModel> processedEventList = getAllProcessedEvents();
-        if (processedEventList != null && processedEventList.size() > 0) {
-            for (ProcessedEventModel processedEvent : processedEventList) {
-                totalEvents = totalEvents + processedEvent.getNumberOfEvents();
-            }
-        }
-        return totalEvents;
-    }
 }

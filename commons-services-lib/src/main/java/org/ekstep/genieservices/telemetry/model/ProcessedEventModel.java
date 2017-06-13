@@ -14,34 +14,32 @@ import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import java.util.Locale;
 
 /**
- * Created by swayangjit on 26/4/17.
+ * Created on 26/4/17.
+ *
+ * @author swayangjit
  */
-
 public class ProcessedEventModel implements IWritable, ICleanable, IReadable {
+
+    private Long id = -1L;
+    private IDBSession dbSession;
+    private ContentValues contentValues;
 
     private String msgId;
     private byte[] data;
-    private Long id;
     private int numberOfEvents;
     private int priority;
-    private ContentValues contentValues;
-    private IDBSession mDBSession;
 
     private ProcessedEventModel(IDBSession dbSession) {
-        this.mDBSession = dbSession;
+        this.dbSession = dbSession;
         this.contentValues = new ContentValues();
     }
 
     private ProcessedEventModel(IDBSession dbSession, String msgId, byte[] data, int numberOfEvents, int priority) {
-        this(dbSession, msgId, data, numberOfEvents, priority, new ContentValues());
-    }
+        this(dbSession);
 
-    private ProcessedEventModel(IDBSession dbSession, String msgId, byte[] data, int numberOfEvents, int priority, ContentValues contentValues) {
-        this.mDBSession = dbSession;
         this.msgId = msgId;
         this.data = data;
         this.numberOfEvents = numberOfEvents;
-        this.contentValues = contentValues;
         this.priority = priority;
     }
 
@@ -50,13 +48,23 @@ public class ProcessedEventModel implements IWritable, ICleanable, IReadable {
     }
 
     public static ProcessedEventModel build(IDBSession dbSession, String msgId, byte[] data, int numberOfEvents, int priority) {
-        return new ProcessedEventModel(dbSession, msgId, data, numberOfEvents, priority, new ContentValues());
+        return new ProcessedEventModel(dbSession, msgId, data, numberOfEvents, priority);
     }
 
     public static ProcessedEventModel find(IDBSession dbSesion) {
         ProcessedEventModel processedEventModel = new ProcessedEventModel(dbSesion);
         dbSesion.read(processedEventModel);
         return processedEventModel;
+    }
+
+    public void save() {
+        dbSession.create(this);
+    }
+
+    public int delete() {
+        int eventExported = this.numberOfEvents;
+        dbSession.clean(this);
+        return eventExported;
     }
 
     @Override
@@ -89,16 +97,15 @@ public class ProcessedEventModel implements IWritable, ICleanable, IReadable {
 
     @Override
     public void clean() {
+        id = -1L;
         msgId = "";
         data = new byte[]{};
-        id = null;
         numberOfEvents = 0;
     }
 
     @Override
     public String selectionToClean() {
-        String selectionBy = String.format(Locale.US, "WHERE _id = %d", id);
-        return selectionBy;
+        return String.format(Locale.US, "WHERE _id = %d", id);
     }
 
     @Override
@@ -112,7 +119,7 @@ public class ProcessedEventModel implements IWritable, ICleanable, IReadable {
 
     @Override
     public void updateId(long id) {
-
+        this.id = id;
     }
 
     @Override
@@ -122,17 +129,6 @@ public class ProcessedEventModel implements IWritable, ICleanable, IReadable {
 
     @Override
     public void beforeWrite(AppContext context) {
-
-    }
-
-    public int clear() {
-        int eventExported = this.numberOfEvents;
-        mDBSession.clean(this);
-        return eventExported;
-    }
-
-    public void save() {
-        mDBSession.create(this);
     }
 
     public void readWithoutMoving(IResultSet resultSet) {
@@ -143,8 +139,8 @@ public class ProcessedEventModel implements IWritable, ICleanable, IReadable {
         priority = resultSet.getInt(resultSet.getColumnIndex(TelemetryProcessedEntry.COLUMN_NAME_PRIORITY));
     }
 
-    public int getNumberOfEvents() {
-        return numberOfEvents;
+    public String getMsgId() {
+        return msgId;
     }
 
     public byte[] getData() {
@@ -155,8 +151,12 @@ public class ProcessedEventModel implements IWritable, ICleanable, IReadable {
         this.data = data;
     }
 
-    public boolean isEmpty() {
-        return numberOfEvents == 0 || data == null || data.length == 0;
+    public int getNumberOfEvents() {
+        return numberOfEvents;
+    }
+
+    public int getPriority() {
+        return priority;
     }
 
 }

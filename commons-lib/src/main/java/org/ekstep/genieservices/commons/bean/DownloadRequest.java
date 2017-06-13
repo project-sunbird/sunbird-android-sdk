@@ -2,8 +2,6 @@ package org.ekstep.genieservices.commons.bean;
 
 import org.ekstep.genieservices.commons.utils.DateUtil;
 
-import java.io.File;
-
 /**
  * Created on 17/5/17.
  *

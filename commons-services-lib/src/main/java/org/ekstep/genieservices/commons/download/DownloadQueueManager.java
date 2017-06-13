@@ -1,6 +1,5 @@
 package org.ekstep.genieservices.commons.download;
 
-import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -15,7 +14,7 @@ import java.util.List;
  *
  * @author swayangjit
  */
-    public class DownloadQueueManager {
+public class DownloadQueueManager {
 
     private static final String DOWNLOAD_QUEUE = "download_queue";
     private static final String CURRENT_DOWNLOAD = "current_download";
@@ -41,7 +40,7 @@ import java.util.List;
     public DownloadRequest popDownloadrequest() {
         DownloadRequest request = null;
         List<DownloadRequest> requestList = getAllRequests();
-        if(requestList.size() > 0) {
+        if (requestList.size() > 0) {
             request = requestList.get(0);
         }
         return request;
@@ -49,7 +48,7 @@ import java.util.List;
 
     public DownloadRequest getRequestByDownloadId(long downloadId) {
         List<DownloadRequest> requestList = getAllRequests();
-        for (DownloadRequest request: requestList) {
+        for (DownloadRequest request : requestList) {
             if (request.getDownloadId() == downloadId) {
                 return request;
             }
@@ -59,7 +58,7 @@ import java.util.List;
 
     public DownloadRequest getRequestByIdentifier(String identifier) {
         List<DownloadRequest> requestList = getAllRequests();
-        for (DownloadRequest request: requestList) {
+        for (DownloadRequest request : requestList) {
             if (identifier.equals(request.getIdentifier())) {
                 return request;
             }
@@ -69,7 +68,7 @@ import java.util.List;
 
     public void updateDownload(String identifier, long downloadId) {
         List<DownloadRequest> contentList = getAllRequests();
-        for (DownloadRequest request: contentList) {
+        for (DownloadRequest request : contentList) {
             if (identifier.equals(request.getIdentifier())) {
                 request.setDownloadId(downloadId);
                 save(contentList);
@@ -130,7 +129,7 @@ import java.util.List;
 
     public void removeFromCurrentDownloadQueue(String identifier) {
         List<String> currentlyDownloading = getCurrentDownloads();
-        for (String currentItem: currentlyDownloading) {
+        for (String currentItem : currentlyDownloading) {
             if (identifier.equals(currentItem)) {
                 currentlyDownloading.remove(currentItem);
                 saveCurrentDownloads(currentlyDownloading);

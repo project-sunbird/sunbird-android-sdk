@@ -7,11 +7,11 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
-import org.ekstep.genieservices.commons.bean.ContentAccessLearnerState;
+import org.ekstep.genieservices.commons.bean.ContentLearnerState;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.Profile;
-import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.enums.ContentAccessStatusType;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
@@ -26,9 +26,21 @@ import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
+import org.ekstep.genieservices.commons.db.operations.IDataSource;
 import org.ekstep.genieservices.commons.utils.DateUtil;
+import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
+import org.ekstep.genieservices.profile.chained.export.AddGeTransferProfileExportEvent;
+import org.ekstep.genieservices.profile.chained.export.CleanupExportedFile;
+import org.ekstep.genieservices.profile.chained.export.CopyDatabase;
+import org.ekstep.genieservices.profile.chained.export.CreateMetadata;
+import org.ekstep.genieservices.profile.chained.imports.AddGeTransferProfileImportEvent;
+import org.ekstep.genieservices.profile.chained.imports.TransportProfiles;
+import org.ekstep.genieservices.profile.chained.imports.TransportSummarizer;
+import org.ekstep.genieservices.profile.chained.imports.TransportUser;
+import org.ekstep.genieservices.profile.chained.imports.UpdateImportedProfileMetadata;
+import org.ekstep.genieservices.profile.chained.imports.ValidateProfileMetadata;
 import org.ekstep.genieservices.profile.db.model.ContentAccessModel;
 import org.ekstep.genieservices.profile.db.model.ContentAccessesModel;
 import org.ekstep.genieservices.profile.db.model.UserModel;
@@ -37,6 +49,7 @@ import org.ekstep.genieservices.profile.db.model.UserProfilesModel;
 import org.ekstep.genieservices.profile.db.model.UserSessionModel;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,7 +67,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
     private static final String TAG = UserServiceImpl.class.getSimpleName();
 
-    private GameData mGameData = null;
+    private GameData mGameData;
 
     public UserServiceImpl(AppContext appContext) {
         super(appContext);
@@ -78,7 +91,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
             logGEError(response, "createUserProfile");
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_CREATE_PROFILE);
             return response;
-        } else if (profile != null && !profile.isValid()) {
+        } else if (!profile.isValid()) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.VALIDATION_ERROR, profile.getErrors().toString(), methodName, Profile.class);
             logGEError(response, "createUserProfile");
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_CREATE_PROFILE);
@@ -111,7 +124,6 @@ public class UserServiceImpl extends BaseService implements IUserService {
         TelemetryLogger.log(geError);
     }
 
-
     private GenieResponse<Profile> saveUserProfile(final Profile profile, IDBSession dbSession) {
         String uid = UUID.randomUUID().toString();
         profile.setUid(uid);
@@ -133,9 +145,9 @@ public class UserServiceImpl extends BaseService implements IUserService {
                 return null;
             }
         });
+
         GenieResponse<Profile> successResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         successResponse.setResult(GsonUtil.fromJson(profileModel.getProfile().toString(), Profile.class));
-
         return successResponse;
     }
 
@@ -146,23 +158,23 @@ public class UserServiceImpl extends BaseService implements IUserService {
      */
     @Override
     public GenieResponse<Profile> updateUserProfile(Profile profile) {
-
         String methodName = "updateUserProfile@UserServiceImpl";
         HashMap params = new HashMap();
         params.put("logLevel", "2");
 
+        GenieResponse<Profile> response;
         if (profile == null || StringUtil.isNullOrEmpty(profile.getUid())) {
-            GenieResponse<Profile> genieResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROFILE_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_PROFILE, TAG, Profile.class);
-            logGEError(genieResponse, "updateUserProfile");
-            TelemetryLogger.logFailure(mAppContext, genieResponse, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_UPDTAE_PROFILE);
-            return genieResponse;
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROFILE_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_PROFILE, TAG, Profile.class);
+            logGEError(response, "updateUserProfile");
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_UPDTAE_PROFILE);
+            return response;
         }
 
         if (!profile.isValid()) {
-            GenieResponse<Profile> genieResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.VALIDATION_ERROR, profile.getErrors().toString(), TAG, Profile.class);
-            logGEError(genieResponse, "updateUserProfile");
-            TelemetryLogger.logFailure(mAppContext, genieResponse, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_UPDTAE_PROFILE);
-            return genieResponse;
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.VALIDATION_ERROR, profile.getErrors().toString(), TAG, Profile.class);
+            logGEError(response, "updateUserProfile");
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_UPDTAE_PROFILE);
+            return response;
         }
         UserProfileModel userProfileModel = UserProfileModel.build(mAppContext.getDBSession(), profile);
         // TODO: 6/6/2017 - check if profile exists or not before updating.
@@ -171,13 +183,11 @@ public class UserServiceImpl extends BaseService implements IUserService {
         GEUpdateProfile geUpdateProfile = new GEUpdateProfile(mGameData, profile, mAppContext.getDeviceInfo().getDeviceID());
         TelemetryLogger.log(geUpdateProfile);
 
-        GenieResponse<Profile> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Profile.class);
+        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Profile.class);
         response.setResult(profile);
 
         TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
-
         return response;
-
     }
 
     /**
@@ -187,11 +197,12 @@ public class UserServiceImpl extends BaseService implements IUserService {
      */
     @Override
     public GenieResponse<Void> deleteUser(String uid) {
-
         String methodName = "deleteUser@UserServiceImpl";
         HashMap params = new HashMap();
         params.put("uid", uid);
         params.put("logLevel", "2");
+
+        GenieResponse<Void> response;
 
         //get the current user id
         UserSessionModel userSession = UserSessionModel.findUserSession(mAppContext);
@@ -203,9 +214,9 @@ public class UserServiceImpl extends BaseService implements IUserService {
         final ContentAccessesModel accessesModel = ContentAccessesModel.findByUid(mAppContext.getDBSession(), uid);
         final UserProfileModel userProfileModel = UserProfileModel.find(mAppContext.getDBSession(), uid);
         if (userProfileModel == null) {
-            GenieResponse<Void> genieResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROFILE_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_PROFILE, TAG, Void.class);
-            TelemetryLogger.logFailure(mAppContext, genieResponse, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_DELETE_PROFILE);
-            return genieResponse;
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROFILE_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_PROFILE, TAG, Void.class);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_DELETE_PROFILE);
+            return response;
         } else {
             final UserModel userModel = UserModel.findByUserId(mAppContext.getDBSession(), uid);
 
@@ -227,12 +238,10 @@ public class UserServiceImpl extends BaseService implements IUserService {
                 }
             });
 
-            GenieResponse response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
-
             return response;
         }
-
     }
 
     private String createAnonymousUser() {
@@ -271,11 +280,10 @@ public class UserServiceImpl extends BaseService implements IUserService {
             TelemetryLogger.log(geCreateUser);
         }
         Profile profile = new Profile(uid);
-        GenieResponse response = GenieResponseBuilder.getSuccessResponse("", Profile.class);
+        GenieResponse<Profile> response = GenieResponseBuilder.getSuccessResponse("", Profile.class);
         response.setResult(profile);
         return response;
     }
-
 
     private String getAnonymousUserId() {
         String anonymousUserQuery = "select u.uid from users u left join profiles p on p.uid=u.uid where p.uid is null and u.uid is not null";
@@ -295,9 +303,11 @@ public class UserServiceImpl extends BaseService implements IUserService {
         params.put("uid", uid);
         params.put("logLevel", "2");
 
+        GenieResponse<Void> response;
+
         UserModel userModel = UserModel.findByUserId(mAppContext.getDBSession(), uid);
         if (userModel == null) {
-            GenieResponse response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_USER, ServiceConstants.ErrorMessage.NO_USER_WITH_SPECIFIED_ID, TAG, Void.class);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_USER, ServiceConstants.ErrorMessage.NO_USER_WITH_SPECIFIED_ID, TAG, Void.class);
             logGEError(response, "setCurrentUser");
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_SET_CURRENT_USER);
             return response;
@@ -320,11 +330,9 @@ public class UserServiceImpl extends BaseService implements IUserService {
             GESessionStart geSessionStart = new GESessionStart(mGameData, userSessionModel.getUserSessionBean(), mAppContext.getLocationInfo().getLocation(), mAppContext.getDeviceInfo().getDeviceID());
             TelemetryLogger.log(geSessionStart);
         }
-        GenieResponse response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
 
+        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
         TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
-
-
         return response;
     }
 
@@ -333,7 +341,6 @@ public class UserServiceImpl extends BaseService implements IUserService {
      */
     @Override
     public GenieResponse<Profile> getCurrentUser() {
-
         String methodName = "getCurrentUser@UserServiceImpl";
         HashMap params = new HashMap();
         params.put("logLevel", "1");
@@ -347,27 +354,25 @@ public class UserServiceImpl extends BaseService implements IUserService {
         }
 
         UserProfileModel userProfileModel = UserProfileModel.find(mAppContext.getDBSession(), userSessionModel.getUserSessionBean().getUid());
-        Profile profile = null;
+        Profile profile;
         if (userProfileModel == null) {
             profile = new Profile(userSessionModel.getUserSessionBean().getUid());
         } else {
             profile = userProfileModel.getProfile();
         }
+
         GenieResponse<Profile> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(profile);
-
         TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
-
-
         return response;
     }
 
     @Override
     public GenieResponse<UserSession> getCurrentUserSession() {
-
         String methodName = "getCurrentUserSession@UserServiceImpl";
         HashMap params = new HashMap();
         params.put("logLevel", "1");
+
         UserSessionModel userSessionModel = UserSessionModel.findUserSession(mAppContext);
 
         //This should not happen if the calling app has set an anonymous user during launch. If they have not, we will create and set an anonymous user as the current user.
@@ -375,9 +380,9 @@ public class UserServiceImpl extends BaseService implements IUserService {
             initAnonymousUser();
             userSessionModel = UserSessionModel.findUserSession(mAppContext);
         }
+
         GenieResponse<UserSession> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(userSessionModel.getUserSessionBean());
-
         return response;
     }
 
@@ -393,7 +398,6 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
     @Override
     public GenieResponse<List<ContentAccess>> getAllContentAccess(ContentAccessFilterCriteria criteria) {
-
         String methodName = "getAllContentAccess@UserServiceImpl";
         HashMap params = new HashMap();
         params.put("logLevel", "1");
@@ -448,25 +452,26 @@ public class UserServiceImpl extends BaseService implements IUserService {
     }
 
     @Override
-    public GenieResponse<Void> setLearnerState(ContentAccessLearnerState contentAccessLearnerState) {
-
+    public GenieResponse<Void> setLearnerState(ContentLearnerState contentLearnerState) {
         String methodName = "setLearnerState@UserServiceImpl";
         HashMap params = new HashMap();
-        params.put("contentIdentifier", contentAccessLearnerState.getContentId());
-        params.put("learnerState", contentAccessLearnerState.getLearnerState());
+        params.put("contentIdentifier", contentLearnerState.getContentId());
+        params.put("learnerState", contentLearnerState.getLearnerState());
         params.put("logLevel", "2");
+
+        GenieResponse<Void> response;
 
         UserSession userSession = getCurrentUserSession().getResult();
         String uid = userSession.getUid();
         if (StringUtil.isNullOrEmpty(uid)) {
-            GenieResponse response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROFILE_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_PROFILE, TAG);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROFILE_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_PROFILE, TAG);
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_SET_CURRENT_USER);
             return response;
         }
 
         ContentAccessModel contentAccessModel = ContentAccessModel.build(mAppContext.getDBSession(),
-                uid, contentAccessLearnerState.getContentId(), GsonUtil.toJson(contentAccessLearnerState.getLearnerState()));
-        ContentAccessModel contentAccessModelInDb = ContentAccessModel.find(mAppContext.getDBSession(), uid, contentAccessLearnerState.getContentId());
+                uid, contentLearnerState.getContentId(), GsonUtil.toJson(contentLearnerState.getLearnerState()));
+        ContentAccessModel contentAccessModelInDb = ContentAccessModel.find(mAppContext.getDBSession(), uid, contentLearnerState.getContentId());
         if (contentAccessModelInDb == null) {
             contentAccessModel.setStatus(ContentAccessStatusType.PLAYED.getValue());
             contentAccessModel.save();
@@ -475,43 +480,47 @@ public class UserServiceImpl extends BaseService implements IUserService {
             contentAccessModel.update();
         }
 
-        GenieResponse genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-        TelemetryLogger.logSuccess(mAppContext, genieResponse, TAG, methodName, params);
-
-        return genieResponse;
+        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        return response;
     }
 
     @Override
-    public GenieResponse<Void> importProfile(ProfileImportRequest importRequest) {
-        GenieResponse<Void> response;
+    public GenieResponse<Void> importProfile(IDBSession dbSession, Map<String, Object> metadata) {
+        ImportContext importContext = new ImportContext(dbSession, metadata);
 
-//        if (!FileUtil.doesFileExists(importRequest.getSourceFilePath())) {
-//            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Profile import failed, file doesn't exists", TAG);
-//            return response;
-//        }
-//
-//        String ext = FileUtil.getFileExtension(importRequest.getSourceFilePath());
-//        if (!ServiceConstants.FileExtension.PROFILE.equals(ext)) {
-//            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Profile import failed, unsupported file extension", TAG);
-//            return response;
-//        } else {
-//            ImportContext importContext = new ImportContext(importRequest.isChildContent(), importRequest.getSourceFilePath(), importRequest.getDestinationFolder());
-//
-//            IChainable importContentSteps = ContentImportStep.initImportContent();
-//            importContentSteps.then(new DeviceMemoryCheck())
-//                    .then(new ExtractEcar())
-//                    .then(new ValidateEcar())
-//                    .then(new ExtractPayloads())
-//                    .then(new EcarCleanUp())
-//                    .then(new AddGeTransferContentImportEvent());
-//            GenieResponse<Void> genieResponse = importContentSteps.execute(mAppContext, importContext);
-////            if (genieResponse.getStatus()) {
-////                EventPublisher.postImportSuccessfull(new ImportStatus(null));
-////            }
-//            return genieResponse;
-//        }
+        ValidateProfileMetadata validateProfileMetadata = new ValidateProfileMetadata();
+        validateProfileMetadata.then(new TransportProfiles())
+                .then(new TransportUser())
+                .then(new TransportSummarizer())
+                .then(new UpdateImportedProfileMetadata())
+                .then(new AddGeTransferProfileImportEvent());
 
-        return null;
+        return validateProfileMetadata.execute(mAppContext, importContext);
     }
+
+    @Override
+    public GenieResponse<Void> exportProfile(List<String> userIds, File destinationFolder, String sourceDBFilePath, String destinationDBFilePath, IDataSource dataSource, Map<String, Object> metadata) {
+        HashMap<String, Object> exportDataMap = new HashMap<>();
+        exportDataMap.put(ServiceConstants.UNCOMPRESSED_SOURCE_LOCATION, FileUtil.getTempLocation(destinationFolder));
+        exportDataMap.put(ServiceConstants.EXPORTED_EPAR_DESTINATION_LOCATION, destinationDBFilePath);
+
+        if (FileUtil.doesFileExists(destinationDBFilePath)) {
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "File already exists.", TAG);
+        }
+
+        ImportContext importContext = new ImportContext(null, metadata);
+
+        CopyDatabase copyDatabase = new CopyDatabase(sourceDBFilePath, destinationDBFilePath, dataSource);
+        copyDatabase.then(new CreateMetadata(destinationDBFilePath, userIds))
+                .then(new CleanupExportedFile(destinationDBFilePath, userIds))
+                .then(new AddGeTransferProfileExportEvent(destinationDBFilePath));
+
+        // TODO: 6/12/2017 - if export failed.
+//                .then(new RemoveExportFile(destinationDBFilePath));
+
+        return copyDatabase.execute(mAppContext, importContext);
+    }
+
 
 }

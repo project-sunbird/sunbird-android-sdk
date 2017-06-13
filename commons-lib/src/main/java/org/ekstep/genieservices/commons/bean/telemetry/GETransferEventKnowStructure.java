@@ -1,7 +1,5 @@
 package org.ekstep.genieservices.commons.bean.telemetry;
 
-import org.ekstep.genieservices.commons.bean.telemetry.GETransferContentMap;
-
 import java.util.List;
 
 /**
@@ -23,10 +21,10 @@ public class GETransferEventKnowStructure {
     private String datatype;
     private int count = -1;
     private long size;
-    private List<GETransferContentMap> contents;
+    private List<GETransferMap> contents;
 
     public GETransferEventKnowStructure(String direction, String datatype, int count,
-                                        long size, List<GETransferContentMap> contents) {
+                                        long size, List<GETransferMap> contents) {
         this.direction = direction;
         this.datatype = datatype;
         this.count = count;
@@ -46,7 +44,7 @@ public class GETransferEventKnowStructure {
         return count;
     }
 
-    public List<GETransferContentMap> contents() {
+    public List<GETransferMap> contents() {
         return contents;
     }
 

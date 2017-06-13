@@ -1,5 +1,6 @@
-package org.ekstep.genieservices.content.bean;
+package org.ekstep.genieservices.commons.bean;
 
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 
 import java.io.File;
@@ -19,11 +20,18 @@ public class ImportContext {
     private File ecarFile;
     private File tmpLocation;
     private File destinationFolder;
-    private Map<String, Object> metadata;
     private List<String> skippedItemsIdentifier;
     private String manifestVersion;
     private List<HashMap<String, Object>> items;
     private boolean isChildContent;
+    private Map<String, Object> metadata;
+    private IDBSession dbSession;
+
+    // Used for import/export
+    public ImportContext(IDBSession dbSession, Map<String, Object> metadata) {
+        this.dbSession = dbSession;
+        this.metadata = metadata;
+    }
 
     public ImportContext(boolean isChildContent, String ecarFilePath, File destinationFolder) {
         this.ecarFile = new File(ecarFilePath);
@@ -76,4 +84,11 @@ public class ImportContext {
         return isChildContent;
     }
 
+    public IDBSession getDBSession() {
+        return dbSession;
+    }
+
+    public void setDbSession(IDBSession dbSession) {
+        this.dbSession = dbSession;
+    }
 }
