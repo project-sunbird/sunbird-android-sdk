@@ -6,12 +6,15 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentDetails;
+import org.ekstep.genieservices.commons.bean.LearnerContentSummaryDetails;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
-import org.ekstep.genieservices.commons.db.contract.LearnerContentSummaryEntry;
+import org.ekstep.genieservices.commons.db.contract.LearnerSummaryEntry;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.profile.db.model.LearnerAssessmentDetailsModel;
+import org.ekstep.genieservices.profile.db.model.LearnerSummaryEventsModel;
+import org.ekstep.genieservices.profile.db.model.LearnerSummaryModel;
 
 import java.util.Locale;
 
@@ -29,7 +32,7 @@ public class TransportSummarizer implements IChainable {
     public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
         //check table exist
         if (isTableExist(importContext.getDBSession(), LearnerAssessmentsEntry.TABLE_NAME) &&
-                isTableExist(importContext.getDBSession(), LearnerContentSummaryEntry.TABLE_NAME)) {
+                isTableExist(importContext.getDBSession(), LearnerSummaryEntry.TABLE_NAME)) {
 
             // Read the learner assessment data from imported DB and insert into GS DB.
             LearnerAssessmentDetailsModel importedLearnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.find(importContext.getDBSession(), "");
@@ -41,7 +44,24 @@ public class TransportSummarizer implements IChainable {
             }
 
             // Read the learner content summary data from imported DB and insert into GS DB.
-            // TODO: 6/9/2017
+            LearnerSummaryEventsModel learnerSummaryEventsModel = LearnerSummaryEventsModel.find(importContext.getDBSession(), "");
+            if (learnerSummaryEventsModel != null) {
+                for (LearnerSummaryModel l : learnerSummaryEventsModel.getAllLearnerSummaryModelList()) {
+                    LearnerContentSummaryDetails learnerContentSummaryDetails = new LearnerContentSummaryDetails();
+                    learnerContentSummaryDetails.setUid(l.getUid());
+                    learnerContentSummaryDetails.setContentId(l.getContentId());
+                    learnerContentSummaryDetails.setAvgts(l.getAvgts());
+                    learnerContentSummaryDetails.setSessions(l.getSessions());
+                    learnerContentSummaryDetails.setTotalts(l.getTotalts());
+                    learnerContentSummaryDetails.setTimespent(l.getTimespent());
+                    learnerContentSummaryDetails.setTimestamp(l.getTimestamp());
+                    learnerContentSummaryDetails.setHierarchyData(l.getHierarchyData());
+                    learnerContentSummaryDetails.setLastUpdated(l.getLastUpdated());
+
+                    LearnerSummaryModel learnerSummaryModel = LearnerSummaryModel.build(appContext.getDBSession(), learnerContentSummaryDetails);
+                    learnerSummaryModel.save();
+                }
+            }
         }
 
         if (nextLink != null) {

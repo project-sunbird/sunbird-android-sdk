@@ -8,7 +8,7 @@ import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
-import org.ekstep.genieservices.commons.db.contract.LearnerContentSummaryEntry;
+import org.ekstep.genieservices.commons.db.contract.LearnerSummaryEntry;
 import org.ekstep.genieservices.commons.db.contract.MetaEntry;
 import org.ekstep.genieservices.commons.db.contract.ProfileEntry;
 import org.ekstep.genieservices.commons.db.contract.UserEntry;
@@ -97,7 +97,7 @@ public class CleanupExportedFile implements IChainable {
         tablesToExclude.add(UserEntry.TABLE_NAME);
         tablesToExclude.add(ProfileEntry.TABLE_NAME);
         tablesToExclude.add(LearnerAssessmentsEntry.TABLE_NAME);
-        tablesToExclude.add(LearnerContentSummaryEntry.TABLE_NAME);
+        tablesToExclude.add(LearnerSummaryEntry.TABLE_NAME);
 
         return tablesToExclude;
     }
@@ -153,7 +153,7 @@ public class CleanupExportedFile implements IChainable {
             public Void perform(IDBSession dbSession) {
                 String commaSeparatedUids = "'" + StringUtil.join("','", userIds) + "'";
                 String delLearnerAssesmentQuery = "DELETE FROM " + LearnerAssessmentsEntry.TABLE_NAME + " WHERE " + LearnerAssessmentsEntry.COLUMN_NAME_UID + "NOT IN(" + commaSeparatedUids + ")";
-                String delLearnerSummaryQuery = "DELETE FROM " + LearnerContentSummaryEntry.TABLE_NAME + " WHERE " + LearnerAssessmentsEntry.COLUMN_NAME_UID + "NOT IN(" + commaSeparatedUids + ")";
+                String delLearnerSummaryQuery = "DELETE FROM " + LearnerSummaryEntry.TABLE_NAME + " WHERE " + LearnerAssessmentsEntry.COLUMN_NAME_UID + "NOT IN(" + commaSeparatedUids + ")";
 
                 dbSession.execute(delLearnerAssesmentQuery);
                 dbSession.execute(delLearnerSummaryQuery);

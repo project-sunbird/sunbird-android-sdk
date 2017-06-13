@@ -61,7 +61,7 @@ public class LearnerSummaryEventsModel implements IReadable {
 
     @Override
     public String filterForRead() {
-        return "";
+        return filterCondition;
     }
 
     @Override

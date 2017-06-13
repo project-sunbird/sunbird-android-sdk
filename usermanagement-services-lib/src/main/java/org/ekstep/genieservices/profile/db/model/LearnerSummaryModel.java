@@ -19,6 +19,8 @@ import java.util.Locale;
 
 public class LearnerSummaryModel implements IReadable, IWritable, IUpdatable {
     private Long id = -1L;
+    private IDBSession dbSession;
+
     private String uid;
     private String contentId;
     private Double avgts;
@@ -28,7 +30,6 @@ public class LearnerSummaryModel implements IReadable, IWritable, IUpdatable {
     private Double timespent;
     private Long timestamp;
     private String hierarchyData;
-    private IDBSession dbSession;
 
     private LearnerSummaryModel(IDBSession dbSession, String uid, String contentId, String hierarchyData) {
         this.uid = uid;
@@ -74,6 +75,14 @@ public class LearnerSummaryModel implements IReadable, IWritable, IUpdatable {
         return model;
     }
 
+    public void save() {
+        dbSession.create(this);
+    }
+
+    public void update() {
+        dbSession.update(this);
+    }
+
     @Override
     public IReadable read(IResultSet cursor) {
         if (cursor != null) {
@@ -93,10 +102,6 @@ public class LearnerSummaryModel implements IReadable, IWritable, IUpdatable {
         this.totalts = cursor.getDouble(5);
         this.lastUpdated = cursor.getLong(6);
         return this;
-    }
-
-    public void update() {
-        dbSession.update(this);
     }
 
     @Override
@@ -167,8 +172,12 @@ public class LearnerSummaryModel implements IReadable, IWritable, IUpdatable {
         return "";
     }
 
-    public void save() {
-        dbSession.create(this);
+    public String getUid() {
+        return uid;
+    }
+
+    public String getContentId() {
+        return contentId;
     }
 
     public Double getAvgts() {
@@ -195,7 +204,7 @@ public class LearnerSummaryModel implements IReadable, IWritable, IUpdatable {
         return timestamp;
     }
 
-    public Long getId() {
-        return this.id;
+    public String getHierarchyData() {
+        return hierarchyData;
     }
 }
