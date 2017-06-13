@@ -53,11 +53,14 @@ public class DownloadServiceImpl implements IDownloadService {
         List<String> currentDownloads = mDownloadQueueManager.getCurrentDownloads();
         if (currentDownloads.size() == 0) {
             DownloadRequest request = mDownloadQueueManager.popDownloadrequest();
-            long downloadId = mDownloadManager.enqueue(request);
-            TelemetryLogger.log(buildGEInteractEvent(InteractionType.TOUCH, ServiceConstants.Telemetry.CONTENT_DOWNLOAD_INITIATE, request.getCoRelation(), request.getIdentifier()));
-            mDownloadQueueManager.updateDownload(request.getIdentifier(), downloadId);
-            mDownloadQueueManager.addToCurrentDownloadQueue(request.getIdentifier());
-            startTrackingProgress(request.getIdentifier(), downloadId);
+            if (request != null) {
+                long downloadId = mDownloadManager.enqueue(request);
+                TelemetryLogger.log(buildGEInteractEvent(InteractionType.TOUCH, ServiceConstants.Telemetry.CONTENT_DOWNLOAD_INITIATE, request.getCoRelation(), request.getIdentifier()));
+                mDownloadQueueManager.updateDownload(request.getIdentifier(), downloadId);
+                mDownloadQueueManager.addToCurrentDownloadQueue(request.getIdentifier());
+                startTrackingProgress(request.getIdentifier(), downloadId);
+            }
+
         } else {
             DownloadRequest request = mDownloadQueueManager.getRequestByIdentifier(currentDownloads.get(0));
             if (request != null) {

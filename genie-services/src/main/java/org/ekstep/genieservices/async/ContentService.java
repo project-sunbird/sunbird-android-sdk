@@ -16,6 +16,7 @@ import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
+import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
@@ -232,6 +233,15 @@ public class ContentService {
             @Override
             public GenieResponse<Void> perform() {
                 return contentService.importContent(contentImportRequest);
+            }
+        });
+    }
+
+    public void importEcar(final EcarImportRequest ecarImportRequest, IResponseHandler<Void> responseHandler) {
+        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return contentService.importEcar(ecarImportRequest);
             }
         });
     }

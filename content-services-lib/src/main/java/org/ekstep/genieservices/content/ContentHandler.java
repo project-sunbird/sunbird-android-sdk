@@ -1160,7 +1160,7 @@ public class ContentHandler {
         for (Map<String, Object> sectionMap : sections) {
             String contentDataList = null;
             if (sectionMap.containsKey("contents")) {
-                contentDataList = (String) sectionMap.get("contents");
+                contentDataList = GsonUtil.toJson(sectionMap.get("contents"));
             }
 
             ContentSearchCriteria contentSearchCriteria = null;
