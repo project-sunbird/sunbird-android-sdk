@@ -18,7 +18,6 @@ import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchFilter;
-import org.ekstep.genieservices.commons.bean.Display;
 import org.ekstep.genieservices.commons.bean.FilterValue;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MasterData;
@@ -1229,7 +1228,7 @@ public class ContentHandler {
             Section section = new Section();
             section.setResponseMessageId((String) sectionMap.get("resmsgid"));
             section.setApiId((String) sectionMap.get("apiid"));
-            section.setDisplay(GsonUtil.fromMap((Map) sectionMap.get("display"), Display.class));
+            section.setSectionName(((Map)((Map) sectionMap.get("display")).get("Name")).get("en").toString());
 
             if (!StringUtil.isNullOrEmpty(contentDataList)) {
                 Type type = new TypeToken<List<ContentData>>() {

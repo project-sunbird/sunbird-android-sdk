@@ -21,7 +21,7 @@ public class ChildContentRequest {
     public static class Builder {
         private String contentId;
 
-        public ChildContentRequest.Builder contentId(String contentId) {
+        public Builder forContent(String contentId) {
             if (StringUtil.isNullOrEmpty(contentId)) {
                 throw new IllegalArgumentException("contentId required.");
             }

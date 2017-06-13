@@ -12,7 +12,7 @@ public class Section implements Serializable {
 
     private String responseMessageId;
     private String apiId;
-    private Display display;
+    private String sectionName;
     private List<ContentData> contentDataList;
     private ContentSearchCriteria contentSearchCriteria;
 
@@ -24,20 +24,20 @@ public class Section implements Serializable {
         this.responseMessageId = responseMessageId;
     }
 
+    public String getSectionName() {
+        return sectionName;
+    }
+
+    public void setSectionName(String sectionName) {
+        this.sectionName = sectionName;
+    }
+
     public String getApiId() {
         return apiId;
     }
 
     public void setApiId(String apiId) {
         this.apiId = apiId;
-    }
-
-    public Display getDisplay() {
-        return display;
-    }
-
-    public void setDisplay(Display display) {
-        this.display = display;
     }
 
     public List<ContentData> getContentDataList() {
