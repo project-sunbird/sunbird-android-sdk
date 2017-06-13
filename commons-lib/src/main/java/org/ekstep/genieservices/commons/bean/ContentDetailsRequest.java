@@ -38,7 +38,7 @@ public class ContentDetailsRequest {
 
         public Builder contentId(String contentId) {
             if (StringUtil.isNullOrEmpty(contentId)) {
-                throw new IllegalArgumentException("Illegal contentId");
+                throw new IllegalArgumentException("contentId required.");
             }
             this.contentId = contentId;
             return this;

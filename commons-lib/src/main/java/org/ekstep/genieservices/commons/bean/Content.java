@@ -22,6 +22,7 @@ public class Content implements Serializable {
     private List<ContentFeedback> contentFeedback;
     private ContentAccess contentAccess;
     private List<Content> children;
+    private List<HierarchyInfo> childrenHierarchyInfo;
 
     public String getIdentifier() {
         return identifier;
@@ -110,4 +111,21 @@ public class Content implements Serializable {
     public void setContentAccess(ContentAccess contentAccess) {
         this.contentAccess = contentAccess;
     }
+
+    public List<Content> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<Content> children) {
+        this.children = children;
+    }
+
+    public List<HierarchyInfo> getChildrenHierarchyInfo() {
+        return childrenHierarchyInfo;
+    }
+
+    public void setChildrenHierarchyInfo(List<HierarchyInfo> childrenHierarchyInfo) {
+        this.childrenHierarchyInfo = childrenHierarchyInfo;
+    }
+
 }

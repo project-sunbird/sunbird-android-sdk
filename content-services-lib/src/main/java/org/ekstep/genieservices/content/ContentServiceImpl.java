@@ -10,6 +10,7 @@ import org.ekstep.genieservices.IContentService;
 import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
@@ -26,6 +27,7 @@ import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
+import org.ekstep.genieservices.commons.bean.HierarchyInfo;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
@@ -160,44 +162,60 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<List<Content>> getChildContents(String contentId, int levelAndState) {
+    public GenieResponse<Content> getChildContents(ChildContentRequest childContentRequest) {
         // TODO: Telemetry logger
         String methodName = "getChildContents@ContentServiceImpl";
 
-        GenieResponse<List<Content>> response;
-        ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), contentId);
+        List<HierarchyInfo> hierarchyInfoList = new ArrayList<>();
+        GenieResponse<Content> response;
+        ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), childContentRequest.getContentId());
         if (contentModel == null) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, "No content found for identifier = " + contentId, TAG);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, "No content found for identifier = " + childContentRequest.getContentId(), TAG);
             return response;
         }
 
-        List<Content> childContentList = new ArrayList<>();
+        //check and fetch all childrens of this content
+        List<Content> childrenList = checkAndFetchChildrenOfContent(contentModel, hierarchyInfoList);
 
-        switch (levelAndState) {
-            case ContentConstants.ChildContents.FIRST_LEVEL_ALL:
-                if (ContentHandler.hasChildren(contentModel.getLocalData())) {
-                    List<ContentModel> contentModelListInDB = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), contentModel.getLocalData(), ContentConstants.ChildContents.FIRST_LEVEL_ALL);
-                    for (ContentModel cm : contentModelListInDB) {
-                        Content c = ContentHandler.convertContentModelToBean(cm);
-                        childContentList.add(c);
-                    }
+        Content content = ContentHandler.convertContentModelToBean(contentModel);
+        if (childrenList != null) {
+            content.setChildren(childrenList);
+        }
+        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        response.setResult(content);
+        return response;
+    }
+
+    private List<Content> checkAndFetchChildrenOfContent(ContentModel contentModel, List<HierarchyInfo> hierarchyInfoList) {
+        List<Content> contentList = new ArrayList<>();
+
+        // check if the content model has immediate children
+        if (ContentHandler.hasChildren(contentModel.getLocalData())) {
+
+            //add hierarchy info
+            HierarchyInfo hierarchyInfo = new HierarchyInfo();
+            hierarchyInfo.setContentType(contentModel.getContentType());
+            hierarchyInfo.setIdentifier(contentModel.getIdentifier());
+            hierarchyInfoList.add(hierarchyInfo);
+
+            //get all the children
+            List<ContentModel> contentModelList = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), contentModel.getLocalData(), ContentConstants.ChildContents.FIRST_LEVEL_ALL);
+
+            //check for null and size more than 0
+            if (contentModelList != null) {
+                for (ContentModel perContentModel : contentModelList) {
+                    Content perContent = ContentHandler.convertContentModelToBean(perContentModel);
+                    perContent.setChildrenHierarchyInfo(hierarchyInfoList);
+                    //add this content to the list
+                    contentList.add(perContent);
+
+                    //recurse again on this content
+                    checkAndFetchChildrenOfContent(perContentModel, hierarchyInfoList);
                 }
-                break;
-
-            case ContentConstants.ChildContents.FIRST_LEVEL_DOWNLOADED:
-//  TODO:              childContentList = populateChildren(content, childContents);
-                break;
-
-            case ContentConstants.ChildContents.FIRST_LEVEL_SPINE:
-//   TODO:             childContentList = populateChildren(content, childContents);
-                break;
-
-            default:
+            }
         }
 
-        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-        response.setResult(childContentList);
-        return response;
+        return contentList;
     }
 
     @Override
