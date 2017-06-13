@@ -67,7 +67,7 @@ public class LearnerAssessmentSummaryModel implements IReadable {
         learnerAssessmentSummary.setUid(this.uid);
 
         this.contentId = cursor.getString(1);
-        learnerAssessmentSummary.setContent_id(this.contentId);
+        learnerAssessmentSummary.setContentId(this.contentId);
 
         this.noOfQuestions = cursor.getInt(2);
         learnerAssessmentSummary.setNoOfQuestions(this.noOfQuestions);

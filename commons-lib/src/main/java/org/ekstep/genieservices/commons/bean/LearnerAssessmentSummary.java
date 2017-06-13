@@ -1,13 +1,15 @@
 package org.ekstep.genieservices.commons.bean;
 
+import java.io.Serializable;
+
 /**
  * Created on 6/6/17.
  * shriharsh
  */
 
-public class LearnerAssessmentSummary {
+public class LearnerAssessmentSummary implements Serializable {
     private String uid;
-    private String content_id;
+    private String contentId;
     private int noOfQuestions;
     private int correctAnswers;
     private Double totalTimespent;
@@ -20,12 +22,12 @@ public class LearnerAssessmentSummary {
         this.uid = uid;
     }
 
-    public String getContent_id() {
-        return content_id;
+    public String getContentId() {
+        return contentId;
     }
 
-    public void setContent_id(String content_id) {
-        this.content_id = content_id;
+    public void setContentId(String contentId) {
+        this.contentId = contentId;
     }
 
     public int getNoOfQuestions() {

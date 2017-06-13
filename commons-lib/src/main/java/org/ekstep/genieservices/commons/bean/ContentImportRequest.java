@@ -12,11 +12,13 @@ public class ContentImportRequest {
     private boolean isChildContent;
     private String destinationFolder;
     private List<String> contentIds;
+    private List<CoRelation> coRelation;
 
-    private ContentImportRequest(boolean isChildContent, String destinationFolder, List<String> contentIds) {
+    private ContentImportRequest(boolean isChildContent, String destinationFolder, List<String> contentIds, List<CoRelation> coRelation) {
         this.isChildContent = isChildContent;
         this.destinationFolder = destinationFolder;
         this.contentIds = contentIds;
+        this.coRelation = coRelation;
     }
 
     public boolean isChildContent() {
@@ -31,10 +33,15 @@ public class ContentImportRequest {
         return contentIds;
     }
 
+    public List<CoRelation> getCoRelation() {
+        return coRelation;
+    }
+
     public static class Builder {
         private boolean isChildContent;
         private String destinationFolder;
         private List<String> contentIds;
+        private List<CoRelation> coRelation;
 
         /**
          * Method to indicate that the file being imported is a child content
@@ -63,6 +70,14 @@ public class ContentImportRequest {
             return this;
         }
 
+        /**
+         * CoRelation of content.
+         */
+        public Builder coRelation(List<CoRelation> coRelation) {
+            this.coRelation = coRelation;
+            return this;
+        }
+
         public ContentImportRequest build() {
             if (destinationFolder == null) {
                 throw new IllegalStateException("To folder required.");
@@ -72,7 +87,7 @@ public class ContentImportRequest {
                 throw new IllegalStateException("ContentIds required.");
             }
 
-            return new ContentImportRequest(isChildContent, destinationFolder, contentIds);
+            return new ContentImportRequest(isChildContent, destinationFolder, contentIds, coRelation);
         }
     }
 }

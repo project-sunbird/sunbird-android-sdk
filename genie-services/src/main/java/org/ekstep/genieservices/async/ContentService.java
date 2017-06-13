@@ -4,6 +4,7 @@ import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.IContentFeedbackService;
 import org.ekstep.genieservices.IContentService;
 import org.ekstep.genieservices.commons.IResponseHandler;
+import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentCriteria;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
@@ -88,26 +89,14 @@ public class ContentService {
      * On failing to fetch the child content details, the response will return status as FALSE with the following error code
      * <p>NO_DATA_FOUND
      *
-     * @param contentIdentifier - identifier of a content
-     * @param levelAndState     - Below are the int flags to be used
-     *                          <p>
-     *                          <p>
-     *                          0 - Downloaded or spine both
-     *                          <p>
-     *                          <p>
-     *                          1 - All descendant downloaded contents
-     *                          <p>
-     *                          <p>
-     *                          2 - All descendant spine contents
-     *                          <p>
-     *                          <p>
-     * @return {@link List<Content>}
+     * @param childContentRequest - {@link ChildContentRequest}
+     * @return {@link GenieResponse<Content>}
      */
-    public void getChildContents(final String contentIdentifier, final int levelAndState, IResponseHandler<Content> responseHandler) {
+    public void getChildContents(final ChildContentRequest childContentRequest, IResponseHandler<Content> responseHandler) {
         new AsyncHandler<Content>(responseHandler).execute(new IPerformable<Content>() {
             @Override
             public GenieResponse<Content> perform() {
-                return contentService.getChildContents(contentIdentifier, levelAndState);
+                return contentService.getChildContents(childContentRequest);
             }
         });
     }

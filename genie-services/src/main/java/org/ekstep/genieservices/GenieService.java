@@ -15,7 +15,6 @@ import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.config.ConfigServiceImpl;
 import org.ekstep.genieservices.content.ContentFeedbackServiceImpl;
 import org.ekstep.genieservices.content.ContentServiceImpl;
-import org.ekstep.genieservices.content.DownloadQueueListener;
 import org.ekstep.genieservices.content.LanguageServiceImpl;
 import org.ekstep.genieservices.importexport.FileExporter;
 import org.ekstep.genieservices.importexport.FileImporter;
@@ -75,7 +74,6 @@ public class GenieService {
             Logger.init(new AndroidLogger());
             ContentPlayer.init(applicationContext.getParams().getQualifier());
             TelemetryLogger.init(new TelemetryServiceImpl(applicationContext, new UserServiceImpl(applicationContext)));
-            DownloadQueueListener.init(applicationContext, new DownloadServiceImpl(applicationContext));
             //initializing event bus for Telemetry
             TelemetryListener.init(applicationContext);
             SummaryListener.init(applicationContext);

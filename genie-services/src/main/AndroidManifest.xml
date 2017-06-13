@@ -22,6 +22,10 @@
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
             </intent-filter>
         </receiver>
+        <service
+            android:name="org.ekstep.genieservices.commons.download.ContentImportService"
+            android:enabled="true"
+            android:exported="true" />
     </application>
 
 </manifest>
