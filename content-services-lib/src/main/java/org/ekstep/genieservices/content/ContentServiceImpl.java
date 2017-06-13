@@ -38,7 +38,7 @@ import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
-import org.ekstep.genieservices.commons.download.DownloadService;
+import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
@@ -58,6 +58,8 @@ import org.ekstep.genieservices.content.network.RecommendedContentAPI;
 import org.ekstep.genieservices.content.network.RelatedContentAPI;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
+import java.io.File;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -88,7 +90,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         this.userService = userService;
         this.contentFeedbackService = contentFeedbackService;
         this.configService = configService;
-        this.downloadService  = downloadService;
+        this.downloadService = downloadService;
     }
 
     @Override
@@ -631,7 +633,6 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 interActionType(InteractionType.TOUCH).
                 build();
         TelemetryLogger.log(geInteract);
-
     }
 
     private void buildSuccessEvent() {
@@ -642,6 +643,5 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 build();
         TelemetryLogger.log(geInteract);
     }
-
 
 }

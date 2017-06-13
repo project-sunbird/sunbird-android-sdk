@@ -3,24 +3,12 @@ package org.ekstep.genieservices.commons.download;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.Build;
-import android.os.ParcelFileDescriptor;
-import android.provider.MediaStore;
 
 import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.IDownloadService;
 import org.ekstep.genieservices.commons.IDownloadManager;
 import org.ekstep.genieservices.commons.bean.DownloadProgress;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
-import org.ekstep.genieservices.commons.bean.DownloadResponse;
-import org.ekstep.genieservices.commons.utils.FileUtil;
-import org.ekstep.genieservices.commons.utils.Logger;
-import org.ekstep.genieservices.commons.download.DownloadQueueManager;
-import org.ekstep.genieservices.eventbus.EventPublisher;
-
-import java.io.FileNotFoundException;
 
 /**
  * Created on 17/5/17.

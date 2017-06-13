@@ -2,8 +2,6 @@ package org.ekstep.genieservices.commons.bean;
 
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
-import java.util.List;
-
 /**
  * Created on 6/6/2017.
  *
