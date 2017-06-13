@@ -7,7 +7,7 @@ import org.ekstep.genieservices.commons.db.ServiceDbHelper;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.cache.PreferenceWrapper;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.commons.download.DownloadManager;
+import org.ekstep.genieservices.commons.download.AndroidDownloadManager;
 import org.ekstep.genieservices.commons.network.AndroidHttpClient;
 import org.ekstep.genieservices.commons.network.AndroidNetworkConnectivity;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
@@ -34,14 +34,14 @@ public class AndroidAppContext extends AppContext<Context> {
 
     public static AppContext buildAppContext(Context context, String appPackage) {
         AndroidAppContext appContext = new AndroidAppContext(context, appPackage);
-        appContext.setParams(new BuildParams(appPackage));
+        appContext.setParams(new BuildParams(context, appPackage));
         appContext.setDBSession(ServiceDbHelper.getGSDBSession(appContext));
         appContext.setConnectionInfo(new AndroidNetworkConnectivity(appContext));
         appContext.setHttpClient(new AndroidHttpClient(new BasicAuthenticator(appContext.getParams().getUserName(), appContext.getParams().getPassword())));
         appContext.setKeyValueStore(new PreferenceWrapper(context, Constants.SHARED_PREFERENCE_NAME));
         appContext.setDeviceInfo(new DeviceInfo(context));
         appContext.setLocationInfo(new LocationInfo(context));
-        appContext.setDownloadManager(new DownloadManager(context));
+        appContext.setDownloadManager(new AndroidDownloadManager(context));
         return appContext;
     }
 

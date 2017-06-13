@@ -1,6 +1,7 @@
 package org.ekstep.genieservices.commons;
 
 import org.ekstep.genieservices.commons.bean.DownloadProgress;
+import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.Request;
 
 /**
@@ -9,9 +10,17 @@ import org.ekstep.genieservices.commons.bean.Request;
 
 public interface IDownloadManager {
 
-    long enqueue(Request request);
+    final int UNKNOWN = -1;
+    final int NOT_STARTED = 0;
+    final int STARTED = 1;
+    final int COMPLETED = 2;
+    final int FAILED = 3;
 
-    DownloadProgress query(long downloadId);
+    long enqueue(DownloadRequest request);
+
+    DownloadProgress getProgress(long downloadId);
 
     void cancel(long downloadId);
+
+    String getDownloadPath(long downloadId);
 }
