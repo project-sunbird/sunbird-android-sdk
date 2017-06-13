@@ -7,8 +7,9 @@ import org.ekstep.genieservices.commons.AndroidAppContext;
 import org.ekstep.genieservices.commons.AndroidLogger;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IDeviceInfo;
+import org.ekstep.genieservices.commons.IDownloadManager;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
-import org.ekstep.genieservices.commons.download.DownloadService;
+import org.ekstep.genieservices.commons.download.DownloadServiceImpl;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.config.ConfigServiceImpl;
@@ -72,7 +73,7 @@ public class GenieService {
             Logger.init(new AndroidLogger());
             ContentPlayer.init(applicationContext.getParams().getQualifier());
             TelemetryLogger.init(new TelemetryServiceImpl(applicationContext, new UserServiceImpl(applicationContext)));
-            DownloadQueueListener.init(applicationContext, new DownloadService(applicationContext));
+            DownloadQueueListener.init(applicationContext, new DownloadServiceImpl(applicationContext));
             //initializing event bus for Telemetry
             TelemetryListener.init(applicationContext);
             SummaryListener.init(applicationContext);
@@ -182,7 +183,7 @@ public class GenieService {
      */
     public IContentService getContentService() {
         if (mContentService == null) {
-            mContentService = new ContentServiceImpl(mAppContext, getUserProfileService(), getContentFeedbackService(), getConfigService());
+            mContentService = new ContentServiceImpl(mAppContext, getUserProfileService(), getContentFeedbackService(), getConfigService(), getDownloadService());
         }
         return mContentService;
     }
@@ -280,8 +281,11 @@ public class GenieService {
      *
      * @return
      */
-    public DownloadService getDownloadService() {
-        return new DownloadService(mAppContext);
+    public IDownloadService getDownloadService() {
+        return new DownloadServiceImpl(mAppContext);
     }
 
+    public IDownloadManager getDownloadManager() {
+        return mAppContext.getDownloadManager();
+    }
 }

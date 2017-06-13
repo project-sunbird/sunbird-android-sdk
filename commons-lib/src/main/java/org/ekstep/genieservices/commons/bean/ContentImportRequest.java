@@ -13,14 +13,12 @@ import java.util.List;
 public class ContentImportRequest {
 
     private boolean isChildContent;
-    private File destinationFolder;
-    private String sourceFilePath;
+    private String destinationFolder;
     private List<String> contentIds;
 
-    public ContentImportRequest(boolean isChildContent, File destinationFolder, String sourceFilePath, List<String> contentIds) {
+    private ContentImportRequest(boolean isChildContent, String destinationFolder, List<String> contentIds) {
         this.isChildContent = isChildContent;
         this.destinationFolder = destinationFolder;
-        this.sourceFilePath = sourceFilePath;
         this.contentIds = contentIds;
     }
 
@@ -28,12 +26,8 @@ public class ContentImportRequest {
         return isChildContent;
     }
 
-    public File getDestinationFolder() {
+    public String getDestinationFolder() {
         return destinationFolder;
-    }
-
-    public String getSourceFilePath() {
-        return sourceFilePath;
     }
 
     public List<String> getContentIds() {
@@ -42,33 +36,21 @@ public class ContentImportRequest {
 
     public static class Builder {
         private boolean isChildContent;
-        private File destinationFolder;
-        private String sourceFilePath;
+        private String destinationFolder;
         private List<String> contentIds;
 
         /**
-         * @param isChildContent Should be True if importing nested content of any collection/textbook else False.
+         * Method to indicate that the file being imported is a child content
          */
-        public Builder isChildContent(boolean isChildContent) {
-            this.isChildContent = isChildContent;
-            return this;
-        }
-
-        /**
-         * Content file path which needs to import
-         */
-        public Builder fromFilePath(String filePath) {
-            if (StringUtil.isNullOrEmpty(filePath)) {
-                throw new IllegalArgumentException("Illegal filePath: " + filePath);
-            }
-            this.sourceFilePath = filePath;
+        public Builder childContent() {
+            this.isChildContent = true;
             return this;
         }
 
         /**
          * Destination folder where content will import.
          */
-        public Builder toFolder(File toFolder) {
+        public Builder toFolder(String toFolder) {
             if (toFolder == null) {
                 throw new IllegalArgumentException("Illegal toFolder");
             }
@@ -89,11 +71,11 @@ public class ContentImportRequest {
                 throw new IllegalStateException("To folder required.");
             }
 
-            if (StringUtil.isNullOrEmpty(sourceFilePath) && contentIds == null) {
-                throw new IllegalStateException("Provide either fromFilePath or contentIds.");
+            if (contentIds == null || contentIds.size() == 0) {
+                throw new IllegalStateException("ContentIds required.");
             }
 
-            return new ContentImportRequest(isChildContent, destinationFolder, sourceFilePath, contentIds);
+            return new ContentImportRequest(isChildContent, destinationFolder, contentIds);
         }
     }
 }

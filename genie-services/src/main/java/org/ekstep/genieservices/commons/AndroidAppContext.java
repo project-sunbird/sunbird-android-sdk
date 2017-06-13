@@ -7,13 +7,12 @@ import org.ekstep.genieservices.commons.db.ServiceDbHelper;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.cache.PreferenceWrapper;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.commons.download.DownloadManager;
+import org.ekstep.genieservices.commons.download.AndroidDownloadManager;
 import org.ekstep.genieservices.commons.network.AndroidHttpClient;
 import org.ekstep.genieservices.commons.network.AndroidNetworkConnectivity;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.network.IHttpClient;
 import org.ekstep.genieservices.commons.network.auth.BasicAuthenticator;
-import org.ekstep.genieservices.telemetry.event.TelemetryListener;
 
 /**
  * Created on 18/4/17.
@@ -42,7 +41,7 @@ public class AndroidAppContext extends AppContext<Context> {
         appContext.setKeyValueStore(new PreferenceWrapper(context, Constants.SHARED_PREFERENCE_NAME));
         appContext.setDeviceInfo(new DeviceInfo(context));
         appContext.setLocationInfo(new LocationInfo(context));
-        appContext.setDownloadManager(new DownloadManager(context));
+        appContext.setDownloadManager(new AndroidDownloadManager(context));
         return appContext;
     }
 

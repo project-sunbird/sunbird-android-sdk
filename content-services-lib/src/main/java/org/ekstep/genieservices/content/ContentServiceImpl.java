@@ -6,6 +6,7 @@ import org.ekstep.genieservices.BaseService;
 import org.ekstep.genieservices.IConfigService;
 import org.ekstep.genieservices.IContentFeedbackService;
 import org.ekstep.genieservices.IContentService;
+import org.ekstep.genieservices.IDownloadService;
 import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
@@ -21,6 +22,7 @@ import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
+import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
@@ -31,7 +33,6 @@ import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
-import org.ekstep.genieservices.commons.download.DownloadService;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
@@ -53,6 +54,7 @@ import org.ekstep.genieservices.content.network.RecommendedContentAPI;
 import org.ekstep.genieservices.content.network.RelatedContentAPI;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -71,17 +73,19 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     private IUserService userService;
     private IContentFeedbackService contentFeedbackService;
     private IConfigService configService;
+    private IDownloadService downloadService;
 
     public ContentServiceImpl(AppContext appContext) {
         super(appContext);
     }
 
-    public ContentServiceImpl(AppContext appContext, IUserService userService, IContentFeedbackService contentFeedbackService, IConfigService configService) {
+    public ContentServiceImpl(AppContext appContext, IUserService userService, IContentFeedbackService contentFeedbackService, IConfigService configService, IDownloadService downloadService) {
         super(appContext);
 
         this.userService = userService;
         this.contentFeedbackService = contentFeedbackService;
         this.configService = configService;
+        this.downloadService  = downloadService;
     }
 
     @Override
@@ -499,9 +503,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<Void> importContent(ContentImportRequest importRequest) {
+    public GenieResponse<Void> importEcar(EcarImportRequest importRequest) {
 
-        String method = "importContent@ContentServiceImpl";
+        String method = "importEcar@ContentServiceImpl";
         Map<String, Object> params = new HashMap<>();
         params.put("importContent", importRequest.getSourceFilePath());
         params.put("isChildContent", importRequest.isChildContent());
@@ -509,77 +513,84 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         GenieResponse<Void> response;
 
-        if (!StringUtil.isNullOrEmpty(importRequest.getSourceFilePath())) {   // Import from file
-            if (!FileUtil.doesFileExists(importRequest.getSourceFilePath())) {
-                response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "content import failed, file doesn't exists", TAG);
-                return response;
-            }
+        if (!FileUtil.doesFileExists(importRequest.getSourceFilePath())) {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.ECAR_NOT_FOUND, "content import failed, file doesn't exist", TAG);
+            return response;
+        }
 
-            String ext = FileUtil.getFileExtension(importRequest.getSourceFilePath());
-            if (!ServiceConstants.FileExtension.CONTENT.equals(ext)) {
-                response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "content import failed, unsupported file extension", TAG);
-                return response;
-            } else {
-                ImportContext importContext = new ImportContext(importRequest.isChildContent(), importRequest.getSourceFilePath(), importRequest.getDestinationFolder());
+        String ext = FileUtil.getFileExtension(importRequest.getSourceFilePath());
+        if (!ServiceConstants.FileExtension.CONTENT.equals(ext)) {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "content import failed, unsupported file extension", TAG);
+            return response;
+        } else {
+            ImportContext importContext = new ImportContext(importRequest.isChildContent(), importRequest.getSourceFilePath(), new File(importRequest.getDestinationFolder()));
 
+            // TODO: 6/8/2017 - Add identifier in the GE_INTERACT event
+            buildInitiateEvent();
+
+            IChainable importContentSteps = ContentImportStep.initImportContent();
+            importContentSteps.then(new DeviceMemoryCheck())
+                    .then(new ExtractEcar())
+                    .then(new ValidateEcar())
+                    .then(new ExtractPayloads())
+                    .then(new EcarCleanUp())
+                    .then(new AddGeTransferContentImportEvent());
+            GenieResponse<Void> genieResponse = importContentSteps.execute(mAppContext, importContext);
+            if (genieResponse.getStatus()) {
                 // TODO: 6/8/2017 - Add identifier in the GE_INTERACT event
-                buildInitiateEvent();
-
-                IChainable importContentSteps = ContentImportStep.initImportContent();
-                importContentSteps.then(new DeviceMemoryCheck())
-                        .then(new ExtractEcar())
-                        .then(new ValidateEcar())
-                        .then(new ExtractPayloads())
-                        .then(new EcarCleanUp())
-                        .then(new AddGeTransferContentImportEvent());
-                GenieResponse<Void> genieResponse = importContentSteps.execute(mAppContext, importContext);
-                if (genieResponse.getStatus()) {
-                    // TODO: 6/8/2017 - Add identifier in the GE_INTERACT event
-                    buildSuccessEvent();
+                buildSuccessEvent();
 //                EventPublisher.postImportSuccessfull(new ImportStatus(null));
 
-                }
-                return genieResponse;
             }
-        } else {    // Download and then import
-            DownloadService downloadService = new DownloadService(mAppContext);
+            return genieResponse;
+        }
+    }
 
-            ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, ContentHandler.getSearchRequest(importRequest.getContentIds()));
-            GenieResponse apiResponse = contentSearchAPI.post();
-            if (apiResponse.getStatus()) {
-                String body = apiResponse.getResult().toString();
+    @Override
+    public GenieResponse<Void> importContent(ContentImportRequest importRequest) {
 
-                LinkedTreeMap map = GsonUtil.fromJson(body, LinkedTreeMap.class);
-                LinkedTreeMap result = (LinkedTreeMap) map.get("result");
+        String method = "importContent@ContentServiceImpl";
+        Map<String, Object> params = new HashMap<>();
+        params.put("isChildContent", importRequest.isChildContent());
+        params.put("logLevel", "2");
 
-                List<Map<String, Object>> contentDataList = null;
-                if (result.containsKey("content")) {
-                    contentDataList = (List<Map<String, Object>>) result.get("content");
-                }
+        GenieResponse<Void> response;
 
-                if (contentDataList != null) {
-                    DownloadRequest[] downloadRequests = new DownloadRequest[contentDataList.size()];
-                    for (int i = 0; i < contentDataList.size(); i++) {
-                        Map dataMap = contentDataList.get(i);
-                        String downloadUrl = ContentHandler.getDownloadUrl(dataMap);
-                        if (downloadUrl != null) {
-                            downloadUrl = downloadUrl.trim();
-                        }
+        ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, ContentHandler.getSearchRequest(importRequest.getContentIds()));
+        GenieResponse apiResponse = contentSearchAPI.post();
+        if (apiResponse.getStatus()) {
+            String body = apiResponse.getResult().toString();
 
-                        if (!StringUtil.isNullOrEmpty(downloadUrl) && ServiceConstants.FileExtension.CONTENT.equalsIgnoreCase(FileUtil.getFileExtension(downloadUrl))) {
-                            String contentIdentifier = ContentHandler.readIdentifier(dataMap);
-                            DownloadRequest downloadRequest = new DownloadRequest(contentIdentifier, downloadUrl,
-                                    ContentConstants.MimeType.ECAR, importRequest.getDestinationFolder(), importRequest.isChildContent());
-                            downloadRequests[i] = downloadRequest;
-                        }
+            LinkedTreeMap map = GsonUtil.fromJson(body, LinkedTreeMap.class);
+            LinkedTreeMap result = (LinkedTreeMap) map.get("result");
+
+            List<Map<String, Object>> contentDataList = null;
+            if (result.containsKey("content")) {
+                contentDataList = (List<Map<String, Object>>) result.get("content");
+            }
+
+            if (contentDataList != null) {
+                DownloadRequest[] downloadRequests = new DownloadRequest[contentDataList.size()];
+                for (int i = 0; i < contentDataList.size(); i++) {
+                    Map dataMap = contentDataList.get(i);
+                    String downloadUrl = ContentHandler.getDownloadUrl(dataMap);
+                    if (downloadUrl != null) {
+                        downloadUrl = downloadUrl.trim();
                     }
 
-                    downloadService.enqueue(downloadRequests);
+                    if (!StringUtil.isNullOrEmpty(downloadUrl) && ServiceConstants.FileExtension.CONTENT.equalsIgnoreCase(FileUtil.getFileExtension(downloadUrl))) {
+                        String contentIdentifier = ContentHandler.readIdentifier(dataMap);
+                        DownloadRequest downloadRequest = new DownloadRequest(contentIdentifier, downloadUrl,
+                                ContentConstants.MimeType.ECAR, importRequest.getDestinationFolder(), importRequest.isChildContent());
+                        downloadRequests[i] = downloadRequest;
+                    }
                 }
-            }
 
-            return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+                downloadService.enqueue(downloadRequests);
+            }
         }
+
+        return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
     }
 
     private void buildInitiateEvent() {

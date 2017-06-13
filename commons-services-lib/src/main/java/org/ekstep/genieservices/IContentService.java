@@ -9,6 +9,7 @@ import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
+import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
@@ -169,9 +170,11 @@ public interface IContentService {
      * On failing to import the content, the response will be with return status as FALSE and wih the following error
      * <p>INVALID_FILE
      *
-     * @param contentImportRequest - {@link ContentImportRequest}
+     * @param ecarImportRequest - {@link ContentImportRequest}
      * @return - {@link GenieResponse<Void>}
      */
+    GenieResponse<Void> importEcar(EcarImportRequest ecarImportRequest);
+
     GenieResponse<Void> importContent(ContentImportRequest contentImportRequest);
 
 }

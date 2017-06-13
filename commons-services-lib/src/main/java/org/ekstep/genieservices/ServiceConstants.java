@@ -42,9 +42,6 @@ public interface ServiceConstants {
         String LAST_SYNC_TIME = "lastSyncTime";
         String SYNC_FILE_SIZE = "SYNC_FILE_SIZE";
 
-        //Download queue
-        String DOWNLOAD_QUEUE = "download_queue";
-
         //Partner
         String KEY_PARTNER_ID = "partnerid";
         String KEY_ACTIVE_PARTNER_ID = "partner.activeid";
@@ -114,6 +111,7 @@ public interface ServiceConstants {
         //Content
         String NO_DATA_FOUND = "NO_DATA_FOUND";
         String INVALID_FILE = "INVALID_FILE";
+        String ECAR_NOT_FOUND = "ECAR_NOT_FOUND";
 
     }
 
