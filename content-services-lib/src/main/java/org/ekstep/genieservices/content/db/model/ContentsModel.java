@@ -30,7 +30,7 @@ public class ContentsModel implements IReadable {
         ContentsModel contentsModel = new ContentsModel(dbSession, filter);
         dbSession.read(contentsModel);
 
-        if (contentsModel.getContentModelList() == null) {
+        if (contentsModel.contentModelList == null) {
             return null;
         } else {
             return contentsModel;

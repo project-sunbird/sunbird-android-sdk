@@ -293,6 +293,10 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         return contentType;
     }
 
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
     public String getLocalLastUpdatedTime() {
         return localLastUpdatedTime;
     }
