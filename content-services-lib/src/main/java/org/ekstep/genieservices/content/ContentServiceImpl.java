@@ -12,6 +12,7 @@ import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.IDownloadManager;
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentData;
@@ -25,6 +26,7 @@ import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
+import org.ekstep.genieservices.commons.bean.DownloadProgress;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GameData;
@@ -585,11 +587,24 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             if (genieResponse.getStatus()) {
                 String identifier=importContext.getIdentifiers()!=null?importContext.getIdentifiers().get(0):"";
                 buildSuccessEvent(identifier);
-                EventPublisher.postContentImportSuccessfull(new ContentImportResponse(identifier));
+                EventPublisher.postContentImportSuccessfull(new ContentImportResponse(identifier, 2));
 
             }
             return genieResponse;
         }
+    }
+
+    @Override
+    public GenieResponse<ContentImportResponse> getImportStatus(String identifier) {
+        DownloadRequest request = downloadService.getDownloadRequest(identifier);
+        int status = -1;
+        if (request != null) {
+            status = request.getDownloadId() == -1 ? 0 : 1;
+        }
+        ContentImportResponse contentImportResponse = new ContentImportResponse(identifier, status);
+        GenieResponse<ContentImportResponse> response = GenieResponseBuilder.getSuccessResponse("", ContentImportResponse.class);
+        response.setResult(contentImportResponse);
+        return response;
     }
 
     @Override

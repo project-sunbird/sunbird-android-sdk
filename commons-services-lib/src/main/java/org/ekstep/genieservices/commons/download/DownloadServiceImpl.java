@@ -99,7 +99,10 @@ public class DownloadServiceImpl implements IDownloadService {
             public void run() {
                 DownloadProgress downloadProgress = mDownloadManager.getProgress(downloadId);
                 downloadProgress.setIdentifier(identifier);
-                if (downloadProgress.getStatus() == IDownloadManager.UNKNOWN || downloadProgress.getStatus() == IDownloadManager.FAILED || downloadProgress.getStatus() == IDownloadManager.COMPLETED) {
+                if (downloadProgress.getStatus() == IDownloadManager.UNKNOWN || downloadProgress.getStatus() == IDownloadManager.FAILED) {
+                    mExecutor.shutdown();
+                } else if (downloadProgress.getStatus() == IDownloadManager.COMPLETED) {
+                    EventPublisher.postDownloadProgress(downloadProgress);
                     mExecutor.shutdown();
                 } else if (downloadProgress.getStatus() == IDownloadManager.NOT_STARTED) {
                     //do nothing
