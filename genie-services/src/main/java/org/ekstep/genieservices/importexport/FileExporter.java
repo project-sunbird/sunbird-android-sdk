@@ -43,26 +43,28 @@ public class FileExporter {
         this.dataSource = new SQLiteDataSource(appContext);
     }
 
+    public GenieResponse<Void> exportTelemetry(TelemetryExportRequest exportRequest, ITelemetryService telemetryService) {
+        IDBContext dbContext = new GSDBContext();
+        String sourceDBFilePath = appContext.getContext().getDatabasePath(dbContext.getDBName()).getPath();
+        return telemetryService.exportTelemetry(new File(exportRequest.getDestinationFolder()), sourceDBFilePath,
+                dataSource, getMetadata(dbContext, ServiceConstants.EXPORT_TYPE_TELEMETRY));
+    }
+
     public GenieResponse<Void> exportProfile(ProfileExportRequest exportRequest, IUserService userService) {
         if (exportRequest.getUserIds() != null && exportRequest.getUserIds().size() > 0) {
+            File destinationFolder = new File(exportRequest.getDestinationFolder());
+
             // Read the first profile and get the temp location path
-            String destinationDBFilePath = getEparFilePath(exportRequest.getUserIds(), exportRequest.getDestinationFolder());
+            String destinationDBFilePath = getEparFilePath(exportRequest.getUserIds(), destinationFolder);
 
             IDBContext dbContext = new GSDBContext();
             String sourceDBFilePath = appContext.getContext().getDatabasePath(dbContext.getDBName()).getPath();
 
-            return userService.exportProfile(exportRequest.getUserIds(), exportRequest.getDestinationFolder(), sourceDBFilePath,
+            return userService.exportProfile(exportRequest.getUserIds(), destinationFolder, sourceDBFilePath,
                     destinationDBFilePath, dataSource, getMetadata(dbContext, ServiceConstants.EXPORT_TYPE_PROFILE));
         } else {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "There are no profile to export.", TAG);
         }
-    }
-
-    public GenieResponse<Void> exportTelemetry(TelemetryExportRequest exportRequest, ITelemetryService telemetryService) {
-        IDBContext dbContext = new GSDBContext();
-        String sourceDBFilePath = appContext.getContext().getDatabasePath(dbContext.getDBName()).getPath();
-        return telemetryService.exportTelemetry(exportRequest.getDestinationFolder(), sourceDBFilePath,
-                dataSource, getMetadata(dbContext, ServiceConstants.EXPORT_TYPE_TELEMETRY));
     }
 
     private String getEparFilePath(List<String> userIds, File destinationFolder) {

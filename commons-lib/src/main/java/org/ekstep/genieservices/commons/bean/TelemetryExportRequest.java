@@ -1,7 +1,5 @@
 package org.ekstep.genieservices.commons.bean;
 
-import java.io.File;
-
 /**
  * Created on 6/12/2017.
  *
@@ -9,20 +7,20 @@ import java.io.File;
  */
 public class TelemetryExportRequest {
 
-    private File destinationFolder;
+    private String destinationFolder;
 
-    private TelemetryExportRequest(File destinationFolder) {
+    private TelemetryExportRequest(String destinationFolder) {
         this.destinationFolder = destinationFolder;
     }
 
-    public File getDestinationFolder() {
+    public String getDestinationFolder() {
         return destinationFolder;
     }
 
     public static class Builder {
-        private File destinationFolder;
+        private String destinationFolder;
 
-        public Builder toFolder(File destinationFolder) {
+        public Builder toFolder(String destinationFolder) {
             this.destinationFolder = destinationFolder;
             return this;
         }

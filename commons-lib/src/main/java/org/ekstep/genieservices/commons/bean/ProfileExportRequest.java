@@ -1,6 +1,5 @@
 package org.ekstep.genieservices.commons.bean;
 
-import java.io.File;
 import java.util.List;
 
 /**
@@ -11,9 +10,9 @@ import java.util.List;
 public class ProfileExportRequest {
 
     private List<String> userIds;
-    private File destinationFolder;
+    private String destinationFolder;
 
-    private ProfileExportRequest(List<String> userIds, File destinationFolder) {
+    private ProfileExportRequest(List<String> userIds, String destinationFolder) {
         this.userIds = userIds;
         this.destinationFolder = destinationFolder;
     }
@@ -22,13 +21,13 @@ public class ProfileExportRequest {
         return userIds;
     }
 
-    public File getDestinationFolder() {
+    public String getDestinationFolder() {
         return destinationFolder;
     }
 
     public static class Builder {
         private List<String> userIds;
-        private File destinationFolder;
+        private String destinationFolder;
 
         /**
          * List of user which needs to export.
@@ -38,7 +37,7 @@ public class ProfileExportRequest {
             return this;
         }
 
-        public Builder toFolder(File destinationFolder) {
+        public Builder toFolder(String destinationFolder) {
             this.destinationFolder = destinationFolder;
             return this;
         }
