@@ -53,7 +53,7 @@ public class AddGeTransferTelemetryExportEvent implements IChainable {
                 contents.add(GETransferMap.createMapForTelemetry(importedMetadataModel.getDeviceId(),
                         importedMetadataModel.getImportedId(), importedMetadataModel.getCount()));
             }
-            aggregateCount += Integer.valueOf(importContext.getMetadata().get(ServiceConstants.PROFILES_COUNT).toString());
+            aggregateCount += Integer.valueOf(importContext.getMetadata().get(ServiceConstants.EVENTS_COUNT).toString());
             GETransferEventKnowStructure eks = new GETransferEventKnowStructure(
                     GETransferEventKnowStructure.TRANSFER_DIRECTION_EXPORT,
                     GETransferEventKnowStructure.DATATYPE_TELEMETRY,
