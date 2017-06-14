@@ -140,13 +140,17 @@ public class DownloadServiceImpl implements IDownloadService {
     @Override
     public DownloadProgress getProgress(String identifier) {
         DownloadRequest request = mDownloadQueueManager.getRequestByIdentifier(identifier);
-        long downloadId = -1;
+        DownloadProgress progress = new DownloadProgress(-1);
+        progress.setIdentifier(identifier);
         if (request != null) {
-            downloadId = request.getDownloadId();
-        }
-        DownloadProgress progress = mDownloadManager.getProgress(downloadId);
-        if (progress.getStatus() == IDownloadManager.COMPLETED) {
-            progress.setDownloadPath(mDownloadManager.getDownloadPath(downloadId));
+            if (request.getDownloadId() == -1) {
+                progress.setStatus(0);
+            } else {
+                progress = mDownloadManager.getProgress(request.getDownloadId());
+                if (progress.getStatus() == IDownloadManager.COMPLETED) {
+                    progress.setDownloadPath(mDownloadManager.getDownloadPath(request.getDownloadId()));
+                }
+            }
         }
         return progress;
     }
