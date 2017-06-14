@@ -10,10 +10,10 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
-import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
 import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
+import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
@@ -1228,7 +1228,7 @@ public class ContentHandler {
             Section section = new Section();
             section.setResponseMessageId((String) sectionMap.get("resmsgid"));
             section.setApiId((String) sectionMap.get("apiid"));
-            section.setSectionName(((Map)((Map) sectionMap.get("display")).get("Name")).get("en").toString());
+            section.setSectionName(((Map) ((Map) sectionMap.get("display")).get("name")).get("en").toString());
 
             if (!StringUtil.isNullOrEmpty(contentDataList)) {
                 Type type = new TypeToken<List<ContentData>>() {
