@@ -319,7 +319,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
             String contentDataList = null;
             if (result.containsKey("content")) {
-                contentDataList = (String) result.get("content");
+                contentDataList = GsonUtil.toJson(result.get("content"));
             }
 
             ContentSearchResult searchResult = new ContentSearchResult();
@@ -366,16 +366,20 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 responseMessageId = (String) responseParams.get("resmsgid");
             }
 
-            List<Map<String, Object>> contentDataList = null;
+            String contentDataList = null;
             if (result.containsKey("content")) {
-                contentDataList = (List<Map<String, Object>>) result.get("content");
+                contentDataList = GsonUtil.toJson(result.get("content"));
             }
 
             RecommendedContentResult recommendedContentResult = new RecommendedContentResult();
             recommendedContentResult.setId(id);
             recommendedContentResult.setResponseMessageId(responseMessageId);
-            recommendedContentResult.setContents(ContentHandler.convertContentMapListToBeanList(mAppContext.getDBSession(), contentDataList));
-
+            if (!StringUtil.isNullOrEmpty(contentDataList)) {
+                Type type = new TypeToken<List<ContentData>>() {
+                }.getType();
+                List<ContentData> contentData = GsonUtil.getGson().fromJson(contentDataList, type);
+                recommendedContentResult.setContents(contentData);
+            }
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(recommendedContentResult);
             return response;
