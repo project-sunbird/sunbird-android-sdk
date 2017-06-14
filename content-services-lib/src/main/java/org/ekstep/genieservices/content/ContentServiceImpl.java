@@ -173,7 +173,6 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         String methodName = "getChildContents@ContentServiceImpl";
 
         List<HierarchyInfo> hierarchyInfoList = new ArrayList<>();
-        List<Content> contentList = new ArrayList<>();
 
         GenieResponse<Content> response;
         ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), childContentRequest.getContentId());
@@ -183,18 +182,16 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         }
 
         //check and fetch all childrens of this content
-        List<Content> childrenList = checkAndFetchChildrenOfContent(contentModel, hierarchyInfoList, contentList);
+        Content content = checkAndFetchChildrenOfContent(contentModel, hierarchyInfoList);
 
-        Content content = ContentHandler.convertContentModelToBean(contentModel);
-        if (childrenList != null) {
-            content.setChildren(childrenList);
-        }
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(content);
         return response;
     }
 
-    private List<Content> checkAndFetchChildrenOfContent(ContentModel contentModel, List<HierarchyInfo> hierarchyInfoList, List<Content> contentList) {
+    private Content checkAndFetchChildrenOfContent(ContentModel contentModel, List<HierarchyInfo> hierarchyInfoList) {
+        Content content = ContentHandler.convertContentModelToBean(contentModel);
+
         // check if the content model has immediate children
         if (ContentHandler.hasChildren(contentModel.getLocalData())) {
 
@@ -207,24 +204,30 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             //get all the children
             List<ContentModel> contentModelList = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), contentModel.getLocalData(), ContentConstants.ChildContents.FIRST_LEVEL_ALL);
 
-            //check for null and size more than 0
+            //check for null
             if (contentModelList != null) {
+
+                List<Content> childContents = new ArrayList<>();
+
                 for (ContentModel perContentModel : contentModelList) {
                     Content perContent = ContentHandler.convertContentModelToBean(perContentModel);
+                    childContents.add(perContent);
+
                     perContent.setChildrenHierarchyInfo(hierarchyInfoList);
-                    //add this content to the list
-                    contentList.add(perContent);
 
                     //check if this content has children
                     if (ContentHandler.hasChildren(perContentModel.getLocalData())) {
                         //recurse again on this content
-                        checkAndFetchChildrenOfContent(perContentModel, hierarchyInfoList, contentList);
+                        checkAndFetchChildrenOfContent(perContentModel, hierarchyInfoList);
                     }
                 }
+
+                //add children to the main content
+                content.setChildren(childContents);
             }
         }
 
-        return contentList;
+        return content;
     }
 
     @Override
