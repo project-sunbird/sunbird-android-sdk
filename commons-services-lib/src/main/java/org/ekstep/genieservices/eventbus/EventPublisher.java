@@ -1,8 +1,8 @@
 package org.ekstep.genieservices.eventbus;
 
+import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.DownloadProgress;
 import org.ekstep.genieservices.commons.bean.DownloadResponse;
-import org.ekstep.genieservices.commons.bean.ImportStatus;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.util.AsyncExecutor;
@@ -49,13 +49,13 @@ public class EventPublisher {
                 });
     }
 
-    public static void postImportSuccessfull(final ImportStatus importStatus) {
+    public static void postContentImportSuccessfull(final ContentImportResponse contentImportResponse) {
         EventPublisherThreadPool
                 .getInstance()
                 .execute(new AsyncExecutor.RunnableEx() {
                     @Override
                     public void run() throws Exception {
-                        EventBus.getDefault().post(importStatus);
+                        EventBus.getDefault().post(contentImportResponse);
                     }
                 });
     }

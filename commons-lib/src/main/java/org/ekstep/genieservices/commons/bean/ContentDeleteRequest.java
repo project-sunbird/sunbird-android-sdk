@@ -37,8 +37,8 @@ public class ContentDeleteRequest {
             return this;
         }
 
-        public Builder isChildContent(boolean isChildContent) {
-            this.isChildContent = isChildContent;
+        public Builder isChildContent() {
+            this.isChildContent = true;
             return this;
         }
 

@@ -14,12 +14,13 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
-import org.ekstep.genieservices.commons.bean.ContentCriteria;
+import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
+import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
@@ -56,6 +57,7 @@ import org.ekstep.genieservices.content.network.ContentListingAPI;
 import org.ekstep.genieservices.content.network.ContentSearchAPI;
 import org.ekstep.genieservices.content.network.RecommendedContentAPI;
 import org.ekstep.genieservices.content.network.RelatedContentAPI;
+import org.ekstep.genieservices.eventbus.EventPublisher;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.io.File;
@@ -135,7 +137,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<List<Content>> getAllLocalContent(ContentCriteria criteria) {
+    public GenieResponse<List<Content>> getAllLocalContent(ContentFilterCriteria criteria) {
         // TODO: Telemetry logger
         String methodName = "getAllLocalContent@ContentServiceImpl";
 
@@ -558,7 +560,6 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         } else {
             ImportContext importContext = new ImportContext(importRequest.isChildContent(), importRequest.getSourceFilePath(), new File(importRequest.getDestinationFolder()));
 
-            // TODO: 6/8/2017 - Add identifier in the GE_INTERACT event
             buildInitiateEvent();
 
             IChainable importContentSteps = ContentImportStep.initImportContent();
@@ -570,9 +571,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                     .then(new AddGeTransferContentImportEvent());
             GenieResponse<Void> genieResponse = importContentSteps.execute(mAppContext, importContext);
             if (genieResponse.getStatus()) {
-                // TODO: 6/8/2017 - Add identifier in the GE_INTERACT event
                 buildSuccessEvent();
-//                EventPublisher.postImportSuccessfull(new ImportStatus(null));
+                EventPublisher.postContentImportSuccessfull(new ContentImportResponse(null));
 
             }
             return genieResponse;
@@ -615,6 +615,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                         String contentIdentifier = ContentHandler.readIdentifier(dataMap);
                         DownloadRequest downloadRequest = new DownloadRequest(contentIdentifier, downloadUrl,
                                 ContentConstants.MimeType.ECAR, importRequest.getDestinationFolder(), importRequest.isChildContent());
+                        downloadRequest.setCoRelation(importRequest.getCoRelation());
                         downloadRequests[i] = downloadRequest;
                     }
                 }

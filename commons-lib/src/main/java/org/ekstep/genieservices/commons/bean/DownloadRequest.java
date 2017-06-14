@@ -2,12 +2,15 @@ package org.ekstep.genieservices.commons.bean;
 
 import org.ekstep.genieservices.commons.utils.DateUtil;
 
+import java.io.Serializable;
+import java.util.List;
+
 /**
  * Created on 17/5/17.
  *
  * @author swayangjit
  */
-public class DownloadRequest {
+public class DownloadRequest implements Serializable {
 
     private long downloadId = -1;
     private String identifier;
@@ -17,7 +20,8 @@ public class DownloadRequest {
     private String destinationFolder;
     private long createdAt;
     private boolean isChildContent;
-
+    private String processorClass;
+    private List<CoRelation> coRelation;
 
     public DownloadRequest(String identifier, String downloadUrl, String mimeType, String destinationFolder, boolean isChildContent) {
         this.identifier = identifier;
@@ -62,6 +66,22 @@ public class DownloadRequest {
 
     public String getDestinationFolder() {
         return destinationFolder;
+    }
+
+    public String getProcessorClass() {
+        return processorClass;
+    }
+
+    public void setProcessorClass(String processorClass) {
+        this.processorClass = processorClass;
+    }
+
+    public List<CoRelation> getCoRelation() {
+        return coRelation;
+    }
+
+    public void setCoRelation(List<CoRelation> coRelation) {
+        this.coRelation = coRelation;
     }
 
     @Override

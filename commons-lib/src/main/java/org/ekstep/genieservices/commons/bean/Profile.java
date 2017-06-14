@@ -33,6 +33,7 @@ public class Profile implements Serializable, IValidate {
     private boolean isGroupUser;
     private Date createdAt;
     private transient List<IValidate> validators;
+    private String profileImage = "";
 
     public Profile(String uid) {
         this.uid = uid;
@@ -161,6 +162,14 @@ public class Profile implements Serializable, IValidate {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 
     public String toString() {

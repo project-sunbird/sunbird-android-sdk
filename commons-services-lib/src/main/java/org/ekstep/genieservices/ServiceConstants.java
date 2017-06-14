@@ -37,6 +37,8 @@ public interface ServiceConstants {
     String EXPORTED_ECAR_DESTINATION_LOCATION = "ecarLocation";
     String EXPORTED_EPAR_DESTINATION_LOCATION = "eparLocation";
     String UNCOMPRESSED_SOURCE_LOCATION = "location";
+    String BUNDLE_KEY_IS_CHILD = "is_child";
+    String BUNDLE_KEY_LOCAL_FILE_PATH = "local_file_path";
 
     interface FileExtension {
         String CONTENT = "ecar";
@@ -92,12 +94,10 @@ public interface ServiceConstants {
         String CONTENT_IMPORT_INITIATED_SUB_TYPE = "ContentImport-Initiated";
         String CONTENT_IMPORT_SUCCESS_SUB_TYPE = "ContentImport-Success";
         String CONTENT_IMPORT_STAGE_ID = "ImportContent";
-        String AUTO_SYNC_SUB_TYPE_INITIATED = "AutoSync-Initiated";
-        String AUTO_SYNC_SUB_TYPE_SUCCESS = "AutoSync-Success";
-        String AUTO_SYNC_STAGE_ID = "Genie-TelemetrySync";
-        String TYPE_OTHER = "OTHER";
-        String TYPE_TOUCH = "TOUCH";
-        String SIZE_OF_DATA_IN_KB = "SizeOfDataInKB";
+        String CONTENT_DOWNLOAD_INITIATE = "ContentDownload-Initiate";
+        String CONTENT_DOWNLOAD_SUCCESS = "ContentDownload-Success";
+        String CONTENT_DOWNLOAD_CANCEL = "ContentDownload-Cancel";
+        String CONTENT_DETAIL = "ContentDetail";
     }
 
     interface ErrorCode {
@@ -166,12 +166,10 @@ public interface ServiceConstants {
         String IMPORT_CONTENT_FAILED = "Import content failed.";
         String IMPORT_TELEMETRY_FAILED = "Import telemetry failed.";
     }
-
     interface ContentStatus {
         String LIVE = "LIVE";
         String DRAFT = "DRAFT";
     }
-
     interface GeTransferEvent {
         String TRANSFER_DIRECTION_EXPORT = "EXPORT";
         String TRANSFER_DIRECTION_IMPORT = "IMPORT";

@@ -36,7 +36,7 @@ public class ContentDetailsRequest {
         private boolean attachFeedback;
         private boolean attachContentAccess;
 
-        public Builder contentId(String contentId) {
+        public Builder forContent(String contentId) {
             if (StringUtil.isNullOrEmpty(contentId)) {
                 throw new IllegalArgumentException("contentId required.");
             }

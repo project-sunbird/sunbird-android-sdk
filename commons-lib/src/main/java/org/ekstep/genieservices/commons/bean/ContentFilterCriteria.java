@@ -8,14 +8,14 @@ import org.ekstep.genieservices.commons.utils.GsonUtil;
  *
  * @author anil
  */
-public class ContentCriteria {
+public class ContentFilterCriteria {
 
     private String uid;
     private ContentType[] contentTypes;
     private boolean attachFeedback;
     private boolean attachContentAccess;
 
-    private ContentCriteria(String uid, ContentType[] contentTypes, boolean attachFeedback, boolean attachContentAccess) {
+    private ContentFilterCriteria(String uid, ContentType[] contentTypes, boolean attachFeedback, boolean attachContentAccess) {
         this.uid = uid;
         this.contentTypes = contentTypes;
         this.attachFeedback = attachFeedback;
@@ -53,7 +53,7 @@ public class ContentCriteria {
          * User id to get the content in order to access by that user.
          * And also required when want feedback and content access.
          */
-        public Builder userId(String uid) {
+        public Builder forUser(String uid) {
             this.uid = uid;
             return this;
         }
@@ -79,8 +79,8 @@ public class ContentCriteria {
             return this;
         }
 
-        public ContentCriteria build() {
-            return new ContentCriteria(uid, contentTypes, attachFeedback, attachContentAccess);
+        public ContentFilterCriteria build() {
+            return new ContentFilterCriteria(uid, contentTypes, attachFeedback, attachContentAccess);
         }
     }
 }

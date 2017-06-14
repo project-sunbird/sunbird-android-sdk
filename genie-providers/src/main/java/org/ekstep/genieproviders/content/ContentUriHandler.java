@@ -37,7 +37,7 @@ public class ContentUriHandler implements IUriHandler {
             cursor = getMatrixCursor();
             Logger.i(TAG, "Content Identifier - " + contentIdentifier[0]);
             ContentDetailsRequest.Builder builder = new ContentDetailsRequest.Builder();
-            builder.contentId(contentIdentifier[0]);
+            builder.forContent(contentIdentifier[0]);
             GenieResponse genieResponse = genieService.getContentService().getContentDetails(builder.build());
 
             if (genieResponse != null) {

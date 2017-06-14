@@ -44,7 +44,7 @@ public class ContentListingCriteria {
         private Profile profile;
         private List<PartnerFilter> partnerFilters;
 
-        public Builder byId(String contentListingId) {
+        public Builder listingId(String contentListingId) {
             this.contentListingId = contentListingId;
             return this;
         }

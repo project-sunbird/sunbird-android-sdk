@@ -150,6 +150,10 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
         if (cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_BOARD) != -1) {
             profile.setBoard(cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_BOARD)));
         }
+
+        if (cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_PROFILE_IMAGE) != -1) {
+            profile.setProfileImage(cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_PROFILE_IMAGE)));
+        }
     }
 
     @Override
@@ -199,6 +203,7 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
         contentValues.put(ProfileEntry.COLUMN_NAME_CREATED_AT, profile.getCreatedAt().getTime());
         contentValues.put(ProfileEntry.COLUMN_NAME_MEDIUM, profile.getMedium());
         contentValues.put(ProfileEntry.COLUMN_NAME_BOARD, profile.getBoard());
+        contentValues.put(ProfileEntry.COLUMN_NAME_PROFILE_IMAGE, profile.getProfileImage());
     }
 
     private void updateFieldsForGroupUser() {
@@ -210,6 +215,7 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
             profile.setGender("");
             profile.setMedium("");
             profile.setBoard("");
+            profile.setProfileImage("");
         }
     }
 

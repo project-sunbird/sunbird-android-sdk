@@ -29,6 +29,7 @@ public class ContentData implements Serializable {
     private List<String> language;
     private List<String> gradeLevel;
     private String osId;
+    private String contentType;
     private List<Variant> variantList;
     //    private ContentMetadata contentMetadata;
 
@@ -114,6 +115,10 @@ public class ContentData implements Serializable {
 
     public void setVariants(List<Variant> variantList) {
         this.variantList = variantList;
+    }
+
+    public String getContentType() {
+        return contentType;
     }
 
     @Override

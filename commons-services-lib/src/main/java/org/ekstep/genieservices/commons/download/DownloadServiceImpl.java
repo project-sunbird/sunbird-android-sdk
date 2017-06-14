@@ -1,12 +1,17 @@
 package org.ekstep.genieservices.commons.download;
 
 import org.ekstep.genieservices.IDownloadService;
+import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IDownloadManager;
+import org.ekstep.genieservices.commons.bean.CoRelation;
 import org.ekstep.genieservices.commons.bean.DownloadProgress;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
-import org.ekstep.genieservices.commons.bean.DownloadResponse;
+import org.ekstep.genieservices.commons.bean.GameData;
+import org.ekstep.genieservices.commons.bean.enums.InteractionType;
+import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
 import org.ekstep.genieservices.eventbus.EventPublisher;
+import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -42,15 +47,20 @@ public class DownloadServiceImpl implements IDownloadService {
         resumeDownloads();
     }
 
+    @Override
     public void resumeDownloads() {
         //Assumption is that only 1 download happens at a time. This method will need refactoring whenever this assumption changes
         List<String> currentDownloads = mDownloadQueueManager.getCurrentDownloads();
         if (currentDownloads.size() == 0) {
             DownloadRequest request = mDownloadQueueManager.popDownloadrequest();
-            long downloadId = mDownloadManager.enqueue(request);
-            mDownloadQueueManager.updateDownload(request.getIdentifier(), downloadId);
-            mDownloadQueueManager.addToCurrentDownloadQueue(request.getIdentifier());
-            startTrackingProgress(request.getIdentifier(), downloadId);
+            if (request != null) {
+                long downloadId = mDownloadManager.enqueue(request);
+                TelemetryLogger.log(buildGEInteractEvent(InteractionType.TOUCH, ServiceConstants.Telemetry.CONTENT_DOWNLOAD_INITIATE, request.getCoRelation(), request.getIdentifier()));
+                mDownloadQueueManager.updateDownload(request.getIdentifier(), downloadId);
+                mDownloadQueueManager.addToCurrentDownloadQueue(request.getIdentifier());
+                startTrackingProgress(request.getIdentifier(), downloadId);
+            }
+
         } else {
             DownloadRequest request = mDownloadQueueManager.getRequestByIdentifier(currentDownloads.get(0));
             if (request != null) {
@@ -68,6 +78,18 @@ public class DownloadServiceImpl implements IDownloadService {
             }
         }
     }
+
+    private GEInteract buildGEInteractEvent(InteractionType type, String subType, List<CoRelation> coRelationList, String contendId) {
+        GEInteract geInteract = new GEInteract.Builder(new GameData(mAppContext.getParams().getGid(), mAppContext.getParams().getVersionName()))
+                .interActionType(type)
+                .stageId(ServiceConstants.Telemetry.CONTENT_DETAIL)
+                .subType(subType)
+                .id(contendId)
+                .coRelation(coRelationList)
+                .build();
+        return geInteract;
+    }
+
 
     private void startTrackingProgress(final String identifier, final long downloadId) {
         mExecutor = Executors.newScheduledThreadPool(1);
@@ -126,15 +148,17 @@ public class DownloadServiceImpl implements IDownloadService {
     }
 
     @Override
-    public void onDownloadComplete(DownloadResponse downloadResponse) {
-        mDownloadQueueManager.removeFromQueue(downloadResponse.getIdentifier());
-        mDownloadQueueManager.removeFromCurrentDownloadQueue(downloadResponse.getIdentifier());
+    public void onDownloadComplete(String identifier) {
+        DownloadRequest request = mDownloadQueueManager.getRequestByIdentifier(identifier);
+        TelemetryLogger.log(buildGEInteractEvent(InteractionType.OTHER, ServiceConstants.Telemetry.CONTENT_DOWNLOAD_SUCCESS, request.getCoRelation(), request.getIdentifier()));
+        mDownloadQueueManager.removeFromQueue(identifier);
+        mDownloadQueueManager.removeFromCurrentDownloadQueue(identifier);
         resumeDownloads();
     }
 
     @Override
-    public void onDownloadFailed(DownloadResponse downloadResponse) {
-        mDownloadQueueManager.removeFromQueue(downloadResponse.getIdentifier());
+    public void onDownloadFailed(String identiifer) {
+        mDownloadQueueManager.removeFromQueue(identiifer);
         resumeDownloads();
     }
 }

@@ -31,4 +31,9 @@ public class LanguageService extends BaseService {
         createAndExecuteTask(responseHandler, getLanguageSearchTask);
     }
 
+    public void getAllLanguages(IResponseHandler<Map> responseHandler) {
+        GetAllLanguagesTask getAllLanguagesTask = new GetAllLanguagesTask(context, appQualifier);
+        createAndExecuteTask(responseHandler, getAllLanguagesTask);
+    }
+
 }

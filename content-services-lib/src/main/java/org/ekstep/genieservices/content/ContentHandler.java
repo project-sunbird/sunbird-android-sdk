@@ -10,7 +10,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
-import org.ekstep.genieservices.commons.bean.ContentCriteria;
+import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
 import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
@@ -18,7 +18,6 @@ import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchFilter;
-import org.ekstep.genieservices.commons.bean.Display;
 import org.ekstep.genieservices.commons.bean.FilterValue;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MasterData;
@@ -416,8 +415,8 @@ public class ContentHandler {
 
     private static List<ContentAccess> getAllContentAccess(IUserService userService, String uid, String contentIdentifier) {
         ContentAccessFilterCriteria.Builder builder = new ContentAccessFilterCriteria.Builder();
-        builder.uid(uid);
-        builder.contentId(contentIdentifier);
+        builder.byUser(uid);
+        builder.forContent(contentIdentifier);
         return userService.getAllContentAccess(builder.build()).getResult();
     }
 
@@ -440,7 +439,7 @@ public class ContentHandler {
         return contentState == ContentConstants.State.ARTIFACT_AVAILABLE;
     }
 
-    public static List<ContentModel> getAllLocalContentSortedByContentAccess(IDBSession dbSession, ContentCriteria criteria) {
+    public static List<ContentModel> getAllLocalContentSortedByContentAccess(IDBSession dbSession, ContentFilterCriteria criteria) {
         String uid = null;
         ContentType[] contentTypes = null;
         if (criteria != null) {
@@ -1160,7 +1159,7 @@ public class ContentHandler {
         for (Map<String, Object> sectionMap : sections) {
             String contentDataList = null;
             if (sectionMap.containsKey("contents")) {
-                contentDataList = (String) sectionMap.get("contents");
+                contentDataList = GsonUtil.toJson(sectionMap.get("contents"));
             }
 
             ContentSearchCriteria contentSearchCriteria = null;
@@ -1229,7 +1228,7 @@ public class ContentHandler {
             Section section = new Section();
             section.setResponseMessageId((String) sectionMap.get("resmsgid"));
             section.setApiId((String) sectionMap.get("apiid"));
-            section.setDisplay(GsonUtil.fromMap((Map) sectionMap.get("display"), Display.class));
+            section.setSectionName(((Map)((Map) sectionMap.get("display")).get("Name")).get("en").toString());
 
             if (!StringUtil.isNullOrEmpty(contentDataList)) {
                 Type type = new TypeToken<List<ContentData>>() {
