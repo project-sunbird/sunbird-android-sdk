@@ -14,11 +14,11 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
-import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
+import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
@@ -215,8 +215,11 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                     //add this content to the list
                     contentList.add(perContent);
 
-                    //recurse again on this content
-                    checkAndFetchChildrenOfContent(perContentModel, hierarchyInfoList);
+                    //check if this content has children
+                    if (ContentHandler.hasChildren(perContentModel.getLocalData())) {
+                        //recurse again on this content
+                        checkAndFetchChildrenOfContent(perContentModel, hierarchyInfoList);
+                    }
                 }
             }
         }
