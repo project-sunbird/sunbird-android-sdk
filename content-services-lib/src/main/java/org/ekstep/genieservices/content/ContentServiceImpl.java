@@ -172,9 +172,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         // TODO: Telemetry logger
         String methodName = "getChildContents@ContentServiceImpl";
 
-        List<HierarchyInfo> hierarchyInfoList = new ArrayList<>();
-
         GenieResponse<Content> response;
+        List<HierarchyInfo> hierarchyInfoList = new ArrayList<>();
         ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), childContentRequest.getContentId());
         if (contentModel == null) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, "No content found for identifier = " + childContentRequest.getContentId(), TAG);
@@ -189,9 +188,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         return response;
     }
 
-    private Content checkAndFetchChildrenOfContent(ContentModel contentModel, List<HierarchyInfo> hierarchyInfoList) {
+    private Content checkAndFetchChildrenOfContent(ContentModel contentModel, List<HierarchyInfo> sourceInfoList) {
         Content content = ContentHandler.convertContentModelToBean(contentModel);
-
         // check if the content model has immediate children
         if (ContentHandler.hasChildren(contentModel.getLocalData())) {
 
@@ -199,6 +197,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             HierarchyInfo hierarchyInfo = new HierarchyInfo();
             hierarchyInfo.setContentType(contentModel.getContentType());
             hierarchyInfo.setIdentifier(contentModel.getIdentifier());
+
+            List<HierarchyInfo> hierarchyInfoList = new ArrayList<>();
+            hierarchyInfoList.addAll(sourceInfoList);
             hierarchyInfoList.add(hierarchyInfo);
 
             //get all the children
@@ -211,15 +212,16 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
                 for (ContentModel perContentModel : contentModelList) {
                     Content perContent = ContentHandler.convertContentModelToBean(perContentModel);
-                    childContents.add(perContent);
-
                     perContent.setChildrenHierarchyInfo(hierarchyInfoList);
 
                     //check if this content has children
                     if (ContentHandler.hasChildren(perContentModel.getLocalData())) {
                         //recurse again on this content
-                        checkAndFetchChildrenOfContent(perContentModel, hierarchyInfoList);
+                        Content iteratedContent = checkAndFetchChildrenOfContent(perContentModel, hierarchyInfoList);
+                        perContent.setChildren(iteratedContent.getChildren());
                     }
+
+                    childContents.add(perContent);
                 }
 
                 //add children to the main content
