@@ -1280,7 +1280,7 @@ public class ContentHandler {
             }
         }
 
-        if (!StringUtil.isNullOrEmpty(downloadUrl)) {
+        if (StringUtil.isNullOrEmpty(downloadUrl)) {
             downloadUrl = (String) dataMap.get(KEY_DOWNLOAD_URL);
         }
         return downloadUrl;

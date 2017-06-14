@@ -11,4 +11,8 @@ public class ContentImportResponse {
     public ContentImportResponse(String identifier) {
         this.identifier = identifier;
     }
+
+    public String getIdentifier() {
+        return identifier;
+    }
 }

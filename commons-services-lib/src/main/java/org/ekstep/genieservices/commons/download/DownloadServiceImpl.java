@@ -34,7 +34,8 @@ public class DownloadServiceImpl implements IDownloadService {
         this.mAppContext = appContext;
         this.mDownloadQueueManager = new DownloadQueueManager(mAppContext.getKeyValueStore());
         mDownloadManager = mAppContext.getDownloadManager();
-        resumeDownloads();
+        // TODO: 14/6/17  Figure it out later
+//        resumeDownloads();
     }
 
     @Override

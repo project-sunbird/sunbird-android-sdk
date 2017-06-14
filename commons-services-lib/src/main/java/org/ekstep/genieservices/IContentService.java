@@ -166,4 +166,6 @@ public interface IContentService {
 
     GenieResponse<Void> importContent(ContentImportRequest contentImportRequest);
 
+    GenieResponse<Void> cancelDownload(String identifier);
+
 }

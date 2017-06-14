@@ -273,4 +273,13 @@ public class ContentService {
         });
     }
 
+    public void cancelDownload(final String identifier, IResponseHandler<Void> responseHandler) {
+        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return contentService.cancelDownload(identifier);
+            }
+        });
+    }
+
 }

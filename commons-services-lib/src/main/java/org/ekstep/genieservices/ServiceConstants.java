@@ -39,6 +39,7 @@ public interface ServiceConstants {
     String UNCOMPRESSED_SOURCE_LOCATION = "location";
     String BUNDLE_KEY_IS_CHILD = "is_child";
     String BUNDLE_KEY_LOCAL_FILE_PATH = "local_file_path";
+    String BUNDLE_KEY_DESTINATION_FILE_PATH = "destination_file_path";
 
     interface FileExtension {
         String CONTENT = "ecar";

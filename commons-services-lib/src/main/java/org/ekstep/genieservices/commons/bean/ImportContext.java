@@ -25,6 +25,7 @@ public class ImportContext {
     private List<HashMap<String, Object>> items;
     private boolean isChildContent;
     private Map<String, Object> metadata;
+    private List<String> identifiers=new ArrayList<>();
     private IDBSession dbSession;
 
     // Used for import/export
@@ -91,4 +92,14 @@ public class ImportContext {
     public void setDbSession(IDBSession dbSession) {
         this.dbSession = dbSession;
     }
+
+
+    public List<String> getIdentifiers() {
+        return identifiers;
+    }
+
+    public void setIdentifiers(String identifier) {
+        this.identifiers .add(identifier);
+    }
+
 }

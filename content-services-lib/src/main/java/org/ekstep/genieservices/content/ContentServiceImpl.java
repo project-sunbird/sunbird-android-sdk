@@ -583,8 +583,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                     .then(new AddGeTransferContentImportEvent());
             GenieResponse<Void> genieResponse = importContentSteps.execute(mAppContext, importContext);
             if (genieResponse.getStatus()) {
-                buildSuccessEvent();
-                EventPublisher.postContentImportSuccessfull(new ContentImportResponse(null));
+                String identifier=importContext.getIdentifiers()!=null?importContext.getIdentifiers().get(0):"";
+                buildSuccessEvent(identifier);
+                EventPublisher.postContentImportSuccessfull(new ContentImportResponse(identifier));
 
             }
             return genieResponse;
@@ -628,6 +629,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                         DownloadRequest downloadRequest = new DownloadRequest(contentIdentifier, downloadUrl,
                                 ContentConstants.MimeType.ECAR, importRequest.getDestinationFolder(), importRequest.isChildContent());
                         downloadRequest.setCoRelation(importRequest.getCoRelation());
+                        downloadRequest.setProcessorClass("org.ekstep.genieservices.commons.download.ContentImportService");
                         downloadRequests[i] = downloadRequest;
                     }
                 }
@@ -636,6 +638,12 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             }
         }
 
+        return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+    }
+
+    @Override
+    public GenieResponse<Void> cancelDownload(String identifier) {
+        downloadService.cancel(identifier);
         return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
     }
 
@@ -648,11 +656,12 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         TelemetryLogger.log(geInteract);
     }
 
-    private void buildSuccessEvent() {
+    private void buildSuccessEvent(String identifier) {
         GEInteract geInteract = new GEInteract.Builder(new GameData(mAppContext.getParams().getGid(), mAppContext.getParams().getVersionName())).
                 stageId(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID).
                 subType(ServiceConstants.Telemetry.CONTENT_IMPORT_SUCCESS_SUB_TYPE).
                 interActionType(InteractionType.OTHER).
+                id(identifier).
                 build();
         TelemetryLogger.log(geInteract);
     }
