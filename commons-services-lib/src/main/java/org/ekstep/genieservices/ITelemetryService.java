@@ -4,7 +4,9 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.commons.db.operations.IDataSource;
 
+import java.io.File;
 import java.util.Map;
 
 /**
@@ -56,5 +58,7 @@ public interface ITelemetryService {
      * @return
      */
     GenieResponse<Void> importTelemetry(IDBSession dbSession, Map<String, Object> metadata);
+
+    GenieResponse<Void> exportTelemetry(File destinationFolder, String sourceDBFilePath, IDataSource dataSource, Map<String, Object> metadata);
 
 }

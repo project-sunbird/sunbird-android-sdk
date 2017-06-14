@@ -10,6 +10,7 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportRequest;
+import org.ekstep.genieservices.commons.bean.TelemetryExportRequest;
 import org.ekstep.genieservices.commons.db.GSDBContext;
 import org.ekstep.genieservices.commons.db.IDBContext;
 import org.ekstep.genieservices.commons.db.operations.IDataSource;
@@ -57,10 +58,11 @@ public class FileExporter {
         }
     }
 
-    public GenieResponse<Void> exportTelemetry(File destinationFolder, ITelemetryService telemetryService) {
+    public GenieResponse<Void> exportTelemetry(TelemetryExportRequest exportRequest, ITelemetryService telemetryService) {
         IDBContext dbContext = new GSDBContext();
         String sourceDBFilePath = appContext.getContext().getDatabasePath(dbContext.getDBName()).getPath();
-        return null;
+        return telemetryService.exportTelemetry(exportRequest.getDestinationFolder(), sourceDBFilePath,
+                dataSource, getMetadata(dbContext, ServiceConstants.EXPORT_TYPE_TELEMETRY));
     }
 
     private String getEparFilePath(List<String> userIds, File destinationFolder) {

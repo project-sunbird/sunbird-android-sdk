@@ -5,8 +5,10 @@ import org.ekstep.genieservices.ITelemetryService;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportRequest;
+import org.ekstep.genieservices.commons.bean.TelemetryExportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
+import org.ekstep.genieservices.importexport.FileExporter;
 import org.ekstep.genieservices.importexport.FileImporter;
 
 /**
@@ -16,10 +18,12 @@ public class TelemetryService {
 
     private ITelemetryService telemetryService;
     private FileImporter fileImporter;
+    private FileExporter fileExporter;
 
     public TelemetryService(GenieService genieService) {
         this.telemetryService = genieService.getTelemetryService();
         this.fileImporter = genieService.getFileImporter();
+        this.fileExporter = genieService.getFileExporter();
     }
 
     /**
@@ -83,6 +87,15 @@ public class TelemetryService {
             @Override
             public GenieResponse<Void> perform() {
                 return fileImporter.importTelemetry(importRequest, telemetryService);
+            }
+        });
+    }
+
+    public void exportTelemetry(final TelemetryExportRequest telemetryExportRequest, IResponseHandler<Void> responseHandler) {
+        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return fileExporter.exportTelemetry(telemetryExportRequest, telemetryService);
             }
         });
     }

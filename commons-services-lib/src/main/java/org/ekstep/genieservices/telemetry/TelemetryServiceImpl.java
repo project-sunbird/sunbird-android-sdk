@@ -172,6 +172,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         return telemetryImportSteps.execute(mAppContext, importContext);
     }
 
+    @Override
     public GenieResponse<Void> exportTelemetry(File destinationFolder, String sourceDBFilePath, IDataSource dataSource, Map<String, Object> metadata) {
         String destinationDBFilePath = FileUtil.getExportTelemetryFilePath(destinationFolder);
 
