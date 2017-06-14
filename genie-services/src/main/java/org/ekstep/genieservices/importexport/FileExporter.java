@@ -51,13 +51,15 @@ public class FileExporter {
             String sourceDBFilePath = appContext.getContext().getDatabasePath(dbContext.getDBName()).getPath();
 
             return userService.exportProfile(exportRequest.getUserIds(), exportRequest.getDestinationFolder(), sourceDBFilePath,
-                    destinationDBFilePath, dataSource, getMetadata(dbContext));
+                    destinationDBFilePath, dataSource, getMetadata(dbContext, ServiceConstants.EXPORT_TYPE_PROFILE));
         } else {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "There are no profile to export.", TAG);
         }
     }
 
     public GenieResponse<Void> exportTelemetry(File destinationFolder, ITelemetryService telemetryService) {
+        IDBContext dbContext = new GSDBContext();
+        String sourceDBFilePath = appContext.getContext().getDatabasePath(dbContext.getDBName()).getPath();
         return null;
     }
 
@@ -85,10 +87,10 @@ public class FileExporter {
         return eparFile.getAbsolutePath();
     }
 
-    private Map<String, Object> getMetadata(IDBContext dbContext) {
+    private Map<String, Object> getMetadata(IDBContext dbContext, String exportType) {
         Map<String, Object> metadata = new HashMap<>();
         metadata.put(ServiceConstants.VERSION, String.valueOf(dbContext.getDBVersion()));
-        metadata.put(ServiceConstants.EXPORT_TYPES, GsonUtil.toJson(Collections.singletonList(ServiceConstants.EXPORT_TYPE_PROFILE)));
+        metadata.put(ServiceConstants.EXPORT_TYPES, GsonUtil.toJson(Collections.singletonList(exportType)));
         metadata.put(ServiceConstants.DID, appContext.getDeviceInfo().getDeviceID());
 
         return metadata;

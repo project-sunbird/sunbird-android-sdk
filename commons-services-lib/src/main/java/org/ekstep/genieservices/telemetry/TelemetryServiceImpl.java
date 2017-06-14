@@ -15,21 +15,29 @@ import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.commons.db.operations.IDataSource;
 import org.ekstep.genieservices.commons.exception.InvalidDataException;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
+import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.eventbus.EventPublisher;
 import org.ekstep.genieservices.tag.cache.TelemetryTagCache;
+import org.ekstep.genieservices.telemetry.chained.export.AddGeTransferTelemetryExportEvent;
+import org.ekstep.genieservices.telemetry.chained.export.CleanupExportedFile;
+import org.ekstep.genieservices.telemetry.chained.export.CopyDatabase;
+import org.ekstep.genieservices.telemetry.chained.export.CreateMetadata;
 import org.ekstep.genieservices.telemetry.chained.imports.AddGeTransferTelemetryImportEvent;
 import org.ekstep.genieservices.telemetry.chained.imports.TelemetryImportStep;
 import org.ekstep.genieservices.telemetry.chained.imports.TransportProcessedEventsImportEvent;
 import org.ekstep.genieservices.telemetry.chained.imports.UpdateImportedTelemetryMetadata;
 import org.ekstep.genieservices.telemetry.chained.imports.ValidateTelemetryMetadata;
 import org.ekstep.genieservices.telemetry.model.EventModel;
+import org.ekstep.genieservices.telemetry.processors.EventProcessorFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -162,6 +170,28 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
                 .then(new AddGeTransferTelemetryImportEvent());
 
         return telemetryImportSteps.execute(mAppContext, importContext);
+    }
+
+    public GenieResponse<Void> exportTelemetry(File destinationFolder, String sourceDBFilePath, IDataSource dataSource, Map<String, Object> metadata) {
+        String destinationDBFilePath = FileUtil.getExportTelemetryFilePath(destinationFolder);
+
+        if (FileUtil.doesFileExists(destinationDBFilePath)) {
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "File already exists.", TAG);
+        }
+
+        EventProcessorFactory.processEvents(mAppContext);
+
+        ImportContext importContext = new ImportContext(null, metadata);
+
+        CopyDatabase copyDatabase = new CopyDatabase(sourceDBFilePath, destinationDBFilePath, dataSource);
+        copyDatabase.then(new CreateMetadata(destinationDBFilePath))
+                .then(new CleanupExportedFile(destinationDBFilePath))
+                .then(new AddGeTransferTelemetryExportEvent(destinationDBFilePath));
+
+        // TODO: 6/12/2017 - if export failed.
+//                .then(new RemoveExportFile(destinationDBFilePath));
+
+        return copyDatabase.execute(mAppContext, importContext);
     }
 
 }
