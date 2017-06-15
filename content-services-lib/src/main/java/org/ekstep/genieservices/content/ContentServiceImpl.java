@@ -119,9 +119,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         if (content.isAvailableLocally()) {
             String uid = ContentHandler.getCurrentUserId(userService);
-            if (contentDetailsRequest.isAttachFeedback()) {
-                content.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, content.getIdentifier(), uid));
-            }
+                if (contentDetailsRequest.isAttachFeedback()) {
+                    content.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, content.getIdentifier(), uid));
+                }
 
             if (contentDetailsRequest.isAttachContentAccess()) {
                 content.setContentAccess(ContentHandler.getContentAccess(userService, content.getIdentifier(), uid));

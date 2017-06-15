@@ -437,7 +437,10 @@ public class UserServiceImpl extends BaseService implements IUserService {
             for (ContentAccessModel contentAccessModel : contentAccessesModel.getContentAccessModelList()) {
                 ContentAccess contentAccess = new ContentAccess();
                 contentAccess.setStatus(contentAccessModel.getStatus());
-                contentAccess.setLearnerState(GsonUtil.fromJson(contentAccessModel.getLearnerStateJson(), Map.class));
+                Map learnerState = GsonUtil.fromJson(contentAccessModel.getLearnerStateJson(), Map.class);
+                ContentLearnerState contentLearnerState = new ContentLearnerState();
+                contentLearnerState.setLearnerState(learnerState);
+                contentAccess.setContentLearnerState(contentLearnerState);
 
                 contentAccessList.add(contentAccess);
             }
@@ -452,11 +455,12 @@ public class UserServiceImpl extends BaseService implements IUserService {
     }
 
     @Override
-    public GenieResponse<Void> setLearnerState(ContentLearnerState contentLearnerState) {
+    public GenieResponse<Void> addContentAccess(ContentAccess contentAccess) {
         String methodName = "setLearnerState@UserServiceImpl";
+        String contentLearnerState = (contentAccess.getContentLearnerState() == null) ? null : GsonUtil.toJson(contentAccess.getContentLearnerState().getLearnerState());
         HashMap params = new HashMap();
-        params.put("contentIdentifier", contentLearnerState.getContentId());
-        params.put("learnerState", contentLearnerState.getLearnerState());
+        params.put("contentIdentifier", contentAccess.getContentId());
+        params.put("learnerState", contentLearnerState);
         params.put("logLevel", "2");
 
         GenieResponse<Void> response;
@@ -469,15 +473,17 @@ public class UserServiceImpl extends BaseService implements IUserService {
             return response;
         }
 
-        ContentAccessModel contentAccessModel = ContentAccessModel.build(mAppContext.getDBSession(),
-                uid, contentLearnerState.getContentId(), GsonUtil.toJson(contentLearnerState.getLearnerState()));
-        ContentAccessModel contentAccessModelInDb = ContentAccessModel.find(mAppContext.getDBSession(), uid, contentLearnerState.getContentId());
+        ContentAccessModel contentAccessModelInDb = ContentAccessModel.find(mAppContext.getDBSession(), uid, contentAccess.getContentId());
         if (contentAccessModelInDb == null) {
+            ContentAccessModel contentAccessModel = ContentAccessModel.build(mAppContext.getDBSession(),
+                    uid, contentAccess.getContentId(), contentLearnerState);
             contentAccessModel.setStatus(ContentAccessStatusType.PLAYED.getValue());
             contentAccessModel.save();
         } else {
-            contentAccessModel.setStatus(contentAccessModelInDb.getStatus());
-            contentAccessModel.update();
+            contentAccessModelInDb.setStatus(contentAccessModelInDb.getStatus());
+            if (contentLearnerState != null)
+            contentAccessModelInDb.setLearnerStateJson(contentLearnerState);
+            contentAccessModelInDb.update();
         }
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);

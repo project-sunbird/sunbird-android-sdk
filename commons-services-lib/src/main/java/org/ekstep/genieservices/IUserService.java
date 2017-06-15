@@ -144,7 +144,7 @@ public interface IUserService {
      * @param contentLearnerState
      * @return
      */
-    GenieResponse<Void> setLearnerState(ContentLearnerState contentLearnerState);
+    GenieResponse<Void> addContentAccess(ContentAccess contentAccess);
 
     /**
      * This API is used to import profiles.
