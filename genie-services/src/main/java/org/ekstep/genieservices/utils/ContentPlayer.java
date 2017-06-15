@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.widget.Toast;
 
 import org.ekstep.genieservices.Constants;
+import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentHierarchy;
@@ -71,15 +72,14 @@ public class ContentPlayer {
             return;
         }
 
-        intent.putExtra("origin", "Genie");
-//        if (hierarchyList != null && hierarchyList.size() > 0) {
-//            intent.putExtra("contentExtras", getContentHierarchy(hierarchyList, contentData.getIdentifier(), content.getContentType()));
-//        }
-        // TODO: 9/6/17 This will be updated when content child will be done
-        intent.putExtra("contentExtras", new ArrayList<>());
-        intent.putExtra("appInfo", GsonUtil.toJson(contentData));
-        intent.putExtra("languageInfo", GsonUtil.toJson(resourceBundle));
-        intent.putExtra("appQualifier", sContentPlayer.mQualifier);
+        intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_ORIGIN, "Genie");
+
+        if (content != null && content.getChildrenHierarchyInfo() != null) {
+            intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_CONTENT_EXTRAS, GsonUtil.toJson(content.getChildrenHierarchyInfo()));
+        }
+        intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_APP_INFO, GsonUtil.toJson(contentData));
+        intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_LANGUAGE_INFO, GsonUtil.toJson(resourceBundle));
+        intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_APP_QUALIFIER, sContentPlayer.mQualifier);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
 
         context.startActivity(intent);
