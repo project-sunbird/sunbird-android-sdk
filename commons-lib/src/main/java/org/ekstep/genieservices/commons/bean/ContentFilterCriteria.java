@@ -66,16 +66,16 @@ public class ContentFilterCriteria {
         /**
          * Pass true if want feedback, provided by given uid else false.
          */
-        public Builder withFeedback(boolean b) {
-            this.attachFeedback = b;
+        public Builder withFeedback() {
+            this.attachFeedback = true;
             return this;
         }
 
         /**
          * Pass true if want content access by given uid else false.
          */
-        public Builder withContentAccess(boolean b) {
-            this.attachContentAccess = b;
+        public Builder withContentAccess() {
+            this.attachContentAccess = true;
             return this;
         }
 

@@ -12,7 +12,6 @@ import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
-import org.ekstep.genieservices.commons.IDownloadManager;
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentData;
@@ -26,7 +25,6 @@ import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
-import org.ekstep.genieservices.commons.bean.DownloadProgress;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GameData;
@@ -122,10 +120,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         if (content.isAvailableLocally()) {
             String uid = ContentHandler.getCurrentUserId(userService);
             if (contentDetailsRequest.isAttachFeedback()) {
-                ContentFeedbackCriteria.Builder builder = new ContentFeedbackCriteria.Builder();
-                builder.byUser(uid)
-                        .forContent(content.getIdentifier());
-                content.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, builder.build()));
+                content.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, content.getIdentifier(), uid));
             }
 
             if (contentDetailsRequest.isAttachContentAccess()) {
@@ -145,22 +140,18 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         GenieResponse<List<Content>> response;
 
-        List<ContentModel> contentModelListInDB = ContentHandler.getAllLocalContentSortedByContentAccess(mAppContext.getDBSession(), criteria);
+        List<ContentModel> contentModelListInDB = ContentHandler.getAllLocalContent(mAppContext.getDBSession(), criteria);
 
         List<Content> contentList = new ArrayList<>();
         for (ContentModel contentModel : contentModelListInDB) {
             Content c = ContentHandler.convertContentModelToBean(contentModel);
 
             if (criteria.attachFeedback()) {
-                ContentFeedbackCriteria.Builder builder = new ContentFeedbackCriteria.Builder();
-                builder.byUser(criteria.getUid())
-                        .forContent(c.getIdentifier());
-                c.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, builder.build()));
+                c.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, c.getIdentifier(), criteria.getUid()));
             }
             if (criteria.attachContentAccess()) {
                 c.setContentAccess(ContentHandler.getContentAccess(userService, c.getIdentifier(), criteria.getUid()));
             }
-
             contentList.add(c);
         }
 
