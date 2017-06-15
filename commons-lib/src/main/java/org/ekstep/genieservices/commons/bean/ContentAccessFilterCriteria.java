@@ -11,12 +11,10 @@ public class ContentAccessFilterCriteria {
 
     private String contentId;
     private String uid;
-    private ContentType[] contentTypes;
 
-    private ContentAccessFilterCriteria(String contentId, String uid, ContentType[] contentTypes) {
+    private ContentAccessFilterCriteria(String contentId, String uid) {
         this.contentId = contentId;
         this.uid = uid;
-        this.contentTypes = contentTypes;
     }
 
     public String getContentId() {
@@ -27,14 +25,9 @@ public class ContentAccessFilterCriteria {
         return uid;
     }
 
-    public ContentType[] getContentTypes() {
-        return contentTypes;
-    }
-
     public static class Builder {
         private String contentId;
         private String uid;
-        private ContentType[] contentTypes;
 
         public Builder forContent(String contentId) {
             this.contentId = contentId;
@@ -46,13 +39,8 @@ public class ContentAccessFilterCriteria {
             return this;
         }
 
-        public Builder contentTypes(ContentType[] contentTypes) {
-            this.contentTypes = contentTypes;
-            return this;
-        }
-
         public ContentAccessFilterCriteria build() {
-            return new ContentAccessFilterCriteria(contentId, uid, contentTypes);
+            return new ContentAccessFilterCriteria(contentId, uid);
         }
     }
 
