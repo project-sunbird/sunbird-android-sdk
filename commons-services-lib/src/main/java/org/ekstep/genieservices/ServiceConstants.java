@@ -176,6 +176,10 @@ public interface ServiceConstants {
         String IMPORT_PROFILE_FAILED = "Import profile failed.";
         String IMPORT_CONTENT_FAILED = "Import content failed.";
         String IMPORT_TELEMETRY_FAILED = "Import telemetry failed.";
+        String FILE_DOESNT_EXIST = "Content import failed, file doesn't exist.";
+        String UNSUPPORTED_FILE = "Content import failed, unsupported file extension";
+        String CONTENT_NOT_FOUND = "No content found for identifier = ";
+        String CONTENT_NOT_FOUND_TO_DELETE = "No content found to delete for identifier = ";
     }
     interface ContentStatus {
         String LIVE = "LIVE";
