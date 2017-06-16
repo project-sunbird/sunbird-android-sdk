@@ -4,6 +4,7 @@ import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
+import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentLearnerState;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportRequest;
@@ -213,6 +214,15 @@ public class UserService {
             @Override
             public GenieResponse<Void> perform() {
                 return userService.addContentAccess(contentAccess);
+            }
+        });
+    }
+
+    public void getAllContentAccess(final ContentAccessFilterCriteria criteria, IResponseHandler<List<ContentAccess>> responseHandler) {
+        new AsyncHandler<List<ContentAccess>>(responseHandler).execute(new IPerformable<List<ContentAccess>>() {
+            @Override
+            public GenieResponse<List<ContentAccess>> perform() {
+                return userService.getAllContentAccess(criteria);
             }
         });
     }
