@@ -33,7 +33,7 @@ public class DownloadServiceImpl implements IDownloadService {
     public DownloadServiceImpl(AppContext appContext) {
         this.mAppContext = appContext;
         this.mDownloadQueueManager = new DownloadQueueManager(mAppContext.getKeyValueStore());
-        mDownloadManager = mAppContext.getDownloadManager();
+        this.mDownloadManager = mAppContext.getDownloadManager();
         // TODO: 14/6/17  Figure it out later
 //        resumeDownloads();
     }
@@ -119,6 +119,7 @@ public class DownloadServiceImpl implements IDownloadService {
         DownloadRequest request = mDownloadQueueManager.getRequestByIdentifier(identifier);
         if (request != null) {
             if (request.getDownloadId() != -1) {
+                mExecutor.shutdown();
                 mDownloadManager.cancel(request.getDownloadId());
                 mDownloadQueueManager.removeFromCurrentDownloadQueue(identifier);
             }
