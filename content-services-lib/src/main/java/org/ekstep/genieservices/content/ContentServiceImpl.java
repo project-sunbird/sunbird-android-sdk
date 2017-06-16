@@ -194,9 +194,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         if (ContentHandler.hasChildren(contentModel.getLocalData())) {
 
             //add hierarchy info
-            HierarchyInfo hierarchyInfo = new HierarchyInfo();
-            hierarchyInfo.setContentType(contentModel.getContentType());
-            hierarchyInfo.setIdentifier(contentModel.getIdentifier());
+            HierarchyInfo hierarchyInfo = new HierarchyInfo(contentModel.getIdentifier(), contentModel.getContentType());
 
             List<HierarchyInfo> hierarchyInfoList = new ArrayList<>();
             hierarchyInfoList.addAll(sourceInfoList);

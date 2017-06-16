@@ -5,12 +5,12 @@ package org.ekstep.genieservices.commons.bean;
  *
  * @author anil
  */
-public class ContentFeedbackCriteria {
+public class ContentFeedbackFilterCriteria {
 
     private String uid;
     private String contentId;
 
-    private ContentFeedbackCriteria(String uid, String contentId) {
+    private ContentFeedbackFilterCriteria(String uid, String contentId) {
         this.uid = uid;
         this.contentId = contentId;
     }
@@ -37,8 +37,8 @@ public class ContentFeedbackCriteria {
             return this;
         }
 
-        public ContentFeedbackCriteria build() {
-            return new ContentFeedbackCriteria(uid, contentId);
+        public ContentFeedbackFilterCriteria build() {
+            return new ContentFeedbackFilterCriteria(uid, contentId);
         }
     }
 }

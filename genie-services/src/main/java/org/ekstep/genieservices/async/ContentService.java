@@ -9,7 +9,7 @@ import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
-import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
+import org.ekstep.genieservices.commons.bean.ContentFeedbackFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
@@ -265,11 +265,11 @@ public class ContentService {
         });
     }
 
-    public void getFeedback(final ContentFeedbackCriteria contentFeedbackCriteria, IResponseHandler<List<ContentFeedback>> responseHandler) {
+    public void getFeedback(final ContentFeedbackFilterCriteria contentFeedbackFilterCriteria, IResponseHandler<List<ContentFeedback>> responseHandler) {
         new AsyncHandler<List<ContentFeedback>>(responseHandler).execute(new IPerformable<List<ContentFeedback>>() {
             @Override
             public GenieResponse<List<ContentFeedback>> perform() {
-                return contentFeedbackService.getFeedback(contentFeedbackCriteria);
+                return contentFeedbackService.getFeedback(contentFeedbackFilterCriteria);
             }
         });
     }

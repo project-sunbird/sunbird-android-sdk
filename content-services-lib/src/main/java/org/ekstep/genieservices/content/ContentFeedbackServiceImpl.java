@@ -7,7 +7,7 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
-import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
+import org.ekstep.genieservices.commons.bean.ContentFeedbackFilterCriteria;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.telemetry.GEFeedback;
@@ -71,7 +71,7 @@ public class ContentFeedbackServiceImpl extends BaseService implements IContentF
     }
 
     @Override
-    public GenieResponse<List<ContentFeedback>> getFeedback(ContentFeedbackCriteria criteria) {
+    public GenieResponse<List<ContentFeedback>> getFeedback(ContentFeedbackFilterCriteria criteria) {
         GenieResponse<List<ContentFeedback>> response;
 
         String isUid = String.format(Locale.US, "%s = '%s'", ContentFeedbackEntry.COLUMN_NAME_UID, criteria.getUid());

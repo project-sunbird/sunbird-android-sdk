@@ -1,7 +1,7 @@
 package org.ekstep.genieservices;
 
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
-import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
+import org.ekstep.genieservices.commons.bean.ContentFeedbackFilterCriteria;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 
 import java.util.List;
@@ -26,9 +26,9 @@ public interface IContentFeedbackService {
      * <p>
      * On failing to fetch the data, the response will return status as FALSE with the following error.
      *
-     * @param contentFeedbackCriteria - {@link ContentFeedbackCriteria}
+     * @param contentFeedbackFilterCriteria - {@link ContentFeedbackFilterCriteria}
      * @return {@link GenieResponse<List<ContentFeedback>>}
      */
-    GenieResponse<List<ContentFeedback>> getFeedback(ContentFeedbackCriteria contentFeedbackCriteria);
+    GenieResponse<List<ContentFeedback>> getFeedback(ContentFeedbackFilterCriteria contentFeedbackFilterCriteria);
 
 }

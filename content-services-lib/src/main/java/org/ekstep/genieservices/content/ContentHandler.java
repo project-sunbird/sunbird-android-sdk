@@ -12,7 +12,7 @@ import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
-import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
+import org.ekstep.genieservices.commons.bean.ContentFeedbackFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingResult;
@@ -396,7 +396,7 @@ public class ContentHandler {
 
     public static List<ContentFeedback> getContentFeedback(IContentFeedbackService contentFeedbackService, String identifier, String uid) {
         if (contentFeedbackService != null) {
-            ContentFeedbackCriteria.Builder builder = new ContentFeedbackCriteria.Builder();
+            ContentFeedbackFilterCriteria.Builder builder = new ContentFeedbackFilterCriteria.Builder();
             builder.byUser(uid).forContent(identifier);
             return contentFeedbackService.getFeedback(builder.build()).getResult();
         }
