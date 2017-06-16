@@ -216,7 +216,9 @@ public class ExtractPayloads implements IChainable {
                     FileUtil.rm(new File(oldContentPath));
                 }
             }
+            importContext.setIdentifiers(identifier);
         }
+
 
         if (nextLink != null) {
             return nextLink.execute(appContext, importContext);

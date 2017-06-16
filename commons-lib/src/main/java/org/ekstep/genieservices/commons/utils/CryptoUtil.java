@@ -23,12 +23,12 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-public class Crypto {
+public class CryptoUtil {
     public static final String AES = "AES";
     public static final String CIPHER_AES = "AES/CBC/PKCS7Padding";
     private static final String ALGO = "RSA";
     private static final String CIPHER_ALGO = "RSA/ECB/PKCS1Padding";
-    private static final String TAG = "org.ekstep.genieservices.util-Crypto";
+    private static final String TAG = "org.ekstep.genieservices.util-CryptoUtil";
 
     public static String checksum(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         MessageDigest md = null;
@@ -59,7 +59,7 @@ public class Crypto {
         byte[] plainTextByte = plainText.getBytes("UTF-8");
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, iv);
         byte[] encryptedBytes = cipher.doFinal(plainTextByte);
-        String encryptedText = Base64.encodeToString(encryptedBytes, Base64.DEFAULT);
+        String encryptedText = Base64Util.encodeToString(encryptedBytes, Base64Util.DEFAULT);
         return encryptedText;
     }
 
@@ -75,7 +75,7 @@ public class Crypto {
         String temp = new String(publicKey);
         temp = temp.replace("-----BEGIN PUBLIC KEY-----\n", "");
         temp = temp.replace("-----END PUBLIC KEY-----", "");
-        byte[] byteKey = Base64.decode(temp.getBytes("UTF-8"), Base64.DEFAULT);
+        byte[] byteKey = Base64Util.decode(temp.getBytes("UTF-8"), Base64Util.DEFAULT);
         X509EncodedKeySpec X509publicKey = new X509EncodedKeySpec(byteKey);
         KeyFactory kf = KeyFactory.getInstance(ALGO);
         PublicKey _public_key = kf.generatePublic(X509publicKey);
@@ -83,7 +83,7 @@ public class Crypto {
         cipher.init(Cipher.ENCRYPT_MODE, _public_key);
 //        byte[] stringBytes = testString.getBytes("UTF-8");
         byte[] encryptedBytes = cipher.doFinal(testString);
-        String encryptedData = Base64.encodeToString(encryptedBytes, Base64.DEFAULT);
+        String encryptedData = Base64Util.encodeToString(encryptedBytes, Base64Util.DEFAULT);
         return encryptedData;
     }
 
@@ -106,7 +106,7 @@ public class Crypto {
         String temp = new String(publicKey);
         temp = temp.replace("-----BEGIN PUBLIC KEY-----\n", "");
         temp = temp.replace("-----END PUBLIC KEY-----", "");
-        byte[] byteKey = Base64.decode(temp.getBytes("UTF-8"), Base64.DEFAULT);
+        byte[] byteKey = Base64Util.decode(temp.getBytes("UTF-8"), Base64Util.DEFAULT);
         X509EncodedKeySpec X509publicKey = new X509EncodedKeySpec(byteKey);
         KeyFactory kf = KeyFactory.getInstance(ALGO);
         PublicKey _public_key = kf.generatePublic(X509publicKey);
@@ -114,7 +114,7 @@ public class Crypto {
         cipher.init(Cipher.ENCRYPT_MODE, _public_key);
         byte[] stringBytes = testString.getBytes("UTF-8");
         byte[] encryptedBytes = cipher.doFinal(stringBytes);
-        String encryptedData = Base64.encodeToString(encryptedBytes, Base64.DEFAULT);
+        String encryptedData = Base64Util.encodeToString(encryptedBytes, Base64Util.DEFAULT);
         return encryptedData;
     }
 
@@ -122,7 +122,7 @@ public class Crypto {
         Cipher cipher = Cipher.getInstance(CIPHER_ALGO);
         cipher.init(Cipher.DECRYPT_MODE, key);
         byte[] decryptedBytes = cipher.doFinal(encrypted);
-        String decryptedData = Base64.encodeToString(decryptedBytes, Base64.DEFAULT);
+        String decryptedData = Base64Util.encodeToString(decryptedBytes, Base64Util.DEFAULT);
         return decryptedData;
     }
 
@@ -132,7 +132,7 @@ public class Crypto {
         String privKeyPEM = temp.replace("-----BEGIN PRIVATE KEY-----\n", "");
         privKeyPEM = privKeyPEM.replace("-----END PRIVATE KEY-----", "");
 
-        byte[] decoded = Base64.decode(privKeyPEM.getBytes("UTF-8"), Base64.DEFAULT);
+        byte[] decoded = Base64Util.decode(privKeyPEM.getBytes("UTF-8"), Base64Util.DEFAULT);
 
         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(decoded);
         KeyFactory kf = KeyFactory.getInstance(ALGO);
@@ -143,7 +143,7 @@ public class Crypto {
         String temp = new String(publicKey);
         temp = temp.replace("-----BEGIN PUBLIC KEY-----\n", "");
         temp = temp.replace("-----END PUBLIC KEY-----", "");
-        byte[] byteKey = Base64.decode(temp.getBytes("UTF-8"), Base64.DEFAULT);
+        byte[] byteKey = Base64Util.decode(temp.getBytes("UTF-8"), Base64Util.DEFAULT);
         X509EncodedKeySpec X509publicKey = new X509EncodedKeySpec(byteKey);
         KeyFactory kf = KeyFactory.getInstance(ALGO);
         PublicKey _public_key = kf.generatePublic(X509publicKey);
@@ -151,18 +151,18 @@ public class Crypto {
     }
 
     public static String convertSecretKeyToString(SecretKey aesKey) {
-        return Base64.encodeToString(aesKey.getEncoded(), Base64.DEFAULT);
+        return Base64Util.encodeToString(aesKey.getEncoded(), Base64Util.DEFAULT);
     }
 
     public static SecretKey generateSecretKey(String secretKeyString) throws UnsupportedEncodingException {
-        byte[] byteKey = Base64.decode(secretKeyString.getBytes("UTF-8"), Base64.DEFAULT);
+        byte[] byteKey = Base64Util.decode(secretKeyString.getBytes("UTF-8"), Base64Util.DEFAULT);
         return new SecretKeySpec(byteKey, 0, byteKey.length, AES);
     }
 
     public static String decryptWithSecretKey(String data, SecretKey secretKey, String ivString) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, UnsupportedEncodingException, InvalidAlgorithmParameterException {
-        byte[] encryptedDataBytes = Base64.decode(data.getBytes("UTF-8"), Base64.DEFAULT);
+        byte[] encryptedDataBytes = Base64Util.decode(data.getBytes("UTF-8"), Base64Util.DEFAULT);
         Cipher cipher = Cipher.getInstance(CIPHER_AES);
-        byte[] ivBytes = Base64.decode(ivString.getBytes("UTF-8"), Base64.DEFAULT);
+        byte[] ivBytes = Base64Util.decode(ivString.getBytes("UTF-8"), Base64Util.DEFAULT);
         IvParameterSpec ivSpec = new IvParameterSpec(ivBytes);
         cipher.init(Cipher.DECRYPT_MODE, secretKey, ivSpec);
         byte[] decryptedBytes = cipher.doFinal(encryptedDataBytes);

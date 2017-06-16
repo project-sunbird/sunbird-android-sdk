@@ -52,19 +52,19 @@ public class GetAllLanguagesTask extends BaseTask {
     protected GenieResponse<Map> execute() {
         List<Language> languages = new ArrayList<>();
 
-        Language enLanguage = new Language(LANG_ENGLISH, ENGLISH);
+        Language enLanguage = new Language(ENGLISH, LANG_ENGLISH);
         languages.add(enLanguage);
 
-        Language hiLanguage = new Language(LANG_HINDI, HINDI);
+        Language hiLanguage = new Language(HINDI, LANG_HINDI);
         languages.add(hiLanguage);
 
-        Language knLanguage = new Language(LANG_KANNADA, KANNADA);
+        Language knLanguage = new Language(KANNADA, LANG_KANNADA);
         languages.add(knLanguage);
 
-        Language teLanguage = new Language(LANG_TELUGU, TELUGU);
+        Language teLanguage = new Language(TELUGU, LANG_TELUGU);
         languages.add(teLanguage);
 
-        Language mrLanguage = new Language(LANG_MARATHI, MARATHI);
+        Language mrLanguage = new Language(MARATHI, LANG_MARATHI);
         languages.add(mrLanguage);
 
         GenieResponse<List<Language>> response = getLanguageSuccessResponse(Constants.SUCCESSFUL, languages);

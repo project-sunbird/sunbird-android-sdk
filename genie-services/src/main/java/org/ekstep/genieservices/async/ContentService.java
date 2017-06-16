@@ -6,12 +6,13 @@ import org.ekstep.genieservices.IContentService;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
-import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
 import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
+import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
+import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
@@ -269,6 +270,24 @@ public class ContentService {
             @Override
             public GenieResponse<List<ContentFeedback>> perform() {
                 return contentFeedbackService.getFeedback(contentFeedbackCriteria);
+            }
+        });
+    }
+
+    public void getImportStatus(final String identifier, IResponseHandler<ContentImportResponse> responseHandler) {
+        new AsyncHandler<ContentImportResponse>(responseHandler).execute(new IPerformable<ContentImportResponse>() {
+            @Override
+            public GenieResponse<ContentImportResponse> perform() {
+                return contentService.getImportStatus(identifier);
+            }
+        });
+    }
+
+    public void cancelDownload(final String identifier, IResponseHandler<Void> responseHandler) {
+        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return contentService.cancelDownload(identifier);
             }
         });
     }

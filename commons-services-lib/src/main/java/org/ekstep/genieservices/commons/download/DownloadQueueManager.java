@@ -26,13 +26,11 @@ public class DownloadQueueManager {
     }
 
     public List<DownloadRequest> getAllRequests() {
-        List<DownloadRequest> requestList;
+        List<DownloadRequest> requestList=new ArrayList<>();
         String jsonContents = mKeyValueStore.getString(DOWNLOAD_QUEUE, null);
         if (!StringUtil.isNullOrEmpty(jsonContents)) {
             DownloadRequest[] contentItems = GsonUtil.fromJson(jsonContents, DownloadRequest[].class);
-            requestList = Arrays.asList(contentItems);
-        } else {
-            requestList = new ArrayList<>();
+            requestList.addAll(Arrays.asList(contentItems));
         }
         return requestList;
     }
@@ -110,13 +108,11 @@ public class DownloadQueueManager {
     }
 
     public List<String> getCurrentDownloads() {
-        List<String> downloadingList;
+        List<String> downloadingList=new ArrayList<>();
         String jsonContents = mKeyValueStore.getString(CURRENT_DOWNLOAD, null);
         if (!StringUtil.isNullOrEmpty(jsonContents)) {
             String[] items = GsonUtil.fromJson(jsonContents, String[].class);
-            downloadingList = Arrays.asList(items);
-        } else {
-            downloadingList = new ArrayList<>();
+            downloadingList.addAll(Arrays.asList(items));
         }
         return downloadingList;
     }

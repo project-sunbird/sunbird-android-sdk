@@ -6,6 +6,7 @@ import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
+import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
@@ -165,5 +166,9 @@ public interface IContentService {
     GenieResponse<Void> importEcar(EcarImportRequest ecarImportRequest);
 
     GenieResponse<Void> importContent(ContentImportRequest contentImportRequest);
+
+    GenieResponse<ContentImportResponse> getImportStatus(String identifier);
+
+    GenieResponse<Void> cancelDownload(String identifier);
 
 }

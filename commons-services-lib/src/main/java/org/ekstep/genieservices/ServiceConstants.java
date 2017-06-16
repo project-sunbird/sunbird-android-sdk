@@ -37,8 +37,19 @@ public interface ServiceConstants {
     String EXPORTED_ECAR_DESTINATION_LOCATION = "ecarLocation";
     String EXPORTED_EPAR_DESTINATION_LOCATION = "eparLocation";
     String UNCOMPRESSED_SOURCE_LOCATION = "location";
-    String BUNDLE_KEY_IS_CHILD = "is_child";
-    String BUNDLE_KEY_LOCAL_FILE_PATH = "local_file_path";
+
+    interface BundleKey {
+        //ContentPlayer
+        String BUNDLE_KEY_ORIGIN = "origin";
+        String BUNDLE_KEY_CONTENT_EXTRAS = "contentExtras";
+        String BUNDLE_KEY_APP_INFO = "appInfo";
+        String BUNDLE_KEY_LANGUAGE_INFO = "languageInfo";
+        String BUNDLE_KEY_APP_QUALIFIER = "appQualifier";
+
+        String BUNDLE_KEY_IS_CHILD = "is_child";
+        String BUNDLE_KEY_LOCAL_FILE_PATH = "local_file_path";
+        String BUNDLE_KEY_DESTINATION_FILE_PATH = "destination_file_path";
+    }
 
     interface FileExtension {
         String CONTENT = "ecar";
@@ -165,6 +176,10 @@ public interface ServiceConstants {
         String IMPORT_PROFILE_FAILED = "Import profile failed.";
         String IMPORT_CONTENT_FAILED = "Import content failed.";
         String IMPORT_TELEMETRY_FAILED = "Import telemetry failed.";
+        String FILE_DOESNT_EXIST = "Content import failed, file doesn't exist.";
+        String UNSUPPORTED_FILE = "Content import failed, unsupported file extension";
+        String CONTENT_NOT_FOUND = "No content found for identifier = ";
+        String CONTENT_NOT_FOUND_TO_DELETE = "No content found to delete for identifier = ";
     }
     interface ContentStatus {
         String LIVE = "LIVE";

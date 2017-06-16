@@ -33,8 +33,9 @@ public class DownloadServiceImpl implements IDownloadService {
     public DownloadServiceImpl(AppContext appContext) {
         this.mAppContext = appContext;
         this.mDownloadQueueManager = new DownloadQueueManager(mAppContext.getKeyValueStore());
-        mDownloadManager = mAppContext.getDownloadManager();
-        resumeDownloads();
+        this.mDownloadManager = mAppContext.getDownloadManager();
+        // TODO: 14/6/17  Figure it out later
+//        resumeDownloads();
     }
 
     @Override
@@ -98,7 +99,10 @@ public class DownloadServiceImpl implements IDownloadService {
             public void run() {
                 DownloadProgress downloadProgress = mDownloadManager.getProgress(downloadId);
                 downloadProgress.setIdentifier(identifier);
-                if (downloadProgress.getStatus() == IDownloadManager.UNKNOWN || downloadProgress.getStatus() == IDownloadManager.FAILED || downloadProgress.getStatus() == IDownloadManager.COMPLETED) {
+                if (downloadProgress.getStatus() == IDownloadManager.UNKNOWN || downloadProgress.getStatus() == IDownloadManager.FAILED) {
+                    mExecutor.shutdown();
+                } else if (downloadProgress.getStatus() == IDownloadManager.COMPLETED) {
+                    EventPublisher.postDownloadProgress(downloadProgress);
                     mExecutor.shutdown();
                 } else if (downloadProgress.getStatus() == IDownloadManager.NOT_STARTED) {
                     //do nothing
@@ -115,6 +119,7 @@ public class DownloadServiceImpl implements IDownloadService {
         DownloadRequest request = mDownloadQueueManager.getRequestByIdentifier(identifier);
         if (request != null) {
             if (request.getDownloadId() != -1) {
+                mExecutor.shutdown();
                 mDownloadManager.cancel(request.getDownloadId());
                 mDownloadQueueManager.removeFromCurrentDownloadQueue(identifier);
             }
@@ -136,13 +141,17 @@ public class DownloadServiceImpl implements IDownloadService {
     @Override
     public DownloadProgress getProgress(String identifier) {
         DownloadRequest request = mDownloadQueueManager.getRequestByIdentifier(identifier);
-        long downloadId = -1;
+        DownloadProgress progress = new DownloadProgress(-1);
+        progress.setIdentifier(identifier);
         if (request != null) {
-            downloadId = request.getDownloadId();
-        }
-        DownloadProgress progress = mDownloadManager.getProgress(downloadId);
-        if (progress.getStatus() == IDownloadManager.COMPLETED) {
-            progress.setDownloadPath(mDownloadManager.getDownloadPath(downloadId));
+            if (request.getDownloadId() == -1) {
+                progress.setStatus(0);
+            } else {
+                progress = mDownloadManager.getProgress(request.getDownloadId());
+                if (progress.getStatus() == IDownloadManager.COMPLETED) {
+                    progress.setDownloadPath(mDownloadManager.getDownloadPath(request.getDownloadId()));
+                }
+            }
         }
         return progress;
     }

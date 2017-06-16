@@ -9,16 +9,7 @@ import java.util.Map;
  */
 public class ContentLearnerState {
 
-    private String contentId;
     private Map<String, Object> learnerState;
-
-    public String getContentId() {
-        return contentId;
-    }
-
-    public void setContentId(String contentId) {
-        this.contentId = contentId;
-    }
 
     public Map<String, Object> getLearnerState() {
         return learnerState;

@@ -35,8 +35,9 @@ public class DownloadFileReceiver extends BroadcastReceiver {
                     //Ideally get the service class from Reflection utils with a service name provided in the downloadRequest
                     Class _class = ReflectionUtil.getClass(request.getProcessorClass());
                     Intent serviceIntent = new Intent(context, _class);
-                    serviceIntent.putExtra(ServiceConstants.BUNDLE_KEY_IS_CHILD, request.isChildContent());
-                    serviceIntent.putExtra(ServiceConstants.BUNDLE_KEY_LOCAL_FILE_PATH, localFilePath);
+                    serviceIntent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_IS_CHILD, request.isChildContent());
+                    serviceIntent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_LOCAL_FILE_PATH, localFilePath);
+                    serviceIntent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_DESTINATION_FILE_PATH, request.getDestinationFolder());
                     context.startService(serviceIntent);
                     break;
                 case IDownloadManager.FAILED:

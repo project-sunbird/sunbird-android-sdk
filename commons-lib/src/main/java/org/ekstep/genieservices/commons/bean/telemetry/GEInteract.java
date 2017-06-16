@@ -155,7 +155,10 @@ public class GEInteract extends Telemetry {
 
         public Builder coRelation(List<CoRelation> coRelation) {
             this.coRelation = new ArrayList<>();
-            this.coRelation.addAll(coRelation);
+            if(!CollectionUtil.isNullOrEmpty(coRelation)){
+                this.coRelation.addAll(coRelation);
+            }
+
             return this;
         }
 

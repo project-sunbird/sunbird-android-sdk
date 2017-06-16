@@ -41,7 +41,7 @@ public class SetUserUriHandler implements IUriHandler {
         if (genieService != null && selection != null) {
             Logger.i(TAG, "User Id - " + selection);
             cursor = getMatrixCursor();
-            GenieResponse genieResponse = genieService.getUserProfileService().setCurrentUser(selection);
+            GenieResponse genieResponse = genieService.getUserService().setCurrentUser(selection);
 
             if (genieResponse != null) {
                 cursor.addRow(new String[]{new Gson().toJson(genieResponse)});

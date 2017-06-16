@@ -14,11 +14,10 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
-import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
-import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
+import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
@@ -97,8 +96,10 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
     @Override
     public GenieResponse<Content> getContentDetails(ContentDetailsRequest contentDetailsRequest) {
-        // TODO: Telemetry logger
         String methodName = "getContentDetails@ContentServiceImpl";
+        HashMap params = new HashMap();
+        params.put("request", GsonUtil.toJson(contentDetailsRequest));
+        params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
 
         GenieResponse<Content> response;
         ContentModel contentModelInDB = ContentModel.find(mAppContext.getDBSession(), contentDetailsRequest.getContentId());
@@ -106,7 +107,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         if (contentModelInDB == null) {     // Fetch from server if detail is not available in DB
             Map contentData = ContentHandler.fetchContentDetailsFromServer(mAppContext, contentDetailsRequest.getContentId());
             if (contentData == null) {
-                response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, "No content found for identifier = " + contentDetailsRequest.getContentId(), TAG);
+                response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, ServiceConstants.ErrorMessage.CONTENT_NOT_FOUND + contentDetailsRequest.getContentId(), TAG);
+                TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.CONTENT_NOT_FOUND + contentDetailsRequest.getContentId());
                 return response;
             }
 
@@ -119,12 +121,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         if (content.isAvailableLocally()) {
             String uid = ContentHandler.getCurrentUserId(userService);
-            if (contentDetailsRequest.isAttachFeedback()) {
-                ContentFeedbackCriteria.Builder builder = new ContentFeedbackCriteria.Builder();
-                builder.byUser(uid)
-                        .forContent(content.getIdentifier());
-                content.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, builder.build()));
-            }
+                if (contentDetailsRequest.isAttachFeedback()) {
+                    content.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, content.getIdentifier(), uid));
+                }
 
             if (contentDetailsRequest.isAttachContentAccess()) {
                 content.setContentAccess(ContentHandler.getContentAccess(userService, content.getIdentifier(), uid));
@@ -133,68 +132,64 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(content);
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;
     }
 
     @Override
     public GenieResponse<List<Content>> getAllLocalContent(ContentFilterCriteria criteria) {
-        // TODO: Telemetry logger
         String methodName = "getAllLocalContent@ContentServiceImpl";
+        HashMap params = new HashMap();
+        params.put("criteria", GsonUtil.toJson(criteria));
 
         GenieResponse<List<Content>> response;
 
-        List<ContentModel> contentModelListInDB = ContentHandler.getAllLocalContentSortedByContentAccess(mAppContext.getDBSession(), criteria);
+        List<ContentModel> contentModelListInDB = ContentHandler.getAllLocalContent(mAppContext.getDBSession(), criteria);
 
         List<Content> contentList = new ArrayList<>();
         for (ContentModel contentModel : contentModelListInDB) {
             Content c = ContentHandler.convertContentModelToBean(contentModel);
 
             if (criteria.attachFeedback()) {
-                ContentFeedbackCriteria.Builder builder = new ContentFeedbackCriteria.Builder();
-                builder.byUser(criteria.getUid())
-                        .forContent(c.getIdentifier());
-                c.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, builder.build()));
+                c.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, c.getIdentifier(), criteria.getUid()));
             }
             if (criteria.attachContentAccess()) {
                 c.setContentAccess(ContentHandler.getContentAccess(userService, c.getIdentifier(), criteria.getUid()));
             }
-
             contentList.add(c);
         }
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(contentList);
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;
     }
 
     @Override
     public GenieResponse<Content> getChildContents(ChildContentRequest childContentRequest) {
-        // TODO: Telemetry logger
         String methodName = "getChildContents@ContentServiceImpl";
+        HashMap params = new HashMap();
+        params.put("request", GsonUtil.toJson(childContentRequest));
 
-        List<HierarchyInfo> hierarchyInfoList = new ArrayList<>();
         GenieResponse<Content> response;
+        List<HierarchyInfo> hierarchyInfoList = new ArrayList<>();
         ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), childContentRequest.getContentId());
         if (contentModel == null) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, "No content found for identifier = " + childContentRequest.getContentId(), TAG);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, ServiceConstants.ErrorMessage.CONTENT_NOT_FOUND + childContentRequest.getContentId(), TAG);
             return response;
         }
 
         //check and fetch all childrens of this content
-        List<Content> childrenList = checkAndFetchChildrenOfContent(contentModel, hierarchyInfoList);
+        Content content = checkAndFetchChildrenOfContent(contentModel, hierarchyInfoList);
 
-        Content content = ContentHandler.convertContentModelToBean(contentModel);
-        if (childrenList != null) {
-            content.setChildren(childrenList);
-        }
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(content);
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;
     }
 
-    private List<Content> checkAndFetchChildrenOfContent(ContentModel contentModel, List<HierarchyInfo> hierarchyInfoList) {
-        List<Content> contentList = new ArrayList<>();
-
+    private Content checkAndFetchChildrenOfContent(ContentModel contentModel, List<HierarchyInfo> sourceInfoList) {
+        Content content = ContentHandler.convertContentModelToBean(contentModel);
         // check if the content model has immediate children
         if (ContentHandler.hasChildren(contentModel.getLocalData())) {
 
@@ -202,35 +197,54 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             HierarchyInfo hierarchyInfo = new HierarchyInfo();
             hierarchyInfo.setContentType(contentModel.getContentType());
             hierarchyInfo.setIdentifier(contentModel.getIdentifier());
+
+            List<HierarchyInfo> hierarchyInfoList = new ArrayList<>();
+            hierarchyInfoList.addAll(sourceInfoList);
             hierarchyInfoList.add(hierarchyInfo);
 
             //get all the children
             List<ContentModel> contentModelList = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), contentModel.getLocalData(), ContentConstants.ChildContents.FIRST_LEVEL_ALL);
 
-            //check for null and size more than 0
+            //check for null
             if (contentModelList != null) {
+
+                List<Content> childContents = new ArrayList<>();
+
                 for (ContentModel perContentModel : contentModelList) {
                     Content perContent = ContentHandler.convertContentModelToBean(perContentModel);
                     perContent.setChildrenHierarchyInfo(hierarchyInfoList);
-                    //add this content to the list
-                    contentList.add(perContent);
 
-                    //recurse again on this content
-                    checkAndFetchChildrenOfContent(perContentModel, hierarchyInfoList);
+                    //check if this content has children
+                    if (ContentHandler.hasChildren(perContentModel.getLocalData())) {
+                        //recurse again on this content
+                        Content iteratedContent = checkAndFetchChildrenOfContent(perContentModel, hierarchyInfoList);
+                        perContent.setChildren(iteratedContent.getChildren());
+                    }
+
+                    childContents.add(perContent);
                 }
+
+                //add children to the main content
+                content.setChildren(childContents);
             }
         }
 
-        return contentList;
+        return content;
     }
 
     @Override
     public GenieResponse<Void> deleteContent(ContentDeleteRequest deleteRequest) {
+
+        HashMap params = new HashMap();
+        params.put("request", GsonUtil.toJson(deleteRequest));
+        String methodName = "deleteContent@ContentServiceImpl";
+
         GenieResponse<Void> response;
         ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), deleteRequest.getContentId());
 
         if (contentModel == null) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, "No content found to delete for identifier = " + deleteRequest.getContentId(), TAG);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, ServiceConstants.ErrorMessage.CONTENT_NOT_FOUND_TO_DELETE + deleteRequest.getContentId(), TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.NO_CONTENT_LISTING_DATA);
             return response;
         }
 
@@ -248,11 +262,17 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         ContentHandler.deleteOrUpdateContent(contentModel, false, deleteRequest.isChildContent());
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;
     }
 
     @Override
     public GenieResponse<ContentListingResult> getContentListing(ContentListingCriteria contentListingCriteria) {
+        HashMap params = new HashMap();
+        params.put("criteria", GsonUtil.toJson(contentListingCriteria));
+        params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
+        String methodName = "getContentListing@ContentServiceImpl";
+
         Profile profile = contentListingCriteria.getProfile();
 
         String jsonStr = null;
@@ -284,15 +304,22 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             if (contentListingResult != null) {
                 GenieResponse<ContentListingResult> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
                 response.setResult(contentListingResult);
+                TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
                 return response;
             }
         }
-
-        return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.DATA_NOT_FOUND_ERROR, ServiceConstants.ErrorMessage.NO_CONTENT_LISTING_DATA, TAG);
+        GenieResponse response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.DATA_NOT_FOUND_ERROR, ServiceConstants.ErrorMessage.NO_CONTENT_LISTING_DATA, TAG);
+        TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.NO_CONTENT_LISTING_DATA);
+        return response;
     }
 
     @Override
     public GenieResponse<ContentSearchResult> searchContent(ContentSearchCriteria contentSearchCriteria) {
+        HashMap params = new HashMap();
+        params.put("request", GsonUtil.toJson(contentSearchCriteria));
+        params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
+        String methodName = "searchContent@ContentServiceImpl";
+
         GenieResponse<ContentSearchResult> response;
 
         Map<String, Object> requestMap = ContentHandler.getSearchRequest(userService, configService, contentSearchCriteria);
@@ -319,7 +346,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
             String contentDataList = null;
             if (result.containsKey("content")) {
-                contentDataList = (String) result.get("content");
+                contentDataList = GsonUtil.toJson(result.get("content"));
             }
 
             ContentSearchResult searchResult = new ContentSearchResult();
@@ -337,18 +364,21 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(searchResult);
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
             return response;
         }
 
         response = GenieResponseBuilder.getErrorResponse(apiResponse.getError(), (String) apiResponse.getErrorMessages().get(0), TAG);
+        TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, (String) apiResponse.getErrorMessages().get(0));
         return response;
     }
 
     @Override
     public GenieResponse<RecommendedContentResult> getRecommendedContent(RecommendedContentRequest request) {
-//        HashMap params = new HashMap();
-//        params.put("mode", getNetworkMode());
-        String method = "getRecommendedContents@ContentServiceImpl";
+        HashMap params = new HashMap();
+        params.put("request", GsonUtil.toJson(request));
+        params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
+        String methodName = "getRecommendedContents@ContentServiceImpl";
 
         GenieResponse<RecommendedContentResult> response;
         RecommendedContentAPI recommendedContentAPI = new RecommendedContentAPI(mAppContext, ContentHandler.getRecommendedContentRequest(request, mAppContext.getDeviceInfo().getDeviceID()));
@@ -366,33 +396,37 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 responseMessageId = (String) responseParams.get("resmsgid");
             }
 
-            List<Map<String, Object>> contentDataList = null;
+            String contentDataList = null;
             if (result.containsKey("content")) {
-                contentDataList = (List<Map<String, Object>>) result.get("content");
+                contentDataList = GsonUtil.toJson(result.get("content"));
             }
 
             RecommendedContentResult recommendedContentResult = new RecommendedContentResult();
             recommendedContentResult.setId(id);
             recommendedContentResult.setResponseMessageId(responseMessageId);
-            recommendedContentResult.setContents(ContentHandler.convertContentMapListToBeanList(mAppContext.getDBSession(), contentDataList));
-
+            if (!StringUtil.isNullOrEmpty(contentDataList)) {
+                Type type = new TypeToken<List<ContentData>>() {
+                }.getType();
+                List<ContentData> contentData = GsonUtil.getGson().fromJson(contentDataList, type);
+                recommendedContentResult.setContents(contentData);
+            }
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(recommendedContentResult);
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
             return response;
         }
 
         response = GenieResponseBuilder.getErrorResponse(apiResponse.getError(), (String) apiResponse.getErrorMessages().get(0), TAG);
+        TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, (String) apiResponse.getErrorMessages().get(0));
         return response;
     }
 
     @Override
     public GenieResponse<RelatedContentResult> getRelatedContent(RelatedContentRequest request) {
-        // TODO: 5/18/2017 - Telemetry
-//        HashMap params = new HashMap();
-//        params.put("uid", uid);
-//        params.put("content_id", contentIdentifier);
-//        params.put("mode", getNetworkMode());
-//        String method = "getRelatedContent@ContentServiceImpl";
+        HashMap params = new HashMap();
+        params.put("request", GsonUtil.toJson(request));
+        params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
+        String methodName = "getRelatedContent@ContentServiceImpl";
 
         GenieResponse<RelatedContentResult> response;
         RelatedContentAPI relatedContentAPI = new RelatedContentAPI(mAppContext, ContentHandler.getRelatedContentRequest(userService, request, mAppContext.getDeviceInfo().getDeviceID()));
@@ -438,15 +472,23 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(relatedContentResult);
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
             return response;
         }
 
         response = GenieResponseBuilder.getErrorResponse(apiResponse.getError(), (String) apiResponse.getErrorMessages().get(0), TAG);
+        TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, (String) apiResponse.getErrorMessages().get(0));
         return response;
     }
 
     @Override
     public GenieResponse<List<Content>> nextContent(List<String> contentIdentifiers) {
+
+        String methodName = "nextContent@ContentServiceImpl";
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("contentIdentifiers", GsonUtil.toJson(contentIdentifiers));
+        params.put("logLevel", "2");
+
         List<Content> contentList = new ArrayList<>();
 
         try {
@@ -534,14 +576,15 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         GenieResponse<List<Content>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(contentList);
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;
     }
 
     @Override
     public GenieResponse<Void> importEcar(EcarImportRequest importRequest) {
 
-        String method = "importEcar@ContentServiceImpl";
-        Map<String, Object> params = new HashMap<>();
+        String methodName = "importEcar@ContentServiceImpl";
+        HashMap<String, Object> params = new HashMap<>();
         params.put("importContent", importRequest.getSourceFilePath());
         params.put("isChildContent", importRequest.isChildContent());
         params.put("logLevel", "2");
@@ -549,13 +592,15 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         GenieResponse<Void> response;
 
         if (!FileUtil.doesFileExists(importRequest.getSourceFilePath())) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.ECAR_NOT_FOUND, "content import failed, file doesn't exist", TAG);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.ECAR_NOT_FOUND, ServiceConstants.ErrorMessage.FILE_DOESNT_EXIST, TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.FILE_DOESNT_EXIST);
             return response;
         }
 
         String ext = FileUtil.getFileExtension(importRequest.getSourceFilePath());
         if (!ServiceConstants.FileExtension.CONTENT.equals(ext)) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "content import failed, unsupported file extension", TAG);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, ServiceConstants.ErrorMessage.UNSUPPORTED_FILE, TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNSUPPORTED_FILE);
             return response;
         } else {
             ImportContext importContext = new ImportContext(importRequest.isChildContent(), importRequest.getSourceFilePath(), new File(importRequest.getDestinationFolder()));
@@ -571,8 +616,10 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                     .then(new AddGeTransferContentImportEvent());
             GenieResponse<Void> genieResponse = importContentSteps.execute(mAppContext, importContext);
             if (genieResponse.getStatus()) {
-                buildSuccessEvent();
-                EventPublisher.postContentImportSuccessfull(new ContentImportResponse(null));
+                String identifier=importContext.getIdentifiers()!=null?importContext.getIdentifiers().get(0):"";
+                buildSuccessEvent(identifier);
+                TelemetryLogger.logSuccess(mAppContext, genieResponse, TAG, methodName, params);
+                EventPublisher.postContentImportSuccessfull(new ContentImportResponse(identifier, 2));
 
             }
             return genieResponse;
@@ -580,11 +627,29 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
+    public GenieResponse<ContentImportResponse> getImportStatus(String identifier) {
+        String methodName = "getImportStatus@ContentServiceImpl";
+        HashMap params = new HashMap<>();
+        params.put("identifier", identifier);
+        params.put("logLevel", "2");
+        DownloadRequest request = downloadService.getDownloadRequest(identifier);
+        int status = -1;
+        if (request != null) {
+            status = request.getDownloadId() == -1 ? 0 : 1;
+        }
+        ContentImportResponse contentImportResponse = new ContentImportResponse(identifier, status);
+        GenieResponse<ContentImportResponse> response = GenieResponseBuilder.getSuccessResponse("", ContentImportResponse.class);
+        response.setResult(contentImportResponse);
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        return response;
+    }
+
+    @Override
     public GenieResponse<Void> importContent(ContentImportRequest importRequest) {
 
-        String method = "importContent@ContentServiceImpl";
-        Map<String, Object> params = new HashMap<>();
-        params.put("isChildContent", importRequest.isChildContent());
+        String methodName = "importContent@ContentServiceImpl";
+        HashMap params = new HashMap<>();
+        params.put("request", GsonUtil.toJson(importRequest));
         params.put("logLevel", "2");
 
         GenieResponse<Void> response;
@@ -616,6 +681,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                         DownloadRequest downloadRequest = new DownloadRequest(contentIdentifier, downloadUrl,
                                 ContentConstants.MimeType.ECAR, importRequest.getDestinationFolder(), importRequest.isChildContent());
                         downloadRequest.setCoRelation(importRequest.getCoRelation());
+                        downloadRequest.setProcessorClass("org.ekstep.genieservices.commons.download.ContentImportService");
                         downloadRequests[i] = downloadRequest;
                     }
                 }
@@ -623,8 +689,22 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 downloadService.enqueue(downloadRequests);
             }
         }
+        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
 
-        return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        return response;
+    }
+
+    @Override
+    public GenieResponse<Void> cancelDownload(String identifier) {
+        String methodName = "cancelDownload@ContentServiceImpl";
+        HashMap params = new HashMap<>();
+        params.put("identifier", identifier);
+        params.put("logLevel", "2");
+        downloadService.cancel(identifier);
+        GenieResponse response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        return response;
     }
 
     private void buildInitiateEvent() {
@@ -636,11 +716,12 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         TelemetryLogger.log(geInteract);
     }
 
-    private void buildSuccessEvent() {
+    private void buildSuccessEvent(String identifier) {
         GEInteract geInteract = new GEInteract.Builder(new GameData(mAppContext.getParams().getGid(), mAppContext.getParams().getVersionName())).
                 stageId(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID).
                 subType(ServiceConstants.Telemetry.CONTENT_IMPORT_SUCCESS_SUB_TYPE).
                 interActionType(InteractionType.OTHER).
+                id(identifier).
                 build();
         TelemetryLogger.log(geInteract);
     }

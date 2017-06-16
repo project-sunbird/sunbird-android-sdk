@@ -13,7 +13,8 @@ import java.util.Map;
 public class ContentAccess implements Serializable {
 
     private int status;
-    private Map<String, Object> learnerState;
+    private String contentId;
+    private ContentLearnerState contentLearnerState;
 
     public ContentAccessStatusType getStatus() {
         ContentAccessStatusType contentAccessStatusType;
@@ -35,11 +36,20 @@ public class ContentAccess implements Serializable {
         this.status = status;
     }
 
-    public Map<String, Object> getLearnerState() {
-        return learnerState;
+    public String getContentId() {
+        return contentId;
     }
 
-    public void setLearnerState(Map<String, Object> learnerState) {
-        this.learnerState = learnerState;
+    public void setContentId(String contentId) {
+        this.contentId = contentId;
     }
+
+    public ContentLearnerState getContentLearnerState() {
+        return contentLearnerState;
+    }
+
+    public void setContentLearnerState(ContentLearnerState contentLearnerState) {
+        this.contentLearnerState = contentLearnerState;
+    }
+
 }

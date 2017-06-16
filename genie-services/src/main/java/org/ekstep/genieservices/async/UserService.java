@@ -3,6 +3,7 @@ package org.ekstep.genieservices.async;
 import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.commons.IResponseHandler;
+import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentLearnerState;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportRequest;
@@ -204,14 +205,14 @@ public class UserService {
     }
 
     /**
-     * @param contentLearnerState
+     * @param contentAccess
      * @param responseHandler
      */
-    public void setLearnerState(final ContentLearnerState contentLearnerState, IResponseHandler<Void> responseHandler) {
+    public void addContentAccess(final ContentAccess contentAccess, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
-                return userService.setLearnerState(contentLearnerState);
+                return userService.addContentAccess(contentAccess);
             }
         });
     }
