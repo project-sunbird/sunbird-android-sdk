@@ -7,7 +7,6 @@ import org.ekstep.genieservices.commons.ILogger;
 /**
  * Created on 18/4/17.
  *
- * @author mathew
  */
 public class AndroidLogger implements ILogger {
 

@@ -4,8 +4,6 @@ import org.ekstep.genieservices.GenieService;
 
 /**
  * Created on 22/5/17.
- *
- * @author mathew
  */
 public class GenieAsyncService {
 
