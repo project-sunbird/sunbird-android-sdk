@@ -48,7 +48,6 @@ public abstract class BaseAPI {
         }
         try {
             IHttpClient httpClient = httpClientFactory.getClient();
-            httpClient.createClient();
             httpClient.setTimeouts(NetworkConstants.NETWORK_CONNECT_TIMEOUT_MINUTES, NetworkConstants.NETWORK_CONNECT_TIMEOUT_MINUTES);
             httpClient.handleAuth();
             httpClient.createRequest(url);

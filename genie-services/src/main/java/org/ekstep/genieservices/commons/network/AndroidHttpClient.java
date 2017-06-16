@@ -25,6 +25,7 @@ public class AndroidHttpClient implements IHttpClient {
 
     public AndroidHttpClient(Authenticator authenticator) {
         this.authenticator = authenticator;
+        this.httpClient = new OkHttpClient();
     }
 
     @Override
@@ -59,12 +60,6 @@ public class AndroidHttpClient implements IHttpClient {
         Request request = requestBuilder.build();
         Response response = httpClient.newCall(request).execute();
         return new ApiResponse(response.isSuccessful(), response.body() != null ? response.body().string() : "");
-    }
-
-    @Override
-    public Void createClient() {
-        httpClient = new OkHttpClient();
-        return null;
     }
 
     @Override
