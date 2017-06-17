@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import static java.lang.String.format;
+
 /**
  * This is the implementation of the interface {@link IContentFeedbackService}
  */
@@ -74,9 +76,26 @@ public class ContentFeedbackServiceImpl extends BaseService implements IContentF
     public GenieResponse<List<ContentFeedback>> getFeedback(ContentFeedbackFilterCriteria criteria) {
         GenieResponse<List<ContentFeedback>> response;
 
-        String isUid = String.format(Locale.US, "%s = '%s'", ContentFeedbackEntry.COLUMN_NAME_UID, criteria.getUid());
-        String isContentId = String.format(Locale.US, "%s = '%s'", ContentFeedbackEntry.COLUMN_NAME_CONTENT_ID, criteria.getContentId());
-        String filter = String.format(Locale.US, " where %s AND %s", isUid, isContentId);
+        String userFilter = null;
+        String contentIdFilter = null;
+
+        if(criteria != null) {
+            if (criteria.getUid() != null) {
+                userFilter = String.format(Locale.US, "%s = '%s'", ContentFeedbackEntry.COLUMN_NAME_UID, criteria.getUid());
+            }
+            if (criteria.getContentId() != null) {
+                contentIdFilter = format(Locale.US, "%s = '%s'", ContentFeedbackEntry.COLUMN_NAME_CONTENT_ID, criteria.getContentId());
+            }
+        }
+
+        String filter = null;
+        if (!StringUtil.isNullOrEmpty(contentIdFilter) && !StringUtil.isNullOrEmpty(userFilter)) {
+            filter = String.format(Locale.US, " where %s AND %s", userFilter, contentIdFilter);
+        } else if (!StringUtil.isNullOrEmpty(contentIdFilter)) {
+            filter = String.format(Locale.US, " where %s", contentIdFilter);
+        } else if (!StringUtil.isNullOrEmpty(userFilter)) {
+            filter = String.format(Locale.US, " where %s", userFilter);
+        }
         ContentFeedbacksModel contentFeedbacksModel = ContentFeedbacksModel.find(mAppContext.getDBSession(), filter);
 
         List<ContentFeedback> contentFeedbackList = new ArrayList<>();

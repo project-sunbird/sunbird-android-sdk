@@ -261,6 +261,18 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         return serverData;
     }
 
+    public void setServerData(String serverData) {
+        this.serverData = serverData;
+    }
+
+    public void setAudience(String audience) {
+        this.audience = audience;
+    }
+
+    public void setServerLastUpdatedOn(String serverLastUpdatedOn) {
+        this.serverLastUpdatedOn = serverLastUpdatedOn;
+    }
+
     public String getLocalData() {
         return localData;
     }

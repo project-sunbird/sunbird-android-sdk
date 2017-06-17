@@ -14,9 +14,6 @@ public class ContentVariant implements Serializable {
     private String ecarUrl;
     private String size;
 
-    public ContentVariant() {
-    }
-
     public ContentVariant(String name, String ecarUrl, String size) {
         this.name = name;
         this.ecarUrl = ecarUrl;

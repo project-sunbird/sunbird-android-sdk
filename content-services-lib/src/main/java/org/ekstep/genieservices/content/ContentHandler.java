@@ -63,6 +63,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.TreeMap;
 
+import static java.lang.String.format;
+
 /**
  * Created on 5/23/2017.
  *
@@ -296,12 +298,10 @@ public class ContentHandler {
                 Map contentData = fetchContentDetailsFromServer(appContext, contentIdentifier);
 
                 if (contentData != null) {
-                    ContentModel contentModel = convertContentMapToModel(appContext.getDBSession(), contentData, null);
-                    contentModel.setVisibility(existingContentModel.getVisibility());
-                    contentModel.addOrUpdateRefCount(existingContentModel.getRefCount());
-                    contentModel.addOrUpdateContentState(existingContentModel.getContentState());
-
-                    contentModel.update();
+                    existingContentModel.setServerData(GsonUtil.toJson(contentData));
+                    existingContentModel.setServerLastUpdatedOn(serverLastUpdatedOn(contentData));
+                    existingContentModel.setAudience(readAudience(contentData));
+                    existingContentModel.update();
                 }
             }
         }).start();
@@ -395,26 +395,22 @@ public class ContentHandler {
         return profile;
     }
 
-    public static List<ContentFeedback> getContentFeedback(IContentFeedbackService contentFeedbackService, String identifier, String uid) {
+    public static List<ContentFeedback> getContentFeedback(IContentFeedbackService contentFeedbackService, String contentIdentifier, String uid) {
         if (contentFeedbackService != null) {
-            ContentFeedbackFilterCriteria.Builder builder = new ContentFeedbackFilterCriteria.Builder();
-            builder.byUser(uid).forContent(identifier);
+            ContentFeedbackFilterCriteria.Builder builder = new ContentFeedbackFilterCriteria.Builder().byUser(uid).forContent(contentIdentifier);
             return contentFeedbackService.getFeedback(builder.build()).getResult();
         }
 
         return null;
     }
 
-    public static ContentAccess getContentAccess(IUserService userService, String contentIdentifier, String uid) {
+    public static List<ContentAccess> getContentAccess(IUserService userService, String contentIdentifier, String uid) {
         if (userService != null) {
             ContentAccessFilterCriteria.Builder builder = new ContentAccessFilterCriteria.Builder().byUser(uid).forContent(contentIdentifier);
-            List<ContentAccess> contentAccessList = userService.getAllContentAccess(builder.build()).getResult();
-            if (contentAccessList.size() > 0) {
-                return contentAccessList.get(0);
-            }
+            return userService.getAllContentAccess(builder.build()).getResult();
         }
 
-        return new ContentAccess();
+        return null;
     }
 
     private static boolean isUpdateAvailable(ContentData serverData, ContentData localData) {
@@ -445,16 +441,22 @@ public class ContentHandler {
         }
         String contentTypesStr = ContentType.getCommaSeparatedContentTypes(contentTypes);
 
-        String contentTypeFilter = String.format(Locale.US, "c.%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr);
-        String contentVisibilityFilter = String.format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
-        String artifactAvailabilityFilter = String.format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
-        String filter = String.format(Locale.US, "WHERE (%s AND %s AND %s)", contentVisibilityFilter, artifactAvailabilityFilter, contentTypeFilter);
+        String contentTypeFilter = format(Locale.US, "c.%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr);
+        String contentVisibilityFilter = format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
+        String artifactAvailabilityFilter = format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
+        String filter = format(Locale.US, "WHERE (%s AND %s AND %s)", contentVisibilityFilter, artifactAvailabilityFilter, contentTypeFilter);
 
-        String orderBy = String.format(Locale.US, "ORDER BY ca.%s desc, c.%s desc, c.%s desc", ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP, ContentEntry.COLUMN_NAME_LOCAL_LAST_UPDATED_ON, ContentEntry.COLUMN_NAME_SERVER_LAST_UPDATED_ON);
+        String orderBy = format(Locale.US, "ORDER BY ca.%s desc, c.%s desc, c.%s desc", ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP, ContentEntry.COLUMN_NAME_LOCAL_LAST_UPDATED_ON, ContentEntry.COLUMN_NAME_SERVER_LAST_UPDATED_ON);
 
-        String query = String.format(Locale.US, "SELECT c.* FROM  %s c LEFT JOIN %s ca ON c.%s = ca.%s AND ca.%s = '%s' %s %s;",
+        String query = null;
+        if (uid != null) {
+            query = String.format(Locale.US, "SELECT c.* FROM  %s c LEFT JOIN %s ca ON c.%s = ca.%s AND ca.%s = '%s' %s %s;",
                 ContentEntry.TABLE_NAME, ContentAccessEntry.TABLE_NAME, ContentEntry.COLUMN_NAME_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_UID, uid,
                 filter, orderBy);
+        } else {
+            query = String.format(Locale.US, "SELECT c.* FROM  %s c %s;",
+                    ContentEntry.TABLE_NAME, filter);
+        }
 
         List<ContentModel> contentModelListInDB;
         ContentsModel contentsModel = ContentsModel.findWithCustomQuery(dbSession, query);
@@ -470,12 +472,12 @@ public class ContentHandler {
     public static List<ContentModel> getAllLocalContentModel(IDBSession dbSession, ContentType[] contentTypes) {
         String contentTypesStr = ContentType.getCommaSeparatedContentTypes(contentTypes);
 
-        String contentTypeFilter = String.format(Locale.US, "%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr);
-        String contentVisibilityFilter = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
+        String contentTypeFilter = format(Locale.US, "%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr);
+        String contentVisibilityFilter = format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
         // For hiding the non compatible imported content, which visibility is DEFAULT.
-        String artifactAvailabilityFilter = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
+        String artifactAvailabilityFilter = format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
 
-        String filter = String.format(Locale.US, " where (%s AND %s AND %s)", contentVisibilityFilter, artifactAvailabilityFilter, contentTypeFilter);
+        String filter = format(Locale.US, " where (%s AND %s AND %s)", contentVisibilityFilter, artifactAvailabilityFilter, contentTypeFilter);
 
         List<ContentModel> contentModelListInDB;
         ContentsModel contentsModel = ContentsModel.find(dbSession, filter);
@@ -590,7 +592,7 @@ public class ContentHandler {
     }
 
     private static List<ContentModel> findAllContentsWithIdentifiers(IDBSession dbSession, List<String> identifiers) {
-        String filter = String.format(Locale.US, " where %s in ('%s') ", ContentEntry.COLUMN_NAME_IDENTIFIER, StringUtil.join("','", identifiers));
+        String filter = format(Locale.US, " where %s in ('%s') ", ContentEntry.COLUMN_NAME_IDENTIFIER, StringUtil.join("','", identifiers));
 
         List<ContentModel> contentModelListInDB = null;
         ContentsModel contentsModel = ContentsModel.find(dbSession, filter);
@@ -749,23 +751,23 @@ public class ContentHandler {
 
         for (ContentChild contentChild : contentChildList) {
             childIdentifiers.add(contentChild.getIdentifier());
-            whenAndThen.append(String.format(Locale.US, " WHEN '%s' THEN %s ", contentChild.getIdentifier(), i));
+            whenAndThen.append(format(Locale.US, " WHEN '%s' THEN %s ", contentChild.getIdentifier(), i));
             i++;
         }
 
         String orderBy = "";
         if (i > 0) {
-            orderBy = String.format(Locale.US, " ORDER BY CASE %s %s END", ContentEntry.COLUMN_NAME_IDENTIFIER, whenAndThen.toString());
+            orderBy = format(Locale.US, " ORDER BY CASE %s %s END", ContentEntry.COLUMN_NAME_IDENTIFIER, whenAndThen.toString());
         }
 
         String filter;
         switch (childContents) {
             case ContentConstants.ChildContents.FIRST_LEVEL_DOWNLOADED:
-                filter = String.format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
+                filter = format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
                 break;
 
             case ContentConstants.ChildContents.FIRST_LEVEL_SPINE:
-                filter = String.format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ONLY_SPINE);
+                filter = format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ONLY_SPINE);
                 break;
 
 //            case CHILD_CONTENTS_FIRST_LEVEL_TEXTBOOK_UNIT:
@@ -778,7 +780,7 @@ public class ContentHandler {
                 break;
         }
 
-        String query = String.format(Locale.US, "Select * from %s where %s in ('%s') %s %s",
+        String query = format(Locale.US, "Select * from %s where %s in ('%s') %s %s",
                 ContentEntry.TABLE_NAME, ContentEntry.COLUMN_NAME_IDENTIFIER, StringUtil.join("','", childIdentifiers), filter, orderBy);
         List<ContentModel> contentModelListInDB;
         ContentsModel contentsModel = ContentsModel.findWithCustomQuery(dbSession, query);
@@ -1239,18 +1241,6 @@ public class ContentHandler {
         }
 
         return contentListingSectionList;
-    }
-
-    public static List<Content> convertContentMapListToBeanList(IDBSession dbSession, List<Map<String, Object>> contentDataList) {
-        List<Content> contents = new ArrayList<>();
-        if (contentDataList != null) {
-            for (Map contentDataMap : contentDataList) {
-                ContentModel contentModel = convertContentMapToModel(dbSession, contentDataMap, null);
-                Content content = convertContentModelToBean(contentModel);
-                contents.add(content);
-            }
-        }
-        return contents;
     }
 
     public static String getDownloadUrl(Map<String, Object> dataMap) {

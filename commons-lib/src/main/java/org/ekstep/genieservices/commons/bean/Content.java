@@ -20,9 +20,9 @@ public class Content implements Serializable {
     private boolean isAvailableLocally;
     private boolean isUpdateAvailable;
     private List<ContentFeedback> contentFeedback;
-    private ContentAccess contentAccess;
+    private List<ContentAccess> contentAccess;
     private List<Content> children;
-    private List<HierarchyInfo> childrenHierarchyInfo;
+    private List<HierarchyInfo> hierarchyInfo;
 
     public String getIdentifier() {
         return identifier;
@@ -104,11 +104,11 @@ public class Content implements Serializable {
         this.contentFeedback = contentFeedback;
     }
 
-    public ContentAccess getContentAccess() {
+    public List<ContentAccess> getContentAccess() {
         return contentAccess;
     }
 
-    public void setContentAccess(ContentAccess contentAccess) {
+    public void setContentAccess(List<ContentAccess> contentAccess) {
         this.contentAccess = contentAccess;
     }
 
@@ -120,12 +120,12 @@ public class Content implements Serializable {
         this.children = children;
     }
 
-    public List<HierarchyInfo> getChildrenHierarchyInfo() {
-        return childrenHierarchyInfo;
+    public List<HierarchyInfo> getHierarchyInfo() {
+        return hierarchyInfo;
     }
 
-    public void setChildrenHierarchyInfo(List<HierarchyInfo> childrenHierarchyInfo) {
-        this.childrenHierarchyInfo = childrenHierarchyInfo;
+    public void setHierarchyInfo(List<HierarchyInfo> hierarchyInfo) {
+        this.hierarchyInfo = hierarchyInfo;
     }
 
 }

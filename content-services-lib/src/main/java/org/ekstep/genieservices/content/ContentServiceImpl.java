@@ -81,10 +81,6 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     private IConfigService configService;
     private IDownloadService downloadService;
 
-    public ContentServiceImpl(AppContext appContext) {
-        super(appContext);
-    }
-
     public ContentServiceImpl(AppContext appContext, IUserService userService, IContentFeedbackService contentFeedbackService, IConfigService configService, IDownloadService downloadService) {
         super(appContext);
 
@@ -121,9 +117,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         if (content.isAvailableLocally()) {
             String uid = ContentHandler.getCurrentUserId(userService);
-                if (contentDetailsRequest.isAttachFeedback()) {
-                    content.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, content.getIdentifier(), uid));
-                }
+            if (contentDetailsRequest.isAttachFeedback()) {
+                content.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, content.getIdentifier(), uid));
+            }
 
             if (contentDetailsRequest.isAttachContentAccess()) {
                 content.setContentAccess(ContentHandler.getContentAccess(userService, content.getIdentifier(), uid));
@@ -210,7 +206,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
                 for (ContentModel perContentModel : contentModelList) {
                     Content perContent = ContentHandler.convertContentModelToBean(perContentModel);
-                    perContent.setChildrenHierarchyInfo(hierarchyInfoList);
+                    perContent.setHierarchyInfo(hierarchyInfoList);
 
                     //check if this content has children
                     if (ContentHandler.hasChildren(perContentModel.getLocalData())) {
