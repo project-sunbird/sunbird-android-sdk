@@ -21,7 +21,7 @@ import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
-import org.ekstep.genieservices.commons.bean.ContentListingResult;
+import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
@@ -265,7 +265,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<ContentListingResult> getContentListing(ContentListingCriteria contentListingCriteria) {
+    public GenieResponse<ContentListing> getContentListing(ContentListingCriteria contentListingCriteria) {
         HashMap params = new HashMap();
         params.put("criteria", GsonUtil.toJson(contentListingCriteria));
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
@@ -298,10 +298,10 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         }
 
         if (jsonStr != null) {
-            ContentListingResult contentListingResult = ContentHandler.getContentListingResult(mAppContext.getDBSession(), contentListingCriteria, jsonStr);
-            if (contentListingResult != null) {
-                GenieResponse<ContentListingResult> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-                response.setResult(contentListingResult);
+            ContentListing contentListing = ContentHandler.getContentListingResult(mAppContext.getDBSession(), contentListingCriteria, jsonStr);
+            if (contentListing != null) {
+                GenieResponse<ContentListing> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+                response.setResult(contentListing);
                 TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
                 return response;
             }
@@ -617,7 +617,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 String identifier=importContext.getIdentifiers()!=null?importContext.getIdentifiers().get(0):"";
                 buildSuccessEvent(identifier);
                 TelemetryLogger.logSuccess(mAppContext, genieResponse, TAG, methodName, params);
-                EventPublisher.postContentImportSuccessfull(new ContentImportResponse(identifier, 2));
+                EventPublisher.postContentImportSuccessful(new ContentImportResponse(identifier, 2));
 
             }
             return genieResponse;
@@ -678,7 +678,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                         String contentIdentifier = ContentHandler.readIdentifier(dataMap);
                         DownloadRequest downloadRequest = new DownloadRequest(contentIdentifier, downloadUrl,
                                 ContentConstants.MimeType.ECAR, importRequest.getDestinationFolder(), importRequest.isChildContent());
-                        downloadRequest.setCoRelation(importRequest.getCoRelation());
+                        downloadRequest.setCorrelationData(importRequest.getCorrelationData());
                         downloadRequest.setProcessorClass("org.ekstep.genieservices.commons.download.ContentImportService");
                         downloadRequests[i] = downloadRequest;
                     }

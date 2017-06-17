@@ -2,6 +2,8 @@ package org.ekstep.genieservices.commons.bean;
 
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
+import java.util.List;
+
 /**
  * Created on 6/6/2017.
  *
@@ -12,11 +14,13 @@ public class EcarImportRequest {
     private boolean isChildContent;
     private String destinationFolder;
     private String sourceFilePath;
+    private List<CorrelationData> correlationData;
 
-    private EcarImportRequest(boolean isChildContent, String destinationFolder, String sourceFilePath) {
+    private EcarImportRequest(boolean isChildContent, String destinationFolder, String sourceFilePath, List<CorrelationData> correlationData) {
         this.isChildContent = isChildContent;
         this.destinationFolder = destinationFolder;
         this.sourceFilePath = sourceFilePath;
+        this.correlationData = correlationData;
     }
 
     public boolean isChildContent() {
@@ -35,6 +39,7 @@ public class EcarImportRequest {
         private boolean isChildContent;
         private String destinationFolder;
         private String sourceFilePath;
+        private List<CorrelationData> correlationData;
 
         /**
          * Method to indicate that the file being imported is a child content
@@ -66,6 +71,14 @@ public class EcarImportRequest {
             return this;
         }
 
+        /**
+         * CorrelationData of content.
+         */
+        public Builder correlationData(List<CorrelationData> correlationData) {
+            this.correlationData = correlationData;
+            return this;
+        }
+
         public EcarImportRequest build() {
             if (destinationFolder == null) {
                 throw new IllegalStateException("Destination folder required.");
@@ -75,7 +88,7 @@ public class EcarImportRequest {
                 throw new IllegalStateException("fromFilePath required.");
             }
 
-            return new EcarImportRequest(isChildContent, destinationFolder, sourceFilePath);
+            return new EcarImportRequest(isChildContent, destinationFolder, sourceFilePath, correlationData);
         }
     }
 }

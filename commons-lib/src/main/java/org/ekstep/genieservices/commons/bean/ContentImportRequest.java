@@ -12,13 +12,13 @@ public class ContentImportRequest {
     private boolean isChildContent;
     private String destinationFolder;
     private List<String> contentIds;
-    private List<CoRelation> coRelation;
+    private List<CorrelationData> correlationData;
 
-    private ContentImportRequest(boolean isChildContent, String destinationFolder, List<String> contentIds, List<CoRelation> coRelation) {
+    private ContentImportRequest(boolean isChildContent, String destinationFolder, List<String> contentIds, List<CorrelationData> correlationData) {
         this.isChildContent = isChildContent;
         this.destinationFolder = destinationFolder;
         this.contentIds = contentIds;
-        this.coRelation = coRelation;
+        this.correlationData = correlationData;
     }
 
     public boolean isChildContent() {
@@ -33,15 +33,15 @@ public class ContentImportRequest {
         return contentIds;
     }
 
-    public List<CoRelation> getCoRelation() {
-        return coRelation;
+    public List<CorrelationData> getCorrelationData() {
+        return correlationData;
     }
 
     public static class Builder {
         private boolean isChildContent;
         private String destinationFolder;
         private List<String> contentIds;
-        private List<CoRelation> coRelation;
+        private List<CorrelationData> correlationData;
 
         /**
          * Method to indicate that the file being imported is a child content
@@ -71,10 +71,10 @@ public class ContentImportRequest {
         }
 
         /**
-         * CoRelation of content.
+         * CorrelationData of content.
          */
-        public Builder coRelation(List<CoRelation> coRelation) {
-            this.coRelation = coRelation;
+        public Builder correlationData(List<CorrelationData> correlationData) {
+            this.correlationData = correlationData;
             return this;
         }
 
@@ -87,7 +87,7 @@ public class ContentImportRequest {
                 throw new IllegalStateException("ContentIds required.");
             }
 
-            return new ContentImportRequest(isChildContent, destinationFolder, contentIds, coRelation);
+            return new ContentImportRequest(isChildContent, destinationFolder, contentIds, correlationData);
         }
     }
 }

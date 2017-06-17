@@ -14,7 +14,7 @@ import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
-import org.ekstep.genieservices.commons.bean.ContentListingResult;
+import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
@@ -247,10 +247,10 @@ public class ContentService {
         });
     }
 
-    public void getContentListing(final ContentListingCriteria contentListingCriteria, IResponseHandler<ContentListingResult> responseHandler) {
-        new AsyncHandler<ContentListingResult>(responseHandler).execute(new IPerformable<ContentListingResult>() {
+    public void getContentListing(final ContentListingCriteria contentListingCriteria, IResponseHandler<ContentListing> responseHandler) {
+        new AsyncHandler<ContentListing>(responseHandler).execute(new IPerformable<ContentListing>() {
             @Override
-            public GenieResponse<ContentListingResult> perform() {
+            public GenieResponse<ContentListing> perform() {
                 return contentService.getContentListing(contentListingCriteria);
             }
         });

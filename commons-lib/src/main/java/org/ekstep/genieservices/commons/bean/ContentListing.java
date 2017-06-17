@@ -7,11 +7,11 @@ import java.util.List;
  *
  * @author anil
  */
-public class ContentListingResult {
+public class ContentListing {
 
     private String id;
     private String responseMessageId;
-    private List<Section> sections;
+    private List<ContentListingSection> contentListingSections;
 
     public String getId() {
         return id;
@@ -29,11 +29,11 @@ public class ContentListingResult {
         this.responseMessageId = responseMessageId;
     }
 
-    public List<Section> getSections() {
-        return sections;
+    public List<ContentListingSection> getContentListingSections() {
+        return contentListingSections;
     }
 
-    public void setSections(List<Section> sections) {
-        this.sections = sections;
+    public void setContentListingSections(List<ContentListingSection> contentListingSections) {
+        this.contentListingSections = contentListingSections;
     }
 }

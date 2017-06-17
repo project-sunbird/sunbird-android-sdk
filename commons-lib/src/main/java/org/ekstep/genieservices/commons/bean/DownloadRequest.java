@@ -21,7 +21,7 @@ public class DownloadRequest implements Serializable {
     private long createdAt;
     private boolean isChildContent;
     private String processorClass;
-    private List<CoRelation> coRelation;
+    private List<CorrelationData> correlationData;
 
     public DownloadRequest(String identifier, String downloadUrl, String mimeType, String destinationFolder, boolean isChildContent) {
         this.identifier = identifier;
@@ -76,12 +76,12 @@ public class DownloadRequest implements Serializable {
         this.processorClass = processorClass;
     }
 
-    public List<CoRelation> getCoRelation() {
-        return coRelation;
+    public List<CorrelationData> getCorrelationData() {
+        return correlationData;
     }
 
-    public void setCoRelation(List<CoRelation> coRelation) {
-        this.coRelation = coRelation;
+    public void setCorrelationData(List<CorrelationData> correlationData) {
+        this.correlationData = correlationData;
     }
 
     @Override

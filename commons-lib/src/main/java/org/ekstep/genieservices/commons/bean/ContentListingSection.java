@@ -8,7 +8,7 @@ import java.util.List;
  *
  * @author anil
  */
-public class Section implements Serializable {
+public class ContentListingSection implements Serializable {
 
     private String responseMessageId;
     private String apiId;

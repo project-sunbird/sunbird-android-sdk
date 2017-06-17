@@ -4,7 +4,7 @@ import org.ekstep.genieservices.IDownloadService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IDownloadManager;
-import org.ekstep.genieservices.commons.bean.CoRelation;
+import org.ekstep.genieservices.commons.bean.CorrelationData;
 import org.ekstep.genieservices.commons.bean.DownloadProgress;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.GameData;
@@ -56,7 +56,7 @@ public class DownloadServiceImpl implements IDownloadService {
             DownloadRequest request = mDownloadQueueManager.popDownloadrequest();
             if (request != null) {
                 long downloadId = mDownloadManager.enqueue(request);
-                TelemetryLogger.log(buildGEInteractEvent(InteractionType.TOUCH, ServiceConstants.Telemetry.CONTENT_DOWNLOAD_INITIATE, request.getCoRelation(), request.getIdentifier()));
+                TelemetryLogger.log(buildGEInteractEvent(InteractionType.TOUCH, ServiceConstants.Telemetry.CONTENT_DOWNLOAD_INITIATE, request.getCorrelationData(), request.getIdentifier()));
                 mDownloadQueueManager.updateDownload(request.getIdentifier(), downloadId);
                 mDownloadQueueManager.addToCurrentDownloadQueue(request.getIdentifier());
                 startTrackingProgress(request.getIdentifier(), downloadId);
@@ -80,13 +80,13 @@ public class DownloadServiceImpl implements IDownloadService {
         }
     }
 
-    private GEInteract buildGEInteractEvent(InteractionType type, String subType, List<CoRelation> coRelationList, String contendId) {
+    private GEInteract buildGEInteractEvent(InteractionType type, String subType, List<CorrelationData> correlationDataList, String contendId) {
         GEInteract geInteract = new GEInteract.Builder(new GameData(mAppContext.getParams().getGid(), mAppContext.getParams().getVersionName()))
                 .interActionType(type)
                 .stageId(ServiceConstants.Telemetry.CONTENT_DETAIL)
                 .subType(subType)
                 .id(contendId)
-                .coRelation(coRelationList)
+                .correlationData(correlationDataList)
                 .build();
         return geInteract;
     }
@@ -159,7 +159,7 @@ public class DownloadServiceImpl implements IDownloadService {
     @Override
     public void onDownloadComplete(String identifier) {
         DownloadRequest request = mDownloadQueueManager.getRequestByIdentifier(identifier);
-        TelemetryLogger.log(buildGEInteractEvent(InteractionType.OTHER, ServiceConstants.Telemetry.CONTENT_DOWNLOAD_SUCCESS, request.getCoRelation(), request.getIdentifier()));
+        TelemetryLogger.log(buildGEInteractEvent(InteractionType.OTHER, ServiceConstants.Telemetry.CONTENT_DOWNLOAD_SUCCESS, request.getCorrelationData(), request.getIdentifier()));
         mDownloadQueueManager.removeFromQueue(identifier);
         mDownloadQueueManager.removeFromCurrentDownloadQueue(identifier);
         resumeDownloads();

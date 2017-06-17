@@ -8,16 +8,16 @@ import java.io.Serializable;
  *
  * @author anil
  */
-public class Variant implements Serializable {
+public class ContentVariant implements Serializable {
 
     private String name;
     private String ecarUrl;
     private String size;
 
-    public Variant() {
+    public ContentVariant() {
     }
 
-    public Variant(String name, String ecarUrl, String size) {
+    public ContentVariant(String name, String ecarUrl, String size) {
         this.name = name;
         this.ecarUrl = ecarUrl;
         this.size = size;

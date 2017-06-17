@@ -30,8 +30,7 @@ public class ContentData implements Serializable {
     private List<String> gradeLevel;
     private String osId;
     private String contentType;
-    private List<Variant> variantList;
-    //    private ContentMetadata contentMetadata;
+    private List<ContentVariant> contentVariantList;
 
     public String getIdentifier() {
         return identifier;
@@ -109,12 +108,12 @@ public class ContentData implements Serializable {
         return osId;
     }
 
-    public List<Variant> getVariants() {
-        return variantList;
+    public List<ContentVariant> getVariants() {
+        return contentVariantList;
     }
 
-    public void setVariants(List<Variant> variantList) {
-        this.variantList = variantList;
+    public void setVariants(List<ContentVariant> contentVariantList) {
+        this.contentVariantList = contentVariantList;
     }
 
     public String getContentType() {

@@ -8,7 +8,7 @@ import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
-import org.ekstep.genieservices.commons.bean.ContentListingResult;
+import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
@@ -84,9 +84,9 @@ public interface IContentService {
 
     /**
      * @param contentListingCriteria - {@link ContentListingCriteria}
-     * @return {@link GenieResponse<ContentListingResult>}
+     * @return {@link GenieResponse< ContentListing >}
      */
-    GenieResponse<ContentListingResult> getContentListing(ContentListingCriteria contentListingCriteria);
+    GenieResponse<ContentListing> getContentListing(ContentListingCriteria contentListingCriteria);
 
     /**
      * This api is used to search for contents with the search criterion mentioned in {@link ContentSearchCriteria}

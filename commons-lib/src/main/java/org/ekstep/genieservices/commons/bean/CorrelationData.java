@@ -7,12 +7,12 @@ import java.io.Serializable;
  *
  * @author swayangjit
  */
-public class CoRelation implements Serializable {
+public class CorrelationData implements Serializable {
 
     private String type;    // Used to indicate action that is being correlated
     private String id;      // The correlation ID value
 
-    public CoRelation(String id, String type) {
+    public CorrelationData(String id, String type) {
         this.type = type;
         this.id = id;
     }

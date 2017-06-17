@@ -5,7 +5,7 @@ import org.ekstep.genieservices.ISummarizerService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
-import org.ekstep.genieservices.commons.bean.CoRelation;
+import org.ekstep.genieservices.commons.bean.CorrelationData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentDetails;
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentSummary;
@@ -177,7 +177,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
 
         if (telemetry.getCdata() != null) {
             List<String> idList = new ArrayList<>();
-            for (CoRelation eachCdataValue : telemetry.getCdata()) {
+            for (CorrelationData eachCdataValue : telemetry.getCdata()) {
                 idList.add(eachCdataValue.getId());
             }
             learnerContentSummaryDetails.setHierarchyData(StringUtil.join(",", idList));
@@ -210,7 +210,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
 
         if (telemetry.getCdata() != null) {
             List<String> idList = new ArrayList<>();
-            for (CoRelation eachCdataValue : telemetry.getCdata()) {
+            for (CorrelationData eachCdataValue : telemetry.getCdata()) {
                 idList.add(eachCdataValue.getId());
             }
             learnerAssessmentDetails.setHierarchyData(StringUtil.join(",", idList));

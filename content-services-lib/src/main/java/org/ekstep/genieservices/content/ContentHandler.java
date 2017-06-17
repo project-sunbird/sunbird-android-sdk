@@ -15,7 +15,7 @@ import org.ekstep.genieservices.commons.bean.ContentFeedback;
 import org.ekstep.genieservices.commons.bean.ContentFeedbackFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
-import org.ekstep.genieservices.commons.bean.ContentListingResult;
+import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchFilter;
 import org.ekstep.genieservices.commons.bean.FilterValue;
@@ -26,9 +26,9 @@ import org.ekstep.genieservices.commons.bean.PartnerFilter;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
-import org.ekstep.genieservices.commons.bean.Section;
+import org.ekstep.genieservices.commons.bean.ContentListingSection;
 import org.ekstep.genieservices.commons.bean.UserSession;
-import org.ekstep.genieservices.commons.bean.Variant;
+import org.ekstep.genieservices.commons.bean.ContentVariant;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
 import org.ekstep.genieservices.commons.bean.enums.SortBy;
@@ -41,7 +41,6 @@ import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.bean.ContentChild;
-import org.ekstep.genieservices.content.bean.ContentVariant;
 import org.ekstep.genieservices.content.db.model.ContentListingModel;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.db.model.ContentsModel;
@@ -324,10 +323,10 @@ public class ContentHandler {
 
         if (serverData != null) {
             content.setContentData(serverData);
-            addContentVariants(serverData, contentModel.getServerData());
+            serverData.setVariants(getContentVariants(contentModel.getServerData()));
         } else if (localData != null) {
             content.setContentData(localData);
-            addContentVariants(localData, contentModel.getLocalData());
+            localData.setVariants(getContentVariants(contentModel.getLocalData()));
         }
 
         content.setMimeType(contentModel.getMimeType());
@@ -347,30 +346,32 @@ public class ContentHandler {
         return content;
     }
 
-    private static void addContentVariants(ContentData contentData, String dataJson) {
-        List<Variant> variantList = new ArrayList<>();
+    private static List<ContentVariant> getContentVariants(String dataJson) {
+        List<ContentVariant> contentVariantList = new ArrayList<>();
 
         Map<String, Object> dataMap = GsonUtil.fromJson(dataJson, Map.class);
+        ContentVariant spineContentVariant = getVariant(dataMap, "spine");
+        if (spineContentVariant != null) contentVariantList.add(spineContentVariant);
+        return contentVariantList;
+    }
 
-        Object variants = dataMap.get(KEY_VARIANTS);
+    private static ContentVariant getVariant(Map contentDataMap, String variantName) {
+        Object variants = contentDataMap.get(KEY_VARIANTS);
+        ContentVariant contentVariant = null;
         if (variants != null) {
-            String variantsString;
+            Map variantData = null;
             if (variants instanceof Map) {
-                variantsString = GsonUtil.getGson().toJson(variants);
+                variantData = (Map) variants;
             } else {
-                variantsString = (String) variants;
+                variantData = GsonUtil.fromJson(((String) variants).replace("\\", ""), Map.class);
             }
 
-            variantsString = variantsString.replace("\\", "");
-            ContentVariant contentVariant = GsonUtil.fromJson(variantsString, ContentVariant.class);
-
-            if (contentVariant.getSpine() != null) {
-                Variant variant = new Variant("spine", contentVariant.getSpine().getEcarUrl(), contentVariant.getSpine().getSize());
-                variantList.add(variant);
+            if (variantData.get(variantName) != null) {
+                Map spineData = (Map) variantData.get(variantName);
+                contentVariant = new ContentVariant(variantName, spineData.get("ecarUrl").toString(), spineData.get("size").toString());
             }
         }
-
-        contentData.setVariants(variantList);
+        return contentVariant;
     }
 
     public static String getCurrentUserId(IUserService userService) {
@@ -1124,8 +1125,8 @@ public class ContentHandler {
         contentListingModel.save();
     }
 
-    public static ContentListingResult getContentListingResult(IDBSession dbSession, ContentListingCriteria contentListingCriteria, String jsonStr) {
-        ContentListingResult contentListingResult = null;
+    public static ContentListing getContentListingResult(IDBSession dbSession, ContentListingCriteria contentListingCriteria, String jsonStr) {
+        ContentListing contentListing = null;
 
         LinkedTreeMap map = GsonUtil.fromJson(jsonStr, LinkedTreeMap.class);
         LinkedTreeMap responseParams = (LinkedTreeMap) map.get("params");
@@ -1137,19 +1138,19 @@ public class ContentHandler {
         }
 
         if (result != null) {
-            contentListingResult = new ContentListingResult();
-            contentListingResult.setId(contentListingCriteria.getContentListingId());
-            contentListingResult.setResponseMessageId(responseMessageId);
+            contentListing = new ContentListing();
+            contentListing.setId(contentListingCriteria.getContentListingId());
+            contentListing.setResponseMessageId(responseMessageId);
             if (result.containsKey("page")) {
-                contentListingResult.setSections(getSectionsFromPageMap(dbSession, (Map<String, Object>) result.get("page"), contentListingCriteria));
+                contentListing.setContentListingSections(getSectionsFromPageMap(dbSession, (Map<String, Object>) result.get("page"), contentListingCriteria));
             }
         }
 
-        return contentListingResult;
+        return contentListing;
     }
 
-    private static List<Section> getSectionsFromPageMap(IDBSession dbSession, Map<String, Object> pageMap, ContentListingCriteria contentListingCriteria) {
-        List<Section> sectionList = new ArrayList<>();
+    private static List<ContentListingSection> getSectionsFromPageMap(IDBSession dbSession, Map<String, Object> pageMap, ContentListingCriteria contentListingCriteria) {
+        List<ContentListingSection> contentListingSectionList = new ArrayList<>();
 
         List<Map<String, Object>> sections = (List<Map<String, Object>>) pageMap.get("sections");
         for (Map<String, Object> sectionMap : sections) {
@@ -1221,23 +1222,23 @@ public class ContentHandler {
                 contentSearchCriteria = builder.build();
             }
 
-            Section section = new Section();
-            section.setResponseMessageId((String) sectionMap.get("resmsgid"));
-            section.setApiId((String) sectionMap.get("apiid"));
-            section.setSectionName(((Map) ((Map) sectionMap.get("display")).get("name")).get("en").toString());
+            ContentListingSection contentListingSection = new ContentListingSection();
+            contentListingSection.setResponseMessageId((String) sectionMap.get("resmsgid"));
+            contentListingSection.setApiId((String) sectionMap.get("apiid"));
+            contentListingSection.setSectionName(((Map) ((Map) sectionMap.get("display")).get("name")).get("en").toString());
 
             if (!StringUtil.isNullOrEmpty(contentDataList)) {
                 Type type = new TypeToken<List<ContentData>>() {
                 }.getType();
                 List<ContentData> contentData = GsonUtil.getGson().fromJson(contentDataList, type);
-                section.setContentDataList(contentData);
+                contentListingSection.setContentDataList(contentData);
             }
-            section.setContentSearchCriteria(contentSearchCriteria);
+            contentListingSection.setContentSearchCriteria(contentSearchCriteria);
 
-            sectionList.add(section);
+            contentListingSectionList.add(contentListingSection);
         }
 
-        return sectionList;
+        return contentListingSectionList;
     }
 
     public static List<Content> convertContentMapListToBeanList(IDBSession dbSession, List<Map<String, Object>> contentDataList) {
@@ -1258,21 +1259,9 @@ public class ContentHandler {
         String contentType = (String) dataMap.get(KEY_CONTENT_TYPE);
         if ((ContentType.TEXTBOOK.getValue().equalsIgnoreCase(contentType)
                 || ContentType.COLLECTION.getValue().equalsIgnoreCase(contentType))) {
-            Object variants = dataMap.get(KEY_VARIANTS);
-            if (variants != null) {
-                String variantsString;
-                if (variants instanceof Map) {
-                    variantsString = GsonUtil.getGson().toJson(variants);
-                } else {
-                    variantsString = (String) variants;
-                }
-
-                variantsString = variantsString.replace("\\", "");
-                ContentVariant contentVariant = GsonUtil.fromJson(variantsString, ContentVariant.class);
-
-                if ((contentVariant.getSpine() != null && !StringUtil.isNullOrEmpty(contentVariant.getSpine().getEcarUrl()))) {
-                    downloadUrl = contentVariant.getSpine().getEcarUrl();
-                }
+            ContentVariant spineContentVariant = getVariant(dataMap, "spine");
+            if (spineContentVariant != null) {
+                downloadUrl = spineContentVariant.getEcarUrl();
             }
         }
 
