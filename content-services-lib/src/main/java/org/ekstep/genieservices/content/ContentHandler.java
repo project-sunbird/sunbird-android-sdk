@@ -310,31 +310,23 @@ public class ContentHandler {
     public static Content convertContentModelToBean(ContentModel contentModel) {
         Content content = new Content();
         content.setIdentifier(contentModel.getIdentifier());
-
-        ContentData localData = null;
+        ContentData localData = null, serverData = null;
         if (contentModel.getLocalData() != null) {
             localData = GsonUtil.fromJson(contentModel.getLocalData(), ContentData.class);
-        }
-
-        ContentData serverData = null;
-        if (contentModel.getServerData() != null) {
-            serverData = GsonUtil.fromJson(contentModel.getServerData(), ContentData.class);
-        }
-
-        if (serverData != null) {
-            content.setContentData(serverData);
-            serverData.setVariants(getContentVariants(contentModel.getServerData()));
-        } else if (localData != null) {
-            content.setContentData(localData);
             localData.setVariants(getContentVariants(contentModel.getLocalData()));
+            content.setContentData(localData);
+        } else if (contentModel.getServerData() != null) {
+            serverData = GsonUtil.fromJson(contentModel.getServerData(), ContentData.class);
+            serverData.setVariants(getContentVariants(contentModel.getServerData()));
+            content.setContentData(serverData);
         }
 
+        content.setUpdateAvailable(isUpdateAvailable(serverData, localData));
         content.setMimeType(contentModel.getMimeType());
         content.setBasePath(contentModel.getPath());
         content.setContentType(contentModel.getContentType());
         content.setAvailableLocally(isAvailableLocally(contentModel.getContentState()));
         content.setReferenceCount(contentModel.getRefCount());
-        content.setUpdateAvailable(isUpdateAvailable(serverData, localData));
 
         long contentCreationTime = 0;
         String localLastUpdatedTime = contentModel.getLocalLastUpdatedTime();
