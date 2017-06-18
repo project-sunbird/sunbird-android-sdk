@@ -70,7 +70,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         HashMap params = new HashMap();
         params.put("logLevel", "2");
 
-        String filter = getFilterForLearnerAssessmentDetails(null, summaryRequest.getUid(), summaryRequest.getContentId(), null);
+        String filter = getFilterForLearnerAssessmentDetails(null, summaryRequest.getUid(), summaryRequest.getContentId(), summaryRequest.getHierarchyData());
 
         LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.find(mAppContext.getDBSession(), filter);
         if (learnerAssessmentDetailsModel == null) {
@@ -180,7 +180,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
             for (CorrelationData eachCdataValue : telemetry.getCdata()) {
                 idList.add(eachCdataValue.getId());
             }
-            learnerContentSummaryDetails.setHierarchyData(StringUtil.join(",", idList));
+//            learnerContentSummaryDetails.setHierarchyData(StringUtil.join(",", idList));
         }
 
         return learnerContentSummaryDetails;
@@ -213,7 +213,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
             for (CorrelationData eachCdataValue : telemetry.getCdata()) {
                 idList.add(eachCdataValue.getId());
             }
-            learnerAssessmentDetails.setHierarchyData(StringUtil.join(",", idList));
+//            learnerAssessmentDetails.setHierarchyData(StringUtil.join(",", idList));
         }
         return learnerAssessmentDetails;
     }
