@@ -151,6 +151,8 @@ public class ExtractPayloads implements IChainable {
                                 || ContentType.TEXTBOOK_UNIT.getValue().equalsIgnoreCase(contentType)) {
 
                             contentState = ContentConstants.State.ARTIFACT_AVAILABLE;
+                        } else {
+                            contentState = ContentConstants.State.ONLY_SPINE;
                         }
                     }
 
