@@ -4,9 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * Created on 5/4/2017.
- *
- * @author anil
+ *This class holds all the data related to a content.
  */
 public class Content implements Serializable {
 

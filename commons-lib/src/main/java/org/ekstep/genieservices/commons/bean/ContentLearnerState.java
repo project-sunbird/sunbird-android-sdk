@@ -4,9 +4,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
- * Created on 6/6/2017.
- *
- * @author anil
+ * This class holds the data related to learner state in a map object
  */
 public class ContentLearnerState implements Serializable {
 

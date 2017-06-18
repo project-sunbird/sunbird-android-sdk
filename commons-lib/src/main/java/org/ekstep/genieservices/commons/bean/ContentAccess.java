@@ -3,12 +3,10 @@ package org.ekstep.genieservices.commons.bean;
 import org.ekstep.genieservices.commons.bean.enums.ContentAccessStatusType;
 
 import java.io.Serializable;
-import java.util.Map;
 
 /**
- * Created on 5/9/2017.
+ * This class holds the data related to content access, for a particular content, like status and learner state.
  *
- * @author anil
  */
 public class ContentAccess implements Serializable {
 
