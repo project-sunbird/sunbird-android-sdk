@@ -35,7 +35,7 @@ public class AndroidDownloadManager implements IDownloadManager {
         android.app.DownloadManager.Request managerRequest = new android.app.DownloadManager.Request(Uri.parse(request.getDownloadUrl()));
         managerRequest.setTitle(request.getIdentifier());
         managerRequest.setMimeType(request.getMimeType());
-        managerRequest.setNotificationVisibility(android.app.DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        managerRequest.setNotificationVisibility(android.app.DownloadManager.Request.VISIBILITY_VISIBLE);
         return mDownloadManager.enqueue(managerRequest);
     }
 

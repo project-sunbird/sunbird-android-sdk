@@ -641,8 +641,12 @@ public class ContentHandler {
         try {
             String oldIdentifier = oldContent.getIdentifier();
             if (oldIdentifier.equalsIgnoreCase(newIdentifier)) {
-                isExist = (pkgVersion(oldContent.getLocalData()) >= newPkgVersion) // If old content's pkgVersion is less than the new content then return false.
-                        || oldContent.getContentState() == ContentConstants.State.ARTIFACT_AVAILABLE;  // If content_state is other than artifact available then also return  false.
+                if ((pkgVersion(oldContent.getLocalData()) < newPkgVersion) // If old content's pkgVersion is less than the new content then return false.
+                        || oldContent.getContentState() != ContentConstants.State.ARTIFACT_AVAILABLE) {  //  If content_state is other than artifact available then also return  false.
+                    isExist = false;
+                } else {
+                    isExist = true;
+                }
             }
         } catch (Exception e) {
             Logger.e(TAG, "isContentExist", e);

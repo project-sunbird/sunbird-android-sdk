@@ -162,12 +162,10 @@ public class DownloadServiceImpl implements IDownloadService {
         TelemetryLogger.log(buildGEInteractEvent(InteractionType.OTHER, ServiceConstants.Telemetry.CONTENT_DOWNLOAD_SUCCESS, request.getCorrelationData(), request.getIdentifier()));
         mDownloadQueueManager.removeFromQueue(identifier);
         mDownloadQueueManager.removeFromCurrentDownloadQueue(identifier);
-        resumeDownloads();
     }
 
     @Override
     public void onDownloadFailed(String identiifer) {
         mDownloadQueueManager.removeFromQueue(identiifer);
-        resumeDownloads();
     }
 }

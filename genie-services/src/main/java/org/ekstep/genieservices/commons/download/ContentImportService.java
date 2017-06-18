@@ -9,7 +9,6 @@ import org.ekstep.genieservices.IContentService;
 import org.ekstep.genieservices.IDownloadService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
-import org.ekstep.genieservices.commons.bean.GenieResponse;
 
 /**
  * Created by swayangjit on 13/6/17.
@@ -33,10 +32,8 @@ public class ContentImportService extends Service {
         builder.fromFilePath(localFilePath);
         EcarImportRequest ecarImportRequest = builder.build();
 
-        GenieResponse<Void> genieResponse = contentService.importEcar(ecarImportRequest);
-        if (genieResponse.getStatus()) {
-            downloadService.resumeDownloads();
-        }
+        contentService.importEcar(ecarImportRequest);
+        downloadService.resumeDownloads();
         stopSelf();
         return Service.START_REDELIVER_INTENT;
     }

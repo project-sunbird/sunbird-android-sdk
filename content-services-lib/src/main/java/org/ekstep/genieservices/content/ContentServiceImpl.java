@@ -20,8 +20,8 @@ import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
-import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListing;
+import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
@@ -575,6 +575,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         GenieResponse<Void> response;
 
+        EventPublisher.postContentImportStatus(new ContentImportResponse(null, 1, importRequest.getSourceFilePath()));
+
         if (!FileUtil.doesFileExists(importRequest.getSourceFilePath())) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.ECAR_NOT_FOUND, ServiceConstants.ErrorMessage.FILE_DOESNT_EXIST, TAG);
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.FILE_DOESNT_EXIST);
@@ -603,7 +605,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 String identifier=importContext.getIdentifiers()!=null?importContext.getIdentifiers().get(0):"";
                 buildSuccessEvent(identifier);
                 TelemetryLogger.logSuccess(mAppContext, genieResponse, TAG, methodName, params);
-                EventPublisher.postContentImportSuccessful(new ContentImportResponse(identifier, 2));
+                EventPublisher.postContentImportStatus(new ContentImportResponse(identifier, 2, importRequest.getSourceFilePath()));
 
             }
             return genieResponse;
@@ -621,7 +623,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         if (request != null) {
             status = request.getDownloadId() == -1 ? 0 : 1;
         }
-        ContentImportResponse contentImportResponse = new ContentImportResponse(identifier, status);
+        ContentImportResponse contentImportResponse = new ContentImportResponse(identifier, status, null);
         GenieResponse<ContentImportResponse> response = GenieResponseBuilder.getSuccessResponse("", ContentImportResponse.class);
         response.setResult(contentImportResponse);
         TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);

@@ -37,7 +37,7 @@ public class EventPublisher {
                 });
     }
 
-    public static void postContentImportSuccessful(final ContentImportResponse contentImportResponse) {
+    public static void postContentImportStatus(final ContentImportResponse contentImportResponse) {
         EventPublisherThreadPool
                 .getInstance()
                 .execute(new AsyncExecutor.RunnableEx() {
