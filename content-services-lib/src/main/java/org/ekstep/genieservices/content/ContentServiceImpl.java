@@ -187,7 +187,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     private Content checkAndFetchChildrenOfContent(ContentModel contentModel, List<HierarchyInfo> sourceInfoList) {
         Content content = ContentHandler.convertContentModelToBean(contentModel);
         // check if the content model has immediate children
-        if (ContentHandler.hasChildren(contentModel.getLocalData())) {
+        List<ContentModel> contentModelList = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), contentModel.getLocalData(), ContentConstants.ChildContents.FIRST_LEVEL_ALL);
+        if (contentModelList.size() > 0) {
 
             //add hierarchy info
             HierarchyInfo hierarchyInfo = new HierarchyInfo(contentModel.getIdentifier(), contentModel.getContentType());
@@ -196,31 +197,20 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             hierarchyInfoList.addAll(sourceInfoList);
             hierarchyInfoList.add(hierarchyInfo);
 
-            //get all the children
-            List<ContentModel> contentModelList = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), contentModel.getLocalData(), ContentConstants.ChildContents.FIRST_LEVEL_ALL);
+            List<Content> childContents = new ArrayList<>();
 
-            //check for null
-            if (contentModelList != null) {
+            for (ContentModel perContentModel : contentModelList) {
+                Content perContent = ContentHandler.convertContentModelToBean(perContentModel);
+                perContent.setHierarchyInfo(hierarchyInfoList);
 
-                List<Content> childContents = new ArrayList<>();
+                Content iteratedContent = checkAndFetchChildrenOfContent(perContentModel, hierarchyInfoList);
+                perContent.setChildren(iteratedContent.getChildren());
 
-                for (ContentModel perContentModel : contentModelList) {
-                    Content perContent = ContentHandler.convertContentModelToBean(perContentModel);
-                    perContent.setHierarchyInfo(hierarchyInfoList);
-
-                    //check if this content has children
-                    if (ContentHandler.hasChildren(perContentModel.getLocalData())) {
-                        //recurse again on this content
-                        Content iteratedContent = checkAndFetchChildrenOfContent(perContentModel, hierarchyInfoList);
-                        perContent.setChildren(iteratedContent.getChildren());
-                    }
-
-                    childContents.add(perContent);
-                }
-
-                //add children to the main content
-                content.setChildren(childContents);
+                childContents.add(perContent);
             }
+
+            //add children to the main content
+            content.setChildren(childContents);
         }
 
         return content;

@@ -729,63 +729,62 @@ public class ContentHandler {
 
     public static List<ContentModel> getSortedChildrenList(IDBSession dbSession, String localData, int childContents) {
         Map<String, Object> localDataMap = GsonUtil.fromJson(localData, Map.class);
-        String childrenString = GsonUtil.toJson(localDataMap.get("children"));
+        List<Map> children = (List<Map>) localDataMap.get("children");
+        List<ContentModel> contentModelListInDB;
+        if (children != null && children.size() > 0) {
+            // Sort by index of child content
+            Comparator<Map> comparator = new Comparator<Map>() {
+                @Override
+                public int compare(Map left, Map right) {
+                    double leftIndex = Double.valueOf(left.get("index").toString());
+                    double rightIndex = Double.valueOf(right.get("index").toString());
+                    return (int) (leftIndex - rightIndex); // use your logic
+                }
+            };
+            Collections.sort(children, comparator);
+            List<String> childIdentifiers = new ArrayList<>();
+            StringBuilder whenAndThen = new StringBuilder();
+            int i = 0;
 
-        // json string to list of child
-        Type type = new TypeToken<List<ContentChild>>() {
-        }.getType();
-        List<ContentChild> contentChildList = GsonUtil.getGson().fromJson(childrenString, type);
-
-        // Sort by index of child content
-        Comparator<ContentChild> comparator = new Comparator<ContentChild>() {
-            @Override
-            public int compare(ContentChild left, ContentChild right) {
-                return (int) (left.getIndex() - right.getIndex()); // use your logic
+            for (Map contentChild : children) {
+                childIdentifiers.add(contentChild.get("identifier").toString());
+                whenAndThen.append(format(Locale.US, " WHEN '%s' THEN %s ", contentChild.get("identifier").toString(), i));
+                i++;
             }
-        };
-        Collections.sort(contentChildList, comparator);
 
-        List<String> childIdentifiers = new ArrayList<>();
-        StringBuilder whenAndThen = new StringBuilder();
-        int i = 0;
+            String orderBy = "";
+            if (i > 0) {
+                orderBy = format(Locale.US, " ORDER BY CASE %s %s END", ContentEntry.COLUMN_NAME_IDENTIFIER, whenAndThen.toString());
+            }
 
-        for (ContentChild contentChild : contentChildList) {
-            childIdentifiers.add(contentChild.getIdentifier());
-            whenAndThen.append(format(Locale.US, " WHEN '%s' THEN %s ", contentChild.getIdentifier(), i));
-            i++;
-        }
+            String filter;
+            switch (childContents) {
+                case ContentConstants.ChildContents.FIRST_LEVEL_DOWNLOADED:
+                    filter = format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
+                    break;
 
-        String orderBy = "";
-        if (i > 0) {
-            orderBy = format(Locale.US, " ORDER BY CASE %s %s END", ContentEntry.COLUMN_NAME_IDENTIFIER, whenAndThen.toString());
-        }
-
-        String filter;
-        switch (childContents) {
-            case ContentConstants.ChildContents.FIRST_LEVEL_DOWNLOADED:
-                filter = format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
-                break;
-
-            case ContentConstants.ChildContents.FIRST_LEVEL_SPINE:
-                filter = format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ONLY_SPINE);
-                break;
+                case ContentConstants.ChildContents.FIRST_LEVEL_SPINE:
+                    filter = format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ONLY_SPINE);
+                    break;
 
 //            case CHILD_CONTENTS_FIRST_LEVEL_TEXTBOOK_UNIT:
 //                filter = String.format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_TYPE, ContentType.TEXTBOOK_UNIT.getValue());
 //                break;
 
-            case ContentConstants.ChildContents.FIRST_LEVEL_ALL:
-            default:
-                filter = "";
-                break;
-        }
+                case ContentConstants.ChildContents.FIRST_LEVEL_ALL:
+                default:
+                    filter = "";
+                    break;
+            }
 
-        String query = format(Locale.US, "Select * from %s where %s in ('%s') %s %s",
-                ContentEntry.TABLE_NAME, ContentEntry.COLUMN_NAME_IDENTIFIER, StringUtil.join("','", childIdentifiers), filter, orderBy);
-        List<ContentModel> contentModelListInDB;
-        ContentsModel contentsModel = ContentsModel.findWithCustomQuery(dbSession, query);
-        if (contentsModel != null) {
-            contentModelListInDB = contentsModel.getContentModelList();
+            String query = format(Locale.US, "Select * from %s where %s in ('%s') %s %s",
+                    ContentEntry.TABLE_NAME, ContentEntry.COLUMN_NAME_IDENTIFIER, StringUtil.join("','", childIdentifiers), filter, orderBy);
+            ContentsModel contentsModel = ContentsModel.findWithCustomQuery(dbSession, query);
+            if (contentsModel != null) {
+                contentModelListInDB = contentsModel.getContentModelList();
+            } else {
+                contentModelListInDB = new ArrayList<>();
+            }
         } else {
             contentModelListInDB = new ArrayList<>();
         }
