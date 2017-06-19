@@ -85,7 +85,7 @@ public interface IContentService {
 
     /**
      * @param contentListingCriteria - {@link ContentListingCriteria}
-     * @return {@link GenieResponse< ContentListing >}
+     * @return {@link GenieResponse<ContentListing>}
      */
     GenieResponse<ContentListing> getContentListing(ContentListingCriteria contentListingCriteria);
 

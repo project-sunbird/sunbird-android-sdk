@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.content.chained;
+package org.ekstep.genieservices.content.chained.imports;
 
 import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;

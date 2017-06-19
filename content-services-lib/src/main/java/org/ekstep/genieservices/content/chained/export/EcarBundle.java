@@ -5,7 +5,12 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
+import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.commons.utils.Compress;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Created on 6/19/2017.
@@ -20,6 +25,19 @@ public class EcarBundle implements IChainable {
 
     @Override
     public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
+
+        File source = importContext.getTmpLocation();
+        File destination = importContext.getEcarFile();
+
+        Compress compressWorker = new Compress(source, destination);
+
+        try {
+            compressWorker.zip();
+            importContext.getMetadata().put(GETransferEventKnowStructure.FILE_SIZE, destination.length());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, e.getMessage(), TAG);
+        }
 
         if (nextLink != null) {
             return nextLink.execute(appContext, importContext);

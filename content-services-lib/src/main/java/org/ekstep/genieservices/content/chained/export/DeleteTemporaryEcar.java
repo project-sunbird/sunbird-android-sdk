@@ -6,6 +6,9 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.commons.utils.Logger;
+
+import java.io.File;
 
 /**
  * Created on 6/19/2017.
@@ -21,6 +24,16 @@ public class DeleteTemporaryEcar implements IChainable {
     @Override
     public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
 
+        try {
+            File filePath = importContext.getTmpLocation();
+            if (filePath.isDirectory()) {
+                Logger.i(TAG, "Folder Deleted - " + filePath.getName());
+                deleteRecursive(filePath);
+            }
+        } catch (Exception e) {
+            Logger.i(TAG, "Error in Deleting Ecar Temporary directory: " + e.getMessage());
+        }
+
         if (nextLink != null) {
             return nextLink.execute(appContext, importContext);
         } else {
@@ -32,5 +45,17 @@ public class DeleteTemporaryEcar implements IChainable {
     public IChainable then(IChainable link) {
         nextLink = link;
         return link;
+    }
+
+    private void deleteRecursive(File fileOrDirectory) {
+        if (fileOrDirectory.isDirectory()) {
+            for (File child : fileOrDirectory.listFiles()) {
+                deleteRecursive(child);
+            }
+        }
+
+        if (!fileOrDirectory.delete()) {
+            Logger.i(TAG, "Error in Deleting Ecar Temporary directory: " + fileOrDirectory.getName());
+        }
     }
 }

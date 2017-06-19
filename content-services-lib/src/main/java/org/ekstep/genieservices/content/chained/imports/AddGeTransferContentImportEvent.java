@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.content.chained;
+package org.ekstep.genieservices.content.chained.imports;
 
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;

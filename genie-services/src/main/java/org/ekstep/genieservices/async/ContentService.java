@@ -8,13 +8,14 @@ import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
+import org.ekstep.genieservices.commons.bean.ContentExportRequest;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
 import org.ekstep.genieservices.commons.bean.ContentFeedbackFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
-import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListing;
+import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
@@ -288,6 +289,15 @@ public class ContentService {
             @Override
             public GenieResponse<Void> perform() {
                 return contentService.cancelDownload(identifier);
+            }
+        });
+    }
+
+    public void exportContent(final ContentExportRequest contentExportRequest, IResponseHandler<Void> responseHandler) {
+        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return contentService.exportContent(contentExportRequest);
             }
         });
     }

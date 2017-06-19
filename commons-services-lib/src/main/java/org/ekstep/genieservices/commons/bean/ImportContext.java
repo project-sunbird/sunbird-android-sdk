@@ -38,7 +38,8 @@ public class ImportContext {
     /**
      * Used for Export Content
      */
-    public ImportContext(File destinationFolder, File ecarFile) {
+    public ImportContext(Map<String, Object> metadata, File destinationFolder, File ecarFile) {
+        this.metadata = metadata;
         this.destinationFolder = destinationFolder;
         this.ecarFile = ecarFile;
 

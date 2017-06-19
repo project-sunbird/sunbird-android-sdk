@@ -39,18 +39,12 @@ import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
+import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
-import org.ekstep.genieservices.content.chained.AddGeTransferContentImportEvent;
-import org.ekstep.genieservices.content.chained.ContentImportStep;
-import org.ekstep.genieservices.content.chained.DeviceMemoryCheck;
-import org.ekstep.genieservices.content.chained.EcarCleanUp;
-import org.ekstep.genieservices.content.chained.ExtractEcar;
-import org.ekstep.genieservices.content.chained.ExtractPayloads;
-import org.ekstep.genieservices.content.chained.ValidateEcar;
 import org.ekstep.genieservices.content.chained.export.AddGeTransferContentExportEvent;
 import org.ekstep.genieservices.content.chained.export.CleanTempLoc;
 import org.ekstep.genieservices.content.chained.export.CompressContent;
@@ -60,6 +54,13 @@ import org.ekstep.genieservices.content.chained.export.CreateTempLoc;
 import org.ekstep.genieservices.content.chained.export.DeleteTemporaryEcar;
 import org.ekstep.genieservices.content.chained.export.EcarBundle;
 import org.ekstep.genieservices.content.chained.export.WriteManifest;
+import org.ekstep.genieservices.content.chained.imports.AddGeTransferContentImportEvent;
+import org.ekstep.genieservices.content.chained.imports.ContentImportStep;
+import org.ekstep.genieservices.content.chained.imports.DeviceMemoryCheck;
+import org.ekstep.genieservices.content.chained.imports.EcarCleanUp;
+import org.ekstep.genieservices.content.chained.imports.ExtractEcar;
+import org.ekstep.genieservices.content.chained.imports.ExtractPayloads;
+import org.ekstep.genieservices.content.chained.imports.ValidateEcar;
 import org.ekstep.genieservices.content.db.model.ContentListingModel;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.network.ContentListingAPI;
@@ -735,13 +736,10 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         String fileName = ContentHandler.getExportedFileName(contentModelsToExport);
         File ecarFile = FileUtil.getTempLocation(destinationFolder, fileName);
 
-        HashMap<String, Object> exportData = new HashMap<>();
-        exportData.put("contents", contentModelsToExport);
-        exportData.put(ServiceConstants.UNCOMPRESSED_SOURCE_LOCATION, FileUtil.getTempLocation(destinationFolder));
-//        exportData.put("manifest", manifest);
-        exportData.put(ServiceConstants.EXPORTED_ECAR_DESTINATION_LOCATION, ecarFile);
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put(GETransferEventKnowStructure.CONTENT_ITEMS_KEY, contentModelsToExport);
 
-        ImportContext importContext = new ImportContext(destinationFolder, ecarFile);
+        ImportContext importContext = new ImportContext(metadata, destinationFolder, ecarFile);
 
         CleanTempLoc cleanTempLoc = new CleanTempLoc();
         cleanTempLoc.then(new CreateTempLoc())
