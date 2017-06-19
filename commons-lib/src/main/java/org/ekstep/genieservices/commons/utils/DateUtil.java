@@ -4,7 +4,9 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.Seconds;
 import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -121,6 +123,23 @@ public class DateUtil {
         } catch (Exception ex) {
             return getEpochTime();
         }
+    }
+
+    public static String getCurrentTimestampDate() {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern(DATE_FORMAT).withLocale(Locale.US);
+        DateTime dateTime = new DateTime();
+        return dateTime.toString(dateTimeFormatter);
+    }
+
+    public static String getEpochTimeStamp() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+        return dateFormat.format(new Date());
+    }
+
+    public static long convertLocalTimeMillis(String dateTime) throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
+        Date date = dateFormat.parse(dateTime);
+        return date.getTime();
     }
 
 }

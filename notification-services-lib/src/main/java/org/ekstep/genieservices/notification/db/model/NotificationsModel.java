@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 /**
  * Created by Indraja Machani on 6/12/2017.
@@ -25,43 +24,26 @@ public class NotificationsModel implements IReadable, IUpdatable, ICleanable {
     private String mFilterCondition = null;
     private IDBSession mDBSession;
 
-
-    public static NotificationsModel build(IDBSession dbSession, String filterCondition) {
-        NotificationsModel notificationsModel = new NotificationsModel(dbSession, filterCondition);
-        return notificationsModel;
-    }
-
-    public static NotificationsModel build(String filterCondition) {
-        NotificationsModel notificationsModel = new NotificationsModel(filterCondition);
-        return notificationsModel;
-    }
-
     private NotificationsModel(IDBSession dbSession, String filterCondition) {
         mDBSession = dbSession;
         mFilterCondition = filterCondition;
         mNotifications = new ArrayList<>();
     }
 
-    private NotificationsModel(String filterCondition) {
-        mFilterCondition = filterCondition;
-        mNotifications = new ArrayList<>();
+    public static NotificationsModel build(IDBSession dbSession, String filterCondition) {
+        NotificationsModel notificationsModel = new NotificationsModel(dbSession, filterCondition);
+        return notificationsModel;
     }
 
-    public static String getFilterCondition() {
-        String isValidNotification = String.format(Locale.US, "%s <= '%s' AND %s > '%s'",
-                NotificationEntry.COLUMN_NAME_NOTIFICATION_DISPLAY_TIME,
-                new Date().getTime(), NotificationEntry.COLUMN_NAME_EXPIRY_TIME, new Date().getTime());
-        return String.format(Locale.US, " where %s", isValidNotification);
-    }
+    public static NotificationsModel find(IDBSession dbSession, String filter) {
+        NotificationsModel notificationsModel = new NotificationsModel(dbSession, filter);
+        dbSession.read(notificationsModel);
 
-    public Void update() {
-        mDBSession.update(this);
-        return null;
-    }
-
-    public Void delete() {
-        mDBSession.clean(this);
-        return null;
+        if (notificationsModel.getNotifications() == null) {
+            return null;
+        } else {
+            return notificationsModel;
+        }
     }
 
     @Override
@@ -78,15 +60,21 @@ public class NotificationsModel implements IReadable, IUpdatable, ICleanable {
         return this;
     }
 
+    public Void update() {
+        mDBSession.update(this);
+        return null;
+    }
+
+    public Void delete() {
+        mDBSession.clean(this);
+        return null;
+    }
+
     @Override
     public ContentValues getFieldsToUpdate() {
         ContentValues contentValues = new ContentValues();
-        with(contentValues, NotificationEntry.COLUMN_NAME_IS_READ, 1);
+        contentValues.put(NotificationEntry.COLUMN_NAME_IS_READ, 1);
         return contentValues;
-    }
-
-    public void with(ContentValues contentValues, String key, int value) {
-        contentValues.put(key, value);
     }
 
     @Override
@@ -132,17 +120,6 @@ public class NotificationsModel implements IReadable, IUpdatable, ICleanable {
         return "";
     }
 
-    public ArrayList<Map<String, Object>> asMap() {
-        ArrayList<Map<String, Object>> contentsMap = new ArrayList<>();
-        for (NotificationModel notification : this.mNotifications) {
-            if (notification.getReadStatus() == 0) {
-                notification.setReadStatus(1);
-            }
-            contentsMap.add(notification.getNotificationJsonMap());
-        }
-        return contentsMap;
-    }
-
     public List<Notification> getNotificationBeans() {
         List<Notification> notifications = new ArrayList<>();
         for (NotificationModel notificationModel : this.mNotifications) {
@@ -170,20 +147,8 @@ public class NotificationsModel implements IReadable, IUpdatable, ICleanable {
 
     }
 
-    public static NotificationsModel find(IDBSession dbSession, String filter) {
-        NotificationsModel contentsModel = new NotificationsModel(dbSession, filter);
-        dbSession.read(contentsModel);
-
-        if (contentsModel.getNotifications() == null) {
-            return null;
-        } else {
-            return contentsModel;
-        }
-    }
-
     public List<NotificationModel> getNotifications() {
         return mNotifications;
     }
-
 
 }

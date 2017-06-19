@@ -9,13 +9,11 @@ import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.commons.utils.MapUtil;
-import org.ekstep.genieservices.commons.utils.TimeUtil;
+import org.ekstep.genieservices.commons.utils.DateUtil;
 
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Map;
 
 /**
  * Created on 5/28/2017.
@@ -38,46 +36,14 @@ public class NotificationModel implements IWritable, IUpdatable, IReadable, ICle
     private long displayTimeinMillis;
     private long receivedAtTime;
 
-    private Map<String, Object> mNotificationJsonMap;
-
     private static final String KEY_ISREAD = "isRead";
 
     private NotificationModel() {
     }
 
-    public static NotificationModel find(IDBSession dbSession, double msgId) {
-        NotificationModel notification = new NotificationModel(msgId);
-        dbSession.read(notification);
-
-        if (notification.id == -1L) {
-            return null;
-        } else {
-            return notification;
-        }
-    }
-
-    private NotificationModel(double msgId) {
+    private NotificationModel(IDBSession dbSession, double msgId) {
+        this.mDBSession = dbSession;
         this.mMsgId = msgId;
-    }
-
-
-    private NotificationModel(String notificationJson) {
-        this.mNotificationJson = notificationJson;
-    }
-
-    public static NotificationModel build(IDBSession dbSession, String notificationJson) {
-        NotificationModel notificationModel = new NotificationModel(notificationJson);
-        return notificationModel;
-    }
-
-    public static NotificationModel build() {
-        NotificationModel notificationModel = new NotificationModel();
-        return notificationModel;
-    }
-
-    public static NotificationModel build(double msgId) {
-        NotificationModel notificationModel = new NotificationModel(msgId);
-        return notificationModel;
     }
 
     private NotificationModel(IDBSession dbSession, double mMsgId, String mDisplayTime, long mExpiryTime,
@@ -90,6 +56,34 @@ public class NotificationModel implements IWritable, IUpdatable, IReadable, ICle
         this.mNotificationJson = mNotificationJson;
     }
 
+    public static NotificationModel build() {
+        NotificationModel notificationModel = new NotificationModel();
+        return notificationModel;
+    }
+
+    public static NotificationModel build(IDBSession dbSession, double msgId) {
+        NotificationModel notificationModel = new NotificationModel(dbSession, msgId);
+        return notificationModel;
+    }
+
+    public static NotificationModel build(IDBSession dbSession, double mMsgId, String mDisplayTime, long mExpiryTime,
+                                          Date receivedAt, String mNotificationJson) {
+        NotificationModel notificationModel = new NotificationModel(dbSession, mMsgId, mDisplayTime, mExpiryTime,
+                receivedAt, mNotificationJson);
+        return notificationModel;
+    }
+
+    public static NotificationModel find(IDBSession dbSession, double msgId) {
+        NotificationModel notification = new NotificationModel(dbSession, msgId);
+        dbSession.read(notification);
+
+        if (notification.id == -1L) {
+            return null;
+        } else {
+            return notification;
+        }
+    }
+
     public Void save() {
         mDBSession.create(this);
         return null;
@@ -100,23 +94,16 @@ public class NotificationModel implements IWritable, IUpdatable, IReadable, ICle
         return null;
     }
 
-    public static NotificationModel build(IDBSession dbSession, double mMsgId, String mDisplayTime, long mExpiryTime,
-                                          Date receivedAt, String mNotificationJson) {
-        NotificationModel notificationModel = new NotificationModel(dbSession, mMsgId, mDisplayTime, mExpiryTime,
-                receivedAt, mNotificationJson);
-        return notificationModel;
-    }
-
     @Override
     public ContentValues getContentValues() {
 //        return null;
         ContentValues contentValues = new ContentValues();
-        with(contentValues, NotificationEntry.COLUMN_NAME_MESSAGE_ID, mMsgId);
-        with(contentValues, NotificationEntry.COLUMN_NAME_EXPIRY_TIME, mExpiryTime);
-        with(contentValues, NotificationEntry.COLUMN_NAME_NOTIFICATION_DISPLAY_TIME, getDisplayTime());
-        with(contentValues, NotificationEntry.COLUMN_NAME_NOTIFICATION_RECEIVED_AT, receivedAt.getTime());
+        contentValues.put(NotificationEntry.COLUMN_NAME_MESSAGE_ID, mMsgId);
+        contentValues.put(NotificationEntry.COLUMN_NAME_EXPIRY_TIME, mExpiryTime);
+        contentValues.put(NotificationEntry.COLUMN_NAME_NOTIFICATION_DISPLAY_TIME, getDisplayTime());
+        contentValues.put(NotificationEntry.COLUMN_NAME_NOTIFICATION_RECEIVED_AT, receivedAt.getTime());
         with(contentValues, NotificationEntry.COLUMN_NAME_NOTIFICATION_JSON, mNotificationJson);
-        with(contentValues, NotificationEntry.COLUMN_NAME_IS_READ, isRead);
+        contentValues.put(NotificationEntry.COLUMN_NAME_IS_READ, isRead);
 
         return contentValues;
     }
@@ -127,18 +114,10 @@ public class NotificationModel implements IWritable, IUpdatable, IReadable, ICle
         }
     }
 
-    private void with(ContentValues contentValues, String key, double value) {
-        contentValues.put(key, value);
-    }
-
-    private void with(ContentValues contentValues, String key, long value) {
-        contentValues.put(key, value);
-    }
-
     private long getDisplayTime() {
         long displayTime = 0;
         try {
-            displayTime = TimeUtil.convertLocalTimeMillis(mDisplayTime);
+            displayTime = DateUtil.convertLocalTimeMillis(mDisplayTime);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -154,12 +133,12 @@ public class NotificationModel implements IWritable, IUpdatable, IReadable, ICle
     public ContentValues getFieldsToUpdate() {
         // return null;
         ContentValues contentValues = new ContentValues();
-        with(contentValues, NotificationEntry.COLUMN_NAME_MESSAGE_ID, mMsgId);
-        with(contentValues, NotificationEntry.COLUMN_NAME_EXPIRY_TIME, mExpiryTime);
-        with(contentValues, NotificationEntry.COLUMN_NAME_NOTIFICATION_DISPLAY_TIME, getDisplayTime());
-        with(contentValues, NotificationEntry.COLUMN_NAME_NOTIFICATION_RECEIVED_AT, receivedAt.getTime());
+        contentValues.put(NotificationEntry.COLUMN_NAME_MESSAGE_ID, mMsgId);
+        contentValues.put(NotificationEntry.COLUMN_NAME_EXPIRY_TIME, mExpiryTime);
+        contentValues.put(NotificationEntry.COLUMN_NAME_NOTIFICATION_DISPLAY_TIME, getDisplayTime());
+        contentValues.put(NotificationEntry.COLUMN_NAME_NOTIFICATION_RECEIVED_AT, receivedAt.getTime());
         with(contentValues, NotificationEntry.COLUMN_NAME_NOTIFICATION_JSON, mNotificationJson);
-        with(contentValues, NotificationEntry.COLUMN_NAME_IS_READ, isRead);
+        contentValues.put(NotificationEntry.COLUMN_NAME_IS_READ, isRead);
         return contentValues;
     }
 
@@ -185,9 +164,6 @@ public class NotificationModel implements IWritable, IUpdatable, IReadable, ICle
 
         mNotificationJson = resultSet.getString(resultSet.getColumnIndex(NotificationEntry.COLUMN_NAME_NOTIFICATION_JSON));
         isRead = resultSet.getInt(resultSet.getColumnIndex(NotificationEntry.COLUMN_NAME_IS_READ));
-
-        mNotificationJsonMap = MapUtil.toMap(mNotificationJson);
-        mNotificationJsonMap.put(KEY_ISREAD, isRead);
     }
 
     @Override
@@ -235,10 +211,6 @@ public class NotificationModel implements IWritable, IUpdatable, IReadable, ICle
 
     }
 
-    public Map<String, Object> getNotificationJsonMap() {
-        return mNotificationJsonMap;
-    }
-
     public String getNotificationJson() {
         return mNotificationJson;
     }
@@ -274,6 +246,5 @@ public class NotificationModel implements IWritable, IUpdatable, IReadable, ICle
     public void setReadStatus(int isRead) {
         this.isRead = isRead;
     }
-
 
 }

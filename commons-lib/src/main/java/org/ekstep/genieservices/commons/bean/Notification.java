@@ -10,35 +10,11 @@ import java.util.Date;
  */
 public class Notification implements Serializable {
 
-    private double mMsgId;
-    private long mExpiryTime;
-    private String mDisplayTime;
+    private double msgId;
+    private long expiryTime;
+    private String displayTime;
     private Date receivedAt;
     private String notificationJson;
-
-    public double getmMsgId() {
-        return mMsgId;
-    }
-
-    public void setmMsgId(double mMsgId) {
-        this.mMsgId = mMsgId;
-    }
-
-    public long getmExpiryTime() {
-        return mExpiryTime;
-    }
-
-    public void setmExpiryTime(long mExpiryTime) {
-        this.mExpiryTime = mExpiryTime;
-    }
-
-    public String getmDisplayTime() {
-        return mDisplayTime;
-    }
-
-    public void setmDisplayTime(String mDisplayTime) {
-        this.mDisplayTime = mDisplayTime;
-    }
 
     public Date getReceivedAt() {
         return receivedAt;
@@ -55,4 +31,29 @@ public class Notification implements Serializable {
     public void setNotificationJson(String notificationJson) {
         this.notificationJson = notificationJson;
     }
+
+    public double getMsgId() {
+        return msgId;
+    }
+
+    public void setMsgId(double msgId) {
+        this.msgId = msgId;
+    }
+
+    public long getExpiryTime() {
+        return expiryTime;
+    }
+
+    public void setExpiryTime(long expiryTime) {
+        this.expiryTime = expiryTime;
+    }
+
+    public String getDisplayTime() {
+        return displayTime;
+    }
+
+    public void setDisplayTime(String displayTime) {
+        this.displayTime = displayTime;
+    }
+
 }

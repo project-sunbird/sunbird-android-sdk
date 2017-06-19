@@ -2,14 +2,13 @@ package org.ekstep.genieservices.notification;
 
 import org.ekstep.genieservices.commons.db.contract.NotificationEntry;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.commons.utils.MapUtil;
-import org.ekstep.genieservices.commons.utils.TimeUtil;
+import org.ekstep.genieservices.commons.utils.DateUtil;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.notification.db.model.NotificationModel;
 import org.ekstep.genieservices.notification.db.model.NotificationsModel;
 
 import java.text.ParseException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -30,16 +29,16 @@ public class NotificationHandler {
     private static final String KEY_VALIDITY = "validity";
     private static final String KEY_TIME = "time";
 
-    public static NotificationModel getNotificationModel(IDBSession dbSession, String notificationJson) {
-        Map notificationData = MapUtil.toMap(notificationJson);
+    public static NotificationModel convertNotificationMapToModel(IDBSession dbSession, String notificationJson) {
+        Map notificationData = GsonUtil.fromJson(notificationJson, Map.class);
 
-        double mMsgId = readMsdId(notificationData);
-        String mDisplayTime = readDisplayTime(notificationData);
-        long mExpiryTime = getComputeExpiryTime(notificationData, mDisplayTime);
+        double msdId = readMsdId(notificationData);
+        String displayTime = readDisplayTime(notificationData);
+        long expiryTime = getComputeExpiryTime(notificationData, displayTime);
         Date receivedAt = new Date();
 
-        NotificationModel notificationModel = NotificationModel.build(dbSession, mMsgId,
-                mDisplayTime, mExpiryTime, receivedAt, notificationJson);
+        NotificationModel notificationModel = NotificationModel.build(dbSession, msdId,
+                displayTime, expiryTime, receivedAt, notificationJson);
         return notificationModel;
     }
 
@@ -51,39 +50,44 @@ public class NotificationHandler {
     }
 
     private static String readDisplayTime(Map notificationData) {
-        String mDisplayTime = null;
+        String displayTime = null;
         if (notificationData.containsKey(KEY_TIME)) {
-            mDisplayTime = notificationData.get(KEY_TIME).toString();
+            displayTime = notificationData.get(KEY_TIME).toString();
         } else {
-            mDisplayTime = TimeUtil.getEpochTimeStamp();
+            displayTime = DateUtil.getEpochTimeStamp();
         }
-        return mDisplayTime;
+        return displayTime;
     }
 
-    private static long getComputeExpiryTime(Map notificationData, String mDisplayTime) {
-        long mExpiryTime = -1;
+    private static long getComputeExpiryTime(Map notificationData, String displayTime) {
+        long expiryTime = -1;
         try {
             if (notificationData.containsKey(KEY_RELATIVETIME)) {
                 //Its Local notification
                 Double relativeTime = Double.valueOf(notificationData.get(KEY_RELATIVETIME).toString());
-                mExpiryTime = TimeUtil.convertLocalTimeMillis(mDisplayTime) +/*relativeTime.longValue()* HOUR_MILLIS*/DAY_MILLIS;
+                expiryTime = DateUtil.convertLocalTimeMillis(displayTime) + DAY_MILLIS;
 
             } else if (notificationData.containsKey(KEY_VALIDITY)) {
                 //Its FCM push notification
                 double validity = 0;
                 validity = Double.valueOf(notificationData.get(KEY_VALIDITY).toString());
-                mExpiryTime = TimeUtil.convertLocalTimeMillis(mDisplayTime) + (int) validity * MINUTE_MILLIS;
+                expiryTime = DateUtil.convertLocalTimeMillis(displayTime) + (int) validity * MINUTE_MILLIS;
             }
 
         } catch (ParseException e) {
             e.printStackTrace();
-            mExpiryTime = new Date().getTime() + DAY_MILLIS;
+            expiryTime = new Date().getTime() + DAY_MILLIS;
         }
 
-        return mExpiryTime;
+        return expiryTime;
     }
 
-    public static String getUpdateCondition(int msgId) {
+    public static String getFilterCondition() {
+        String isValidNotification = String.format(Locale.US, "%s <= '%s' AND %s > '%s'", NotificationEntry.COLUMN_NAME_NOTIFICATION_DISPLAY_TIME, new Date().getTime(), NotificationEntry.COLUMN_NAME_EXPIRY_TIME, new Date().getTime());
+        return String.format(Locale.US, " where %s", isValidNotification);
+    }
+
+    public static String getFilterConditionToUpdate(int msgId) {
         //Update query to update  given  notification msg id
         if (msgId != -1) {
             String isValidNotification = String.format(Locale.US, "%s = '%s'", NotificationEntry.COLUMN_NAME_MESSAGE_ID, msgId);
@@ -96,37 +100,24 @@ public class NotificationHandler {
                     new Date().getTime() - DAY_MILLIS);
             return String.format(Locale.US, " %s", isValidNotification);
         }
-
     }
 
-    private static String getFilterCondition() {
+    public static String getFilterConditionToRead() {
         String isValidNotification = String.format(Locale.US, "%s <= '%s' AND %s > '%s' AND %s = '%s'", NotificationEntry.COLUMN_NAME_NOTIFICATION_DISPLAY_TIME, new Date().getTime(), NotificationEntry.COLUMN_NAME_EXPIRY_TIME, new Date().getTime(), NotificationEntry.COLUMN_NAME_IS_READ, 0);
         return String.format(Locale.US, " where %s", isValidNotification);
     }
 
-    private static int getAllUnReadNotifications(IDBSession dbSession) {
-        NotificationsModel notifications = NotificationsModel.build(getFilterCondition());
+    /**
+     * getUnreadNotificationCount
+     *
+     * @param dbSession
+     * @return
+     */
+    public static Integer getUnreadNotificationCount(IDBSession dbSession) {
+        NotificationsModel notifications = NotificationsModel.build(dbSession, getFilterCondition());
         dbSession.read(notifications);
         List<NotificationModel> notificationList = notifications.getNotifications();
         return notificationList.size();
-    }
-
-    // TODO it will be removed in future, once if it is not required
-    public static Map<String, Object> getUnreadNotificationCountMap(IDBSession dbSession) {
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("count", NotificationHandler.getAllUnReadNotifications(dbSession));
-        return map;
-    }
-
-    // TODO it will be removed in future, once if it is not required
-    public static Map<String, Object> getAllNotifications(NotificationsModel notifications) {
-        Map<String, Object> result = new HashMap<>();
-        result.put("notifications", notifications.asMap());
-        return result;
-    }
-
-    public static Integer getUnreadNotificationCount(IDBSession dbSession) {
-        return NotificationHandler.getAllUnReadNotifications(dbSession);
     }
 
 }

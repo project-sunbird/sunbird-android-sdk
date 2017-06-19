@@ -23,7 +23,7 @@ public class NotificationServiceImpl extends BaseService implements INotificatio
     @Override
     public GenieResponse<Void> addNotification(String notificationJson) {
         try {
-            NotificationModel notification = NotificationHandler.getNotificationModel(mAppContext.getDBSession(), notificationJson);
+            NotificationModel notification = NotificationHandler.convertNotificationMapToModel(mAppContext.getDBSession(), notificationJson);
             NotificationModel oldNotification = NotificationModel.find(mAppContext.getDBSession(), notification.getNotificationMessageId());
 
             if (oldNotification != null) {
@@ -51,7 +51,7 @@ public class NotificationServiceImpl extends BaseService implements INotificatio
     public GenieResponse<Void> updateNotificationStatus(int msgId) {
         String errorMessage = "Failed to update the notification";
         try {
-            NotificationsModel notificationsUpdate = NotificationsModel.build(mAppContext.getDBSession(), NotificationHandler.getUpdateCondition(msgId));
+            NotificationsModel notificationsUpdate = NotificationsModel.build(mAppContext.getDBSession(), NotificationHandler.getFilterConditionToUpdate(msgId));
             notificationsUpdate.update();
             return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         } catch (Exception e) {
@@ -79,7 +79,7 @@ public class NotificationServiceImpl extends BaseService implements INotificatio
     public GenieResponse<Void> deleteNotification(int msgId) {
         String errorMessage = "Failed to delete notification";
         try {
-            NotificationModel notification = NotificationModel.build(msgId);
+            NotificationModel notification = NotificationModel.build(mAppContext.getDBSession(), msgId);
             mAppContext.getDBSession().clean(notification);
 
             return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
@@ -91,7 +91,7 @@ public class NotificationServiceImpl extends BaseService implements INotificatio
     @Override
     public GenieResponse<List<Notification>> getAllNotifications() {
         try {
-            NotificationsModel notifications = NotificationsModel.build(mAppContext.getDBSession(), NotificationsModel.getFilterCondition());
+            NotificationsModel notifications = NotificationsModel.build(mAppContext.getDBSession(), NotificationHandler.getFilterCondition());
 
             //Deletes all expired notifications
             mAppContext.getDBSession().clean(notifications);
@@ -100,9 +100,7 @@ public class NotificationServiceImpl extends BaseService implements INotificatio
 
             GenieResponse successResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             List<Notification> notificationBeans = notifications.getNotificationBeans();
-//            Map<String, Object> result = new HashMap<>();
-//            result.put("notifications", notifications.asMap());
-
+//
             successResponse.setResult(notificationBeans);
             return successResponse;
         } catch (Exception e) {
