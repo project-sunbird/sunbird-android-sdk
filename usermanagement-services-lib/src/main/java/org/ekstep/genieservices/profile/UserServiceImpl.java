@@ -435,7 +435,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
             for (ContentAccessModel contentAccessModel : contentAccessesModel.getContentAccessModelList()) {
                 ContentAccess contentAccess = new ContentAccess();
                 contentAccess.setStatus(contentAccessModel.getStatus());
-                Map learnerState = GsonUtil.fromJson(contentAccessModel.getLearnerStateJson(), Map.class);
+                Map learnerState = GsonUtil.fromJson(contentAccessModel.getLearnerStateJson(), HashMap.class);
                 ContentLearnerState contentLearnerState = new ContentLearnerState();
                 contentLearnerState.setLearnerState(learnerState);
                 contentAccess.setContentLearnerState(contentLearnerState);
