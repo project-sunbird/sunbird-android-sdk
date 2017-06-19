@@ -1,15 +1,16 @@
 package org.ekstep.genieservices.notification;
 
+import org.ekstep.genieservices.commons.bean.Notification;
+import org.ekstep.genieservices.commons.bean.NotificationFilterCriteria;
+import org.ekstep.genieservices.commons.bean.enums.NotificationStatus;
 import org.ekstep.genieservices.commons.db.contract.NotificationEntry;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.notification.db.model.NotificationModel;
-import org.ekstep.genieservices.notification.db.model.NotificationsModel;
 
 import java.text.ParseException;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -29,8 +30,9 @@ public class NotificationHandler {
     private static final String KEY_VALIDITY = "validity";
     private static final String KEY_TIME = "time";
 
-    public static NotificationModel convertNotificationMapToModel(IDBSession dbSession, String notificationJson) {
-        Map notificationData = GsonUtil.fromJson(notificationJson, Map.class);
+    public static NotificationModel convertNotificationMapToModel(IDBSession dbSession, Notification notification) {
+        String notificationJsonString = GsonUtil.toJson(notification);
+        Map notificationData = GsonUtil.fromJson(notificationJsonString, Map.class);
 
         double msdId = readMsdId(notificationData);
         String displayTime = readDisplayTime(notificationData);
@@ -38,7 +40,7 @@ public class NotificationHandler {
         Date receivedAt = new Date();
 
         NotificationModel notificationModel = NotificationModel.build(dbSession, msdId,
-                displayTime, expiryTime, receivedAt, notificationJson);
+                displayTime, expiryTime, receivedAt, notificationJsonString);
         return notificationModel;
     }
 
@@ -54,7 +56,7 @@ public class NotificationHandler {
         if (notificationData.containsKey(KEY_TIME)) {
             displayTime = notificationData.get(KEY_TIME).toString();
         } else {
-            displayTime = DateUtil.getEpochTimeStamp();
+            displayTime = DateUtil.format(new Date(), DateUtil.DATE_FORMAT);
         }
         return displayTime;
     }
@@ -82,12 +84,7 @@ public class NotificationHandler {
         return expiryTime;
     }
 
-    public static String getFilterCondition() {
-        String isValidNotification = String.format(Locale.US, "%s <= '%s' AND %s > '%s'", NotificationEntry.COLUMN_NAME_NOTIFICATION_DISPLAY_TIME, new Date().getTime(), NotificationEntry.COLUMN_NAME_EXPIRY_TIME, new Date().getTime());
-        return String.format(Locale.US, " where %s", isValidNotification);
-    }
-
-    public static String getFilterConditionToUpdate(int msgId) {
+    public static String getFilterConditionToUpdate(double msgId) {
         //Update query to update  given  notification msg id
         if (msgId != -1) {
             String isValidNotification = String.format(Locale.US, "%s = '%s'", NotificationEntry.COLUMN_NAME_MESSAGE_ID, msgId);
@@ -102,22 +99,32 @@ public class NotificationHandler {
         }
     }
 
-    public static String getFilterConditionToRead() {
+    private static String getFilterConditionToGetAllNotifications() {
+        String isValidNotification = String.format(Locale.US, "%s <= '%s' AND %s > '%s'", NotificationEntry.COLUMN_NAME_NOTIFICATION_DISPLAY_TIME, new Date().getTime(), NotificationEntry.COLUMN_NAME_EXPIRY_TIME, new Date().getTime());
+        return String.format(Locale.US, " where %s", isValidNotification);
+    }
+
+    private static String getFilterConditionToGetUnreadNotifications() {
         String isValidNotification = String.format(Locale.US, "%s <= '%s' AND %s > '%s' AND %s = '%s'", NotificationEntry.COLUMN_NAME_NOTIFICATION_DISPLAY_TIME, new Date().getTime(), NotificationEntry.COLUMN_NAME_EXPIRY_TIME, new Date().getTime(), NotificationEntry.COLUMN_NAME_IS_READ, 0);
         return String.format(Locale.US, " where %s", isValidNotification);
     }
 
-    /**
-     * getUnreadNotificationCount
-     *
-     * @param dbSession
-     * @return
-     */
-    public static Integer getUnreadNotificationCount(IDBSession dbSession) {
-        NotificationsModel notifications = NotificationsModel.build(dbSession, getFilterCondition());
-        dbSession.read(notifications);
-        List<NotificationModel> notificationList = notifications.getNotifications();
-        return notificationList.size();
+    private static String getFilterConditionToGetReadNotifications() {
+        String isValidNotification = String.format(Locale.US, "%s <= '%s' AND %s > '%s' AND %s = '%s'", NotificationEntry.COLUMN_NAME_NOTIFICATION_DISPLAY_TIME, new Date().getTime(), NotificationEntry.COLUMN_NAME_EXPIRY_TIME, new Date().getTime(), NotificationEntry.COLUMN_NAME_IS_READ, 1);
+        return String.format(Locale.US, " where %s", isValidNotification);
+    }
+
+    public static String getFilterCondition(NotificationFilterCriteria criteria) {
+        NotificationStatus status = criteria.getNotificationStatus();
+
+        if (status.getValue().equalsIgnoreCase(NotificationStatus.ALL.getValue()))
+            return getFilterConditionToGetAllNotifications();
+        else if (status.getValue().equalsIgnoreCase(NotificationStatus.UNREAD.getValue()))
+            return getFilterConditionToGetUnreadNotifications();
+        else if (status.getValue().equalsIgnoreCase(NotificationStatus.READ.getValue()))
+            return getFilterConditionToGetReadNotifications();
+        else
+            return null;
     }
 
 }

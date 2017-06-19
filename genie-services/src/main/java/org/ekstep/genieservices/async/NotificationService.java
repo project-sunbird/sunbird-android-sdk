@@ -5,6 +5,7 @@ import org.ekstep.genieservices.INotificationService;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Notification;
+import org.ekstep.genieservices.commons.bean.NotificationFilterCriteria;
 
 import java.util.List;
 
@@ -24,11 +25,11 @@ public class NotificationService {
      *
      * @param responseHandler
      */
-    public void addNotification(final String notificationJson, IResponseHandler<Void> responseHandler) {
+    public void addNotification(final Notification notification, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
-                return notificationService.addNotification(notificationJson);
+                return notificationService.addNotification(notification);
             }
         });
     }
@@ -38,26 +39,11 @@ public class NotificationService {
      *
      * @param responseHandler
      */
-    public void updateAllNotificationStatus(IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+    public void updateNotification(final Notification notification, IResponseHandler<Notification> responseHandler) {
+        new AsyncHandler<Notification>(responseHandler).execute(new IPerformable<Notification>() {
             @Override
-            public GenieResponse<Void> perform() {
-                return notificationService.updateAllNotificationStatus();
-            }
-        });
-    }
-
-    /**
-     * This api updates the status of a specific notification.
-     *
-     * @param notificationId
-     * @param responseHandler
-     */
-    public void updateNotificationStatus(final int notificationId, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
-            @Override
-            public GenieResponse<Void> perform() {
-                return notificationService.updateNotificationStatus(notificationId);
+            public GenieResponse<Notification> perform() {
+                return notificationService.updateNotification(notification);
             }
         });
     }
@@ -78,15 +64,15 @@ public class NotificationService {
     }
 
     /**
-     * This api gets all the notifications.
+     * This api gets unread notifications count.
      *
      * @param responseHandler
      */
-    public void getUnreadNotificationCount(IResponseHandler<Integer> responseHandler) {
+    public void getUnreadNotificationCount(final NotificationFilterCriteria criteria, IResponseHandler<Integer> responseHandler) {
         new AsyncHandler<Integer>(responseHandler).execute(new IPerformable<Integer>() {
             @Override
             public GenieResponse<Integer> perform() {
-                return notificationService.getUnreadNotificationCount();
+                return notificationService.getUnreadNotificationCount(criteria);
             }
         });
     }
@@ -97,11 +83,11 @@ public class NotificationService {
      *
      * @param responseHandler
      */
-    public void getAllNotifications(IResponseHandler<List<Notification>> responseHandler) {
+    public void getAllNotifications(final NotificationFilterCriteria criteria, IResponseHandler<List<Notification>> responseHandler) {
         new AsyncHandler<List<Notification>>(responseHandler).execute(new IPerformable<List<Notification>>() {
             @Override
             public GenieResponse<List<Notification>> perform() {
-                return notificationService.getAllNotifications();
+                return notificationService.getAllNotifications(criteria);
             }
         });
     }

@@ -15,6 +15,7 @@ public class Notification implements Serializable {
     private String displayTime;
     private Date receivedAt;
     private String notificationJson;
+    private String status;
 
     public Date getReceivedAt() {
         return receivedAt;
@@ -56,4 +57,11 @@ public class Notification implements Serializable {
         this.displayTime = displayTime;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

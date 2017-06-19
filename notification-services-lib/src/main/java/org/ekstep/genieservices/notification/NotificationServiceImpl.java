@@ -7,6 +7,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Notification;
+import org.ekstep.genieservices.commons.bean.NotificationFilterCriteria;
 import org.ekstep.genieservices.commons.exception.DbException;
 import org.ekstep.genieservices.commons.exception.InvalidDataException;
 import org.ekstep.genieservices.notification.db.model.NotificationModel;
@@ -21,15 +22,15 @@ public class NotificationServiceImpl extends BaseService implements INotificatio
     }
 
     @Override
-    public GenieResponse<Void> addNotification(String notificationJson) {
+    public GenieResponse<Void> addNotification(Notification notification) {
         try {
-            NotificationModel notification = NotificationHandler.convertNotificationMapToModel(mAppContext.getDBSession(), notificationJson);
-            NotificationModel oldNotification = NotificationModel.find(mAppContext.getDBSession(), notification.getNotificationMessageId());
+            NotificationModel notificationModel = NotificationHandler.convertNotificationMapToModel(mAppContext.getDBSession(), notification);
+            NotificationModel oldNotification = NotificationModel.find(mAppContext.getDBSession(), notification.getMsgId());
 
             if (oldNotification != null) {
-                notification.update();
+                notificationModel.update();
             } else {
-                notification.save();
+                notificationModel.save();
             }
 
             return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
@@ -41,14 +42,9 @@ public class NotificationServiceImpl extends BaseService implements INotificatio
     }
 
     @Override
-    public GenieResponse<Void> updateAllNotificationStatus() {
+    public GenieResponse<Notification> updateNotification(Notification notification) {
         // -1 to update all the notifications
-        int msgId = -1;
-        return updateNotificationStatus(msgId);
-    }
-
-    @Override
-    public GenieResponse<Void> updateNotificationStatus(int msgId) {
+        double msgId = notification.getMsgId();
         String errorMessage = "Failed to update the notification";
         try {
             NotificationsModel notificationsUpdate = NotificationsModel.build(mAppContext.getDBSession(), NotificationHandler.getFilterConditionToUpdate(msgId));
@@ -60,12 +56,16 @@ public class NotificationServiceImpl extends BaseService implements INotificatio
     }
 
     @Override
-    public GenieResponse<Integer> getUnreadNotificationCount() {
+    public GenieResponse<Integer> getUnreadNotificationCount(NotificationFilterCriteria criteria) {
         String errorMessage = "Not able to fetch notifications";
         GenieResponse<Integer> genieResponse = null;
         try {
             genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-            genieResponse.setResult(NotificationHandler.getUnreadNotificationCount(mAppContext.getDBSession()));
+
+            NotificationsModel notifications = NotificationsModel.build(mAppContext.getDBSession(), NotificationHandler.getFilterCondition(criteria));
+            mAppContext.getDBSession().read(notifications);
+            List<NotificationModel> notificationList = notifications.getNotifications();
+            genieResponse.setResult(notificationList.size());
             return genieResponse;
         } catch (DbException e) {
             e.printStackTrace();
@@ -89,9 +89,9 @@ public class NotificationServiceImpl extends BaseService implements INotificatio
     }
 
     @Override
-    public GenieResponse<List<Notification>> getAllNotifications() {
+    public GenieResponse<List<Notification>> getAllNotifications(NotificationFilterCriteria criteria) {
         try {
-            NotificationsModel notifications = NotificationsModel.build(mAppContext.getDBSession(), NotificationHandler.getFilterCondition());
+            NotificationsModel notifications = NotificationsModel.build(mAppContext.getDBSession(), NotificationHandler.getFilterCondition(criteria));
 
             //Deletes all expired notifications
             mAppContext.getDBSession().clean(notifications);

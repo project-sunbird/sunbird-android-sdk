@@ -4,7 +4,6 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.Seconds;
 import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -16,10 +15,10 @@ public class DateUtil {
 
     public static final int MILLISECONDS_IN_AN_HOUR = 3600000;
     public static final String DATE_TIME_AM_PM_FORMAT = "dd/MM/yyyy, hh:mma";
-    private static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";
-    private static final String ISO_DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SZZZZZ";
-    private static final String DATETIME_FORMAT_WITHOUTTIMEZONE = "yyyy-MM-dd'T'HH:mm:ss";
-    private static final String DATE_FORMAT = "yyyy-MM-dd";
+    public static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";
+    public static final String ISO_DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SZZZZZ";
+    public static final String DATETIME_FORMAT_WITHOUTTIMEZONE = "yyyy-MM-dd'T'HH:mm:ss";
+    public static final String DATE_FORMAT = "yyyy-MM-dd";
 
     public static String getCurrentTimestamp() {
         return format(getEpochTime(), DATETIME_FORMAT);
@@ -125,19 +124,8 @@ public class DateUtil {
         }
     }
 
-    public static String getCurrentTimestampDate() {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern(DATE_FORMAT).withLocale(Locale.US);
-        DateTime dateTime = new DateTime();
-        return dateTime.toString(dateTimeFormatter);
-    }
-
-    public static String getEpochTimeStamp() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-        return dateFormat.format(new Date());
-    }
-
     public static long convertLocalTimeMillis(String dateTime) throws ParseException {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATETIME_FORMAT_WITHOUTTIMEZONE, Locale.US);
         Date date = dateFormat.parse(dateTime);
         return date.getTime();
     }
