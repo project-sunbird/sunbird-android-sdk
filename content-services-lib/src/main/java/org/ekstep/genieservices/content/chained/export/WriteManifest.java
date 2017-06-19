@@ -36,6 +36,8 @@ public class WriteManifest implements IChainable<ContentExportResponse> {
 
         try {
             File manifestFile = new File(importContext.getTmpLocation(), "manifest.json");
+            // TODO: 6/19/2017  
+            manifestFile.createNewFile();
             FileOutputStream fileOutputStream = new FileOutputStream(manifestFile);
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
 
