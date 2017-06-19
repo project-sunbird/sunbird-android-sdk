@@ -111,7 +111,7 @@ public class DownloadServiceImpl implements IDownloadService {
                 }
 
             }
-        }, 2, 10, TimeUnit.SECONDS);
+        }, 0, 1, TimeUnit.SECONDS);
     }
 
     @Override
