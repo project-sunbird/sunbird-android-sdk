@@ -1,9 +1,9 @@
 package org.ekstep.genieservices.commons.bean;
 
 /**
- * Created by swayangjit on 26/5/17.
+ * This class holds the identifier, status and filePath after importing the content.
+ *
  */
-
 public class ContentImportResponse {
 
     private String identifier;

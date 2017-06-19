@@ -1,9 +1,8 @@
 package org.ekstep.genieservices.commons.bean;
 
 /**
- * Created on 6/6/2017.
+ * This class holds the contentId and uid used for filtering the content feedback.
  *
- * @author anil
  */
 public class ContentFeedbackFilterCriteria {
 

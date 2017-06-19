@@ -3,9 +3,12 @@ package org.ekstep.genieservices.commons.bean;
 import java.util.List;
 
 /**
- * Created on 6/6/2017.
+ * This class accepts,
+ * - isChildContent - if the child contents are required while importing
+ * - destinationFolder - where the contents are to be stored
+ * - contentIds - list of contentIds to be imported
+ * - correlationData - list of correlationData
  *
- * @author anil
  */
 public class ContentImportRequest {
 

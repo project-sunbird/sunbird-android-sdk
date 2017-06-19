@@ -3,9 +3,7 @@ package org.ekstep.genieservices.commons.bean;
 import java.util.List;
 
 /**
- * Created on 5/29/2017.
- *
- * @author anil
+ * This class holds the data related to content listing.
  */
 public class ContentListing {
 

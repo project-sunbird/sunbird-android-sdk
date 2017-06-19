@@ -3,9 +3,8 @@ package org.ekstep.genieservices.commons.bean;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
 /**
- * Created on 6/6/2017.
+ * This class accepts contentId,attachFeedback and attachContentAccess while building the request, and is used when requesting content details.
  *
- * @author anil
  */
 public class ContentDetailsRequest {
 

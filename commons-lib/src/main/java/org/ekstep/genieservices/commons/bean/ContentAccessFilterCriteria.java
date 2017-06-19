@@ -1,11 +1,7 @@
 package org.ekstep.genieservices.commons.bean;
 
-import org.ekstep.genieservices.commons.bean.enums.ContentType;
-
 /**
- * Created on 5/11/2017.
- *
- * @author anil
+ * This class holds the contentId and uid for filtering the content access
  */
 public class ContentAccessFilterCriteria {
 
