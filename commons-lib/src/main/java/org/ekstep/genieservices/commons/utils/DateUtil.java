@@ -16,11 +16,11 @@ public class DateUtil {
     public static final String DATE_TIME_AM_PM_FORMAT = "dd/MM/yyyy, hh:mma";
     public static final String TIME_ZONE_GMT = "GMT";
 
-    private static final String DATE_FORMAT_EXPORT_CONTENT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
-    private static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";
-    private static final String ISO_DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SZZZZZ";
-    private static final String DATETIME_FORMAT_WITHOUTTIMEZONE = "yyyy-MM-dd'T'HH:mm:ss";
-    private static final String DATE_FORMAT = "yyyy-MM-dd";
+    public static final String DATE_FORMAT_EXPORT_CONTENT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    public static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";
+    public static final String ISO_DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SZZZZZ";
+    public static final String DATETIME_FORMAT_WITHOUTTIMEZONE = "yyyy-MM-dd'T'HH:mm:ss";
+    public static final String DATE_FORMAT = "yyyy-MM-dd";
 
     public static String getCurrentTimestamp() {
         return format(getEpochTime(), DATETIME_FORMAT);
