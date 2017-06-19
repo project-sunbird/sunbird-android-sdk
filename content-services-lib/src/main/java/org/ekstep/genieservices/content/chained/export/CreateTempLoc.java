@@ -22,7 +22,7 @@ public class CreateTempLoc implements IChainable<ContentExportResponse> {
     @Override
     public GenieResponse<ContentExportResponse> execute(AppContext appContext, ImportContext importContext) {
         try {
-            importContext.getEcarFile().mkdirs();
+            importContext.getTmpLocation().mkdirs();
         } catch (Exception e) {
             e.printStackTrace();
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, e.getMessage(), TAG);
