@@ -74,24 +74,24 @@ public abstract class ProfileEntry implements BaseColumns {
 
     public static List<String> getUpdateProfileImage(String basePath) {
         return Arrays.asList(
-                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "avatar_normal_1.png", COLUMN_NAME_AVATAR, "@drawable/ic_avatar1"),
-                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "avatar_normal_2.png", COLUMN_NAME_AVATAR, "@drawable/ic_avatar2"),
-                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "avatar_normal_3.png", COLUMN_NAME_AVATAR, "@drawable/ic_avatar3"),
-                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "avatar_normal_4.png", COLUMN_NAME_AVATAR, "@drawable/ic_avatar4"),
-                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "avatar_normal_5.png", COLUMN_NAME_AVATAR, "@drawable/ic_avatar5"),
-                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "avatar_normal_6.png", COLUMN_NAME_AVATAR, "@drawable/ic_avatar6"),
-                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "avatar_normal_7.png", COLUMN_NAME_AVATAR, "@drawable/ic_avatar7"),
-                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "img_badge01.png", COLUMN_NAME_AVATAR, "@drawable/ic_badge1"),
-                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "img_badge02.png", COLUMN_NAME_AVATAR, "@drawable/ic_badge2"),
-                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "img_badge03.png", COLUMN_NAME_AVATAR, "@drawable/ic_badge3"),
-                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "img_badge04.png", COLUMN_NAME_AVATAR, "@drawable/ic_badge4"),
-                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "img_badge05.png", COLUMN_NAME_AVATAR, "@drawable/ic_badge5"),
-                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "img_badge06.png", COLUMN_NAME_AVATAR, "@drawable/ic_badge6"),
-                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "img_badge07.png", COLUMN_NAME_AVATAR, "@drawable/ic_badge7"),
-                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "img_badge08.png", COLUMN_NAME_AVATAR, "@drawable/ic_badge8"),
-                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "img_badge09.png", COLUMN_NAME_AVATAR, "@drawable/ic_badge9"),
-                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "img_badge10.png", COLUMN_NAME_AVATAR, "@drawable/ic_badge10"),
-                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "avatar_anonymous.png", COLUMN_NAME_AVATAR, "")
+                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "/avatar_normal_1.png", COLUMN_NAME_AVATAR, "@drawable/ic_avatar1"),
+                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "/avatar_normal_2.png", COLUMN_NAME_AVATAR, "@drawable/ic_avatar2"),
+                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "/avatar_normal_3.png", COLUMN_NAME_AVATAR, "@drawable/ic_avatar3"),
+                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "/avatar_normal_4.png", COLUMN_NAME_AVATAR, "@drawable/ic_avatar4"),
+                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "/avatar_normal_5.png", COLUMN_NAME_AVATAR, "@drawable/ic_avatar5"),
+                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "/avatar_normal_6.png", COLUMN_NAME_AVATAR, "@drawable/ic_avatar6"),
+                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "/avatar_normal_7.png", COLUMN_NAME_AVATAR, "@drawable/ic_avatar7"),
+                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "/img_badge01.png", COLUMN_NAME_AVATAR, "@drawable/ic_badge1"),
+                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "/img_badge02.png", COLUMN_NAME_AVATAR, "@drawable/ic_badge2"),
+                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "/img_badge03.png", COLUMN_NAME_AVATAR, "@drawable/ic_badge3"),
+                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "/img_badge04.png", COLUMN_NAME_AVATAR, "@drawable/ic_badge4"),
+                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "/img_badge05.png", COLUMN_NAME_AVATAR, "@drawable/ic_badge5"),
+                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "/img_badge06.png", COLUMN_NAME_AVATAR, "@drawable/ic_badge6"),
+                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "/img_badge07.png", COLUMN_NAME_AVATAR, "@drawable/ic_badge7"),
+                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "/img_badge08.png", COLUMN_NAME_AVATAR, "@drawable/ic_badge8"),
+                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "/img_badge09.png", COLUMN_NAME_AVATAR, "@drawable/ic_badge9"),
+                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "/img_badge10.png", COLUMN_NAME_AVATAR, "@drawable/ic_badge10"),
+                String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "/avatar_anonymous.png", COLUMN_NAME_AVATAR, "")
         );
     }
 
