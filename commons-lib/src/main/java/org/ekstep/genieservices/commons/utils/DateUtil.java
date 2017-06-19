@@ -133,10 +133,4 @@ public class DateUtil {
         return sdf.format(now());
     }
 
-    public static long convertLocalTimeMillis(String dateTime) throws ParseException {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(DATETIME_FORMAT_WITHOUTTIMEZONE, Locale.US);
-        Date date = dateFormat.parse(dateTime);
-        return date.getTime();
-    }
-
 }
