@@ -3,6 +3,7 @@ package org.ekstep.genieservices.content.chained.export;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.bean.ContentExportResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.chained.IChainable;
@@ -18,14 +19,14 @@ import java.util.Map;
  *
  * @author anil
  */
-public class DeviceMemoryCheck implements IChainable {
+public class DeviceMemoryCheck implements IChainable<ContentExportResponse> {
 
     private static final String TAG = DeviceMemoryCheck.class.getSimpleName();
 
-    private IChainable nextLink;
+    private IChainable<ContentExportResponse> nextLink;
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<ContentExportResponse> execute(AppContext appContext, ImportContext importContext) {
         long deviceUsableSpace = FileUtil.getFreeUsableSpace(importContext.getDestinationFolder());
         long fileSize = 0;
         List<Map<String, Object>> items = importContext.getItems();
@@ -58,7 +59,7 @@ public class DeviceMemoryCheck implements IChainable {
     }
 
     @Override
-    public IChainable then(IChainable link) {
+    public IChainable<ContentExportResponse> then(IChainable<ContentExportResponse> link) {
         nextLink = link;
         return link;
     }

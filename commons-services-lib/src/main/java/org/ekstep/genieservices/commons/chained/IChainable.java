@@ -9,8 +9,8 @@ import org.ekstep.genieservices.commons.bean.ImportContext;
  *
  * @author anil
  */
-public interface IChainable {
-    GenieResponse<Void> execute(AppContext appContext, ImportContext importContext);
+public interface IChainable<T> {
+    GenieResponse<T> execute(AppContext appContext, ImportContext importContext);
 
-    IChainable then(IChainable link);
+    IChainable<T> then(IChainable<T> link);
 }

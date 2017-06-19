@@ -9,6 +9,7 @@ import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentExportRequest;
+import org.ekstep.genieservices.commons.bean.ContentExportResponse;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
 import org.ekstep.genieservices.commons.bean.ContentFeedbackFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
@@ -293,10 +294,10 @@ public class ContentService {
         });
     }
 
-    public void exportContent(final ContentExportRequest contentExportRequest, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+    public void exportContent(final ContentExportRequest contentExportRequest, IResponseHandler<ContentExportResponse> responseHandler) {
+        new AsyncHandler<ContentExportResponse>(responseHandler).execute(new IPerformable<ContentExportResponse>() {
             @Override
-            public GenieResponse<Void> perform() {
+            public GenieResponse<ContentExportResponse> perform() {
                 return contentService.exportContent(contentExportRequest);
             }
         });

@@ -3,6 +3,7 @@ package org.ekstep.genieservices.content.chained.export;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.bean.ContentExportResponse;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
@@ -22,10 +23,10 @@ import java.util.Map;
  *
  * @author anil
  */
-public class AddGeTransferContentExportEvent implements IChainable {
+public class AddGeTransferContentExportEvent implements IChainable<ContentExportResponse> {
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<ContentExportResponse> execute(AppContext appContext, ImportContext importContext) {
         Map<String, Object> metadata = importContext.getMetadata();
 
         GETransferEventKnowStructure eks = new GETransferEventKnowStructure(
@@ -36,12 +37,17 @@ public class AddGeTransferContentExportEvent implements IChainable {
                 buildContentsMetadata(importContext.getItems()));
         GETransfer geTransfer = new GETransfer(new GameData(appContext.getParams().getGid(), appContext.getParams().getVersionName()), eks);
         TelemetryLogger.log(geTransfer);
-        return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
 
+        ContentExportResponse contentExportResponse = new ContentExportResponse();
+        contentExportResponse.setExportedFilePath(importContext.getEcarFile().toString());
+
+        GenieResponse<ContentExportResponse> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        response.setResult(contentExportResponse);
+        return response;
     }
 
     @Override
-    public IChainable then(IChainable link) {
+    public IChainable<ContentExportResponse> then(IChainable<ContentExportResponse> link) {
         return link;
     }
 
@@ -55,6 +61,7 @@ public class AddGeTransferContentExportEvent implements IChainable {
                     ContentHandler.readTransferCountFromContentMap(item),
                     ContentHandler.readOriginFromContentMap(item)));
         }
+
         return contentsMetadata;
     }
 }

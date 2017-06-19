@@ -3,6 +3,7 @@ package org.ekstep.genieservices.content.chained.export;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.bean.ContentExportResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.chained.IChainable;
@@ -15,14 +16,14 @@ import java.io.File;
  *
  * @author anil
  */
-public class DeleteTemporaryEcar implements IChainable {
+public class DeleteTemporaryEcar implements IChainable<ContentExportResponse> {
 
     private static final String TAG = DeleteTemporaryEcar.class.getSimpleName();
 
-    private IChainable nextLink;
+    private IChainable<ContentExportResponse> nextLink;
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<ContentExportResponse> execute(AppContext appContext, ImportContext importContext) {
 
         try {
             File filePath = importContext.getTmpLocation();
@@ -42,7 +43,7 @@ public class DeleteTemporaryEcar implements IChainable {
     }
 
     @Override
-    public IChainable then(IChainable link) {
+    public IChainable<ContentExportResponse> then(IChainable<ContentExportResponse> link) {
         nextLink = link;
         return link;
     }

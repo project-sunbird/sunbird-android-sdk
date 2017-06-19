@@ -5,6 +5,7 @@ import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentExportRequest;
+import org.ekstep.genieservices.commons.bean.ContentExportResponse;
 import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
@@ -172,6 +173,6 @@ public interface IContentService {
 
     GenieResponse<Void> cancelDownload(String identifier);
 
-    GenieResponse<Void> exportContent(ContentExportRequest contentExportRequest);
+    GenieResponse<ContentExportResponse> exportContent(ContentExportRequest contentExportRequest);
 
 }
