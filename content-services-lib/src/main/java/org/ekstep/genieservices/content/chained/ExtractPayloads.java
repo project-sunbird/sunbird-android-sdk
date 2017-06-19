@@ -48,7 +48,7 @@ public class ExtractPayloads implements IChainable {
         File payloadDestination = null;
         ContentModel oldContentModel;
 
-        for (HashMap<String, Object> item : importContext.getItems()) {
+        for (Map<String, Object> item : importContext.getItems()) {
             identifier = ContentHandler.readIdentifier(item);
             mimeType = ContentHandler.readMimeType(item);
             contentType = ContentHandler.readContentType(item);

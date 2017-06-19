@@ -9,6 +9,10 @@ import org.ekstep.genieservices.commons.utils.DateUtil;
  */
 public interface ContentConstants {
 
+    String SUPPORTED_MANIFEST_VERSION = "1.1";
+    String EKSTEP_CONTENT_ARCHIVE = "ekstep.content.archive";
+    int TTL = 24;
+
     long CACHE_TIMEOUT_HOME_CONTENT = (24 * DateUtil.MILLISECONDS_IN_AN_HOUR);
 
     String IMPORT_FAILED_DEVICE_MEMORY_FULL = "IMPORT_FAILED_DEVICE_MEMORY_FULL";

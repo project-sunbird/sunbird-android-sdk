@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Created on 5/16/2017.
@@ -22,11 +21,13 @@ public class ImportContext {
     private File destinationFolder;
     private List<String> skippedItemsIdentifier;
     private String manifestVersion;
-    private List<HashMap<String, Object>> items;
+    private List<Map<String, Object>> items;
     private boolean isChildContent;
     private Map<String, Object> metadata;
-    private List<String> identifiers=new ArrayList<>();
-    private IDBSession dbSession;
+    private List<String> identifiers = new ArrayList<>();
+    private IDBSession dbSession;   // External DB
+
+    private Map<String, Object> manifest;
 
     // Used for import/export
     public ImportContext(IDBSession dbSession, Map<String, Object> metadata) {
@@ -34,9 +35,20 @@ public class ImportContext {
         this.metadata = metadata;
     }
 
+    /**
+     * Used for Export Content
+     */
+    public ImportContext(File destinationFolder, File ecarFile) {
+        this.destinationFolder = destinationFolder;
+        this.ecarFile = ecarFile;
+
+        this.manifest = new HashMap<>();
+        this.tmpLocation = FileUtil.getTempLocation(destinationFolder);
+    }
+
     public ImportContext(boolean isChildContent, String ecarFilePath, File destinationFolder) {
         this.ecarFile = new File(ecarFilePath);
-        this.tmpLocation = new File(FileUtil.getTmpDir(destinationFolder), UUID.randomUUID().toString());
+        this.tmpLocation = FileUtil.getTempLocation(destinationFolder);
 
         this.destinationFolder = destinationFolder;
         this.metadata = new HashMap<>();
@@ -73,11 +85,11 @@ public class ImportContext {
         this.manifestVersion = manifestVersion;
     }
 
-    public List<HashMap<String, Object>> getItems() {
+    public List<Map<String, Object>> getItems() {
         return items;
     }
 
-    public void setItems(List<HashMap<String, Object>> items) {
+    public void setItems(List<Map<String, Object>> items) {
         this.items = items;
     }
 
@@ -93,13 +105,15 @@ public class ImportContext {
         this.dbSession = dbSession;
     }
 
-
     public List<String> getIdentifiers() {
         return identifiers;
     }
 
     public void setIdentifiers(String identifier) {
-        this.identifiers .add(identifier);
+        this.identifiers.add(identifier);
     }
 
+    public Map<String, Object> getManifest() {
+        return manifest;
+    }
 }

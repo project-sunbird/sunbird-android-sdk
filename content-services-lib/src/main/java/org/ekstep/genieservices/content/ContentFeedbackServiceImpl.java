@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import static java.lang.String.format;
-
 /**
  * This is the implementation of the interface {@link IContentFeedbackService}
  */
@@ -79,12 +77,12 @@ public class ContentFeedbackServiceImpl extends BaseService implements IContentF
         String userFilter = null;
         String contentIdFilter = null;
 
-        if(criteria != null) {
+        if (criteria != null) {
             if (criteria.getUid() != null) {
                 userFilter = String.format(Locale.US, "%s = '%s'", ContentFeedbackEntry.COLUMN_NAME_UID, criteria.getUid());
             }
             if (criteria.getContentId() != null) {
-                contentIdFilter = format(Locale.US, "%s = '%s'", ContentFeedbackEntry.COLUMN_NAME_CONTENT_ID, criteria.getContentId());
+                contentIdFilter = String.format(Locale.US, "%s = '%s'", ContentFeedbackEntry.COLUMN_NAME_CONTENT_ID, criteria.getContentId());
             }
         }
 

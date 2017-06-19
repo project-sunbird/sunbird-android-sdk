@@ -14,6 +14,9 @@ public class DateUtil {
 
     public static final int MILLISECONDS_IN_AN_HOUR = 3600000;
     public static final String DATE_TIME_AM_PM_FORMAT = "dd/MM/yyyy, hh:mma";
+    public static final String TIME_ZONE_GMT = "GMT";
+
+    private static final String DATE_FORMAT_EXPORT_CONTENT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     private static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";
     private static final String ISO_DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SZZZZZ";
     private static final String DATETIME_FORMAT_WITHOUTTIMEZONE = "yyyy-MM-dd'T'HH:mm:ss";
@@ -121,6 +124,12 @@ public class DateUtil {
         } catch (Exception ex) {
             return getEpochTime();
         }
+    }
+
+    public static String getFormattedDateWithTimeZone(String timezone) {
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_EXPORT_CONTENT, Locale.US);
+        sdf.setTimeZone(TimeZone.getTimeZone(timezone));
+        return sdf.format(now());
     }
 
 }

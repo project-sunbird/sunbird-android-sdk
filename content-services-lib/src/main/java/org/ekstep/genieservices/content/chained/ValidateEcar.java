@@ -19,8 +19,8 @@ import org.ekstep.genieservices.content.ContentHandler;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 
 import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created on 5/16/2017.
@@ -53,9 +53,9 @@ public class ValidateEcar implements IChainable {
             return getErrorResponse(importContext, ContentConstants.NO_CONTENT_TO_IMPORT, "Empty ecar, cannot import!");
         }
 
-        Type type = new TypeToken<List<HashMap<String, Object>>>() {
+        Type type = new TypeToken<List<Map<String, Object>>>() {
         }.getType();
-        List<HashMap<String, Object>> items = GsonUtil.getGson().fromJson(itemsString, type);
+        List<Map<String, Object>> items = GsonUtil.getGson().fromJson(itemsString, type);
         if (items.isEmpty()) {
             return getErrorResponse(importContext, ContentConstants.NO_CONTENT_TO_IMPORT, "Empty ecar, cannot import!");
         }
@@ -65,7 +65,7 @@ public class ValidateEcar implements IChainable {
         importContext.getMetadata().put(ServiceConstants.GeTransferEvent.CONTENT_ITEMS_KEY, items);
         Logger.d(TAG, items.toString());
 
-        for (HashMap<String, Object> item : items) {
+        for (Map<String, Object> item : items) {
             String identifier = ContentHandler.readIdentifier(item);
             ContentModel oldContentModel = ContentModel.find(appContext.getDBSession(), identifier);
             String oldContentPath = oldContentModel == null ? null : oldContentModel.getPath();

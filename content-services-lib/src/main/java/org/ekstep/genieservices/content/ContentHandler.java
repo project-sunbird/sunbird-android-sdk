@@ -54,6 +54,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -62,8 +63,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.TreeMap;
 
-import static java.lang.String.format;
-
 /**
  * Created on 5/23/2017.
  *
@@ -71,6 +70,7 @@ import static java.lang.String.format;
  */
 public class ContentHandler {
 
+    public static final String KEY_VISIBILITY = "visibility";
     private static final String TAG = ContentHandler.class.getSimpleName();
 
     private static final String KEY_IDENTIFIER = "identifier";
@@ -85,12 +85,12 @@ public class ContentHandler {
     private static final String KEY_DOWNLOAD_URL = "downloadUrl";
     private static final String KEY_COMPATIBILITY_LEVEL = "compatibilityLevel";
     private static final String KEY_MIME_TYPE = "mimeType";
-    private static final String KEY_VISIBILITY = "visibility";
     private static final Object AUDIENCE_KEY = "audience";
     private static final String KEY_LAST_UPDATED_ON = "lastUpdatedOn";
     private static final String KEY_PRE_REQUISITES = "pre_requisites";
     private static final String KEY_CHILDREN = "children";
     private static final String KEY_CONTENT_TYPE = "contentType";
+    private static final String KEY_NAME = "name";
 
     private static final String KEY_CONTENT_METADATA = "contentMetadata";
     private static final String KEY_VIRALITY_METADATA = "virality";
@@ -99,7 +99,7 @@ public class ContentHandler {
 
     private static final int DEFAULT_PACKAGE_VERSION = -1;
     private static final int INITIAL_VALUE_FOR_TRANSFER_COUNT = 0;
-
+    private static final int MAX_CONTENT_NAME = 30;
     public static int minCompatibilityLevel = 1;
     public static int maxCompatibilityLevel = 3;
     // TODO: 02-03-2017 : We can remove this later after few release
@@ -150,6 +150,13 @@ public class ContentHandler {
                 contentType = contentType.toLowerCase();
             }
             return contentType;
+        }
+        return null;
+    }
+
+    public static String readName(Map contentData) {
+        if (contentData.containsKey(KEY_NAME)) {
+            return (String) contentData.get(KEY_NAME);
         }
         return null;
     }
@@ -244,7 +251,7 @@ public class ContentHandler {
         return GsonUtil.fromJson(localData, Map.class).get(KEY_PRE_REQUISITES) != null;
     }
 
-    private static List<String> getPreRequisitesIdentifiers(String localData) {
+    public static List<String> getPreRequisitesIdentifiers(String localData) {
         List<Map> children = (List) GsonUtil.fromJson(localData, Map.class).get(KEY_PRE_REQUISITES);
 
         List<String> childIdentifiers = new ArrayList<>();
@@ -261,7 +268,7 @@ public class ContentHandler {
         return GsonUtil.fromJson(localData, Map.class).get(KEY_CHILDREN) != null;
     }
 
-    private static List<String> getChildContentsIdentifiers(String localData) {
+    public static List<String> getChildContentsIdentifiers(String localData) {
         List<Map> children = (List) GsonUtil.fromJson(localData, Map.class).get(KEY_CHILDREN);
 
         List<String> childIdentifiers = new ArrayList<>();
@@ -419,7 +426,7 @@ public class ContentHandler {
         return sVersion > 0 && lVersion > 0 && sVersion > lVersion;
     }
 
-    private static boolean isAvailableLocally(int contentState) {
+    public static boolean isAvailableLocally(int contentState) {
         return contentState == ContentConstants.State.ARTIFACT_AVAILABLE;
     }
 
@@ -432,18 +439,18 @@ public class ContentHandler {
         }
         String contentTypesStr = ContentType.getCommaSeparatedContentTypes(contentTypes);
 
-        String contentTypeFilter = format(Locale.US, "c.%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr);
-        String contentVisibilityFilter = format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
-        String artifactAvailabilityFilter = format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
-        String filter = format(Locale.US, "WHERE (%s AND %s AND %s)", contentVisibilityFilter, artifactAvailabilityFilter, contentTypeFilter);
+        String contentTypeFilter = String.format(Locale.US, "c.%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr);
+        String contentVisibilityFilter = String.format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
+        String artifactAvailabilityFilter = String.format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
+        String filter = String.format(Locale.US, "WHERE (%s AND %s AND %s)", contentVisibilityFilter, artifactAvailabilityFilter, contentTypeFilter);
 
-        String orderBy = format(Locale.US, "ORDER BY ca.%s desc, c.%s desc, c.%s desc", ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP, ContentEntry.COLUMN_NAME_LOCAL_LAST_UPDATED_ON, ContentEntry.COLUMN_NAME_SERVER_LAST_UPDATED_ON);
+        String orderBy = String.format(Locale.US, "ORDER BY ca.%s desc, c.%s desc, c.%s desc", ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP, ContentEntry.COLUMN_NAME_LOCAL_LAST_UPDATED_ON, ContentEntry.COLUMN_NAME_SERVER_LAST_UPDATED_ON);
 
         String query = null;
         if (uid != null) {
             query = String.format(Locale.US, "SELECT c.* FROM  %s c LEFT JOIN %s ca ON c.%s = ca.%s AND ca.%s = '%s' %s %s;",
-                ContentEntry.TABLE_NAME, ContentAccessEntry.TABLE_NAME, ContentEntry.COLUMN_NAME_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_UID, uid,
-                filter, orderBy);
+                    ContentEntry.TABLE_NAME, ContentAccessEntry.TABLE_NAME, ContentEntry.COLUMN_NAME_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_UID, uid,
+                    filter, orderBy);
         } else {
             query = String.format(Locale.US, "SELECT c.* FROM  %s c %s;",
                     ContentEntry.TABLE_NAME, filter);
@@ -463,12 +470,12 @@ public class ContentHandler {
     public static List<ContentModel> getAllLocalContentModel(IDBSession dbSession, ContentType[] contentTypes) {
         String contentTypesStr = ContentType.getCommaSeparatedContentTypes(contentTypes);
 
-        String contentTypeFilter = format(Locale.US, "%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr);
-        String contentVisibilityFilter = format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
+        String contentTypeFilter = String.format(Locale.US, "%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr);
+        String contentVisibilityFilter = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
         // For hiding the non compatible imported content, which visibility is DEFAULT.
-        String artifactAvailabilityFilter = format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
+        String artifactAvailabilityFilter = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
 
-        String filter = format(Locale.US, " where (%s AND %s AND %s)", contentVisibilityFilter, artifactAvailabilityFilter, contentTypeFilter);
+        String filter = String.format(Locale.US, " where (%s AND %s AND %s)", contentVisibilityFilter, artifactAvailabilityFilter, contentTypeFilter);
 
         List<ContentModel> contentModelListInDB;
         ContentsModel contentsModel = ContentsModel.find(dbSession, filter);
@@ -583,7 +590,7 @@ public class ContentHandler {
     }
 
     private static List<ContentModel> findAllContentsWithIdentifiers(IDBSession dbSession, List<String> identifiers) {
-        String filter = format(Locale.US, " where %s in ('%s') ", ContentEntry.COLUMN_NAME_IDENTIFIER, StringUtil.join("','", identifiers));
+        String filter = String.format(Locale.US, " where %s in ('%s') ", ContentEntry.COLUMN_NAME_IDENTIFIER, StringUtil.join("','", identifiers));
 
         List<ContentModel> contentModelListInDB = null;
         ContentsModel contentsModel = ContentsModel.find(dbSession, filter);
@@ -743,23 +750,23 @@ public class ContentHandler {
 
             for (Map contentChild : children) {
                 childIdentifiers.add(contentChild.get("identifier").toString());
-                whenAndThen.append(format(Locale.US, " WHEN '%s' THEN %s ", contentChild.get("identifier").toString(), i));
+                whenAndThen.append(String.format(Locale.US, " WHEN '%s' THEN %s ", contentChild.get("identifier").toString(), i));
                 i++;
             }
 
             String orderBy = "";
             if (i > 0) {
-                orderBy = format(Locale.US, " ORDER BY CASE %s %s END", ContentEntry.COLUMN_NAME_IDENTIFIER, whenAndThen.toString());
+                orderBy = String.format(Locale.US, " ORDER BY CASE %s %s END", ContentEntry.COLUMN_NAME_IDENTIFIER, whenAndThen.toString());
             }
 
             String filter;
             switch (childContents) {
                 case ContentConstants.ChildContents.FIRST_LEVEL_DOWNLOADED:
-                    filter = format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
+                    filter = String.format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
                     break;
 
                 case ContentConstants.ChildContents.FIRST_LEVEL_SPINE:
-                    filter = format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ONLY_SPINE);
+                    filter = String.format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ONLY_SPINE);
                     break;
 
 //            case CHILD_CONTENTS_FIRST_LEVEL_TEXTBOOK_UNIT:
@@ -772,7 +779,7 @@ public class ContentHandler {
                     break;
             }
 
-            String query = format(Locale.US, "Select * from %s where %s in ('%s') %s %s",
+            String query = String.format(Locale.US, "Select * from %s where %s in ('%s') %s %s",
                     ContentEntry.TABLE_NAME, ContentEntry.COLUMN_NAME_IDENTIFIER, StringUtil.join("','", childIdentifiers), filter, orderBy);
             ContentsModel contentsModel = ContentsModel.findWithCustomQuery(dbSession, query);
             if (contentsModel != null) {
@@ -1253,6 +1260,86 @@ public class ContentHandler {
             downloadUrl = (String) dataMap.get(KEY_DOWNLOAD_URL);
         }
         return downloadUrl;
+    }
+
+    public static List<ContentModel> getContentModelToExport(IDBSession dbSession, List<String> contentIds) {
+        List<ContentModel> contentModelToExport = new ArrayList<>();
+        Queue<ContentModel> queue = new LinkedList<>();
+
+        List<ContentModel> contentModelList = findAllContentsWithIdentifiers(dbSession, contentIds);
+        if (contentModelList != null) {
+            queue.addAll(contentModelList);
+        }
+
+        ContentModel node;
+        while (!queue.isEmpty()) {
+            node = queue.remove();
+
+            if (hasChildren(node.getLocalData())) {
+                List<String> childContentsIdentifiers = getChildContentsIdentifiers(node.getLocalData());
+                List<ContentModel> contentModelListInDB = findAllContentsWithIdentifiers(dbSession, childContentsIdentifiers);
+                if (contentModelListInDB != null) {
+                    queue.addAll(contentModelListInDB);
+                }
+            } else if (hasPreRequisites(node.getLocalData())) {
+                List<String> preRequisitesIdentifiers = getPreRequisitesIdentifiers(node.getLocalData());
+                List<ContentModel> preRequisitiesListInDB = findAllContentsWithIdentifiers(dbSession, preRequisitesIdentifiers);
+                if (preRequisitiesListInDB != null) {
+                    queue.addAll(preRequisitiesListInDB);
+                }
+            }
+
+            contentModelToExport.add(node);
+        }
+
+        return contentModelToExport;
+    }
+
+    public static List<ContentModel> deDupe(List<ContentModel> contentModelList) {
+        Set<ContentModel> uniqueContentModels = new LinkedHashSet<>(contentModelList);
+
+        return new ArrayList<>(uniqueContentModels);
+    }
+
+    public static String getExportedFileName(List<ContentModel> contentModelList) {
+        String fileName = "blank.ecar";
+        ContentModel firstContent = null;
+        int rootContents = 0;
+
+        if (contentModelList.size() > 0) {
+            firstContent = contentModelList.get(0);
+        }
+
+        String appendName = "";
+
+        for (ContentModel contentModel : contentModelList) {
+            if (ContentConstants.Visibility.DEFAULT.equalsIgnoreCase(contentModel.getVisibility())) {
+                rootContents++;
+            }
+        }
+
+        if (rootContents > 1) {
+            appendName = String.format(Locale.US, "+%s", rootContents - 1);
+        }
+
+        if (firstContent != null) {
+            String name = readName(GsonUtil.fromJson(firstContent.getLocalData(), Map.class));
+            if (!StringUtil.isNullOrEmpty(name) && name.length() > MAX_CONTENT_NAME) {
+                name = name.substring(0, MAX_CONTENT_NAME - 3) + "...";
+            }
+
+            double pkgVersion;
+
+            try {
+                pkgVersion = pkgVersion(firstContent.getLocalData());
+            } catch (Exception e) {
+                pkgVersion = 0;
+            }
+
+            fileName = String.format(Locale.US, "%s-v%s%s.ecar", name, "" + pkgVersion, appendName);
+        }
+
+        return fileName;
     }
 
 }

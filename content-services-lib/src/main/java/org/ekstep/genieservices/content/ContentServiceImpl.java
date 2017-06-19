@@ -17,6 +17,7 @@ import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
+import org.ekstep.genieservices.commons.bean.ContentExportRequest;
 import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
@@ -50,6 +51,15 @@ import org.ekstep.genieservices.content.chained.EcarCleanUp;
 import org.ekstep.genieservices.content.chained.ExtractEcar;
 import org.ekstep.genieservices.content.chained.ExtractPayloads;
 import org.ekstep.genieservices.content.chained.ValidateEcar;
+import org.ekstep.genieservices.content.chained.export.AddGeTransferContentExportEvent;
+import org.ekstep.genieservices.content.chained.export.CleanTempLoc;
+import org.ekstep.genieservices.content.chained.export.CompressContent;
+import org.ekstep.genieservices.content.chained.export.CopyAsset;
+import org.ekstep.genieservices.content.chained.export.CreateContentExportManifest;
+import org.ekstep.genieservices.content.chained.export.CreateTempLoc;
+import org.ekstep.genieservices.content.chained.export.DeleteTemporaryEcar;
+import org.ekstep.genieservices.content.chained.export.EcarBundle;
+import org.ekstep.genieservices.content.chained.export.WriteManifest;
 import org.ekstep.genieservices.content.db.model.ContentListingModel;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.network.ContentListingAPI;
@@ -602,7 +612,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                     .then(new AddGeTransferContentImportEvent());
             GenieResponse<Void> genieResponse = importContentSteps.execute(mAppContext, importContext);
             if (genieResponse.getStatus()) {
-                String identifier=importContext.getIdentifiers()!=null?importContext.getIdentifiers().get(0):"";
+                String identifier = importContext.getIdentifiers() != null ? importContext.getIdentifiers().get(0) : "";
                 buildSuccessEvent(identifier);
                 TelemetryLogger.logSuccess(mAppContext, genieResponse, TAG, methodName, params);
                 EventPublisher.postContentImportStatus(new ContentImportResponse(identifier, 2, importRequest.getSourceFilePath()));
@@ -710,6 +720,41 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 id(identifier).
                 build();
         TelemetryLogger.log(geInteract);
+    }
+
+    @Override
+    public GenieResponse<Void> exportContent(ContentExportRequest contentExportRequest) {
+        if (contentExportRequest.getContentIds() == null && contentExportRequest.getContentIds().isEmpty()) {
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, ServiceConstants.ErrorMessage.NO_CONTENT_TO_EXPORT, TAG);
+        }
+
+        File destinationFolder = new File(contentExportRequest.getDestinationFolder());
+        List<ContentModel> contentModelsToExport = ContentHandler.getContentModelToExport(mAppContext.getDBSession(), contentExportRequest.getContentIds());
+        contentModelsToExport = ContentHandler.deDupe(contentModelsToExport);
+
+        String fileName = ContentHandler.getExportedFileName(contentModelsToExport);
+        File ecarFile = FileUtil.getTempLocation(destinationFolder, fileName);
+
+        HashMap<String, Object> exportData = new HashMap<>();
+        exportData.put("contents", contentModelsToExport);
+        exportData.put(ServiceConstants.UNCOMPRESSED_SOURCE_LOCATION, FileUtil.getTempLocation(destinationFolder));
+//        exportData.put("manifest", manifest);
+        exportData.put(ServiceConstants.EXPORTED_ECAR_DESTINATION_LOCATION, ecarFile);
+
+        ImportContext importContext = new ImportContext(destinationFolder, ecarFile);
+
+        CleanTempLoc cleanTempLoc = new CleanTempLoc();
+        cleanTempLoc.then(new CreateTempLoc())
+                .then(new CreateContentExportManifest(contentModelsToExport))
+                .then(new WriteManifest())
+                .then(new CompressContent(contentModelsToExport))
+                .then(new org.ekstep.genieservices.content.chained.export.DeviceMemoryCheck())
+                .then(new CopyAsset(contentModelsToExport))
+                .then(new EcarBundle())
+                .then(new DeleteTemporaryEcar())
+                .then(new AddGeTransferContentExportEvent());
+
+        return cleanTempLoc.execute(mAppContext, importContext);
     }
 
 }

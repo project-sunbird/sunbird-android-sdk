@@ -180,11 +180,14 @@ public interface ServiceConstants {
         String UNSUPPORTED_FILE = "Content import failed, unsupported file extension";
         String CONTENT_NOT_FOUND = "No content found for identifier = ";
         String CONTENT_NOT_FOUND_TO_DELETE = "No content found to delete for identifier = ";
+        String NO_CONTENT_TO_EXPORT = "Nothing to export!";
     }
+
     interface ContentStatus {
         String LIVE = "LIVE";
         String DRAFT = "DRAFT";
     }
+
     interface GeTransferEvent {
         String TRANSFER_DIRECTION_EXPORT = "EXPORT";
         String TRANSFER_DIRECTION_IMPORT = "IMPORT";
