@@ -15,7 +15,6 @@ import org.ekstep.genieservices.content.ContentHandler;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,8 +24,6 @@ import java.util.Map;
  * @author anil
  */
 public class AddGeTransferContentImportEvent implements IChainable {
-
-    private static final String TAG = AddGeTransferContentImportEvent.class.getSimpleName();
 
     @Override
     public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
@@ -56,11 +53,11 @@ public class AddGeTransferContentImportEvent implements IChainable {
     }
 
     private List<GETransferMap> buildContentsMetadata(Map<String, Object> metadata) {
-        List<HashMap> contents = (List<HashMap>) metadata.get(GETransferEventKnowStructure.CONTENT_ITEMS_KEY);
+        List<Map> contents = (List<Map>) metadata.get(GETransferEventKnowStructure.CONTENT_ITEMS_KEY);
         ArrayList<GETransferMap> contentsMetadata = new ArrayList<>();
         metadata.put(GETransferEventKnowStructure.CONTENT_ITEMS_KEY, contentsMetadata);
 
-        for (HashMap contentMap : contents) {
+        for (Map contentMap : contents) {
             contentsMetadata.add(GETransferMap.createMapForContent(
                     ContentHandler.readIdentifier(contentMap),
                     ContentHandler.readPkgVersion(contentMap),
