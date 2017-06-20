@@ -3,9 +3,8 @@ package org.ekstep.genieservices.commons.bean;
 import java.io.Serializable;
 
 /**
- * Created on 5/26/2017.
+ * This class holds the name of the filter, count and apply boolean if it has to be applied while searching for a content.
  *
- * @author anil
  */
 public class FilterValue implements Serializable {
 

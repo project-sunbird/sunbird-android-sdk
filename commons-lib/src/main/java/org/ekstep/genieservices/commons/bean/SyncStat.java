@@ -1,9 +1,9 @@
 package org.ekstep.genieservices.commons.bean;
 
 /**
- * Created by swayangjit on 17/5/17.
+ * This class holds data related to the sync state
+ *
  */
-
 public class SyncStat {
 
     private int syncedEventCount;

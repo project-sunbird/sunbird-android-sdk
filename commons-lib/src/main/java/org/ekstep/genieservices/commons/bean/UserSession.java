@@ -1,11 +1,8 @@
 package org.ekstep.genieservices.commons.bean;
 
 /**
- * Created on 27/4/17.
- *
- * @author shriharsh
+ * This class holds the details about the current user session.
  */
-
 public class UserSession {
     private String uid;
     private String sid;

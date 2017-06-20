@@ -2,10 +2,10 @@ package org.ekstep.genieservices.commons.bean;
 
 import java.io.Serializable;
 
+
 /**
- * Created on 6/19/2017.
+ * This class holds the exportedFilePath data which is where the exported content is stored.
  *
- * @author anil
  */
 public class ContentExportResponse implements Serializable {
 

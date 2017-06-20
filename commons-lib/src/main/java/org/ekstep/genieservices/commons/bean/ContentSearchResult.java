@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created on 5/12/2017.
+ * This class holds the id, responseMessageId, filter as {@link List<ContentSearchFilter>}, request as {@link Map<String, Object>} and contentDataList as {@link List<ContentData>}
+ * after searching for a particular content.
  *
- * @author anil
  */
 public class ContentSearchResult implements Serializable {
 

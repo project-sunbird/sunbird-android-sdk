@@ -5,9 +5,9 @@ import org.ekstep.genieservices.commons.utils.GsonUtil;
 import java.util.Map;
 
 /**
- * Created by swayangjit on 3/5/17.
+ * This class holds the details about each of the master data values.
+ *
  */
-
 public class MasterDataValues {
 
     private String label;

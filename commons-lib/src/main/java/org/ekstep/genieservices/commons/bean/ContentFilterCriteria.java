@@ -4,7 +4,7 @@ import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 /**
- * This class holds the uid, types of content required and attachFeedback, attachContentAccess if the feedback and content access are required.
+ * This class holds the uid, types of content required and attachFeedback, attachContentAccess flags if the feedback and content access are required.
  *
  */
 public class ContentFilterCriteria {

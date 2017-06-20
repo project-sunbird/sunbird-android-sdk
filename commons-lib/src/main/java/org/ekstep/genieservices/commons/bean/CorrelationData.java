@@ -3,9 +3,8 @@ package org.ekstep.genieservices.commons.bean;
 import java.io.Serializable;
 
 /**
- * Created on 6/5/17.
+ * This class holds the content type and content Id.
  *
- * @author swayangjit
  */
 public class CorrelationData implements Serializable {
 

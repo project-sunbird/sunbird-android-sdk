@@ -2,11 +2,11 @@ package org.ekstep.genieservices.commons.bean;
 
 import java.io.Serializable;
 
-/**
- * Created on 12/6/17.
- * shriharsh
- */
 
+/**
+ * This class holds the identifier and contentType
+ *
+ */
 public class HierarchyInfo implements Serializable {
 
     private String identifier;

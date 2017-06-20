@@ -17,6 +17,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This class holds all the data related to profile details.
+ */
 public class Profile implements Serializable, IValidate {
 
     private String uid;

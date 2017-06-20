@@ -1,10 +1,9 @@
 package org.ekstep.genieservices.commons.bean;
 
 /**
- * Created on 5/6/17.
- * shriharsh
+ * This class holds the data about content summary details of a learner.
+ *
  */
-
 public class LearnerContentSummaryDetails {
 
     private String uid;

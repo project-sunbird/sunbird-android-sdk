@@ -3,9 +3,8 @@ package org.ekstep.genieservices.commons.bean;
 import java.util.List;
 
 /**
- * Created on 5/30/2017.
+ * This class accepts contentListingId, subject, {@link Profile}, and list of {@link PartnerFilter} while building the criteria for content listing request.
  *
- * @author anil
  */
 public class ContentListingCriteria {
 

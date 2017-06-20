@@ -6,9 +6,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * Created on 17/5/17.
- *
- * @author swayangjit
+ * This class accepts downloadId,identifier,downloadUrl,name,mimeType,destinationFolder,createdAt,isChildContent,processorClass and {@link List<CorrelationData>} whem requesting for a download to begin.
  */
 public class DownloadRequest implements Serializable {
 

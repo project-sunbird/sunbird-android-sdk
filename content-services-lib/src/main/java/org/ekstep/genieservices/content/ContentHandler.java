@@ -1142,7 +1142,7 @@ public class ContentHandler {
 
         if (result != null) {
             contentListing = new ContentListing();
-            contentListing.setId(contentListingCriteria.getContentListingId());
+            contentListing.setContentListingId(contentListingCriteria.getContentListingId());
             contentListing.setResponseMessageId(responseMessageId);
             if (result.containsKey("page")) {
                 contentListing.setContentListingSections(getSectionsFromPageMap(dbSession, (Map<String, Object>) result.get("page"), contentListingCriteria));

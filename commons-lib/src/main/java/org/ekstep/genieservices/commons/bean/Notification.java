@@ -4,9 +4,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * Created on 6/12/2017.
+ * This class holds data about the Notification details.
  *
- * @author Indraja Machani
  */
 public class Notification implements Serializable {
 

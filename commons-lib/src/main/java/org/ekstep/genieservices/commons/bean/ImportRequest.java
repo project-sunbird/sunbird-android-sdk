@@ -3,9 +3,8 @@ package org.ekstep.genieservices.commons.bean;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
 /**
- * Created on 6/7/2017.
+ * This class accepts sourceFilePath while requesting for import.
  *
- * @author anil
  */
 public class ImportRequest {
 

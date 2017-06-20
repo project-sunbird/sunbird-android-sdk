@@ -3,7 +3,7 @@ package org.ekstep.genieservices.commons.bean;
 import java.io.Serializable;
 
 /**
- * This class holds the data related to content feedback.
+ * This class holds the data related to feedback of a content.
  *
  */
 public class ContentFeedback implements Serializable {

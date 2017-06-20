@@ -3,9 +3,8 @@ package org.ekstep.genieservices.commons.bean;
 import java.util.List;
 
 /**
- * Created on 6/5/2017.
+ * This class holds the data in id, responseMessageId and {@link List<ContentData>} after requesting for recommended content.
  *
- * @author anil
  */
 public class RecommendedContentResult {
 

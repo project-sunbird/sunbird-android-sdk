@@ -1,9 +1,13 @@
 package org.ekstep.genieservices.commons.bean;
 
 /**
- * Created on 20/5/17.
- *
- * @author swayangjit
+ * This class holds the data like downloadId, content identifier, download progress and status to represent the state of the download progress.
+ * <p>
+ * Status -
+ * -1 for unknown
+ * 0 - not started
+ * 1 - started
+ * 2- success, 3- failed
  */
 public class DownloadProgress {
 
@@ -19,10 +23,6 @@ public class DownloadProgress {
         this.downloadId = downloadId;
     }
 
-    public void setDownloadProgress(int downloadProgress) {
-        this.downloadProgress = downloadProgress;
-    }
-
     public String getDownloadPath() {
         return downloadPath;
     }
@@ -30,7 +30,6 @@ public class DownloadProgress {
     public void setDownloadPath(String downloadPath) {
         this.downloadPath = downloadPath;
     }
-
 
     public int getStatus() {
         return status;
@@ -44,16 +43,20 @@ public class DownloadProgress {
         return downloadId;
     }
 
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
-    }
-
     public String getIdentifier() {
         return identifier;
     }
 
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
+
     public int getDownloadProgress() {
         return downloadProgress;
+    }
+
+    public void setDownloadProgress(int downloadProgress) {
+        this.downloadProgress = downloadProgress;
     }
 
     @Override

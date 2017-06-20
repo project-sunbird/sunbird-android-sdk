@@ -3,9 +3,8 @@ package org.ekstep.genieservices.commons.bean;
 import java.util.Locale;
 
 /**
- * Created on 24/4/17.
+ * This class holds the day, month and year data.
  *
- * @author shriharsh
  */
 public class DayMonth {
     private int day;

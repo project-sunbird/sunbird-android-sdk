@@ -4,17 +4,9 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * This class implements the criteria that would affect/change a search query. It has
- * options like <b>sort</b>, <b>filter</b>, <b>limit</b>, <b>offset</b> and <b>options</b>
- * which can be used to fine tune a search.
+ * This class accepts query string, list of {@link ContentSearchFilter}, list of {@link PartnerFilter}, sort by string, limit and profileFilter for searching a content with all
+ * set criteria
  *
- * @query - The keywords used for search.
- * @sort - A map of options and the order to sort "asc"/"desc" to arrange the results in desired order.
- * @filter - A map of options which helps to refine the search results as per the need.
- * @limit - Used for pagination, the number of records in the response of search result.
- * @offset - Used for pagination, the page number of current response.
- * @facets - List of filter options, the result will have all the possible values for each of the options.
- * @options - Other set of conditions in the search.
  */
 public class ContentSearchCriteria implements Serializable {
 

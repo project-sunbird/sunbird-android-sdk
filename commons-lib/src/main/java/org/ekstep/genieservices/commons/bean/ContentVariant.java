@@ -3,10 +3,8 @@ package org.ekstep.genieservices.commons.bean;
 import java.io.Serializable;
 
 /**
- * Ecar variants.
- * Created on 3/7/2017.
+ * This class holds name of the content, ecarUrl and size of the content.
  *
- * @author anil
  */
 public class ContentVariant implements Serializable {
 
