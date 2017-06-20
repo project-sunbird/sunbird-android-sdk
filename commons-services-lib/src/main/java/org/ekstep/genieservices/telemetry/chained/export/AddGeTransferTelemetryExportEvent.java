@@ -6,6 +6,7 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
+import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransfer;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferMap;
@@ -23,10 +24,9 @@ import java.util.List;
  *
  * @author anil
  */
-public class AddGeTransferTelemetryExportEvent implements IChainable {
+public class AddGeTransferTelemetryExportEvent implements IChainable<TelemetryExportResponse> {
 
     private static final String TAG = AddGeTransferTelemetryExportEvent.class.getSimpleName();
-    private IChainable nextLink;
 
     private String destinationDBFilePath;
 
@@ -35,7 +35,7 @@ public class AddGeTransferTelemetryExportEvent implements IChainable {
     }
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<TelemetryExportResponse> execute(AppContext appContext, ImportContext importContext) {
         try {
             int aggregateCount = 0;
             ImportedMetadataListModel importedMetadataListModel = ImportedMetadataListModel.findAll(appContext.getDBSession());
@@ -67,16 +67,16 @@ public class AddGeTransferTelemetryExportEvent implements IChainable {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, ex.getMessage(), TAG);
         }
 
-        if (nextLink != null) {
-            return nextLink.execute(appContext, importContext);
-        } else {
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "Export profile failed", TAG);
-        }
+        TelemetryExportResponse telemetryExportResponse = new TelemetryExportResponse();
+        telemetryExportResponse.setExportedFilePath(destinationDBFilePath);
+
+        GenieResponse<TelemetryExportResponse> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        response.setResult(telemetryExportResponse);
+        return response;
     }
 
     @Override
-    public IChainable then(IChainable link) {
-        nextLink = link;
+    public IChainable<TelemetryExportResponse> then(IChainable<TelemetryExportResponse> link) {
         return link;
     }
 }

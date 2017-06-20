@@ -12,6 +12,7 @@ import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.bean.TelemetryExportRequest;
+import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
 import org.ekstep.genieservices.commons.db.GSDBContext;
 import org.ekstep.genieservices.commons.db.IDBContext;
 import org.ekstep.genieservices.commons.db.operations.IDataSource;
@@ -44,7 +45,7 @@ public class FileExporter {
         this.dataSource = new SQLiteDataSource(appContext);
     }
 
-    public GenieResponse<Void> exportTelemetry(TelemetryExportRequest exportRequest, ITelemetryService telemetryService) {
+    public GenieResponse<TelemetryExportResponse> exportTelemetry(TelemetryExportRequest exportRequest, ITelemetryService telemetryService) {
         IDBContext dbContext = new GSDBContext();
         String sourceDBFilePath = appContext.getContext().getDatabasePath(dbContext.getDBName()).getPath();
         return telemetryService.exportTelemetry(new File(exportRequest.getDestinationFolder()), sourceDBFilePath,

@@ -5,6 +5,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
+import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.contract.MetaEntry;
 import org.ekstep.genieservices.commons.db.contract.TelemetryProcessedEntry;
@@ -22,10 +23,10 @@ import java.util.Locale;
  *
  * @author anil
  */
-public class CleanupExportedFile implements IChainable {
+public class CleanupExportedFile implements IChainable<TelemetryExportResponse> {
 
     private static final String TAG = CleanupExportedFile.class.getSimpleName();
-    private IChainable nextLink;
+    private IChainable<TelemetryExportResponse> nextLink;
 
     private String destinationDBFilePath;
 
@@ -34,7 +35,7 @@ public class CleanupExportedFile implements IChainable {
     }
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<TelemetryExportResponse> execute(AppContext appContext, ImportContext importContext) {
 
         List<String> allTables = getAllTables(importContext.getDBSession());
         List<String> allTableToExclude = getAllTableToExclude();
@@ -58,7 +59,7 @@ public class CleanupExportedFile implements IChainable {
     }
 
     @Override
-    public IChainable then(IChainable link) {
+    public IChainable<TelemetryExportResponse> then(IChainable<TelemetryExportResponse> link) {
         nextLink = link;
         return link;
     }
