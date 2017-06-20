@@ -44,7 +44,7 @@ public class Notification implements Serializable {
         this.notificationJson = notificationJson;
     }
 
-    public double getMsgId() {
+    public int getMsgId() {
         return msgid;
     }
 
