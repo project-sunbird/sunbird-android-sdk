@@ -21,9 +21,16 @@ public class NotificationService {
     }
 
     /**
-     * This api adds the notification
+     * This api adds the notification.
+     * <p>
+     * On successful of adding the notification, the response will return status as TRUE and with {@link Notification} in the result.
+     * <p>
+     * <p>
+     * On failing to add the notification, the response will return status as FALSE with the following error code
+     * <p>ADD_FAILED
      *
-     * @param responseHandler
+     * @param notification    - {@link Notification}
+     * @param responseHandler - {@link IResponseHandler<Void>}
      */
     public void addNotification(final Notification notification, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
@@ -35,9 +42,19 @@ public class NotificationService {
     }
 
     /**
-     * This api updates the status of all notifications.
+     * `
+     * This api updates the status of notification
+     * <p>
+     * <p>
+     * On successful of updating the notification status, the response will return status as TRUE and with {@link Notification} in the result.
+     * <p>
+     * <p>
+     * On failing to update the notification, the response will return status as FALSE with the following error code
+     * <p>UPDATE_FAILED
+     * <p>
      *
-     * @param responseHandler
+     * @param notification    - {@link Notification}
+     * @param responseHandler - {@link IResponseHandler<Notification>}
      */
     public void updateNotification(final Notification notification, IResponseHandler<Notification> responseHandler) {
         new AsyncHandler<Notification>(responseHandler).execute(new IPerformable<Notification>() {
@@ -49,10 +66,18 @@ public class NotificationService {
     }
 
     /**
-     * This api deletes the specific notification.
+     * This api deletes the specific notification by using msgId.
+     * <p>
+     * <p>
+     * On successful deletion of the notification, the response will return status as TRUE in the result.
+     * <p>
+     * <p>
+     * On failing to delete the notification, the response will return status as FALSE with the following error code
+     * <p>DELETE_FAILED
+     * <p>
      *
      * @param msgId
-     * @param responseHandler
+     * @param responseHandler - {@link IResponseHandler<Void>}
      */
     public void deleteNotification(final int msgId, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
@@ -64,9 +89,18 @@ public class NotificationService {
     }
 
     /**
-     * This api gets all the notifications.
+     * This api gets all the notifications by using with criteria {@link NotificationFilterCriteria} param
+     * <p>
+     * <p>
+     * On successful finding of the list of notifications, the response will return status as TRUE in the result.
+     * <p>
+     * <p>
+     * On failing to find the notifications, the response will return status as FALSE with the following error code
+     * <p>NO_NOTIFICATIONS_FOUND
+     * <p>
      *
-     * @param responseHandler
+     * @param criteria        - {@link NotificationFilterCriteria}
+     * @param responseHandler - {@link IResponseHandler<List<Notification>>}
      */
     public void getAllNotifications(final NotificationFilterCriteria criteria, IResponseHandler<List<Notification>> responseHandler) {
         new AsyncHandler<List<Notification>>(responseHandler).execute(new IPerformable<List<Notification>>() {
