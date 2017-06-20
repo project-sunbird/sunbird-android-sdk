@@ -20,12 +20,14 @@ class LearnerAssessmentTask extends BaseTask {
     private String uid;
     private String contentId;
     private String appQualifier;
+    private String hierarchyData;
 
-    public LearnerAssessmentTask(Context context, String appQualifier, String uid, String contentId) {
+    public LearnerAssessmentTask(Context context, String appQualifier, String uid, String contentId, String hierarchyData) {
         super(context);
         this.appQualifier = appQualifier;
         this.uid = uid;
         this.contentId = contentId;
+        this.hierarchyData = hierarchyData;
     }
 
     @Override
@@ -35,7 +37,7 @@ class LearnerAssessmentTask extends BaseTask {
 
     @Override
     protected GenieResponse<Map> execute() {
-        Cursor cursor = contentResolver.query(getUri(), null, null, new String[]{uid, contentId}, null);
+        Cursor cursor = contentResolver.query(getUri(), null, null, new String[]{uid, contentId, hierarchyData}, null);
         if (cursor == null || cursor.getCount() == 0) {
             return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), LearnerAssessmentTask.class.getSimpleName());
         }

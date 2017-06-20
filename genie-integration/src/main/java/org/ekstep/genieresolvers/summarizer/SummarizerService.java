@@ -20,8 +20,8 @@ public class SummarizerService extends BaseService {
         this.appQualifier = appQualifier;
     }
 
-    public void getLearnerAssessment(String uid, String contentId, IResponseHandler responseHandler) {
-        LearnerAssessmentTask createUserTask = new LearnerAssessmentTask(context, appQualifier, uid, contentId);
+    public void getLearnerAssessment(String uid, String contentId, String hierarchyData, IResponseHandler responseHandler) {
+        LearnerAssessmentTask createUserTask = new LearnerAssessmentTask(context, appQualifier, uid, contentId, hierarchyData);
         createAndExecuteTask(responseHandler, createUserTask);
     }
 

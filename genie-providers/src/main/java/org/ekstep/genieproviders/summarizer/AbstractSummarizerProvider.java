@@ -35,9 +35,11 @@ public abstract class AbstractSummarizerProvider extends BaseContentProvider {
 
             String uid = selectionArgs[0];
             String contentId = selectionArgs[1];
+            String hierarchyData = selectionArgs[2];
             SummaryRequest.Builder summaryRequestBuilder = new SummaryRequest.Builder();
             summaryRequestBuilder.contentId(contentId);
             summaryRequestBuilder.uid(uid);
+            summaryRequestBuilder.hierarchyData(hierarchyData);
             genieResponse = getService().getSummarizerService().getLearnerAssessmentDetails(summaryRequestBuilder.build());
 
             if (genieResponse != null && genieResponse.getStatus()) {
