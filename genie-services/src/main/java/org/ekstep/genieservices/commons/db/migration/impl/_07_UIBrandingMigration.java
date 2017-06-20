@@ -3,13 +3,19 @@ package org.ekstep.genieservices.commons.db.migration.impl;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.contract.ContentEntry;
+import org.ekstep.genieservices.commons.db.contract.MasterDataEntry;
 import org.ekstep.genieservices.commons.db.contract.NotificationEntry;
 import org.ekstep.genieservices.commons.db.contract.PageEntry;
 import org.ekstep.genieservices.commons.db.contract.ProfileEntry;
 import org.ekstep.genieservices.commons.db.migration.Migration;
-import org.ekstep.genieservices.commons.db.contract.MasterDataEntry;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.commons.utils.StringUtil;
+import org.ekstep.genieservices.content.ContentHandler;
+import org.ekstep.genieservices.content.db.model.ContentModel;
+import org.ekstep.genieservices.content.db.model.ContentsModel;
 
 import java.util.List;
+import java.util.Map;
 
 public class _07_UIBrandingMigration extends Migration {
     //Don't change these values
@@ -56,60 +62,22 @@ public class _07_UIBrandingMigration extends Migration {
     }
 
     private void migrateContentTypeCol(AppContext appContext) {
-        // Get the list of all content and check if localData or serverData is available.
-        // TODO: 4/19/2017 Anil - Uncomment after mode
-//        List<Content> contents = getLocalContents(appContext);
-//
-//        updateContentType(appContext, contents);
+        ContentsModel contentsModel = ContentsModel.find(appContext.getDBSession(), "");
+
+        if (contentsModel != null) {
+            for (ContentModel contentModel : contentsModel.getContentModelList()) {
+                String contentType = null;
+                if (!StringUtil.isNullOrEmpty(contentModel.getLocalData())) {
+                    contentType = ContentHandler.readContentType(GsonUtil.fromJson(contentModel.getLocalData(), Map.class));
+                } else if (!StringUtil.isNullOrEmpty(contentModel.getServerData())) {
+                    contentType = ContentHandler.readContentType(GsonUtil.fromJson(contentModel.getServerData(), Map.class));
+                }
+
+                if (!StringUtil.isNullOrEmpty(contentType)) {
+                    contentModel.setContentType(contentType);
+                    contentModel.update();
+                }
+            }
+        }
     }
-
-//    private void updateContentType(AppContext appContext, List<Content> contents) {
-//        for (Content content : contents) {
-//            Updater contentUpdater = new Updater(content);
-//
-//            contentUpdater.perform(db);
-//        }
-//    }
-
-//    private List<Content> getLocalContents(AppContext appContext) {
-//        Contents contents = new Contents("");
-//
-//        Reader contentReader = new Reader(contents);
-//        contentReader.perform(db);
-//
-//        List<Map<String, Object>> contentList = contents.asMap();
-//
-//        List<Content> updatedContentList = new ArrayList<>();
-//
-//        for (Map<String, Object> content : contentList) {
-//            String contentType = null;
-//            LinkedTreeMap<String, Object> contentData = null;
-//
-//            if (content.get("localData") != null) {
-//                contentData = (LinkedTreeMap<String, Object>) content.get("localData");
-//
-//                contentType = (String) contentData.get(KEY_CONTENT_TYPE);
-//            } else if (content.get("serverData") != null) {
-//                contentData = (LinkedTreeMap<String, Object>) content.get("serverData");
-//
-//                contentType = (String) contentData.get(KEY_CONTENT_TYPE);
-//            }
-//
-//            if (contentType != null) {
-//                Content existingContent = new Content(valueOf(content.get("identifier")));
-//                Reader existingContentReader = new Reader(existingContent);
-//                existingContentReader.perform(db);
-//
-//                Content updatedContent = new Content(contentData, null, true);
-//                updatedContent.setVisibility(existingContent.getVisibility());
-//                updatedContent.addOrUpdateRefCount(existingContent.getRefCount());
-//                updatedContent.addOrUpdateContentState(existingContent.getContentState());
-//
-//                updatedContentList.add(updatedContent);
-//            }
-//        }
-//
-//        return updatedContentList;
-//    }
-
 }

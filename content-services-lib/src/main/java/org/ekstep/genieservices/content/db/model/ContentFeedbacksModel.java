@@ -8,7 +8,6 @@ import org.ekstep.genieservices.commons.db.operations.IDBSession;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Created on 5/4/2017.
@@ -27,25 +26,12 @@ public class ContentFeedbacksModel implements IReadable, ICleanable {
         this.filterCondition = filter;
     }
 
-    public static ContentFeedbacksModel findByUid(IDBSession dbSession, String uid) {
-        String filter = String.format(Locale.US, " where %s = '%s' ", ContentFeedbackEntry.COLUMN_NAME_UID, uid);
+    public static ContentFeedbacksModel find(IDBSession dbSession, String filter) {
         ContentFeedbacksModel contentFeedbacksModel = new ContentFeedbacksModel(dbSession, filter);
 
         dbSession.read(contentFeedbacksModel);
 
-        if (contentFeedbacksModel.getContentFeedbackModelList() == null) {
-            return null;
-        } else {
-            return contentFeedbacksModel;
-        }
-    }
-
-    public static ContentFeedbacksModel findByContentIdentifier(IDBSession dbSession, String identifier) {
-        String filter = String.format(Locale.US, " where %s = '%s' ", ContentFeedbackEntry.COLUMN_NAME_CONTENT_ID, identifier);
-        ContentFeedbacksModel contentFeedbacksModel = new ContentFeedbacksModel(dbSession, filter);
-        dbSession.read(contentFeedbacksModel);
-
-        if (contentFeedbacksModel.getContentFeedbackModelList() == null) {
+        if (contentFeedbacksModel.contentFeedbackModelList == null) {
             return null;
         } else {
             return contentFeedbacksModel;

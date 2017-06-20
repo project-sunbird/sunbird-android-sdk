@@ -4,17 +4,22 @@ import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.IContentFeedbackService;
 import org.ekstep.genieservices.IContentService;
 import org.ekstep.genieservices.commons.IResponseHandler;
+import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
-import org.ekstep.genieservices.commons.bean.ContentCriteria;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
+import org.ekstep.genieservices.commons.bean.ContentExportRequest;
+import org.ekstep.genieservices.commons.bean.ContentExportResponse;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
-import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
+import org.ekstep.genieservices.commons.bean.ContentFeedbackFilterCriteria;
+import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
+import org.ekstep.genieservices.commons.bean.ContentImportResponse;
+import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
-import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
+import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
@@ -69,7 +74,7 @@ public class ContentService {
      * @param criteria
      * @return
      */
-    public void getAllLocalContent(final ContentCriteria criteria, IResponseHandler<List<Content>> responseHandler) {
+    public void getAllLocalContent(final ContentFilterCriteria criteria, IResponseHandler<List<Content>> responseHandler) {
         new AsyncHandler<List<Content>>(responseHandler).execute(new IPerformable<List<Content>>() {
             @Override
             public GenieResponse<List<Content>> perform() {
@@ -88,26 +93,14 @@ public class ContentService {
      * On failing to fetch the child content details, the response will return status as FALSE with the following error code
      * <p>NO_DATA_FOUND
      *
-     * @param contentIdentifier - identifier of a content
-     * @param levelAndState     - Below are the int flags to be used
-     *                          <p>
-     *                          <p>
-     *                          0 - Downloaded or spine both
-     *                          <p>
-     *                          <p>
-     *                          1 - All descendant downloaded contents
-     *                          <p>
-     *                          <p>
-     *                          2 - All descendant spine contents
-     *                          <p>
-     *                          <p>
-     * @return {@link List<Content>}
+     * @param childContentRequest - {@link ChildContentRequest}
+     * @return {@link GenieResponse<Content>}
      */
-    public void getChildContents(final String contentIdentifier, final int levelAndState, IResponseHandler<Content> responseHandler) {
+    public void getChildContents(final ChildContentRequest childContentRequest, IResponseHandler<Content> responseHandler) {
         new AsyncHandler<Content>(responseHandler).execute(new IPerformable<Content>() {
             @Override
             public GenieResponse<Content> perform() {
-                return contentService.getChildContents(contentIdentifier, levelAndState);
+                return contentService.getChildContents(childContentRequest);
             }
         });
     }
@@ -247,10 +240,19 @@ public class ContentService {
         });
     }
 
-    public void getContentListing(final ContentListingCriteria contentListingCriteria, IResponseHandler<ContentListingResult> responseHandler) {
-        new AsyncHandler<ContentListingResult>(responseHandler).execute(new IPerformable<ContentListingResult>() {
+    public void importEcar(final EcarImportRequest ecarImportRequest, IResponseHandler<Void> responseHandler) {
+        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
             @Override
-            public GenieResponse<ContentListingResult> perform() {
+            public GenieResponse<Void> perform() {
+                return contentService.importEcar(ecarImportRequest);
+            }
+        });
+    }
+
+    public void getContentListing(final ContentListingCriteria contentListingCriteria, IResponseHandler<ContentListing> responseHandler) {
+        new AsyncHandler<ContentListing>(responseHandler).execute(new IPerformable<ContentListing>() {
+            @Override
+            public GenieResponse<ContentListing> perform() {
                 return contentService.getContentListing(contentListingCriteria);
             }
         });
@@ -265,11 +267,38 @@ public class ContentService {
         });
     }
 
-    public void getFeedback(final ContentFeedbackCriteria contentFeedbackCriteria, IResponseHandler<ContentFeedback> responseHandler) {
-        new AsyncHandler<ContentFeedback>(responseHandler).execute(new IPerformable<ContentFeedback>() {
+    public void getFeedback(final ContentFeedbackFilterCriteria contentFeedbackFilterCriteria, IResponseHandler<List<ContentFeedback>> responseHandler) {
+        new AsyncHandler<List<ContentFeedback>>(responseHandler).execute(new IPerformable<List<ContentFeedback>>() {
             @Override
-            public GenieResponse<ContentFeedback> perform() {
-                return contentFeedbackService.getFeedback(contentFeedbackCriteria);
+            public GenieResponse<List<ContentFeedback>> perform() {
+                return contentFeedbackService.getFeedback(contentFeedbackFilterCriteria);
+            }
+        });
+    }
+
+    public void getImportStatus(final String identifier, IResponseHandler<ContentImportResponse> responseHandler) {
+        new AsyncHandler<ContentImportResponse>(responseHandler).execute(new IPerformable<ContentImportResponse>() {
+            @Override
+            public GenieResponse<ContentImportResponse> perform() {
+                return contentService.getImportStatus(identifier);
+            }
+        });
+    }
+
+    public void cancelDownload(final String identifier, IResponseHandler<Void> responseHandler) {
+        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return contentService.cancelDownload(identifier);
+            }
+        });
+    }
+
+    public void exportContent(final ContentExportRequest contentExportRequest, IResponseHandler<ContentExportResponse> responseHandler) {
+        new AsyncHandler<ContentExportResponse>(responseHandler).execute(new IPerformable<ContentExportResponse>() {
+            @Override
+            public GenieResponse<ContentExportResponse> perform() {
+                return contentService.exportContent(contentExportRequest);
             }
         });
     }

@@ -1,6 +1,6 @@
 package org.ekstep.genieservices.commons.bean.telemetry;
 
-import org.ekstep.genieservices.commons.bean.CoRelation;
+import org.ekstep.genieservices.commons.bean.CorrelationData;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
@@ -95,7 +95,7 @@ public class GEInteract extends Telemetry {
         private List<Map<String, Object>> values = new ArrayList<>();
         private String targetResourceId = "";
         private String uri = "";
-        private List<CoRelation> coRelation;
+        private List<CorrelationData> correlationData;
 
         public Builder(GameData gameData) {
             this.gameData = gameData;
@@ -153,9 +153,12 @@ public class GEInteract extends Telemetry {
             return this;
         }
 
-        public Builder coRelation(List<CoRelation> coRelation) {
-            this.coRelation = new ArrayList<>();
-            this.coRelation.addAll(coRelation);
+        public Builder correlationData(List<CorrelationData> correlationData) {
+            this.correlationData = new ArrayList<>();
+            if(!CollectionUtil.isNullOrEmpty(correlationData)){
+                this.correlationData.addAll(correlationData);
+            }
+
             return this;
         }
 
@@ -171,7 +174,7 @@ public class GEInteract extends Telemetry {
 
         public GEInteract build() {
             GEInteract event = new GEInteract(gameData, stageId, type, subType, exType, pos, values, id, targetResourceId, uri);
-            event.addCoRelation(coRelation);
+            event.addCorrelationData(correlationData);
             return event;
         }
     }

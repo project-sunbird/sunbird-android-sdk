@@ -6,15 +6,13 @@ import android.content.pm.PackageManager;
 import android.widget.Toast;
 
 import org.ekstep.genieservices.Constants;
+import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentData;
-import org.ekstep.genieservices.commons.bean.ContentHierarchy;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
-import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.ReflectionUtil;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -57,7 +55,7 @@ public class ContentPlayer {
                 return;
             }
 
-        } else if (content.getMimeType().equalsIgnoreCase(Constants.MimeType.ECML_MIME_TYPE) && !isCollectionorTextBook(content.getContentType())) {
+        } else if (content.getMimeType().equalsIgnoreCase(Constants.MimeType.ECML_MIME_TYPE) && !isCollectionOrTextBook(content.getContentType())) {
             if (osId == null || GENIE_QUIZ_APP_PACKAGE.equals(osId) || GENIE_CANVAS_PACKAGE.equals(osId)) {
                 Class<?> className = ReflectionUtil.getClass(GENIE_CANVAS_ACTIVITY);
                 if (className == null) {
@@ -71,31 +69,22 @@ public class ContentPlayer {
             return;
         }
 
-        intent.putExtra("origin", "Genie");
-//        if (hierarchyList != null && hierarchyList.size() > 0) {
-//            intent.putExtra("contentExtras", getContentHierarchy(hierarchyList, contentData.getIdentifier(), content.getContentType()));
-//        }
-        // TODO: 9/6/17 This will be updated when content child will be done
-        intent.putExtra("contentExtras", new ArrayList<>());
-        intent.putExtra("appInfo", GsonUtil.toJson(contentData));
-        intent.putExtra("languageInfo", GsonUtil.toJson(resourceBundle));
-        intent.putExtra("appQualifier", sContentPlayer.mQualifier);
+        intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_ORIGIN, "Genie");
+
+        if (content.getHierarchyInfo() != null) {
+            intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_CONTENT_EXTRAS, GsonUtil.toJson(content.getHierarchyInfo()));
+        }
+        intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_APP_INFO, GsonUtil.toJson(contentData));
+        intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_LANGUAGE_INFO, GsonUtil.toJson(resourceBundle));
+        intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_APP_QUALIFIER, sContentPlayer.mQualifier);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
 
         context.startActivity(intent);
 
     }
 
-    //Added this method not to mess up with the main list.The issue was if we play the content again and again then Content info was being added repeatedly.
-    private static String getContentHierarchy(ArrayList<ContentHierarchy> contentInfoList, String identifier, String contentType) {
-        ArrayList<ContentHierarchy> infoList = new ArrayList<>();
-        infoList.addAll(contentInfoList);
-        infoList.add(new ContentHierarchy(identifier, contentType));
-        Logger.i("ContentHierarchyList", "" + infoList);
-        return GsonUtil.toJson(infoList);
-    }
 
-    private static boolean isCollectionorTextBook(String contentType) {
+    private static boolean isCollectionOrTextBook(String contentType) {
         return contentType.equalsIgnoreCase(ContentType.COLLECTION.getValue())
                 || contentType.equalsIgnoreCase(ContentType.TEXTBOOK.getValue())
                 || contentType.equalsIgnoreCase(ContentType.TEXTBOOK_UNIT.getValue());

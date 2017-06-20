@@ -4,6 +4,7 @@ import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.network.IHttpClient;
+import org.ekstep.genieservices.commons.network.IHttpClientFactory;
 
 /**
  * Created on 14/4/17.
@@ -15,9 +16,6 @@ public abstract class AppContext<C> {
     private C mContext;
 
     private String mAppPackage;
-    private String mKey;
-    private String mGDataId;
-    private String mGDataVersionName;
 
     protected AppContext(C context, String appPackage) {
         this.mContext = context;
@@ -28,14 +26,6 @@ public abstract class AppContext<C> {
         return mContext;
     }
 
-    public String getAppPackage() {
-        return mAppPackage;
-    }
-
-    public String getKey() {
-        return mKey;
-    }
-
     public abstract IDBSession getDBSession();
 
     public abstract Void setDBSession(IDBSession session);
@@ -44,7 +34,7 @@ public abstract class AppContext<C> {
 
     public abstract IConnectionInfo getConnectionInfo();
 
-    public abstract IHttpClient getHttpClient();
+    public abstract IHttpClientFactory getHttpClientFactory();
 
     public abstract IDeviceInfo getDeviceInfo();
 

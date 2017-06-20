@@ -144,7 +144,6 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         if (resultSet != null && resultSet.moveToFirst()) {
             readWithoutMoving(resultSet);
         }
-
         return this;
     }
 
@@ -262,6 +261,18 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         return serverData;
     }
 
+    public void setServerData(String serverData) {
+        this.serverData = serverData;
+    }
+
+    public void setAudience(String audience) {
+        this.audience = audience;
+    }
+
+    public void setServerLastUpdatedOn(String serverLastUpdatedOn) {
+        this.serverLastUpdatedOn = serverLastUpdatedOn;
+    }
+
     public String getLocalData() {
         return localData;
     }
@@ -292,6 +303,10 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
 
     public String getContentType() {
         return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
 
     public String getLocalLastUpdatedTime() {

@@ -4,9 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * Created on 5/4/2017.
- *
- * @author anil
+ *This class holds all the data related to a content.
  */
 public class Content implements Serializable {
 
@@ -19,10 +17,10 @@ public class Content implements Serializable {
     private Long lastUpdatedTime;
     private boolean isAvailableLocally;
     private boolean isUpdateAvailable;
-    private ContentFeedback contentFeedback;
-    private ContentAccess contentAccess;
+    private List<ContentFeedback> contentFeedback;
+    private List<ContentAccess> contentAccess;
     private List<Content> children;
-    private List<HierarchyInfo> childrenHierarchyInfo;
+    private List<HierarchyInfo> hierarchyInfo;
 
     public String getIdentifier() {
         return identifier;
@@ -96,19 +94,19 @@ public class Content implements Serializable {
         isUpdateAvailable = updateAvailable;
     }
 
-    public ContentFeedback getContentFeedback() {
+    public List<ContentFeedback> getContentFeedback() {
         return contentFeedback;
     }
 
-    public void setContentFeedback(ContentFeedback contentFeedback) {
+    public void setContentFeedback(List<ContentFeedback> contentFeedback) {
         this.contentFeedback = contentFeedback;
     }
 
-    public ContentAccess getContentAccess() {
+    public List<ContentAccess> getContentAccess() {
         return contentAccess;
     }
 
-    public void setContentAccess(ContentAccess contentAccess) {
+    public void setContentAccess(List<ContentAccess> contentAccess) {
         this.contentAccess = contentAccess;
     }
 
@@ -120,12 +118,12 @@ public class Content implements Serializable {
         this.children = children;
     }
 
-    public List<HierarchyInfo> getChildrenHierarchyInfo() {
-        return childrenHierarchyInfo;
+    public List<HierarchyInfo> getHierarchyInfo() {
+        return hierarchyInfo;
     }
 
-    public void setChildrenHierarchyInfo(List<HierarchyInfo> childrenHierarchyInfo) {
-        this.childrenHierarchyInfo = childrenHierarchyInfo;
+    public void setHierarchyInfo(List<HierarchyInfo> hierarchyInfo) {
+        this.hierarchyInfo = hierarchyInfo;
     }
 
 }

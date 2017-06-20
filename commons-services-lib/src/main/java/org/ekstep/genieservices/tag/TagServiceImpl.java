@@ -7,7 +7,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Tag;
-import org.ekstep.genieservices.commons.utils.Crypto;
+import org.ekstep.genieservices.commons.utils.CryptoUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.SecurityUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
@@ -130,7 +130,7 @@ public class TagServiceImpl extends BaseService implements ITagService {
             } else {
                 String tagHash = null;
                 try {
-                    tagHash = Crypto.checksum(tag.getName().trim());
+                    tagHash = CryptoUtil.checksum(tag.getName().trim());
                 } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
                     //This will never occur as the algo and encoding are hardcoded.
                 }

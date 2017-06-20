@@ -20,7 +20,7 @@ public abstract class BaseAPI {
     private static final String POST = "POST";
 
     private AppContext appContext;
-    private IHttpClient httpClient;
+    private IHttpClientFactory httpClientFactory;
     private Map<String, String> headers;
     private String url;
     private String TAG;
@@ -29,13 +29,9 @@ public abstract class BaseAPI {
         this.url = url;
         this.appContext = appContext;
         this.TAG = TAG;
-        this.httpClient = appContext.getHttpClient();
+        this.httpClientFactory = appContext.getHttpClientFactory();
         this.headers = new HashMap<>();
         this.headers.put("Accept-Encoding", "gzip, deflate");
-    }
-
-    public void handleAuth() {
-        httpClient.handleAuth();
     }
 
     public GenieResponse get() {
@@ -51,9 +47,9 @@ public abstract class BaseAPI {
             return GenieResponseBuilder.getErrorResponse(NetworkConstants.CONNECTION_ERROR, NetworkConstants.CONNECTION_ERROR_MESSAGE, TAG, String.class);
         }
         try {
-            httpClient.createClient();
+            IHttpClient httpClient = httpClientFactory.getClient();
             httpClient.setTimeouts(NetworkConstants.NETWORK_CONNECT_TIMEOUT_MINUTES, NetworkConstants.NETWORK_CONNECT_TIMEOUT_MINUTES);
-            handleAuth();
+            httpClient.handleAuth();
             httpClient.createRequest(url);
             httpClient.setHeaders(headers);
             httpClient.setHeaders(getRequestHeaders());

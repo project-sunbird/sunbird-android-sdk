@@ -2,13 +2,16 @@ package org.ekstep.genieservices;
 
 import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
-import org.ekstep.genieservices.commons.bean.ContentAccessLearnerState;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
-import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
+import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.commons.db.operations.IDataSource;
 
+import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This is the interface with all the required APIs to perform necessary operations related to Users
@@ -138,16 +141,26 @@ public interface IUserService {
      * <p> On failing to set the learner state, the response will have status as FALSE with the following error:
      * <p>PROFILE_NOT_FOUND
      *
-     * @param contentAccessLearnerState
+     * @param contentAccess
      * @return
      */
-    GenieResponse<Void> setLearnerState(ContentAccessLearnerState contentAccessLearnerState);
+    GenieResponse<Void> addContentAccess(ContentAccess contentAccess);
 
     /**
      * This API is used to import profiles.
      *
-     * @param profileImportRequest
+     * @param dbSession
+     * @param metadata
      * @return
      */
-    GenieResponse<Void> importProfile(ProfileImportRequest profileImportRequest);
+    GenieResponse<Void> importProfile(IDBSession dbSession, Map<String, Object> metadata);
+
+    /**
+     * This API is used to export profiles.
+     *
+     * @param userIds
+     * @return
+     */
+    GenieResponse<ProfileExportResponse> exportProfile(List<String> userIds, File destinationFolder, String sourceDBFilePath, String destinationDBFilePath, IDataSource dataSource, Map<String, Object> metadata);
+
 }

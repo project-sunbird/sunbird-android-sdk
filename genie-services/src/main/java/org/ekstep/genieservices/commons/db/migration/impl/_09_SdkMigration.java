@@ -4,8 +4,11 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.contract.GameEntry;
 import org.ekstep.genieservices.commons.db.contract.LanguageEntry;
 import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
-import org.ekstep.genieservices.commons.db.contract.LearnerContentSummaryEntry;
+import org.ekstep.genieservices.commons.db.contract.LearnerSummaryEntry;
+import org.ekstep.genieservices.commons.db.contract.ProfileEntry;
 import org.ekstep.genieservices.commons.db.migration.Migration;
+
+import java.util.List;
 
 public class _09_SdkMigration extends Migration {
 
@@ -26,7 +29,16 @@ public class _09_SdkMigration extends Migration {
 
         // Summarizer related tables
         appContext.getDBSession().execute(LearnerAssessmentsEntry.getCreateEntry());
-        appContext.getDBSession().execute(LearnerContentSummaryEntry.getCreateEntry());
+        appContext.getDBSession().execute(LearnerSummaryEntry.getCreateEntry());
+
+        //Profile Image Entry
+        appContext.getDBSession().execute(ProfileEntry.getAlterEntryForProfileImage());
+
+        //update profile image with respective avatar
+        List<String> updateProfileImageQueries = ProfileEntry.getUpdateProfileImage(appContext.getParams().getProfilePath());
+        for (String updateQuery : updateProfileImageQueries) {
+            appContext.getDBSession().execute(updateQuery);
+        }
     }
 
 }

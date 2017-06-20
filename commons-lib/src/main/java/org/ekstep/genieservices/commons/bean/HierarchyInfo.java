@@ -12,6 +12,11 @@ public class HierarchyInfo implements Serializable {
     private String identifier;
     private String contentType;
 
+    public HierarchyInfo(String identifier, String contentType) {
+        this.identifier = identifier;
+        this.contentType = contentType;
+    }
+
     public String getIdentifier() {
         return identifier;
     }

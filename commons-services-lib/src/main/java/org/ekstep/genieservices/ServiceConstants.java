@@ -12,6 +12,7 @@ public interface ServiceConstants {
     String SUCCESS_RESPONSE = "successful";
     String FAILED_RESPONSE = "failed";
     String ERROR_DELETING_A_USER = "Error when deleting user profile";
+    String FAILED_TO_ADD_UPDATE_NOTIFICATION = "Failed to add/update  notification";
 
     String INVALID_USER = "INVALID_USER";
     String NO_USER_WITH_SPECIFIED_ID = "There is no user with specified id exists";
@@ -25,9 +26,31 @@ public interface ServiceConstants {
     /* Key Constants for all the key value store */
     String KEY_USER_SESSION = "session";
 
-    String NEVER_SYNCED = "NEVER";
-    String SYNC_PROMPT = "SYNC_PROMPT";
-    String CONTENT_API_EXPIRATION_KEY = "content_api_expiration_time";
+    String VERSION = "version";
+    String EXPORT_ID = "export_id";
+    String DID = "did";
+    String EVENTS_COUNT = "events_count";
+    String PROFILES_COUNT = "profiles_count";
+    String EXPORT_TYPES = "types";
+    String EXPORT_TYPE_TELEMETRY = "telemetry";
+    String EXPORT_TYPE_PROFILE = "userprofile";
+    // Used in export
+    String EXPORTED_ECAR_DESTINATION_LOCATION = "ecarLocation";
+    String EXPORTED_EPAR_DESTINATION_LOCATION = "eparLocation";
+    String UNCOMPRESSED_SOURCE_LOCATION = "location";
+
+    interface BundleKey {
+        //ContentPlayer
+        String BUNDLE_KEY_ORIGIN = "origin";
+        String BUNDLE_KEY_CONTENT_EXTRAS = "contentExtras";
+        String BUNDLE_KEY_APP_INFO = "appInfo";
+        String BUNDLE_KEY_LANGUAGE_INFO = "languageInfo";
+        String BUNDLE_KEY_APP_QUALIFIER = "appQualifier";
+
+        String BUNDLE_KEY_IS_CHILD = "is_child";
+        String BUNDLE_KEY_LOCAL_FILE_PATH = "local_file_path";
+        String BUNDLE_KEY_DESTINATION_FILE_PATH = "destination_file_path";
+    }
 
     interface FileExtension {
         String CONTENT = "ecar";
@@ -41,9 +64,6 @@ public interface ServiceConstants {
         String SYNC_CONFIG_SHARED_PREFERENCE_KEY = "syncConfig";
         String LAST_SYNC_TIME = "lastSyncTime";
         String SYNC_FILE_SIZE = "SYNC_FILE_SIZE";
-
-        //Download queue
-        String DOWNLOAD_QUEUE = "download_queue";
 
         //Partner
         String KEY_PARTNER_ID = "partnerid";
@@ -86,12 +106,10 @@ public interface ServiceConstants {
         String CONTENT_IMPORT_INITIATED_SUB_TYPE = "ContentImport-Initiated";
         String CONTENT_IMPORT_SUCCESS_SUB_TYPE = "ContentImport-Success";
         String CONTENT_IMPORT_STAGE_ID = "ImportContent";
-        String AUTO_SYNC_SUB_TYPE_INITIATED = "AutoSync-Initiated";
-        String AUTO_SYNC_SUB_TYPE_SUCCESS = "AutoSync-Success";
-        String AUTO_SYNC_STAGE_ID = "Genie-TelemetrySync";
-        String TYPE_OTHER = "OTHER";
-        String TYPE_TOUCH = "TOUCH";
-        String SIZE_OF_DATA_IN_KB = "SizeOfDataInKB";
+        String CONTENT_DOWNLOAD_INITIATE = "ContentDownload-Initiate";
+        String CONTENT_DOWNLOAD_SUCCESS = "ContentDownload-Success";
+        String CONTENT_DOWNLOAD_CANCEL = "ContentDownload-Cancel";
+        String CONTENT_DETAIL = "ContentDetail";
     }
 
     interface ErrorCode {
@@ -102,6 +120,8 @@ public interface ServiceConstants {
         String INVALID_PROFILE = "INVALID_PROFILE";
         String PROFILE_NOT_FOUND = "PROFILE_NOT_FOUND";
         String INVALID_USER = "INVALID_USER";
+        String EXPORT_FAILED = "EXPORT_FAILED";
+        String IMPORT_FAILED = "IMPORT_FAILED";
 
         //Partner
         String UNREGISTERED_PARTNER = "UNREGISTERED_PARTNER";
@@ -114,6 +134,7 @@ public interface ServiceConstants {
         //Content
         String NO_DATA_FOUND = "NO_DATA_FOUND";
         String INVALID_FILE = "INVALID_FILE";
+        String ECAR_NOT_FOUND = "ECAR_NOT_FOUND";
 
     }
 
@@ -151,6 +172,16 @@ public interface ServiceConstants {
 
         //Telemetry
         String UNABLE_TO_SAVE_EVENT = "Not able to save event";
+
+        //Import
+        String IMPORT_PROFILE_FAILED = "Import profile failed.";
+        String IMPORT_CONTENT_FAILED = "Import content failed.";
+        String IMPORT_TELEMETRY_FAILED = "Import telemetry failed.";
+        String FILE_DOESNT_EXIST = "Content import failed, file doesn't exist.";
+        String UNSUPPORTED_FILE = "Content import failed, unsupported file extension";
+        String CONTENT_NOT_FOUND = "No content found for identifier = ";
+        String CONTENT_NOT_FOUND_TO_DELETE = "No content found to delete for identifier = ";
+        String NO_CONTENT_TO_EXPORT = "Nothing to export!";
     }
 
     interface ContentStatus {

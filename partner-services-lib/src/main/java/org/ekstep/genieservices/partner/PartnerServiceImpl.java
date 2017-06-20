@@ -13,8 +13,8 @@ import org.ekstep.genieservices.commons.bean.telemetry.GESendPartnerData;
 import org.ekstep.genieservices.commons.bean.telemetry.GEStartPartnerSession;
 import org.ekstep.genieservices.commons.bean.telemetry.GETerminatePartnerSession;
 import org.ekstep.genieservices.commons.exception.EncryptionException;
-import org.ekstep.genieservices.commons.utils.Base64;
-import org.ekstep.genieservices.commons.utils.Crypto;
+import org.ekstep.genieservices.commons.utils.Base64Util;
+import org.ekstep.genieservices.commons.utils.CryptoUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
@@ -98,7 +98,7 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
     private String getPublicKeyId(PartnerData request) {
         if (request.getPublicKey() != null) {
             try {
-                return Crypto.checksum(request.getPublicKey());
+                return CryptoUtil.checksum(request.getPublicKey());
             } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
                 Logger.e(TAG, "Bad Algorithm", e);
                 return null;
@@ -220,13 +220,13 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
     private Map<String, String> processData(PartnerData partnerData) throws EncryptionException {
         Map<String, String> data = new HashMap<>();
         try {
-            SecretKey AESKey = Crypto.generateAESKey(); //ok
-            IvParameterSpec iv = Crypto.generateIVSpecForAES();
-            String ivString = Base64.encodeToString(iv.getIV(), Base64.DEFAULT);
-            PublicKey publicKey = Crypto.generatePublicKey(partnerData.getPublicKey());
-            byte[] encryptedKey = Crypto.encryptSecretKeyWithRSAPublic(AESKey, publicKey);
-            String encryptedKeyString = Base64.encodeToString(encryptedKey, Base64.DEFAULT);
-            String encryptedData = Crypto.encryptWithAES(partnerData.getPartnerData(), AESKey, iv);
+            SecretKey AESKey = CryptoUtil.generateAESKey(); //ok
+            IvParameterSpec iv = CryptoUtil.generateIVSpecForAES();
+            String ivString = Base64Util.encodeToString(iv.getIV(), Base64Util.DEFAULT);
+            PublicKey publicKey = CryptoUtil.generatePublicKey(partnerData.getPublicKey());
+            byte[] encryptedKey = CryptoUtil.encryptSecretKeyWithRSAPublic(AESKey, publicKey);
+            String encryptedKeyString = Base64Util.encodeToString(encryptedKey, Base64Util.DEFAULT);
+            String encryptedData = CryptoUtil.encryptWithAES(partnerData.getPartnerData(), AESKey, iv);
             data.put("iv", ivString);
             data.put("encrypted_data", encryptedData);
             data.put("encrypted_key", encryptedKeyString);
@@ -244,8 +244,8 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
         if (request.getPublicKey() == null || request.getPublicKey().isEmpty())
             errorMessages.add(ServiceConstants.ErrorCode.MISSING_PUBLIC_KEY);
         try {
-            Crypto.encryptWithPublic(TEST, request.getPublicKey());
-            Crypto.checksum(request.getPublicKey());
+            CryptoUtil.encryptWithPublic(TEST, request.getPublicKey());
+            CryptoUtil.checksum(request.getPublicKey());
         } catch (Exception e) {
             Logger.e(TAG, "ERROR Bad Public Key!", e);
             errorMessages.add(ServiceConstants.ErrorCode.INVALID_RSA_PUBLIC_KEY);

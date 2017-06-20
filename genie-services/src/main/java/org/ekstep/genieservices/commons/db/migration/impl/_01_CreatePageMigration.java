@@ -13,7 +13,6 @@ import org.ekstep.genieservices.commons.db.contract.TelemetryTagEntry;
 import org.ekstep.genieservices.commons.db.contract.UserEntry;
 import org.ekstep.genieservices.commons.db.migration.Migration;
 
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,11 +24,6 @@ public class _01_CreatePageMigration extends Migration {
     public _01_CreatePageMigration() {
         super(MIGRATION_NUMBER, TARGET_DB_VERSION);
     }
-
-//    @Override
-//    public void apply(SQLiteDatabase db) {
-//        db.execSQL(PageEntry.getCreateEntry());
-//    }
 
     @Override
     public void apply(AppContext appContext) {

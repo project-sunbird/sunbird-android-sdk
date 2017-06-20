@@ -11,7 +11,7 @@ public class RecommendedContentResult {
 
     private String id;
     private String responseMessageId;
-    private List<Content> contents;
+    private List<ContentData> contents;
 
     public String getId() {
         return id;
@@ -29,11 +29,11 @@ public class RecommendedContentResult {
         this.responseMessageId = responseMessageId;
     }
 
-    public List<Content> getContents() {
+    public List<ContentData> getContents() {
         return contents;
     }
 
-    public void setContents(List<Content> contents) {
+    public void setContents(List<ContentData> contents) {
         this.contents = contents;
     }
 }

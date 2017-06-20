@@ -10,15 +10,16 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
-import org.ekstep.genieservices.commons.bean.ContentCriteria;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
-import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
+import org.ekstep.genieservices.commons.bean.ContentFeedbackFilterCriteria;
+import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
+import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
-import org.ekstep.genieservices.commons.bean.ContentListingResult;
+import org.ekstep.genieservices.commons.bean.ContentListingSection;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchFilter;
-import org.ekstep.genieservices.commons.bean.Display;
+import org.ekstep.genieservices.commons.bean.ContentVariant;
 import org.ekstep.genieservices.commons.bean.FilterValue;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MasterData;
@@ -27,9 +28,7 @@ import org.ekstep.genieservices.commons.bean.PartnerFilter;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
-import org.ekstep.genieservices.commons.bean.Section;
 import org.ekstep.genieservices.commons.bean.UserSession;
-import org.ekstep.genieservices.commons.bean.Variant;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
 import org.ekstep.genieservices.commons.bean.enums.SortBy;
@@ -41,8 +40,6 @@ import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
-import org.ekstep.genieservices.content.bean.ContentChild;
-import org.ekstep.genieservices.content.bean.ContentVariant;
 import org.ekstep.genieservices.content.db.model.ContentListingModel;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.db.model.ContentsModel;
@@ -57,6 +54,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -72,6 +70,7 @@ import java.util.TreeMap;
  */
 public class ContentHandler {
 
+    public static final String KEY_VISIBILITY = "visibility";
     private static final String TAG = ContentHandler.class.getSimpleName();
 
     private static final String KEY_IDENTIFIER = "identifier";
@@ -86,12 +85,12 @@ public class ContentHandler {
     private static final String KEY_DOWNLOAD_URL = "downloadUrl";
     private static final String KEY_COMPATIBILITY_LEVEL = "compatibilityLevel";
     private static final String KEY_MIME_TYPE = "mimeType";
-    private static final String KEY_VISIBILITY = "visibility";
     private static final Object AUDIENCE_KEY = "audience";
     private static final String KEY_LAST_UPDATED_ON = "lastUpdatedOn";
     private static final String KEY_PRE_REQUISITES = "pre_requisites";
     private static final String KEY_CHILDREN = "children";
     private static final String KEY_CONTENT_TYPE = "contentType";
+    private static final String KEY_NAME = "name";
 
     private static final String KEY_CONTENT_METADATA = "contentMetadata";
     private static final String KEY_VIRALITY_METADATA = "virality";
@@ -100,7 +99,7 @@ public class ContentHandler {
 
     private static final int DEFAULT_PACKAGE_VERSION = -1;
     private static final int INITIAL_VALUE_FOR_TRANSFER_COUNT = 0;
-
+    private static final int MAX_CONTENT_NAME = 30;
     public static int minCompatibilityLevel = 1;
     public static int maxCompatibilityLevel = 3;
     // TODO: 02-03-2017 : We can remove this later after few release
@@ -151,6 +150,13 @@ public class ContentHandler {
                 contentType = contentType.toLowerCase();
             }
             return contentType;
+        }
+        return null;
+    }
+
+    public static String readName(Map contentData) {
+        if (contentData.containsKey(KEY_NAME)) {
+            return (String) contentData.get(KEY_NAME);
         }
         return null;
     }
@@ -245,7 +251,7 @@ public class ContentHandler {
         return GsonUtil.fromJson(localData, Map.class).get(KEY_PRE_REQUISITES) != null;
     }
 
-    private static List<String> getPreRequisitesIdentifiers(String localData) {
+    public static List<String> getPreRequisitesIdentifiers(String localData) {
         List<Map> children = (List) GsonUtil.fromJson(localData, Map.class).get(KEY_PRE_REQUISITES);
 
         List<String> childIdentifiers = new ArrayList<>();
@@ -262,7 +268,7 @@ public class ContentHandler {
         return GsonUtil.fromJson(localData, Map.class).get(KEY_CHILDREN) != null;
     }
 
-    private static List<String> getChildContentsIdentifiers(String localData) {
+    public static List<String> getChildContentsIdentifiers(String localData) {
         List<Map> children = (List) GsonUtil.fromJson(localData, Map.class).get(KEY_CHILDREN);
 
         List<String> childIdentifiers = new ArrayList<>();
@@ -298,12 +304,10 @@ public class ContentHandler {
                 Map contentData = fetchContentDetailsFromServer(appContext, contentIdentifier);
 
                 if (contentData != null) {
-                    ContentModel contentModel = convertContentMapToModel(appContext.getDBSession(), contentData, null);
-                    contentModel.setVisibility(existingContentModel.getVisibility());
-                    contentModel.addOrUpdateRefCount(existingContentModel.getRefCount());
-                    contentModel.addOrUpdateContentState(existingContentModel.getContentState());
-
-                    contentModel.update();
+                    existingContentModel.setServerData(GsonUtil.toJson(contentData));
+                    existingContentModel.setServerLastUpdatedOn(serverLastUpdatedOn(contentData));
+                    existingContentModel.setAudience(readAudience(contentData));
+                    existingContentModel.update();
                 }
             }
         }).start();
@@ -312,31 +316,23 @@ public class ContentHandler {
     public static Content convertContentModelToBean(ContentModel contentModel) {
         Content content = new Content();
         content.setIdentifier(contentModel.getIdentifier());
-
-        ContentData localData = null;
+        ContentData localData = null, serverData = null;
         if (contentModel.getLocalData() != null) {
             localData = GsonUtil.fromJson(contentModel.getLocalData(), ContentData.class);
-        }
-
-        ContentData serverData = null;
-        if (contentModel.getServerData() != null) {
-            serverData = GsonUtil.fromJson(contentModel.getServerData(), ContentData.class);
-        }
-
-        if (serverData != null) {
-            content.setContentData(serverData);
-            addContentVariants(serverData, contentModel.getServerData());
-        } else if (localData != null) {
+            localData.setVariants(getContentVariants(contentModel.getLocalData()));
             content.setContentData(localData);
-            addContentVariants(localData, contentModel.getLocalData());
+        } else if (contentModel.getServerData() != null) {
+            serverData = GsonUtil.fromJson(contentModel.getServerData(), ContentData.class);
+            serverData.setVariants(getContentVariants(contentModel.getServerData()));
+            content.setContentData(serverData);
         }
 
+        content.setUpdateAvailable(isUpdateAvailable(serverData, localData));
         content.setMimeType(contentModel.getMimeType());
         content.setBasePath(contentModel.getPath());
         content.setContentType(contentModel.getContentType());
         content.setAvailableLocally(isAvailableLocally(contentModel.getContentState()));
         content.setReferenceCount(contentModel.getRefCount());
-        content.setUpdateAvailable(isUpdateAvailable(serverData, localData));
 
         long contentCreationTime = 0;
         String localLastUpdatedTime = contentModel.getLocalLastUpdatedTime();
@@ -348,30 +344,32 @@ public class ContentHandler {
         return content;
     }
 
-    private static void addContentVariants(ContentData contentData, String dataJson) {
-        List<Variant> variantList = new ArrayList<>();
+    private static List<ContentVariant> getContentVariants(String dataJson) {
+        List<ContentVariant> contentVariantList = new ArrayList<>();
 
         Map<String, Object> dataMap = GsonUtil.fromJson(dataJson, Map.class);
+        ContentVariant spineContentVariant = getVariant(dataMap, "spine");
+        if (spineContentVariant != null) contentVariantList.add(spineContentVariant);
+        return contentVariantList;
+    }
 
-        Object variants = dataMap.get(KEY_VARIANTS);
+    private static ContentVariant getVariant(Map contentDataMap, String variantName) {
+        Object variants = contentDataMap.get(KEY_VARIANTS);
+        ContentVariant contentVariant = null;
         if (variants != null) {
-            String variantsString;
+            Map variantData = null;
             if (variants instanceof Map) {
-                variantsString = GsonUtil.getGson().toJson(variants);
+                variantData = (Map) variants;
             } else {
-                variantsString = (String) variants;
+                variantData = GsonUtil.fromJson(((String) variants).replace("\\", ""), Map.class);
             }
 
-            variantsString = variantsString.replace("\\", "");
-            ContentVariant contentVariant = GsonUtil.fromJson(variantsString, ContentVariant.class);
-
-            if (contentVariant.getSpine() != null) {
-                Variant variant = new Variant("spine", contentVariant.getSpine().getEcarUrl(), contentVariant.getSpine().getSize());
-                variantList.add(variant);
+            if (variantData.get(variantName) != null) {
+                Map spineData = (Map) variantData.get(variantName);
+                contentVariant = new ContentVariant(variantName, spineData.get("ecarUrl").toString(), spineData.get("size").toString());
             }
         }
-
-        contentData.setVariants(variantList);
+        return contentVariant;
     }
 
     public static String getCurrentUserId(IUserService userService) {
@@ -395,30 +393,22 @@ public class ContentHandler {
         return profile;
     }
 
-    public static ContentFeedback getContentFeedback(IContentFeedbackService contentFeedbackService, ContentFeedbackCriteria contentFeedbackCriteria) {
+    public static List<ContentFeedback> getContentFeedback(IContentFeedbackService contentFeedbackService, String contentIdentifier, String uid) {
         if (contentFeedbackService != null) {
-            return contentFeedbackService.getFeedback(contentFeedbackCriteria).getResult();
+            ContentFeedbackFilterCriteria.Builder builder = new ContentFeedbackFilterCriteria.Builder().byUser(uid).forContent(contentIdentifier);
+            return contentFeedbackService.getFeedback(builder.build()).getResult();
         }
 
         return null;
     }
 
-    public static ContentAccess getContentAccess(IUserService userService, String contentIdentifier, String uid) {
+    public static List<ContentAccess> getContentAccess(IUserService userService, String contentIdentifier, String uid) {
         if (userService != null) {
-            List<ContentAccess> contentAccessList = getAllContentAccess(userService, uid, contentIdentifier);
-            if (contentAccessList.size() > 0) {
-                return contentAccessList.get(0);
-            }
+            ContentAccessFilterCriteria.Builder builder = new ContentAccessFilterCriteria.Builder().byUser(uid).forContent(contentIdentifier);
+            return userService.getAllContentAccess(builder.build()).getResult();
         }
 
-        return new ContentAccess();
-    }
-
-    private static List<ContentAccess> getAllContentAccess(IUserService userService, String uid, String contentIdentifier) {
-        ContentAccessFilterCriteria.Builder builder = new ContentAccessFilterCriteria.Builder();
-        builder.uid(uid);
-        builder.contentId(contentIdentifier);
-        return userService.getAllContentAccess(builder.build()).getResult();
+        return null;
     }
 
     private static boolean isUpdateAvailable(ContentData serverData, ContentData localData) {
@@ -436,11 +426,11 @@ public class ContentHandler {
         return sVersion > 0 && lVersion > 0 && sVersion > lVersion;
     }
 
-    private static boolean isAvailableLocally(int contentState) {
+    public static boolean isAvailableLocally(int contentState) {
         return contentState == ContentConstants.State.ARTIFACT_AVAILABLE;
     }
 
-    public static List<ContentModel> getAllLocalContentSortedByContentAccess(IDBSession dbSession, ContentCriteria criteria) {
+    public static List<ContentModel> getAllLocalContent(IDBSession dbSession, ContentFilterCriteria criteria) {
         String uid = null;
         ContentType[] contentTypes = null;
         if (criteria != null) {
@@ -449,16 +439,22 @@ public class ContentHandler {
         }
         String contentTypesStr = ContentType.getCommaSeparatedContentTypes(contentTypes);
 
-        String isContentType = String.format(Locale.US, "c.%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr);
-        String isVisible = String.format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
-        String isArtifactAvailable = String.format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
-        String filter = String.format(Locale.US, "WHERE (%s AND %s AND %s)", isVisible, isArtifactAvailable, isContentType);
+        String contentTypeFilter = String.format(Locale.US, "c.%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr);
+        String contentVisibilityFilter = String.format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
+        String artifactAvailabilityFilter = String.format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
+        String filter = String.format(Locale.US, "WHERE (%s AND %s AND %s)", contentVisibilityFilter, artifactAvailabilityFilter, contentTypeFilter);
 
         String orderBy = String.format(Locale.US, "ORDER BY ca.%s desc, c.%s desc, c.%s desc", ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP, ContentEntry.COLUMN_NAME_LOCAL_LAST_UPDATED_ON, ContentEntry.COLUMN_NAME_SERVER_LAST_UPDATED_ON);
 
-        String query = String.format(Locale.US, "SELECT c.* FROM  %s c LEFT JOIN %s ca ON c.%s = ca.%s AND ca.%s = '%s' %s %s;",
-                ContentEntry.TABLE_NAME, ContentAccessEntry.TABLE_NAME, ContentEntry.COLUMN_NAME_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_UID, uid,
-                filter, orderBy);
+        String query = null;
+        if (uid != null) {
+            query = String.format(Locale.US, "SELECT c.* FROM  %s c LEFT JOIN %s ca ON c.%s = ca.%s AND ca.%s = '%s' %s %s;",
+                    ContentEntry.TABLE_NAME, ContentAccessEntry.TABLE_NAME, ContentEntry.COLUMN_NAME_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_UID, uid,
+                    filter, orderBy);
+        } else {
+            query = String.format(Locale.US, "SELECT c.* FROM  %s c %s;",
+                    ContentEntry.TABLE_NAME, filter);
+        }
 
         List<ContentModel> contentModelListInDB;
         ContentsModel contentsModel = ContentsModel.findWithCustomQuery(dbSession, query);
@@ -474,12 +470,12 @@ public class ContentHandler {
     public static List<ContentModel> getAllLocalContentModel(IDBSession dbSession, ContentType[] contentTypes) {
         String contentTypesStr = ContentType.getCommaSeparatedContentTypes(contentTypes);
 
-        String isContentType = String.format(Locale.US, "%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr);
-        String isVisible = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
+        String contentTypeFilter = String.format(Locale.US, "%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr);
+        String contentVisibilityFilter = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
         // For hiding the non compatible imported content, which visibility is DEFAULT.
-        String isArtifactAvailable = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
+        String artifactAvailabilityFilter = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
 
-        String filter = String.format(Locale.US, " where (%s AND %s AND %s)", isVisible, isArtifactAvailable, isContentType);
+        String filter = String.format(Locale.US, " where (%s AND %s AND %s)", contentVisibilityFilter, artifactAvailabilityFilter, contentTypeFilter);
 
         List<ContentModel> contentModelListInDB;
         ContentsModel contentsModel = ContentsModel.find(dbSession, filter);
@@ -652,8 +648,12 @@ public class ContentHandler {
         try {
             String oldIdentifier = oldContent.getIdentifier();
             if (oldIdentifier.equalsIgnoreCase(newIdentifier)) {
-                isExist = (pkgVersion(oldContent.getLocalData()) >= newPkgVersion) // If old content's pkgVersion is less than the new content then return false.
-                        || oldContent.getContentState() == ContentConstants.State.ARTIFACT_AVAILABLE;  // If content_state is other than artifact available then also return  false.
+                if ((pkgVersion(oldContent.getLocalData()) < newPkgVersion) // If old content's pkgVersion is less than the new content then return false.
+                        || oldContent.getContentState() != ContentConstants.State.ARTIFACT_AVAILABLE) {  //  If content_state is other than artifact available then also return  false.
+                    isExist = false;
+                } else {
+                    isExist = true;
+                }
             }
         } catch (Exception e) {
             Logger.e(TAG, "isContentExist", e);
@@ -731,63 +731,62 @@ public class ContentHandler {
 
     public static List<ContentModel> getSortedChildrenList(IDBSession dbSession, String localData, int childContents) {
         Map<String, Object> localDataMap = GsonUtil.fromJson(localData, Map.class);
-        String childrenString = GsonUtil.toJson(localDataMap.get("children"));
+        List<Map> children = (List<Map>) localDataMap.get("children");
+        List<ContentModel> contentModelListInDB;
+        if (children != null && children.size() > 0) {
+            // Sort by index of child content
+            Comparator<Map> comparator = new Comparator<Map>() {
+                @Override
+                public int compare(Map left, Map right) {
+                    double leftIndex = Double.valueOf(left.get("index").toString());
+                    double rightIndex = Double.valueOf(right.get("index").toString());
+                    return (int) (leftIndex - rightIndex); // use your logic
+                }
+            };
+            Collections.sort(children, comparator);
+            List<String> childIdentifiers = new ArrayList<>();
+            StringBuilder whenAndThen = new StringBuilder();
+            int i = 0;
 
-        // json string to list of child
-        Type type = new TypeToken<List<ContentChild>>() {
-        }.getType();
-        List<ContentChild> contentChildList = GsonUtil.getGson().fromJson(childrenString, type);
-
-        // Sort by index of child content
-        Comparator<ContentChild> comparator = new Comparator<ContentChild>() {
-            @Override
-            public int compare(ContentChild left, ContentChild right) {
-                return (int) (left.getIndex() - right.getIndex()); // use your logic
+            for (Map contentChild : children) {
+                childIdentifiers.add(contentChild.get("identifier").toString());
+                whenAndThen.append(String.format(Locale.US, " WHEN '%s' THEN %s ", contentChild.get("identifier").toString(), i));
+                i++;
             }
-        };
-        Collections.sort(contentChildList, comparator);
 
-        List<String> childIdentifiers = new ArrayList<>();
-        StringBuilder whenAndThen = new StringBuilder();
-        int i = 0;
+            String orderBy = "";
+            if (i > 0) {
+                orderBy = String.format(Locale.US, " ORDER BY CASE %s %s END", ContentEntry.COLUMN_NAME_IDENTIFIER, whenAndThen.toString());
+            }
 
-        for (ContentChild contentChild : contentChildList) {
-            childIdentifiers.add(contentChild.getIdentifier());
-            whenAndThen.append(String.format(Locale.US, " WHEN '%s' THEN %s ", contentChild.getIdentifier(), i));
-            i++;
-        }
+            String filter;
+            switch (childContents) {
+                case ContentConstants.ChildContents.FIRST_LEVEL_DOWNLOADED:
+                    filter = String.format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
+                    break;
 
-        String orderBy = "";
-        if (i > 0) {
-            orderBy = String.format(Locale.US, " ORDER BY CASE %s %s END", ContentEntry.COLUMN_NAME_IDENTIFIER, whenAndThen.toString());
-        }
-
-        String filter;
-        switch (childContents) {
-            case ContentConstants.ChildContents.FIRST_LEVEL_DOWNLOADED:
-                filter = String.format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
-                break;
-
-            case ContentConstants.ChildContents.FIRST_LEVEL_SPINE:
-                filter = String.format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ONLY_SPINE);
-                break;
+                case ContentConstants.ChildContents.FIRST_LEVEL_SPINE:
+                    filter = String.format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ONLY_SPINE);
+                    break;
 
 //            case CHILD_CONTENTS_FIRST_LEVEL_TEXTBOOK_UNIT:
 //                filter = String.format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_TYPE, ContentType.TEXTBOOK_UNIT.getValue());
 //                break;
 
-            case ContentConstants.ChildContents.FIRST_LEVEL_ALL:
-            default:
-                filter = "";
-                break;
-        }
+                case ContentConstants.ChildContents.FIRST_LEVEL_ALL:
+                default:
+                    filter = "";
+                    break;
+            }
 
-        String query = String.format(Locale.US, "Select * from %s where %s in ('%s') %s %s",
-                ContentEntry.TABLE_NAME, ContentEntry.COLUMN_NAME_IDENTIFIER, StringUtil.join("','", childIdentifiers), filter, orderBy);
-        List<ContentModel> contentModelListInDB;
-        ContentsModel contentsModel = ContentsModel.findWithCustomQuery(dbSession, query);
-        if (contentsModel != null) {
-            contentModelListInDB = contentsModel.getContentModelList();
+            String query = String.format(Locale.US, "Select * from %s where %s in ('%s') %s %s",
+                    ContentEntry.TABLE_NAME, ContentEntry.COLUMN_NAME_IDENTIFIER, StringUtil.join("','", childIdentifiers), filter, orderBy);
+            ContentsModel contentsModel = ContentsModel.findWithCustomQuery(dbSession, query);
+            if (contentsModel != null) {
+                contentModelListInDB = contentsModel.getContentModelList();
+            } else {
+                contentModelListInDB = new ArrayList<>();
+            }
         } else {
             contentModelListInDB = new ArrayList<>();
         }
@@ -1129,8 +1128,8 @@ public class ContentHandler {
         contentListingModel.save();
     }
 
-    public static ContentListingResult getContentListingResult(IDBSession dbSession, ContentListingCriteria contentListingCriteria, String jsonStr) {
-        ContentListingResult contentListingResult = null;
+    public static ContentListing getContentListingResult(IDBSession dbSession, ContentListingCriteria contentListingCriteria, String jsonStr) {
+        ContentListing contentListing = null;
 
         LinkedTreeMap map = GsonUtil.fromJson(jsonStr, LinkedTreeMap.class);
         LinkedTreeMap responseParams = (LinkedTreeMap) map.get("params");
@@ -1142,25 +1141,25 @@ public class ContentHandler {
         }
 
         if (result != null) {
-            contentListingResult = new ContentListingResult();
-            contentListingResult.setId(contentListingCriteria.getContentListingId());
-            contentListingResult.setResponseMessageId(responseMessageId);
+            contentListing = new ContentListing();
+            contentListing.setId(contentListingCriteria.getContentListingId());
+            contentListing.setResponseMessageId(responseMessageId);
             if (result.containsKey("page")) {
-                contentListingResult.setSections(getSectionsFromPageMap(dbSession, (Map<String, Object>) result.get("page"), contentListingCriteria));
+                contentListing.setContentListingSections(getSectionsFromPageMap(dbSession, (Map<String, Object>) result.get("page"), contentListingCriteria));
             }
         }
 
-        return contentListingResult;
+        return contentListing;
     }
 
-    private static List<Section> getSectionsFromPageMap(IDBSession dbSession, Map<String, Object> pageMap, ContentListingCriteria contentListingCriteria) {
-        List<Section> sectionList = new ArrayList<>();
+    private static List<ContentListingSection> getSectionsFromPageMap(IDBSession dbSession, Map<String, Object> pageMap, ContentListingCriteria contentListingCriteria) {
+        List<ContentListingSection> contentListingSectionList = new ArrayList<>();
 
         List<Map<String, Object>> sections = (List<Map<String, Object>>) pageMap.get("sections");
         for (Map<String, Object> sectionMap : sections) {
-            List<Map<String, Object>> contentDataList = null;
+            String contentDataList = null;
             if (sectionMap.containsKey("contents")) {
-                contentDataList = (List<Map<String, Object>>) sectionMap.get("contents");
+                contentDataList = GsonUtil.toJson(sectionMap.get("contents"));
             }
 
             ContentSearchCriteria contentSearchCriteria = null;
@@ -1226,58 +1225,121 @@ public class ContentHandler {
                 contentSearchCriteria = builder.build();
             }
 
-            Section section = new Section();
-            section.setResponseMessageId((String) sectionMap.get("resmsgid"));
-            section.setApiId((String) sectionMap.get("apiid"));
-            section.setDisplay(GsonUtil.fromMap((Map) sectionMap.get("display"), Display.class));
-            section.setContents(convertContentMapListToBeanList(dbSession, contentDataList));
-            section.setContentSearchCriteria(contentSearchCriteria);
+            ContentListingSection contentListingSection = new ContentListingSection();
+            contentListingSection.setResponseMessageId((String) sectionMap.get("resmsgid"));
+            contentListingSection.setApiId((String) sectionMap.get("apiid"));
+            contentListingSection.setSectionName(((Map) ((Map) sectionMap.get("display")).get("name")).get("en").toString());
 
-            sectionList.add(section);
-        }
-
-        return sectionList;
-    }
-
-    public static List<Content> convertContentMapListToBeanList(IDBSession dbSession, List<Map<String, Object>> contentDataList) {
-        List<Content> contents = new ArrayList<>();
-        if (contentDataList != null) {
-            for (Map contentDataMap : contentDataList) {
-                ContentModel contentModel = convertContentMapToModel(dbSession, contentDataMap, null);
-                Content content = convertContentModelToBean(contentModel);
-                contents.add(content);
+            if (!StringUtil.isNullOrEmpty(contentDataList)) {
+                Type type = new TypeToken<List<ContentData>>() {
+                }.getType();
+                List<ContentData> contentData = GsonUtil.getGson().fromJson(contentDataList, type);
+                contentListingSection.setContentDataList(contentData);
             }
+            contentListingSection.setContentSearchCriteria(contentSearchCriteria);
+
+            contentListingSectionList.add(contentListingSection);
         }
-        return contents;
+
+        return contentListingSectionList;
     }
 
     public static String getDownloadUrl(Map<String, Object> dataMap) {
         String downloadUrl = null;
 
-        Object variants = dataMap.get(KEY_VARIANTS);
-        if (variants != null) {
-            String variantsString;
-            if (variants instanceof Map) {
-                variantsString = GsonUtil.getGson().toJson(variants);
-            } else {
-                variantsString = (String) variants;
+        String contentType = (String) dataMap.get(KEY_CONTENT_TYPE);
+        if ((ContentType.TEXTBOOK.getValue().equalsIgnoreCase(contentType)
+                || ContentType.COLLECTION.getValue().equalsIgnoreCase(contentType))) {
+            ContentVariant spineContentVariant = getVariant(dataMap, "spine");
+            if (spineContentVariant != null) {
+                downloadUrl = spineContentVariant.getEcarUrl();
             }
-
-            variantsString = variantsString.replace("\\", "");
-            ContentVariant contentVariant = GsonUtil.fromJson(variantsString, ContentVariant.class);
-
-            String contentType = (String) dataMap.get(KEY_CONTENT_TYPE);
-            if ((contentVariant.getSpine() != null && !StringUtil.isNullOrEmpty(contentVariant.getSpine().getEcarUrl()))
-                    && (ContentType.TEXTBOOK.getValue().equalsIgnoreCase(contentType)
-                    || ContentType.COLLECTION.getValue().equalsIgnoreCase(contentType))) {
-
-                downloadUrl = contentVariant.getSpine().getEcarUrl();
-            }
-        } else {
-            downloadUrl = (String) dataMap.get(KEY_DOWNLOAD_URL);
         }
 
+        if (StringUtil.isNullOrEmpty(downloadUrl)) {
+            downloadUrl = (String) dataMap.get(KEY_DOWNLOAD_URL);
+        }
         return downloadUrl;
+    }
+
+    public static List<ContentModel> getContentModelToExport(IDBSession dbSession, List<String> contentIds) {
+        List<ContentModel> contentModelToExport = new ArrayList<>();
+        Queue<ContentModel> queue = new LinkedList<>();
+
+        List<ContentModel> contentModelList = findAllContentsWithIdentifiers(dbSession, contentIds);
+        if (contentModelList != null) {
+            queue.addAll(contentModelList);
+        }
+
+        ContentModel node;
+        while (!queue.isEmpty()) {
+            node = queue.remove();
+
+            if (hasChildren(node.getLocalData())) {
+                List<String> childContentsIdentifiers = getChildContentsIdentifiers(node.getLocalData());
+                List<ContentModel> contentModelListInDB = findAllContentsWithIdentifiers(dbSession, childContentsIdentifiers);
+                if (contentModelListInDB != null) {
+                    queue.addAll(contentModelListInDB);
+                }
+            } else if (hasPreRequisites(node.getLocalData())) {
+                List<String> preRequisitesIdentifiers = getPreRequisitesIdentifiers(node.getLocalData());
+                List<ContentModel> preRequisitiesListInDB = findAllContentsWithIdentifiers(dbSession, preRequisitesIdentifiers);
+                if (preRequisitiesListInDB != null) {
+                    queue.addAll(preRequisitiesListInDB);
+                }
+            }
+
+            contentModelToExport.add(node);
+        }
+
+        return contentModelToExport;
+    }
+
+    public static List<ContentModel> deDupe(List<ContentModel> contentModelList) {
+        Set<ContentModel> uniqueContentModels = new LinkedHashSet<>(contentModelList);
+
+        return new ArrayList<>(uniqueContentModels);
+    }
+
+    public static String getExportedFileName(List<ContentModel> contentModelList) {
+        String fileName = "blank.ecar";
+        ContentModel firstContent = null;
+        int rootContents = 0;
+
+        if (contentModelList.size() > 0) {
+            firstContent = contentModelList.get(0);
+        }
+
+        String appendName = "";
+
+        for (ContentModel contentModel : contentModelList) {
+            if (ContentConstants.Visibility.DEFAULT.equalsIgnoreCase(contentModel.getVisibility())) {
+                rootContents++;
+            }
+        }
+
+        if (rootContents > 1) {
+            appendName = String.format(Locale.US, "+%s", rootContents - 1);
+        }
+
+        if (firstContent != null) {
+            String name = readName(GsonUtil.fromJson(firstContent.getLocalData(), Map.class));
+            if (!StringUtil.isNullOrEmpty(name) && name.length() > MAX_CONTENT_NAME) {
+                name = name.substring(0, MAX_CONTENT_NAME - 3) + "...";
+            }
+
+            double pkgVersion;
+
+            try {
+                pkgVersion = pkgVersion(firstContent.getLocalData());
+            } catch (Exception e) {
+                pkgVersion = 0;
+            }
+
+            fileName = String.format(Locale.US, "%s-v%s%s.ecar", name, "" + pkgVersion, appendName);
+        }
+
+        return fileName;
     }
 
 }

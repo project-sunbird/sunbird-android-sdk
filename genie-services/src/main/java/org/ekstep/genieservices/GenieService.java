@@ -1,21 +1,24 @@
 package org.ekstep.genieservices;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.ekstep.genieservices.async.GenieAsyncService;
 import org.ekstep.genieservices.commons.AndroidAppContext;
 import org.ekstep.genieservices.commons.AndroidLogger;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IDeviceInfo;
+import org.ekstep.genieservices.commons.IDownloadManager;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
-import org.ekstep.genieservices.commons.download.DownloadService;
+import org.ekstep.genieservices.commons.download.DownloadServiceImpl;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.config.ConfigServiceImpl;
 import org.ekstep.genieservices.content.ContentFeedbackServiceImpl;
 import org.ekstep.genieservices.content.ContentServiceImpl;
-import org.ekstep.genieservices.content.DownloadQueueListener;
 import org.ekstep.genieservices.content.LanguageServiceImpl;
+import org.ekstep.genieservices.importexport.FileExporter;
+import org.ekstep.genieservices.importexport.FileImporter;
 import org.ekstep.genieservices.notification.NotificationServiceImpl;
 import org.ekstep.genieservices.partner.PartnerServiceImpl;
 import org.ekstep.genieservices.profile.SummarizerServiceImpl;
@@ -72,7 +75,6 @@ public class GenieService {
             Logger.init(new AndroidLogger());
             ContentPlayer.init(applicationContext.getParams().getQualifier());
             TelemetryLogger.init(new TelemetryServiceImpl(applicationContext, new UserServiceImpl(applicationContext)));
-            DownloadQueueListener.init(applicationContext, new DownloadService(applicationContext));
             //initializing event bus for Telemetry
             TelemetryListener.init(applicationContext);
             SummaryListener.init(applicationContext);
@@ -100,12 +102,12 @@ public class GenieService {
     /**
      * This api gets the {@link UserServiceImpl}, when accessed in the below way
      * <p>
-     * getService().getUserProfileService()
+     * getService().getUserService()
      * <p><p>
      *
      * @return {@link IUserService}
      */
-    public IUserService getUserProfileService() {
+    public IUserService getUserService() {
         if (mUserService == null) {
             mUserService = new UserServiceImpl(mAppContext);
         }
@@ -122,7 +124,7 @@ public class GenieService {
      */
     public ITelemetryService getTelemetryService() {
         if (mTelemetryService == null) {
-            mTelemetryService = new TelemetryServiceImpl(mAppContext, getUserProfileService());
+            mTelemetryService = new TelemetryServiceImpl(mAppContext, getUserService());
         }
         return mTelemetryService;
     }
@@ -167,7 +169,7 @@ public class GenieService {
      */
     public IContentFeedbackService getContentFeedbackService() {
         if (mContentFeedbackService == null) {
-            mContentFeedbackService = new ContentFeedbackServiceImpl(mAppContext, getUserProfileService());
+            mContentFeedbackService = new ContentFeedbackServiceImpl(mAppContext, getUserService());
         }
         return mContentFeedbackService;
     }
@@ -182,7 +184,7 @@ public class GenieService {
      */
     public IContentService getContentService() {
         if (mContentService == null) {
-            mContentService = new ContentServiceImpl(mAppContext, getUserProfileService(), getContentFeedbackService(), getConfigService());
+            mContentService = new ContentServiceImpl(mAppContext, getUserService(), getContentFeedbackService(), getConfigService(), getDownloadService());
         }
         return mContentService;
     }
@@ -280,8 +282,19 @@ public class GenieService {
      *
      * @return
      */
-    public DownloadService getDownloadService() {
-        return new DownloadService(mAppContext);
+    public IDownloadService getDownloadService() {
+        return new DownloadServiceImpl(mAppContext);
     }
 
+    public IDownloadManager getDownloadManager() {
+        return mAppContext.getDownloadManager();
+    }
+
+    public FileImporter getFileImporter() {
+        return new FileImporter(mAppContext);
+    }
+
+    public FileExporter getFileExporter() {
+        return new FileExporter(mAppContext);
+    }
 }

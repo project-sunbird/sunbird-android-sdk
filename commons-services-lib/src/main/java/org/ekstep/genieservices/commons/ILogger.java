@@ -2,8 +2,6 @@ package org.ekstep.genieservices.commons;
 
 /**
  * Created on 18/4/17.
- *
- * @author mathew
  */
 public interface ILogger {
 

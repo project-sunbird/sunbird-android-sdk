@@ -1,74 +1,63 @@
 package org.ekstep.genieservices.commons.bean;
 
-import org.ekstep.genieservices.commons.utils.StringUtil;
-
-import java.io.File;
 import java.util.List;
 
 /**
- * Created on 6/6/2017.
+ * This class accepts,
+ * - isChildContent - if the child contents are required while importing
+ * - destinationFolder - where the contents are to be stored
+ * - contentIds - list of contentIds to be imported
+ * - correlationData - list of correlationData
  *
- * @author anil
  */
 public class ContentImportRequest {
 
     private boolean isChildContent;
-    private File destinationFolder;
-    private String sourceFilePath;
+    private String destinationFolder;
     private List<String> contentIds;
+    private List<CorrelationData> correlationData;
 
-    public ContentImportRequest(boolean isChildContent, File destinationFolder, String sourceFilePath, List<String> contentIds) {
+    private ContentImportRequest(boolean isChildContent, String destinationFolder, List<String> contentIds, List<CorrelationData> correlationData) {
         this.isChildContent = isChildContent;
         this.destinationFolder = destinationFolder;
-        this.sourceFilePath = sourceFilePath;
         this.contentIds = contentIds;
+        this.correlationData = correlationData;
     }
 
     public boolean isChildContent() {
         return isChildContent;
     }
 
-    public File getDestinationFolder() {
+    public String getDestinationFolder() {
         return destinationFolder;
-    }
-
-    public String getSourceFilePath() {
-        return sourceFilePath;
     }
 
     public List<String> getContentIds() {
         return contentIds;
     }
 
+    public List<CorrelationData> getCorrelationData() {
+        return correlationData;
+    }
+
     public static class Builder {
         private boolean isChildContent;
-        private File destinationFolder;
-        private String sourceFilePath;
+        private String destinationFolder;
         private List<String> contentIds;
+        private List<CorrelationData> correlationData;
 
         /**
-         * @param isChildContent Should be True if importing nested content of any collection/textbook else False.
+         * Method to indicate that the file being imported is a child content
          */
-        public Builder isChildContent(boolean isChildContent) {
-            this.isChildContent = isChildContent;
-            return this;
-        }
-
-        /**
-         * Content file path which needs to import
-         */
-        public Builder fromFilePath(String filePath) {
-            if (StringUtil.isNullOrEmpty(filePath)) {
-                throw new IllegalArgumentException("Illegal filePath: " + filePath);
-            }
-            this.sourceFilePath = filePath;
+        public Builder childContent() {
+            this.isChildContent = true;
             return this;
         }
 
         /**
          * Destination folder where content will import.
          */
-        public Builder toFolder(File toFolder) {
+        public Builder toFolder(String toFolder) {
             if (toFolder == null) {
                 throw new IllegalArgumentException("Illegal toFolder");
             }
@@ -84,16 +73,24 @@ public class ContentImportRequest {
             return this;
         }
 
+        /**
+         * CorrelationData of content.
+         */
+        public Builder correlationData(List<CorrelationData> correlationData) {
+            this.correlationData = correlationData;
+            return this;
+        }
+
         public ContentImportRequest build() {
             if (destinationFolder == null) {
                 throw new IllegalStateException("To folder required.");
             }
 
-            if (StringUtil.isNullOrEmpty(sourceFilePath) && contentIds == null) {
-                throw new IllegalStateException("Provide either fromFilePath or contentIds.");
+            if (contentIds == null || contentIds.size() == 0) {
+                throw new IllegalStateException("ContentIds required.");
             }
 
-            return new ContentImportRequest(isChildContent, destinationFolder, sourceFilePath, contentIds);
+            return new ContentImportRequest(isChildContent, destinationFolder, contentIds, correlationData);
         }
     }
 }

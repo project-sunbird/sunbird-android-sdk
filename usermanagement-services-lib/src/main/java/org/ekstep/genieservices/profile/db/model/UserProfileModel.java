@@ -3,6 +3,7 @@ package org.ekstep.genieservices.profile.db.model;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.db.contract.ProfileEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
@@ -11,7 +12,6 @@ import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.StringUtil;
-import org.ekstep.genieservices.commons.db.contract.ProfileEntry;
 
 import java.util.Date;
 import java.util.Locale;
@@ -44,12 +44,22 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
         }
     }
 
-    public long getId() {
-        return id;
-    }
-
     public Profile getProfile() {
         return profile;
+    }
+
+    public void update() {
+        dbSession.update(this);
+    }
+
+    public Void save() {
+        dbSession.create(this);
+        return null;
+    }
+
+    public Void delete() {
+        dbSession.clean(this);
+        return null;
     }
 
     @Override
@@ -140,6 +150,10 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
         if (cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_BOARD) != -1) {
             profile.setBoard(cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_BOARD)));
         }
+
+        if (cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_PROFILE_IMAGE) != -1) {
+            profile.setProfileImage(cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_PROFILE_IMAGE)));
+        }
     }
 
     @Override
@@ -174,20 +188,6 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
         return String.format(Locale.US, "uid = '%s'", profile.getUid());
     }
 
-    public void update() {
-        dbSession.update(this);
-    }
-
-    public Void save() {
-        dbSession.create(this);
-        return null;
-    }
-
-    public Void delete() {
-        dbSession.clean(this);
-        return null;
-    }
-
     private void populateContentValues(ContentValues contentValues) {
         updateFieldsForGroupUser();
 
@@ -203,6 +203,7 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
         contentValues.put(ProfileEntry.COLUMN_NAME_CREATED_AT, profile.getCreatedAt().getTime());
         contentValues.put(ProfileEntry.COLUMN_NAME_MEDIUM, profile.getMedium());
         contentValues.put(ProfileEntry.COLUMN_NAME_BOARD, profile.getBoard());
+        contentValues.put(ProfileEntry.COLUMN_NAME_PROFILE_IMAGE, profile.getProfileImage());
     }
 
     private void updateFieldsForGroupUser() {
@@ -214,6 +215,7 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
             profile.setGender("");
             profile.setMedium("");
             profile.setBoard("");
+            profile.setProfileImage("");
         }
     }
 

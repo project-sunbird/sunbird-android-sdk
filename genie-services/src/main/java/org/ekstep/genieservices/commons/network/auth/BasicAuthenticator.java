@@ -5,6 +5,8 @@ import com.squareup.okhttp.Credentials;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
+import org.ekstep.genieservices.commons.exception.AuthenticationFailedException;
+
 import java.io.IOException;
 import java.net.Proxy;
 
@@ -29,9 +31,9 @@ public class BasicAuthenticator implements Authenticator {
     @Override
     public Request authenticate(Proxy proxy, Response response) throws IOException {
 
-//        if (currentAttempt >= MAX_RETRY) {
-//            throw new AuthenticationFailedException("Invalid credentials");
-//        }
+        if (currentAttempt >= MAX_RETRY) {
+            throw new AuthenticationFailedException("Invalid credentials");
+        }
 
         currentAttempt++;
 

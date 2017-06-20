@@ -51,7 +51,7 @@ public abstract class AbstractUserProvider extends BaseContentProvider {
         if (values != null && values.getAsString(Constants.PROFILE) != null) {
             Logger.i(TAG, "Inserting profile - " + values.getAsString(Constants.PROFILE));
             Profile profile = GsonUtil.fromJson(values.getAsString(Constants.PROFILE), Profile.class);
-            GenieResponse<Profile> response = getService().getUserProfileService().createUserProfile(profile);
+            GenieResponse<Profile> response = getService().getUserService().createUserProfile(profile);
             if (response != null && response.getStatus() && response.getResult() != null) {
                 return Uri.parse(response.getResult().getUid());
             }
@@ -68,7 +68,7 @@ public abstract class AbstractUserProvider extends BaseContentProvider {
             return 0;
         } else {
             Logger.i(TAG, "Deleting profile - Selection Id - " + selectionArgs[0]);
-            GenieResponse response = getService().getUserProfileService().deleteUser(selectionArgs[0]);
+            GenieResponse response = getService().getUserService().deleteUser(selectionArgs[0]);
             if (response.getStatus()) {
                 return 1;
             }
@@ -81,7 +81,7 @@ public abstract class AbstractUserProvider extends BaseContentProvider {
     public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         if (values != null && values.getAsString(Constants.PROFILE) != null) {
             Profile profile = GsonUtil.fromJson(values.getAsString(Constants.PROFILE), Profile.class);
-            GenieResponse response = getService().getUserProfileService().updateUserProfile(profile);
+            GenieResponse response = getService().getUserService().updateUserProfile(profile);
             if (response != null && response.getStatus()) {
                 return 1;
             }

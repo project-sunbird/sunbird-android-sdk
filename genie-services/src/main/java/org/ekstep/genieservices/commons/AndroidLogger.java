@@ -4,8 +4,6 @@ import android.util.Log;
 
 /**
  * Created on 18/4/17.
- *
- * @author mathew
  */
 public class AndroidLogger implements ILogger {
 

@@ -1,14 +1,19 @@
 package org.ekstep.genieservices;
 
+import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
-import org.ekstep.genieservices.commons.bean.ContentCriteria;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
+import org.ekstep.genieservices.commons.bean.ContentExportRequest;
+import org.ekstep.genieservices.commons.bean.ContentExportResponse;
+import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
+import org.ekstep.genieservices.commons.bean.ContentImportResponse;
+import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
-import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
+import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
@@ -44,10 +49,10 @@ public interface IContentService {
      * <p>
      * Response status will always be TRUE with {@link List<Content>} set in the result.
      *
-     * @param criteria - {@link ContentCriteria}
+     * @param criteria - {@link ContentFilterCriteria}
      * @return {@link GenieResponse<List<Content>>}
      */
-    GenieResponse<List<Content>> getAllLocalContent(ContentCriteria criteria);
+    GenieResponse<List<Content>> getAllLocalContent(ContentFilterCriteria criteria);
 
     /**
      * This api is used to get the child contents of a particular content, this is used in the case of COLLECTION/TEXTBOOK.
@@ -59,22 +64,10 @@ public interface IContentService {
      * On failing to fetch the child content details, the response will return status as FALSE with the following error code
      * <p>NO_DATA_FOUND
      *
-     * @param contentId     - {@link String} - identifier of a content
-     * @param levelAndState - {@link int} - Below are the int flags to be used
-     *                      <p>
-     *                      <p>
-     *                      0 - Downloaded or spine both
-     *                      <p>
-     *                      <p>
-     *                      1 - All descendant downloaded contents
-     *                      <p>
-     *                      <p>
-     *                      2 - All descendant spine contents
-     *                      <p>
-     *                      <p>
+     * @param childContentRequest - {@link ChildContentRequest}
      * @return {@link GenieResponse<Content>}
      */
-    GenieResponse<Content> getChildContents(String contentId, int levelAndState);
+    GenieResponse<Content> getChildContents(ChildContentRequest childContentRequest);
 
     /**
      * This api is used to delete a particular content.
@@ -93,9 +86,9 @@ public interface IContentService {
 
     /**
      * @param contentListingCriteria - {@link ContentListingCriteria}
-     * @return {@link GenieResponse<ContentListingResult>}
+     * @return {@link GenieResponse<ContentListing>}
      */
-    GenieResponse<ContentListingResult> getContentListing(ContentListingCriteria contentListingCriteria);
+    GenieResponse<ContentListing> getContentListing(ContentListingCriteria contentListingCriteria);
 
     /**
      * This api is used to search for contents with the search criterion mentioned in {@link ContentSearchCriteria}
@@ -169,9 +162,17 @@ public interface IContentService {
      * On failing to import the content, the response will be with return status as FALSE and wih the following error
      * <p>INVALID_FILE
      *
-     * @param contentImportRequest - {@link ContentImportRequest}
+     * @param ecarImportRequest - {@link ContentImportRequest}
      * @return - {@link GenieResponse<Void>}
      */
+    GenieResponse<Void> importEcar(EcarImportRequest ecarImportRequest);
+
     GenieResponse<Void> importContent(ContentImportRequest contentImportRequest);
+
+    GenieResponse<ContentImportResponse> getImportStatus(String identifier);
+
+    GenieResponse<Void> cancelDownload(String identifier);
+
+    GenieResponse<ContentExportResponse> exportContent(ContentExportRequest contentExportRequest);
 
 }

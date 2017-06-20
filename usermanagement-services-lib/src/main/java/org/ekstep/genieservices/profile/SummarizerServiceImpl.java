@@ -5,7 +5,7 @@ import org.ekstep.genieservices.ISummarizerService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
-import org.ekstep.genieservices.commons.bean.CoRelation;
+import org.ekstep.genieservices.commons.bean.CorrelationData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentDetails;
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentSummary;
@@ -18,7 +18,7 @@ import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.profile.db.model.LearnerAssessmentDetailsModel;
 import org.ekstep.genieservices.profile.db.model.LearnerAssessmentSummaryModel;
-import org.ekstep.genieservices.profile.db.model.LearnerContentSummaryModel;
+import org.ekstep.genieservices.profile.db.model.LearnerSummaryModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,7 +70,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         HashMap params = new HashMap();
         params.put("logLevel", "2");
 
-        String filter = getFilterForLearnerAssessmentDetails(null, summaryRequest.getUid(), summaryRequest.getContentId(), null);
+        String filter = getFilterForLearnerAssessmentDetails(null, summaryRequest.getUid(), summaryRequest.getContentId(), summaryRequest.getHierarchyData());
 
         LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.find(mAppContext.getDBSession(), filter);
         if (learnerAssessmentDetailsModel == null) {
@@ -133,30 +133,30 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         HashMap params = new HashMap();
         params.put("logLevel", "2");
         LearnerContentSummaryDetails learnerContentSummaryDetails = mapTelemtryToLearnerContentSummaryDeatils(telemetry);
-        LearnerContentSummaryModel learnerContentSummaryModel;
+        LearnerSummaryModel learnerSummaryModel;
 
-        LearnerContentSummaryModel learnerContentSummaryModelInDB = LearnerContentSummaryModel.find(mAppContext.getDBSession(), learnerContentSummaryDetails.getUid(), learnerContentSummaryDetails.getContentId(),
+        LearnerSummaryModel learnerSummaryModelInDB = LearnerSummaryModel.find(mAppContext.getDBSession(), learnerContentSummaryDetails.getUid(), learnerContentSummaryDetails.getContentId(),
                 learnerContentSummaryDetails.getHierarchyData() == null ? "" : learnerContentSummaryDetails.getHierarchyData());
 
         //Check if the learner content summary already exists
-        if (learnerContentSummaryModelInDB == null) {
+        if (learnerSummaryModelInDB == null) {
             learnerContentSummaryDetails.setAvgts(learnerContentSummaryDetails.getTimespent());
             learnerContentSummaryDetails.setSessions(1);
             learnerContentSummaryDetails.setTotalts(learnerContentSummaryDetails.getTimespent());
             learnerContentSummaryDetails.setLastUpdated(learnerContentSummaryDetails.getTimestamp());
             //save with new details
-            learnerContentSummaryModel = LearnerContentSummaryModel.build(mAppContext.getDBSession(), learnerContentSummaryDetails);
-            learnerContentSummaryModel.save();
+            learnerSummaryModel = LearnerSummaryModel.build(mAppContext.getDBSession(), learnerContentSummaryDetails);
+            learnerSummaryModel.save();
 
         } else {
-            if (learnerContentSummaryModelInDB.getTimespent() != null) {
-                learnerContentSummaryDetails.setSessions(learnerContentSummaryModelInDB.getSessions() + 1);
-                learnerContentSummaryDetails.setTotalts(learnerContentSummaryModelInDB.getTotalts() + learnerContentSummaryModelInDB.getTimespent());
-                learnerContentSummaryDetails.setAvgts(learnerContentSummaryModelInDB.getTotalts() / learnerContentSummaryModelInDB.getSessions());
-                learnerContentSummaryDetails.setLastUpdated(learnerContentSummaryModelInDB.getTimestamp());
+            if (learnerSummaryModelInDB.getTimespent() != null) {
+                learnerContentSummaryDetails.setSessions(learnerSummaryModelInDB.getSessions() + 1);
+                learnerContentSummaryDetails.setTotalts(learnerSummaryModelInDB.getTotalts() + learnerSummaryModelInDB.getTimespent());
+                learnerContentSummaryDetails.setAvgts(learnerSummaryModelInDB.getTotalts() / learnerSummaryModelInDB.getSessions());
+                learnerContentSummaryDetails.setLastUpdated(learnerSummaryModelInDB.getTimestamp());
                 //update with new details
-                learnerContentSummaryModel = LearnerContentSummaryModel.build(mAppContext.getDBSession(), learnerContentSummaryDetails);
-                learnerContentSummaryModel.update();
+                learnerSummaryModel = LearnerSummaryModel.build(mAppContext.getDBSession(), learnerContentSummaryDetails);
+                learnerSummaryModel.update();
             }
         }
 
@@ -177,10 +177,10 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
 
         if (telemetry.getCdata() != null) {
             List<String> idList = new ArrayList<>();
-            for (CoRelation eachCdataValue : telemetry.getCdata()) {
+            for (CorrelationData eachCdataValue : telemetry.getCdata()) {
                 idList.add(eachCdataValue.getId());
             }
-            learnerContentSummaryDetails.setHierarchyData(StringUtil.join(",", idList));
+//            learnerContentSummaryDetails.setHierarchyData(StringUtil.join(",", idList));
         }
 
         return learnerContentSummaryDetails;
@@ -210,10 +210,10 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
 
         if (telemetry.getCdata() != null) {
             List<String> idList = new ArrayList<>();
-            for (CoRelation eachCdataValue : telemetry.getCdata()) {
+            for (CorrelationData eachCdataValue : telemetry.getCdata()) {
                 idList.add(eachCdataValue.getId());
             }
-            learnerAssessmentDetails.setHierarchyData(StringUtil.join(",", idList));
+//            learnerAssessmentDetails.setHierarchyData(StringUtil.join(",", idList));
         }
         return learnerAssessmentDetails;
     }

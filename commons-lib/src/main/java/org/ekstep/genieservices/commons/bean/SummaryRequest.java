@@ -9,10 +9,12 @@ public class SummaryRequest {
 
     private String uid;
     private String contentId;
+    private String hierarchyData;
 
-    private SummaryRequest(String uid, String contentId) {
+    private SummaryRequest(String uid, String contentId, String hierarchyData) {
         this.uid = uid;
         this.contentId = contentId;
+        this.hierarchyData = hierarchyData;
     }
 
     public String getUid() {
@@ -23,9 +25,14 @@ public class SummaryRequest {
         return contentId;
     }
 
+    public String getHierarchyData() {
+        return hierarchyData;
+    }
+
     public static class Builder {
         private String uid;
         private String contentId;
+        private String hierarchyData;
 
         public Builder() {
         }
@@ -40,8 +47,13 @@ public class SummaryRequest {
             return this;
         }
 
+        public Builder hierarchyData(String hierarchyData) {
+            this.hierarchyData = hierarchyData;
+            return this;
+        }
+
         public SummaryRequest build() {
-            return new SummaryRequest(uid, contentId);
+            return new SummaryRequest(uid, contentId, hierarchyData);
         }
     }
 

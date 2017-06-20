@@ -3,10 +3,16 @@ package org.ekstep.genieservices.async;
 import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.commons.IResponseHandler;
-import org.ekstep.genieservices.commons.bean.ContentAccessLearnerState;
+import org.ekstep.genieservices.commons.bean.ContentAccess;
+import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.ImportRequest;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.bean.ProfileExportRequest;
+import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
+import org.ekstep.genieservices.importexport.FileExporter;
+import org.ekstep.genieservices.importexport.FileImporter;
 
 import java.util.List;
 
@@ -14,10 +20,15 @@ import java.util.List;
  * This class provides all the required APIs to perform necessary operations related to Users on a separate thread
  */
 public class UserService {
+
     private IUserService userService;
+    private FileImporter fileImporter;
+    private FileExporter fileExporter;
 
     public UserService(GenieService genieService) {
-        this.userService = genieService.getUserProfileService();
+        this.userService = genieService.getUserService();
+        this.fileImporter = genieService.getFileImporter();
+        this.fileExporter = genieService.getFileExporter();
     }
 
     /**
@@ -195,14 +206,41 @@ public class UserService {
     }
 
     /**
-     * @param contentAccessLearnerState
+     * @param contentAccess
      * @param responseHandler
      */
-    public void setLearnerState(final ContentAccessLearnerState contentAccessLearnerState, IResponseHandler<Void> responseHandler) {
+    public void addContentAccess(final ContentAccess contentAccess, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
-                return userService.setLearnerState(contentAccessLearnerState);
+                return userService.addContentAccess(contentAccess);
+            }
+        });
+    }
+
+    public void getAllContentAccess(final ContentAccessFilterCriteria criteria, IResponseHandler<List<ContentAccess>> responseHandler) {
+        new AsyncHandler<List<ContentAccess>>(responseHandler).execute(new IPerformable<List<ContentAccess>>() {
+            @Override
+            public GenieResponse<List<ContentAccess>> perform() {
+                return userService.getAllContentAccess(criteria);
+            }
+        });
+    }
+
+    public void importProfile(final ImportRequest importRequest, IResponseHandler<Void> responseHandler) {
+        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return fileImporter.importProfile(importRequest, userService);
+            }
+        });
+    }
+
+    public void exportProfile(final ProfileExportRequest profileExportRequest, IResponseHandler<ProfileExportResponse> responseHandler) {
+        new AsyncHandler<ProfileExportResponse>(responseHandler).execute(new IPerformable<ProfileExportResponse>() {
+            @Override
+            public GenieResponse<ProfileExportResponse> perform() {
+                return fileExporter.exportProfile(profileExportRequest, userService);
             }
         });
     }

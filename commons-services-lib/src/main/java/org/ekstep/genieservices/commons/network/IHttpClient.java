@@ -10,8 +10,6 @@ import java.util.Map;
  */
 public interface IHttpClient {
 
-    Void createClient();
-
     Void setTimeouts(int connectionTimeout, int readTimeout);
 
     Void handleAuth();

@@ -26,6 +26,7 @@ public class DeviceInfo implements IDeviceInfo {
     }
 
     private String sha1(String input) {
+        //TODO Remove this method
         MessageDigest mDigest = null;
         StringBuffer sb = new StringBuffer();
         try {

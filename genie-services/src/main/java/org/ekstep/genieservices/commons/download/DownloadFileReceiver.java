@@ -3,19 +3,14 @@ package org.ekstep.genieservices.commons.download;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.Build;
-import android.os.ParcelFileDescriptor;
-import android.provider.MediaStore;
 
-import org.ekstep.genieservices.commons.bean.DownloadResponse;
-import org.ekstep.genieservices.commons.utils.FileUtil;
-import org.ekstep.genieservices.commons.utils.Logger;
-import org.ekstep.genieservices.commons.download.DownloadQueueManager;
-import org.ekstep.genieservices.eventbus.EventPublisher;
-
-import java.io.FileNotFoundException;
+import org.ekstep.genieservices.GenieService;
+import org.ekstep.genieservices.IDownloadService;
+import org.ekstep.genieservices.ServiceConstants;
+import org.ekstep.genieservices.commons.IDownloadManager;
+import org.ekstep.genieservices.commons.bean.DownloadProgress;
+import org.ekstep.genieservices.commons.bean.DownloadRequest;
+import org.ekstep.genieservices.commons.utils.ReflectionUtil;
 
 /**
  * Created on 17/5/17.
@@ -28,67 +23,27 @@ public class DownloadFileReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        String downloadedFilePath = null;
+        IDownloadService downloadService = GenieService.getService().getDownloadService();
         long downloadId = intent.getLongExtra(android.app.DownloadManager.EXTRA_DOWNLOAD_ID, 0);
-
-        android.app.DownloadManager downloadManager = (android.app.DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-        android.app.DownloadManager.Query query = new android.app.DownloadManager.Query();
-        query.setFilterById(downloadId);
-
-        Cursor cursor = downloadManager.query(query);
-        if (cursor != null && cursor.moveToFirst()) {
-            int status = cursor.getInt(cursor.getColumnIndex(android.app.DownloadManager.COLUMN_STATUS));
-            Logger.d(TAG, "Download status: " + status);
-
-            switch (status) {
-                case android.app.DownloadManager.STATUS_SUCCESSFUL:
-                    if (Build.VERSION.SDK_INT >= 24) {
-                        ParcelFileDescriptor fileDescriptor = null;
-                        try {
-                            fileDescriptor = downloadManager.openDownloadedFile(downloadId);
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        }
-                        downloadedFilePath = FileUtil.getDownloadedFileLocation(new ParcelFileDescriptor.AutoCloseInputStream(fileDescriptor));
-                    } else {
-
-                        String filepath = cursor.getString(cursor.getColumnIndex(android.app.DownloadManager.COLUMN_LOCAL_URI));
-                        downloadedFilePath = getRealPathFromURI(context, Uri.parse(filepath));
-
-                    }
-                    EventPublisher.postDownloadResponse(new DownloadResponse(true, downloadId, null, downloadedFilePath, null));
+        DownloadRequest request = downloadService.getDownloadRequest(downloadId);
+        if (request != null) {
+            DownloadProgress progress = downloadService.getProgress(request.getIdentifier());
+            String localFilePath = progress.getDownloadPath();
+            switch (progress.getStatus()) {
+                case IDownloadManager.COMPLETED:
+                    downloadService.onDownloadComplete(request.getIdentifier());
+                    //Ideally get the service class from Reflection utils with a service name provided in the downloadRequest
+                    Class _class = ReflectionUtil.getClass(request.getProcessorClass());
+                    Intent serviceIntent = new Intent(context, _class);
+                    serviceIntent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_IS_CHILD, request.isChildContent());
+                    serviceIntent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_LOCAL_FILE_PATH, localFilePath);
+                    serviceIntent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_DESTINATION_FILE_PATH, request.getDestinationFolder());
+                    context.startService(serviceIntent);
+                    break;
+                case IDownloadManager.FAILED:
+                    downloadService.onDownloadFailed(request.getIdentifier());
                     break;
 
-//                case android.app.DownloadManager.ERROR_INSUFFICIENT_SPACE:
-//                    Toast.makeText(context, R.string.download_failed_insufficient_space_on_your_device, Toast.LENGTH_LONG).show();
-//                    break;
-//
-//                case android.app.DownloadManager.STATUS_FAILED:
-//                    Toast.makeText(context, R.string.download_failed_insufficient_space_on_your_device, Toast.LENGTH_LONG).show();
-//                    break;
-            }
-        }
-
-
-    }
-
-    private String getRealPathFromURI(Context context, Uri contentUri) {
-        Cursor cursor = null;
-        String path = null;
-        try {
-            String[] proj = {MediaStore.Images.Media.DATA};
-            cursor = context.getContentResolver().query(contentUri, proj, null, null, null);
-
-            if (cursor != null && cursor.getCount() > 0) {
-                int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                cursor.moveToFirst();
-                path = cursor.getString(index);
-            }
-
-            return path;
-        } finally {
-            if (cursor != null) {
-                cursor.close();
             }
         }
     }

@@ -5,6 +5,7 @@ import org.joda.time.LocalDate;
 import org.joda.time.Seconds;
 import org.joda.time.format.DateTimeFormat;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -14,10 +15,12 @@ public class DateUtil {
 
     public static final int MILLISECONDS_IN_AN_HOUR = 3600000;
     public static final String DATE_TIME_AM_PM_FORMAT = "dd/MM/yyyy, hh:mma";
-    private static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";
-    private static final String ISO_DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SZZZZZ";
-    private static final String DATETIME_FORMAT_WITHOUTTIMEZONE = "yyyy-MM-dd'T'HH:mm:ss";
-    private static final String DATE_FORMAT = "yyyy-MM-dd";
+    public static final String TIME_ZONE_GMT = "GMT";
+    public static final String DATE_FORMAT_EXPORT_CONTENT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    public static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";
+    public static final String ISO_DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SZZZZZ";
+    public static final String DATETIME_FORMAT_WITHOUTTIMEZONE = "yyyy-MM-dd'T'HH:mm:ss";
+    public static final String DATE_FORMAT = "yyyy-MM-dd";
 
     public static String getCurrentTimestamp() {
         return format(getEpochTime(), DATETIME_FORMAT);
@@ -121,6 +124,19 @@ public class DateUtil {
         } catch (Exception ex) {
             return getEpochTime();
         }
+    }
+
+    public static String getFormattedDateWithTimeZone(String timezone) {
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_EXPORT_CONTENT, Locale.US);
+        sdf.setTimeZone(TimeZone.getTimeZone(timezone));
+        return sdf.format(now());
+    }
+
+
+    public static long convertLocalTimeMillis(String dateTime) throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATETIME_FORMAT_WITHOUTTIMEZONE, Locale.US);
+        Date date = dateFormat.parse(dateTime);
+        return date.getTime();
     }
 
 }

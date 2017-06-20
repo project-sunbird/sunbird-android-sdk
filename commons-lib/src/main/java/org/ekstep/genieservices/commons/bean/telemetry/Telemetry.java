@@ -1,6 +1,6 @@
 package org.ekstep.genieservices.commons.bean.telemetry;
 
-import org.ekstep.genieservices.commons.bean.CoRelation;
+import org.ekstep.genieservices.commons.bean.CorrelationData;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -29,7 +29,7 @@ public class Telemetry {
     private GameData gdata;
     private Map<String, Object> edata = new HashMap<>();
     private List<Map<String, Object>> tags = new ArrayList();
-    private List<CoRelation> cdata;
+    private List<CorrelationData> cdata;
 
     public Telemetry(GameData gameData, String eid) {
         setGdata(gameData);
@@ -38,15 +38,15 @@ public class Telemetry {
         this.ets = DateUtil.getEpochTime();
     }
 
-    public void addCoRelation(List<CoRelation> coRelation) {
+    public void addCorrelationData(List<CorrelationData> correlationData) {
         this.cdata = new ArrayList<>();
-        if (coRelation != null) {
-            this.cdata.addAll(coRelation);
+        if (correlationData != null) {
+            this.cdata.addAll(correlationData);
         }
     }
 
 
-    public List<CoRelation> getCdata() {
+    public List<CorrelationData> getCdata() {
         return cdata;
     }
 
