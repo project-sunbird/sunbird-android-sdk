@@ -71,8 +71,6 @@ public class GenieService {
     public static GenieService init(Context context, String packageName) {
 
         if (sService == null) {
-            long time = System.nanoTime();
-            Log.e("MathewTesting", "genieserviceinit start - " + time);
             AppContext<Context> applicationContext = AndroidAppContext.buildAppContext(context, packageName);
             Logger.init(new AndroidLogger());
             ContentPlayer.init(applicationContext.getParams().getQualifier());
@@ -81,7 +79,6 @@ public class GenieService {
             TelemetryListener.init(applicationContext);
             SummaryListener.init(applicationContext);
             sService = new GenieService(applicationContext);
-            Log.e("MathewTesting", "genieserviceinit end - " + System.nanoTime() + " and took in ns - " + (System.nanoTime() - time));
         }
         GenieAsyncService.init(sService);
         return sService;
