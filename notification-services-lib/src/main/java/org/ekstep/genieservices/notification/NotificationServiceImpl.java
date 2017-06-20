@@ -23,7 +23,7 @@ public class NotificationServiceImpl extends BaseService implements INotificatio
     public GenieResponse<Void> addNotification(Notification notification) {
         try {
             NotificationModel notificationModel = NotificationHandler.convertNotificationMapToModel(mAppContext.getDBSession(), notification);
-            NotificationModel oldNotification = NotificationModel.find(mAppContext.getDBSession(), notification.getMsgId());
+            NotificationModel oldNotification = NotificationModel.find(mAppContext.getDBSession(), notification.getMsgid());
 
             if (oldNotification != null) {
                 notificationModel.update();
@@ -42,7 +42,7 @@ public class NotificationServiceImpl extends BaseService implements INotificatio
     @Override
     public GenieResponse<Notification> updateNotification(Notification notification) {
         // -1 to update all the notifications
-        double msgId = notification.getMsgId();
+        double msgId = notification.getMsgid();
         String errorMessage = "Failed to update the notification";
         try {
             NotificationsModel notificationsUpdate = NotificationsModel.build(mAppContext.getDBSession(), NotificationHandler.getFilterConditionToUpdate(msgId));
