@@ -612,15 +612,17 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                     .then(new ExtractPayloads())
                     .then(new EcarCleanUp())
                     .then(new AddGeTransferContentImportEvent());
-            GenieResponse<Void> genieResponse = importContentSteps.execute(mAppContext, importContext);
-            if (genieResponse.getStatus()) {
+
+            response = importContentSteps.execute(mAppContext, importContext);
+            if (response.getStatus()) {
                 String identifier = importContext.getIdentifiers() != null ? importContext.getIdentifiers().get(0) : "";
                 buildSuccessEvent(identifier);
-                TelemetryLogger.logSuccess(mAppContext, genieResponse, TAG, methodName, params);
-                EventPublisher.postContentImportStatus(new ContentImportResponse(identifier, 2, importRequest.getSourceFilePath()));
+                TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
 
+                EventPublisher.postContentImportStatus(new ContentImportResponse(identifier, 2, importRequest.getSourceFilePath()));
             }
-            return genieResponse;
+
+            return response;
         }
     }
 

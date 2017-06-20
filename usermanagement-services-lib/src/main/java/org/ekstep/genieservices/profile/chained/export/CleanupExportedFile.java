@@ -6,6 +6,7 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
 import org.ekstep.genieservices.commons.db.contract.LearnerSummaryEntry;
@@ -30,10 +31,10 @@ import java.util.Locale;
  *
  * @author anil
  */
-public class CleanupExportedFile implements IChainable {
+public class CleanupExportedFile implements IChainable<ProfileExportResponse> {
 
     private static final String TAG = CleanupExportedFile.class.getSimpleName();
-    private IChainable nextLink;
+    private IChainable<ProfileExportResponse> nextLink;
 
     private List<String> userIds;
     private String destinationDBFilePath;
@@ -44,7 +45,7 @@ public class CleanupExportedFile implements IChainable {
     }
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<ProfileExportResponse> execute(AppContext appContext, ImportContext importContext) {
 
         List<String> allTables = getAllTables(importContext.getDBSession());
         List<String> allTableToExclude = getAllTableToExclude();
@@ -71,7 +72,7 @@ public class CleanupExportedFile implements IChainable {
     }
 
     @Override
-    public IChainable then(IChainable link) {
+    public IChainable<ProfileExportResponse> then(IChainable<ProfileExportResponse> link) {
         nextLink = link;
         return link;
     }

@@ -2,9 +2,9 @@ package org.ekstep.genieservices;
 
 import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
-import org.ekstep.genieservices.commons.bean.ContentLearnerState;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDataSource;
@@ -141,7 +141,7 @@ public interface IUserService {
      * <p> On failing to set the learner state, the response will have status as FALSE with the following error:
      * <p>PROFILE_NOT_FOUND
      *
-     * @param contentLearnerState
+     * @param contentAccess
      * @return
      */
     GenieResponse<Void> addContentAccess(ContentAccess contentAccess);
@@ -161,6 +161,6 @@ public interface IUserService {
      * @param userIds
      * @return
      */
-    GenieResponse<Void> exportProfile(List<String> userIds, File destinationFolder, String sourceDBFilePath, String destinationDBFilePath, IDataSource dataSource, Map<String, Object> metadata);
+    GenieResponse<ProfileExportResponse> exportProfile(List<String> userIds, File destinationFolder, String sourceDBFilePath, String destinationDBFilePath, IDataSource dataSource, Map<String, Object> metadata);
 
 }

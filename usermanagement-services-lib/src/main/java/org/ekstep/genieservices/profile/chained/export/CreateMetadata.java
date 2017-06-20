@@ -5,6 +5,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
+import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.contract.MetaEntry;
@@ -19,10 +20,10 @@ import java.util.UUID;
  *
  * @author anil
  */
-public class CreateMetadata implements IChainable {
+public class CreateMetadata implements IChainable<ProfileExportResponse> {
 
     private static final String TAG = CreateMetadata.class.getSimpleName();
-    private IChainable nextLink;
+    private IChainable<ProfileExportResponse> nextLink;
 
     private List<String> userIds;
     private String destinationDBFilePath;
@@ -33,7 +34,7 @@ public class CreateMetadata implements IChainable {
     }
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<ProfileExportResponse> execute(AppContext appContext, ImportContext importContext) {
 
         importContext.getDBSession().execute(MetaEntry.getCreateEntry());
 
@@ -54,7 +55,7 @@ public class CreateMetadata implements IChainable {
     }
 
     @Override
-    public IChainable then(IChainable link) {
+    public IChainable<ProfileExportResponse> then(IChainable<ProfileExportResponse> link) {
         nextLink = link;
         return link;
     }

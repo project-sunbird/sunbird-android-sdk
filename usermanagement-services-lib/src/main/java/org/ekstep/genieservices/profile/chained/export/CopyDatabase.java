@@ -5,6 +5,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
+import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.operations.IDataSource;
 import org.ekstep.genieservices.commons.utils.FileUtil;
@@ -16,10 +17,10 @@ import java.io.IOException;
  *
  * @author anil
  */
-public class CopyDatabase implements IChainable {
+public class CopyDatabase implements IChainable<ProfileExportResponse> {
 
     private static final String TAG = CopyDatabase.class.getSimpleName();
-    private IChainable nextLink;
+    private IChainable<ProfileExportResponse> nextLink;
 
     private String sourceDB;
     private String destinationDB;
@@ -32,7 +33,7 @@ public class CopyDatabase implements IChainable {
     }
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<ProfileExportResponse> execute(AppContext appContext, ImportContext importContext) {
         try {
             FileUtil.cp(sourceDB, destinationDB);
         } catch (IOException e) {
@@ -51,7 +52,7 @@ public class CopyDatabase implements IChainable {
     }
 
     @Override
-    public IChainable then(IChainable link) {
+    public IChainable<ProfileExportResponse> then(IChainable<ProfileExportResponse> link) {
         nextLink = link;
         return link;
     }

@@ -10,6 +10,7 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportRequest;
+import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.bean.TelemetryExportRequest;
 import org.ekstep.genieservices.commons.db.GSDBContext;
 import org.ekstep.genieservices.commons.db.IDBContext;
@@ -50,7 +51,7 @@ public class FileExporter {
                 dataSource, getMetadata(dbContext, ServiceConstants.EXPORT_TYPE_TELEMETRY));
     }
 
-    public GenieResponse<Void> exportProfile(ProfileExportRequest exportRequest, IUserService userService) {
+    public GenieResponse<ProfileExportResponse> exportProfile(ProfileExportRequest exportRequest, IUserService userService) {
         if (exportRequest.getUserIds() != null && exportRequest.getUserIds().size() > 0) {
             File destinationFolder = new File(exportRequest.getDestinationFolder());
 

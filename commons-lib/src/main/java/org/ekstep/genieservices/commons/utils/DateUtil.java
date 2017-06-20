@@ -21,7 +21,6 @@ public class DateUtil {
     public static final String ISO_DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SZZZZZ";
     public static final String DATETIME_FORMAT_WITHOUTTIMEZONE = "yyyy-MM-dd'T'HH:mm:ss";
     public static final String DATE_FORMAT = "yyyy-MM-dd";
-    public static final String DATE_FORMAT_WITH_OUT_UTC = "yyyy-MM-dd'T'HH:mm:ssZZ";
 
     public static String getCurrentTimestamp() {
         return format(getEpochTime(), DATETIME_FORMAT);

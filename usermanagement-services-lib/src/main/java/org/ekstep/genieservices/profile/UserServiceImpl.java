@@ -12,9 +12,9 @@ import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.enums.ContentAccessStatusType;
-import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.bean.telemetry.GECreateProfile;
 import org.ekstep.genieservices.commons.bean.telemetry.GECreateUser;
 import org.ekstep.genieservices.commons.bean.telemetry.GEDeleteProfile;
@@ -481,7 +481,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         } else {
             contentAccessModelInDb.setStatus(contentAccessModelInDb.getStatus());
             if (contentLearnerState != null)
-            contentAccessModelInDb.setLearnerStateJson(contentLearnerState);
+                contentAccessModelInDb.setLearnerStateJson(contentLearnerState);
             contentAccessModelInDb.update();
         }
 
@@ -505,7 +505,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     }
 
     @Override
-    public GenieResponse<Void> exportProfile(List<String> userIds, File destinationFolder, String sourceDBFilePath, String destinationDBFilePath, IDataSource dataSource, Map<String, Object> metadata) {
+    public GenieResponse<ProfileExportResponse> exportProfile(List<String> userIds, File destinationFolder, String sourceDBFilePath, String destinationDBFilePath, IDataSource dataSource, Map<String, Object> metadata) {
         HashMap<String, Object> exportDataMap = new HashMap<>();
         exportDataMap.put(ServiceConstants.UNCOMPRESSED_SOURCE_LOCATION, FileUtil.getTempLocation(destinationFolder));
         exportDataMap.put(ServiceConstants.EXPORTED_EPAR_DESTINATION_LOCATION, destinationDBFilePath);
