@@ -8,8 +8,6 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Notification;
 import org.ekstep.genieservices.commons.bean.NotificationFilterCriteria;
-import org.ekstep.genieservices.commons.exception.DbException;
-import org.ekstep.genieservices.commons.exception.InvalidDataException;
 import org.ekstep.genieservices.notification.db.model.NotificationModel;
 import org.ekstep.genieservices.notification.db.model.NotificationsModel;
 
@@ -51,26 +49,6 @@ public class NotificationServiceImpl extends BaseService implements INotificatio
             notificationsUpdate.update();
             return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         } catch (Exception e) {
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, errorMessage, errorMessage);
-        }
-    }
-
-    @Override
-    public GenieResponse<Integer> getUnreadNotificationCount(NotificationFilterCriteria criteria) {
-        String errorMessage = "Not able to fetch notifications";
-        GenieResponse<Integer> genieResponse = null;
-        try {
-            genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-
-            NotificationsModel notifications = NotificationsModel.build(mAppContext.getDBSession(), NotificationHandler.getFilterCondition(criteria));
-            mAppContext.getDBSession().read(notifications);
-            List<NotificationModel> notificationList = notifications.getNotifications();
-            genieResponse.setResult(notificationList.size());
-            return genieResponse;
-        } catch (DbException e) {
-            e.printStackTrace();
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, errorMessage, errorMessage);
-        } catch (InvalidDataException e) {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, errorMessage, errorMessage);
         }
     }

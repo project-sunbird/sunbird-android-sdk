@@ -64,21 +64,6 @@ public class NotificationService {
     }
 
     /**
-     * This api gets unread notifications count.
-     *
-     * @param responseHandler
-     */
-    public void getUnreadNotificationCount(final NotificationFilterCriteria criteria, IResponseHandler<Integer> responseHandler) {
-        new AsyncHandler<Integer>(responseHandler).execute(new IPerformable<Integer>() {
-            @Override
-            public GenieResponse<Integer> perform() {
-                return notificationService.getUnreadNotificationCount(criteria);
-            }
-        });
-    }
-
-
-    /**
      * This api gets all the notifications.
      *
      * @param responseHandler

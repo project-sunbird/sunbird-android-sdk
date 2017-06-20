@@ -28,13 +28,6 @@ public interface INotificationService {
     GenieResponse<Notification> updateNotification(Notification notification);
 
     /**
-     * This api gets all the unread notifications.
-     *
-     * @return
-     */
-    GenieResponse<Integer> getUnreadNotificationCount(NotificationFilterCriteria notificationFilterCriteria);
-
-    /**
      * This api deletes the specific notification.
      *
      * @param msgId
