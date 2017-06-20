@@ -2,9 +2,7 @@ package org.ekstep.genieservices.async;
 
 import org.ekstep.genieservices.GenieService;
 
-/**
- * Created on 22/5/17.
- */
+
 public class GenieAsyncService {
 
     private static GenieService sService;

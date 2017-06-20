@@ -7,7 +7,8 @@ package org.ekstep.genieservices.commons.bean;
  * -1 for unknown
  * 0 - not started
  * 1 - started
- * 2- success, 3- failed
+ * 2- success
+ * 3- failed
  */
 public class DownloadProgress {
 

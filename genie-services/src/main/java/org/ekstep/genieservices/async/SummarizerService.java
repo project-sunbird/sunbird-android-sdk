@@ -33,7 +33,7 @@ public class SummarizerService {
      * <p>PROCESSING_ERROR
      *
      * @param summaryRequest - {@link SummaryRequest}
-     * @return {@link GenieResponse< List < LearnerAssessmentDetails >>}
+     * @param responseHandler -{@link IResponseHandler<List<LearnerAssessmentSummary>>}
      */
     public void getSummary(final SummaryRequest summaryRequest, IResponseHandler<List<LearnerAssessmentSummary>> responseHandler) {
         new AsyncHandler<List<LearnerAssessmentSummary>>(responseHandler).execute(new IPerformable<List<LearnerAssessmentSummary>>() {
@@ -57,7 +57,7 @@ public class SummarizerService {
      * <p>PROCESSING_ERROR
      *
      * @param summaryRequest - {@link SummaryRequest}
-     * @return {@link GenieResponse<List<LearnerAssessmentDetails>>}
+     * @param responseHandler - {@link IResponseHandler<List<LearnerAssessmentDetails>>}
      */
     public void getLearnerAssessmentDetails(final SummaryRequest summaryRequest, IResponseHandler<List<LearnerAssessmentDetails>> responseHandler) {
         new AsyncHandler<List<LearnerAssessmentDetails>>(responseHandler).execute(new IPerformable<List<LearnerAssessmentDetails>>() {

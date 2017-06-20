@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * This class provides all the required APIs to perform tagging related
- * operations on a separate thread
+ * operations on a separate thread.
  */
 public class TagService {
     private ITagService tagService;
@@ -27,8 +27,8 @@ public class TagService {
      * On failing to set to tag, the response will have status set to be FALSE, with the following error
      * <p>VALIDATION_ERROR
      *
-     * @param tag
-     * @param responseHandler
+     * @param tag - {@link Tag}
+     * @param responseHandler - {@link IResponseHandler<Void>}
      */
     public void setTag(final Tag tag, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
@@ -44,7 +44,7 @@ public class TagService {
      * <p><p>
      * Response will always have the status set to TRUE and the {@link List<Tag>} will be set in result.
      *
-     * @param responseHandler
+     * @param responseHandler - {@link IResponseHandler<List<Tag>>}
      */
     public void getTags(IResponseHandler<List<Tag>> responseHandler) {
         new AsyncHandler<List<Tag>>(responseHandler).execute(new IPerformable<List<Tag>>() {
@@ -64,7 +64,7 @@ public class TagService {
      * <p>VALIDATION_ERROR
      *
      * @param name
-     * @param responseHandler
+     * @param responseHandler - {@link IResponseHandler<Void>}
      */
     public void deleteTag(final String name, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
@@ -84,7 +84,7 @@ public class TagService {
      * <p>VALIDATION_ERROR
      *
      * @param tag
-     * @param responseHandler
+     * @param responseHandler - {@link IResponseHandler<Void>}
      */
     public void updateTag(final Tag tag, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {

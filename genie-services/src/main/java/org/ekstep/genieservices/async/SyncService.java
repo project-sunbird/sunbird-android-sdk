@@ -29,7 +29,7 @@ public class SyncService {
      * <p> AUTHENTICATION_ERROR
      * <p> VALIDATION_ERROR
      *
-     * @param responseHandler
+     * @param responseHandler -{@link IResponseHandler<SyncStat>}
      */
     public void sync(IResponseHandler<SyncStat> responseHandler) {
         new AsyncHandler<SyncStat>(responseHandler).execute(new IPerformable<SyncStat>() {

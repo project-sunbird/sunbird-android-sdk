@@ -85,6 +85,14 @@ public interface IContentService {
     GenieResponse<Void> deleteContent(ContentDeleteRequest contentDeleteRequest);
 
     /**
+     * This api is used get the complete content listing with criteria mentioned in {@link ContentListingCriteria}
+     * <p>
+     * <p>
+     * On successful fetching, the response will return status as TRUE, with result set as {@link ContentListing}.
+     * <p>
+     * <p>
+     * On failing to delete a content, the response will return status as FALSE
+     *
      * @param contentListingCriteria - {@link ContentListingCriteria}
      * @return {@link GenieResponse<ContentListing>}
      */
@@ -153,7 +161,7 @@ public interface IContentService {
     GenieResponse<List<Content>> nextContent(List<String> contentIdentifiers);
 
     /**
-     * This api is used to import the content.
+     * This api is used to import the ecar.
      * <p>
      * <p>
      * On successful importing the content, the response will return status as TRUE
@@ -167,12 +175,52 @@ public interface IContentService {
      */
     GenieResponse<Void> importEcar(EcarImportRequest ecarImportRequest);
 
+    /**
+     * This api is used to import the content of specified contentId's from server.
+     * <p>
+     * <p>
+     * On successful importing the content, the response will return status as TRUE
+     *
+     * @param contentImportRequest
+     * @return - {@link GenieResponse<Void>}
+     */
     GenieResponse<Void> importContent(ContentImportRequest contentImportRequest);
 
+    /**
+     * This api is used to get the status of when importing a content
+     * <p>
+     * <p>
+     * Response will always be status set TRUE, with {@link ContentImportResponse} set in result.
+     *
+     * @param identifier
+     * @return {@link GenieResponse<ContentImportResponse>}
+     */
     GenieResponse<ContentImportResponse> getImportStatus(String identifier);
 
+    /**
+     * This api is used to cancel the on-going download
+     * <p>
+     * <p>
+     * Response will always be status set TRUE.
+     *
+     * @param identifier
+     * @return
+     */
     GenieResponse<Void> cancelDownload(String identifier);
 
+    /**
+     * This api is used to export the list of contentId's needed.
+     * <p>
+     * <p>
+     * On successful exporting the content, the response will return status as TRUE, with response set in result
+     * <p>
+     * <p>
+     * On failing to export the content, the response will be with return status as FALSE and with the following error
+     * <p>EXPORT_FAILED
+     *
+     * @param contentExportRequest
+     * @return
+     */
     GenieResponse<ContentExportResponse> exportContent(ContentExportRequest contentExportRequest);
 
 }

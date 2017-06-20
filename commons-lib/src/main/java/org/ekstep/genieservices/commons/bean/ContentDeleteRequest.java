@@ -3,7 +3,7 @@ package org.ekstep.genieservices.commons.bean;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
 /**
- * This class accepts contentId and isChildContent while building, and is used when deleting a content and its child contents if needed.
+ * This class accepts contentId and isChildContent while building it, and is used when deleting a content and also deleting its child contents if needed.
  *
  */
 public class ContentDeleteRequest {
