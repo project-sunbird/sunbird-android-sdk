@@ -44,11 +44,11 @@ public class Notification implements Serializable {
         this.notificationJson = notificationJson;
     }
 
-    public int getMsgId() {
+    public int getMsgid() {
         return msgid;
     }
 
-    public void setMsgId(int msgid) {
+    public void setMsgid(int msgid) {
         this.msgid = msgid;
     }
 
@@ -148,7 +148,7 @@ public class Notification implements Serializable {
         this.dispbehavior = dispbehavior;
     }
 
-    public int getIsRead() {
+    public int isRead() {
         return isRead;
     }
 
