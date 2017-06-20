@@ -10,10 +10,9 @@ import org.ekstep.genieresolvers.telemetry.TelemetryService;
 import org.ekstep.genieresolvers.user.UserService;
 
 /**
- * Created on 18/5/17.
- * shriharsh
+ * This is the entry point of the GenieSDK
+ *
  */
-
 public class GenieSDK {
 
     private static GenieSDK sGenieSDK;
