@@ -180,12 +180,13 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         params.put("request", GsonUtil.toJson(childContentRequest));
 
         GenieResponse<Content> response;
-        List<HierarchyInfo> hierarchyInfoList = new ArrayList<>();
         ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), childContentRequest.getContentId());
         if (contentModel == null) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, ServiceConstants.ErrorMessage.CONTENT_NOT_FOUND + childContentRequest.getContentId(), TAG);
             return response;
         }
+        List<HierarchyInfo> hierarchyInfoList = new ArrayList<>();
+        hierarchyInfoList.add(new HierarchyInfo(contentModel.getIdentifier(), contentModel.getContentType()));
 
         //check and fetch all childrens of this content
         Content content = checkAndFetchChildrenOfContent(contentModel, hierarchyInfoList);
@@ -198,23 +199,18 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
     private Content checkAndFetchChildrenOfContent(ContentModel contentModel, List<HierarchyInfo> sourceInfoList) {
         Content content = ContentHandler.convertContentModelToBean(contentModel);
+        content.setHierarchyInfo(sourceInfoList);
         // check if the content model has immediate children
         List<ContentModel> contentModelList = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), contentModel.getLocalData(), ContentConstants.ChildContents.FIRST_LEVEL_ALL);
         if (contentModelList.size() > 0) {
-
-            //add hierarchy info
-            HierarchyInfo hierarchyInfo = new HierarchyInfo(contentModel.getIdentifier(), contentModel.getContentType());
-
-            List<HierarchyInfo> hierarchyInfoList = new ArrayList<>();
-            hierarchyInfoList.addAll(sourceInfoList);
-            hierarchyInfoList.add(hierarchyInfo);
 
             List<Content> childContents = new ArrayList<>();
 
             for (ContentModel perContentModel : contentModelList) {
                 Content perContent = ContentHandler.convertContentModelToBean(perContentModel);
+                List<HierarchyInfo> hierarchyInfoList = new ArrayList<>(sourceInfoList);
+                hierarchyInfoList.add(new HierarchyInfo(perContent.getIdentifier(), perContent.getContentType()));
                 perContent.setHierarchyInfo(hierarchyInfoList);
-
                 Content iteratedContent = checkAndFetchChildrenOfContent(perContentModel, hierarchyInfoList);
                 perContent.setChildren(iteratedContent.getChildren());
 
