@@ -9,6 +9,7 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created on 6/6/17.
@@ -19,22 +20,24 @@ public class SummarizerService extends BaseService {
 
     private String appQualifier;
     private Context context;
-    private String hierarchyDataInString;
 
     public SummarizerService(Context context, String appQualifier) {
         this.context = context;
         this.appQualifier = appQualifier;
     }
 
-    public void getLearnerAssessment(String uid, String contentId, List<HierarchyInfo> hierarchyData, IResponseHandler responseHandler) {
+    public void getLearnerAssessment(String uid, String contentId, List<Map> hierarchyData, IResponseHandler responseHandler) {
         List<String> idList = new ArrayList<>();
-        if (hierarchyData != null) {
-            for (HierarchyInfo hierarchyInfo : hierarchyData) {
-                idList.add(hierarchyInfo.getIdentifier());
+        String hierarchyDataInString = null;
+        if (hierarchyData != null && hierarchyData.size() > 0) {
+            for (int i = 0 ; i < hierarchyData.size() - 1 ; i++) {
+                Object identifier = hierarchyData.get(i).get("identifier");
+                idList.add(identifier == null ? null : identifier.toString());
             }
-
-            hierarchyDataInString = StringUtil.join("/", idList);
         }
+
+        hierarchyDataInString = idList.size() > 0 ? StringUtil.join("/", idList) : null;
+
         LearnerAssessmentTask createUserTask = new LearnerAssessmentTask(context, appQualifier, uid, contentId, hierarchyDataInString);
         createAndExecuteTask(responseHandler, createUserTask);
     }
