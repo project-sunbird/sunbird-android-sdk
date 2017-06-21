@@ -12,7 +12,12 @@ import org.ekstep.genieproviders.content.AllContentsUriHandler;
 import org.ekstep.genieproviders.util.Constants;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.LearnerAssessmentDetails;
 import org.ekstep.genieservices.commons.bean.SummaryRequest;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created on 6/6/17.
@@ -43,18 +48,38 @@ public abstract class AbstractSummarizerProvider extends BaseContentProvider {
             genieResponse = getService().getSummarizerService().getLearnerAssessmentDetails(summaryRequestBuilder.build());
 
             if (genieResponse != null && genieResponse.getStatus()) {
-                cursor.addRow(new String[]{new Gson().toJson(genieResponse)});
+                List<LearnerAssessmentDetails> learnerAssessmentDetailsList = (List<LearnerAssessmentDetails>) genieResponse.getResult();
+                int totalQuestions = 0;
+                int totalCorrect = 0;
+                Map<String, Integer> resultMap = new HashMap<>();
+                if (learnerAssessmentDetailsList != null && learnerAssessmentDetailsList.size() > 0) {
+                    totalQuestions = learnerAssessmentDetailsList.size();
+                    for (LearnerAssessmentDetails learnerAssessmentDetails : learnerAssessmentDetailsList) {
+                        totalCorrect = totalCorrect + learnerAssessmentDetails.getCorrect();
+                    }
+                }
+
+                resultMap.put("total_correct", totalCorrect);
+                resultMap.put("total_questions", totalQuestions);
+
+                GenieResponse successResponse = GenieResponseBuilder.getSuccessResponse("Successful");
+                successResponse.setResult(resultMap);
+
+                cursor.addRow(new String[]{new Gson().toJson(successResponse)});
+
+                return cursor;
             } else {
                 getErrorResponse(cursor);
             }
         }
+
         return null;
     }
 
-    protected GenieResponse getErrorResponse(MatrixCursor cursor) {
+    protected Cursor getErrorResponse(MatrixCursor cursor) {
         GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(Constants.PROCESSING_ERROR, "Could not get learner assessments!", AllContentsUriHandler.class.getSimpleName());
         cursor.addRow(new String[]{new Gson().toJson(errorResponse)});
-        return errorResponse;
+        return cursor;
     }
 
     private MatrixCursor getMatrixCursor() {
