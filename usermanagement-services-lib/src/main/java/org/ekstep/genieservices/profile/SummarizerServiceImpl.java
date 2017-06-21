@@ -20,7 +20,6 @@ import org.ekstep.genieservices.profile.db.model.LearnerAssessmentDetailsModel;
 import org.ekstep.genieservices.profile.db.model.LearnerAssessmentSummaryModel;
 import org.ekstep.genieservices.profile.db.model.LearnerSummaryModel;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -176,10 +175,10 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         }
 
         if (telemetry.getCdata() != null) {
-            List<String> idList = new ArrayList<>();
             for (CorrelationData eachCdataValue : telemetry.getCdata()) {
                 if (eachCdataValue.getType().equalsIgnoreCase("Collection") || eachCdataValue.getType().equalsIgnoreCase("TextBook")) {
-                    idList.add(eachCdataValue.getId());
+                    learnerContentSummaryDetails.setHierarchyData(eachCdataValue.getId());
+                    break;
                 }
             }
         }
@@ -210,10 +209,10 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         learnerAssessmentDetails.setMaxScore((Double) eks.get("maxscore"));
 
         if (telemetry.getCdata() != null) {
-            List<String> idList = new ArrayList<>();
             for (CorrelationData eachCdataValue : telemetry.getCdata()) {
                 if (eachCdataValue.getType().equalsIgnoreCase("Collection") || eachCdataValue.getType().equalsIgnoreCase("TextBook")) {
-                    idList.add(eachCdataValue.getId());
+                    learnerAssessmentDetails.setHierarchyData(eachCdataValue.getId());
+                    break;
                 }
             }
         }
