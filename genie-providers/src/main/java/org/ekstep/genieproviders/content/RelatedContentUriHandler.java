@@ -60,14 +60,14 @@ public class RelatedContentUriHandler implements IUriHandler {
 
             GenieResponse genieResponse = null;
             if (hierarchyData != null && hierarchyData.size() == 1) {
-                RelatedContentRequest request = new RelatedContentRequest.Builder().contentId(hierarchyData.get(0).get("id").toString()).build();
+                RelatedContentRequest request = new RelatedContentRequest.Builder().contentId(hierarchyData.get(0).get("identifier").toString()).build();
                 genieResponse = genieService.getContentService().getRelatedContent(request);
             } else if (hierarchyData != null && hierarchyData.size() > 1) {
                 // TODO: 29/5/17 NEED TO DECIDE RESULT MAP KEY FOR NEXT CONTENT
                 Map<String, Object> resultMap = new HashMap<>();
                 List<String> contentIdentifiers = new ArrayList<>();
                 for (Map hierarchyItem : hierarchyData) {
-                    contentIdentifiers.add(hierarchyItem.get("id").toString());
+                    contentIdentifiers.add(hierarchyItem.get("identifier").toString());
                 }
                 resultMap.put("nextContent", genieService.getContentService().nextContent(contentIdentifiers).getResult());
                 genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
@@ -75,7 +75,7 @@ public class RelatedContentUriHandler implements IUriHandler {
             }
 
             if (genieResponse != null) {
-                cursor.addRow(new String[]{new Gson().toJson(genieResponse)});
+                cursor.addRow(new String[]{GsonUtil.toJson(genieResponse)});
             } else {
                 getErrorResponse(cursor);
             }
@@ -87,7 +87,7 @@ public class RelatedContentUriHandler implements IUriHandler {
     @NonNull
     protected GenieResponse getErrorResponse(MatrixCursor cursor) {
         GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(Constants.PROCESSING_ERROR, "Could not find the content", "Failed");
-        cursor.addRow(new String[]{new Gson().toJson(errorResponse)});
+        cursor.addRow(new String[]{GsonUtil.toJson(errorResponse)});
         return errorResponse;
     }
 
