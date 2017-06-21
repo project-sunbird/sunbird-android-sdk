@@ -178,9 +178,10 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         if (telemetry.getCdata() != null) {
             List<String> idList = new ArrayList<>();
             for (CorrelationData eachCdataValue : telemetry.getCdata()) {
-                idList.add(eachCdataValue.getId());
+                if (eachCdataValue.getType().equalsIgnoreCase("Collection") || eachCdataValue.getType().equalsIgnoreCase("TextBook")) {
+                    idList.add(eachCdataValue.getId());
+                }
             }
-//            learnerContentSummaryDetails.setHierarchyData(StringUtil.join(",", idList));
         }
 
         return learnerContentSummaryDetails;
@@ -211,9 +212,10 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         if (telemetry.getCdata() != null) {
             List<String> idList = new ArrayList<>();
             for (CorrelationData eachCdataValue : telemetry.getCdata()) {
-                idList.add(eachCdataValue.getId());
+                if (eachCdataValue.getType().equalsIgnoreCase("Collection") || eachCdataValue.getType().equalsIgnoreCase("TextBook")) {
+                    idList.add(eachCdataValue.getId());
+                }
             }
-//            learnerAssessmentDetails.setHierarchyData(StringUtil.join(",", idList));
         }
         return learnerAssessmentDetails;
     }
