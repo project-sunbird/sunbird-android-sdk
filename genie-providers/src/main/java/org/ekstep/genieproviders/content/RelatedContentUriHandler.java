@@ -21,6 +21,7 @@ import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -50,20 +51,24 @@ public class RelatedContentUriHandler implements IUriHandler {
     @Override
     public Cursor process() {
         MatrixCursor cursor = null;
-        if (genieService != null && selectionArgs[0] != null) {
+        if (genieService != null && selection != null) {
             cursor = getMatrixCursor();
-            Logger.i(TAG, "Content Identifier - " + selectionArgs[0]);
-            Type type = new TypeToken<List<String>>() {
+            Logger.i(TAG, "Content Identifier - " + selection);
+            Type type = new TypeToken<List<Map>>() {
             }.getType();
-            List<String> contentIdentifiers = GsonUtil.getGson().fromJson(selectionArgs[0], type);
+            List<Map> hierarchyData = GsonUtil.getGson().fromJson(selection, type);
 
             GenieResponse genieResponse = null;
-            if (contentIdentifiers != null && contentIdentifiers.size() == 1) {
-                RelatedContentRequest request = new RelatedContentRequest.Builder().contentId(contentIdentifiers.get(0)).build();
+            if (hierarchyData != null && hierarchyData.size() == 1) {
+                RelatedContentRequest request = new RelatedContentRequest.Builder().contentId(hierarchyData.get(0).get("id").toString()).build();
                 genieResponse = genieService.getContentService().getRelatedContent(request);
-            } else if (contentIdentifiers != null && contentIdentifiers.size() > 1) {
+            } else if (hierarchyData != null && hierarchyData.size() > 1) {
                 // TODO: 29/5/17 NEED TO DECIDE RESULT MAP KEY FOR NEXT CONTENT
                 Map<String, Object> resultMap = new HashMap<>();
+                List<String> contentIdentifiers = new ArrayList<>();
+                for (Map hierarchyItem : hierarchyData) {
+                    contentIdentifiers.add(hierarchyItem.get("id").toString());
+                }
                 resultMap.put("nextContent", genieService.getContentService().nextContent(contentIdentifiers).getResult());
                 genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
                 genieResponse.setResult(resultMap);
