@@ -682,7 +682,7 @@ public class ContentHandler {
             if (contentMetadataMap != null) {
                 Map viralityMetadataMap = (Map) contentMetadataMap.get(KEY_VIRALITY_METADATA);
                 String count = String.valueOf(viralityMetadataMap.get(KEY_TRANSFER_COUNT));
-                return Integer.valueOf(count);
+                return Double.valueOf(count).intValue();
             }
         } catch (NumberFormatException e) {
             e.printStackTrace();
@@ -708,7 +708,7 @@ public class ContentHandler {
             ((Map<String, Object>) localDataMap.get(KEY_CONTENT_METADATA)).put(KEY_VIRALITY_METADATA, viralityMetadata);
         } else {
             Map<String, Object> viralityMetadata = (Map<String, Object>) ((Map<String, Object>) localDataMap.get(KEY_CONTENT_METADATA)).get(KEY_VIRALITY_METADATA);
-            viralityMetadata.put(KEY_TRANSFER_COUNT, transferCount(localDataMap) + 1);
+            viralityMetadata.put(KEY_TRANSFER_COUNT, transferCount(viralityMetadata) + 1);
         }
     }
 
@@ -744,6 +744,7 @@ public class ContentHandler {
             String transferCount = (String) viralityMetadata.get(KEY_TRANSFER_COUNT);
             return Double.valueOf(transferCount).intValue();
         } catch (Exception e) {
+            e.printStackTrace();
             return 0;
         }
     }
