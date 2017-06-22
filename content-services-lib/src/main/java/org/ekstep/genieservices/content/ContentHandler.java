@@ -980,7 +980,11 @@ public class ContentHandler {
                                     values.addAll(Arrays.asList(filterMapValue));
                                 }
                                 values.addAll(Arrays.asList(filtersMap.get(entry.getKey())));
-                                filterMap.put(property, values.toArray(new String[values.size()]));
+                                try {
+                                    filterMap.put(property, values.toArray());
+                                } catch (Exception ex) {
+                                    Logger.e("mathew testing", "ex", ex);
+                                }
                             }
                         }
                         break;
