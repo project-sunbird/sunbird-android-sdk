@@ -7,6 +7,7 @@ import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.telemetry.GECreateProfile;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
@@ -21,14 +22,13 @@ import org.ekstep.genieservices.telemetry.TelemetryLogger;
  *
  * @author anil
  */
-public class TransportProfiles implements IChainable {
+public class TransportProfiles implements IChainable<ProfileImportResponse> {
 
     private static final String TAG = TransportProfiles.class.getSimpleName();
-    private IChainable nextLink;
+    private IChainable<ProfileImportResponse> nextLink;
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
-        // TODO: 6/9/2017
+    public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportContext importContext) {
         int imported = 0;
         int failed = 0;
 
@@ -68,6 +68,9 @@ public class TransportProfiles implements IChainable {
             }
         }
 
+        importContext.setImported(imported);
+        importContext.setFailed(failed);
+
         if (nextLink != null) {
             return nextLink.execute(appContext, importContext);
         } else {
@@ -76,7 +79,7 @@ public class TransportProfiles implements IChainable {
     }
 
     @Override
-    public IChainable then(IChainable link) {
+    public IChainable<ProfileImportResponse> then(IChainable<ProfileImportResponse> link) {
         nextLink = link;
         return link;
     }

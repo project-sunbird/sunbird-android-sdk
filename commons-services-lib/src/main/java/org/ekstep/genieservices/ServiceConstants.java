@@ -33,10 +33,6 @@ public interface ServiceConstants {
     String EXPORT_TYPES = "types";
     String EXPORT_TYPE_TELEMETRY = "telemetry";
     String EXPORT_TYPE_PROFILE = "userprofile";
-    // Used in export
-    String EXPORTED_ECAR_DESTINATION_LOCATION = "ecarLocation";
-    String EXPORTED_EPAR_DESTINATION_LOCATION = "eparLocation";
-    String UNCOMPRESSED_SOURCE_LOCATION = "location";
 
     interface BundleKey {
         //ContentPlayer

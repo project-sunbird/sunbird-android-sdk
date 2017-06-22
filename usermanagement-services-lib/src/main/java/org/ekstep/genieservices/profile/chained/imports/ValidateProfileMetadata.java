@@ -5,6 +5,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
+import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
@@ -17,13 +18,13 @@ import java.util.Map;
  *
  * @author anil
  */
-public class ValidateProfileMetadata implements IChainable {
+public class ValidateProfileMetadata implements IChainable<ProfileImportResponse> {
 
     private static final String TAG = ValidateProfileMetadata.class.getSimpleName();
-    private IChainable nextLink;
+    private IChainable<ProfileImportResponse> nextLink;
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportContext importContext) {
 
         if (importContext.getMetadata() != null && !importContext.getMetadata().isEmpty()) {
             List<String> importTypes = getImportTypes(importContext.getMetadata());
@@ -42,7 +43,7 @@ public class ValidateProfileMetadata implements IChainable {
     }
 
     @Override
-    public IChainable then(IChainable link) {
+    public IChainable<ProfileImportResponse> then(IChainable<ProfileImportResponse> link) {
         nextLink = link;
         return link;
     }

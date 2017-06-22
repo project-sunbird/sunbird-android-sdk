@@ -10,6 +10,7 @@ import org.ekstep.genieservices.commons.bean.ImportRequest;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
+import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.importexport.FileExporter;
 import org.ekstep.genieservices.importexport.FileImporter;
@@ -254,10 +255,10 @@ public class UserService {
      * @param importRequest   - {@link ImportRequest}
      * @param responseHandler - {@link IResponseHandler<Void>}
      */
-    public void importProfile(final ImportRequest importRequest, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+    public void importProfile(final ImportRequest importRequest, IResponseHandler<ProfileImportResponse> responseHandler) {
+        new AsyncHandler<ProfileImportResponse>(responseHandler).execute(new IPerformable<ProfileImportResponse>() {
             @Override
-            public GenieResponse<Void> perform() {
+            public GenieResponse<ProfileImportResponse> perform() {
                 return fileImporter.importProfile(importRequest, userService);
             }
         });

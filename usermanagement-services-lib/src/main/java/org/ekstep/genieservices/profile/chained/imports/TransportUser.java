@@ -5,6 +5,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
+import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.profile.db.model.UserModel;
 import org.ekstep.genieservices.profile.db.model.UsersModel;
@@ -14,13 +15,13 @@ import org.ekstep.genieservices.profile.db.model.UsersModel;
  *
  * @author anil
  */
-public class TransportUser implements IChainable {
+public class TransportUser implements IChainable<ProfileImportResponse> {
 
     private static final String TAG = TransportUser.class.getSimpleName();
-    private IChainable nextLink;
+    private IChainable<ProfileImportResponse> nextLink;
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportContext importContext) {
         // Read from imported DB
         UsersModel usersModel = UsersModel.findAll(importContext.getDBSession());
 
@@ -41,7 +42,7 @@ public class TransportUser implements IChainable {
     }
 
     @Override
-    public IChainable then(IChainable link) {
+    public IChainable<ProfileImportResponse> then(IChainable<ProfileImportResponse> link) {
         nextLink = link;
         return link;
     }

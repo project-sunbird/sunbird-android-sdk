@@ -5,6 +5,7 @@ import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
+import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDataSource;
@@ -158,7 +159,7 @@ public interface IUserService {
      * @param metadata  - {@link Map<String, Object>}
      * @return {@link GenieResponse<Void>}
      */
-    GenieResponse<Void> importProfile(IDBSession dbSession, Map<String, Object> metadata);
+    GenieResponse<ProfileImportResponse> importProfile(IDBSession dbSession, Map<String, Object> metadata);
 
     /**
      * This api is used to export the profile.
