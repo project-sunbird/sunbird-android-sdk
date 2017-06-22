@@ -14,16 +14,14 @@ public class ContentSearchCriteria implements Serializable {
 
     private String query;
     private List<ContentSearchFilter> filters;
-    private List<PartnerFilter> partnerFilters;
     private String sortBy;
     private long limit;
     private String mode;
     private boolean profileFilter;
 
-    private ContentSearchCriteria(String query, List<ContentSearchFilter> filters, List<PartnerFilter> partnerFilters, String sortBy, long limit, String mode, boolean profileFilter) {
+    private ContentSearchCriteria(String query, List<ContentSearchFilter> filters, String sortBy, long limit, String mode, boolean profileFilter) {
         this.query = query;
         this.filters = filters;
-        this.partnerFilters = partnerFilters;
         this.sortBy = sortBy;
         this.limit = limit;
         this.mode = mode;
@@ -36,10 +34,6 @@ public class ContentSearchCriteria implements Serializable {
 
     public List<ContentSearchFilter> getFilters() {
         return filters;
-    }
-
-    public List<PartnerFilter> getPartnerFilters() {
-        return partnerFilters;
     }
 
     public String getSortBy() {
@@ -70,7 +64,6 @@ public class ContentSearchCriteria implements Serializable {
 
         private String query;
         private List<ContentSearchFilter> filters;
-        private List<PartnerFilter> partnerFilters;
         private String sortBy;
         private long limit;
         private String mode;
@@ -88,11 +81,6 @@ public class ContentSearchCriteria implements Serializable {
 
         public Builder applyFilters(List<ContentSearchFilter> filters) {
             this.filters = filters;
-            return this;
-        }
-
-        public Builder applyPartnerFilters(List<PartnerFilter> partnerFilters) {
-            this.partnerFilters = partnerFilters;
             return this;
         }
 
@@ -117,7 +105,7 @@ public class ContentSearchCriteria implements Serializable {
         }
 
         public ContentSearchCriteria build() {
-            return new ContentSearchCriteria(query, filters, partnerFilters, sortBy, limit, mode, profileFilter);
+            return new ContentSearchCriteria(query, filters, sortBy, limit, mode, profileFilter);
         }
     }
 }

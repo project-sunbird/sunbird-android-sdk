@@ -44,6 +44,7 @@ import org.ekstep.genieservices.content.db.model.ContentListingModel;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.db.model.ContentsModel;
 import org.ekstep.genieservices.content.network.ContentDetailsAPI;
+import org.ekstep.genieservices.content.network.ContentListingAPI;
 
 import java.io.File;
 import java.lang.reflect.Type;
@@ -866,9 +867,6 @@ public class ContentHandler {
             applyProfileFilter(getCurrentProfile(userService), configService, filterMap);
         }
 
-        // Apply partner specific filters
-        applyPartnerFilter(configService, criteria.getPartnerFilters(), filterMap);
-
         return filterMap;
     }
 
@@ -906,6 +904,42 @@ public class ContentHandler {
             for (PartnerFilter partnerFilter : partnerFilters) {
                 for (String propertyValue : partnerFilter.getValues()) {
                     applyFilter(configService, partnerFilter.getMasterDataType(), propertyValue, filterMap);
+                }
+            }
+        }
+    }
+
+    private static void applyListingFilter(IConfigService configService, MasterDataType masterDataType, String propertyValue, Map<String, Object> filterMap) {
+        if (configService != null && propertyValue != null) {
+            String property = masterDataType.getValue();
+
+            if (masterDataType == MasterDataType.AGEGROUP) {
+                masterDataType = MasterDataType.AGE;
+            }
+
+            GenieResponse<MasterData> masterDataResponse = configService.getMasterData(masterDataType);
+
+            if (masterDataResponse.getStatus()) {
+                MasterData masterData = masterDataResponse.getResult();
+
+                for (MasterDataValues masterDataValues : masterData.getValues()) {
+                    if (masterDataValues.getTelemetry().equals(propertyValue)) {
+                        Map<String, Object> searchMap = masterDataValues.getSearch();
+                        Map filtersMap = (Map) searchMap.get("filters");
+                        if (filtersMap != null) {
+                            Set entrySet = filtersMap.entrySet();
+                            for (Object key : entrySet) {
+                                Set values = new HashSet();
+                                Object filterMapValue = filterMap.get(key);
+                                if (filterMapValue != null) {
+                                    values.addAll(Arrays.asList(filterMapValue));
+                                }
+                                values.addAll(Arrays.asList(filtersMap.get(key)));
+                                filterMap.put(property, values.toArray(new String[values.size()]));
+                            }
+                        }
+                        break;
+                    }
                 }
             }
         }
@@ -1076,15 +1110,32 @@ public class ContentHandler {
         return requestMap;
     }
 
-    public static boolean dataHasExpired(long ttl) {
-        Long currentTime = DateUtil.getEpochTime();
-        return currentTime > ttl;
+    public static void refreshContentListingFromServer(final AppContext appContext, final IConfigService configService, final ContentListingCriteria contentListingCriteria,
+                                                       final Profile profile, final String did) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                fetchContentListingFromServer(appContext, configService, contentListingCriteria, profile, did);
+            }
+        }).start();
     }
 
-    public static Map<String, Object> getContentListingRequest(IConfigService configService, ContentListingCriteria contentListingCriteria, String did) {
+    public static String fetchContentListingFromServer(AppContext appContext, IConfigService configService, ContentListingCriteria contentListingCriteria, Profile profile, String did) {
+        Map<String, Object> requestMap = ContentHandler.getContentListingRequest(configService, contentListingCriteria, profile, did);
+        ContentListingAPI api = new ContentListingAPI(appContext, contentListingCriteria.getContentListingId(), requestMap);
+        GenieResponse apiResponse = api.post();
+        String jsonStr = null;
+        if (apiResponse.getStatus()) {
+            jsonStr = apiResponse.getResult().toString();
+            ContentHandler.saveContentListingDataInDB(appContext, contentListingCriteria, jsonStr);
+        }
+        return jsonStr;
+    }
+
+
+    public static Map<String, Object> getContentListingRequest(IConfigService configService, ContentListingCriteria contentListingCriteria, Profile profile, String did) {
         HashMap<String, Object> contextMap = new HashMap<>();
 
-        Profile profile = contentListingCriteria.getProfile();
         if (profile != null) {
             contextMap.put("uid", profile.getUid());
             contextMap.put("dlang", profile.getLanguage());
@@ -1096,13 +1147,37 @@ public class ContentHandler {
         filterMap.put("compatibilityLevel", getCompatibilityLevelFilter());
 
         // Add subject filter
-        applyFilter(configService, MasterDataType.SUBJECT, contentListingCriteria.getSubject(), filterMap);
+        if (!StringUtil.isNullOrEmpty(contentListingCriteria.getSubject()))
+            applyListingFilter(configService, MasterDataType.SUBJECT, contentListingCriteria.getSubject(), filterMap);
 
-        // Apply profile specific filters
-        applyProfileFilter(profile, configService, filterMap);
+        if (contentListingCriteria.getAge() > 0)
+            applyListingFilter(configService, MasterDataType.AGEGROUP, String.valueOf(contentListingCriteria.getAge()), filterMap);
 
-        // Apply partner specific filters
-        applyPartnerFilter(configService, contentListingCriteria.getPartnerFilters(), filterMap);
+        // Add board filter
+        if (!StringUtil.isNullOrEmpty(contentListingCriteria.getBoard()))
+            applyListingFilter(configService, MasterDataType.BOARD, contentListingCriteria.getBoard(), filterMap);
+
+        // Add medium filter
+        if (!StringUtil.isNullOrEmpty(contentListingCriteria.getMedium()))
+            applyListingFilter(configService, MasterDataType.MEDIUM, contentListingCriteria.getMedium(), filterMap);
+
+        // Add standard filter
+        if (contentListingCriteria.getGrade() > 0)
+            applyListingFilter(configService, MasterDataType.GRADELEVEL, String.valueOf(contentListingCriteria.getGrade()), filterMap);
+
+        String[] audienceArr = contentListingCriteria.getAudience();
+        if (audienceArr != null && audienceArr.length > 0) {
+            for (String audience : audienceArr) {
+                applyListingFilter(configService, MasterDataType.AUDIENCE, audience, filterMap);
+            }
+        }
+
+        String[] channelArr = contentListingCriteria.getChannel();
+        if (channelArr != null && channelArr.length > 0) {
+            for (String channel : channelArr) {
+                applyListingFilter(configService, MasterDataType.CHANNEL, channel, filterMap);
+            }
+        }
 
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("context", contextMap);
@@ -1111,20 +1186,18 @@ public class ContentHandler {
         return requestMap;
     }
 
-    public static void saveContentListingDataInDB(IDBSession dbSession, ContentListingCriteria contentListingCriteria, Profile profile, String jsonStr) {
+    public static void saveContentListingDataInDB(AppContext appContext, ContentListingCriteria contentListingCriteria, String jsonStr) {
         if (jsonStr == null) {
             return;
         }
 
-        long expiryTime;
+        long expiryTime = DateUtil.getEpochTime() + ContentConstants.CACHE_TIMEOUT_HOME_CONTENT;
 
-        long ttlInMilliSeconds = ContentConstants.CACHE_TIMEOUT_HOME_CONTENT;
-        Long currentTime = DateUtil.getEpochTime();
-        expiryTime = ttlInMilliSeconds + currentTime;
-
-        // TODO: 6/8/2017 - Read the channel and audience from partnerFilters in criteria and make the comma seperated string and pass in build
-        ContentListingModel contentListingModel = ContentListingModel.build(dbSession, contentListingCriteria.getContentListingId(),
-                jsonStr, profile, contentListingCriteria.getSubject(), null, null, expiryTime);
+        ContentListingModel contentListingModelInDB = ContentListingModel.find(appContext.getDBSession(), contentListingCriteria);
+        if (contentListingModelInDB != null) {
+            contentListingModelInDB.delete();
+        }
+        ContentListingModel contentListingModel = ContentListingModel.build(appContext.getDBSession(), contentListingCriteria, jsonStr, expiryTime);
         contentListingModel.save();
     }
 
@@ -1217,8 +1290,6 @@ public class ContentHandler {
                         }
 
                         builder.applyFilters(filters);
-                        builder.applyCurrentProfile(contentListingCriteria.getProfile() != null);
-                        builder.applyPartnerFilters(contentListingCriteria.getPartnerFilters());
                     }
                 }
 

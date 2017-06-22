@@ -1,7 +1,5 @@
 package org.ekstep.genieservices.commons.bean;
 
-import java.util.List;
-
 /**
  * This class accepts contentListingId, subject, {@link Profile}, and list of {@link PartnerFilter} while building the criteria for content listing request.
  *
@@ -10,14 +8,24 @@ public class ContentListingCriteria {
 
     private String contentListingId;
     private String subject;
-    private Profile profile;
-    private List<PartnerFilter> partnerFilters;
+    private int age;
+    private int grade;
+    private String medium;
+    private String board;
+    private String[] audience;
+    private String[] channel;
+    private String did;
 
-    private ContentListingCriteria(String contentListingId, String subject, Profile profile, List<PartnerFilter> partnerFilters) {
+    public ContentListingCriteria(String contentListingId, String subject, int age, int grade, String medium, String board, String did, String[] audience, String[] channel) {
         this.contentListingId = contentListingId;
         this.subject = subject;
-        this.profile = profile;
-        this.partnerFilters = partnerFilters;
+        this.age = age;
+        this.grade = grade;
+        this.medium = medium;
+        this.board = board;
+        this.audience = audience;
+        this.channel = channel;
+        this.did = did;
     }
 
     public String getContentListingId() {
@@ -28,20 +36,45 @@ public class ContentListingCriteria {
         return subject;
     }
 
-    public Profile getProfile() {
-        return profile;
+    public int getAge() {
+        return age;
     }
 
-    public List<PartnerFilter> getPartnerFilters() {
-        return partnerFilters;
+    public int getGrade() {
+        return grade;
+    }
+
+    public String getMedium() {
+        return medium;
+    }
+
+    public String getBoard() {
+        return board;
+    }
+
+    public String[] getAudience() {
+        return audience;
+    }
+
+    public String[] getChannel() {
+        return channel;
+    }
+
+    public String getDid() {
+        return did;
     }
 
     public static class Builder {
 
         private String contentListingId;
         private String subject;
-        private Profile profile;
-        private List<PartnerFilter> partnerFilters;
+        private int age;
+        private int grade;
+        private String medium;
+        private String board;
+        private String[] audience;
+        private String[] channel;
+        private String did;
 
         public Builder listingId(String contentListingId) {
             this.contentListingId = contentListingId;
@@ -53,18 +86,43 @@ public class ContentListingCriteria {
             return this;
         }
 
-        public Builder profile(Profile profile) {
-            this.profile = profile;
+        public Builder age(int age) {
+            this.age = age;
             return this;
         }
 
-        public Builder partnerFilters(List<PartnerFilter> partnerFilters) {
-            this.partnerFilters = partnerFilters;
+        public Builder grade(int standard) {
+            this.grade = standard;
+            return this;
+        }
+
+        public Builder medium(String medium) {
+            this.medium = medium;
+            return this;
+        }
+
+        public Builder board(String board) {
+            this.board = board;
+            return this;
+        }
+
+        public Builder deviceId(String did) {
+            this.did = did;
+            return this;
+        }
+
+        public Builder audience(String[] audience) {
+            this.audience = audience;
+            return this;
+        }
+
+        public Builder channel(String[] audience) {
+            this.channel = channel;
             return this;
         }
 
         public ContentListingCriteria build() {
-            return new ContentListingCriteria(contentListingId, subject, profile, partnerFilters);
+            return new ContentListingCriteria(contentListingId, subject, age, grade, medium, board, did, audience, channel);
         }
     }
 }

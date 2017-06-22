@@ -42,6 +42,7 @@ import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
@@ -265,30 +266,18 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
         String methodName = "getContentListing@ContentServiceImpl";
 
-        Profile profile = contentListingCriteria.getProfile();
-
         String jsonStr = null;
-        // TODO: 6/8/2017 - Read the channel and audience from partnerFilters in criteria and make the comma seperated string and pass in find
-        ContentListingModel contentListingModelInDB = ContentListingModel.find(mAppContext.getDBSession(), contentListingCriteria.getContentListingId(),
-                profile, contentListingCriteria.getSubject(), null, null);
+
+        ContentListingModel contentListingModelInDB = ContentListingModel.find(mAppContext.getDBSession(), contentListingCriteria);
         if (contentListingModelInDB != null) {
-            if (ContentHandler.dataHasExpired(contentListingModelInDB.getExpiryTime())) {
-                contentListingModelInDB.delete();
-            } else {
-                jsonStr = contentListingModelInDB.getJson();
+            jsonStr = contentListingModelInDB.getJson();
+            if (DateUtil.getEpochDiff(contentListingModelInDB.getExpiryTime()) > 0) {
+                ContentHandler.refreshContentListingFromServer(mAppContext, configService, contentListingCriteria, ContentHandler.getCurrentProfile(userService), mAppContext.getDeviceInfo().getDeviceID());
             }
         }
 
         if (jsonStr == null) {
-            Map<String, Object> requestMap = ContentHandler.getContentListingRequest(configService, contentListingCriteria, mAppContext.getDeviceInfo().getDeviceID());
-            ContentListingAPI api = new ContentListingAPI(mAppContext, contentListingCriteria.getContentListingId(), requestMap);
-            GenieResponse apiResponse = api.post();
-            if (apiResponse.getStatus()) {
-                jsonStr = apiResponse.getResult().toString();
-                ContentHandler.saveContentListingDataInDB(mAppContext.getDBSession(), contentListingCriteria, profile, jsonStr);
-            } else {
-                return GenieResponseBuilder.getErrorResponse(apiResponse.getError(), (String) apiResponse.getErrorMessages().get(0), TAG);
-            }
+            jsonStr = ContentHandler.fetchContentListingFromServer(mAppContext, configService, contentListingCriteria, ContentHandler.getCurrentProfile(userService), mAppContext.getDeviceInfo().getDeviceID());
         }
 
         if (jsonStr != null) {
