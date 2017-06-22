@@ -971,14 +971,15 @@ public class ContentHandler {
                         Map<String, Object> searchMap = masterDataValues.getSearch();
                         Map filtersMap = (Map) searchMap.get("filters");
                         if (filtersMap != null) {
-                            Set entrySet = filtersMap.entrySet();
-                            for (Object key : entrySet) {
+                            Iterator it = filtersMap.entrySet().iterator();
+                            while (it.hasNext()) {
                                 Set values = new HashSet();
-                                Object filterMapValue = filterMap.get(key);
+                                Map.Entry entry = (Map.Entry) it.next();
+                                Object filterMapValue = filterMap.get(entry.getKey());
                                 if (filterMapValue != null) {
                                     values.addAll(Arrays.asList(filterMapValue));
                                 }
-                                values.addAll(Arrays.asList(filtersMap.get(key)));
+                                values.addAll(Arrays.asList(filtersMap.get(entry.getKey())));
                                 filterMap.put(property, values.toArray(new String[values.size()]));
                             }
                         }
