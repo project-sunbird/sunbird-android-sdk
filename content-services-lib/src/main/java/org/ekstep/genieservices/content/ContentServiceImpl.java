@@ -25,6 +25,7 @@ import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
+import org.ekstep.genieservices.commons.bean.ContentSearchFilter;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
@@ -32,7 +33,6 @@ import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
 import org.ekstep.genieservices.commons.bean.ImportContext;
-import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
@@ -65,7 +65,6 @@ import org.ekstep.genieservices.content.chained.imports.ExtractPayloads;
 import org.ekstep.genieservices.content.chained.imports.ValidateEcar;
 import org.ekstep.genieservices.content.db.model.ContentListingModel;
 import org.ekstep.genieservices.content.db.model.ContentModel;
-import org.ekstep.genieservices.content.network.ContentListingAPI;
 import org.ekstep.genieservices.content.network.ContentSearchAPI;
 import org.ekstep.genieservices.content.network.RecommendedContentAPI;
 import org.ekstep.genieservices.content.network.RelatedContentAPI;
@@ -333,7 +332,6 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             ContentSearchResult searchResult = new ContentSearchResult();
             searchResult.setId(id);
             searchResult.setResponseMessageId(responseMessageId);
-            searchResult.setFilter(ContentHandler.getFilters(configService, facets, (Map<String, Object>) requestMap.get("filters")));
             searchResult.setRequest(requestMap);
 
             if (!StringUtil.isNullOrEmpty(contentDataList)) {
@@ -341,7 +339,12 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 }.getType();
                 List<ContentData> contentData = GsonUtil.getGson().fromJson(contentDataList, type);
                 searchResult.setContentDataList(contentData);
+                searchResult.setFilterCriteria(ContentHandler.createFilterCriteria(configService, contentSearchCriteria, facets, (Map<String, Object>) requestMap.get("filters")));
+            } else {
+                searchResult.setContentDataList(new ArrayList<ContentData>());
+                searchResult.setFilterCriteria(null);
             }
+
 
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(searchResult);

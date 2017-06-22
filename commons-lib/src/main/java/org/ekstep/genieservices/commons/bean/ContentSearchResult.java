@@ -13,7 +13,7 @@ public class ContentSearchResult implements Serializable {
 
     private String id;
     private String responseMessageId;
-    private List<ContentSearchFilter> filter;
+    private ContentSearchCriteria filterCriteria;
     private Map<String, Object> request;
     private List<ContentData> contentDataList;
 
@@ -33,12 +33,12 @@ public class ContentSearchResult implements Serializable {
         this.responseMessageId = responseMessageId;
     }
 
-    public List<ContentSearchFilter> getFilter() {
-        return filter;
+    public ContentSearchCriteria getFilterCriteria() {
+        return filterCriteria;
     }
 
-    public void setFilter(List<ContentSearchFilter> filter) {
-        this.filter = filter;
+    public void setFilterCriteria(ContentSearchCriteria filterCriteria) {
+        this.filterCriteria = filterCriteria;
     }
 
     public Map<String, Object> getRequest() {
