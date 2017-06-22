@@ -978,12 +978,12 @@ public class ContentHandler {
                             while (it.hasNext()) {
                                 Set values = new HashSet();
                                 Map.Entry entry = (Map.Entry) it.next();
-                                Object filterMapValue = filterMap.get(entry.getKey());
+                                String[] filterMapValue = (String[]) filterMap.get(entry.getKey());
                                 if (filterMapValue != null) {
                                     values.addAll(Arrays.asList(filterMapValue));
                                 }
                                 values.addAll((List) filtersMap.get(entry.getKey()));
-                                filterMap.put(property, values.toArray());
+                                filterMap.put(entry.getKey().toString(), values.toArray());
                             }
                         }
                         break;
