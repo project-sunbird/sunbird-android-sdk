@@ -7,14 +7,13 @@ import android.database.MatrixCursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
-import com.google.gson.Gson;
-
 import org.ekstep.genieproviders.IUriHandler;
 import org.ekstep.genieproviders.util.Constants;
 import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 import java.util.List;
 import java.util.Locale;
@@ -42,7 +41,7 @@ public class GetAllUsersUriHandler implements IUriHandler {
             GenieResponse<List<Profile>> genieResponse = genieService.getUserService().getAllUserProfile();
 
             if (genieResponse != null) {
-                cursor.addRow(new String[]{new Gson().toJson(genieResponse)});
+                cursor.addRow(new String[]{GsonUtil.toJson(genieResponse)});
             } else {
                 getErrorResponse(cursor);
             }
@@ -54,7 +53,7 @@ public class GetAllUsersUriHandler implements IUriHandler {
     @NonNull
     protected GenieResponse getErrorResponse(MatrixCursor cursor) {
         GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(Constants.PROCESSING_ERROR, "Could not get all the profiles", "Failed");
-        cursor.addRow(new String[]{new Gson().toJson(errorResponse)});
+        cursor.addRow(new String[]{GsonUtil.toJson(errorResponse)});
         return errorResponse;
     }
 

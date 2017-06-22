@@ -5,8 +5,6 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
 
-import com.google.gson.Gson;
-
 import org.ekstep.genieproviders.BaseContentProvider;
 import org.ekstep.genieproviders.content.AllContentsUriHandler;
 import org.ekstep.genieproviders.util.Constants;
@@ -14,6 +12,7 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentDetails;
 import org.ekstep.genieservices.commons.bean.SummaryRequest;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -65,7 +64,7 @@ public abstract class AbstractSummarizerProvider extends BaseContentProvider {
                 GenieResponse successResponse = GenieResponseBuilder.getSuccessResponse("Successful");
                 successResponse.setResult(resultMap);
 
-                cursor.addRow(new String[]{new Gson().toJson(successResponse)});
+                cursor.addRow(new String[]{GsonUtil.toJson(successResponse)});
 
                 return cursor;
             } else {
@@ -78,7 +77,7 @@ public abstract class AbstractSummarizerProvider extends BaseContentProvider {
 
     protected Cursor getErrorResponse(MatrixCursor cursor) {
         GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(Constants.PROCESSING_ERROR, "Could not get learner assessments!", AllContentsUriHandler.class.getSimpleName());
-        cursor.addRow(new String[]{new Gson().toJson(errorResponse)});
+        cursor.addRow(new String[]{GsonUtil.toJson(errorResponse)});
         return cursor;
     }
 

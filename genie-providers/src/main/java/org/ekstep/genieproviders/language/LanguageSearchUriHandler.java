@@ -7,13 +7,12 @@ import android.database.MatrixCursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
-import com.google.gson.Gson;
-
 import org.ekstep.genieproviders.IUriHandler;
 import org.ekstep.genieproviders.util.Constants;
 import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 
 import java.util.Locale;
@@ -45,7 +44,7 @@ public class LanguageSearchUriHandler implements IUriHandler {
             Logger.i(TAG, "Language Id - " + selection);
             GenieResponse genieResponse = genieService.getLanguageService().getLanguageSearch(selection);
             if (genieResponse != null) {
-                cursor.addRow(new String[]{new Gson().toJson(genieResponse)});
+                cursor.addRow(new String[]{GsonUtil.toJson(genieResponse)});
             } else {
                 getErrorResponse(cursor);
             }
@@ -56,7 +55,7 @@ public class LanguageSearchUriHandler implements IUriHandler {
     @NonNull
     protected GenieResponse getErrorResponse(MatrixCursor cursor) {
         GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(Constants.PROCESSING_ERROR, "Could not find the language", "Failed");
-        cursor.addRow(new String[]{new Gson().toJson(errorResponse)});
+        cursor.addRow(new String[]{GsonUtil.toJson(errorResponse)});
         return errorResponse;
     }
 

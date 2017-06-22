@@ -1,10 +1,9 @@
 package org.ekstep.genieservices.telemetry.processors;
 
-import com.google.gson.Gson;
-
 import org.ekstep.genieservices.commons.IDeviceInfo;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.DateUtil;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.telemetry.model.EventsModel;
 import org.ekstep.genieservices.telemetry.model.ProcessedEventModel;
 
@@ -35,7 +34,7 @@ public class DataPopulator implements IProcessEvent {
         processedEventMap.put("ts", DateUtil.getCurrentTimestamp());
         processedEventMap.put("params", getParams(msgId));
         processedEventMap.put("events", events.getEventsMap());
-        byte[] data = new Gson().toJson(processedEventMap).getBytes();
+        byte[] data = GsonUtil.toJson(processedEventMap).getBytes();
         return ProcessedEventModel.build(mDbSession,msgId, data, events.size(), events.getPriority());
     }
 
