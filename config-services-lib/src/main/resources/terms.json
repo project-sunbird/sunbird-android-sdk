@@ -39,6 +39,12 @@
             "filters": {
               "gradeLevel": [
                 "Grade 1"
+              ],
+              "subject": [
+                "MATHS"
+              ],
+              "medium": [
+                "Hindi"
               ]
             }
           }
