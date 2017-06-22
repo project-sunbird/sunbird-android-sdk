@@ -7,7 +7,6 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
-import org.ekstep.genieservices.telemetry.model.ImportedMetadataModel;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,15 +27,7 @@ public class ValidateProfileMetadata implements IChainable {
 
         if (importContext.getMetadata() != null && !importContext.getMetadata().isEmpty()) {
             List<String> importTypes = getImportTypes(importContext.getMetadata());
-            if (importTypes != null && importTypes.contains(ServiceConstants.EXPORT_TYPE_PROFILE)) {
-                String importId = (String) importContext.getMetadata().get(ServiceConstants.EXPORT_ID);
-                String did = (String) importContext.getMetadata().get(ServiceConstants.DID);
-
-                ImportedMetadataModel importedMetadataModel = ImportedMetadataModel.find(appContext.getDBSession(), importId, did);
-                if (importedMetadataModel != null) {
-                    return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "This data has already been imported.", TAG);
-                }
-            } else {
+            if (!importTypes.contains(ServiceConstants.EXPORT_TYPE_PROFILE)) {
                 return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "Profile event import failed, type mismatch.", TAG);
             }
         } else {

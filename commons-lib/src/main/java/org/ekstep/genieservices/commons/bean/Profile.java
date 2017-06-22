@@ -1,7 +1,5 @@
 package org.ekstep.genieservices.commons.bean;
 
-import com.google.gson.Gson;
-
 import org.ekstep.genieservices.commons.IValidate;
 import org.ekstep.genieservices.commons.bean.validator.DateValidator;
 import org.ekstep.genieservices.commons.bean.validator.StringValidator;
