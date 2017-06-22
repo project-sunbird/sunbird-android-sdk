@@ -50,6 +50,7 @@ import org.ekstep.genieservices.content.network.ContentDetailsAPI;
 import org.ekstep.genieservices.content.network.ContentListingAPI;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,6 +67,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.TreeMap;
+
+import static javax.swing.UIManager.get;
 
 /**
  * Created on 5/23/2017.
@@ -979,12 +982,8 @@ public class ContentHandler {
                                 if (filterMapValue != null) {
                                     values.addAll(Arrays.asList(filterMapValue));
                                 }
-                                values.addAll(Arrays.asList(filtersMap.get(entry.getKey())));
-                                try {
-                                    filterMap.put(property, values.toArray());
-                                } catch (Exception ex) {
-                                    Logger.e("mathew testing", "ex", ex);
-                                }
+                                values.addAll((List) filtersMap.get(entry.getKey()));
+                                filterMap.put(property, values.toArray());
                             }
                         }
                         break;
