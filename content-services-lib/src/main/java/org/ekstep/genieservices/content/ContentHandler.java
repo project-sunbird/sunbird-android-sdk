@@ -741,8 +741,8 @@ public class ContentHandler {
 
     private static int transferCount(Map<String, Object> viralityMetadata) {
         try {
-            String transferCount = (String) viralityMetadata.get(KEY_TRANSFER_COUNT);
-            return Double.valueOf(transferCount).intValue();
+            Double transferCount = (Double) viralityMetadata.get(KEY_TRANSFER_COUNT);
+            return transferCount.intValue();
         } catch (Exception e) {
             e.printStackTrace();
             return 0;
