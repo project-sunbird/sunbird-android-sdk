@@ -712,13 +712,31 @@ public class ContentHandler {
         }
     }
 
+    public static void addViralityMetadataIfMissing(Map<String, Object> localDataMap, String origin) {
+        if (localDataMap.get(KEY_CONTENT_METADATA) == null) {
+            localDataMap.put(KEY_CONTENT_METADATA, new HashMap<String, Object>());
+        }
+
+        Map<String, Object> contentMetadata = (Map<String, Object>) localDataMap.get(KEY_CONTENT_METADATA);
+        if (contentMetadata.get(KEY_VIRALITY_METADATA) == null) {
+            contentMetadata.put(KEY_VIRALITY_METADATA, new HashMap<String, Object>());
+        }
+
+        Map<String, Object> viralityMetadata = (Map<String, Object>) contentMetadata.get(KEY_VIRALITY_METADATA);
+        if (viralityMetadata.get(KEY_ORIGIN) == null) {
+            viralityMetadata.put(KEY_ORIGIN, origin);
+        }
+        if (viralityMetadata.get(KEY_TRANSFER_COUNT) == null) {
+            viralityMetadata.put(KEY_TRANSFER_COUNT, INITIAL_VALUE_FOR_TRANSFER_COUNT);
+        }
+    }
+
     private static boolean isContentMetadataAbsent(Map<String, Object> localDataMap) {
         return localDataMap.get(KEY_CONTENT_METADATA) == null;
     }
 
     private static boolean isContentMetadataPresentWithoutViralityMetadata(Map<String, Object> localDataMap) {
-        return localDataMap.get(KEY_CONTENT_METADATA) != null
-                && ((Map<String, Object>) localDataMap.get(KEY_CONTENT_METADATA)).get(KEY_VIRALITY_METADATA) == null;
+        return ((Map<String, Object>) localDataMap.get(KEY_CONTENT_METADATA)).get(KEY_VIRALITY_METADATA) == null;
     }
 
     private static int transferCount(Map<String, Object> viralityMetadata) {
