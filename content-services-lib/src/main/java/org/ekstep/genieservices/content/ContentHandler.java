@@ -852,7 +852,7 @@ public class ContentHandler {
         List<ContentSortCriteria> sortCriterias = criteria.getSortCriteria();
         if (sortCriterias != null && sortCriterias.size() > 0) {
             //TODO for now only handling the first sort criteria. As of now only one criteria is used in the system and the list has been kept for future compatibility.
-            sortMap.put(sortCriterias.get(0).getSortAttribute(), sortCriterias.get(0).getSortOrder().toString());
+            sortMap.put(sortCriterias.get(0).getSortAttribute(), sortCriterias.get(0).getSortOrder().getValue());
             requestMap.put("sort_by", sortMap);
         }
     }
@@ -1269,7 +1269,7 @@ public class ContentHandler {
                         List<ContentSortCriteria> sortCriterias = new ArrayList<>();
                         while (it.hasNext()) {
                             Map.Entry keyValue = (Map.Entry) it.next();
-                            ContentSortCriteria criteria = new ContentSortCriteria(keyValue.getKey().toString(), SortOrder.valueOf(keyValue.getValue().toString()));
+                            ContentSortCriteria criteria = new ContentSortCriteria(keyValue.getKey().toString(), SortOrder.valueOf(keyValue.getValue().toString().toUpperCase()));
                             sortCriterias.add(criteria);
                         }
                         if (sortCriterias.size() > 0) {
