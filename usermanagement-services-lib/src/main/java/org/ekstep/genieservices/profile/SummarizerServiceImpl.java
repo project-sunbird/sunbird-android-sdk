@@ -20,6 +20,7 @@ import org.ekstep.genieservices.profile.db.model.LearnerAssessmentDetailsModel;
 import org.ekstep.genieservices.profile.db.model.LearnerAssessmentSummaryModel;
 import org.ekstep.genieservices.profile.db.model.LearnerSummaryModel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -72,13 +73,13 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         String filter = getFilterForLearnerAssessmentDetails(null, summaryRequest.getUid(), summaryRequest.getContentId(), summaryRequest.getHierarchyData());
 
         LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.find(mAppContext.getDBSession(), filter);
+        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         if (learnerAssessmentDetailsModel == null) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROCESSING_ERROR, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_SUMMARY, TAG);
-            return response;
+            response.setResult(new ArrayList<LearnerAssessmentDetails>());
+        } else {
+            response.setResult(learnerAssessmentDetailsModel.getAllAssessments());
         }
 
-        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-        response.setResult(learnerAssessmentDetailsModel.getAllAssessments());
         return response;
     }
 
