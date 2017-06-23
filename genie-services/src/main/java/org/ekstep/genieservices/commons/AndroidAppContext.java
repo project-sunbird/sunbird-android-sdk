@@ -8,13 +8,10 @@ import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.cache.PreferenceWrapper;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.download.AndroidDownloadManager;
-import org.ekstep.genieservices.commons.network.AndroidHttpClient;
 import org.ekstep.genieservices.commons.network.AndroidHttpClientFactory;
 import org.ekstep.genieservices.commons.network.AndroidNetworkConnectivity;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
-import org.ekstep.genieservices.commons.network.IHttpClient;
 import org.ekstep.genieservices.commons.network.IHttpClientFactory;
-import org.ekstep.genieservices.commons.network.auth.BasicAuthenticator;
 
 /**
  * Created on 18/4/17.
@@ -29,6 +26,7 @@ public class AndroidAppContext extends AppContext<Context> {
     private ILocationInfo mLocationInfo;
     private IParams mParams;
     private IDownloadManager mDownloadManager;
+    private IAPKInstaller mAPKInstaller;
 
     private AndroidAppContext(Context context, String appPackage) {
         super(context, appPackage);
@@ -44,6 +42,7 @@ public class AndroidAppContext extends AppContext<Context> {
         appContext.setDeviceInfo(new DeviceInfo(context));
         appContext.setLocationInfo(new LocationInfo(context));
         appContext.setDownloadManager(new AndroidDownloadManager(context));
+        appContext.setAPKInstaller(new APKInstaller(appContext));
         return appContext;
     }
 
@@ -121,4 +120,12 @@ public class AndroidAppContext extends AppContext<Context> {
         this.mDownloadManager = downloadManager;
     }
 
+    @Override
+    public IAPKInstaller getmAPKInstaller() {
+        return mAPKInstaller;
+    }
+
+    private void setAPKInstaller(APKInstaller APKInstaller) {
+        this.mAPKInstaller = APKInstaller;
+    }
 }
