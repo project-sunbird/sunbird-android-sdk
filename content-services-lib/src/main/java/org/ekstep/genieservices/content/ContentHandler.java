@@ -1276,9 +1276,7 @@ public class ContentHandler {
                             ContentSortCriteria criteria = new ContentSortCriteria(keyValue.getKey().toString(), SortOrder.valueOf(keyValue.getValue().toString().toUpperCase()));
                             sortCriterias.add(criteria);
                         }
-                        if (sortCriterias.size() > 0) {
-                            builder.sort(sortCriterias);
-                        }
+                        builder.sort(sortCriterias);
                     }
                 }
 
