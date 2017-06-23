@@ -6,7 +6,7 @@ package org.ekstep.genieservices.commons.bean;
  */
 public class LearnerAssessmentDetails {
 
-    private Long id;
+    private Long id = -1L;
     private String uid;
     private String contentId;
     private String qid;

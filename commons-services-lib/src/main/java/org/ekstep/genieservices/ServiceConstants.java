@@ -94,7 +94,7 @@ public interface ServiceConstants {
         String MODE_WIFI = "WIFI";
         String MODE_MDATA = "MDATA";
         String MODE_LOCAL = "LOCAL";
-        String MODE_NO_NETWORK = "NO_NETWORK";
+        String MODE_NO_NETWORK = "";
     }
 
     interface Telemetry {
