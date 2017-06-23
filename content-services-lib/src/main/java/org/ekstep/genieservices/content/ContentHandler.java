@@ -447,7 +447,7 @@ public class ContentHandler {
         String contentTypesStr = ContentType.getCommaSeparatedContentTypes(contentTypes);
 
         StringBuilder audienceFilterBuilder = new StringBuilder();
-        if (criteria.getAudience() != null && criteria.getAudience().length > 0) {
+        if (criteria != null && criteria.getAudience() != null && criteria.getAudience().length > 0) {
             for (String audience : criteria.getAudience()) {
                 audienceFilterBuilder.append(audienceFilterBuilder.length() > 0 ? " or " : "");
                 audienceFilterBuilder.append(String.format(Locale.US, "c.%s like '%%%s%%'", ContentEntry.COLUMN_NAME_AUDIENCE, audience));
