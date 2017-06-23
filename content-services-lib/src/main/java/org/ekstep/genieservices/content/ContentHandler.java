@@ -983,7 +983,7 @@ public class ContentHandler {
                                     values.addAll(filterMapValue);
                                 }
                                 values.addAll((List) filtersMap.get(entry.getKey()));
-                                filterMap.put(entry.getKey().toString(), values);
+                                filterMap.put(entry.getKey().toString(), new ArrayList<>(values));
                             }
                         }
                         break;
