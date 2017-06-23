@@ -446,10 +446,20 @@ public class ContentHandler {
         }
         String contentTypesStr = ContentType.getCommaSeparatedContentTypes(contentTypes);
 
+        StringBuilder audienceFilterBuilder = new StringBuilder();
+        if (criteria.getAudience() != null && criteria.getAudience().length > 0) {
+            for (String audience : criteria.getAudience()) {
+                audienceFilterBuilder.append(audienceFilterBuilder.length() > 0 ? " or " : "");
+                audienceFilterBuilder.append(String.format(Locale.US, "c.%s like ('%s')", ContentEntry.COLUMN_NAME_AUDIENCE, audience));
+            }
+        }
+
         String contentTypeFilter = String.format(Locale.US, "c.%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr);
         String contentVisibilityFilter = String.format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
         String artifactAvailabilityFilter = String.format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
-        String filter = String.format(Locale.US, "WHERE (%s AND %s AND %s)", contentVisibilityFilter, artifactAvailabilityFilter, contentTypeFilter);
+        String filter = audienceFilterBuilder.length() == 0
+                ? String.format(Locale.US, "WHERE (%s AND %s AND %s)", contentVisibilityFilter, artifactAvailabilityFilter, contentTypeFilter)
+                : String.format(Locale.US, "WHERE (%s AND %s AND %s AND (%s))", contentVisibilityFilter, artifactAvailabilityFilter, contentTypeFilter, audienceFilterBuilder.toString());
 
         String orderBy = String.format(Locale.US, "ORDER BY ca.%s desc, c.%s desc, c.%s desc", ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP, ContentEntry.COLUMN_NAME_LOCAL_LAST_UPDATED_ON, ContentEntry.COLUMN_NAME_SERVER_LAST_UPDATED_ON);
 
