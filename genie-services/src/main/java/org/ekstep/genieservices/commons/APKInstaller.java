@@ -16,7 +16,6 @@ import org.ekstep.genieservices.content.ContentHandler;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +41,7 @@ public class APKInstaller implements IAPKInstaller {
      * @param preRequisites - Content preRequisites items..
      */
     @Override
-    public void showInstallAPKPrompt(String destPath, String downloadUrl, List<HashMap<String, Object>> preRequisites) {
+    public void showInstallAPKPrompt(String destPath, String downloadUrl, List<Map<String, Object>> preRequisites) {
         try {
             File payloadDestination = getFilePath(destPath, downloadUrl);
             isAllApkInstalled(payloadDestination, preRequisites);
@@ -55,14 +54,14 @@ public class APKInstaller implements IAPKInstaller {
         return new File(path, downloadUrl);
     }
 
-    private boolean isAllApkInstalled(File payloadDestination, List<HashMap<String, Object>> preRequisitesList) {
+    private boolean isAllApkInstalled(File payloadDestination, List<Map<String, Object>> preRequisitesList) {
         PackageManager manager = appContext.getContext().getPackageManager();
 
         boolean isReturn = checkApkInstallation(payloadDestination, manager);
 
         if (preRequisitesList != null && preRequisitesList.size() > 0) {
             for (int i = 0; i < preRequisitesList.size(); i++) {
-                HashMap<String, Object> prerequisites = preRequisitesList.get(i);
+                Map<String, Object> prerequisites = preRequisitesList.get(i);
                 if (prerequisites != null) {
                     ContentModel contentModel = ContentModel.find(appContext.getDBSession(), prerequisites.get("identifier"));
                     if (contentModel != null) {
