@@ -117,11 +117,6 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
             learnerAssessmentDetailsModel.update();
         }
 
-        if (learnerAssessmentDetailsModel.getInsertedId() == -1) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROCESSING_ERROR, ServiceConstants.ErrorMessage.UNABLE_TO_SAVE_LEARNER_ASSESSMENT, TAG);
-            return response;
-        }
-
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         return response;
     }
