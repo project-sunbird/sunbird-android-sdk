@@ -70,7 +70,7 @@ public class ContentPlayer {
         }
 
         intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_ORIGIN, "Genie");
-        intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_MODE, "Play");
+        intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_MODE, "play");
         if (content.getHierarchyInfo() != null)
             intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_CONTENT_EXTRAS, GsonUtil.toJson(content.getHierarchyInfo()));
         intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_APP_INFO, GsonUtil.toJson(contentData));
