@@ -190,7 +190,7 @@ public class ContentHandler {
             audienceList = new ArrayList<>();
         }
         if (audienceList.isEmpty()) {
-            audienceList.add("learner");
+            audienceList.add("Learner");
         }
         Collections.sort(audienceList);
         return StringUtil.join(",", audienceList);
