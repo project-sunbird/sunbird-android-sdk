@@ -978,12 +978,12 @@ public class ContentHandler {
                             while (it.hasNext()) {
                                 Set values = new HashSet();
                                 Map.Entry entry = (Map.Entry) it.next();
-                                String[] filterMapValue = (String[]) filterMap.get(entry.getKey());
+                                List filterMapValue = (List) filterMap.get(entry.getKey());
                                 if (filterMapValue != null) {
-                                    values.addAll(Arrays.asList(filterMapValue));
+                                    values.addAll(filterMapValue);
                                 }
                                 values.addAll((List) filtersMap.get(entry.getKey()));
-                                filterMap.put(entry.getKey().toString(), values.toArray(new String[values.size()]));
+                                filterMap.put(entry.getKey().toString(), values);
                             }
                         }
                         break;
@@ -1050,6 +1050,7 @@ public class ContentHandler {
             appliedFilterMap.remove(facetName);
         }
         filterBuilder.facetFilters(facetFilters);
+        filterBuilder.impliedFilters(mapFilterValues(appliedFilterMap));
         return filterBuilder.build();
     }
 
@@ -1281,7 +1282,7 @@ public class ContentHandler {
                 }
 
                 if (searchMap.containsKey("filters")) {
-                    Map<String, String[]> filtersMap = (Map<String, String[]>) searchMap.get("filters");
+                    Map filtersMap = (Map) searchMap.get("filters");
                     builder.impliedFilters(mapFilterValues(filtersMap));
                 }
 
@@ -1307,7 +1308,7 @@ public class ContentHandler {
         return contentListingSectionList;
     }
 
-    private static List<ContentSearchFilter> mapFilterValues(Map<String, String[]> filtersMap) {
+    private static List<ContentSearchFilter> mapFilterValues(Map filtersMap) {
         List<ContentSearchFilter> filters = new ArrayList<>();
         if (filtersMap != null && !filtersMap.isEmpty()) {
             Iterator it = filtersMap.entrySet().iterator();

@@ -215,7 +215,7 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
             profile.setGender("");
             profile.setMedium("");
             profile.setBoard("");
-            profile.setProfileImage("");
+            profile.setProfileImage(profile.getProfileImage());
         }
     }
 
