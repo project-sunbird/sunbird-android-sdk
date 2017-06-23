@@ -82,7 +82,7 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
         if (!StringUtil.isNullOrEmpty(storedData)) {
             saveMasterData(storedData);
         }
-        //refreshMasterData();
+        refreshMasterData();
     }
 
     private void saveMasterData(String response) {
