@@ -55,7 +55,7 @@ public class ContentPlayer {
                 return;
             }
 
-        } else if (content.getMimeType().equalsIgnoreCase(Constants.MimeType.ECML_MIME_TYPE) && !isCollectionOrTextBook(content.getContentType())) {
+        } else if (isEcml(content.getMimeType()) && !isCollectionOrTextBook(content.getContentType())) {
             if (osId == null || GENIE_QUIZ_APP_PACKAGE.equals(osId) || GENIE_CANVAS_PACKAGE.equals(osId)) {
                 Class<?> className = ReflectionUtil.getClass(GENIE_CANVAS_ACTIVITY);
                 if (className == null) {
@@ -87,5 +87,11 @@ public class ContentPlayer {
         return contentType.equalsIgnoreCase(ContentType.COLLECTION.getValue())
                 || contentType.equalsIgnoreCase(ContentType.TEXTBOOK.getValue())
                 || contentType.equalsIgnoreCase(ContentType.TEXTBOOK_UNIT.getValue());
+    }
+
+    private static boolean isEcml(String mimeType) {
+        return mimeType.equalsIgnoreCase(Constants.MimeType.ECML_MIME_TYPE)
+                || mimeType.equalsIgnoreCase(Constants.MimeType.HTML_MIME_TYPE);
+
     }
 }
