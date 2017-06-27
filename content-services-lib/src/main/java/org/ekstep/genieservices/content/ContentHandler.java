@@ -1006,8 +1006,8 @@ public class ContentHandler {
     public static ContentSearchCriteria createFilterCriteria(IConfigService configService, ContentSearchCriteria previousCriteria, List<Map<String, Object>> facets, Map<String, Object> appliedFilterMap) {
         List<ContentSearchFilter> facetFilters = new ArrayList<>();
         ContentSearchCriteria.FilterBuilder filterBuilder = new ContentSearchCriteria.FilterBuilder();
-        filterBuilder.query(previousCriteria.getQuery()).sort(previousCriteria.getSortCriteria())
-                .limit(previousCriteria.getLimit());
+        filterBuilder.query(previousCriteria.getQuery()).limit(previousCriteria.getLimit());
+        filterBuilder.sort(previousCriteria.getSortCriteria() == null ? new ArrayList<ContentSortCriteria>() : previousCriteria.getSortCriteria());
         if ("soft".equals(previousCriteria.getMode())) {
             filterBuilder.softFilters();
         }
@@ -1289,6 +1289,8 @@ public class ContentHandler {
                         }
                         builder.sort(sortCriterias);
                     }
+                } else {
+                    builder.sort(new ArrayList<ContentSortCriteria>());
                 }
 
                 if (searchMap.containsKey("filters")) {
