@@ -74,6 +74,12 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
+    public GenieResponse<List<MasterData>> getAllMasterData() {
+        idle = false;
+        GenieResponse<List<MasterData>> genieResponse = mGenieService.getConfigService().getAllMasterData();
+        return genieResponse;
+    }
+
     public GenieResponse<Map<String, Object>> getOrdinals() {
         idle = false;
         GenieResponse<Map<String, Object>> genieResponse = mGenieService.getConfigService().getOrdinals();
@@ -125,6 +131,12 @@ public class GenieServiceTestActivity extends Activity {
     public GenieResponse<Profile> updateUserProfile(Profile profile) {
         idle = false;
         GenieResponse<Profile> genieResponse = mGenieService.getUserService().updateUserProfile(profile);
+        return genieResponse;
+    }
+
+    public GenieResponse<List<Profile>> getAllUserProfile() {
+        idle = false;
+        GenieResponse<List<Profile>> genieResponse = mGenieService.getUserService().getAllUserProfile();
         return genieResponse;
     }
 

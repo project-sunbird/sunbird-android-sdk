@@ -1,6 +1,7 @@
 package org.ekstep.genieservices.configservice;
 
 import android.support.test.runner.AndroidJUnit4;
+import android.util.Log;
 
 import junit.framework.Assert;
 
@@ -11,9 +12,11 @@ import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.List;
 import java.util.Map;
 
-/** TODO : shouldValidateResourceBundle() and shouldCheckForNullMasterType() not working.
+/**
+ * TODO : shouldValidateResourceBundle() and shouldCheckForNullMasterType() not working.
  * Created by Sneha on 4/27/2017.
  */
 
@@ -37,6 +40,12 @@ public class ConfigServiceTest extends GenieServiceTestBase {
         Assert.assertTrue(genieResponse.getStatus());
         Assert.assertNotNull(ageData);
         Assert.assertEquals(ageData.getValue(), "age");
+    }
+
+    @Test
+    public void shouldGetAllMasterData() {
+        GenieResponse<List<MasterData>> genieResponse = activity.getAllMasterData();
+        Log.e(TAG, "shouldGetAllMasterData: value --------- " + genieResponse.getResult());
     }
 
     /**

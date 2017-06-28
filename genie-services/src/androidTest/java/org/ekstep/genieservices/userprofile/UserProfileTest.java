@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -417,5 +418,33 @@ public class UserProfileTest extends GenieServiceTestBase {
         Profile anonymousProfile = response.getResult();
         Assert.assertNotNull(anonymousProfile);
         AssertProfile.verifyAnonymousUser(anonymousProfile);
+    }
+
+    /**
+     * Scenario: To get the list of all the created profiles.
+     * Given : To get the list of all profiles.
+     * Then: On Successful fetching of the profiles, the response will status as TRUE and
+     * list of profiles.
+     */
+    @Test
+    public void shouldGetAllUserProfile() {
+
+        GenieServiceDBHelper.clearProfileTable();
+
+        final Profile profile1 = new Profile("Happy21", "@drawable/ic_avatar2", "en");
+        final Profile profile2 = new Profile("Happy31", "@drawable/ic_avatar2", "en");
+        createNewProfile(profile1);
+        createNewProfile(profile2);
+
+        GenieResponse<List<Profile>> genieResponse = activity.getAllUserProfile();
+        Profile saved_profile1 = genieResponse.getResult().get(0);
+        Profile saved_profile2 = genieResponse.getResult().get(1);
+
+        Assert.assertEquals(profile1.getHandle(), saved_profile1.getHandle());
+        Assert.assertEquals(profile2.getHandle(), saved_profile2.getHandle());
+
+        Assert.assertEquals(profile1.getUid(), saved_profile1.getUid());
+        Assert.assertEquals(profile2.getUid(), saved_profile2.getUid());
+
     }
 }
