@@ -4,9 +4,8 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * Created on 5/26/2017.
+ * This class holds the name of the filter and the its list of {@link FilterValue} in values.
  *
- * @author anil
  */
 public class ContentSearchFilter implements Serializable {
 

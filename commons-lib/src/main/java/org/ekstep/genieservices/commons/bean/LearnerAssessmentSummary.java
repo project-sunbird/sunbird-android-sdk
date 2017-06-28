@@ -3,10 +3,9 @@ package org.ekstep.genieservices.commons.bean;
 import java.io.Serializable;
 
 /**
- * Created on 6/6/17.
- * shriharsh
+ * This class holds the details about assessment summary of a learner.
+ *
  */
-
 public class LearnerAssessmentSummary implements Serializable {
     private String uid;
     private String contentId;

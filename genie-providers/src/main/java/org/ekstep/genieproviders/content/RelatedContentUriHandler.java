@@ -7,7 +7,6 @@ import android.database.MatrixCursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.ekstep.genieproviders.IUriHandler;
@@ -21,6 +20,7 @@ import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -50,27 +50,31 @@ public class RelatedContentUriHandler implements IUriHandler {
     @Override
     public Cursor process() {
         MatrixCursor cursor = null;
-        if (genieService != null && selectionArgs[0] != null) {
+        if (genieService != null && selection != null) {
             cursor = getMatrixCursor();
-            Logger.i(TAG, "Content Identifier - " + selectionArgs[0]);
-            Type type = new TypeToken<List<String>>() {
+            Logger.i(TAG, "Content Identifier - " + selection);
+            Type type = new TypeToken<List<Map>>() {
             }.getType();
-            List<String> contentIdentifiers = GsonUtil.getGson().fromJson(selectionArgs[0], type);
+            List<Map> hierarchyData = GsonUtil.getGson().fromJson(selection, type);
 
             GenieResponse genieResponse = null;
-            if (contentIdentifiers != null && contentIdentifiers.size() == 1) {
-                RelatedContentRequest request = new RelatedContentRequest.Builder().contentId(contentIdentifiers.get(0)).build();
+            if (hierarchyData != null && hierarchyData.size() == 1) {
+                RelatedContentRequest request = new RelatedContentRequest.Builder().contentId(hierarchyData.get(0).get("identifier").toString()).build();
                 genieResponse = genieService.getContentService().getRelatedContent(request);
-            } else if (contentIdentifiers != null && contentIdentifiers.size() > 1) {
+            } else if (hierarchyData != null && hierarchyData.size() > 1) {
                 // TODO: 29/5/17 NEED TO DECIDE RESULT MAP KEY FOR NEXT CONTENT
                 Map<String, Object> resultMap = new HashMap<>();
+                List<String> contentIdentifiers = new ArrayList<>();
+                for (Map hierarchyItem : hierarchyData) {
+                    contentIdentifiers.add(hierarchyItem.get("identifier").toString());
+                }
                 resultMap.put("nextContent", genieService.getContentService().nextContent(contentIdentifiers).getResult());
                 genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
                 genieResponse.setResult(resultMap);
             }
 
             if (genieResponse != null) {
-                cursor.addRow(new String[]{new Gson().toJson(genieResponse)});
+                cursor.addRow(new String[]{GsonUtil.toJson(genieResponse)});
             } else {
                 getErrorResponse(cursor);
             }
@@ -82,7 +86,7 @@ public class RelatedContentUriHandler implements IUriHandler {
     @NonNull
     protected GenieResponse getErrorResponse(MatrixCursor cursor) {
         GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(Constants.PROCESSING_ERROR, "Could not find the content", "Failed");
-        cursor.addRow(new String[]{new Gson().toJson(errorResponse)});
+        cursor.addRow(new String[]{GsonUtil.toJson(errorResponse)});
         return errorResponse;
     }
 

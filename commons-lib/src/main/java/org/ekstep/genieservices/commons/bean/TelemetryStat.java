@@ -1,9 +1,10 @@
 package org.ekstep.genieservices.commons.bean;
 
-/**
- * Created by swayangjit on 17/5/17.
- */
 
+/**
+ * This class holds the details about the telemetry stats.
+ *
+ */
 public class TelemetryStat {
 
     private int unSyncedEventCount;

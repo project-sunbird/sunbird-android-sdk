@@ -19,6 +19,7 @@ import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingSection;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchFilter;
+import org.ekstep.genieservices.commons.bean.ContentSortCriteria;
 import org.ekstep.genieservices.commons.bean.ContentVariant;
 import org.ekstep.genieservices.commons.bean.FilterValue;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -31,7 +32,9 @@ import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
+import org.ekstep.genieservices.commons.bean.enums.SearchType;
 import org.ekstep.genieservices.commons.bean.enums.SortBy;
+import org.ekstep.genieservices.commons.bean.enums.SortOrder;
 import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.contract.ContentEntry;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
@@ -44,8 +47,10 @@ import org.ekstep.genieservices.content.db.model.ContentListingModel;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.db.model.ContentsModel;
 import org.ekstep.genieservices.content.network.ContentDetailsAPI;
+import org.ekstep.genieservices.content.network.ContentListingAPI;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,6 +67,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.TreeMap;
+
+import static javax.swing.UIManager.get;
 
 /**
  * Created on 5/23/2017.
@@ -183,7 +190,7 @@ public class ContentHandler {
             audienceList = new ArrayList<>();
         }
         if (audienceList.isEmpty()) {
-            audienceList.add("learner");
+            audienceList.add("Learner");
         }
         Collections.sort(audienceList);
         return StringUtil.join(",", audienceList);
@@ -439,10 +446,20 @@ public class ContentHandler {
         }
         String contentTypesStr = ContentType.getCommaSeparatedContentTypes(contentTypes);
 
+        StringBuilder audienceFilterBuilder = new StringBuilder();
+        if (criteria != null && criteria.getAudience() != null && criteria.getAudience().length > 0) {
+            for (String audience : criteria.getAudience()) {
+                audienceFilterBuilder.append(audienceFilterBuilder.length() > 0 ? " or " : "");
+                audienceFilterBuilder.append(String.format(Locale.US, "c.%s like '%%%s%%'", ContentEntry.COLUMN_NAME_AUDIENCE, audience));
+            }
+        }
+
         String contentTypeFilter = String.format(Locale.US, "c.%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr);
         String contentVisibilityFilter = String.format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
         String artifactAvailabilityFilter = String.format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
-        String filter = String.format(Locale.US, "WHERE (%s AND %s AND %s)", contentVisibilityFilter, artifactAvailabilityFilter, contentTypeFilter);
+        String filter = audienceFilterBuilder.length() == 0
+                ? String.format(Locale.US, "WHERE (%s AND %s AND %s)", contentVisibilityFilter, artifactAvailabilityFilter, contentTypeFilter)
+                : String.format(Locale.US, "WHERE (%s AND %s AND %s AND (%s))", contentVisibilityFilter, artifactAvailabilityFilter, contentTypeFilter, audienceFilterBuilder.toString());
 
         String orderBy = String.format(Locale.US, "ORDER BY ca.%s desc, c.%s desc, c.%s desc", ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP, ContentEntry.COLUMN_NAME_LOCAL_LAST_UPDATED_ON, ContentEntry.COLUMN_NAME_SERVER_LAST_UPDATED_ON);
 
@@ -681,7 +698,7 @@ public class ContentHandler {
             if (contentMetadataMap != null) {
                 Map viralityMetadataMap = (Map) contentMetadataMap.get(KEY_VIRALITY_METADATA);
                 String count = String.valueOf(viralityMetadataMap.get(KEY_TRANSFER_COUNT));
-                return Integer.valueOf(count);
+                return Double.valueOf(count).intValue();
             }
         } catch (NumberFormatException e) {
             e.printStackTrace();
@@ -707,7 +724,26 @@ public class ContentHandler {
             ((Map<String, Object>) localDataMap.get(KEY_CONTENT_METADATA)).put(KEY_VIRALITY_METADATA, viralityMetadata);
         } else {
             Map<String, Object> viralityMetadata = (Map<String, Object>) ((Map<String, Object>) localDataMap.get(KEY_CONTENT_METADATA)).get(KEY_VIRALITY_METADATA);
-            viralityMetadata.put(KEY_TRANSFER_COUNT, transferCount(localDataMap) + 1);
+            viralityMetadata.put(KEY_TRANSFER_COUNT, transferCount(viralityMetadata) + 1);
+        }
+    }
+
+    public static void addViralityMetadataIfMissing(Map<String, Object> localDataMap, String origin) {
+        if (localDataMap.get(KEY_CONTENT_METADATA) == null) {
+            localDataMap.put(KEY_CONTENT_METADATA, new HashMap<String, Object>());
+        }
+
+        Map<String, Object> contentMetadata = (Map<String, Object>) localDataMap.get(KEY_CONTENT_METADATA);
+        if (contentMetadata.get(KEY_VIRALITY_METADATA) == null) {
+            contentMetadata.put(KEY_VIRALITY_METADATA, new HashMap<String, Object>());
+        }
+
+        Map<String, Object> viralityMetadata = (Map<String, Object>) contentMetadata.get(KEY_VIRALITY_METADATA);
+        if (viralityMetadata.get(KEY_ORIGIN) == null) {
+            viralityMetadata.put(KEY_ORIGIN, origin);
+        }
+        if (viralityMetadata.get(KEY_TRANSFER_COUNT) == null) {
+            viralityMetadata.put(KEY_TRANSFER_COUNT, INITIAL_VALUE_FOR_TRANSFER_COUNT);
         }
     }
 
@@ -716,15 +752,15 @@ public class ContentHandler {
     }
 
     private static boolean isContentMetadataPresentWithoutViralityMetadata(Map<String, Object> localDataMap) {
-        return localDataMap.get(KEY_CONTENT_METADATA) != null
-                && ((Map<String, Object>) localDataMap.get(KEY_CONTENT_METADATA)).get(KEY_VIRALITY_METADATA) == null;
+        return ((Map<String, Object>) localDataMap.get(KEY_CONTENT_METADATA)).get(KEY_VIRALITY_METADATA) == null;
     }
 
     private static int transferCount(Map<String, Object> viralityMetadata) {
         try {
-            String transferCount = (String) viralityMetadata.get(KEY_TRANSFER_COUNT);
-            return Double.valueOf(transferCount).intValue();
+            Double transferCount = (Double) viralityMetadata.get(KEY_TRANSFER_COUNT);
+            return transferCount.intValue();
         } catch (Exception e) {
+            e.printStackTrace();
             return 0;
         }
     }
@@ -798,9 +834,9 @@ public class ContentHandler {
         Map<String, Object> filterMap = new HashMap<>();
         filterMap.put("compatibilityLevel", getCompatibilityLevelFilter());
         filterMap.put("identifier", contentIdentifiers);
-        addFiltersIfNotAvailable(filterMap, "objectType", Collections.singletonList("Content"));
+        filterMap.put("status", Collections.singletonList("Live"));
+        filterMap.put("objectType", Collections.singletonList("Content"));
         addFiltersIfNotAvailable(filterMap, "contentType", Arrays.asList("Story", "Worksheet", "Collection", "Game", "TextBook"));
-        addFiltersIfNotAvailable(filterMap, "status", Collections.singletonList("Live"));
 
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("filters", filterMap);
@@ -812,36 +848,76 @@ public class ContentHandler {
     public static Map<String, Object> getSearchRequest(IUserService userService, IConfigService configService, ContentSearchCriteria criteria) {
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("query", criteria.getQuery());
-        requestMap.put("filters", getFilterRequest(userService, configService, criteria));
         requestMap.put("limit", criteria.getLimit());
-        requestMap.put("sort_by", getSortByMap(criteria.getSortBy()));
         requestMap.put("mode", criteria.getMode());
-        requestMap.put("facets", Arrays.asList("contentType", "domain", "ageGroup", "language", "gradeLevel"));
-
+        requestMap.put("facets", getFacetList());
+        addSortCriteria(requestMap, criteria);
+        if (SearchType.SEARCH.equals(criteria.getSearchType())) {
+            requestMap.put("filters", getSearchRequest(configService, criteria));
+        } else {
+            requestMap.put("filters", getFilterRequest(configService, criteria));
+        }
         return requestMap;
     }
 
-    private static Map<String, String> getSortByMap(String sortBy) {
+    private static void addSortCriteria(Map requestMap, ContentSearchCriteria criteria) {
         Map<String, String> sortMap = new HashMap<>();
+        List<ContentSortCriteria> sortCriterias = criteria.getSortCriteria();
+        if (sortCriterias != null && sortCriterias.size() > 0) {
+            //TODO for now only handling the first sort criteria. As of now only one criteria is used in the system and the list has been kept for future compatibility.
+            sortMap.put(sortCriterias.get(0).getSortAttribute(), sortCriterias.get(0).getSortOrder().getValue());
+            requestMap.put("sort_by", sortMap);
+        }
+    }
 
-        if (!StringUtil.isNullOrEmpty(sortBy)) {
-            if (SortBy.NAME.getValue().equals(sortBy)) {
-                sortMap.put("name", "asc");
-            } else if (SortBy.MOST_POPULAR.getValue().equals(sortBy)) {
-                sortMap.put("popularity", "desc");
-            } else if (SortBy.NEWEST.getValue().equals(sortBy)) {
-                sortMap.put("lastPublishedOn", "desc");
+    private static Map<String, Object> getSearchRequest(IConfigService configService, ContentSearchCriteria criteria) {
+        Map<String, Object> filterMap = new HashMap<>();
+
+        // Populating implicit search criteria.
+        filterMap.put("compatibilityLevel", getCompatibilityLevelFilter());
+        filterMap.put("status", Collections.singletonList("Live"));
+        filterMap.put("objectType", Collections.singletonList("Content"));
+        filterMap.put("contentType", Arrays.asList("Story", "Worksheet", "Collection", "Game", "TextBook"));
+
+        //Add filters for criteria atributes
+        // Add subject filter
+        if (criteria.getAge() > 0)
+            applyListingFilter(configService, MasterDataType.AGEGROUP, String.valueOf(criteria.getAge()), filterMap);
+
+        // Add board filter
+        if (!StringUtil.isNullOrEmpty(criteria.getBoard()))
+            applyListingFilter(configService, MasterDataType.BOARD, criteria.getBoard(), filterMap);
+
+        // Add medium filter
+        if (!StringUtil.isNullOrEmpty(criteria.getMedium()))
+            applyListingFilter(configService, MasterDataType.MEDIUM, criteria.getMedium(), filterMap);
+
+        // Add standard filter
+        if (criteria.getGrade() > 0)
+            applyListingFilter(configService, MasterDataType.GRADELEVEL, String.valueOf(criteria.getGrade()), filterMap);
+
+        String[] audienceArr = criteria.getAudience();
+        if (audienceArr != null && audienceArr.length > 0) {
+            for (String audience : audienceArr) {
+                applyListingFilter(configService, MasterDataType.AUDIENCE, audience, filterMap);
             }
         }
 
-        return sortMap;
+        String[] channelArr = criteria.getChannel();
+        if (channelArr != null && channelArr.length > 0) {
+            for (String channel : channelArr) {
+                applyListingFilter(configService, MasterDataType.CHANNEL, channel, filterMap);
+            }
+        }
+
+        return filterMap;
     }
 
-    private static Map<String, Object> getFilterRequest(IUserService userService, IConfigService configService, ContentSearchCriteria criteria) {
+    private static Map<String, Object> getFilterRequest(IConfigService configService, ContentSearchCriteria criteria) {
         Map<String, Object> filterMap = new HashMap<>();
-
-        if (criteria.getFilters() != null) {
-            for (ContentSearchFilter filter : criteria.getFilters()) {
+        filterMap.put("compatibilityLevel", getCompatibilityLevelFilter());
+        if (criteria.getFacetFilters() != null) {
+            for (ContentSearchFilter filter : criteria.getFacetFilters()) {
                 List<String> filterValueList = new ArrayList<>();
                 for (FilterValue filterValue : filter.getValues()) {
                     if (filterValue.isApply()) {
@@ -855,21 +931,26 @@ public class ContentHandler {
             }
         }
 
-        // Populating implicit search criteria.
-        filterMap.put("compatibilityLevel", getCompatibilityLevelFilter());
-        addFiltersIfNotAvailable(filterMap, "objectType", Collections.singletonList("Content"));
-        addFiltersIfNotAvailable(filterMap, "contentType", Arrays.asList("Story", "Worksheet", "Collection", "Game", "TextBook"));
-        addFiltersIfNotAvailable(filterMap, "status", Collections.singletonList("Live"));
+        if (criteria.getImpliedFilters() != null) {
+            for (ContentSearchFilter filter : criteria.getImpliedFilters()) {
+                List<String> filterValueList = new ArrayList<>();
+                for (FilterValue filterValue : filter.getValues()) {
+                    if (filterValue.isApply()) {
+                        filterValueList.add(filterValue.getName());
+                    }
+                }
 
-        // Apply profile specific filters
-        if (criteria.isProfileFilter()) {
-            applyProfileFilter(getCurrentProfile(userService), configService, filterMap);
+                if (!filterValueList.isEmpty()) {
+                    filterMap.put(filter.getName(), filterValueList);
+                }
+            }
         }
 
-        // Apply partner specific filters
-        applyPartnerFilter(configService, criteria.getPartnerFilters(), filterMap);
-
         return filterMap;
+    }
+
+    private static List<String> getFacetList() {
+        return Arrays.asList("contentType", "domain", "ageGroup", "language", "gradeLevel");
     }
 
     private static Map<String, Integer> getCompatibilityLevelFilter() {
@@ -885,33 +966,7 @@ public class ContentHandler {
         }
     }
 
-    private static void applyProfileFilter(Profile profile, IConfigService configService, Map<String, Object> filterMap) {
-        if (profile != null) {
-            // Add age filter
-            applyFilter(configService, MasterDataType.AGEGROUP, String.valueOf(profile.getAge()), filterMap);
-
-            // Add board filter
-            applyFilter(configService, MasterDataType.BOARD, profile.getBoard(), filterMap);
-
-            // Add medium filter
-            applyFilter(configService, MasterDataType.MEDIUM, profile.getMedium(), filterMap);
-
-            // Add standard filter
-            applyFilter(configService, MasterDataType.GRADELEVEL, String.valueOf(profile.getStandard()), filterMap);
-        }
-    }
-
-    private static void applyPartnerFilter(IConfigService configService, List<PartnerFilter> partnerFilters, Map<String, Object> filterMap) {
-        if (configService != null && partnerFilters != null && !partnerFilters.isEmpty()) {
-            for (PartnerFilter partnerFilter : partnerFilters) {
-                for (String propertyValue : partnerFilter.getValues()) {
-                    applyFilter(configService, partnerFilter.getMasterDataType(), propertyValue, filterMap);
-                }
-            }
-        }
-    }
-
-    private static void applyFilter(IConfigService configService, MasterDataType masterDataType, String propertyValue, Map<String, Object> filterMap) {
+    private static void applyListingFilter(IConfigService configService, MasterDataType masterDataType, String propertyValue, Map<String, Object> filterMap) {
         if (configService != null && propertyValue != null) {
             String property = masterDataType.getValue();
 
@@ -924,24 +979,23 @@ public class ContentHandler {
             if (masterDataResponse.getStatus()) {
                 MasterData masterData = masterDataResponse.getResult();
 
-                for (MasterDataValues values : masterData.getValues()) {
-                    if (values.getTelemetry().equals(propertyValue)) {
-                        Map<String, Object> searchMap = values.getSearch();
+                for (MasterDataValues masterDataValues : masterData.getValues()) {
+                    if (masterDataValues.getTelemetry().equals(propertyValue)) {
+                        Map<String, Object> searchMap = masterDataValues.getSearch();
                         Map filtersMap = (Map) searchMap.get("filters");
-                        Set termSet = new HashSet((List) filtersMap.get(property));
-
-                        if (filterMap.containsKey(property)) {
-                            if (filterMap.get(property) != null) {
-                                Set set = new HashSet(Arrays.asList(filterMap.get(property)));
-                                if (set != null && termSet != null) {
-                                    termSet.addAll(set);
+                        if (filtersMap != null) {
+                            Iterator it = filtersMap.entrySet().iterator();
+                            while (it.hasNext()) {
+                                Set values = new HashSet();
+                                Map.Entry entry = (Map.Entry) it.next();
+                                List filterMapValue = (List) filterMap.get(entry.getKey());
+                                if (filterMapValue != null) {
+                                    values.addAll(filterMapValue);
                                 }
+                                values.addAll((List) filtersMap.get(entry.getKey()));
+                                filterMap.put(entry.getKey().toString(), new ArrayList<>(values));
                             }
                         }
-
-                        String[] strArr = new String[termSet.size()];
-                        termSet.toArray(strArr);
-                        filterMap.put(property, strArr);
                         break;
                     }
                 }
@@ -949,14 +1003,21 @@ public class ContentHandler {
         }
     }
 
-    public static List<ContentSearchFilter> getFilters(IConfigService configService, List<Map<String, Object>> facets, Map<String, Object> appliedFilterMap) {
-        List<ContentSearchFilter> filters = new ArrayList<>();
-
-        if (facets == null) {
-            return filters;
+    public static ContentSearchCriteria createFilterCriteria(IConfigService configService, ContentSearchCriteria previousCriteria, List<Map<String, Object>> facets, Map<String, Object> appliedFilterMap) {
+        List<ContentSearchFilter> facetFilters = new ArrayList<>();
+        ContentSearchCriteria.FilterBuilder filterBuilder = new ContentSearchCriteria.FilterBuilder();
+        filterBuilder.query(previousCriteria.getQuery()).limit(previousCriteria.getLimit());
+        filterBuilder.sort(previousCriteria.getSortCriteria() == null ? new ArrayList<ContentSortCriteria>() : previousCriteria.getSortCriteria());
+        if ("soft".equals(previousCriteria.getMode())) {
+            filterBuilder.softFilters();
         }
 
-        Map<String, Object> ordinalsMap = null;
+        if (facets == null) {
+            filterBuilder.facetFilters(facetFilters);
+            return filterBuilder.build();
+        }
+
+        Map<String, Object> ordinalsMap = new HashMap<>();
         if (configService != null) {
             GenieResponse<Map<String, Object>> ordinalsResponse = configService.getOrdinals();
             if (ordinalsResponse.getStatus()) {
@@ -977,7 +1038,7 @@ public class ContentHandler {
             }
 
             List<String> facetOrder = null;
-            if (ordinalsMap != null && ordinalsMap.containsKey(facetName)) {
+            if (ordinalsMap.containsKey(facetName)) {
                 facetOrder = (List<String>) ordinalsMap.get(facetName);
             }
 
@@ -993,11 +1054,14 @@ public class ContentHandler {
                 filter.setValues(values);
 
                 // Set the filter
-                filters.add(filter);
+                facetFilters.add(filter);
             }
-        }
 
-        return filters;
+            appliedFilterMap.remove(facetName);
+        }
+        filterBuilder.facetFilters(facetFilters);
+        filterBuilder.impliedFilters(mapFilterValues(appliedFilterMap));
+        return filterBuilder.build();
     }
 
     private static List<FilterValue> getSortedFilterValuesWithAppliedFilters(List<Map<String, Object>> facetValues, List<String> facetOrder, List<String> appliedFilter) {
@@ -1076,15 +1140,32 @@ public class ContentHandler {
         return requestMap;
     }
 
-    public static boolean dataHasExpired(long ttl) {
-        Long currentTime = DateUtil.getEpochTime();
-        return currentTime > ttl;
+    public static void refreshContentListingFromServer(final AppContext appContext, final IConfigService configService, final ContentListingCriteria contentListingCriteria,
+                                                       final Profile profile, final String did) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                fetchContentListingFromServer(appContext, configService, contentListingCriteria, profile, did);
+            }
+        }).start();
     }
 
-    public static Map<String, Object> getContentListingRequest(IConfigService configService, ContentListingCriteria contentListingCriteria, String did) {
+    public static String fetchContentListingFromServer(AppContext appContext, IConfigService configService, ContentListingCriteria contentListingCriteria, Profile profile, String did) {
+        Map<String, Object> requestMap = ContentHandler.getContentListingRequest(configService, contentListingCriteria, profile, did);
+        ContentListingAPI api = new ContentListingAPI(appContext, contentListingCriteria.getContentListingId(), requestMap);
+        GenieResponse apiResponse = api.post();
+        String jsonStr = null;
+        if (apiResponse.getStatus()) {
+            jsonStr = apiResponse.getResult().toString();
+            ContentHandler.saveContentListingDataInDB(appContext, contentListingCriteria, jsonStr);
+        }
+        return jsonStr;
+    }
+
+
+    public static Map<String, Object> getContentListingRequest(IConfigService configService, ContentListingCriteria contentListingCriteria, Profile profile, String did) {
         HashMap<String, Object> contextMap = new HashMap<>();
 
-        Profile profile = contentListingCriteria.getProfile();
         if (profile != null) {
             contextMap.put("uid", profile.getUid());
             contextMap.put("dlang", profile.getLanguage());
@@ -1096,13 +1177,37 @@ public class ContentHandler {
         filterMap.put("compatibilityLevel", getCompatibilityLevelFilter());
 
         // Add subject filter
-        applyFilter(configService, MasterDataType.SUBJECT, contentListingCriteria.getSubject(), filterMap);
+        if (!StringUtil.isNullOrEmpty(contentListingCriteria.getSubject()))
+            applyListingFilter(configService, MasterDataType.SUBJECT, contentListingCriteria.getSubject(), filterMap);
 
-        // Apply profile specific filters
-        applyProfileFilter(profile, configService, filterMap);
+        if (contentListingCriteria.getAge() > 0)
+            applyListingFilter(configService, MasterDataType.AGEGROUP, String.valueOf(contentListingCriteria.getAge()), filterMap);
 
-        // Apply partner specific filters
-        applyPartnerFilter(configService, contentListingCriteria.getPartnerFilters(), filterMap);
+        // Add board filter
+        if (!StringUtil.isNullOrEmpty(contentListingCriteria.getBoard()))
+            applyListingFilter(configService, MasterDataType.BOARD, contentListingCriteria.getBoard(), filterMap);
+
+        // Add medium filter
+        if (!StringUtil.isNullOrEmpty(contentListingCriteria.getMedium()))
+            applyListingFilter(configService, MasterDataType.MEDIUM, contentListingCriteria.getMedium(), filterMap);
+
+        // Add standard filter
+        if (contentListingCriteria.getGrade() > 0)
+            applyListingFilter(configService, MasterDataType.GRADELEVEL, String.valueOf(contentListingCriteria.getGrade()), filterMap);
+
+        String[] audienceArr = contentListingCriteria.getAudience();
+        if (audienceArr != null && audienceArr.length > 0) {
+            for (String audience : audienceArr) {
+                applyListingFilter(configService, MasterDataType.AUDIENCE, audience, filterMap);
+            }
+        }
+
+        String[] channelArr = contentListingCriteria.getChannel();
+        if (channelArr != null && channelArr.length > 0) {
+            for (String channel : channelArr) {
+                applyListingFilter(configService, MasterDataType.CHANNEL, channel, filterMap);
+            }
+        }
 
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("context", contextMap);
@@ -1111,20 +1216,18 @@ public class ContentHandler {
         return requestMap;
     }
 
-    public static void saveContentListingDataInDB(IDBSession dbSession, ContentListingCriteria contentListingCriteria, Profile profile, String jsonStr) {
+    public static void saveContentListingDataInDB(AppContext appContext, ContentListingCriteria contentListingCriteria, String jsonStr) {
         if (jsonStr == null) {
             return;
         }
 
-        long expiryTime;
+        long expiryTime = DateUtil.getEpochTime() + ContentConstants.CACHE_TIMEOUT_HOME_CONTENT;
 
-        long ttlInMilliSeconds = ContentConstants.CACHE_TIMEOUT_HOME_CONTENT;
-        Long currentTime = DateUtil.getEpochTime();
-        expiryTime = ttlInMilliSeconds + currentTime;
-
-        // TODO: 6/8/2017 - Read the channel and audience from partnerFilters in criteria and make the comma seperated string and pass in build
-        ContentListingModel contentListingModel = ContentListingModel.build(dbSession, contentListingCriteria.getContentListingId(),
-                jsonStr, profile, contentListingCriteria.getSubject(), null, null, expiryTime);
+        ContentListingModel contentListingModelInDB = ContentListingModel.find(appContext.getDBSession(), contentListingCriteria);
+        if (contentListingModelInDB != null) {
+            contentListingModelInDB.delete();
+        }
+        ContentListingModel contentListingModel = ContentListingModel.build(appContext.getDBSession(), contentListingCriteria, jsonStr, expiryTime);
         contentListingModel.save();
     }
 
@@ -1142,7 +1245,7 @@ public class ContentHandler {
 
         if (result != null) {
             contentListing = new ContentListing();
-            contentListing.setId(contentListingCriteria.getContentListingId());
+            contentListing.setContentListingId(contentListingCriteria.getContentListingId());
             contentListing.setResponseMessageId(responseMessageId);
             if (result.containsKey("page")) {
                 contentListing.setContentListingSections(getSectionsFromPageMap(dbSession, (Map<String, Object>) result.get("page"), contentListingCriteria));
@@ -1165,61 +1268,34 @@ public class ContentHandler {
             ContentSearchCriteria contentSearchCriteria = null;
             Map<String, Object> searchMap = (Map<String, Object>) sectionMap.get("search");
             if (searchMap != null) {
-                ContentSearchCriteria.Builder builder = new ContentSearchCriteria.Builder();
+                ContentSearchCriteria.FilterBuilder builder = new ContentSearchCriteria.FilterBuilder();
                 if (searchMap.containsKey("query")) {
                     builder.query((String) searchMap.get("query"));
                 }
 
-                if (searchMap.containsKey("mode")) {
-                    builder.mode((String) searchMap.get("mode"));
+                if (searchMap.containsKey("mode") && "soft".equals(searchMap.get("mode"))) {
+                    builder.softFilters();
                 }
 
                 if (searchMap.containsKey("sort_by")) {
-                    // TODO: 5/30/2017
+                    Map sortMap = (Map) searchMap.get("sort_by");
+                    if (sortMap != null) {
+                        Iterator it = sortMap.entrySet().iterator();
+                        List<ContentSortCriteria> sortCriterias = new ArrayList<>();
+                        while (it.hasNext()) {
+                            Map.Entry keyValue = (Map.Entry) it.next();
+                            ContentSortCriteria criteria = new ContentSortCriteria(keyValue.getKey().toString(), SortOrder.valueOf(keyValue.getValue().toString().toUpperCase()));
+                            sortCriterias.add(criteria);
+                        }
+                        builder.sort(sortCriterias);
+                    }
+                } else {
+                    builder.sort(new ArrayList<ContentSortCriteria>());
                 }
 
                 if (searchMap.containsKey("filters")) {
-                    Map<String, String[]> filtersMap = (Map<String, String[]>) searchMap.get("filters");
-                    if (filtersMap != null && !filtersMap.isEmpty()) {
-
-                        List<ContentSearchFilter> filters = new ArrayList<>();
-
-                        Iterator it = filtersMap.entrySet().iterator();
-                        while (it.hasNext()) {
-                            Map.Entry pair = (Map.Entry) it.next();
-                            String key = pair.getKey().toString();
-                            Object value = pair.getValue();
-
-                            if (value instanceof List) {
-                                List<FilterValue> values = new ArrayList<>();
-                                List<String> valueList = (List<String>) value;
-                                for (String v : valueList) {
-                                    FilterValue filterValue = new FilterValue();
-                                    filterValue.setName(v);
-                                    filterValue.setApply(true);
-
-                                    values.add(filterValue);
-                                }
-
-                                ContentSearchFilter contentSearchFilter = new ContentSearchFilter();
-                                contentSearchFilter.setName(key);
-                                contentSearchFilter.setValues(values);
-
-                                filters.add(contentSearchFilter);
-                            } else {
-                                // TODO: 5/30/2017 - handle object filter here.
-//                                key.equals("compatibilityLevel") && key.equals("genieScore")
-//                                String[] stringArray = mFilterMap.get(values.getName());
-//                                filterSet.addAll(Arrays.asList(stringArray));
-                            }
-
-                            it.remove();
-                        }
-
-                        builder.applyFilters(filters);
-                        builder.applyCurrentProfile(contentListingCriteria.getProfile() != null);
-                        builder.applyPartnerFilters(contentListingCriteria.getPartnerFilters());
-                    }
+                    Map filtersMap = (Map) searchMap.get("filters");
+                    builder.impliedFilters(mapFilterValues(filtersMap));
                 }
 
                 contentSearchCriteria = builder.build();
@@ -1242,6 +1318,43 @@ public class ContentHandler {
         }
 
         return contentListingSectionList;
+    }
+
+    private static List<ContentSearchFilter> mapFilterValues(Map filtersMap) {
+        List<ContentSearchFilter> filters = new ArrayList<>();
+        if (filtersMap != null && !filtersMap.isEmpty()) {
+            Iterator it = filtersMap.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                String key = pair.getKey().toString();
+                Object value = pair.getValue();
+
+                if (value instanceof List) {
+                    List<FilterValue> values = new ArrayList<>();
+                    List<String> valueList = (List<String>) value;
+                    for (String v : valueList) {
+                        FilterValue filterValue = new FilterValue();
+                        filterValue.setName(v);
+                        filterValue.setApply(true);
+
+                        values.add(filterValue);
+                    }
+
+                    ContentSearchFilter contentSearchFilter = new ContentSearchFilter();
+                    contentSearchFilter.setName(key);
+                    contentSearchFilter.setValues(values);
+
+                    filters.add(contentSearchFilter);
+                } else {
+//                  TODO: No change required here. Best of genie will be removed soon and so we dont have to handle the genieScore. Also compatability level gets auto added into every search.
+//                  key.equals("compatibilityLevel") && key.equals("genieScore")
+//                  String[] stringArray = mFilterMap.get(values.getName());
+//                  filterSet.addAll(Arrays.asList(stringArray));
+                }
+            }
+
+        }
+        return filters;
     }
 
     public static String getDownloadUrl(Map<String, Object> dataMap) {

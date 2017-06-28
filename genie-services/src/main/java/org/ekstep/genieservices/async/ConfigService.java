@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created on 22/5/17.
+ * This class provides APIs for performing {@link ConfigService} related operations on a separate thread.
+ *
  */
 public class ConfigService {
 
@@ -31,7 +32,7 @@ public class ConfigService {
      * On failing to fetch the data, the response will return status as FALSE with the following error.
      * <p>NO_DATA_FOUND
      *
-     * @param responseHandler
+     * @param responseHandler - {@link IResponseHandler<List<MasterData>>}
      */
     public void getAllMasterData(IResponseHandler<List<MasterData>> responseHandler) {
         new AsyncHandler<List<MasterData>>(responseHandler).execute(new IPerformable<List<MasterData>>() {
@@ -53,8 +54,8 @@ public class ConfigService {
      * On failing to fetch the data, the response will return status as FALSE with the following error.
      * <p>NO_DATA_FOUND
      *
-     * @param type
-     * @param responseHandler
+     * @param type -{@link MasterDataType}
+     * @param responseHandler - {@link IResponseHandler<MasterData>}
      */
     public void getMasterData(final MasterDataType type, IResponseHandler<MasterData> responseHandler) {
         new AsyncHandler<MasterData>(responseHandler).execute(new IPerformable<MasterData>() {
@@ -77,7 +78,7 @@ public class ConfigService {
      * <p>NO_DATA_FOUND
      *
      * @param languageIdentifier
-     * @param responseHandler
+     * @param responseHandler - {@link IResponseHandler<Map<String, Object>>}
      */
     public void getResourceBundle(final String languageIdentifier, IResponseHandler<Map<String, Object>> responseHandler) {
         new AsyncHandler<Map<String, Object>>(responseHandler).execute(new IPerformable<Map<String, Object>>() {
@@ -98,7 +99,7 @@ public class ConfigService {
      * On failing to fetch the data, the response will return status as FALSE with the following error.
      * <p>NO_DATA_FOUND
      *
-     * @param responseHandler
+     * @param responseHandler - {@link IResponseHandler<Map<String, Object>>}
      */
     public void getOrdinals(IResponseHandler<Map<String, Object>> responseHandler) {
         new AsyncHandler<Map<String, Object>>(responseHandler).execute(new IPerformable<Map<String, Object>>() {

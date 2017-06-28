@@ -1,13 +1,12 @@
 package org.ekstep.genieservices.commons.bean;
 
 /**
- * Created on 4/6/17.
- * shriharsh
+ * This class holds details about learner assessment.
+ *
  */
-
 public class LearnerAssessmentDetails {
 
-    private Long id;
+    private Long id = -1L;
     private String uid;
     private String contentId;
     private String qid;

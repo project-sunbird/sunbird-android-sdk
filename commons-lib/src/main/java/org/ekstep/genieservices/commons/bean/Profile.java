@@ -1,11 +1,10 @@
 package org.ekstep.genieservices.commons.bean;
 
-import com.google.gson.Gson;
-
 import org.ekstep.genieservices.commons.IValidate;
 import org.ekstep.genieservices.commons.bean.validator.DateValidator;
 import org.ekstep.genieservices.commons.bean.validator.StringValidator;
 import org.ekstep.genieservices.commons.utils.DateUtil;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -17,6 +16,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This class holds all the data related to profile details.
+ */
 public class Profile implements Serializable, IValidate {
 
     private String uid;
@@ -173,8 +175,7 @@ public class Profile implements Serializable, IValidate {
     }
 
     public String toString() {
-        Gson gson = new Gson();
-        return gson.toJson(this);
+        return GsonUtil.toJson(this);
     }
 
     @Override

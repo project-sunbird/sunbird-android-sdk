@@ -1,7 +1,7 @@
 package org.ekstep.genieservices.content.db.model;
 
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.db.contract.PageEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
@@ -11,7 +11,11 @@ import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.Logger;
+import org.ekstep.genieservices.commons.utils.StringUtil;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -37,34 +41,39 @@ public class ContentListingModel implements IWritable, IUpdatable, IReadable, IC
     private String channelStr;
     private String audienceStr;
 
-    private ContentListingModel(IDBSession dbSession, String pageIdentifier, Profile profile, String subject, String channelStr, String audienceStr) {
+    private ContentListingModel(IDBSession dbSession, ContentListingCriteria listingCriteria) {
         this.mDBSession = dbSession;
-        this.mPageIdentifier = pageIdentifier;
-        this.mAge = profile != null ? profile.getAge() : -1;
-        this.mStandard = profile != null ? profile.getStandard() : -1;
-        this.mMedium = (profile != null && profile.getMedium() != null) ? profile.getMedium() : "";
-        this.mBoard = (profile != null && profile.getBoard() != null) ? profile.getBoard() : "";
-        this.mSubject = subject != null ? subject : "";
-        this.channelStr = channelStr;
-        this.audienceStr = audienceStr;
+        this.mPageIdentifier = listingCriteria.getContentListingId();
+        this.mAge = listingCriteria.getAge() != 0 ? listingCriteria.getAge() : -1;
+        this.mStandard = listingCriteria.getGrade() != 0 ? listingCriteria.getGrade() : -1;
+        this.mMedium = listingCriteria.getMedium() != null ? listingCriteria.getMedium() : "";
+        this.mBoard = listingCriteria.getBoard() != null ? listingCriteria.getBoard() : "";
+        this.mSubject = listingCriteria.getSubject() != null ? listingCriteria.getSubject() : "";
+        this.channelStr = listingCriteria.getChannel() != null ? StringUtil.join(",", getSortedList(listingCriteria.getChannel())) : "";
+        this.audienceStr = listingCriteria.getAudience() != null ? StringUtil.join(",", getSortedList(listingCriteria.getAudience())) : "";
     }
 
-    private ContentListingModel(IDBSession dbSession, String pageIdentifier, String json, Profile profile, String subject, String channelStr, String audienceStr, long expiryTime) {
-        this(dbSession, pageIdentifier, profile, subject, channelStr, audienceStr);
+    private List<String> getSortedList(String input[]) {
+        List<String> list = Arrays.asList(input);
+        Collections.sort(list);
+        return list;
+    }
+
+    private ContentListingModel(IDBSession dbSession, ContentListingCriteria listingCriteria, String json, long expiryTime) {
+        this(dbSession, listingCriteria);
         this.mJson = json;
         this.mExpiryTime = expiryTime;
     }
 
-    public static ContentListingModel build(IDBSession dbSession, String pageIdentifier, String json, Profile profile, String subject, String channelStr, String audienceStr, long expiryTime) {
-        ContentListingModel contentListingModel = new ContentListingModel(dbSession, pageIdentifier, json, profile, subject, channelStr, audienceStr, expiryTime);
+    public static ContentListingModel build(IDBSession dbSession, ContentListingCriteria listingCriteria, String json, long expiryTime) {
+        ContentListingModel contentListingModel = new ContentListingModel(dbSession, listingCriteria, json, expiryTime);
         return contentListingModel;
     }
 
-    public static ContentListingModel find(IDBSession dbSession, String pageIdentifier, Profile profile, String subject, String channelStr, String audienceStr) {
-        ContentListingModel contentListingModel = new ContentListingModel(dbSession, pageIdentifier, profile, subject, channelStr, audienceStr);
+    public static ContentListingModel find(IDBSession dbSession, ContentListingCriteria listingCriteria) {
+        ContentListingModel contentListingModel = new ContentListingModel(dbSession, listingCriteria);
         dbSession.read(contentListingModel);
-        // return null if the page json was not found
-        if (contentListingModel.id == -1) {
+         if (contentListingModel.id == -1) {
             return null;
         } else {
             return contentListingModel;

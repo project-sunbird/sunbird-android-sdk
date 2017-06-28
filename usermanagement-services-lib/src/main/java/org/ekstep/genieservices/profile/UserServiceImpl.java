@@ -13,6 +13,7 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
+import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.enums.ContentAccessStatusType;
 import org.ekstep.genieservices.commons.bean.telemetry.GECreateProfile;
@@ -491,7 +492,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     }
 
     @Override
-    public GenieResponse<Void> importProfile(IDBSession dbSession, Map<String, Object> metadata) {
+    public GenieResponse<ProfileImportResponse> importProfile(IDBSession dbSession, Map<String, Object> metadata) {
         ImportContext importContext = new ImportContext(dbSession, metadata);
 
         ValidateProfileMetadata validateProfileMetadata = new ValidateProfileMetadata();
@@ -506,10 +507,6 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
     @Override
     public GenieResponse<ProfileExportResponse> exportProfile(List<String> userIds, File destinationFolder, String sourceDBFilePath, String destinationDBFilePath, IDataSource dataSource, Map<String, Object> metadata) {
-        HashMap<String, Object> exportDataMap = new HashMap<>();
-        exportDataMap.put(ServiceConstants.UNCOMPRESSED_SOURCE_LOCATION, FileUtil.getTempLocation(destinationFolder));
-        exportDataMap.put(ServiceConstants.EXPORTED_EPAR_DESTINATION_LOCATION, destinationDBFilePath);
-
         if (FileUtil.doesFileExists(destinationDBFilePath)) {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "File already exists.", TAG);
         }

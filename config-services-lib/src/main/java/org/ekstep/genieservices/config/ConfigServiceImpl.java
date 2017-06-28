@@ -132,7 +132,16 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
             refreshResourceBundle();
         }
         ResourceBundleModel resourceBundle = ResourceBundleModel.findById(mAppContext.getDBSession(), languageIdentifier);
-        String result = resourceBundle.getResourceString();
+        String result = null;
+        if (resourceBundle == null) {
+            //language data not available in the resources API
+            resourceBundle = ResourceBundleModel.findById(mAppContext.getDBSession(), "en");
+            if (resourceBundle == null) {
+                result = resourceBundle.getResourceString();
+            }
+        } else {
+            result = resourceBundle.getResourceString();
+        }
         Map<String, Object> resourceBundleMap = new HashMap<>();
         resourceBundleMap.put(resourceBundle.getIdentifier(), resourceBundle.getResourceString());
 

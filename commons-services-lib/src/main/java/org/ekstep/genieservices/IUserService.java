@@ -5,6 +5,7 @@ import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
+import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDataSource;
@@ -147,19 +148,35 @@ public interface IUserService {
     GenieResponse<Void> addContentAccess(ContentAccess contentAccess);
 
     /**
-     * This API is used to import profiles.
+     * This api is used to import the profile.
+     * <p>
+     * <p> On successful importing the profile, the response will return status as TRUE.
+     * <p>
+     * <p>On failing to importing the profile, the response will return status as FALSE and the error be the following:
+     * <p>IMPORT_FAILED
      *
-     * @param dbSession
-     * @param metadata
-     * @return
+     * @param dbSession - {@link IDBSession}
+     * @param metadata  - {@link Map<String, Object>}
+     * @return {@link GenieResponse<Void>}
      */
-    GenieResponse<Void> importProfile(IDBSession dbSession, Map<String, Object> metadata);
+    GenieResponse<ProfileImportResponse> importProfile(IDBSession dbSession, Map<String, Object> metadata);
 
     /**
-     * This API is used to export profiles.
+     * This api is used to export the profile.
+     * <p>
+     * <p> On successful exporting the telemetry, the response will return status as TRUE.
+     * <p>
+     * <p>On failing to exporting the telemetry, the response will return status as FALSE and the error be the following:
+     * <p>EXPORT_FAILED
      *
      * @param userIds
-     * @return
+     * @param userIds
+     * @param destinationFolder
+     * @param sourceDBFilePath
+     * @param destinationDBFilePath
+     * @param dataSource
+     * @param metadata
+     * @return - {@link GenieResponse<ProfileExportResponse>}
      */
     GenieResponse<ProfileExportResponse> exportProfile(List<String> userIds, File destinationFolder, String sourceDBFilePath, String destinationDBFilePath, IDataSource dataSource, Map<String, Object> metadata);
 

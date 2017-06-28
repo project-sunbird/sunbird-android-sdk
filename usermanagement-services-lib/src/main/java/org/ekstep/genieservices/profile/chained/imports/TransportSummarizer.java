@@ -7,6 +7,7 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentDetails;
 import org.ekstep.genieservices.commons.bean.LearnerContentSummaryDetails;
+import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
 import org.ekstep.genieservices.commons.db.contract.LearnerSummaryEntry;
@@ -23,13 +24,13 @@ import java.util.Locale;
  *
  * @author anil
  */
-public class TransportSummarizer implements IChainable {
+public class TransportSummarizer implements IChainable<ProfileImportResponse> {
 
     private static final String TAG = TransportSummarizer.class.getSimpleName();
-    private IChainable nextLink;
+    private IChainable<ProfileImportResponse> nextLink;
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportContext importContext) {
         //check table exist
         if (isTableExist(importContext.getDBSession(), LearnerAssessmentsEntry.TABLE_NAME) &&
                 isTableExist(importContext.getDBSession(), LearnerSummaryEntry.TABLE_NAME)) {
@@ -72,7 +73,7 @@ public class TransportSummarizer implements IChainable {
     }
 
     @Override
-    public IChainable then(IChainable link) {
+    public IChainable<ProfileImportResponse> then(IChainable<ProfileImportResponse> link) {
         nextLink = link;
         return link;
     }

@@ -81,7 +81,7 @@ public class ExtractPayloads implements IChainable {
             if ((!StringUtil.isNullOrEmpty(mimeType) && mimeType.equalsIgnoreCase(ContentConstants.MimeType.APPLICATION)) ||
                     (!StringUtil.isNullOrEmpty(artifactUrl) && artifactUrl.contains("." + ServiceConstants.FileExtension.APK))) {
 
-                List<HashMap<String, Object>> preRequisites = (List<HashMap<String, Object>>) item.get("pre_requisites");
+                List<Map<String, Object>> preRequisites = (List<Map<String, Object>>) item.get("pre_requisites");
 
                 if (isContentExist) {
                     payloadDestination = null;
@@ -116,8 +116,7 @@ public class ExtractPayloads implements IChainable {
 
                 // TODO: 5/18/2017 - Revisit this - handling the APK while importing ECAR.
                 //launch system prompt for Install apk...
-//                showInstallAPKPrompt(context, path, artifactUrl, preRequisites);
-
+                appContext.getmAPKInstaller().showInstallAPKPrompt(path, artifactUrl, preRequisites);
             } else {
                 //If the content is exist then copy the old content data and add it into new content.
                 if (isContentExist && !(ServiceConstants.ContentStatus.DRAFT.equalsIgnoreCase(ContentHandler.readStatus(item)))) {

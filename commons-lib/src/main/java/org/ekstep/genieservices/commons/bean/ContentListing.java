@@ -3,20 +3,20 @@ package org.ekstep.genieservices.commons.bean;
 import java.util.List;
 
 /**
- * This class holds the data related to content listing.
+ * This class holds list of {@link ContentListingSection}, responseMessageId, contentListingId.
  */
 public class ContentListing {
 
-    private String id;
+    private String contentListingId;
     private String responseMessageId;
     private List<ContentListingSection> contentListingSections;
 
-    public String getId() {
-        return id;
+    public String getContentListingId() {
+        return contentListingId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setContentListingId(String contentListingId) {
+        this.contentListingId = contentListingId;
     }
 
     public String getResponseMessageId() {

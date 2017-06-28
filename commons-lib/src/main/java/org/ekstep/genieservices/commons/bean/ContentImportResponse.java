@@ -2,7 +2,12 @@ package org.ekstep.genieservices.commons.bean;
 
 /**
  * This class holds the identifier, status and filePath after importing the content.
- *
+ * <p>
+ * Status -
+ * -1 for unknown
+ * 0 - not started
+ * 1 - started download
+ * 2- imported successfully
  */
 public class ContentImportResponse {
 

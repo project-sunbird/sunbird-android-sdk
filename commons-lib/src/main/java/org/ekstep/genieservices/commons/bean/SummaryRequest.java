@@ -1,10 +1,9 @@
 package org.ekstep.genieservices.commons.bean;
 
 /**
- * Created on 7/6/17.
- * shriharsh
+ * This class accepts uid, contentId and hierarchyInfo when requesting for learner summary details.
+ *
  */
-
 public class SummaryRequest {
 
     private String uid;

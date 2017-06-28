@@ -27,6 +27,9 @@ public class ImportContext {
     private List<String> identifiers = new ArrayList<>();
     private IDBSession dbSession;   // External DB
 
+    private int imported;
+    private int failed;
+
     private Map<String, Object> manifest;
 
     // Used for import/export
@@ -112,6 +115,22 @@ public class ImportContext {
 
     public void setIdentifiers(String identifier) {
         this.identifiers.add(identifier);
+    }
+
+    public int getImported() {
+        return imported;
+    }
+
+    public void setImported(int imported) {
+        this.imported = imported;
+    }
+
+    public int getFailed() {
+        return failed;
+    }
+
+    public void setFailed(int failed) {
+        this.failed = failed;
     }
 
     public Map<String, Object> getManifest() {

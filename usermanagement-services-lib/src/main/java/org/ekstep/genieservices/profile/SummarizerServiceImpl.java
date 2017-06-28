@@ -73,13 +73,13 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         String filter = getFilterForLearnerAssessmentDetails(null, summaryRequest.getUid(), summaryRequest.getContentId(), summaryRequest.getHierarchyData());
 
         LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.find(mAppContext.getDBSession(), filter);
+        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         if (learnerAssessmentDetailsModel == null) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROCESSING_ERROR, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_SUMMARY, TAG);
-            return response;
+            response.setResult(new ArrayList<LearnerAssessmentDetails>());
+        } else {
+            response.setResult(learnerAssessmentDetailsModel.getAllAssessments());
         }
 
-        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-        response.setResult(learnerAssessmentDetailsModel.getAllAssessments());
         return response;
     }
 
@@ -115,11 +115,6 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
             learnerAssessmentDetailsModel.save();
         } else {
             learnerAssessmentDetailsModel.update();
-        }
-
-        if (learnerAssessmentDetailsModel.getInsertedId() == -1) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROCESSING_ERROR, ServiceConstants.ErrorMessage.UNABLE_TO_SAVE_LEARNER_ASSESSMENT, TAG);
-            return response;
         }
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
@@ -176,11 +171,12 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         }
 
         if (telemetry.getCdata() != null) {
-            List<String> idList = new ArrayList<>();
             for (CorrelationData eachCdataValue : telemetry.getCdata()) {
-                idList.add(eachCdataValue.getId());
+                if (eachCdataValue.getType().equalsIgnoreCase("Collection") || eachCdataValue.getType().equalsIgnoreCase("TextBook")) {
+                    learnerContentSummaryDetails.setHierarchyData(eachCdataValue.getId());
+                    break;
+                }
             }
-//            learnerContentSummaryDetails.setHierarchyData(StringUtil.join(",", idList));
         }
 
         return learnerContentSummaryDetails;
@@ -209,11 +205,12 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         learnerAssessmentDetails.setMaxScore((Double) eks.get("maxscore"));
 
         if (telemetry.getCdata() != null) {
-            List<String> idList = new ArrayList<>();
             for (CorrelationData eachCdataValue : telemetry.getCdata()) {
-                idList.add(eachCdataValue.getId());
+                if (eachCdataValue.getType().equalsIgnoreCase("Collection") || eachCdataValue.getType().equalsIgnoreCase("TextBook")) {
+                    learnerAssessmentDetails.setHierarchyData(eachCdataValue.getId());
+                    break;
+                }
             }
-//            learnerAssessmentDetails.setHierarchyData(StringUtil.join(",", idList));
         }
         return learnerAssessmentDetails;
     }

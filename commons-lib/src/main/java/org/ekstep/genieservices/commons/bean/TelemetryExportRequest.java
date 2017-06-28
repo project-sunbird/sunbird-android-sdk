@@ -1,9 +1,8 @@
 package org.ekstep.genieservices.commons.bean;
 
 /**
- * Created on 6/12/2017.
+ * This class accepts the desinationFolder name when requesting for the telemetry request.
  *
- * @author anil
  */
 public class TelemetryExportRequest {
 

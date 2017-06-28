@@ -29,9 +29,8 @@ import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import java.util.List;
 
 /**
- * Created on 30/5/17.
+ * This class provides APIs for performing {@link ContentService} related operations on a separate thread.
  *
- * @author swayangjit
  */
 public class ContentService {
 
@@ -53,8 +52,8 @@ public class ContentService {
      * On failing to fetch the content details, the response will return status as FALSE with the following error code
      * <p>NO_DATA_FOUND
      *
-     * @param contentDetailsRequest
-     * @return
+     * @param contentDetailsRequest - {@link ContentDetailsRequest}
+     * @param responseHandler       - {@link IResponseHandler<Content>}
      */
     public void getContentDetails(final ContentDetailsRequest contentDetailsRequest, IResponseHandler<Content> responseHandler) {
         new AsyncHandler<Content>(responseHandler).execute(new IPerformable<Content>() {
@@ -71,8 +70,8 @@ public class ContentService {
      * <p>
      * Response status will always be TRUE with {@link List<Content>} set in the result.
      *
-     * @param criteria
-     * @return
+     * @param criteria        - {@link ContentFilterCriteria}
+     * @param responseHandler - {@link IResponseHandler<List<Content>>}
      */
     public void getAllLocalContent(final ContentFilterCriteria criteria, IResponseHandler<List<Content>> responseHandler) {
         new AsyncHandler<List<Content>>(responseHandler).execute(new IPerformable<List<Content>>() {
@@ -94,7 +93,7 @@ public class ContentService {
      * <p>NO_DATA_FOUND
      *
      * @param childContentRequest - {@link ChildContentRequest}
-     * @return {@link GenieResponse<Content>}
+     * @param responseHandler     - {@link IResponseHandler<Content>}
      */
     public void getChildContents(final ChildContentRequest childContentRequest, IResponseHandler<Content> responseHandler) {
         new AsyncHandler<Content>(responseHandler).execute(new IPerformable<Content>() {
@@ -115,8 +114,8 @@ public class ContentService {
      * On failing to delete a content, the response will return status as FALSE with the following error code
      * <p>NO_DATA_FOUND
      *
-     * @param contentDeleteRequest
-     * @return
+     * @param contentDeleteRequest - {@link ContentDeleteRequest}
+     * @param responseHandler      - {@link IResponseHandler<Void>}
      */
     public void deleteContent(final ContentDeleteRequest contentDeleteRequest, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
@@ -139,8 +138,8 @@ public class ContentService {
      * <p>SERVER_ERROR
      * <p>NETWORK_ERROR
      *
-     * @param contentSearchCriteria
-     * @return
+     * @param contentSearchCriteria - {@link ContentSearchCriteria}
+     * @param responseHandler       - {@link IResponseHandler<ContentSearchResult>}
      */
     public void searchContent(final ContentSearchCriteria contentSearchCriteria, IResponseHandler<ContentSearchResult> responseHandler) {
         new AsyncHandler<ContentSearchResult>(responseHandler).execute(new IPerformable<ContentSearchResult>() {
@@ -163,8 +162,8 @@ public class ContentService {
      * <p>SERVER_ERROR
      * <p>NETWORK_ERROR
      *
-     * @param recommendedContentRequest
-     * @return
+     * @param recommendedContentRequest - {@link RecommendedContentRequest}
+     * @param responseHandler           - {@link IResponseHandler<RecommendedContentResult>}
      */
     public void getRecommendedContent(final RecommendedContentRequest recommendedContentRequest, IResponseHandler<RecommendedContentResult> responseHandler) {
         new AsyncHandler<RecommendedContentResult>(responseHandler).execute(new IPerformable<RecommendedContentResult>() {
@@ -188,8 +187,8 @@ public class ContentService {
      * <p>SERVER_ERROR
      * <p>NETWORK_ERROR
      *
-     * @param relatedContentRequest
-     * @return
+     * @param relatedContentRequest - {@link RelatedContentRequest}
+     * @param responseHandler       - {@link IResponseHandler<RelatedContentResult>}
      */
     public void getRelatedContent(final RelatedContentRequest relatedContentRequest, IResponseHandler<RelatedContentResult> responseHandler) {
         new AsyncHandler<RelatedContentResult>(responseHandler).execute(new IPerformable<RelatedContentResult>() {
@@ -206,8 +205,8 @@ public class ContentService {
      * <p>
      * On successful finding the next list of contents, the response will return status as TRUE and the result will be set with {@link List<Content>}
      *
-     * @param contentIdentifiers
-     * @return
+     * @param contentIdentifiers - {@link List<String>}
+     * @param responseHandler    - {@link IResponseHandler<List<Content>>}
      */
     public void nextContent(final List<String> contentIdentifiers, IResponseHandler<List<Content>> responseHandler) {
         new AsyncHandler<List<Content>>(responseHandler).execute(new IPerformable<List<Content>>() {
@@ -228,8 +227,8 @@ public class ContentService {
      * On failing to import the content, the response will be with return status as FALSE and wih the following error
      * <p>INVALID_FILE
      *
-     * @param contentImportRequest
-     * @return
+     * @param contentImportRequest - {@link ContentImportRequest}
+     * @param responseHandler      - {@link IResponseHandler<Void>}
      */
     public void importContent(final ContentImportRequest contentImportRequest, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
@@ -240,6 +239,19 @@ public class ContentService {
         });
     }
 
+    /**
+     * This api is used to import the ecar.
+     * <p>
+     * <p>
+     * On successful importing the content, the response will return status as TRUE
+     * <p>
+     * <p>
+     * On failing to import the content, the response will be with return status as FALSE and wih the following error
+     * <p>INVALID_FILE
+     *
+     * @param ecarImportRequest - {@link ContentImportRequest}
+     * @param responseHandler   - {@link IResponseHandler<Void>}
+     */
     public void importEcar(final EcarImportRequest ecarImportRequest, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
             @Override
@@ -249,6 +261,18 @@ public class ContentService {
         });
     }
 
+    /**
+     * This api is used get the complete content listing with criteria mentioned in {@link ContentListingCriteria}
+     * <p>
+     * <p>
+     * On successful fetching, the response will return status as TRUE, with result set as {@link ContentListing}.
+     * <p>
+     * <p>
+     * On failing to delete a content, the response will return status as FALSE
+     *
+     * @param contentListingCriteria - {@link ContentListingCriteria}
+     * @param responseHandler        - {@link ContentListingCriteria}
+     */
     public void getContentListing(final ContentListingCriteria contentListingCriteria, IResponseHandler<ContentListing> responseHandler) {
         new AsyncHandler<ContentListing>(responseHandler).execute(new IPerformable<ContentListing>() {
             @Override
@@ -258,6 +282,18 @@ public class ContentService {
         });
     }
 
+    /**
+     * This api is used to save the feedback about content.
+     * <p>
+     * <p>
+     * On successful sending the feedback, the response will return status as TRUE.
+     * <p>
+     * <p>
+     * On failing to delete a content, the response will return status as FALSE
+     *
+     * @param contentFeedback - {@link ContentFeedback}
+     * @param responseHandler - {@link IResponseHandler<Void>}
+     */
     public void sendFeedback(final ContentFeedback contentFeedback, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
             @Override
@@ -267,6 +303,16 @@ public class ContentService {
         });
     }
 
+    /**
+     * This api is used to get the feedback about a content.
+     * <p>
+     * <p>On successful fetching the data, the response will return status as TRUE and with result type as {@link ContentFeedback}, if content has any feedback then the result will not be null,
+     * <p>
+     * On failing to fetch the data, the response will return status as FALSE with the following error.
+     *
+     * @param contentFeedbackFilterCriteria - {@link ContentFeedbackFilterCriteria}
+     * @param responseHandler               - {@link IResponseHandler<List<ContentFeedback>>}
+     */
     public void getFeedback(final ContentFeedbackFilterCriteria contentFeedbackFilterCriteria, IResponseHandler<List<ContentFeedback>> responseHandler) {
         new AsyncHandler<List<ContentFeedback>>(responseHandler).execute(new IPerformable<List<ContentFeedback>>() {
             @Override
@@ -276,6 +322,15 @@ public class ContentService {
         });
     }
 
+    /**
+     * This api is used to get the status of when importing a content
+     * <p>
+     * <p>
+     * Response will always be status set TRUE, with {@link ContentImportResponse} set in result.
+     *
+     * @param identifier
+     * @param responseHandler - {@link IResponseHandler<ContentImportResponse>}
+     */
     public void getImportStatus(final String identifier, IResponseHandler<ContentImportResponse> responseHandler) {
         new AsyncHandler<ContentImportResponse>(responseHandler).execute(new IPerformable<ContentImportResponse>() {
             @Override
@@ -285,6 +340,15 @@ public class ContentService {
         });
     }
 
+    /**
+     * This api is used to cancel the on-going download
+     * <p>
+     * <p>
+     * Response will always be status set TRUE.
+     *
+     * @param identifier
+     * @param responseHandler - {@link IResponseHandler<Void>}
+     */
     public void cancelDownload(final String identifier, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
             @Override
@@ -294,6 +358,19 @@ public class ContentService {
         });
     }
 
+    /**
+     * This api is used to export the list of contentId's needed.
+     * <p>
+     * <p>
+     * On successful exporting the content, the response will return status as TRUE, with response set in result
+     * <p>
+     * <p>
+     * On failing to export the content, the response will be with return status as FALSE and with the following error
+     * <p>EXPORT_FAILED
+     *
+     * @param contentExportRequest - {@link ContentExportRequest}
+     * @param responseHandler      - {@link IResponseHandler<ContentExportResponse>}
+     */
     public void exportContent(final ContentExportRequest contentExportRequest, IResponseHandler<ContentExportResponse> responseHandler) {
         new AsyncHandler<ContentExportResponse>(responseHandler).execute(new IPerformable<ContentExportResponse>() {
             @Override

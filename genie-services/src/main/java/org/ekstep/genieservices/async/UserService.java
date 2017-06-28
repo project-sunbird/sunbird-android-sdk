@@ -10,6 +10,7 @@ import org.ekstep.genieservices.commons.bean.ImportRequest;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
+import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.importexport.FileExporter;
 import org.ekstep.genieservices.importexport.FileImporter;
@@ -39,8 +40,8 @@ public class UserService {
      * <p>On failing to delete a user, the response will have status as FALSE with the following error:
      * <p>FAILED - createProfile
      *
-     * @param profile
-     * @param responseHandler
+     * @param profile         - {@link Profile}
+     * @param responseHandler - {@link IResponseHandler<Profile>}
      */
     public void createUserProfile(final Profile profile, IResponseHandler<Profile> responseHandler) {
         new AsyncHandler<Profile>(responseHandler).execute(new IPerformable<Profile>() {
@@ -58,7 +59,8 @@ public class UserService {
      * <p>
      * <p>On failing to get all user profiles, the response will have status as FALSE
      * <p>
-     * t     * @param responseHandler
+     *
+     * @param responseHandler {@link IResponseHandler<List<Profile>>}
      */
     public void getAllUserProfile(IResponseHandler<List<Profile>> responseHandler) {
         new AsyncHandler<List<Profile>>(responseHandler).execute(new IPerformable<List<Profile>>() {
@@ -79,7 +81,7 @@ public class UserService {
      * <p>FAILED
      *
      * @param uid
-     * @param responseHandler
+     * @param responseHandler - {@link IResponseHandler<Void>}
      */
     public void deleteUser(final String uid, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
@@ -100,7 +102,7 @@ public class UserService {
      * <p>INVALID_USER
      *
      * @param uid
-     * @param responseHandler
+     * @param responseHandler - {@link IResponseHandler<Void>}
      */
     public void setCurrentUser(final String uid, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
@@ -118,7 +120,7 @@ public class UserService {
      * <p>
      * <p>Their would be no failure case with this api, as it would by default had set anonymous user as active.
      *
-     * @param responseHandler
+     * @param responseHandler - {@link IResponseHandler<Profile>}
      */
     public void getCurrentUser(IResponseHandler<Profile> responseHandler) {
         new AsyncHandler<Profile>(responseHandler).execute(new IPerformable<Profile>() {
@@ -136,7 +138,7 @@ public class UserService {
      * <p>
      * <p>Their would be no failure case with this api, as it would by default had set anonymous user session as active.
      *
-     * @param responseHandler
+     * @param responseHandler - {@link IResponseHandler<UserSession>}
      */
     public void getCurrentUserSession(IResponseHandler<UserSession> responseHandler) {
         new AsyncHandler<UserSession>(responseHandler).execute(new IPerformable<UserSession>() {
@@ -154,7 +156,7 @@ public class UserService {
      * <p>
      * <p>Their would be no failure case with this api, as it would get anonymous user if exists or a new one will be created.
      *
-     * @param responseHandler
+     * @param responseHandler - {@link IResponseHandler<Profile>}
      */
     public void getAnonymousUser(IResponseHandler<Profile> responseHandler) {
         new AsyncHandler<Profile>(responseHandler).execute(new IPerformable<Profile>() {
@@ -172,7 +174,7 @@ public class UserService {
      * <p>
      * <p>Their would be no failure case with this api, as it would get anonymous user if exists or a new one will be created and set to active user.
      *
-     * @param responseHandler
+     * @param responseHandler - {@link IResponseHandler<String>}
      */
     public void setAnonymousUser(IResponseHandler<String> responseHandler) {
         new AsyncHandler<String>(responseHandler).execute(new IPerformable<String>() {
@@ -193,8 +195,8 @@ public class UserService {
      * <p>INVALID_PROFILE
      * <p>VALIDATION_ERROR
      *
-     * @param profile
-     * @param responseHandler
+     * @param profile         - {@link Profile}
+     * @param responseHandler - {@link IResponseHandler<Profile>}
      */
     public void updateUserProfile(final Profile profile, IResponseHandler<Profile> responseHandler) {
         new AsyncHandler<Profile>(responseHandler).execute(new IPerformable<Profile>() {
@@ -206,8 +208,15 @@ public class UserService {
     }
 
     /**
-     * @param contentAccess
-     * @param responseHandler
+     * This api is used to the set the state of learner.
+     * <p>
+     * <p> On successful setting the learner state, the response will return status as TRUE
+     * <p>
+     * <p> On failing to set the learner state, the response will have status as FALSE with the following error:
+     * <p>PROFILE_NOT_FOUND
+     *
+     * @param contentAccess   - {@link ContentAccess}
+     * @param responseHandler - {@link IResponseHandler<Void>}
      */
     public void addContentAccess(final ContentAccess contentAccess, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
@@ -218,6 +227,14 @@ public class UserService {
         });
     }
 
+    /**
+     * This api gives the status each content of being accessed.
+     * <p>
+     * <p>Response status always be True, with all the contents access state set in result
+     *
+     * @param criteria        - {@link ContentAccessFilterCriteria}
+     * @param responseHandler - {@link IResponseHandler<List<ContentAccess>>}
+     */
     public void getAllContentAccess(final ContentAccessFilterCriteria criteria, IResponseHandler<List<ContentAccess>> responseHandler) {
         new AsyncHandler<List<ContentAccess>>(responseHandler).execute(new IPerformable<List<ContentAccess>>() {
             @Override
@@ -227,15 +244,37 @@ public class UserService {
         });
     }
 
-    public void importProfile(final ImportRequest importRequest, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+    /**
+     * This api is used to import the profile.
+     * <p>
+     * <p> On successful importing the profile, the response will return status as TRUE.
+     * <p>
+     * <p>On failing to importing the profile, the response will return status as FALSE and the error be the following:
+     * <p>IMPORT_FAILED
+     *
+     * @param importRequest   - {@link ImportRequest}
+     * @param responseHandler - {@link IResponseHandler<Void>}
+     */
+    public void importProfile(final ImportRequest importRequest, IResponseHandler<ProfileImportResponse> responseHandler) {
+        new AsyncHandler<ProfileImportResponse>(responseHandler).execute(new IPerformable<ProfileImportResponse>() {
             @Override
-            public GenieResponse<Void> perform() {
+            public GenieResponse<ProfileImportResponse> perform() {
                 return fileImporter.importProfile(importRequest, userService);
             }
         });
     }
 
+    /**
+     * This api is used to export the profile.
+     * <p>
+     * <p> On successful exporting the telemetry, the response will return status as TRUE.
+     * <p>
+     * <p>On failing to exporting the telemetry, the response will return status as FALSE and the error be the following:
+     * <p>EXPORT_FAILED
+     *
+     * @param profileExportRequest - {@link ProfileExportRequest}
+     * @param responseHandler      - {@link IResponseHandler<ProfileExportResponse>}
+     */
     public void exportProfile(final ProfileExportRequest profileExportRequest, IResponseHandler<ProfileExportResponse> responseHandler) {
         new AsyncHandler<ProfileExportResponse>(responseHandler).execute(new IPerformable<ProfileExportResponse>() {
             @Override

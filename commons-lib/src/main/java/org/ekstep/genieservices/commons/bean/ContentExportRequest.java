@@ -3,9 +3,8 @@ package org.ekstep.genieservices.commons.bean;
 import java.util.List;
 
 /**
- * Created on 6/12/2017.
+ * This class accepts list of contentId's, and destination folder while building the request, and is used when requesting content export.
  *
- * @author anil
  */
 public class ContentExportRequest {
 

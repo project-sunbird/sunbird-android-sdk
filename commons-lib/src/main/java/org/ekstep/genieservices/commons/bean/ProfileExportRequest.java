@@ -3,9 +3,8 @@ package org.ekstep.genieservices.commons.bean;
 import java.util.List;
 
 /**
- * Created on 6/12/2017.
+ * This class accepts userIds as {@link List<String>}, and destinationFolder when requesting to export user profiles.
  *
- * @author anil
  */
 public class ProfileExportRequest {
 

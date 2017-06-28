@@ -1,7 +1,5 @@
 package org.ekstep.genieservices.telemetry.event;
 
-import com.google.gson.Gson;
-
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.utils.Logger;
@@ -53,6 +51,6 @@ public class TelemetryListener {
 
     @Subscribe
     public void onNoSubscriberEvent(NoSubscriberEvent event) {
-        Logger.e(TAG, "Got NoSubscriberEvent, event: " + new Gson().toJson(event));
+        Logger.e(TAG, "Got NoSubscriberEvent, event: " + event);
     }
 }

@@ -3,9 +3,8 @@ package org.ekstep.genieservices.commons.bean;
 import java.util.List;
 
 /**
- * Created on 5/12/2017.
+ * This class holds the data in id, responseMessageId and {@link List<ContentData>} after requesting for related content.
  *
- * @author anil
  */
 public class RelatedContentResult {
 

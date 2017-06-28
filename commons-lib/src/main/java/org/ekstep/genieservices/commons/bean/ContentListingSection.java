@@ -4,9 +4,8 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * Created on 5/29/2017.
+ * This class holds responseMessageId, apiId, sectionName, list of {@link ContentData} and {@link ContentSearchCriteria}.
  *
- * @author anil
  */
 public class ContentListingSection implements Serializable {
 

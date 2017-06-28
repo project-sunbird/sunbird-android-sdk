@@ -4,21 +4,27 @@ import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 /**
- * This class holds the uid, types of content required and attachFeedback, attachContentAccess if the feedback and content access are required.
+ * This class holds the uid, types of content required and attachFeedback, attachContentAccess flags if the feedback and content access are required.
  *
  */
 public class ContentFilterCriteria {
 
     private String uid;
+    private String[] audience;
     private ContentType[] contentTypes;
     private boolean attachFeedback;
     private boolean attachContentAccess;
 
-    private ContentFilterCriteria(String uid, ContentType[] contentTypes, boolean attachFeedback, boolean attachContentAccess) {
+    private ContentFilterCriteria(String uid, ContentType[] contentTypes, String[] audience, boolean attachFeedback, boolean attachContentAccess) {
         this.uid = uid;
         this.contentTypes = contentTypes;
+        this.audience = audience;
         this.attachFeedback = attachFeedback;
         this.attachContentAccess = attachContentAccess;
+    }
+
+    public String[] getAudience() {
+        return audience;
     }
 
     public String getUid() {
@@ -45,6 +51,7 @@ public class ContentFilterCriteria {
     public static class Builder {
         private String uid;
         private ContentType[] contentTypes;
+        private String[] audience;
         private boolean attachFeedback;
         private boolean attachContentAccess;
 
@@ -70,6 +77,10 @@ public class ContentFilterCriteria {
             return this;
         }
 
+        public Builder audience(String[] audience) {
+            this.audience = audience;
+            return this;
+        }
         /**
          * Pass true if want content access by given uid else false.
          */
@@ -79,7 +90,7 @@ public class ContentFilterCriteria {
         }
 
         public ContentFilterCriteria build() {
-            return new ContentFilterCriteria(uid, contentTypes, attachFeedback, attachContentAccess);
+            return new ContentFilterCriteria(uid, contentTypes, audience, attachFeedback, attachContentAccess);
         }
     }
 }

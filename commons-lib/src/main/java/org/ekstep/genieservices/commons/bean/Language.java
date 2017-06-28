@@ -1,10 +1,9 @@
 package org.ekstep.genieservices.commons.bean;
 
 /**
- * Created on 23/5/17.
- * shriharsh
+ * This class holds the name and code of the language.
+ *
  */
-
 public class Language {
     private String name;
     private String code;

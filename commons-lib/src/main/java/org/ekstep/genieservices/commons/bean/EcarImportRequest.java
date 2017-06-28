@@ -5,9 +5,7 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
 import java.util.List;
 
 /**
- * Created on 6/6/2017.
- *
- * @author anil
+ * This class accepts isChildContent, destinationFolder name, sourceFilePath name and {@link List<CorrelationData>} when requesting to import an ecar.
  */
 public class EcarImportRequest {
 

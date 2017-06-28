@@ -21,12 +21,12 @@ public class GetRelatedContentTask extends BaseTask {
 
     private String userId;
     private String appQualifier;
-    private List<String> contentIdentifiers;
+    private List<Map> hierarchyData;
 
-    public GetRelatedContentTask(Context context, String appQualifier, List<String> contentIdentifiers, String userId) {
+    public GetRelatedContentTask(Context context, String appQualifier, List<Map> hierarchyData, String userId) {
         super(context);
         this.appQualifier = appQualifier;
-        this.contentIdentifiers = contentIdentifiers;
+        this.hierarchyData = hierarchyData;
         this.userId = userId;
     }
 
@@ -37,7 +37,7 @@ public class GetRelatedContentTask extends BaseTask {
 
     @Override
     protected GenieResponse<Map> execute() {
-        String requestData = GsonUtil.toJson(contentIdentifiers);
+        String requestData = GsonUtil.toJson(hierarchyData);
         Cursor cursor = contentResolver.query(getUri(), null, requestData, null, null);
         if (cursor == null || cursor.getCount() == 0) {
             return getErrorResponse(Constants.PROCESSING_ERROR,

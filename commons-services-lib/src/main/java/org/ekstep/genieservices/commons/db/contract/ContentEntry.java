@@ -50,7 +50,7 @@ public abstract class ContentEntry implements BaseColumns {
     }
 
     public static String getAlterEntryForAudience() {
-        return "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_NAME_AUDIENCE + DbConstants.TEXT_TYPE + " DEFAULT 'learner';";
+        return "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_NAME_AUDIENCE + DbConstants.TEXT_TYPE + " DEFAULT 'Learner';";
     }
 
     public static final String getDeleteEntry() {

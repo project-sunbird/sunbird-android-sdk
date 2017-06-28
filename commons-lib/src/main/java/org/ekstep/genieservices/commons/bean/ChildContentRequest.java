@@ -3,7 +3,7 @@ package org.ekstep.genieservices.commons.bean;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
 /**
- * This class accepts contentId while building, and is used when requesting child contents.
+ * This class accepts contentId while building it, and is used when requesting child contents.
  */
 
 public class ChildContentRequest {

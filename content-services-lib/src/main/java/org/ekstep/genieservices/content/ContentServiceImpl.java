@@ -25,6 +25,7 @@ import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
+import org.ekstep.genieservices.commons.bean.ContentSearchFilter;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
@@ -32,7 +33,6 @@ import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
 import org.ekstep.genieservices.commons.bean.ImportContext;
-import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
@@ -42,6 +42,7 @@ import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
@@ -64,7 +65,6 @@ import org.ekstep.genieservices.content.chained.imports.ExtractPayloads;
 import org.ekstep.genieservices.content.chained.imports.ValidateEcar;
 import org.ekstep.genieservices.content.db.model.ContentListingModel;
 import org.ekstep.genieservices.content.db.model.ContentModel;
-import org.ekstep.genieservices.content.network.ContentListingAPI;
 import org.ekstep.genieservices.content.network.ContentSearchAPI;
 import org.ekstep.genieservices.content.network.RecommendedContentAPI;
 import org.ekstep.genieservices.content.network.RelatedContentAPI;
@@ -180,12 +180,13 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         params.put("request", GsonUtil.toJson(childContentRequest));
 
         GenieResponse<Content> response;
-        List<HierarchyInfo> hierarchyInfoList = new ArrayList<>();
         ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), childContentRequest.getContentId());
         if (contentModel == null) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, ServiceConstants.ErrorMessage.CONTENT_NOT_FOUND + childContentRequest.getContentId(), TAG);
             return response;
         }
+        List<HierarchyInfo> hierarchyInfoList = new ArrayList<>();
+        hierarchyInfoList.add(new HierarchyInfo(contentModel.getIdentifier(), contentModel.getContentType()));
 
         //check and fetch all childrens of this content
         Content content = checkAndFetchChildrenOfContent(contentModel, hierarchyInfoList);
@@ -198,23 +199,18 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
     private Content checkAndFetchChildrenOfContent(ContentModel contentModel, List<HierarchyInfo> sourceInfoList) {
         Content content = ContentHandler.convertContentModelToBean(contentModel);
+        content.setHierarchyInfo(sourceInfoList);
         // check if the content model has immediate children
         List<ContentModel> contentModelList = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), contentModel.getLocalData(), ContentConstants.ChildContents.FIRST_LEVEL_ALL);
         if (contentModelList.size() > 0) {
-
-            //add hierarchy info
-            HierarchyInfo hierarchyInfo = new HierarchyInfo(contentModel.getIdentifier(), contentModel.getContentType());
-
-            List<HierarchyInfo> hierarchyInfoList = new ArrayList<>();
-            hierarchyInfoList.addAll(sourceInfoList);
-            hierarchyInfoList.add(hierarchyInfo);
 
             List<Content> childContents = new ArrayList<>();
 
             for (ContentModel perContentModel : contentModelList) {
                 Content perContent = ContentHandler.convertContentModelToBean(perContentModel);
+                List<HierarchyInfo> hierarchyInfoList = new ArrayList<>(sourceInfoList);
+                hierarchyInfoList.add(new HierarchyInfo(perContent.getIdentifier(), perContent.getContentType()));
                 perContent.setHierarchyInfo(hierarchyInfoList);
-
                 Content iteratedContent = checkAndFetchChildrenOfContent(perContentModel, hierarchyInfoList);
                 perContent.setChildren(iteratedContent.getChildren());
 
@@ -269,30 +265,18 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
         String methodName = "getContentListing@ContentServiceImpl";
 
-        Profile profile = contentListingCriteria.getProfile();
-
         String jsonStr = null;
-        // TODO: 6/8/2017 - Read the channel and audience from partnerFilters in criteria and make the comma seperated string and pass in find
-        ContentListingModel contentListingModelInDB = ContentListingModel.find(mAppContext.getDBSession(), contentListingCriteria.getContentListingId(),
-                profile, contentListingCriteria.getSubject(), null, null);
+
+        ContentListingModel contentListingModelInDB = ContentListingModel.find(mAppContext.getDBSession(), contentListingCriteria);
         if (contentListingModelInDB != null) {
-            if (ContentHandler.dataHasExpired(contentListingModelInDB.getExpiryTime())) {
-                contentListingModelInDB.delete();
-            } else {
-                jsonStr = contentListingModelInDB.getJson();
+            jsonStr = contentListingModelInDB.getJson();
+            if (DateUtil.getEpochDiff(contentListingModelInDB.getExpiryTime()) > 0) {
+                ContentHandler.refreshContentListingFromServer(mAppContext, configService, contentListingCriteria, ContentHandler.getCurrentProfile(userService), mAppContext.getDeviceInfo().getDeviceID());
             }
         }
 
         if (jsonStr == null) {
-            Map<String, Object> requestMap = ContentHandler.getContentListingRequest(configService, contentListingCriteria, mAppContext.getDeviceInfo().getDeviceID());
-            ContentListingAPI api = new ContentListingAPI(mAppContext, contentListingCriteria.getContentListingId(), requestMap);
-            GenieResponse apiResponse = api.post();
-            if (apiResponse.getStatus()) {
-                jsonStr = apiResponse.getResult().toString();
-                ContentHandler.saveContentListingDataInDB(mAppContext.getDBSession(), contentListingCriteria, profile, jsonStr);
-            } else {
-                return GenieResponseBuilder.getErrorResponse(apiResponse.getError(), (String) apiResponse.getErrorMessages().get(0), TAG);
-            }
+            jsonStr = ContentHandler.fetchContentListingFromServer(mAppContext, configService, contentListingCriteria, ContentHandler.getCurrentProfile(userService), mAppContext.getDeviceInfo().getDeviceID());
         }
 
         if (jsonStr != null) {
@@ -348,7 +332,6 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             ContentSearchResult searchResult = new ContentSearchResult();
             searchResult.setId(id);
             searchResult.setResponseMessageId(responseMessageId);
-            searchResult.setFilter(ContentHandler.getFilters(configService, facets, (Map<String, Object>) requestMap.get("filters")));
             searchResult.setRequest(requestMap);
 
             if (!StringUtil.isNullOrEmpty(contentDataList)) {
@@ -356,7 +339,12 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 }.getType();
                 List<ContentData> contentData = GsonUtil.getGson().fromJson(contentDataList, type);
                 searchResult.setContentDataList(contentData);
+                searchResult.setFilterCriteria(ContentHandler.createFilterCriteria(configService, contentSearchCriteria, facets, (Map<String, Object>) requestMap.get("filters")));
+            } else {
+                searchResult.setContentDataList(new ArrayList<ContentData>());
+                searchResult.setFilterCriteria(null);
             }
+
 
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(searchResult);

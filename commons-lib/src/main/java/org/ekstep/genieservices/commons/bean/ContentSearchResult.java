@@ -5,15 +5,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created on 5/12/2017.
+ * This class holds the id, responseMessageId, filter as {@link List<ContentSearchFilter>}, request as {@link Map<String, Object>} and contentDataList as {@link List<ContentData>}
+ * after searching for a particular content.
  *
- * @author anil
  */
 public class ContentSearchResult implements Serializable {
 
     private String id;
     private String responseMessageId;
-    private List<ContentSearchFilter> filter;
+    private ContentSearchCriteria filterCriteria;
     private Map<String, Object> request;
     private List<ContentData> contentDataList;
 
@@ -33,12 +33,12 @@ public class ContentSearchResult implements Serializable {
         this.responseMessageId = responseMessageId;
     }
 
-    public List<ContentSearchFilter> getFilter() {
-        return filter;
+    public ContentSearchCriteria getFilterCriteria() {
+        return filterCriteria;
     }
 
-    public void setFilter(List<ContentSearchFilter> filter) {
-        this.filter = filter;
+    public void setFilterCriteria(ContentSearchCriteria filterCriteria) {
+        this.filterCriteria = filterCriteria;
     }
 
     public Map<String, Object> getRequest() {

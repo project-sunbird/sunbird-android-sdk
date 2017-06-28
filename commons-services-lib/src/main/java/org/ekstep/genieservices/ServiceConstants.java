@@ -12,7 +12,6 @@ public interface ServiceConstants {
     String SUCCESS_RESPONSE = "successful";
     String FAILED_RESPONSE = "failed";
     String ERROR_DELETING_A_USER = "Error when deleting user profile";
-    String FAILED_TO_ADD_UPDATE_NOTIFICATION = "Failed to add/update  notification";
 
     String INVALID_USER = "INVALID_USER";
     String NO_USER_WITH_SPECIFIED_ID = "There is no user with specified id exists";
@@ -34,14 +33,11 @@ public interface ServiceConstants {
     String EXPORT_TYPES = "types";
     String EXPORT_TYPE_TELEMETRY = "telemetry";
     String EXPORT_TYPE_PROFILE = "userprofile";
-    // Used in export
-    String EXPORTED_ECAR_DESTINATION_LOCATION = "ecarLocation";
-    String EXPORTED_EPAR_DESTINATION_LOCATION = "eparLocation";
-    String UNCOMPRESSED_SOURCE_LOCATION = "location";
 
     interface BundleKey {
         //ContentPlayer
         String BUNDLE_KEY_ORIGIN = "origin";
+        String BUNDLE_KEY_MODE = "mode";
         String BUNDLE_KEY_CONTENT_EXTRAS = "contentExtras";
         String BUNDLE_KEY_APP_INFO = "appInfo";
         String BUNDLE_KEY_LANGUAGE_INFO = "languageInfo";
@@ -99,7 +95,7 @@ public interface ServiceConstants {
         String MODE_WIFI = "WIFI";
         String MODE_MDATA = "MDATA";
         String MODE_LOCAL = "LOCAL";
-        String MODE_NO_NETWORK = "NO_NETWORK";
+        String MODE_NO_NETWORK = "";
     }
 
     interface Telemetry {
@@ -135,6 +131,12 @@ public interface ServiceConstants {
         String NO_DATA_FOUND = "NO_DATA_FOUND";
         String INVALID_FILE = "INVALID_FILE";
         String ECAR_NOT_FOUND = "ECAR_NOT_FOUND";
+
+        // Notification
+        String NO_NOTIFICATIONS_FOUND = "NO_NOTIFICATIONS_FOUND";
+        String ADD_FAILED = "ADD_FAILED";
+        String UPDATE_FAILED = "UPDATE_FAILED";
+        String DELETE_FAILED = "DELETE_FAILED";
 
     }
 
@@ -182,6 +184,11 @@ public interface ServiceConstants {
         String CONTENT_NOT_FOUND = "No content found for identifier = ";
         String CONTENT_NOT_FOUND_TO_DELETE = "No content found to delete for identifier = ";
         String NO_CONTENT_TO_EXPORT = "Nothing to export!";
+
+        String FAILED_TO_UPDATE_THE_NOTIFICATION = "Failed to update the notification";
+        String FAILED_TO_DELETE_NOTIFICATION = "Failed to delete notification";
+        String ERROR_WHILE_GETTING_NOTIFICATIONS = "Error while getting notifications";
+        String FAILED_TO_ADD_UPDATE_NOTIFICATION = "Failed to add/update  notification";
     }
 
     interface ContentStatus {

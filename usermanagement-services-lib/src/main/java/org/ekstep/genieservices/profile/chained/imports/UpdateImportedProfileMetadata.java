@@ -5,6 +5,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
+import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.telemetry.model.ImportedMetadataModel;
 
@@ -13,13 +14,13 @@ import org.ekstep.genieservices.telemetry.model.ImportedMetadataModel;
  *
  * @author anil
  */
-public class UpdateImportedProfileMetadata implements IChainable {
+public class UpdateImportedProfileMetadata implements IChainable<ProfileImportResponse> {
 
     private static final String TAG = UpdateImportedProfileMetadata.class.getSimpleName();
-    private IChainable nextLink;
+    private IChainable<ProfileImportResponse> nextLink;
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportContext importContext) {
 
         String importId = (String) importContext.getMetadata().get(ServiceConstants.EXPORT_ID);
         String did = (String) importContext.getMetadata().get(ServiceConstants.DID);
@@ -40,7 +41,7 @@ public class UpdateImportedProfileMetadata implements IChainable {
     }
 
     @Override
-    public IChainable then(IChainable link) {
+    public IChainable<ProfileImportResponse> then(IChainable<ProfileImportResponse> link) {
         nextLink = link;
         return link;
     }

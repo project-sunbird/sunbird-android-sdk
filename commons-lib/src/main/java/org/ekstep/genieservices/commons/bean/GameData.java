@@ -1,9 +1,10 @@
 package org.ekstep.genieservices.commons.bean;
 
-/**
- * Created by swayangjit on 27/4/17.
- */
 
+/**
+ *
+ *
+ */
 public class GameData {
 
     private String id;

@@ -3,9 +3,7 @@ package org.ekstep.genieservices.commons.bean;
 import java.io.Serializable;
 
 /**
- * Created on 12/5/17.
- *
- * @author swayangjit
+ * This class holds the data related to the Tag details
  */
 public class Tag implements Serializable {
 

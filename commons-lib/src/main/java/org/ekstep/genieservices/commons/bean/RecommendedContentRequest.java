@@ -3,9 +3,8 @@ package org.ekstep.genieservices.commons.bean;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 /**
- * Created on 6/5/2017.
+ * This class accepts language and limit when requesting for a recommended content with respect to a particular language.
  *
- * @author anil
  */
 public class RecommendedContentRequest {
 

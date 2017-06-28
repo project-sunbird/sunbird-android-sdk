@@ -4,9 +4,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * Created on 6/12/2017.
+ * This class holds data about the Notification details.
  *
- * @author Indraja Machani
  */
 public class Notification implements Serializable {
 
@@ -45,11 +44,11 @@ public class Notification implements Serializable {
         this.notificationJson = notificationJson;
     }
 
-    public double getMsgId() {
+    public int getMsgid() {
         return msgid;
     }
 
-    public void setMsgId(int msgid) {
+    public void setMsgid(int msgid) {
         this.msgid = msgid;
     }
 
@@ -149,7 +148,7 @@ public class Notification implements Serializable {
         this.dispbehavior = dispbehavior;
     }
 
-    public int getIsRead() {
+    public int isRead() {
         return isRead;
     }
 

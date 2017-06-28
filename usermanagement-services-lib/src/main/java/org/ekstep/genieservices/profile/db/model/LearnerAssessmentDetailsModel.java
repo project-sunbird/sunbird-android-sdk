@@ -47,7 +47,6 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
     private LearnerAssessmentDetailsModel(IDBSession dbSession, LearnerAssessmentDetails learnerAssessmentDetails) {
         this.dbSession = dbSession;
 
-        this.id = learnerAssessmentDetails.getId();
         this.uid = learnerAssessmentDetails.getUid();
         this.contentId = learnerAssessmentDetails.getContentId();
         this.qid = learnerAssessmentDetails.getQid();

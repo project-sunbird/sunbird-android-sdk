@@ -5,9 +5,9 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
+import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
-import org.ekstep.genieservices.telemetry.model.ImportedMetadataModel;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,25 +18,17 @@ import java.util.Map;
  *
  * @author anil
  */
-public class ValidateProfileMetadata implements IChainable {
+public class ValidateProfileMetadata implements IChainable<ProfileImportResponse> {
 
     private static final String TAG = ValidateProfileMetadata.class.getSimpleName();
-    private IChainable nextLink;
+    private IChainable<ProfileImportResponse> nextLink;
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportContext importContext) {
 
         if (importContext.getMetadata() != null && !importContext.getMetadata().isEmpty()) {
             List<String> importTypes = getImportTypes(importContext.getMetadata());
-            if (importTypes != null && importTypes.contains(ServiceConstants.EXPORT_TYPE_PROFILE)) {
-                String importId = (String) importContext.getMetadata().get(ServiceConstants.EXPORT_ID);
-                String did = (String) importContext.getMetadata().get(ServiceConstants.DID);
-
-                ImportedMetadataModel importedMetadataModel = ImportedMetadataModel.find(appContext.getDBSession(), importId, did);
-                if (importedMetadataModel != null) {
-                    return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "This data has already been imported.", TAG);
-                }
-            } else {
+            if (!importTypes.contains(ServiceConstants.EXPORT_TYPE_PROFILE)) {
                 return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "Profile event import failed, type mismatch.", TAG);
             }
         } else {
@@ -51,7 +43,7 @@ public class ValidateProfileMetadata implements IChainable {
     }
 
     @Override
-    public IChainable then(IChainable link) {
+    public IChainable<ProfileImportResponse> then(IChainable<ProfileImportResponse> link) {
         nextLink = link;
         return link;
     }

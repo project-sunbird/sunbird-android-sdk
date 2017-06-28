@@ -90,7 +90,7 @@ public class NotificationHandler {
             String isValidNotification = String.format(Locale.US, "%s = '%s'", NotificationEntry.COLUMN_NAME_MESSAGE_ID, msgId);
             return String.format(Locale.US, " %s", isValidNotification);
         }
-        //Update query for to update all valid notifications's status
+        //Update query for to update all valid notifications's status, and msgId = -1 means update all notifications
         else {
             String isValidNotification = String.format(Locale.US, "%s = %s AND %s <= '%s' AND %s > '%s'",
                     NotificationEntry.COLUMN_NAME_IS_READ, 0, NotificationEntry.COLUMN_NAME_NOTIFICATION_DISPLAY_TIME, new Date().getTime(), NotificationEntry.COLUMN_NAME_EXPIRY_TIME,

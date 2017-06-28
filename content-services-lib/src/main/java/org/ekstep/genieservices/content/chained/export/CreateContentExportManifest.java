@@ -49,7 +49,7 @@ public class CreateContentExportManifest implements IChainable<ContentExportResp
 
             // index item
             contentIndex.put(contentModel.getIdentifier(), item);
-            ContentHandler.addOrUpdateViralityMetadata(item, appContext.getDeviceInfo().getDeviceID());
+            ContentHandler.addViralityMetadataIfMissing(item, appContext.getDeviceInfo().getDeviceID());
 
             // get item's children only to mark children with visibility as Parent
             if (ContentHandler.hasChildren(contentModel.getLocalData())) {
