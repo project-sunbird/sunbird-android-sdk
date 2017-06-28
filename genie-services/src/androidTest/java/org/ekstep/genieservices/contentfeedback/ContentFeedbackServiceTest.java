@@ -11,11 +11,14 @@ import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
+import org.ekstep.genieservices.commons.bean.ContentFeedbackFilterCriteria;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.List;
 
 /**
  * Created by Sneha on 6/2/2017.
@@ -31,33 +34,35 @@ public class ContentFeedbackServiceTest extends GenieServiceTestBase {
 
         GenieServiceDBHelper.clearEcarEntryFromDB();
 
+        //create profile
         String uid = createAndSetProfileForGetFeedback();
 
-        EcarImportRequest.Builder importRequest = new EcarImportRequest.Builder().fromFilePath(CONTENT_FILEPATH).toFolder(activity.getExternalFilesDir(null).toString());
+        //import content
+        importContent();
 
-        GenieResponse genieResponse = activity.importEcar(importRequest.build());
-        Assert.assertTrue(genieResponse.getStatus());
-
-        ContentFeedback contentFeedback = new ContentFeedback();
-        contentFeedback.setComments("Great content");
-        contentFeedback.setContentId(CONTENT_ID);
-        contentFeedback.setRating(3);
-
-        GenieResponse genieResponseSendFeedback = activity.sendFeedback(contentFeedback);
+        //send feedback
+        ContentFeedback sendFeedbackData = new ContentFeedback();
+        sendFeedbackData.setComments("Great content");
+        sendFeedbackData.setContentId(CONTENT_ID);
+        sendFeedbackData.setRating(3);
+        GenieResponse genieResponseSendFeedback = activity.sendFeedback(sendFeedbackData);
         Assert.assertTrue(genieResponseSendFeedback.getStatus());
 
-        shouldAssertFeedbackData(contentFeedback);
+        //assert send feedback data
+        shouldAssertSendFeedbackData(sendFeedbackData);
 
-//        ContentFeedbackFilterCriteria.Builder data = new ContentFeedbackFilterCriteria.Builder().byUser(uid).forContent(CONTENT_ID);
-//
-//        GenieResponse<List<ContentFeedback>> genieResponseGetFeedback = activity.getFeedback(data.build());
-//        Assert.assertTrue(genieResponseGetFeedback.getStatus());
-//        ContentFeedback getFeedback = genieResponseGetFeedback.getResult().get(0);
-//        assertGetFeedbackData(contentFeedback, getFeedback);
+        //get feedback
+        ContentFeedbackFilterCriteria.Builder data = new ContentFeedbackFilterCriteria.Builder()
+                .byUser(uid).forContent(CONTENT_ID);
+        GenieResponse<List<ContentFeedback>> genieResponseGetFeedback = activity.getFeedback(data.build());
+        Assert.assertTrue(genieResponseGetFeedback.getStatus());
+        ContentFeedback getFeedbackData = genieResponseGetFeedback.getResult().get(0);
 
+        //assert get feedback data
+        shouldAssertGetFeedbackData(sendFeedbackData, getFeedbackData);
     }
 
-    private void assertGetFeedbackData(ContentFeedback contentFeedback, ContentFeedback getFeedback) {
+    private void shouldAssertGetFeedbackData(ContentFeedback contentFeedback, ContentFeedback getFeedback) {
         Assert.assertEquals(contentFeedback.getContentId(), getFeedback.getContentId());
         Assert.assertEquals(contentFeedback.getRating(), getFeedback.getRating());
         Assert.assertEquals(contentFeedback.getComments(), getFeedback.getComments());
@@ -68,26 +73,23 @@ public class ContentFeedbackServiceTest extends GenieServiceTestBase {
      *
      * @param contentFeedback
      */
-    private void shouldAssertFeedbackData(ContentFeedback contentFeedback) {
+    private void shouldAssertSendFeedbackData(ContentFeedback contentFeedback) {
 
-        GenieServiceDBHelper.findContent(CONTENT_ID);
+        GenieServiceDBHelper.findContentEntryInDB(CONTENT_ID);
 
-        ContentDetailsRequest.Builder detailsRequest = new ContentDetailsRequest.Builder().forContent(CONTENT_ID);
-
+        ContentDetailsRequest.Builder detailsRequest = new ContentDetailsRequest.Builder().forContent(CONTENT_ID).withFeedback();
         GenieResponse<Content> genieResponseDetails = activity.getContentDetails(detailsRequest.build());
 
         Assert.assertTrue("true", genieResponseDetails.getStatus());
         Assert.assertEquals("worksheet", genieResponseDetails.getResult().getContentType());
         Assert.assertTrue("true", genieResponseDetails.getResult().isAvailableLocally());
         Assert.assertEquals(CONTENT_ID, genieResponseDetails.getResult().getIdentifier());
-        Assert.assertNull(genieResponseDetails.getResult().getContentFeedback());
+        Assert.assertNotNull(genieResponseDetails.getResult().getContentFeedback());
 
-        Log.e(TAG, "shouldAssertFeedbackData: content feedback : " + genieResponseDetails.getResult().getContentFeedback());
-
-//        Assert.assertEquals(contentFeedback.getComments(), genieResponseDetails.getResult().getContentFeedback().get(0).getComments());
-//        Assert.assertEquals(contentFeedback.getContentId(), genieResponseDetails.getResult().getContentFeedback().get(0).getContentId());
-//        Assert.assertEquals(contentFeedback.getRating(), genieResponseDetails.getResult().getContentFeedback().get(0).getRating());
-//        Assert.assertNotNull(genieResponseDetails.getResult().getContentFeedback().get(0).getCreatedAt());
+        Assert.assertEquals(contentFeedback.getComments(), genieResponseDetails.getResult().getContentFeedback().get(0).getComments());
+        Assert.assertEquals(contentFeedback.getContentId(), genieResponseDetails.getResult().getContentFeedback().get(0).getContentId());
+        Assert.assertEquals(contentFeedback.getRating(), genieResponseDetails.getResult().getContentFeedback().get(0).getRating());
+        Assert.assertNotNull(genieResponseDetails.getResult().getContentFeedback().get(0).getCreatedAt());
     }
 
     private String createAndSetProfileForGetFeedback() {
@@ -108,6 +110,13 @@ public class ContentFeedbackServiceTest extends GenieServiceTestBase {
         String uid = responseGetCurrentUser.getResult().getUid();
 
         return uid;
+    }
+
+    private void importContent() {
+        EcarImportRequest.Builder importRequest = new EcarImportRequest.Builder().fromFilePath(CONTENT_FILEPATH)
+                .toFolder(activity.getExternalFilesDir(null).toString());
+        GenieResponse genieResponse = activity.importEcar(importRequest.build());
+        Assert.assertTrue(genieResponse.getStatus());
     }
 
 }

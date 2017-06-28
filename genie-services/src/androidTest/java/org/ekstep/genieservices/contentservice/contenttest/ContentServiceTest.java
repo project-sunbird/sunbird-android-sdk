@@ -226,7 +226,7 @@ public class ContentServiceTest extends GenieServiceTestBase {
 
 //        ContentSearchCriteria.Builder searchCriteria = new ContentSearchCriteria.Builder().query("collection").limit(10);
 
-        ContentSearchCriteria.Builder contentSearchCriteria = new ContentSearchCriteria.Builder().query("collection").limit(10);
+        ContentSearchCriteria.SearchBuilder contentSearchCriteria = new ContentSearchCriteria.SearchBuilder().query("collection").limit(10);
         GenieResponse<ContentSearchResult> response = activity.searchContent(contentSearchCriteria.build());
         Assert.assertTrue(response.getStatus());
         Assert.assertNotNull(response.getResult().getContentDataList());

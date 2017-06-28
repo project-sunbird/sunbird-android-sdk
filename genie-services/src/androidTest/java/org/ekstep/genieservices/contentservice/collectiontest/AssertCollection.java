@@ -54,14 +54,14 @@ public class AssertCollection extends GenieServiceTestBase {
     public static final String CHILD_APK_CONTENT_ID_TAKE_OFF = "org.ekstep.delta";
 
     public static void verifyNoChildContentEntry(String identifier) {
-        ContentModel content = GenieServiceDBHelper.findContent(identifier);
+        ContentModel content = GenieServiceDBHelper.findContentEntryInDB(identifier);
         Assert.assertNotNull(content);
         Assert.assertFalse(ContentHandler.hasChildren(content.getLocalData()));
     }
 
     public static void verifyCollectionEntryAndVisibility(String identifier, String visibility) {
 
-        ContentModel content = GenieServiceDBHelper.findContent(identifier);
+        ContentModel content = GenieServiceDBHelper.findContentEntryInDB(identifier);
         Assert.assertNotNull(content);
         Assert.assertTrue(ContentHandler.hasChildren(content.getLocalData()));
         Assert.assertTrue(content.getVisibility().equalsIgnoreCase(visibility));
@@ -69,14 +69,14 @@ public class AssertCollection extends GenieServiceTestBase {
 
     public static void verifyContentEntryAndVisibility(String identifier, String visibility) {
 
-        ContentModel content = GenieServiceDBHelper.findContent(identifier);
+        ContentModel content = GenieServiceDBHelper.findContentEntryInDB(identifier);
         Assert.assertNotNull(content);
         Assert.assertTrue(content.getVisibility().equalsIgnoreCase(visibility));
     }
 
     public static void verifyContentVersionToBeUpdated(String identifier, double version, int refCount) {
 
-        ContentModel content = GenieServiceDBHelper.findContent(identifier);
+        ContentModel content = GenieServiceDBHelper.findContentEntryInDB(identifier);
         Assert.assertNotNull(content);
         Assert.assertTrue(refCount == content.getRefCount());
 
@@ -88,7 +88,7 @@ public class AssertCollection extends GenieServiceTestBase {
     public static void verifyContentIsDeleted(String identifier, GenieServiceTestActivity activity, String contentPath) {
 
         Assert.assertFalse(activity.isFilePresent(contentPath));
-        ContentModel content = GenieServiceDBHelper.findContent(identifier);
+        ContentModel content = GenieServiceDBHelper.findContentEntryInDB(identifier);
         Assert.assertNotNull(content.getLocalData());
     }
 }

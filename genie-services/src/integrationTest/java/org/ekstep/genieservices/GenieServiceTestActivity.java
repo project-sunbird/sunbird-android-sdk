@@ -74,6 +74,9 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
+    /**
+     * TODO GetAllMasterData implementation missing in the GenieServices.
+     */
     public GenieResponse<List<MasterData>> getAllMasterData() {
         idle = false;
         GenieResponse<List<MasterData>> genieResponse = mGenieService.getConfigService().getAllMasterData();
