@@ -59,7 +59,7 @@ public class GenieServiceDBHelper {
     }
 
     public static ContentModel findContent(String identifier) {
-        Cursor cursor = GenieServiceDBHelper.getDatabase().rawQuery(findContentDBEntry(identifier), null);
+        Cursor cursor = GenieServiceDBHelper.getDatabase().rawQuery(findEcarDBEntry(identifier), null);
         List<EventModel> events = new ArrayList<>();
         ContentModel contentModel = ContentModel.build(sGSDBHelper.mAppContext.getDBSession());
         if (cursor != null && cursor.moveToFirst())
@@ -149,12 +149,12 @@ public class GenieServiceDBHelper {
         return "SELECT * FROM telemetry where event_type='" + eid + "'";
     }
 
-    public static String findContentDBEntry(String content_id) {
-        Log.e(TAG, "findContentDBEntry");
+    public static String findEcarDBEntry(String content_id) {
+        Log.e(TAG, "findEcarDBEntry");
         return "SELECT * FROM content where identifier='" + content_id + "'";
     }
 
-    public static void clearContentDBEntry() {
+    public static void clearEcarEntryFromDB() {
         try {
             int count = getDatabase().delete("content", "1", null);
             Log.v("Count:::::", "" + count);

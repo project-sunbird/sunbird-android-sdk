@@ -9,7 +9,7 @@ import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
-import org.ekstep.genieservices.commons.bean.ContentImportRequest;
+import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.junit.After;
@@ -35,7 +35,7 @@ public class CollectionDeleteWithNChildTest extends GenieServiceTestBase {
     public void setup() throws IOException {
         super.setup();
         activity = rule.getActivity();
-        GenieServiceDBHelper.clearContentDBEntry();
+        GenieServiceDBHelper.clearEcarEntryFromDB();
     }
 
     @After
@@ -48,13 +48,13 @@ public class CollectionDeleteWithNChildTest extends GenieServiceTestBase {
 
         String ext = FileUtil.getFileExtension(COLLECTION_FILE_PATH);
 
-        ContentImportRequest.Builder importRequest = new ContentImportRequest.Builder().isChildContent(false).fromFilePath(COLLECTION_FILE_PATH).toFolder(activity.getExternalFilesDir(null));
+        EcarImportRequest.Builder importRequest = new EcarImportRequest.Builder().fromFilePath(COLLECTION_FILE_PATH).toFolder(activity.getExternalFilesDir(null).toString());
 
-        GenieResponse response = activity.importContent(importRequest.build());
+        GenieResponse response = activity.importEcar(importRequest.build());
         Assert.assertTrue("true", response.getStatus());
         Assert.assertEquals(ServiceConstants.FileExtension.CONTENT, ext);
 
-        GenieServiceDBHelper.findContentDBEntry(CONTENT_ID);
+        GenieServiceDBHelper.findEcarDBEntry(CONTENT_ID);
 
         AssertCollection.verifyCollectionEntryAndVisibility(AssertCollection.COLLECTION_ECAR_ID, VISIBILITY_DEFAULT);
         AssertCollection.verifyContentEntryAndVisibility(AssertCollection.CHILD_C2_ID, VISIBILITY_PARENT);
@@ -67,7 +67,7 @@ public class CollectionDeleteWithNChildTest extends GenieServiceTestBase {
         AssertCollection.verifyContentEntryAndVisibility(AssertCollection.CHILD_C9_ID, VISIBILITY_PARENT);
         AssertCollection.verifyContentEntryAndVisibility(AssertCollection.CHILD_C10_ID, VISIBILITY_PARENT);
 
-        ContentDeleteRequest.Builder contentDelete = new ContentDeleteRequest.Builder().contentId(CONTENT_ID).isChildContent(false);
+        ContentDeleteRequest.Builder contentDelete = new ContentDeleteRequest.Builder().contentId(CONTENT_ID);
 
         GenieResponse genieResponse = activity.deleteContent(contentDelete.build());
         Assert.assertTrue("true", genieResponse.getStatus());

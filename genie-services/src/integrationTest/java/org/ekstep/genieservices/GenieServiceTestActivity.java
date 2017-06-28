@@ -5,17 +5,18 @@ import android.os.Bundle;
 
 import org.ekstep.genieservices.commons.AndroidAppContext;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
-import org.ekstep.genieservices.commons.bean.ContentCriteria;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
-import org.ekstep.genieservices.commons.bean.ContentFeedbackCriteria;
-import org.ekstep.genieservices.commons.bean.ContentImportRequest;
+import org.ekstep.genieservices.commons.bean.ContentFeedbackFilterCriteria;
+import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
+import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
-import org.ekstep.genieservices.commons.bean.ContentListingResult;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
+import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.PartnerData;
@@ -38,6 +39,7 @@ import java.util.Map;
  */
 
 public class GenieServiceTestActivity extends Activity {
+    private static final String TAG = GenieServiceTestActivity.class.getSimpleName();
 
     private boolean idle = true;
     private GenieService mGenieService;
@@ -51,6 +53,8 @@ public class GenieServiceTestActivity extends Activity {
         mGenieService = GenieService.init(getApplicationContext(), getPackageName());
         mAppContext = AndroidAppContext.buildAppContext(getApplicationContext(), getPackageName());
         GenieServiceDBHelper.init(mAppContext);
+        GenieSdkEventListner.init(mAppContext);
+
     }
 
     public boolean isFilePresent(String filePath) {
@@ -166,9 +170,9 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
-    public GenieResponse<Void> importContent(ContentImportRequest contentImportRequest) {
+    public GenieResponse<Void> importEcar(EcarImportRequest ecarImportRequest) {
         idle = false;
-        GenieResponse genieResponse = mGenieService.getContentService().importContent(contentImportRequest);
+        GenieResponse genieResponse = mGenieService.getContentService().importEcar(ecarImportRequest);
         return genieResponse;
     }
 
@@ -178,15 +182,15 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
-    public GenieResponse<List<Content>> getAllLocalContent(ContentCriteria contentCriteria) {
+    public GenieResponse<List<Content>> getAllLocalContent(ContentFilterCriteria contentCriteria) {
         idle = false;
         GenieResponse<List<Content>> genieResponse = mGenieService.getContentService().getAllLocalContent(contentCriteria);
         return genieResponse;
     }
 
-    public GenieResponse<Content> getChildContents(String contentIdentifier, int levelAndState) {
+    public GenieResponse<Content> getChildContents(ChildContentRequest childContentRequest) {
         idle = false;
-        GenieResponse<Content> genieResponse = mGenieService.getContentService().getChildContents(contentIdentifier, levelAndState);
+        GenieResponse<Content> genieResponse = mGenieService.getContentService().getChildContents(childContentRequest);
         return genieResponse;
     }
 
@@ -202,9 +206,9 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
-    public GenieResponse<ContentListingResult> getContentListing(ContentListingCriteria contentListingCriteria) {
+    public GenieResponse<ContentListing> getContentListing(ContentListingCriteria contentListingCriteria) {
         idle = false;
-        GenieResponse<ContentListingResult> genieResponse = mGenieService.getContentService().getContentListing(contentListingCriteria);
+        GenieResponse<ContentListing> genieResponse = mGenieService.getContentService().getContentListing(contentListingCriteria);
         return genieResponse;
     }
 
@@ -232,9 +236,9 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
-    public GenieResponse<ContentFeedback> getFeedback(ContentFeedbackCriteria contentFeedbackCriteria) {
+    public GenieResponse<List<ContentFeedback>> getFeedback(ContentFeedbackFilterCriteria contentFeedbackCriteria) {
         idle = false;
-        GenieResponse<ContentFeedback> genieResponse = mGenieService.getContentFeedbackService().getFeedback(contentFeedbackCriteria);
+        GenieResponse<List<ContentFeedback>> genieResponse = mGenieService.getContentFeedbackService().getFeedback(contentFeedbackCriteria);
         return genieResponse;
     }
 

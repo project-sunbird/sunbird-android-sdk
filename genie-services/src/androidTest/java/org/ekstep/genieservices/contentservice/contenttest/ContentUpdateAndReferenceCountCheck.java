@@ -11,6 +11,7 @@ import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
+import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.contentservice.collectiontest.AssertCollection;
 import org.junit.Test;
@@ -36,36 +37,37 @@ public class ContentUpdateAndReferenceCountCheck extends GenieServiceTestBase {
     @Test
     public void test1ShouldCheckContentUpdate() {
 
-        GenieServiceDBHelper.clearContentDBEntry();
+        GenieServiceDBHelper.clearEcarEntryFromDB();
 
         //import collection
-        ContentImportRequest.Builder collectionImportRequest = new ContentImportRequest.Builder().isChildContent(false).fromFilePath(COLLECTION_FILE_PATH).toFolder(activity.getExternalFilesDir(null));
-        GenieResponse<Void> genieImportResponse = activity.importContent(collectionImportRequest.build());
+        EcarImportRequest.Builder ecarImportRequest = new EcarImportRequest.Builder().fromFilePath(COLLECTION_FILE_PATH).toFolder(activity.getExternalFilesDir(null).toString());
+        GenieResponse<Void> genieImportResponse = activity.importEcar(ecarImportRequest.build());
+        Assert.assertTrue(genieImportResponse.getStatus());
 
         //check for reference count for c4 child
-        ContentDetailsRequest.Builder contentDetailReuqest = new ContentDetailsRequest.Builder().contentId(AssertCollection.CHILD_C4_ID);
+        ContentDetailsRequest.Builder contentDetailReuqest = new ContentDetailsRequest.Builder().forContent(AssertCollection.CHILD_C4_ID);
         GenieResponse<Content> detailsResponse = activity.getContentDetails(contentDetailReuqest.build());
         Assert.assertTrue(detailsResponse.getStatus());
         Assert.assertEquals(1, detailsResponse.getResult().getReferenceCount());
 
         //import newer version of c4 content.
-        ContentImportRequest.Builder importRequestBuilder = new ContentImportRequest.Builder().isChildContent(false).fromFilePath(CHILD_CONTENT_FILE_PATH).toFolder(activity.getExternalFilesDir(null));
-        GenieResponse<Void> genieResponse = activity.importContent(importRequestBuilder.build());
+        EcarImportRequest.Builder ecarImportRequest2 = new EcarImportRequest.Builder().fromFilePath(CHILD_CONTENT_FILE_PATH).toFolder(activity.getExternalFilesDir(null).toString());
+        GenieResponse<Void> genieResponse = activity.importEcar(ecarImportRequest2.build());
         Assert.assertTrue(genieResponse.getStatus());
 
         //check the reference count
-        ContentDetailsRequest.Builder contentId = new ContentDetailsRequest.Builder().contentId(AssertCollection.CHILD_CONTENT_ECAR_ID);
+        ContentDetailsRequest.Builder contentId = new ContentDetailsRequest.Builder().forContent(AssertCollection.CHILD_CONTENT_ECAR_ID);
         GenieResponse<Content> contentDetailsResponse = activity.getContentDetails(contentId.build());
         Assert.assertTrue(contentDetailsResponse.getStatus());
         Assert.assertEquals(2, contentDetailsResponse.getResult().getReferenceCount());
 
         //delete content
-        ContentDeleteRequest.Builder deleteRequest = new ContentDeleteRequest.Builder().contentId(AssertCollection.CHILD_C4_ID).isChildContent(true);
+        ContentDeleteRequest.Builder deleteRequest = new ContentDeleteRequest.Builder().contentId(AssertCollection.CHILD_C4_ID).isChildContent();
         GenieResponse deleteResponse = activity.deleteContent(deleteRequest.build());
         Assert.assertTrue(deleteResponse.getStatus());
 
         //check the reference count after deleting
-        ContentDetailsRequest.Builder contentDetails = new ContentDetailsRequest.Builder().contentId(AssertCollection.CHILD_CONTENT_ECAR_ID);
+        ContentDetailsRequest.Builder contentDetails = new ContentDetailsRequest.Builder().forContent(AssertCollection.CHILD_CONTENT_ECAR_ID);
         GenieResponse<Content> detailResponse = activity.getContentDetails(contentDetails.build());
         Assert.assertTrue(detailResponse.getStatus());
         Assert.assertEquals(1, detailResponse.getResult().getReferenceCount());
