@@ -204,7 +204,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         // check if the content model has immediate children
         List<ContentModel> contentModelList = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), contentModel.getLocalData(), ContentConstants.ChildContents.ALL);
         if (contentModelList.size() > 0
-                && (level == -1 || level < currentLevel)) {
+                && (level == -1 || currentLevel < level)) {
             List<Content> childContents = new ArrayList<>();
 
             for (ContentModel perContentModel : contentModelList) {

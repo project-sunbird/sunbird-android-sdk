@@ -54,12 +54,12 @@ public class ChildContentRequest {
             return this;
         }
 
-        public Builder nextLevel() {
+        public Builder nextLevelOnly() {
             this.level = 1;
             return this;
         }
 
-        public Builder leafLevel() {
+        public Builder tillLeafLevel() {
             this.level = -1;
             return this;
         }
