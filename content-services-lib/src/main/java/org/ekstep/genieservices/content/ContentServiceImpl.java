@@ -205,6 +205,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         List<ContentModel> contentModelList = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), contentModel.getLocalData(), ContentConstants.ChildContents.ALL);
         if (contentModelList.size() > 0
                 && (level == -1 || currentLevel < level)) {
+            currentLevel = currentLevel + 1;
             List<Content> childContents = new ArrayList<>();
 
             for (ContentModel perContentModel : contentModelList) {
@@ -212,7 +213,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 List<HierarchyInfo> hierarchyInfoList = new ArrayList<>(sourceInfoList);
                 hierarchyInfoList.add(new HierarchyInfo(perContent.getIdentifier(), perContent.getContentType()));
                 perContent.setHierarchyInfo(hierarchyInfoList);
-                Content iteratedContent = checkAndFetchChildrenOfContent(perContentModel, hierarchyInfoList, currentLevel++, level);
+                Content iteratedContent = checkAndFetchChildrenOfContent(perContentModel, hierarchyInfoList, currentLevel, level);
                 perContent.setChildren(iteratedContent.getChildren());
 
                 childContents.add(perContent);
