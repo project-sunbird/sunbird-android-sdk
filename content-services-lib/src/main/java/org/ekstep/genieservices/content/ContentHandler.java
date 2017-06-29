@@ -25,7 +25,6 @@ import org.ekstep.genieservices.commons.bean.FilterValue;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.MasterDataValues;
-import org.ekstep.genieservices.commons.bean.PartnerFilter;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
@@ -33,7 +32,6 @@ import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
 import org.ekstep.genieservices.commons.bean.enums.SearchType;
-import org.ekstep.genieservices.commons.bean.enums.SortBy;
 import org.ekstep.genieservices.commons.bean.enums.SortOrder;
 import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.contract.ContentEntry;
@@ -50,7 +48,6 @@ import org.ekstep.genieservices.content.network.ContentDetailsAPI;
 import org.ekstep.genieservices.content.network.ContentListingAPI;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,8 +64,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.TreeMap;
-
-import static javax.swing.UIManager.get;
 
 /**
  * Created on 5/23/2017.
@@ -768,7 +763,7 @@ public class ContentHandler {
     public static List<ContentModel> getSortedChildrenList(IDBSession dbSession, String localData, int childContents) {
         Map<String, Object> localDataMap = GsonUtil.fromJson(localData, Map.class);
         List<Map> children = (List<Map>) localDataMap.get("children");
-        List<ContentModel> contentModelListInDB;
+        List<ContentModel> contentModelListInDB = null;
         if (children != null && children.size() > 0) {
             // Sort by index of child content
             Comparator<Map> comparator = new Comparator<Map>() {
@@ -797,11 +792,11 @@ public class ContentHandler {
 
             String filter;
             switch (childContents) {
-                case ContentConstants.ChildContents.FIRST_LEVEL_DOWNLOADED:
+                case ContentConstants.ChildContents.DOWNLOADED:
                     filter = String.format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
                     break;
 
-                case ContentConstants.ChildContents.FIRST_LEVEL_SPINE:
+                case ContentConstants.ChildContents.SPINE:
                     filter = String.format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ONLY_SPINE);
                     break;
 
@@ -809,7 +804,7 @@ public class ContentHandler {
 //                filter = String.format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_TYPE, ContentType.TEXTBOOK_UNIT.getValue());
 //                break;
 
-                case ContentConstants.ChildContents.FIRST_LEVEL_ALL:
+                case ContentConstants.ChildContents.ALL:
                 default:
                     filter = "";
                     break;
@@ -820,10 +815,10 @@ public class ContentHandler {
             ContentsModel contentsModel = ContentsModel.findWithCustomQuery(dbSession, query);
             if (contentsModel != null) {
                 contentModelListInDB = contentsModel.getContentModelList();
-            } else {
-                contentModelListInDB = new ArrayList<>();
             }
-        } else {
+        }
+
+        if (contentModelListInDB == null) {
             contentModelListInDB = new ArrayList<>();
         }
 

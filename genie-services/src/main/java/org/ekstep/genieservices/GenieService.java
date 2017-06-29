@@ -1,7 +1,6 @@
 package org.ekstep.genieservices;
 
 import android.content.Context;
-import android.util.Log;
 
 import org.ekstep.genieservices.async.GenieAsyncService;
 import org.ekstep.genieservices.commons.AndroidAppContext;
@@ -69,7 +68,6 @@ public class GenieService {
     }
 
     public static GenieService init(Context context, String packageName) {
-
         if (sService == null) {
             AppContext<Context> applicationContext = AndroidAppContext.buildAppContext(context, packageName);
             Logger.init(new AndroidLogger());
@@ -80,7 +78,9 @@ public class GenieService {
             SummaryListener.init(applicationContext);
             sService = new GenieService(applicationContext);
         }
+
         GenieAsyncService.init(sService);
+
         return sService;
     }
 

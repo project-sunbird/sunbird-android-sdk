@@ -13,6 +13,7 @@ import org.ekstep.genieservices.utils.BuildConfigUtil;
  * @author swayangjit
  */
 public class BuildParams implements IParams {
+
     private String baseApiUrl;
     private String userName;
     private String password;
@@ -30,6 +31,7 @@ public class BuildParams implements IParams {
         gId = BuildConfigUtil.getBuildConfigValue(packageName, Constants.Params.GID);
         logLevel = LogLevel.getLogLevel(BuildConfigUtil.getBuildConfigValue(packageName, Constants.Params.LOGLEVEL)).getLevel();
         qualifier = BuildConfigUtil.getBuildConfigValue(packageName, Constants.Params.APP_QUALIFIER);
+
         String profileConfigClass = BuildConfigUtil.getBuildConfigValue(packageName, Constants.Params.PROFILE_CONFIG);
         if (profileConfigClass != null) {
             Class<?> classInstance = ReflectionUtil.getClass(profileConfigClass);
@@ -37,7 +39,6 @@ public class BuildParams implements IParams {
                 IProfileConfig profileConfiguration = (IProfileConfig) ReflectionUtil.getInstance(classInstance);
                 profilePath = profileConfiguration.getProfilePath(context);
             }
-
         }
     }
 
@@ -80,6 +81,5 @@ public class BuildParams implements IParams {
     public String getProfilePath() {
         return profilePath;
     }
-
 
 }

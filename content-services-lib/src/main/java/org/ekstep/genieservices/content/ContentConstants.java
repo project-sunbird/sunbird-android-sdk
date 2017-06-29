@@ -46,21 +46,15 @@ public interface ContentConstants {
         /**
          * Downloaded or spine both
          */
-        int FIRST_LEVEL_ALL = 0;
+        int ALL = 0;
         /**
          * All descendant downloaded contents
          */
-        int FIRST_LEVEL_DOWNLOADED = 1;
+        int DOWNLOADED = 1;
         /**
          * All descendant spine contents
          */
-        int FIRST_LEVEL_SPINE = 2;
-
-        int LEAF_LEVEL_ALL = 3;
-        int LEAF_LEVEL_DOWNLOADED = 4;
-        int LEAF_LEVEL_SPINE = 5;
-
-//        int FIRST_LEVEL_TEXTBOOK_UNIT = 3;
+        int SPINE = 2;
     }
 
 }

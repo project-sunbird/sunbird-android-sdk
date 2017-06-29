@@ -32,7 +32,7 @@ public class AndroidAppContext extends AppContext<Context> {
         super(context, appPackage);
     }
 
-    public static AppContext buildAppContext(Context context, String appPackage) {
+    public static AppContext<Context> buildAppContext(Context context, String appPackage) {
         AndroidAppContext appContext = new AndroidAppContext(context, appPackage);
         appContext.setParams(new BuildParams(context, appPackage));
         appContext.setDBSession(ServiceDbHelper.getGSDBSession(appContext));

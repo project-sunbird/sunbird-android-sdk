@@ -25,7 +25,6 @@ import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
-import org.ekstep.genieservices.commons.bean.ContentSearchFilter;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
@@ -185,11 +184,12 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, ServiceConstants.ErrorMessage.CONTENT_NOT_FOUND + childContentRequest.getContentId(), TAG);
             return response;
         }
+
         List<HierarchyInfo> hierarchyInfoList = new ArrayList<>();
         hierarchyInfoList.add(new HierarchyInfo(contentModel.getIdentifier(), contentModel.getContentType()));
 
-        //check and fetch all childrens of this content
-        Content content = checkAndFetchChildrenOfContent(contentModel, hierarchyInfoList);
+        //check and fetch all children of this content
+        Content content = checkAndFetchChildrenOfContent(contentModel, hierarchyInfoList, 0, childContentRequest.getLevel());
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(content);
@@ -197,13 +197,14 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         return response;
     }
 
-    private Content checkAndFetchChildrenOfContent(ContentModel contentModel, List<HierarchyInfo> sourceInfoList) {
+    private Content checkAndFetchChildrenOfContent(ContentModel contentModel, List<HierarchyInfo> sourceInfoList, int currentLevel, int level) {
         Content content = ContentHandler.convertContentModelToBean(contentModel);
         content.setHierarchyInfo(sourceInfoList);
-        // check if the content model has immediate children
-        List<ContentModel> contentModelList = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), contentModel.getLocalData(), ContentConstants.ChildContents.FIRST_LEVEL_ALL);
-        if (contentModelList.size() > 0) {
 
+        // check if the content model has immediate children
+        List<ContentModel> contentModelList = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), contentModel.getLocalData(), ContentConstants.ChildContents.ALL);
+        if (contentModelList.size() > 0
+                && (level == -1 || level < currentLevel)) {
             List<Content> childContents = new ArrayList<>();
 
             for (ContentModel perContentModel : contentModelList) {
@@ -211,7 +212,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 List<HierarchyInfo> hierarchyInfoList = new ArrayList<>(sourceInfoList);
                 hierarchyInfoList.add(new HierarchyInfo(perContent.getIdentifier(), perContent.getContentType()));
                 perContent.setHierarchyInfo(hierarchyInfoList);
-                Content iteratedContent = checkAndFetchChildrenOfContent(perContentModel, hierarchyInfoList);
+                Content iteratedContent = checkAndFetchChildrenOfContent(perContentModel, hierarchyInfoList, currentLevel++, level);
                 perContent.setChildren(iteratedContent.getChildren());
 
                 childContents.add(perContent);
@@ -489,7 +490,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             while (!stack.isEmpty()) {
                 node = stack.pop();
                 if (ContentHandler.hasChildren(node.getLocalData())) {
-                    List<ContentModel> childContents = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), node.getLocalData(), ContentConstants.ChildContents.FIRST_LEVEL_ALL);
+                    List<ContentModel> childContents = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), node.getLocalData(), ContentConstants.ChildContents.ALL);
                     stack.addAll(childContents);
 
                     for (ContentModel c : childContents) {
