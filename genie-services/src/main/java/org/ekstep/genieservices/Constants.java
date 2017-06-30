@@ -1,12 +1,12 @@
 package org.ekstep.genieservices;
 
 /**
- * Created by swayangjit on 19/4/17.
+ * Created on 19/4/17.
+ *
+ * @author swayangjit
  */
-
 public interface Constants {
     String SHARED_PREFERENCE_NAME = "org.ekstep.genieservices.preference_file";
-    String TELEMETRY_VERSION = "2";
 
     interface Params {
         String VERSION_CODE = "VERSION_CODE";

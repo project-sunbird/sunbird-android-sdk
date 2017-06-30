@@ -500,7 +500,8 @@
           "value": "Other",
           "telemetry": "",
           "description": "",
-          "search": {}
+          "search": {
+          }
         }
       ]
     },
@@ -667,7 +668,8 @@
           "value": "Other",
           "telemetry": "",
           "description": "",
-          "search": {}
+          "search": {
+          }
         }
       ]
     },
@@ -870,6 +872,61 @@
           "telemetry": "-1",
           "description": "",
           "search": {}
+        }
+      ]
+    },
+    "channel": {
+      "label": "Channel",
+      "value": "channel",
+      "language": "en",
+      "description": "List of partner channels",
+      "values": [
+        {
+          "label": "APSSDC",
+          "value": "AP_1",
+          "telemetry": "AP_1",
+          "description": "",
+          "search": {
+            "filters": {
+              "tags": [
+                "APSSDC"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "audience": {
+      "label": "audience",
+      "value": "audience",
+      "language": "en",
+      "description": "Purpose of the content",
+      "values": [
+        {
+          "label": "Learner",
+          "value": "learner",
+          "telemetry": "learner",
+          "description": "",
+          "search": {
+            "filters": {
+              "audience": [
+                "learner"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Instructor",
+          "value": "instructor",
+          "telemetry": "instructor",
+          "description": "",
+          "search": {
+            "filters": {
+              "audience": [
+                "instructor"
+              ]
+            }
+          }
         }
       ]
     }
