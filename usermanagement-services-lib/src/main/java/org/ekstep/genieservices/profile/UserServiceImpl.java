@@ -104,29 +104,11 @@ public class UserServiceImpl extends BaseService implements IUserService {
         }
     }
 
-    @Override
-    public GenieResponse<List<Profile>> getAllUserProfile() {
-        String methodName = "getAllUserProfile@UserServiceImpl";
-        HashMap params = new HashMap();
-        params.put("logLevel", "1");
-        UserProfilesModel userProfilesModel = UserProfilesModel.find(mAppContext.getDBSession());
-        GenieResponse genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, List.class);
-        if (userProfilesModel == null) {
-            genieResponse.setResult(new ArrayList<Profile>());
-        } else {
-            genieResponse.setResult(userProfilesModel.getProfileList());
-        }
-        TelemetryLogger.logSuccess(mAppContext, genieResponse, TAG, methodName, params);
-        return genieResponse;
-    }
-
-    private void logGEError(GenieResponse response, String id) {
-        GEError geError = new GEError(mGameData, response.getError(), id, "", response.getErrorMessages().toString());
-        TelemetryLogger.log(geError);
-    }
-
     private GenieResponse<Profile> saveUserProfile(final Profile profile, IDBSession dbSession) {
-        String uid = UUID.randomUUID().toString();
+        String uid = profile.getUid();
+        if (StringUtil.isNullOrEmpty(uid)) {
+            uid = UUID.randomUUID().toString();
+        }
         profile.setUid(uid);
         if (profile.getCreatedAt() == null) {
             profile.setCreatedAt(DateUtil.now());
@@ -150,6 +132,29 @@ public class UserServiceImpl extends BaseService implements IUserService {
         GenieResponse<Profile> successResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         successResponse.setResult(GsonUtil.fromJson(profileModel.getProfile().toString(), Profile.class));
         return successResponse;
+    }
+
+    @Override
+    public GenieResponse<List<Profile>> getAllUserProfile() {
+        String methodName = "getAllUserProfile@UserServiceImpl";
+        HashMap params = new HashMap();
+        params.put("logLevel", "1");
+
+        GenieResponse<List<Profile>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+
+        UserProfilesModel userProfilesModel = UserProfilesModel.find(mAppContext.getDBSession());
+        if (userProfilesModel == null) {
+            response.setResult(new ArrayList<Profile>());
+        } else {
+            response.setResult(userProfilesModel.getProfileList());
+        }
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        return response;
+    }
+
+    private void logGEError(GenieResponse response, String id) {
+        GEError geError = new GEError(mGameData, response.getError(), id, "", response.getErrorMessages().toString());
+        TelemetryLogger.log(geError);
     }
 
     /**
@@ -523,6 +528,5 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
         return copyDatabase.execute(mAppContext, importContext);
     }
-
 
 }

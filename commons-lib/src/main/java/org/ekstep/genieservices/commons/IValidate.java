@@ -7,8 +7,8 @@ import java.util.List;
  *
  * @author shriharsh
  */
-
 public interface IValidate {
+
     boolean isValid();
 
     List<String> getErrors();

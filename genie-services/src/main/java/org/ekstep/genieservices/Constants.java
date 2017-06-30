@@ -6,7 +6,6 @@ package org.ekstep.genieservices;
  * @author swayangjit
  */
 public interface Constants {
-    String SHARED_PREFERENCE_NAME = "org.ekstep.genieservices.preference_file";
 
     interface Params {
         String VERSION_CODE = "VERSION_CODE";

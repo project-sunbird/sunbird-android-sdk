@@ -4,7 +4,6 @@ import java.util.Locale;
 
 /**
  * This class holds the day, month and year data.
- *
  */
 public class DayMonth {
     private int day;

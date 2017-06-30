@@ -9,7 +9,7 @@ import org.ekstep.genieservices.commons.utils.ReflectionUtil;
  */
 public class BuildConfigUtil {
 
-    public static Class<?> getBuildConfigClass(String packageName) {
+    private static Class<?> getBuildConfigClass(String packageName) {
         return ReflectionUtil.getClass(packageName + ".BuildConfig");
     }
 

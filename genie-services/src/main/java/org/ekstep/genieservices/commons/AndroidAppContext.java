@@ -2,7 +2,6 @@ package org.ekstep.genieservices.commons;
 
 import android.content.Context;
 
-import org.ekstep.genieservices.Constants;
 import org.ekstep.genieservices.commons.db.ServiceDbHelper;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.cache.PreferenceWrapper;
@@ -17,6 +16,8 @@ import org.ekstep.genieservices.commons.network.IHttpClientFactory;
  * Created on 18/4/17.
  */
 public class AndroidAppContext extends AppContext<Context> {
+
+    private static final String SHARED_PREFERENCE_NAME = "org.ekstep.genieservices.preference_file";
 
     private IDBSession mDBSession;
     private IConnectionInfo mConnectionInfo;
@@ -38,7 +39,7 @@ public class AndroidAppContext extends AppContext<Context> {
         appContext.setDBSession(ServiceDbHelper.getGSDBSession(appContext));
         appContext.setConnectionInfo(new AndroidNetworkConnectivity(appContext));
         appContext.setHttpClientFactory(new AndroidHttpClientFactory(appContext));
-        appContext.setKeyValueStore(new PreferenceWrapper(context, Constants.SHARED_PREFERENCE_NAME));
+        appContext.setKeyValueStore(new PreferenceWrapper(context, SHARED_PREFERENCE_NAME));
         appContext.setDeviceInfo(new DeviceInfo(context));
         appContext.setLocationInfo(new LocationInfo(context));
         appContext.setDownloadManager(new AndroidDownloadManager(context));
