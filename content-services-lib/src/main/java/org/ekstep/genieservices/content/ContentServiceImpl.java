@@ -185,8 +185,10 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             return response;
         }
 
-        List<HierarchyInfo> hierarchyInfoList = new ArrayList<>();
-        hierarchyInfoList.add(new HierarchyInfo(contentModel.getIdentifier(), contentModel.getContentType()));
+        List<HierarchyInfo> hierarchyInfoList = childContentRequest.getHierarchyInfo();
+        if (hierarchyInfoList.isEmpty()) {
+            hierarchyInfoList.add(new HierarchyInfo(contentModel.getIdentifier(), contentModel.getContentType()));
+        }
 
         //check and fetch all children of this content
         Content content = checkAndFetchChildrenOfContent(contentModel, hierarchyInfoList, 0, childContentRequest.getLevel());
@@ -617,17 +619,17 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<ContentImportResponse> getImportStatus(String identifier) {
+    public GenieResponse<ContentImportResponse> getImportStatus(String contentId) {
         String methodName = "getImportStatus@ContentServiceImpl";
         HashMap params = new HashMap<>();
-        params.put("identifier", identifier);
+        params.put("identifier", contentId);
         params.put("logLevel", "2");
-        DownloadRequest request = downloadService.getDownloadRequest(identifier);
+        DownloadRequest request = downloadService.getDownloadRequest(contentId);
         int status = -1;
         if (request != null) {
             status = request.getDownloadId() == -1 ? 0 : 1;
         }
-        ContentImportResponse contentImportResponse = new ContentImportResponse(identifier, status, null);
+        ContentImportResponse contentImportResponse = new ContentImportResponse(contentId, status, null);
         GenieResponse<ContentImportResponse> response = GenieResponseBuilder.getSuccessResponse("", ContentImportResponse.class);
         response.setResult(contentImportResponse);
         TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
@@ -686,12 +688,12 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<Void> cancelDownload(String identifier) {
+    public GenieResponse<Void> cancelDownload(String contentId) {
         String methodName = "cancelDownload@ContentServiceImpl";
         HashMap params = new HashMap<>();
-        params.put("identifier", identifier);
+        params.put("identifier", contentId);
         params.put("logLevel", "2");
-        downloadService.cancel(identifier);
+        downloadService.cancel(contentId);
         GenieResponse response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;

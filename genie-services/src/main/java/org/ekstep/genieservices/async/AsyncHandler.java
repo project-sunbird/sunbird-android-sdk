@@ -10,7 +10,6 @@ import org.ekstep.genieservices.commons.utils.Logger;
 /**
  * Created on 22/5/17.
  */
-
 public class AsyncHandler<T> extends AsyncTask<IPerformable<T>, Void, GenieResponse<T>> {
 
     private IResponseHandler<T> handler;
@@ -22,7 +21,9 @@ public class AsyncHandler<T> extends AsyncTask<IPerformable<T>, Void, GenieRespo
     @Override
     protected GenieResponse<T> doInBackground(IPerformable<T>... params) {
         GenieResponse<T> response = params[0].perform();
-        if (Logger.isDebugEnabled()) Logger.d("GenieAsyncResponse", GsonUtil.toJson(response));
+        if (Logger.isDebugEnabled()) {
+            Logger.d("GenieAsyncResponse", GsonUtil.toJson(response));
+        }
         return response;
     }
 

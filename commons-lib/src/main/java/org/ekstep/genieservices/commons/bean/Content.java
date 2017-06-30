@@ -1,10 +1,11 @@
 package org.ekstep.genieservices.commons.bean;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- *This class holds all the data related to a content.
+ * This class holds all the data related to a content.
  */
 public class Content implements Serializable {
 
@@ -119,6 +120,9 @@ public class Content implements Serializable {
     }
 
     public List<HierarchyInfo> getHierarchyInfo() {
+        if (hierarchyInfo == null) {
+            hierarchyInfo = new ArrayList<>();
+        }
         return hierarchyInfo;
     }
 

@@ -30,7 +30,6 @@ import java.util.List;
 
 /**
  * This class provides APIs for performing {@link ContentService} related operations on a separate thread.
- *
  */
 public class ContentService {
 
@@ -328,14 +327,14 @@ public class ContentService {
      * <p>
      * Response will always be status set TRUE, with {@link ContentImportResponse} set in result.
      *
-     * @param identifier
+     * @param contentId       Content id.
      * @param responseHandler - {@link IResponseHandler<ContentImportResponse>}
      */
-    public void getImportStatus(final String identifier, IResponseHandler<ContentImportResponse> responseHandler) {
+    public void getImportStatus(final String contentId, IResponseHandler<ContentImportResponse> responseHandler) {
         new AsyncHandler<ContentImportResponse>(responseHandler).execute(new IPerformable<ContentImportResponse>() {
             @Override
             public GenieResponse<ContentImportResponse> perform() {
-                return contentService.getImportStatus(identifier);
+                return contentService.getImportStatus(contentId);
             }
         });
     }
@@ -346,14 +345,14 @@ public class ContentService {
      * <p>
      * Response will always be status set TRUE.
      *
-     * @param identifier
+     * @param contentId       Content id.
      * @param responseHandler - {@link IResponseHandler<Void>}
      */
-    public void cancelDownload(final String identifier, IResponseHandler<Void> responseHandler) {
+    public void cancelDownload(final String contentId, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
-                return contentService.cancelDownload(identifier);
+                return contentService.cancelDownload(contentId);
             }
         });
     }

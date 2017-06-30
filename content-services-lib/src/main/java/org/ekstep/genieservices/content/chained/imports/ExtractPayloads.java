@@ -18,7 +18,6 @@ import org.ekstep.genieservices.content.db.model.ContentModel;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -116,7 +115,7 @@ public class ExtractPayloads implements IChainable {
 
                 // TODO: 5/18/2017 - Revisit this - handling the APK while importing ECAR.
                 //launch system prompt for Install apk...
-                appContext.getmAPKInstaller().showInstallAPKPrompt(path, artifactUrl, preRequisites);
+                appContext.getAPKInstaller().showInstallAPKPrompt(path, artifactUrl, preRequisites);
             } else {
                 //If the content is exist then copy the old content data and add it into new content.
                 if (isContentExist && !(ServiceConstants.ContentStatus.DRAFT.equalsIgnoreCase(ContentHandler.readStatus(item)))) {

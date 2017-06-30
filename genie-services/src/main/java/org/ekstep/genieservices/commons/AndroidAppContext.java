@@ -28,12 +28,12 @@ public class AndroidAppContext extends AppContext<Context> {
     private IDownloadManager mDownloadManager;
     private IAPKInstaller mAPKInstaller;
 
-    private AndroidAppContext(Context context, String appPackage) {
-        super(context, appPackage);
+    private AndroidAppContext(Context context) {
+        super(context);
     }
 
     public static AppContext<Context> buildAppContext(Context context, String appPackage) {
-        AndroidAppContext appContext = new AndroidAppContext(context, appPackage);
+        AndroidAppContext appContext = new AndroidAppContext(context);
         appContext.setParams(new BuildParams(context, appPackage));
         appContext.setDBSession(ServiceDbHelper.getGSDBSession(appContext));
         appContext.setConnectionInfo(new AndroidNetworkConnectivity(appContext));
@@ -121,7 +121,7 @@ public class AndroidAppContext extends AppContext<Context> {
     }
 
     @Override
-    public IAPKInstaller getmAPKInstaller() {
+    public IAPKInstaller getAPKInstaller() {
         return mAPKInstaller;
     }
 
