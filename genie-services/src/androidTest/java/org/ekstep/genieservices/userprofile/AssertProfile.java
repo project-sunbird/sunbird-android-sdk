@@ -61,8 +61,6 @@ public class AssertProfile {
         List<EventModel> eventModelList = GenieServiceDBHelper.findEventById(telemetryEvent);
         Map eventMap = eventModelList.get(0).getEventMap();
 
-        Log.v(TAG, "eventMap createProfile:: " + eventMap);
-
         Map<String, Object> edata = (Map<String, Object>) eventMap.get("edata");
         Map<String, Object> eks = (Map<String, Object>) edata.get("eks");
 
@@ -76,5 +74,11 @@ public class AssertProfile {
         Map eventMap = eventModelList.get(0).getEventMap();
 
         Log.v(TAG, "eventMap deleteProfile:: " + eventMap);
+
+        Map<String, Object> edata = (Map<String, Object>) eventMap.get("edata");
+        Map<String, Object> eks = (Map<String, Object>) edata.get("eks");
+
+        Assert.assertNotNull(eks);
+        Assert.assertEquals(telemetryEvent, eventMap.get("eid"));
     }
 }

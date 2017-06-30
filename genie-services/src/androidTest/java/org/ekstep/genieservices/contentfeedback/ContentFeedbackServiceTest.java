@@ -2,7 +2,6 @@ package org.ekstep.genieservices.contentfeedback;
 
 import android.os.Environment;
 import android.support.test.runner.AndroidJUnit4;
-import android.util.Log;
 
 import junit.framework.Assert;
 

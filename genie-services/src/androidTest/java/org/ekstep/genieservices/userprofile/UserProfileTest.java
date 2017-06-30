@@ -1,24 +1,35 @@
 package org.ekstep.genieservices.userprofile;
 
+import android.os.Environment;
+
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
+import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.ImportRequest;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.bean.ProfileExportRequest;
+import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
+import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 /**
- * TODO : Assert for handle in all testcases.
  * Created by Sneha on 5/12/2017.
  */
 
 public class UserProfileTest extends GenieServiceTestBase {
+
+    private final String PROFILE_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Sneha.epar";
+    private final String PROFILE_ID = "76c33e90-5b82-4739-af56-78580bb0f91a";
+    private final String PROFILE_FILEPATH_DEST = "/storage/emulated/0/Android/data/org.ekstep.genieservices.test/files/tmp/Sneha.epar";
 
     @Before
     public void setup() throws IOException {
@@ -446,5 +457,60 @@ public class UserProfileTest extends GenieServiceTestBase {
         Assert.assertEquals(profile1.getUid(), saved_profile1.getUid());
         Assert.assertEquals(profile2.getUid(), saved_profile2.getUid());
 
+    }
+
+    @Test
+    public void shouldImportProfile() {
+
+        GenieServiceDBHelper.clearProfileTable();
+        GenieServiceDBHelper.clearUserTableDBEntry();
+
+        ImportRequest.Builder importRequest = new ImportRequest.Builder().fromFilePath(PROFILE_FILEPATH);
+
+        activity.importProfile(importRequest.build(), new IResponseHandler<ProfileImportResponse>() {
+            @Override
+            public void onSuccess(GenieResponse<ProfileImportResponse> genieResponse) {
+                Assert.assertTrue("true", genieResponse.getStatus());
+                Assert.assertEquals(0, genieResponse.getResult().getFailed());
+                Assert.assertEquals(1, genieResponse.getResult().getImported());
+//                AssertProfile.checkTelemtryEventIsLoggedIn("GE_TRANSFER", null);
+            }
+
+            @Override
+            public void onError(GenieResponse<ProfileImportResponse> genieResponse) {
+                Assert.assertFalse(genieResponse.getStatus());
+            }
+        });
+
+        waitForGenieToBecomeIdle();
+    }
+
+    @Test
+    public void shouldExportProfile() {
+
+        GenieServiceDBHelper.clearProfileTable();
+        GenieServiceDBHelper.clearUserTableDBEntry();
+
+        List<String> userIds = new ArrayList<>();
+        userIds.add(PROFILE_ID);
+
+        //import profile
+        shouldImportProfile();
+
+        ProfileExportRequest.Builder exportRequest = new ProfileExportRequest.Builder().exportUsers(userIds).toFolder(activity.getExternalFilesDir(null).toString());
+
+        activity.exportProfile(exportRequest.build(), new IResponseHandler<ProfileExportResponse>() {
+            @Override
+            public void onSuccess(GenieResponse<ProfileExportResponse> genieResponse) {
+                Assert.assertTrue(genieResponse.getStatus());
+                Assert.assertEquals(PROFILE_FILEPATH_DEST, genieResponse.getResult().getExportedFilePath());
+                // AssertProfile.checkTelemtryEventIsLoggedIn("GE_TRANSFER", null);
+            }
+
+            @Override
+            public void onError(GenieResponse<ProfileExportResponse> genieResponse) {
+                Assert.assertFalse(genieResponse.getStatus());
+            }
+        });
     }
 }

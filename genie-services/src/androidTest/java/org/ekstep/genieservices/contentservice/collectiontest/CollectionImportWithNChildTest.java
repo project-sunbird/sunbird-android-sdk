@@ -128,7 +128,7 @@ public class CollectionImportWithNChildTest extends GenieServiceTestBase {
 
         //assert for the parent in hierarcy
         List<HierarchyInfo> hierarchyInfoList = content.getResult().getChildren().get(0).getHierarchyInfo();
-        Assert.assertEquals(1, hierarchyInfoList.size());
+        Assert.assertEquals(2, hierarchyInfoList.size());
         Assert.assertEquals(CONTENT_ID_WITH_CHILD, hierarchyInfoList.get(0).getIdentifier());
         Assert.assertEquals(content.getResult().getContentType(), hierarchyInfoList.get(0).getContentType());
     }

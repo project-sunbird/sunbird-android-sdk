@@ -5,22 +5,30 @@ import android.os.Bundle;
 
 import org.ekstep.genieservices.commons.AndroidAppContext;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
+import org.ekstep.genieservices.commons.bean.ContentExportRequest;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
 import org.ekstep.genieservices.commons.bean.ContentFeedbackFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
+import org.ekstep.genieservices.commons.bean.ContentImportRequest;
+import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.ImportRequest;
 import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.PartnerData;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.bean.ProfileExportRequest;
+import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
+import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
@@ -143,6 +151,14 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
+    public void importProfile(final ImportRequest importRequest,IResponseHandler<ProfileImportResponse> responseHandler) {
+        GenieService.getAsyncService().getUserService().importProfile(importRequest, responseHandler);
+    }
+
+    public void exportProfile(final ProfileExportRequest profileExportRequest, IResponseHandler<ProfileExportResponse> responseHandler) {
+        GenieService.getAsyncService().getUserService().exportProfile(profileExportRequest, responseHandler);
+    }
+
     public GenieResponse saveTelemetry(Telemetry event) {
         idle = false;
         GenieResponse genieResponse = mGenieService.getTelemetryService().saveTelemetry(event);
@@ -160,6 +176,18 @@ public class GenieServiceTestActivity extends Activity {
         GenieResponse genieResponse = mGenieService.getPartnerService().registerPartner(partnerData);
         return genieResponse;
     }
+
+//    public GenieResponse<Void> importTelemetry() {
+//        idle = false;
+//        GenieResponse genieResponse = mGenieService.getTelemetryService().importTelemetry();
+//        return genieResponse;
+//    }
+//
+//    public GenieResponse<Void> exportTelemetry() {
+//        idle = false;
+//        GenieResponse<Void> genieResponse = mGenieService.getTelemetryService().exportTelemetry();
+//        return genieResponse;
+//    }
 
     public GenieResponse isPartnerRegistered(String partnerID) {
         idle = false;
@@ -188,6 +216,25 @@ public class GenieServiceTestActivity extends Activity {
     public GenieResponse<Void> importEcar(EcarImportRequest ecarImportRequest) {
         idle = false;
         GenieResponse genieResponse = mGenieService.getContentService().importEcar(ecarImportRequest);
+        return genieResponse;
+    }
+
+    //to be done
+    public GenieResponse<Void> importContent(ContentImportRequest contentImportRequest) {
+        idle = false;
+        GenieResponse genieResponse = mGenieService.getContentService().importContent(contentImportRequest);
+        return genieResponse;
+    }
+
+    public GenieResponse<Void> cancelDownload(String identifier) {
+        idle = false;
+        GenieResponse genieResponse = mGenieService.getContentService().cancelDownload(identifier);
+        return genieResponse;
+    }
+
+    public GenieResponse exportContent(ContentExportRequest contentExportRequest) {
+        idle = false;
+        GenieResponse genieResponse = mGenieService.getContentService().exportContent(contentExportRequest);
         return genieResponse;
     }
 
@@ -230,6 +277,13 @@ public class GenieServiceTestActivity extends Activity {
     public GenieResponse<RecommendedContentResult> getRecommendedContent(RecommendedContentRequest recommendedContentRequest) {
         idle = false;
         GenieResponse<RecommendedContentResult> genieResponse = mGenieService.getContentService().getRecommendedContent(recommendedContentRequest);
+        return genieResponse;
+    }
+
+    //to be done
+    public GenieResponse<ContentImportResponse> getImportStatus(String identifier) {
+        idle = false;
+        GenieResponse<ContentImportResponse> genieResponse = mGenieService.getContentService().getImportStatus(identifier);
         return genieResponse;
     }
 

@@ -184,7 +184,6 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
         shouldCheckSyncedTelemetryData(telemetryStatGenieResponse);
     }
 
-
     private void shouldCheckSyncedTelemetryData(GenieResponse<TelemetryStat> telemetryStatGenieResponse) {
 
         GenieResponse<SyncStat> syncStatGenieResponse = activity.sync();
