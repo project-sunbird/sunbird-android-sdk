@@ -1,5 +1,6 @@
 package org.ekstep.genieservices.commons.network;
 
+import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AndroidAppContext;
 import org.ekstep.genieservices.commons.network.auth.BasicAuthenticator;
 
@@ -18,6 +19,6 @@ public class AndroidHttpClientFactory implements IHttpClientFactory {
 
     @Override
     public IHttpClient getClient() {
-        return new AndroidHttpClient(new BasicAuthenticator(mAppContext.getParams().getUserName(), mAppContext.getParams().getPassword()));
+        return new AndroidHttpClient(new BasicAuthenticator(mAppContext.getParams().getString(ServiceConstants.Params.API_USER), mAppContext.getParams().getString(ServiceConstants.Params.API_PASS)));
     }
 }
