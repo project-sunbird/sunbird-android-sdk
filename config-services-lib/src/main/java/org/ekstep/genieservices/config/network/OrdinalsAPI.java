@@ -16,13 +16,15 @@ public class OrdinalsAPI extends BaseAPI {
 
     private static final String TAG = OrdinalsAPI.class.getSimpleName();
 
-    private static final String ENDPOINT = "config/ordinals";
     private static final CharSequence SERVICE_ENDPOINTS = "config";
+    private static final String ENDPOINT = "config/ordinals";
 
     public OrdinalsAPI(AppContext appContext) {
-        super(appContext, String.format(Locale.US, "%s/%s",
-                String.format(Locale.US, appContext.getParams().getString(ServiceConstants.Params.API_BASE_URL) + ServiceConstants.API.LP_EXTENSION, SERVICE_ENDPOINTS),
-                ENDPOINT), TAG);
+        super(appContext,
+                String.format(Locale.US, "%s/%s",
+                        String.format(Locale.US, appContext.getParams().getString(ServiceConstants.Params.LEARNING_PLATFORM_BASE_URL), SERVICE_ENDPOINTS),
+                        ENDPOINT),
+                TAG);
     }
 
     @Override

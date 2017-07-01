@@ -38,7 +38,11 @@ public interface ServiceConstants {
         String VERSION_CODE = "VERSION_CODE";
         String VERSION_NAME = "VERSION_NAME";
         String APP_QUALIFIER = "QUALIFIER";
-        String API_BASE_URL = "API_BASE_URL";
+        String TELEMETRY_BASE_URL = "TELEMETRY_BASE_URL";
+        String LANGUAGE_PLATFORM_BASE_URL = "LANGUAGE_PLATFORM_BASE_URL";
+        String LEARNING_PLATFORM_BASE_URL = "LEARNING_PLATFORM_BASE_URL";
+        String CONTENT_LISTING_BASE_URL = "CONTENT_LISTING_BASE_URL";
+        String ANALYTICS_BASE_URL = "ANALYTICS_BASE_URL";
         String API_PASS = "API_PASS";
         String API_USER = "API_USER";
         String GID = "GID";
@@ -79,12 +83,6 @@ public interface ServiceConstants {
         String KEY_ACTIVE_PARTNER_ID = "partner.activeid";
         String SHARED_PREF_SESSION_KEY = "partnersessionid";
         String SHARED_PREF_PARTNERSET_EPOCH = "partnerSET";
-    }
-
-    interface API {
-        String LP_EXTENSION = "/%s/v2";
-        String EP_EXTENSION = "/%s/v1";
-        String ANALYTICS_EXTENSION = "/analytics";
     }
 
     interface Partner {

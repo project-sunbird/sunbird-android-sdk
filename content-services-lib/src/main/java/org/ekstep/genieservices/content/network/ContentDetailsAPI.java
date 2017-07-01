@@ -19,9 +19,11 @@ public class ContentDetailsAPI extends BaseAPI {
     private static final CharSequence SERVICE_ENDPOINTS = "learning";
 
     public ContentDetailsAPI(AppContext appContext, String contentId) {
-        super(appContext, String.format(Locale.US, "%s/content/%s",
-                String.format(Locale.US, appContext.getParams().getString(ServiceConstants.Params.API_BASE_URL) + ServiceConstants.API.LP_EXTENSION, SERVICE_ENDPOINTS),
-                contentId), TAG);
+        super(appContext,
+                String.format(Locale.US, "%s/content/%s",
+                        String.format(Locale.US, appContext.getParams().getString(ServiceConstants.Params.LANGUAGE_PLATFORM_BASE_URL), SERVICE_ENDPOINTS),
+                        contentId),
+                TAG);
     }
 
     @Override
