@@ -109,7 +109,7 @@ public class APKInstaller implements IAPKInstaller {
      */
     private void installApk(String apkFilePath) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.fromFile(new File(apkFilePath)), ContentConstants.MimeType.APPLICATION);
+        intent.setDataAndType(Uri.fromFile(new File(apkFilePath)), ContentConstants.MimeType.APK);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         appContext.getContext().startActivity(intent);
     }

@@ -77,7 +77,7 @@ public class ExtractPayloads implements IChainable {
             boolean isContentExist = ContentHandler.isContentExist(oldContentModel, identifier, pkgVersion);
 
             //Apk files
-            if ((!StringUtil.isNullOrEmpty(mimeType) && mimeType.equalsIgnoreCase(ContentConstants.MimeType.APPLICATION)) ||
+            if ((!StringUtil.isNullOrEmpty(mimeType) && mimeType.equalsIgnoreCase(ContentConstants.MimeType.APK)) ||
                     (!StringUtil.isNullOrEmpty(artifactUrl) && artifactUrl.contains("." + ServiceConstants.FileExtension.APK))) {
 
                 List<Map<String, Object>> preRequisites = (List<Map<String, Object>>) item.get("pre_requisites");

@@ -5,20 +5,21 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.widget.Toast;
 
-import org.ekstep.genieservices.Constants;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.ReflectionUtil;
+import org.ekstep.genieservices.content.ContentConstants;
 
 import java.util.Map;
 
 /**
- * Created by swayangjit on 1/6/17.
+ * Created on 1/6/17.
+ *
+ * @author swayangjit
  */
-
 public class ContentPlayer {
 
     private static final String TAG = ContentPlayer.class.getSimpleName();
@@ -47,7 +48,7 @@ public class ContentPlayer {
             return;
         }
         Intent intent = null;
-        if (content.getMimeType().equalsIgnoreCase(Constants.MimeType.APK_MIME_TYPE)) {
+        if (content.getMimeType().equalsIgnoreCase(ContentConstants.MimeType.APK)) {
             if (ContentUtil.isAppInstalled(context, osId)) {
                 intent = manager.getLaunchIntentForPackage(osId);
             } else {
@@ -71,17 +72,16 @@ public class ContentPlayer {
 
         intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_ORIGIN, "Genie");
         intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_MODE, "play");
-        if (content.getHierarchyInfo() != null)
+        if (content.getHierarchyInfo() != null) {
             intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_CONTENT_EXTRAS, GsonUtil.toJson(content.getHierarchyInfo()));
+        }
         intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_APP_INFO, GsonUtil.toJson(contentData));
         intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_LANGUAGE_INFO, GsonUtil.toJson(resourceBundle));
         intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_APP_QUALIFIER, sContentPlayer.mQualifier);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
 
         context.startActivity(intent);
-
     }
-
 
     private static boolean isCollectionOrTextBook(String contentType) {
         return contentType.equalsIgnoreCase(ContentType.COLLECTION.getValue())
@@ -90,8 +90,8 @@ public class ContentPlayer {
     }
 
     private static boolean isEcml(String mimeType) {
-        return mimeType.equalsIgnoreCase(Constants.MimeType.ECML_MIME_TYPE)
-                || mimeType.equalsIgnoreCase(Constants.MimeType.HTML_MIME_TYPE);
+        return mimeType.equalsIgnoreCase(ContentConstants.MimeType.ECML)
+                || mimeType.equalsIgnoreCase(ContentConstants.MimeType.HTML);
 
     }
 }
