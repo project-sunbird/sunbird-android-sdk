@@ -35,7 +35,7 @@ public class BuildParams implements IParams {
         mValues.put(ServiceConstants.Params.API_USER, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.API_USER));
         mValues.put(ServiceConstants.Params.API_PASS, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.API_PASS));
         mValues.put(ServiceConstants.Params.GID, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.GID));
-        mValues.put(ServiceConstants.Params.LOGLEVEL, LogLevel.getLogLevel(BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.LOGLEVEL)).getLevel());
+        mValues.put(ServiceConstants.Params.LOG_LEVEL, LogLevel.getLogLevel(BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.LOG_LEVEL)).getLevel());
 
         String profileConfigClass = BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.PROFILE_CONFIG);
         if (profileConfigClass != null) {

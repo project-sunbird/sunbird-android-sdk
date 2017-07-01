@@ -42,7 +42,7 @@ public interface ServiceConstants {
         String API_PASS = "API_PASS";
         String API_USER = "API_USER";
         String GID = "GID";
-        String LOGLEVEL = "LOGLEVEL";
+        String LOG_LEVEL = "LOG_LEVEL";
         String PROFILE_CONFIG = "PROFILE_CONFIG";
         String PROFILE_PATH = "PROFILE_PATH";
     }
