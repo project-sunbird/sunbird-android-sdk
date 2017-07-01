@@ -19,13 +19,13 @@ public class AndroidAppContext extends AppContext<Context> {
 
     private static final String SHARED_PREFERENCE_NAME = "org.ekstep.genieservices.preference_file";
 
+    private IParams mParams;
     private IDBSession mDBSession;
     private IConnectionInfo mConnectionInfo;
     private IHttpClientFactory mHttpClientFactory;
     private IKeyValueStore mKeyValueOperation;
     private IDeviceInfo mDeviceInfo;
     private ILocationInfo mLocationInfo;
-    private IParams mParams;
     private IDownloadManager mDownloadManager;
     private IAPKInstaller mAPKInstaller;
 
@@ -45,6 +45,15 @@ public class AndroidAppContext extends AppContext<Context> {
         appContext.setDownloadManager(new AndroidDownloadManager(context));
         appContext.setAPKInstaller(new APKInstaller(appContext));
         return appContext;
+    }
+
+    @Override
+    public IParams getParams() {
+        return mParams;
+    }
+
+    private void setParams(IParams params) {
+        this.mParams = params;
     }
 
     @Override
@@ -92,15 +101,6 @@ public class AndroidAppContext extends AppContext<Context> {
 
     private void setHttpClientFactory(IHttpClientFactory clientFactory) {
         this.mHttpClientFactory = clientFactory;
-    }
-
-    @Override
-    public IParams getParams() {
-        return mParams;
-    }
-
-    private void setParams(IParams params) {
-        this.mParams = params;
     }
 
     @Override

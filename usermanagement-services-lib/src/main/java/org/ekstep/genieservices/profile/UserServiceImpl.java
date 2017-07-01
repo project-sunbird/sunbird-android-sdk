@@ -72,7 +72,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
     public UserServiceImpl(AppContext appContext) {
         super(appContext);
-        mGameData = new GameData(mAppContext.getParams().getGid(), mAppContext.getParams().getVersionName());
+        mGameData = new GameData(mAppContext.getParams().getString(ServiceConstants.Params.GID), mAppContext.getParams().getString(ServiceConstants.Params.VERSION_NAME));
     }
 
     /**

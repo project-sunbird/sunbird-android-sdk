@@ -42,7 +42,7 @@ public class AddGeTransferContentImportEvent implements IChainable {
                 (Long) metadata.get(GETransferEventKnowStructure.FILE_SIZE),
                 buildContentsMetadata(metadata));
 
-        GETransfer geTransfer = new GETransfer(new GameData(appContext.getParams().getGid(), appContext.getParams().getVersionName()), eks);
+        GETransfer geTransfer = new GETransfer(new GameData(appContext.getParams().getString(ServiceConstants.Params.GID), appContext.getParams().getString(ServiceConstants.Params.VERSION_NAME)), eks);
         TelemetryLogger.log(geTransfer);
         return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
     }

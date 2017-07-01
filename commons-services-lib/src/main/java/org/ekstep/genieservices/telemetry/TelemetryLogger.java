@@ -13,8 +13,9 @@ import java.util.HashMap;
 
 /**
  * Created by swayangjit on 27/4/17.
+ *
+ * @author swayangjit
  */
-
 public class TelemetryLogger {
 
     private static final String TAG = TelemetryLogger.class.getSimpleName();
@@ -40,14 +41,16 @@ public class TelemetryLogger {
     }
 
     public static void logSuccess(AppContext appContext, GenieResponse response, String service, String method, HashMap params) {
-        appLoggingLevel = appContext.getParams().getLogLevel();
+        appLoggingLevel = appContext.getParams().getInt(ServiceConstants.Params.LOGLEVEL);
         int parsedLogLevel = 3;
         if (params != null & params.get("logLevel") != null) {
             try {
                 parsedLogLevel = Integer.valueOf(params.get("logLevel").toString());
             } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
+
         if (parsedLogLevel >= appLoggingLevel) {
             log(appContext, response, service, method, params, new HashMap());
         } else {
@@ -76,7 +79,7 @@ public class TelemetryLogger {
     }
 
     public static Telemetry create(AppContext appContext, GenieResponse response, HashMap result, String service, String method, HashMap params) {
-        GEServiceAPICall.Builder eventBuilder = new GEServiceAPICall.Builder(new GameData(appContext.getParams().getGid(), appContext.getParams().getVersionName()));
+        GEServiceAPICall.Builder eventBuilder = new GEServiceAPICall.Builder(new GameData(appContext.getParams().getString(ServiceConstants.Params.GID), appContext.getParams().getString(ServiceConstants.Params.VERSION_NAME)));
         return eventBuilder.service(service)
                 .method(method)
                 .mode(getNetworkMode(appContext.getConnectionInfo()))

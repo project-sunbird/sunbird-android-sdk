@@ -20,7 +20,7 @@ public class ContentDetailsAPI extends BaseAPI {
 
     public ContentDetailsAPI(AppContext appContext, String contentId) {
         super(appContext, String.format(Locale.US, "%s/content/%s",
-                String.format(Locale.US, appContext.getParams().getBaseApiUrl() + ServiceConstants.API.LP_EXTENSION, SERVICE_ENDPOINTS),
+                String.format(Locale.US, appContext.getParams().getString(ServiceConstants.Params.API_BASE_URL) + ServiceConstants.API.LP_EXTENSION, SERVICE_ENDPOINTS),
                 contentId), TAG);
     }
 

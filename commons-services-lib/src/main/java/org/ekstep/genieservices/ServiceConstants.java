@@ -34,6 +34,19 @@ public interface ServiceConstants {
     String EXPORT_TYPE_TELEMETRY = "telemetry";
     String EXPORT_TYPE_PROFILE = "userprofile";
 
+    interface Params {
+        String VERSION_CODE = "VERSION_CODE";
+        String VERSION_NAME = "VERSION_NAME";
+        String APP_QUALIFIER = "QUALIFIER";
+        String API_BASE_URL = "API_BASE_URL";
+        String API_PASS = "API_PASS";
+        String API_USER = "API_USER";
+        String GID = "GID";
+        String LOGLEVEL = "LOGLEVEL";
+        String PROFILE_CONFIG = "PROFILE_CONFIG";
+        String PROFILE_PATH = "PROFILE_PATH";
+    }
+
     interface BundleKey {
         //ContentPlayer
         String BUNDLE_KEY_ORIGIN = "origin";

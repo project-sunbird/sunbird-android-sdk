@@ -22,6 +22,8 @@ public abstract class AppContext<C> {
         return context;
     }
 
+    public abstract IParams getParams();
+
     public abstract IDBSession getDBSession();
 
     public abstract Void setDBSession(IDBSession session);
@@ -33,8 +35,6 @@ public abstract class AppContext<C> {
     public abstract IHttpClientFactory getHttpClientFactory();
 
     public abstract IDeviceInfo getDeviceInfo();
-
-    public abstract IParams getParams();
 
     public abstract ILocationInfo getLocationInfo();
 

@@ -60,7 +60,7 @@ public class AddGeTransferTelemetryExportEvent implements IChainable<TelemetryEx
                     aggregateCount,
                     new File(destinationDBFilePath).length(),
                     contents);
-            GETransfer geTransfer = new GETransfer(new GameData(appContext.getParams().getGid(), appContext.getParams().getVersionName()), eks);
+            GETransfer geTransfer = new GETransfer(new GameData(appContext.getParams().getString(ServiceConstants.Params.GID), appContext.getParams().getString(ServiceConstants.Params.VERSION_NAME)), eks);
             TelemetryLogger.log(geTransfer);
 
         } catch (NumberFormatException ex) {

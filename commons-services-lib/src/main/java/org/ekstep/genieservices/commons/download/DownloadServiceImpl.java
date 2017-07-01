@@ -81,7 +81,7 @@ public class DownloadServiceImpl implements IDownloadService {
     }
 
     private GEInteract buildGEInteractEvent(InteractionType type, String subType, List<CorrelationData> correlationDataList, String contendId) {
-        GEInteract geInteract = new GEInteract.Builder(new GameData(mAppContext.getParams().getGid(), mAppContext.getParams().getVersionName()))
+        GEInteract geInteract = new GEInteract.Builder(new GameData(mAppContext.getParams().getString(ServiceConstants.Params.GID), mAppContext.getParams().getString(ServiceConstants.Params.VERSION_NAME)))
                 .interActionType(type)
                 .stageId(ServiceConstants.Telemetry.CONTENT_DETAIL)
                 .subType(subType)

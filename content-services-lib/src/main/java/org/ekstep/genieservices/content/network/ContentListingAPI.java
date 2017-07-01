@@ -28,7 +28,7 @@ public class ContentListingAPI extends BaseAPI {
 
     public ContentListingAPI(AppContext appContext, String pageIdentifier, Map<String, Object> requestMap) {
         super(appContext, String.format(Locale.US, "%s/assemble/%s",
-                String.format(Locale.US, appContext.getParams().getBaseApiUrl() + ServiceConstants.API.EP_EXTENSION, SERVICE_ENDPOINTS),
+                String.format(Locale.US, appContext.getParams().getString(ServiceConstants.Params.API_BASE_URL) + ServiceConstants.API.EP_EXTENSION, SERVICE_ENDPOINTS),
                 pageIdentifier), TAG);
 
         this.pageIdentifier = pageIdentifier;

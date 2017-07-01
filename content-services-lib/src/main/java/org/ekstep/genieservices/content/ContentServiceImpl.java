@@ -700,7 +700,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     private void buildInitiateEvent() {
-        GEInteract geInteract = new GEInteract.Builder(new GameData(mAppContext.getParams().getGid(), mAppContext.getParams().getVersionName())).
+        GEInteract geInteract = new GEInteract.Builder(new GameData(mAppContext.getParams().getString(ServiceConstants.Params.GID), mAppContext.getParams().getString(ServiceConstants.Params.VERSION_NAME))).
                 stageId(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID).
                 subType(ServiceConstants.Telemetry.CONTENT_IMPORT_INITIATED_SUB_TYPE).
                 interActionType(InteractionType.TOUCH).
@@ -709,7 +709,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     private void buildSuccessEvent(String identifier) {
-        GEInteract geInteract = new GEInteract.Builder(new GameData(mAppContext.getParams().getGid(), mAppContext.getParams().getVersionName())).
+        GEInteract geInteract = new GEInteract.Builder(new GameData(mAppContext.getParams().getString(ServiceConstants.Params.GID), mAppContext.getParams().getString(ServiceConstants.Params.VERSION_NAME))).
                 stageId(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID).
                 subType(ServiceConstants.Telemetry.CONTENT_IMPORT_SUCCESS_SUB_TYPE).
                 interActionType(InteractionType.OTHER).

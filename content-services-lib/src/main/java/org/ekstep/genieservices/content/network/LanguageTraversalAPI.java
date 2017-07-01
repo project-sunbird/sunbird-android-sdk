@@ -21,7 +21,7 @@ public class LanguageTraversalAPI extends BaseAPI {
 
     public LanguageTraversalAPI(AppContext appContext, String languageId) {
         super(appContext, String.format(Locale.US, "%s/%s/%s",
-                String.format(Locale.US, appContext.getParams().getBaseApiUrl() + ServiceConstants.API.LP_EXTENSION, SERVICE_ENDPOINTS),
+                String.format(Locale.US, appContext.getParams().getString(ServiceConstants.Params.API_BASE_URL) + ServiceConstants.API.LP_EXTENSION, SERVICE_ENDPOINTS),
                 ENDPOINT, languageId), TAG);
     }
 

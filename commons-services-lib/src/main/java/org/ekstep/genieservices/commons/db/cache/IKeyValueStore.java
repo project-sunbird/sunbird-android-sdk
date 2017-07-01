@@ -3,14 +3,15 @@ package org.ekstep.genieservices.commons.db.cache;
 import java.util.Set;
 
 /**
- * Created by swayangjit on 19/4/17.
+ * Created on 19/4/17.
+ *
+ * @author swayangjit
  */
-
 public interface IKeyValueStore {
 
     void putString(String key, String value);
 
-    void putStringSet(String key,  Set<String> value);
+    void putStringSet(String key, Set<String> value);
 
     void putLong(String key, long value);
 
@@ -33,5 +34,4 @@ public interface IKeyValueStore {
     void remove(String key);
 
     void clear();
-
 }
