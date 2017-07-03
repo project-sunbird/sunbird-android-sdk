@@ -27,7 +27,7 @@ public class BuildParams implements IParams {
     public BuildParams(Context context, String packageName) {
         // Choosing a default size of 8 based on analysis of typical
         // consumption by applications.
-        mValues = new HashMap<>(8);
+        mValues = new HashMap<>(16);
 
         put(ServiceConstants.Params.VERSION_NAME, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.VERSION_NAME));
         put(ServiceConstants.Params.APP_QUALIFIER, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.APP_QUALIFIER));
