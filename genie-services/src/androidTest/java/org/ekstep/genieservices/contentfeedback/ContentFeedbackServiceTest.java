@@ -5,6 +5,7 @@ import android.support.test.runner.AndroidJUnit4;
 
 import junit.framework.Assert;
 
+import org.ekstep.genieservices.EcarCopyUtil;
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.commons.bean.Content;
@@ -14,9 +15,12 @@ import org.ekstep.genieservices.commons.bean.ContentFeedbackFilterCriteria;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -27,6 +31,21 @@ public class ContentFeedbackServiceTest extends GenieServiceTestBase {
     private static final String TAG = ContentFeedbackServiceTest.class.getSimpleName();
     final String CONTENT_ID = "do_30013486";
     private final String CONTENT_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Multiplication2.ecar";
+
+    private final String CONTENT_ASSET_PATH = "Download/Multiplication2.ecar";
+
+    @Before
+    public void setup() throws IOException {
+        super.setup();
+        activity = rule.getActivity();
+        EcarCopyUtil.createFileFromAsset(activity.getApplicationContext(), CONTENT_ASSET_PATH, DESTINATION);
+        GenieServiceDBHelper.clearEcarEntryFromDB();
+    }
+
+    @After
+    public void tearDown() throws IOException {
+        super.tearDown();
+    }
 
     @Test
     public void shouldSendFeedbackForEcar() {

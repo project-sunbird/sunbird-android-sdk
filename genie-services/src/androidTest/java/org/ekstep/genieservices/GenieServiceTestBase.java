@@ -1,5 +1,7 @@
 package org.ekstep.genieservices;
 
+import android.Manifest;
+import android.os.Environment;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.IdlingPolicies;
 import android.support.test.rule.ActivityTestRule;
@@ -26,7 +28,8 @@ public class GenieServiceTestBase {
     public static final int DEFAULT_TIMEOUT_IN_SECONDS = 30;
     public static final int MASTER_POLICY_TIMEOUT_IN_MINS = 1;
     public static final int IDLING_RESOURCE_TIMEOUT_IN_MINS = 1;
-
+    protected static final String DESTINATION = Environment.getExternalStorageDirectory().toString() + "/Download";
+    public final PermissionsRule permissionsRule = new PermissionsRule(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE});
     @Rule
     public ActivityTestRule<GenieServiceTestActivity> rule = new ActivityTestRule<GenieServiceTestActivity>
             (GenieServiceTestActivity.class);

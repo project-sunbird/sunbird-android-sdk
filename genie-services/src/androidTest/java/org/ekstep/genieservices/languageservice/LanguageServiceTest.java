@@ -43,9 +43,11 @@ public class LanguageServiceTest extends GenieServiceTestBase {
         Assert.assertNull(genieResponse.getError());
     }
 
+    //TODO : check this
+    // what should be the search string.
     @Test
     public void _1getLanguageSearch() {
-        GenieResponse<String> genieResponse = activity.getLanguageSearch("stories");
+        GenieResponse<String> genieResponse = activity.getLanguageSearch("en");
 
         Log.v(TAG, "getLanguageSearchRequestDataValidation genieResponse :: " + genieResponse.getStatus());
         Log.v(TAG, "getLanguageSearchRequestDataValidation genieResponse result:: " + genieResponse.getResult());

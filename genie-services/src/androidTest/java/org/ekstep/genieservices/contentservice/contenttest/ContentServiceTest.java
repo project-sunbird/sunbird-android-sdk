@@ -6,6 +6,7 @@ import android.util.Log;
 
 import junit.framework.Assert;
 
+import org.ekstep.genieservices.EcarCopyUtil;
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.ServiceConstants;
@@ -52,11 +53,15 @@ public class ContentServiceTest extends GenieServiceTestBase {
     final String CONTENT_ID_WITH_CHILD = "do_30019820";
     private final String CONTENT_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Multiplication2.ecar";
     private final String CONTENT_WITH_CHILD_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Times_Tables_2_to_10.ecar";
+    private final String COLLECTION_ASSET_PATH = "Download/Multiplication2.ecar";
+    private final String CONTENT_ASSET_PATH = "Download/Times_Tables_2_to_10.ecar";
 
     @Before
     public void setup() throws IOException {
         super.setup();
         activity = rule.getActivity();
+        EcarCopyUtil.createFileFromAsset(activity, COLLECTION_ASSET_PATH, DESTINATION);
+        EcarCopyUtil.createFileFromAsset(activity, CONTENT_ASSET_PATH, DESTINATION);
         GenieServiceDBHelper.clearEcarEntryFromDB();
     }
 
@@ -119,7 +124,7 @@ public class ContentServiceTest extends GenieServiceTestBase {
 
         GenieResponse<Content> genieResponseDetails = activity.getContentDetails(contentDetailsRequest.build());
         Assert.assertNotNull(genieResponseDetails.getResult());
-        Assert.assertTrue(genieResponseDetails.getResult().isAvailableLocally());
+        Assert.assertTrue("true", genieResponseDetails.getResult().isAvailableLocally());
         Assert.assertEquals("worksheet", genieResponseDetails.getResult().getContentType());
         Assert.assertEquals(CONTENT_ID, genieResponseDetails.getResult().getIdentifier());
         Assert.assertEquals(1, genieResponseDetails.getResult().getReferenceCount());
@@ -300,16 +305,16 @@ public class ContentServiceTest extends GenieServiceTestBase {
         GenieResponse exportResponse = activity.exportContent(contentExportRequest.build());
         Assert.assertTrue(exportResponse.getStatus());
 
-        //import the exported profile(in Environment.getExternalStorageDirectory()) to ensure export has happened.
-        EcarImportRequest.Builder ecarImportRequest = new EcarImportRequest.Builder()
-                .fromFilePath(Environment.getExternalStorageDirectory().toString()).toFolder(activity.getExternalFilesDir(null).toString());
-        GenieResponse importResponse = activity.importEcar(ecarImportRequest.build());
-        Assert.assertTrue("true", importResponse.getStatus());
-
         //delete content
         ContentDeleteRequest.Builder deleteRequest = new ContentDeleteRequest.Builder().contentId(CONTENT_ID_WITH_CHILD);
         GenieResponse response = activity.deleteContent(deleteRequest.build());
         Assert.assertTrue(response.getStatus());
+
+        //import the exported profile(in Environment.getExternalStorageDirectory()) to ensure export has happened.
+        EcarImportRequest.Builder ecarImportRequest = new EcarImportRequest.Builder()
+                .fromFilePath(Environment.getExternalStorageDirectory().toString()).toFolder(CONTENT_WITH_CHILD_FILEPATH);
+        GenieResponse importResponse = activity.importEcar(ecarImportRequest.build());
+        Assert.assertTrue("true", importResponse.getStatus());
 
     }
 }

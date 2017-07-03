@@ -5,14 +5,19 @@ import android.support.test.runner.AndroidJUnit4;
 
 import junit.framework.Assert;
 
+import org.ekstep.genieservices.EcarCopyUtil;
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.io.IOException;
 
 /**
  * Created by Sneha on 5/30/2017.
@@ -24,7 +29,23 @@ public class CollectionImportWithOlderChildContent extends GenieServiceTestBase 
     private static final String VISIBILITY_DEFAULT = "default";
     private static final String COLLECTION_FILE_PATH = Environment.getExternalStorageDirectory().toString() + "/Download/Times_Tables_2_to_10.ecar";
     private static final String CHILD_CONTENT_FILE_PATH = Environment.getExternalStorageDirectory().toString() + "/Download/Multiplication4.ecar";
+    private static final String COLLECTION_ASSET_PATH = "Download/Times_Tables_2_to_10.ecar";
+    private static final String CHILD_CONTENT_ASSET_PATH = "Download/Multiplication4.ecar";
     private String CONTENT_VERSION;
+
+    @Before
+    public void setup() throws IOException {
+        super.setup();
+        activity = rule.getActivity();
+        EcarCopyUtil.createFileFromAsset(activity.getApplicationContext(),COLLECTION_ASSET_PATH, DESTINATION);
+        EcarCopyUtil.createFileFromAsset(activity.getApplicationContext(),CHILD_CONTENT_ASSET_PATH, DESTINATION);
+        GenieServiceDBHelper.clearEcarEntryFromDB();
+    }
+
+    @After
+    public void tearDown() throws IOException {
+        super.tearDown();
+    }
 
     /**
      * Import Child Content C1(C1 v4.0 visibility "default")

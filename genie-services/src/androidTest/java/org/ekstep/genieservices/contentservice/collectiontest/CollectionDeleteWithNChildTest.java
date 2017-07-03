@@ -5,6 +5,7 @@ import android.support.test.runner.AndroidJUnit4;
 
 import junit.framework.Assert;
 
+import org.ekstep.genieservices.EcarCopyUtil;
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.ServiceConstants;
@@ -30,11 +31,13 @@ public class CollectionDeleteWithNChildTest extends GenieServiceTestBase {
     private static final String VISIBILITY_DEFAULT = "default";
     private static final String CONTENT_ID = "do_30019820";
     private static final String COLLECTION_FILE_PATH = Environment.getExternalStorageDirectory().toString() + "/Download/Times_Tables_2_to_10.ecar";
+    private static final String COLLECTION_ASSET_PATH = "Download/Times_Tables_2_to_10.ecar";
 
     @Before
     public void setup() throws IOException {
         super.setup();
         activity = rule.getActivity();
+        EcarCopyUtil.createFileFromAsset(activity.getApplicationContext(), COLLECTION_ASSET_PATH, DESTINATION);
         GenieServiceDBHelper.clearEcarEntryFromDB();
     }
 

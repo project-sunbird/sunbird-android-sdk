@@ -2,10 +2,10 @@ package org.ekstep.genieservices.contentservice.collectiontest;
 
 import android.os.Environment;
 import android.support.test.runner.AndroidJUnit4;
-import android.util.Log;
 
 import junit.framework.Assert;
 
+import org.ekstep.genieservices.EcarCopyUtil;
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.ServiceConstants;
@@ -34,6 +34,8 @@ public class CollectionImportWithNChildTest extends GenieServiceTestBase {
     private static final String TAG = CollectionImportWithNChildTest.class.getSimpleName();
     private static final String VISIBILITY_PARENT = "parent";
     private static final String VISIBILITY_DEFAULT = "default";
+    private static final String COLLECTION_ASSET_PATH = "Download/Times_Tables_2_to_10.ecar";
+    private static final String CHILD_CONTENT2_ASSET_PATH = "Download/Empty_Collection.ecar";
     final String CONTENT_ID = "do_20045823";
     final String CONTENT_ID_WITH_CHILD = "do_30019820";
     private final String CONTENT_WITH_CHILD_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Times_Tables_2_to_10.ecar";
@@ -43,6 +45,8 @@ public class CollectionImportWithNChildTest extends GenieServiceTestBase {
     public void setup() throws IOException {
         super.setup();
         activity = rule.getActivity();
+        EcarCopyUtil.createFileFromAsset(activity.getApplicationContext(),COLLECTION_ASSET_PATH, DESTINATION);
+        EcarCopyUtil.createFileFromAsset(activity.getApplicationContext(),EMPTY_COLLECTION_FILEPATH, DESTINATION);
         GenieServiceDBHelper.clearEcarEntryFromDB();
     }
 

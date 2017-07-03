@@ -504,7 +504,6 @@ public class UserProfileTest extends GenieServiceTestBase {
             public void onSuccess(GenieResponse<ProfileExportResponse> genieResponse) {
                 Assert.assertTrue(genieResponse.getStatus());
                 Assert.assertEquals(PROFILE_FILEPATH_DEST, genieResponse.getResult().getExportedFilePath());
-                // AssertProfile.checkTelemtryEventIsLoggedIn("GE_TRANSFER", null);
             }
 
             @Override
