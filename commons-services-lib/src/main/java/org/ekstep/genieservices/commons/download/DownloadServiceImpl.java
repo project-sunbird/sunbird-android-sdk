@@ -73,9 +73,9 @@ public class DownloadServiceImpl implements IDownloadService {
                     mDownloadQueueManager.removeFromCurrentDownloadQueue(request.getIdentifier());
                     mDownloadQueueManager.updateDownload(request.getIdentifier(), -1);
                     resumeDownloads();
+                } else {
+                    mDownloadQueueManager.removeFromCurrentDownloadQueue(request.getIdentifier());
                 }
-            } else {
-                mDownloadQueueManager.removeFromCurrentDownloadQueue(request.getIdentifier());
             }
         }
     }
@@ -90,7 +90,6 @@ public class DownloadServiceImpl implements IDownloadService {
                 .build();
         return geInteract;
     }
-
 
     private void startTrackingProgress(final String identifier, final long downloadId) {
         mExecutor = Executors.newScheduledThreadPool(1);
