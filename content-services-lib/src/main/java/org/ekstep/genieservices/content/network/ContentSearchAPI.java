@@ -18,7 +18,6 @@ public class ContentSearchAPI extends BaseAPI {
 
     private static final String TAG = ContentSearchAPI.class.getSimpleName();
 
-    private static final CharSequence SERVICE_ENDPOINTS = "search";
     private static final String ENDPOINT = "search";
 
     private Map<String, Object> requestMap;
@@ -26,7 +25,7 @@ public class ContentSearchAPI extends BaseAPI {
     public ContentSearchAPI(AppContext appContext, Map<String, Object> requestMap) {
         super(appContext,
                 String.format(Locale.US, "%s/%s",
-                        String.format(Locale.US, appContext.getParams().getString(ServiceConstants.Params.LEARNING_PLATFORM_BASE_URL), SERVICE_ENDPOINTS),
+                        appContext.getParams().getString(ServiceConstants.Params.SEARCH_BASE_URL),
                         ENDPOINT),
                 TAG);
 

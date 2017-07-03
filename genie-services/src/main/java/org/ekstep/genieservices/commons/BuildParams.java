@@ -29,24 +29,26 @@ public class BuildParams implements IParams {
         // consumption by applications.
         mValues = new HashMap<>(8);
 
-        mValues.put(ServiceConstants.Params.VERSION_NAME, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.VERSION_NAME));
-        mValues.put(ServiceConstants.Params.APP_QUALIFIER, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.APP_QUALIFIER));
-        mValues.put(ServiceConstants.Params.TELEMETRY_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.TELEMETRY_BASE_URL));
-        mValues.put(ServiceConstants.Params.LANGUAGE_PLATFORM_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.LANGUAGE_PLATFORM_BASE_URL));
-        mValues.put(ServiceConstants.Params.LEARNING_PLATFORM_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.LEARNING_PLATFORM_BASE_URL));
-        mValues.put(ServiceConstants.Params.CONTENT_LISTING_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.CONTENT_LISTING_BASE_URL));
-        mValues.put(ServiceConstants.Params.ANALYTICS_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.ANALYTICS_BASE_URL));
-        mValues.put(ServiceConstants.Params.API_USER, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.API_USER));
-        mValues.put(ServiceConstants.Params.API_PASS, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.API_PASS));
-        mValues.put(ServiceConstants.Params.GID, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.GID));
-        mValues.put(ServiceConstants.Params.LOG_LEVEL, LogLevel.getLogLevel(BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.LOG_LEVEL)).getLevel());
+        put(ServiceConstants.Params.VERSION_NAME, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.VERSION_NAME));
+        put(ServiceConstants.Params.APP_QUALIFIER, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.APP_QUALIFIER));
+        put(ServiceConstants.Params.TELEMETRY_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.TELEMETRY_BASE_URL));
+        put(ServiceConstants.Params.LANGUAGE_PLATFORM_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.LANGUAGE_PLATFORM_BASE_URL));
+        put(ServiceConstants.Params.LEARNING_PLATFORM_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.LEARNING_PLATFORM_BASE_URL));
+        put(ServiceConstants.Params.CONFIG_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.CONFIG_BASE_URL));
+        put(ServiceConstants.Params.SEARCH_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.SEARCH_BASE_URL));
+        put(ServiceConstants.Params.CONTENT_LISTING_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.CONTENT_LISTING_BASE_URL));
+        put(ServiceConstants.Params.ANALYTICS_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.ANALYTICS_BASE_URL));
+        put(ServiceConstants.Params.API_USER, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.API_USER));
+        put(ServiceConstants.Params.API_PASS, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.API_PASS));
+        put(ServiceConstants.Params.GID, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.GID));
+        put(ServiceConstants.Params.LOG_LEVEL, LogLevel.getLogLevel(BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.LOG_LEVEL)).getLevel());
 
         String profileConfigClass = BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.PROFILE_CONFIG);
         if (profileConfigClass != null) {
             Class<?> classInstance = ReflectionUtil.getClass(profileConfigClass);
             if (classInstance != null) {
                 IProfileConfig profileConfiguration = (IProfileConfig) ReflectionUtil.getInstance(classInstance);
-                mValues.put(ServiceConstants.Params.PROFILE_PATH, profileConfiguration.getProfilePath(context));
+                put(ServiceConstants.Params.PROFILE_PATH, profileConfiguration.getProfilePath(context));
             }
         }
     }
