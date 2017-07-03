@@ -6,9 +6,8 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * This class accepts query string, {@link List<ContentSearchFilter>}, {@link List<PartnerFilter>}, sort by string, limit and profileFilter for searching a content with all
+ * This class accepts query string, {@link List<ContentSearchFilter>}, age, grade, medium, board, audience array, channel array, sort criteria, limit and mode for searching a content with all
  * set criteria
- *
  */
 public class ContentSearchCriteria implements Serializable {
 

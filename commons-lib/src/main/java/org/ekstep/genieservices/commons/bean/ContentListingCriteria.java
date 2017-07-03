@@ -1,8 +1,7 @@
 package org.ekstep.genieservices.commons.bean;
 
 /**
- * This class accepts contentListingId, subject, {@link Profile}, and list of {@link PartnerFilter} while building the criteria for content listing request.
- *
+ * This class accepts contentListingId, subject, age, grade, medium, board, audience array, channel array and device id while building the criteria for content listing request.
  */
 public class ContentListingCriteria {
 
