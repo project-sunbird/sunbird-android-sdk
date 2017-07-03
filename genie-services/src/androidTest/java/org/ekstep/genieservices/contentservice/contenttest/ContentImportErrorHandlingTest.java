@@ -52,7 +52,6 @@ public class ContentImportErrorHandlingTest extends GenieServiceTestBase {
         super.tearDown();
     }
 
-    //TODO test failing
     @Test
     public void importContentFromEcarValidation() {
 

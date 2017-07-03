@@ -473,7 +473,6 @@ public class UserProfileTest extends GenieServiceTestBase {
                 Assert.assertTrue("true", genieResponse.getStatus());
                 Assert.assertEquals(0, genieResponse.getResult().getFailed());
                 Assert.assertEquals(1, genieResponse.getResult().getImported());
-//                AssertProfile.checkTelemtryEventIsLoggedIn("GE_TRANSFER", null);
             }
 
             @Override

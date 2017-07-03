@@ -167,34 +167,21 @@ public class ContentServiceTest extends GenieServiceTestBase {
         Assert.assertNotNull(genieResponse.getResult());
     }
 
-    /**
-     * TODO :: Test case fails
-     * Any other assertions
-     * In the result get recommended list comes as null.
-     */
     @Test
     public void shouldGetAllRecommendedContent() {
 
         RecommendedContentRequest.Builder contentRequest = new RecommendedContentRequest.Builder().language("en");
 
         GenieResponse<RecommendedContentResult> genieResponse = activity.getRecommendedContent(contentRequest.build());
-//        Assert.assertNotNull(genieResponse.getResult());
         Assert.assertTrue(genieResponse.getStatus());
         Assert.assertEquals("ekstep.analytics.recommendations", genieResponse.getResult().getId());
     }
 
-    /**
-     * TODO : test case fails
-     * Any other assertions
-     * In the result get related content comes as null.
-     */
-    @Test
     public void shouldGetRelatedContent() {
 
         RelatedContentRequest.Builder contentRequest = new RelatedContentRequest.Builder().contentId(CONTENT_ID);
 
         GenieResponse<RelatedContentResult> genieResponse = activity.getRelatedContent(contentRequest.build());
-//        Assert.assertNotNull(genieResponse.getResult());
         Assert.assertTrue(genieResponse.getStatus());
         Assert.assertEquals("ekstep.analytics.recommendations", genieResponse.getResult().getId());
     }

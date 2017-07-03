@@ -43,7 +43,6 @@ public class LanguageServiceTest extends GenieServiceTestBase {
         Assert.assertNull(genieResponse.getError());
     }
 
-    //TODO : check this
     // what should be the search string.
     @Test
     public void _1getLanguageSearch() {

@@ -63,7 +63,6 @@ public class PartnerServiceTest extends GenieServiceTestBase {
 //        checkIfTelemetryEventIsLogged("GE_STOP_PARTNER_SESSION");
     }
 
-    //TODO : check this
     private void checkIfTelemetryEventIsLogged(String telemetryEvent) {
 
         List<EventModel> eventModelList = GenieServiceDBHelper.findEventById(telemetryEvent);
