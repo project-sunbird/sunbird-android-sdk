@@ -2,6 +2,7 @@ package org.ekstep.genieservices.config.db.model;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.BaseColumns;
+import org.ekstep.genieservices.commons.db.contract.ResourceBundleEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
@@ -9,15 +10,14 @@ import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.commons.db.contract.ResourceBundleEntry;
 
 import java.util.Locale;
 
 public class ResourceBundleModel implements IWritable, IReadable, IUpdatable, ICleanable {
     private static final String TAG = "model-ResourceBundle";
+    private Long id = -1L;
     private String mIdentifier;
     private String mJson;
-    private Long id = -1L;
     private IDBSession mDBSession;
 
     private ResourceBundleModel(IDBSession dbSession, String identifier) {
@@ -73,7 +73,7 @@ public class ResourceBundleModel implements IWritable, IReadable, IUpdatable, IC
     }
 
     /**
-     * Moves the resultset to the top and reads
+     * Moves the resultSet to the top and reads
      *
      * @param resultSet
      */
@@ -151,7 +151,4 @@ public class ResourceBundleModel implements IWritable, IReadable, IUpdatable, IC
         return mIdentifier;
     }
 
-    public boolean exists() {
-        return this.id != null && this.id != -1L;
-    }
 }

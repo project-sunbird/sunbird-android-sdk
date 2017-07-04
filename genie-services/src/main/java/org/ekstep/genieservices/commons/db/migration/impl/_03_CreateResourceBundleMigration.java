@@ -1,8 +1,8 @@
 package org.ekstep.genieservices.commons.db.migration.impl;
 
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.db.migration.Migration;
 import org.ekstep.genieservices.commons.db.contract.ResourceBundleEntry;
+import org.ekstep.genieservices.commons.db.migration.Migration;
 
 public class _03_CreateResourceBundleMigration extends Migration {
     //Don't change these values

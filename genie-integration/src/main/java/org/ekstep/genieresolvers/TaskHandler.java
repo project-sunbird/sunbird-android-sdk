@@ -8,7 +8,6 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 /**
  * Created on 22/5/17.
  */
-
 public class TaskHandler extends AsyncTask<BaseTask, Void, GenieResponse> {
 
     private IResponseHandler handler;

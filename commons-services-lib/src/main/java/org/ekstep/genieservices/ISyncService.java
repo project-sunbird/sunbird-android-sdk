@@ -3,8 +3,6 @@ package org.ekstep.genieservices;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.SyncStat;
 
-import java.util.Map;
-
 /**
  * This is the interface with all the required APIs for performing Sync related
  * operations.

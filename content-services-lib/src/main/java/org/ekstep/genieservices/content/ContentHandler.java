@@ -30,7 +30,6 @@ import org.ekstep.genieservices.commons.bean.MasterDataValues;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.UserSession;
-import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
 import org.ekstep.genieservices.commons.bean.enums.SearchType;
 import org.ekstep.genieservices.commons.bean.enums.SortOrder;
@@ -419,14 +418,20 @@ public class ContentHandler {
         return contentState == ContentConstants.State.ARTIFACT_AVAILABLE;
     }
 
+    private static List<String> getDefaultContentTypes() {
+        return Arrays.asList("Story", "Worksheet", "Collection", "Game", "TextBook");
+    }
+
     public static List<ContentModel> getAllLocalContent(IDBSession dbSession, ContentFilterCriteria criteria) {
         String uid = null;
-        ContentType[] contentTypes = null;
+        List<String> contentTypes;
         if (criteria != null) {
             uid = criteria.getUid();
             contentTypes = criteria.getContentTypes();
+        } else {
+            contentTypes = getDefaultContentTypes();
         }
-        String contentTypesStr = ContentType.getCommaSeparatedContentTypes(contentTypes);
+        String contentTypesStr = StringUtil.join("','", contentTypes);
 
         StringBuilder audienceFilterBuilder = new StringBuilder();
         if (criteria != null && criteria.getAudience() != null && criteria.getAudience().length > 0) {
@@ -436,7 +441,7 @@ public class ContentHandler {
             }
         }
 
-        String contentTypeFilter = String.format(Locale.US, "c.%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr);
+        String contentTypeFilter = String.format(Locale.US, "c.%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr.toLowerCase());
         String contentVisibilityFilter = String.format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
         String artifactAvailabilityFilter = String.format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
         String filter = audienceFilterBuilder.length() == 0
@@ -445,7 +450,7 @@ public class ContentHandler {
 
         String orderBy = String.format(Locale.US, "ORDER BY ca.%s desc, c.%s desc, c.%s desc", ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP, ContentEntry.COLUMN_NAME_LOCAL_LAST_UPDATED_ON, ContentEntry.COLUMN_NAME_SERVER_LAST_UPDATED_ON);
 
-        String query = null;
+        String query;
         if (uid != null) {
             query = String.format(Locale.US, "SELECT c.* FROM  %s c LEFT JOIN %s ca ON c.%s = ca.%s AND ca.%s = '%s' %s %s;",
                     ContentEntry.TABLE_NAME, ContentAccessEntry.TABLE_NAME, ContentEntry.COLUMN_NAME_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_UID, uid,
@@ -466,15 +471,12 @@ public class ContentHandler {
         return contentModelListInDB;
     }
 
-    public static List<ContentModel> getAllLocalContentModel(IDBSession dbSession, ContentType[] contentTypes) {
-        String contentTypesStr = ContentType.getCommaSeparatedContentTypes(contentTypes);
-
-        String contentTypeFilter = String.format(Locale.US, "%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr);
+    public static List<ContentModel> getAllLocalContentModel(IDBSession dbSession) {
         String contentVisibilityFilter = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
         // For hiding the non compatible imported content, which visibility is DEFAULT.
         String artifactAvailabilityFilter = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
 
-        String filter = String.format(Locale.US, " where (%s AND %s AND %s)", contentVisibilityFilter, artifactAvailabilityFilter, contentTypeFilter);
+        String filter = String.format(Locale.US, " where (%s AND %s)", contentVisibilityFilter, artifactAvailabilityFilter);
 
         List<ContentModel> contentModelListInDB;
         ContentsModel contentsModel = ContentsModel.find(dbSession, filter);
@@ -782,10 +784,6 @@ public class ContentHandler {
                 case ContentConstants.ChildContents.SPINE:
                     filter = String.format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ONLY_SPINE);
                     break;
-
-//            case CHILD_CONTENTS_FIRST_LEVEL_TEXTBOOK_UNIT:
-//                filter = String.format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_TYPE, ContentType.TEXTBOOK_UNIT.getValue());
-//                break;
 
                 case ContentConstants.ChildContents.ALL:
                 default:

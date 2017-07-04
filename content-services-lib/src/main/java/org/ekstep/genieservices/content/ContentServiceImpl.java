@@ -436,7 +436,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 contentDataList = (List<Map<String, Object>>) result.get("content");
             }
 
-            List<ContentModel> allLocalContentModel = ContentHandler.getAllLocalContentModel(mAppContext.getDBSession(), null);
+            List<ContentModel> allLocalContentModel = ContentHandler.getAllLocalContentModel(mAppContext.getDBSession());
 
             List<Content> contents = new ArrayList<>();
             if (contentDataList != null) {
