@@ -100,7 +100,7 @@ public class ExtractPayloads implements IChainable {
 
                     try {
                         // If compatibility level is not in range then do not copy artifact
-                        if (ContentHandler.isCompatible(compatibilityLevel)) {
+                        if (ContentHandler.isCompatible(appContext, compatibilityLevel)) {
                             copyAssets(importContext.getTmpLocation().getPath(), artifactUrl, payloadDestination);
                             contentState = ContentConstants.State.ARTIFACT_AVAILABLE;
                         }
@@ -118,7 +118,7 @@ public class ExtractPayloads implements IChainable {
                 appContext.getAPKInstaller().showInstallAPKPrompt(path, artifactUrl, preRequisites);
             } else {
                 //If the content is exist then copy the old content data and add it into new content.
-                if (isContentExist && !(ServiceConstants.ContentStatus.DRAFT.equalsIgnoreCase(ContentHandler.readStatus(item)))) {
+                if (isContentExist && !(ContentConstants.ContentStatus.DRAFT.equalsIgnoreCase(ContentHandler.readStatus(item)))) {
                     if (oldContentModel.getVisibility().equalsIgnoreCase(ContentConstants.Visibility.DEFAULT)) {
                         Map<String, Object> oldContentLocalDataMap = GsonUtil.fromJson(oldContentModel.getLocalData(), Map.class);
 
@@ -134,7 +134,7 @@ public class ExtractPayloads implements IChainable {
                     payloadDestination.mkdirs();
 
                     // If compatibility level is not in range then do not copy artifact
-                    if (ContentHandler.isCompatible(compatibilityLevel)) {
+                    if (ContentHandler.isCompatible(appContext, compatibilityLevel)) {
                         boolean unzipSuccess = false;
                         if (!StringUtil.isNullOrEmpty(artifactUrl)) {
                             payload = new File(importContext.getTmpLocation().getPath(), "/" + artifactUrl);

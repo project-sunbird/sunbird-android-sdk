@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import org.ekstep.genieservices.IConfigService;
 import org.ekstep.genieservices.IContentFeedbackService;
 import org.ekstep.genieservices.IUserService;
+import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
@@ -102,8 +103,7 @@ public class ContentHandler {
     private static final int DEFAULT_PACKAGE_VERSION = -1;
     private static final int INITIAL_VALUE_FOR_TRANSFER_COUNT = 0;
     private static final int MAX_CONTENT_NAME = 30;
-    public static int minCompatibilityLevel = 1;
-    public static int maxCompatibilityLevel = 3;
+
     // TODO: 02-03-2017 : We can remove this later after few release
     public static int defaultCompatibilityLevel = 1;
 
@@ -618,8 +618,9 @@ public class ContentHandler {
      *
      * @return true if compatible else false.
      */
-    public static boolean isCompatible(Double compatibilityLevel) {
-        return (compatibilityLevel >= minCompatibilityLevel) && (compatibilityLevel <= maxCompatibilityLevel);
+    public static boolean isCompatible(AppContext appContext, Double compatibilityLevel) {
+        return (compatibilityLevel >= appContext.getParams().getInt(ServiceConstants.Params.MIN_COMPATIBILITY_LEVEL))
+                && (compatibilityLevel <= appContext.getParams().getInt(ServiceConstants.Params.MAX_COMPATIBILITY_LEVEL));
     }
 
     public static boolean isImportFileExist(ContentModel oldContentModel, ContentModel newContentModel) {
@@ -825,9 +826,9 @@ public class ContentHandler {
         return contentModelListInDB;
     }
 
-    public static Map<String, Object> getSearchRequest(List<String> contentIdentifiers) {
+    public static Map<String, Object> getSearchRequest(AppContext appContext, List<String> contentIdentifiers) {
         Map<String, Object> filterMap = new HashMap<>();
-        filterMap.put("compatibilityLevel", getCompatibilityLevelFilter());
+        filterMap.put("compatibilityLevel", getCompatibilityLevelFilter(appContext));
         filterMap.put("identifier", contentIdentifiers);
         filterMap.put("status", Collections.singletonList("Live"));
         filterMap.put("objectType", Collections.singletonList("Content"));
@@ -840,7 +841,7 @@ public class ContentHandler {
         return requestMap;
     }
 
-    public static Map<String, Object> getSearchRequest(IUserService userService, IConfigService configService, ContentSearchCriteria criteria) {
+    public static Map<String, Object> getSearchRequest(AppContext appContext, IUserService userService, IConfigService configService, ContentSearchCriteria criteria) {
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("query", criteria.getQuery());
         requestMap.put("limit", criteria.getLimit());
@@ -848,9 +849,9 @@ public class ContentHandler {
         requestMap.put("facets", getFacetList());
         addSortCriteria(requestMap, criteria);
         if (SearchType.SEARCH.equals(criteria.getSearchType())) {
-            requestMap.put("filters", getSearchRequest(configService, criteria));
+            requestMap.put("filters", getSearchRequest(appContext, configService, criteria));
         } else {
-            requestMap.put("filters", getFilterRequest(configService, criteria));
+            requestMap.put("filters", getFilterRequest(appContext, configService, criteria));
         }
         return requestMap;
     }
@@ -865,16 +866,16 @@ public class ContentHandler {
         }
     }
 
-    private static Map<String, Object> getSearchRequest(IConfigService configService, ContentSearchCriteria criteria) {
+    private static Map<String, Object> getSearchRequest(AppContext appContext, IConfigService configService, ContentSearchCriteria criteria) {
         Map<String, Object> filterMap = new HashMap<>();
 
         // Populating implicit search criteria.
-        filterMap.put("compatibilityLevel", getCompatibilityLevelFilter());
+        filterMap.put("compatibilityLevel", getCompatibilityLevelFilter(appContext));
         filterMap.put("status", Collections.singletonList("Live"));
         filterMap.put("objectType", Collections.singletonList("Content"));
         filterMap.put("contentType", Arrays.asList("Story", "Worksheet", "Collection", "Game", "TextBook"));
 
-        //Add filters for criteria atributes
+        //Add filters for criteria attributes
         // Add subject filter
         if (criteria.getAge() > 0)
             applyListingFilter(configService, MasterDataType.AGEGROUP, String.valueOf(criteria.getAge()), filterMap);
@@ -908,9 +909,9 @@ public class ContentHandler {
         return filterMap;
     }
 
-    private static Map<String, Object> getFilterRequest(IConfigService configService, ContentSearchCriteria criteria) {
+    private static Map<String, Object> getFilterRequest(AppContext appContext, IConfigService configService, ContentSearchCriteria criteria) {
         Map<String, Object> filterMap = new HashMap<>();
-        filterMap.put("compatibilityLevel", getCompatibilityLevelFilter());
+        filterMap.put("compatibilityLevel", getCompatibilityLevelFilter(appContext));
         if (criteria.getFacetFilters() != null) {
             for (ContentSearchFilter filter : criteria.getFacetFilters()) {
                 List<String> filterValueList = new ArrayList<>();
@@ -948,10 +949,10 @@ public class ContentHandler {
         return Arrays.asList("contentType", "domain", "ageGroup", "language", "gradeLevel");
     }
 
-    private static Map<String, Integer> getCompatibilityLevelFilter() {
+    private static Map<String, Integer> getCompatibilityLevelFilter(AppContext appContext) {
         Map<String, Integer> compatibilityLevelMap = new HashMap<>();
-        compatibilityLevelMap.put("max", maxCompatibilityLevel);
-        compatibilityLevelMap.put("min", minCompatibilityLevel);
+        compatibilityLevelMap.put("min", appContext.getParams().getInt(ServiceConstants.Params.MIN_COMPATIBILITY_LEVEL));
+        compatibilityLevelMap.put("max", appContext.getParams().getInt(ServiceConstants.Params.MAX_COMPATIBILITY_LEVEL));
         return compatibilityLevelMap;
     }
 
@@ -1146,19 +1147,18 @@ public class ContentHandler {
     }
 
     public static String fetchContentListingFromServer(AppContext appContext, IConfigService configService, ContentListingCriteria contentListingCriteria, Profile profile, String did) {
-        Map<String, Object> requestMap = ContentHandler.getContentListingRequest(configService, contentListingCriteria, profile, did);
+        Map<String, Object> requestMap = getContentListingRequest(appContext, configService, contentListingCriteria, profile, did);
         ContentListingAPI api = new ContentListingAPI(appContext, contentListingCriteria.getContentListingId(), requestMap);
         GenieResponse apiResponse = api.post();
         String jsonStr = null;
         if (apiResponse.getStatus()) {
             jsonStr = apiResponse.getResult().toString();
-            ContentHandler.saveContentListingDataInDB(appContext, contentListingCriteria, jsonStr);
+            saveContentListingDataInDB(appContext, contentListingCriteria, jsonStr);
         }
         return jsonStr;
     }
 
-
-    public static Map<String, Object> getContentListingRequest(IConfigService configService, ContentListingCriteria contentListingCriteria, Profile profile, String did) {
+    private static Map<String, Object> getContentListingRequest(AppContext appContext, IConfigService configService, ContentListingCriteria contentListingCriteria, Profile profile, String did) {
         HashMap<String, Object> contextMap = new HashMap<>();
 
         if (profile != null) {
@@ -1169,7 +1169,7 @@ public class ContentHandler {
         contextMap.put("contentid", "");
 
         Map<String, Object> filterMap = new HashMap<>();
-        filterMap.put("compatibilityLevel", getCompatibilityLevelFilter());
+        filterMap.put("compatibilityLevel", getCompatibilityLevelFilter(appContext));
 
         // Add subject filter
         if (!StringUtil.isNullOrEmpty(contentListingCriteria.getSubject()))
@@ -1211,7 +1211,7 @@ public class ContentHandler {
         return requestMap;
     }
 
-    public static void saveContentListingDataInDB(AppContext appContext, ContentListingCriteria contentListingCriteria, String jsonStr) {
+    private static void saveContentListingDataInDB(AppContext appContext, ContentListingCriteria contentListingCriteria, String jsonStr) {
         if (jsonStr == null) {
             return;
         }

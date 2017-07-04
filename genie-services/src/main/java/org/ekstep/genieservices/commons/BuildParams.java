@@ -25,10 +25,14 @@ public class BuildParams implements IParams {
      * Creates an empty set of values using the default initial size
      */
     public BuildParams(Context context, String packageName) {
-        // Choosing a default size of 8 based on analysis of typical
+        // Choosing a default size of 16 based on analysis of typical
         // consumption by applications.
         mValues = new HashMap<>(16);
 
+        init(context, packageName);
+    }
+
+    private void init(Context context, String packageName) {
         put(ServiceConstants.Params.VERSION_NAME, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.VERSION_NAME));
         put(ServiceConstants.Params.APP_QUALIFIER, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.APP_QUALIFIER));
         put(ServiceConstants.Params.TELEMETRY_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.TELEMETRY_BASE_URL));
@@ -43,6 +47,8 @@ public class BuildParams implements IParams {
         put(ServiceConstants.Params.GID, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.GID));
         put(ServiceConstants.Params.LOG_LEVEL, LogLevel.getLogLevel(BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.LOG_LEVEL)).getLevel());
 
+        initCompatibilityLevel(packageName);
+
         String profileConfigClass = BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.PROFILE_CONFIG);
         if (profileConfigClass != null) {
             Class<?> classInstance = ReflectionUtil.getClass(profileConfigClass);
@@ -51,6 +57,25 @@ public class BuildParams implements IParams {
                 put(ServiceConstants.Params.PROFILE_PATH, profileConfiguration.getProfilePath(context));
             }
         }
+    }
+
+    private void initCompatibilityLevel(String packageName) {
+        int minCompatibilityLevel = BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.MIN_COMPATIBILITY_LEVEL);
+        if (minCompatibilityLevel <= 0) {
+            minCompatibilityLevel = 1;
+        }
+
+        int maxCompatibilityLevel = BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.MAX_COMPATIBILITY_LEVEL);
+        if (maxCompatibilityLevel <= 0) {
+            maxCompatibilityLevel = 3;
+        }
+
+        if (maxCompatibilityLevel < minCompatibilityLevel) {
+            throw new IllegalStateException("MAX_COMPATIBILITY_LEVEL should not be less than MIN_COMPATIBILITY_LEVEL.");
+        }
+
+        put(ServiceConstants.Params.MIN_COMPATIBILITY_LEVEL, minCompatibilityLevel);
+        put(ServiceConstants.Params.MAX_COMPATIBILITY_LEVEL, maxCompatibilityLevel);
     }
 
     @Override

@@ -49,6 +49,8 @@ public interface ServiceConstants {
         String API_USER = "API_USER";
         String GID = "GID";
         String LOG_LEVEL = "LOG_LEVEL";
+        String MIN_COMPATIBILITY_LEVEL = "MIN_COMPATIBILITY_LEVEL";
+        String MAX_COMPATIBILITY_LEVEL = "MAX_COMPATIBILITY_LEVEL";
         String PROFILE_CONFIG = "PROFILE_CONFIG";
         String PROFILE_PATH = "PROFILE_PATH";
     }
@@ -202,11 +204,6 @@ public interface ServiceConstants {
         String FAILED_TO_DELETE_NOTIFICATION = "Failed to delete notification";
         String ERROR_WHILE_GETTING_NOTIFICATIONS = "Error while getting notifications";
         String FAILED_TO_ADD_UPDATE_NOTIFICATION = "Failed to add/update  notification";
-    }
-
-    interface ContentStatus {
-        String LIVE = "LIVE";
-        String DRAFT = "DRAFT";
     }
 
     interface GeTransferEvent {
