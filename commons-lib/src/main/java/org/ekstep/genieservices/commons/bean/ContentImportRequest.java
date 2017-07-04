@@ -1,5 +1,6 @@
 package org.ekstep.genieservices.commons.bean;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import java.util.List;
  * - contentIds - list of contentIds to be imported
  * - correlationData - list of correlationData
  * - status - list of status i.e. "Live", "Draft"
+ * - contentType - List of contentType. "Story", "Worksheet", "Collection", "Game", "TextBook", "Course", "LessonPlan".
  */
 public class ContentImportRequest {
 
@@ -18,13 +20,16 @@ public class ContentImportRequest {
     private List<String> contentIds;
     private List<CorrelationData> correlationData;
     private List<String> status;
+    private List<String> contentType;
 
-    private ContentImportRequest(boolean isChildContent, String destinationFolder, List<String> contentIds, List<CorrelationData> correlationData, List<String> status) {
+    private ContentImportRequest(boolean isChildContent, String destinationFolder, List<String> contentIds,
+                                 List<CorrelationData> correlationData, List<String> status, List<String> contentType) {
         this.isChildContent = isChildContent;
         this.destinationFolder = destinationFolder;
         this.contentIds = contentIds;
         this.correlationData = correlationData;
         this.status = status;
+        this.contentType = contentType;
     }
 
     public boolean isChildContent() {
@@ -47,12 +52,17 @@ public class ContentImportRequest {
         return status;
     }
 
+    public List<String> getContentType() {
+        return contentType;
+    }
+
     public static class Builder {
         private boolean isChildContent;
         private String destinationFolder;
         private List<String> contentIds;
         private List<CorrelationData> correlationData;
         private List<String> status;
+        private List<String> contentType;
 
         /**
          * Method to indicate that the file being imported is a child content
@@ -97,6 +107,14 @@ public class ContentImportRequest {
             return this;
         }
 
+        /**
+         * List of contentType. "Story", "Worksheet", "Collection", "Game", "TextBook", "Course", "LessonPlan".
+         */
+        public Builder contentType(List<String> contentType) {
+            this.contentType = contentType;
+            return this;
+        }
+
         public ContentImportRequest build() {
             if (destinationFolder == null) {
                 throw new IllegalStateException("To folder required.");
@@ -110,7 +128,11 @@ public class ContentImportRequest {
                 this.status = Collections.singletonList("Live");
             }
 
-            return new ContentImportRequest(isChildContent, destinationFolder, contentIds, correlationData, status);
+            if (contentType == null || contentType.isEmpty()) {
+                this.contentType = Arrays.asList("Story", "Worksheet", "Collection", "Game", "TextBook");
+            }
+
+            return new ContentImportRequest(isChildContent, destinationFolder, contentIds, correlationData, status, contentType);
         }
     }
 }

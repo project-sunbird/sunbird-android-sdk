@@ -29,12 +29,13 @@ public class ContentSearchCriteria implements Serializable {
     private String[] channel;
     private List<String> status;
     private List<String> facets;
+    private List<String> contentType;
     // 1 - indicates search, 2 - filter
     private SearchType searchType;
 
     private ContentSearchCriteria(String query, long limit, String mode, int age, int grade, String medium, String board,
-                                  String[] audience, String[] channel, List<String> status, List<String> facets, List<ContentSortCriteria> sortCriteria,
-                                  SearchType searchType) {
+                                  String[] audience, String[] channel, List<String> status, List<String> facets, List<String> contentType,
+                                  List<ContentSortCriteria> sortCriteria, SearchType searchType) {
         this.query = query;
         this.limit = limit;
         this.mode = mode;
@@ -46,11 +47,14 @@ public class ContentSearchCriteria implements Serializable {
         this.channel = channel;
         this.status = status;
         this.facets = facets;
+        this.contentType = contentType;
         this.sortCriteria = sortCriteria;
         this.searchType = searchType;
     }
 
-    private ContentSearchCriteria(String query, long limit, String mode, List<ContentSearchFilter> facetFilters, List<ContentSearchFilter> impliedFilters, List<ContentSortCriteria> sortCriteria, SearchType searchType) {
+    private ContentSearchCriteria(String query, long limit, String mode,
+                                  List<ContentSearchFilter> facetFilters, List<ContentSearchFilter> impliedFilters,
+                                  List<ContentSortCriteria> sortCriteria, SearchType searchType) {
         this.query = query;
         this.limit = limit;
         this.mode = mode;
@@ -96,6 +100,10 @@ public class ContentSearchCriteria implements Serializable {
         return facets;
     }
 
+    public List<String> getContentType() {
+        return contentType;
+    }
+
     public List<ContentSearchFilter> getImpliedFilters() {
         return impliedFilters;
     }
@@ -134,6 +142,7 @@ public class ContentSearchCriteria implements Serializable {
         private List<ContentSortCriteria> sortCriteria;
         private List<String> status;
         private List<String> facets;
+        private List<String> contentType;
 
         public SearchBuilder() {
             this.query = "";
@@ -195,6 +204,11 @@ public class ContentSearchCriteria implements Serializable {
             return this;
         }
 
+        public SearchBuilder contentType(List<String> contentType) {
+            this.contentType = contentType;
+            return this;
+        }
+
         public ContentSearchCriteria build() {
             if (status == null || status.isEmpty()) {
                 this.status = Collections.singletonList("Live");
@@ -204,8 +218,12 @@ public class ContentSearchCriteria implements Serializable {
                 this.facets = Arrays.asList("contentType", "domain", "ageGroup", "language", "gradeLevel");
             }
 
+            if (contentType == null || contentType.isEmpty()) {
+                this.contentType = Arrays.asList("Story", "Worksheet", "Collection", "Game", "TextBook");
+            }
+
             return new ContentSearchCriteria(query, limit, mode, age, grade, medium, board,
-                    audience, channel, status, facets, sortCriteria, SearchType.SEARCH);
+                    audience, channel, status, facets, contentType, sortCriteria, SearchType.SEARCH);
         }
     }
 

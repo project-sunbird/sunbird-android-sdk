@@ -833,7 +833,7 @@ public class ContentHandler {
         filterMap.put("identifier", importRequest.getContentIds());
         filterMap.put("status", importRequest.getStatus());
         filterMap.put("objectType", Collections.singletonList("Content"));
-        addFiltersIfNotAvailable(filterMap, "contentType", Arrays.asList("Story", "Worksheet", "Collection", "Game", "TextBook"));
+        addFiltersIfNotAvailable(filterMap, "contentType", importRequest.getContentType());
 
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("filters", filterMap);
@@ -874,7 +874,7 @@ public class ContentHandler {
         filterMap.put("compatibilityLevel", getCompatibilityLevelFilter(appContext));
         filterMap.put("status", criteria.getStatus());
         filterMap.put("objectType", Collections.singletonList("Content"));
-        filterMap.put("contentType", Arrays.asList("Story", "Worksheet", "Collection", "Game", "TextBook"));
+        filterMap.put("contentType", criteria.getContentType());
 
         //Add filters for criteria attributes
         // Add subject filter
