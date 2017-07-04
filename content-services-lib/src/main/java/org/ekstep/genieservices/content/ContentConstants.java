@@ -27,6 +27,11 @@ public interface ContentConstants {
         String PARENT = "Parent";
     }
 
+    interface ContentStatus {
+        String LIVE = "Live";
+        String DRAFT = "Draft";
+    }
+
     interface MimeType {
         String APK = "application/vnd.android.package-archive";
         String ECML = "application/vnd.ekstep.ecml-archive";
