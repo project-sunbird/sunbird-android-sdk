@@ -638,7 +638,6 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
     @Override
     public GenieResponse<Void> importContent(ContentImportRequest importRequest) {
-
         String methodName = "importContent@ContentServiceImpl";
         HashMap params = new HashMap<>();
         params.put("request", GsonUtil.toJson(importRequest));
@@ -646,7 +645,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         GenieResponse<Void> response;
 
-        ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, ContentHandler.getSearchRequest(mAppContext, importRequest.getContentIds()));
+        ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, ContentHandler.getSearchRequest(mAppContext, importRequest));
         GenieResponse apiResponse = contentSearchAPI.post();
         if (apiResponse.getStatus()) {
             String body = apiResponse.getResult().toString();

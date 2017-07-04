@@ -1,5 +1,6 @@
 package org.ekstep.genieservices.commons.bean;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -8,7 +9,7 @@ import java.util.List;
  * - destinationFolder - where the contents are to be stored
  * - contentIds - list of contentIds to be imported
  * - correlationData - list of correlationData
- *
+ * - status - list of status i.e. "Live", "Draft"
  */
 public class ContentImportRequest {
 
@@ -16,12 +17,14 @@ public class ContentImportRequest {
     private String destinationFolder;
     private List<String> contentIds;
     private List<CorrelationData> correlationData;
+    private List<String> status;
 
-    private ContentImportRequest(boolean isChildContent, String destinationFolder, List<String> contentIds, List<CorrelationData> correlationData) {
+    private ContentImportRequest(boolean isChildContent, String destinationFolder, List<String> contentIds, List<CorrelationData> correlationData, List<String> status) {
         this.isChildContent = isChildContent;
         this.destinationFolder = destinationFolder;
         this.contentIds = contentIds;
         this.correlationData = correlationData;
+        this.status = status;
     }
 
     public boolean isChildContent() {
@@ -40,11 +43,16 @@ public class ContentImportRequest {
         return correlationData;
     }
 
+    public List<String> getStatus() {
+        return status;
+    }
+
     public static class Builder {
         private boolean isChildContent;
         private String destinationFolder;
         private List<String> contentIds;
         private List<CorrelationData> correlationData;
+        private List<String> status;
 
         /**
          * Method to indicate that the file being imported is a child content
@@ -81,6 +89,14 @@ public class ContentImportRequest {
             return this;
         }
 
+        /**
+         * List of status i.e. "Live", "Draft".
+         */
+        public Builder status(List<String> status) {
+            this.status = status;
+            return this;
+        }
+
         public ContentImportRequest build() {
             if (destinationFolder == null) {
                 throw new IllegalStateException("To folder required.");
@@ -90,7 +106,11 @@ public class ContentImportRequest {
                 throw new IllegalStateException("ContentIds required.");
             }
 
-            return new ContentImportRequest(isChildContent, destinationFolder, contentIds, correlationData);
+            if (status == null || status.isEmpty()) {
+                this.status = Collections.singletonList("Live");
+            }
+
+            return new ContentImportRequest(isChildContent, destinationFolder, contentIds, correlationData, status);
         }
     }
 }

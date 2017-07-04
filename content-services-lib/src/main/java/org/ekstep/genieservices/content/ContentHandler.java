@@ -15,6 +15,7 @@ import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
 import org.ekstep.genieservices.commons.bean.ContentFeedbackFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
+import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingSection;
@@ -826,11 +827,11 @@ public class ContentHandler {
         return contentModelListInDB;
     }
 
-    public static Map<String, Object> getSearchRequest(AppContext appContext, List<String> contentIdentifiers) {
+    public static Map<String, Object> getSearchRequest(AppContext appContext, ContentImportRequest importRequest) {
         Map<String, Object> filterMap = new HashMap<>();
         filterMap.put("compatibilityLevel", getCompatibilityLevelFilter(appContext));
-        filterMap.put("identifier", contentIdentifiers);
-        filterMap.put("status", Collections.singletonList("Live"));
+        filterMap.put("identifier", importRequest.getContentIds());
+        filterMap.put("status", importRequest.getStatus());
         filterMap.put("objectType", Collections.singletonList("Content"));
         addFiltersIfNotAvailable(filterMap, "contentType", Arrays.asList("Story", "Worksheet", "Collection", "Game", "TextBook"));
 
@@ -846,7 +847,7 @@ public class ContentHandler {
         requestMap.put("query", criteria.getQuery());
         requestMap.put("limit", criteria.getLimit());
         requestMap.put("mode", criteria.getMode());
-        requestMap.put("facets", getFacetList());
+        requestMap.put("facets", criteria.getFacets());
         addSortCriteria(requestMap, criteria);
         if (SearchType.SEARCH.equals(criteria.getSearchType())) {
             requestMap.put("filters", getSearchRequest(appContext, configService, criteria));
@@ -871,7 +872,7 @@ public class ContentHandler {
 
         // Populating implicit search criteria.
         filterMap.put("compatibilityLevel", getCompatibilityLevelFilter(appContext));
-        filterMap.put("status", Collections.singletonList("Live"));
+        filterMap.put("status", criteria.getStatus());
         filterMap.put("objectType", Collections.singletonList("Content"));
         filterMap.put("contentType", Arrays.asList("Story", "Worksheet", "Collection", "Game", "TextBook"));
 
@@ -943,10 +944,6 @@ public class ContentHandler {
         }
 
         return filterMap;
-    }
-
-    private static List<String> getFacetList() {
-        return Arrays.asList("contentType", "domain", "ageGroup", "language", "gradeLevel");
     }
 
     private static Map<String, Integer> getCompatibilityLevelFilter(AppContext appContext) {
@@ -1437,7 +1434,6 @@ public class ContentHandler {
             }
 
             double pkgVersion;
-
             try {
                 pkgVersion = pkgVersion(firstContent.getLocalData());
             } catch (Exception e) {

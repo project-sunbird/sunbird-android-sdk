@@ -3,6 +3,8 @@ package org.ekstep.genieservices.commons.bean;
 import org.ekstep.genieservices.commons.bean.enums.SearchType;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -25,10 +27,14 @@ public class ContentSearchCriteria implements Serializable {
     private String board;
     private String[] audience;
     private String[] channel;
+    private List<String> status;
+    private List<String> facets;
     // 1 - indicates search, 2 - filter
     private SearchType searchType;
 
-    private ContentSearchCriteria(String query, long limit, String mode, int age, int grade, String medium, String board, String[] audience, String[] channel, List<ContentSortCriteria> sortCriteria, SearchType searchType) {
+    private ContentSearchCriteria(String query, long limit, String mode, int age, int grade, String medium, String board,
+                                  String[] audience, String[] channel, List<String> status, List<String> facets, List<ContentSortCriteria> sortCriteria,
+                                  SearchType searchType) {
         this.query = query;
         this.limit = limit;
         this.mode = mode;
@@ -38,6 +44,8 @@ public class ContentSearchCriteria implements Serializable {
         this.board = board;
         this.audience = audience;
         this.channel = channel;
+        this.status = status;
+        this.facets = facets;
         this.sortCriteria = sortCriteria;
         this.searchType = searchType;
     }
@@ -80,6 +88,14 @@ public class ContentSearchCriteria implements Serializable {
         return channel;
     }
 
+    public List<String> getStatus() {
+        return status;
+    }
+
+    public List<String> getFacets() {
+        return facets;
+    }
+
     public List<ContentSearchFilter> getImpliedFilters() {
         return impliedFilters;
     }
@@ -116,6 +132,8 @@ public class ContentSearchCriteria implements Serializable {
         private String[] audience;
         private String[] channel;
         private List<ContentSortCriteria> sortCriteria;
+        private List<String> status;
+        private List<String> facets;
 
         public SearchBuilder() {
             this.query = "";
@@ -172,8 +190,22 @@ public class ContentSearchCriteria implements Serializable {
             return this;
         }
 
+        public SearchBuilder status(List<String> status) {
+            this.status = status;
+            return this;
+        }
+
         public ContentSearchCriteria build() {
-            return new ContentSearchCriteria(query, limit, mode, age, grade, medium, board, audience, channel, sortCriteria, SearchType.SEARCH);
+            if (status == null || status.isEmpty()) {
+                this.status = Collections.singletonList("Live");
+            }
+
+            if (facets == null || facets.isEmpty()) {
+                this.facets = Arrays.asList("contentType", "domain", "ageGroup", "language", "gradeLevel");
+            }
+
+            return new ContentSearchCriteria(query, limit, mode, age, grade, medium, board,
+                    audience, channel, status, facets, sortCriteria, SearchType.SEARCH);
         }
     }
 
@@ -181,7 +213,6 @@ public class ContentSearchCriteria implements Serializable {
     public static class FilterBuilder {
 
         private String query;
-        private String sortBy;
         private long limit;
         private String mode;
         private List<ContentSearchFilter> facetFilters;
