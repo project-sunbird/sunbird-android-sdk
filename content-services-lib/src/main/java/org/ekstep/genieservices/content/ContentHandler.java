@@ -27,7 +27,6 @@ import org.ekstep.genieservices.commons.bean.FilterValue;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.MasterDataValues;
-import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.UserSession;
@@ -1095,23 +1094,21 @@ public class ContentHandler {
         return requestMap;
     }
 
-    public static HashMap<String, Object> getRelatedContentRequest(IUserService userService, RelatedContentRequest request, String did) {
+    public static HashMap<String, Object> getRelatedContentRequest(RelatedContentRequest request, String did) {
         String dlang = "";
         String uid = "";
-        if (userService != null) {
-            GenieResponse<Profile> profileGenieResponse = userService.getCurrentUser();
-            if (profileGenieResponse.getStatus()) {
-                Profile profile = profileGenieResponse.getResult();
-                uid = profile.getUid();
-                dlang = profile.getLanguage();
-            }
+        if (!StringUtil.isNullOrEmpty(request.getUid())) {
+            uid = request.getUid();
+        }
+        if (!StringUtil.isNullOrEmpty(request.getLanguage())) {
+            dlang = request.getLanguage();
         }
 
         HashMap<String, Object> contextMap = new HashMap<>();
-        contextMap.put("did", did);
-        contextMap.put("dlang", dlang);
         contextMap.put("contentid", request.getContentId());
         contextMap.put("uid", uid);
+        contextMap.put("dlang", dlang);
+        contextMap.put("did", did);
 
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("context", contextMap);

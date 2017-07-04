@@ -417,7 +417,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         String methodName = "getRelatedContent@ContentServiceImpl";
 
         GenieResponse<RelatedContentResult> response;
-        RelatedContentAPI relatedContentAPI = new RelatedContentAPI(mAppContext, ContentHandler.getRelatedContentRequest(userService, request, mAppContext.getDeviceInfo().getDeviceID()));
+        RelatedContentAPI relatedContentAPI = new RelatedContentAPI(mAppContext, ContentHandler.getRelatedContentRequest(request, mAppContext.getDeviceInfo().getDeviceID()));
         GenieResponse apiResponse = relatedContentAPI.post();
         if (apiResponse.getStatus()) {
             String body = apiResponse.getResult().toString();
