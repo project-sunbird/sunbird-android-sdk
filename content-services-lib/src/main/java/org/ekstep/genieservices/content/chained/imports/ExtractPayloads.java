@@ -5,7 +5,6 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
-import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.Decompress;
 import org.ekstep.genieservices.commons.utils.FileUtil;
@@ -144,9 +143,7 @@ public class ExtractPayloads implements IChainable {
 
                         // Add or update the content_state
                         if (unzipSuccess    // If unzip is success it means artifact is available.
-                                || ContentType.COLLECTION.getValue().equalsIgnoreCase(contentType)
-                                || ContentType.TEXTBOOK.getValue().equalsIgnoreCase(contentType)
-                                || ContentType.TEXTBOOK_UNIT.getValue().equalsIgnoreCase(contentType)) {
+                                || ContentConstants.MimeType.COLLECTION.equals(mimeType)) {
 
                             contentState = ContentConstants.State.ARTIFACT_AVAILABLE;
                         } else {

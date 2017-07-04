@@ -36,6 +36,7 @@ public interface ContentConstants {
         String APK = "application/vnd.android.package-archive";
         String ECML = "application/vnd.ekstep.ecml-archive";
         String HTML = "application/vnd.ekstep.html-archive";
+        String COLLECTION = "application/vnd.ekstep.content-collection";
 
         String ZIP = "application/zip";
         String TXT = "text/plain";

@@ -36,7 +36,6 @@ import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
-import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
@@ -520,9 +519,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                         }
                     }
 
-                    if (ContentType.COLLECTION.getValue().equalsIgnoreCase(node.getContentType())
-                            || ContentType.TEXTBOOK.getValue().equalsIgnoreCase(node.getContentType())
-                            || ContentType.TEXTBOOK_UNIT.getValue().equalsIgnoreCase(node.getContentType())) {
+                    if (ContentConstants.MimeType.COLLECTION.equals(node.getMimeType())) {
                         key = key + "/" + node.getIdentifier();
 
                     } else {

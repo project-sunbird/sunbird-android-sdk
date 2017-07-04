@@ -503,10 +503,8 @@ public class ContentHandler {
             }
 
             // Update the contentState
-            // Do not update the content state if contentType is Collection / TextBook / TextBookUnit
-            if (ContentType.COLLECTION.getValue().equalsIgnoreCase(contentModel.getContentType())
-                    || ContentType.TEXTBOOK.getValue().equalsIgnoreCase(contentModel.getContentType())
-                    || ContentType.TEXTBOOK_UNIT.getValue().equalsIgnoreCase(contentModel.getContentType())) {
+            // Do not update the content state if mimeType is "application/vnd.ekstep.content-collection"
+            if (ContentConstants.MimeType.COLLECTION.equals(contentModel.getMimeType())) {
                 contentState = ContentConstants.State.ARTIFACT_AVAILABLE;
             } else {
                 contentState = ContentConstants.State.ONLY_SPINE;
@@ -514,11 +512,8 @@ public class ContentHandler {
 
         } else {
             // TODO: This check should be before updating the existing refCount.
-            // Do not update the content state if contentType is Collection / TextBook / TextBookUnit and refCount is more than 1.
-            if ((ContentType.COLLECTION.getValue().equalsIgnoreCase(contentModel.getContentType())
-                    || ContentType.TEXTBOOK.getValue().equalsIgnoreCase(contentModel.getContentType())
-                    || ContentType.TEXTBOOK_UNIT.getValue().equalsIgnoreCase(contentModel.getContentType()))
-                    && refCount > 1) {
+            // Do not update the content state if mimeType is "application/vnd.ekstep.content-collection" and refCount is more than 1.
+            if (ContentConstants.MimeType.COLLECTION.equals(contentModel.getMimeType()) && refCount > 1) {
                 contentState = ContentConstants.State.ARTIFACT_AVAILABLE;
             } else if (refCount > 1 && isChildItems) {  //contentModel.isVisibilityDefault() &&
                 // Visibility will remain Default only.
@@ -1337,9 +1332,7 @@ public class ContentHandler {
     public static String getDownloadUrl(Map<String, Object> dataMap) {
         String downloadUrl = null;
 
-        String contentType = (String) dataMap.get(KEY_CONTENT_TYPE);
-        if ((ContentType.TEXTBOOK.getValue().equalsIgnoreCase(contentType)
-                || ContentType.COLLECTION.getValue().equalsIgnoreCase(contentType))) {
+        if (ContentConstants.MimeType.COLLECTION.equals(readMimeType(dataMap))) {
             ContentVariant spineContentVariant = getVariant(dataMap, "spine");
             if (spineContentVariant != null) {
                 downloadUrl = spineContentVariant.getEcarUrl();

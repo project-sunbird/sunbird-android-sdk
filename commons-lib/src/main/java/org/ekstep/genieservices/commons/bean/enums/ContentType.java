@@ -12,7 +12,9 @@ import java.util.List;
  */
 public enum ContentType {
 
-    GAME("game"), STORY("story"), WORKSHEET("worksheet"), COLLECTION("collection"), TEXTBOOK("textbook"), TEXTBOOK_UNIT("textbookunit");
+    GAME("Game"), STORY("Story"), WORKSHEET("Worksheet"),
+    COLLECTION("Collection"), TEXTBOOK("Textbook"), TEXTBOOK_UNIT("TextbookUnit"),
+    COURSE("Course"), LESSON_PLAN("LessonPlan");
 
     private String value;
 
@@ -27,7 +29,7 @@ public enum ContentType {
 
         List<String> contentTypeList = new ArrayList<>();
         for (ContentType contentType : contentTypes) {
-            contentTypeList.add(contentType.getValue());
+            contentTypeList.add(contentType.getValue().toLowerCase());
         }
 
         return StringUtil.join("','", contentTypeList);
