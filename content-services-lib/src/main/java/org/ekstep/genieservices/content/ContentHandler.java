@@ -385,23 +385,11 @@ public class ContentHandler {
         return null;
     }
 
-    public static Profile getCurrentProfile(IUserService userService) {
-        Profile profile = null;
-        if (userService != null) {
-            GenieResponse<Profile> profileGenieResponse = userService.getCurrentUser();
-            if (profileGenieResponse.getStatus()) {
-                profile = profileGenieResponse.getResult();
-            }
-        }
-        return profile;
-    }
-
     public static List<ContentFeedback> getContentFeedback(IContentFeedbackService contentFeedbackService, String contentIdentifier, String uid) {
         if (contentFeedbackService != null) {
             ContentFeedbackFilterCriteria.Builder builder = new ContentFeedbackFilterCriteria.Builder().byUser(uid).forContent(contentIdentifier);
             return contentFeedbackService.getFeedback(builder.build()).getResult();
         }
-
         return null;
     }
 
@@ -410,7 +398,6 @@ public class ContentHandler {
             ContentAccessFilterCriteria.Builder builder = new ContentAccessFilterCriteria.Builder().byUser(uid).forContent(contentIdentifier);
             return userService.getAllContentAccess(builder.build()).getResult();
         }
-
         return null;
     }
 
@@ -1133,18 +1120,17 @@ public class ContentHandler {
         return requestMap;
     }
 
-    public static void refreshContentListingFromServer(final AppContext appContext, final IConfigService configService, final ContentListingCriteria contentListingCriteria,
-                                                       final Profile profile, final String did) {
+    public static void refreshContentListingFromServer(final AppContext appContext, final IConfigService configService, final ContentListingCriteria contentListingCriteria, final String did) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                fetchContentListingFromServer(appContext, configService, contentListingCriteria, profile, did);
+                fetchContentListingFromServer(appContext, configService, contentListingCriteria, did);
             }
         }).start();
     }
 
-    public static String fetchContentListingFromServer(AppContext appContext, IConfigService configService, ContentListingCriteria contentListingCriteria, Profile profile, String did) {
-        Map<String, Object> requestMap = getContentListingRequest(appContext, configService, contentListingCriteria, profile, did);
+    public static String fetchContentListingFromServer(AppContext appContext, IConfigService configService, ContentListingCriteria contentListingCriteria, String did) {
+        Map<String, Object> requestMap = getContentListingRequest(appContext, configService, contentListingCriteria, did);
         ContentListingAPI api = new ContentListingAPI(appContext, contentListingCriteria.getContentListingId(), requestMap);
         GenieResponse apiResponse = api.post();
         String jsonStr = null;
@@ -1155,12 +1141,14 @@ public class ContentHandler {
         return jsonStr;
     }
 
-    private static Map<String, Object> getContentListingRequest(AppContext appContext, IConfigService configService, ContentListingCriteria contentListingCriteria, Profile profile, String did) {
+    private static Map<String, Object> getContentListingRequest(AppContext appContext, IConfigService configService, ContentListingCriteria contentListingCriteria, String did) {
         HashMap<String, Object> contextMap = new HashMap<>();
 
-        if (profile != null) {
-            contextMap.put("uid", profile.getUid());
-            contextMap.put("dlang", profile.getLanguage());
+        if (!StringUtil.isNullOrEmpty(contentListingCriteria.getUid())) {
+            contextMap.put("uid", contentListingCriteria.getUid());
+        }
+        if (!StringUtil.isNullOrEmpty(contentListingCriteria.getLanguage())) {
+            contextMap.put("dlang", contentListingCriteria.getLanguage());
         }
         contextMap.put("did", did);
         contextMap.put("contentid", "");

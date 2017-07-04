@@ -275,12 +275,12 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         if (contentListingModelInDB != null) {
             jsonStr = contentListingModelInDB.getJson();
             if (DateUtil.getEpochDiff(contentListingModelInDB.getExpiryTime()) > 0) {
-                ContentHandler.refreshContentListingFromServer(mAppContext, configService, contentListingCriteria, ContentHandler.getCurrentProfile(userService), mAppContext.getDeviceInfo().getDeviceID());
+                ContentHandler.refreshContentListingFromServer(mAppContext, configService, contentListingCriteria, mAppContext.getDeviceInfo().getDeviceID());
             }
         }
 
         if (jsonStr == null) {
-            jsonStr = ContentHandler.fetchContentListingFromServer(mAppContext, configService, contentListingCriteria, ContentHandler.getCurrentProfile(userService), mAppContext.getDeviceInfo().getDeviceID());
+            jsonStr = ContentHandler.fetchContentListingFromServer(mAppContext, configService, contentListingCriteria, mAppContext.getDeviceInfo().getDeviceID());
         }
 
         if (jsonStr != null) {

@@ -6,6 +6,8 @@ package org.ekstep.genieservices.commons.bean;
 public class ContentListingCriteria {
 
     private String contentListingId;
+    private String uid;
+    private String language;
     private String subject;
     private int age;
     private int grade;
@@ -15,8 +17,10 @@ public class ContentListingCriteria {
     private String[] channel;
     private String did;
 
-    public ContentListingCriteria(String contentListingId, String subject, int age, int grade, String medium, String board, String did, String[] audience, String[] channel) {
+    private ContentListingCriteria(String contentListingId, String uid, String language, String subject, int age, int grade, String medium, String board, String did, String[] audience, String[] channel) {
         this.contentListingId = contentListingId;
+        this.uid = uid;
+        this.language = language;
         this.subject = subject;
         this.age = age;
         this.grade = grade;
@@ -29,6 +33,14 @@ public class ContentListingCriteria {
 
     public String getContentListingId() {
         return contentListingId;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public String getLanguage() {
+        return language;
     }
 
     public String getSubject() {
@@ -64,8 +76,9 @@ public class ContentListingCriteria {
     }
 
     public static class Builder {
-
         private String contentListingId;
+        private String uid;
+        private String language;
         private String subject;
         private int age;
         private int grade;
@@ -77,6 +90,16 @@ public class ContentListingCriteria {
 
         public Builder listingId(String contentListingId) {
             this.contentListingId = contentListingId;
+            return this;
+        }
+
+        public Builder byUser(String uid) {
+            this.uid = uid;
+            return this;
+        }
+
+        public Builder byLanguage(String language) {
+            this.language = language;
             return this;
         }
 
@@ -121,7 +144,7 @@ public class ContentListingCriteria {
         }
 
         public ContentListingCriteria build() {
-            return new ContentListingCriteria(contentListingId, subject, age, grade, medium, board, did, audience, channel);
+            return new ContentListingCriteria(contentListingId, uid, language, subject, age, grade, medium, board, did, audience, channel);
         }
     }
 }
