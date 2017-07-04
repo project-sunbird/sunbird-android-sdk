@@ -418,13 +418,13 @@ public class ContentHandler {
         return contentState == ContentConstants.State.ARTIFACT_AVAILABLE;
     }
 
-    private static List<String> getDefaultContentTypes() {
-        return Arrays.asList("Story", "Worksheet", "Collection", "Game", "TextBook");
+    private static String[] getDefaultContentTypes() {
+        return new String[]{"Story", "Worksheet", "Collection", "Game", "TextBook"};
     }
 
     public static List<ContentModel> getAllLocalContent(IDBSession dbSession, ContentFilterCriteria criteria) {
         String uid = null;
-        List<String> contentTypes;
+        String[] contentTypes;
         if (criteria != null) {
             uid = criteria.getUid();
             contentTypes = criteria.getContentTypes();
@@ -810,9 +810,7 @@ public class ContentHandler {
         Map<String, Object> filterMap = new HashMap<>();
         filterMap.put("compatibilityLevel", getCompatibilityLevelFilter(appContext));
         filterMap.put("identifier", importRequest.getContentIds());
-        filterMap.put("status", importRequest.getStatus());
         filterMap.put("objectType", Collections.singletonList("Content"));
-        addFiltersIfNotAvailable(filterMap, "contentType", importRequest.getContentType());
 
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("filters", filterMap);
@@ -851,9 +849,9 @@ public class ContentHandler {
 
         // Populating implicit search criteria.
         filterMap.put("compatibilityLevel", getCompatibilityLevelFilter(appContext));
-        filterMap.put("status", criteria.getStatus());
+        filterMap.put("status", criteria.getContentStatusArray());
         filterMap.put("objectType", Collections.singletonList("Content"));
-        filterMap.put("contentType", criteria.getContentType());
+        filterMap.put("contentType", criteria.getContentTypes());
 
         //Add filters for criteria attributes
         // Add subject filter

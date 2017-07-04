@@ -3,8 +3,6 @@ package org.ekstep.genieservices.commons.bean;
 import org.ekstep.genieservices.commons.bean.enums.SearchType;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -27,14 +25,14 @@ public class ContentSearchCriteria implements Serializable {
     private String board;
     private String[] audience;
     private String[] channel;
-    private List<String> status;
-    private List<String> facets;
-    private List<String> contentType;
+    private String[] contentStatusArray;
+    private String[] facets;
+    private String[] contentTypes;
     // 1 - indicates search, 2 - filter
     private SearchType searchType;
 
     private ContentSearchCriteria(String query, long limit, String mode, int age, int grade, String medium, String board,
-                                  String[] audience, String[] channel, List<String> status, List<String> facets, List<String> contentType,
+                                  String[] audience, String[] channel, String[] contentStatusArray, String[] facets, String[] contentTypes,
                                   List<ContentSortCriteria> sortCriteria, SearchType searchType) {
         this.query = query;
         this.limit = limit;
@@ -45,9 +43,9 @@ public class ContentSearchCriteria implements Serializable {
         this.board = board;
         this.audience = audience;
         this.channel = channel;
-        this.status = status;
+        this.contentStatusArray = contentStatusArray;
         this.facets = facets;
-        this.contentType = contentType;
+        this.contentTypes = contentTypes;
         this.sortCriteria = sortCriteria;
         this.searchType = searchType;
     }
@@ -92,16 +90,16 @@ public class ContentSearchCriteria implements Serializable {
         return channel;
     }
 
-    public List<String> getStatus() {
-        return status;
+    public String[] getContentStatusArray() {
+        return contentStatusArray;
     }
 
-    public List<String> getFacets() {
+    public String[] getFacets() {
         return facets;
     }
 
-    public List<String> getContentType() {
-        return contentType;
+    public String[] getContentTypes() {
+        return contentTypes;
     }
 
     public List<ContentSearchFilter> getImpliedFilters() {
@@ -139,10 +137,10 @@ public class ContentSearchCriteria implements Serializable {
         private String board;
         private String[] audience;
         private String[] channel;
+        private String[] contentStatusArray;
+        private String[] facets;
+        private String[] contentTypes;
         private List<ContentSortCriteria> sortCriteria;
-        private List<String> status;
-        private List<String> facets;
-        private List<String> contentType;
 
         public SearchBuilder() {
             this.query = "";
@@ -199,31 +197,31 @@ public class ContentSearchCriteria implements Serializable {
             return this;
         }
 
-        public SearchBuilder status(List<String> status) {
-            this.status = status;
+        public SearchBuilder contentStatusArray(String[] contentStatusArray) {
+            this.contentStatusArray = contentStatusArray;
             return this;
         }
 
-        public SearchBuilder contentType(List<String> contentType) {
-            this.contentType = contentType;
+        public SearchBuilder contentTypes(String[] contentTypes) {
+            this.contentTypes = contentTypes;
             return this;
         }
 
         public ContentSearchCriteria build() {
-            if (status == null || status.isEmpty()) {
-                this.status = Collections.singletonList("Live");
+            if (contentStatusArray == null || contentStatusArray.length == 0) {
+                this.contentStatusArray = new String[]{"Live"};
             }
 
-            if (facets == null || facets.isEmpty()) {
-                this.facets = Arrays.asList("contentType", "domain", "ageGroup", "language", "gradeLevel");
+            if (facets == null || facets.length == 0) {
+                this.facets = new String[]{"contentType", "domain", "ageGroup", "language", "gradeLevel"};
             }
 
-            if (contentType == null || contentType.isEmpty()) {
-                this.contentType = Arrays.asList("Story", "Worksheet", "Collection", "Game", "TextBook");
+            if (contentTypes == null || contentTypes.length == 0) {
+                this.contentTypes = new String[]{"Story", "Worksheet", "Collection", "Game", "TextBook"};
             }
 
             return new ContentSearchCriteria(query, limit, mode, age, grade, medium, board,
-                    audience, channel, status, facets, contentType, sortCriteria, SearchType.SEARCH);
+                    audience, channel, contentStatusArray, facets, contentTypes, sortCriteria, SearchType.SEARCH);
         }
     }
 

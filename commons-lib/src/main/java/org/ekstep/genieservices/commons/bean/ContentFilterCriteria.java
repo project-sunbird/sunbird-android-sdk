@@ -2,21 +2,18 @@ package org.ekstep.genieservices.commons.bean;
 
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
-import java.util.Arrays;
-import java.util.List;
-
 /**
  * This class holds the uid, types of content required and attachFeedback, attachContentAccess flags if the feedback and content access are required.
  */
 public class ContentFilterCriteria {
 
     private String uid;
+    private String[] contentTypes;
     private String[] audience;
-    private List<String> contentTypes;
     private boolean attachFeedback;
     private boolean attachContentAccess;
 
-    private ContentFilterCriteria(String uid, List<String> contentTypes, String[] audience, boolean attachFeedback, boolean attachContentAccess) {
+    private ContentFilterCriteria(String uid, String[] contentTypes, String[] audience, boolean attachFeedback, boolean attachContentAccess) {
         this.uid = uid;
         this.contentTypes = contentTypes;
         this.audience = audience;
@@ -24,16 +21,16 @@ public class ContentFilterCriteria {
         this.attachContentAccess = attachContentAccess;
     }
 
-    public String[] getAudience() {
-        return audience;
-    }
-
     public String getUid() {
         return uid;
     }
 
-    public List<String> getContentTypes() {
+    public String[] getContentTypes() {
         return contentTypes;
+    }
+
+    public String[] getAudience() {
+        return audience;
     }
 
     public boolean attachFeedback() {
@@ -51,7 +48,7 @@ public class ContentFilterCriteria {
 
     public static class Builder {
         private String uid;
-        private List<String> contentTypes;
+        private String[] contentTypes;
         private String[] audience;
         private boolean attachFeedback;
         private boolean attachContentAccess;
@@ -65,7 +62,7 @@ public class ContentFilterCriteria {
             return this;
         }
 
-        public Builder contentTypes(List<String> contentTypes) {
+        public Builder contentTypes(String[] contentTypes) {
             this.contentTypes = contentTypes;
             return this;
         }
@@ -92,8 +89,8 @@ public class ContentFilterCriteria {
         }
 
         public ContentFilterCriteria build() {
-            if (contentTypes == null || contentTypes.isEmpty()) {
-                contentTypes = Arrays.asList("Story", "Worksheet", "Collection", "Game", "TextBook");
+            if (contentTypes == null || contentTypes.length == 0) {
+                contentTypes = new String[]{"Story", "Worksheet", "Collection", "Game", "TextBook"};
             }
             return new ContentFilterCriteria(uid, contentTypes, audience, attachFeedback, attachContentAccess);
         }
