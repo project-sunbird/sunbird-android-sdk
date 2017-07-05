@@ -8,6 +8,7 @@ import org.ekstep.genieservices.commons.AndroidLogger;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IDeviceInfo;
 import org.ekstep.genieservices.commons.IDownloadManager;
+import org.ekstep.genieservices.commons.ILocationInfo;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.download.DownloadServiceImpl;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
@@ -288,6 +289,10 @@ public class GenieService {
 
     public IDownloadManager getDownloadManager() {
         return mAppContext.getDownloadManager();
+    }
+
+    public ILocationInfo getLocationInfo() {
+        return mAppContext.getLocationInfo();
     }
 
     public FileImporter getFileImporter() {
