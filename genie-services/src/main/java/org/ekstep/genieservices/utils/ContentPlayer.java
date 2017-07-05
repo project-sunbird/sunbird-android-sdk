@@ -8,6 +8,7 @@ import android.widget.Toast;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentData;
+import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.ReflectionUtil;
 import org.ekstep.genieservices.content.ContentConstants;
@@ -75,7 +76,7 @@ public class ContentPlayer {
 
         intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_ORIGIN, "Genie");
         intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_MODE, "play");
-        if (content.getHierarchyInfo() != null) {
+        if (!CollectionUtil.isNullOrEmpty(content.getHierarchyInfo())) {
             intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_CONTENT_EXTRAS, GsonUtil.toJson(content.getHierarchyInfo()));
         }
         intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_APP_INFO, GsonUtil.toJson(contentData));
