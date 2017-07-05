@@ -53,7 +53,7 @@ public class RelatedContentRequest {
             this.limit = DEFAULT_LIMIT;
         }
 
-        public Builder forContentId(String contentId) {
+        public Builder forContent(String contentId) {
             this.contentId = contentId;
             return this;
         }
