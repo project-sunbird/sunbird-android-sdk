@@ -824,7 +824,7 @@ public class ContentHandler {
         requestMap.put("query", criteria.getQuery());
         requestMap.put("limit", criteria.getLimit());
         requestMap.put("mode", criteria.getMode());
-        requestMap.put("facets", criteria.getFacets());
+        requestMap.put("facets", Arrays.asList(criteria.getFacets()));
         addSortCriteria(requestMap, criteria);
         if (SearchType.SEARCH.equals(criteria.getSearchType())) {
             requestMap.put("filters", getSearchRequest(appContext, configService, criteria));
@@ -849,9 +849,9 @@ public class ContentHandler {
 
         // Populating implicit search criteria.
         filterMap.put("compatibilityLevel", getCompatibilityLevelFilter(appContext));
-        filterMap.put("status", criteria.getContentStatusArray());
+        filterMap.put("status", Arrays.asList(criteria.getContentStatusArray()));
         filterMap.put("objectType", Collections.singletonList("Content"));
-        filterMap.put("contentType", criteria.getContentTypes());
+        filterMap.put("contentType", Arrays.asList(criteria.getContentTypes()));
 
         //Add filters for criteria attributes
         // Add subject filter
