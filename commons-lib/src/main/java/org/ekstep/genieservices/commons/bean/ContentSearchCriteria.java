@@ -14,9 +14,6 @@ public class ContentSearchCriteria implements Serializable {
     private static final int DEFAULT_LIMIT = 100;
 
     private String query;
-    private List<ContentSearchFilter> facetFilters;
-    private List<ContentSearchFilter> impliedFilters;
-    private List<ContentSortCriteria> sortCriteria;
     private long limit;
     private String mode;
     private int age;
@@ -28,6 +25,9 @@ public class ContentSearchCriteria implements Serializable {
     private String[] contentStatusArray;
     private String[] facets;
     private String[] contentTypes;
+    private List<ContentSearchFilter> facetFilters;
+    private List<ContentSearchFilter> impliedFilters;
+    private List<ContentSortCriteria> sortCriteria;
     // 1 - indicates search, 2 - filter
     private SearchType searchType;
 
@@ -102,6 +102,10 @@ public class ContentSearchCriteria implements Serializable {
         return contentTypes;
     }
 
+    public List<ContentSearchFilter> getFacetFilters() {
+        return facetFilters;
+    }
+
     public List<ContentSearchFilter> getImpliedFilters() {
         return impliedFilters;
     }
@@ -112,10 +116,6 @@ public class ContentSearchCriteria implements Serializable {
 
     public SearchType getSearchType() {
         return searchType;
-    }
-
-    public List<ContentSearchFilter> getFacetFilters() {
-        return facetFilters;
     }
 
     public long getLimit() {
@@ -187,6 +187,9 @@ public class ContentSearchCriteria implements Serializable {
             return this;
         }
 
+        /**
+         * Array of audience. i.e. "Learner", "Instructor".
+         */
         public SearchBuilder audience(String[] audience) {
             this.audience = audience;
             return this;
@@ -197,11 +200,25 @@ public class ContentSearchCriteria implements Serializable {
             return this;
         }
 
+        /**
+         * Array of status. i.e. "Live", "Draft"
+         */
         public SearchBuilder contentStatusArray(String[] contentStatusArray) {
             this.contentStatusArray = contentStatusArray;
             return this;
         }
 
+        /**
+         * Array of facets. i.e. "contentType", "domain", "ageGroup", "language", "gradeLevel"
+         */
+        public SearchBuilder facets(String[] facets) {
+            this.facets = facets;
+            return this;
+        }
+
+        /**
+         * Array of contentTypes. i.e. "Story", "Worksheet", "Game", "Collection", "TextBook", "Course", "LessonPlan".
+         */
         public SearchBuilder contentTypes(String[] contentTypes) {
             this.contentTypes = contentTypes;
             return this;

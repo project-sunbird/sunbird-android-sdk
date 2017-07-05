@@ -6,7 +6,7 @@ import org.ekstep.genieservices.GenieService;
 public class GenieAsyncService {
 
     private static GenieService sService;
-    private static GenieAsyncService sGenieAsyncService;
+
     private static ConfigService sConfigService;
     private static SyncService sSyncService;
     private static TelemetryService sTelemetryService;
@@ -16,16 +16,12 @@ public class GenieAsyncService {
     private static NotificationService sNotificationService;
     private static SummarizerService sSummarizerService;
 
-    public static GenieAsyncService getAsyncService() {
-        if (sGenieAsyncService == null) {
-            sGenieAsyncService = new GenieAsyncService();
-        }
-        return sGenieAsyncService;
+    private GenieAsyncService(GenieService genieService) {
+        sService = genieService;
     }
 
-    public static void init(GenieService genieService) {
-        sService = genieService;
-        sGenieAsyncService = new GenieAsyncService();
+    public static GenieAsyncService init(GenieService genieService) {
+        return new GenieAsyncService(genieService);
     }
 
     public ConfigService getConfigService() {

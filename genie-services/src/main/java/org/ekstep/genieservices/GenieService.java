@@ -64,7 +64,7 @@ public class GenieService {
     }
 
     public static GenieAsyncService getAsyncService() {
-        return GenieAsyncService.getAsyncService();
+        return sAsyncService;
     }
 
     public static GenieService init(Context context, String packageName) {
@@ -79,7 +79,7 @@ public class GenieService {
             sService = new GenieService(applicationContext);
         }
 
-        GenieAsyncService.init(sService);
+        sAsyncService = GenieAsyncService.init(sService);
 
         return sService;
     }
