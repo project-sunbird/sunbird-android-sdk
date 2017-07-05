@@ -59,7 +59,7 @@ public class RelatedContentUriHandler implements IUriHandler {
 
             GenieResponse genieResponse = null;
             if (hierarchyData != null && hierarchyData.size() == 1) {
-                RelatedContentRequest request = new RelatedContentRequest.Builder().forContentId(hierarchyData.get(0).get("identifier").toString()).build();
+                RelatedContentRequest request = new RelatedContentRequest.Builder().forContent(hierarchyData.get(0).get("identifier").toString()).build();
                 genieResponse = genieService.getContentService().getRelatedContent(request);
             } else if (hierarchyData != null && hierarchyData.size() > 1) {
                 // TODO: 29/5/17 NEED TO DECIDE RESULT MAP KEY FOR NEXT CONTENT
