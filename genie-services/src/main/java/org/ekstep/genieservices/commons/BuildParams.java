@@ -60,12 +60,20 @@ public class BuildParams implements IParams {
     }
 
     private void initCompatibilityLevel(String packageName) {
-        int minCompatibilityLevel = BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.MIN_COMPATIBILITY_LEVEL);
+        Object min = BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.MIN_COMPATIBILITY_LEVEL);
+        int minCompatibilityLevel = 0;
+        if (min != null) {
+            minCompatibilityLevel = (int) min;
+        }
         if (minCompatibilityLevel <= 0) {
             minCompatibilityLevel = 1;
         }
 
-        int maxCompatibilityLevel = BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.MAX_COMPATIBILITY_LEVEL);
+        Object max = BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.MAX_COMPATIBILITY_LEVEL);
+        int maxCompatibilityLevel = 0;
+        if (max != null) {
+            maxCompatibilityLevel = (int) max;
+        }
         if (maxCompatibilityLevel <= 0) {
             maxCompatibilityLevel = 3;
         }
