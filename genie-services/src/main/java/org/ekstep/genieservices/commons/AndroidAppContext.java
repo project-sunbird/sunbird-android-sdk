@@ -41,7 +41,8 @@ public class AndroidAppContext extends AppContext<Context> {
         appContext.setHttpClientFactory(new AndroidHttpClientFactory(appContext));
         appContext.setKeyValueStore(new PreferenceWrapper(context, SHARED_PREFERENCE_NAME));
         appContext.setDeviceInfo(new DeviceInfo(context));
-        appContext.setLocationInfo(new LocationInfo(context));
+        // Initialize this after KeyValueStore initialization.
+        appContext.setLocationInfo(new LocationInfo(appContext));
         appContext.setDownloadManager(new AndroidDownloadManager(context));
         appContext.setAPKInstaller(new APKInstaller(appContext));
         return appContext;
