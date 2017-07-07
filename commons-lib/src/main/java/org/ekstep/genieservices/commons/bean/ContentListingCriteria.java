@@ -13,11 +13,14 @@ public class ContentListingCriteria {
     private int grade;
     private String medium;
     private String board;
+    private String did;
     private String[] audience;
     private String[] channel;
-    private String did;
+    private String[] facets;
 
-    private ContentListingCriteria(String contentListingId, String uid, String language, String subject, int age, int grade, String medium, String board, String did, String[] audience, String[] channel) {
+    private ContentListingCriteria(String contentListingId, String uid, String language, String subject,
+                                   int age, int grade, String medium, String board, String did,
+                                   String[] audience, String[] channel, String[] facets) {
         this.contentListingId = contentListingId;
         this.uid = uid;
         this.language = language;
@@ -26,9 +29,10 @@ public class ContentListingCriteria {
         this.grade = grade;
         this.medium = medium;
         this.board = board;
+        this.did = did;
         this.audience = audience;
         this.channel = channel;
-        this.did = did;
+        this.facets = facets;
     }
 
     public String getContentListingId() {
@@ -63,6 +67,10 @@ public class ContentListingCriteria {
         return board;
     }
 
+    public String getDid() {
+        return did;
+    }
+
     public String[] getAudience() {
         return audience;
     }
@@ -71,8 +79,8 @@ public class ContentListingCriteria {
         return channel;
     }
 
-    public String getDid() {
-        return did;
+    public String[] getFacets() {
+        return facets;
     }
 
     public static class Builder {
@@ -84,9 +92,10 @@ public class ContentListingCriteria {
         private int grade;
         private String medium;
         private String board;
+        private String did;
         private String[] audience;
         private String[] channel;
-        private String did;
+        private String[] facets;
 
         public Builder listingId(String contentListingId) {
             this.contentListingId = contentListingId;
@@ -143,8 +152,19 @@ public class ContentListingCriteria {
             return this;
         }
 
+        /**
+         * Array of facets. i.e. "contentType", "domain", "ageGroup", "language", "gradeLevel"
+         */
+        public Builder facets(String[] facets) {
+            this.facets = facets;
+            return this;
+        }
+
         public ContentListingCriteria build() {
-            return new ContentListingCriteria(contentListingId, uid, language, subject, age, grade, medium, board, did, audience, channel);
+            if (facets == null || facets.length == 0) {
+                this.facets = new String[]{"contentType", "domain", "ageGroup", "language", "gradeLevel"};
+            }
+            return new ContentListingCriteria(contentListingId, uid, language, subject, age, grade, medium, board, did, audience, channel, facets);
         }
     }
 }
