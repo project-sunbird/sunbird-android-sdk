@@ -128,7 +128,7 @@ public class LocationInfo implements ILocationInfo {
     @Override
     public String getLocation() {
         String locationString = "";
-        if (DateUtil.getTimeDifferenceInHours(mAppContext.getKeyValueStore().getLong(LAST_KNOWN_LOCATION_TIME, 0), System.currentTimeMillis()) < 2) {    // If hour difference is less than 2 hours than set the lat long.
+        if (DateUtil.getTimeDifferenceInHours(mAppContext.getKeyValueStore().getLong(LAST_KNOWN_LOCATION_TIME, 0), System.currentTimeMillis()) < 12) {    // If hour difference is less than 12 hours than set the lat long.
             locationString = mAppContext.getKeyValueStore().getString(LAST_KNOWN_LOCATION, "");
         }
         return locationString;
@@ -171,11 +171,9 @@ public class LocationInfo implements ILocationInfo {
         // Set the update interval
         mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
 
-        // Use high accuracy
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        // Set the priority
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
 
-        // Use low power
-        // mLocationRequest.setPriority(PRIORITY_LOW_POWER);
         // Set the interval Fastest interval
         mLocationRequest.setFastestInterval(FAST_INTERVAL_CEILING_IN_MILLISECONDS);
     }
