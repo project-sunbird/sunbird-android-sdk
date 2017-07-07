@@ -118,7 +118,9 @@ public class DownloadServiceImpl implements IDownloadService {
         DownloadRequest request = mDownloadQueueManager.getRequestByIdentifier(identifier);
         if (request != null) {
             if (request.getDownloadId() != -1) {
-                mExecutor.shutdown();
+                if (mExecutor != null) {
+                    mExecutor.shutdown();
+                }
                 mDownloadManager.cancel(request.getDownloadId());
                 mDownloadQueueManager.removeFromCurrentDownloadQueue(identifier);
             }
@@ -148,7 +150,7 @@ public class DownloadServiceImpl implements IDownloadService {
             } else {
                 progress = mDownloadManager.getProgress(request.getDownloadId());
                 if (progress.getStatus() == IDownloadManager.COMPLETED) {
-                    progress.setDownloadPath(mDownloadManager.getDownloadPath(request.getDownloadId()));
+                    progress.setDownloadPath(mDownloadManager.getDownloadPath(request.getDownloadId(), request.getDestinationFolder()));
                 }
             }
         }

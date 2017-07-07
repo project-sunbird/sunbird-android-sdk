@@ -78,7 +78,7 @@ public class AndroidDownloadManager implements IDownloadManager {
     }
 
     @Override
-    public String getDownloadPath(long downloadId) {
+    public String getDownloadPath(long downloadId, String destinationFolder) {
         String downloadPath = null;
         android.app.DownloadManager.Query query = new android.app.DownloadManager.Query();
         query.setFilterById(downloadId);
@@ -93,7 +93,7 @@ public class AndroidDownloadManager implements IDownloadManager {
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
-                    downloadPath = FileUtil.getDownloadedFileLocation(new ParcelFileDescriptor.AutoCloseInputStream(fileDescriptor));
+                    downloadPath = FileUtil.getDownloadedFileLocation(new ParcelFileDescriptor.AutoCloseInputStream(fileDescriptor), destinationFolder);
                 } else {
 
                     String filepath = cursor.getString(cursor.getColumnIndex(android.app.DownloadManager.COLUMN_LOCAL_URI));
