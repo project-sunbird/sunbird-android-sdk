@@ -829,7 +829,7 @@ public class ContentHandler {
         if (SearchType.SEARCH.equals(criteria.getSearchType())) {
             requestMap.put("filters", getSearchRequest(appContext, configService, criteria));
         } else {
-            requestMap.put("filters", getFilterRequest(appContext, configService, criteria));
+            requestMap.put("filters", getFilterRequest(appContext, criteria));
         }
         return requestMap;
     }
@@ -887,7 +887,7 @@ public class ContentHandler {
         return filterMap;
     }
 
-    private static Map<String, Object> getFilterRequest(AppContext appContext, IConfigService configService, ContentSearchCriteria criteria) {
+    private static Map<String, Object> getFilterRequest(AppContext appContext, ContentSearchCriteria criteria) {
         Map<String, Object> filterMap = new HashMap<>();
         filterMap.put("compatibilityLevel", getCompatibilityLevelFilter(appContext));
         if (criteria.getFacetFilters() != null) {
@@ -918,6 +918,10 @@ public class ContentHandler {
                     filterMap.put(filter.getName(), filterValueList);
                 }
             }
+        }
+
+        if (!filterMap.containsKey("contentType")) {
+            filterMap.put("contentType", Arrays.asList(criteria.getContentTypes()));
         }
 
         return filterMap;
@@ -976,8 +980,11 @@ public class ContentHandler {
     public static ContentSearchCriteria createFilterCriteria(IConfigService configService, ContentSearchCriteria previousCriteria, List<Map<String, Object>> facets, Map<String, Object> appliedFilterMap) {
         List<ContentSearchFilter> facetFilters = new ArrayList<>();
         ContentSearchCriteria.FilterBuilder filterBuilder = new ContentSearchCriteria.FilterBuilder();
-        filterBuilder.query(previousCriteria.getQuery()).limit(previousCriteria.getLimit());
-        filterBuilder.sort(previousCriteria.getSortCriteria() == null ? new ArrayList<ContentSortCriteria>() : previousCriteria.getSortCriteria());
+        filterBuilder.query(previousCriteria.getQuery())
+                .limit(previousCriteria.getLimit())
+                .contentTypes(previousCriteria.getContentTypes())
+                .sort(previousCriteria.getSortCriteria() == null ? new ArrayList<ContentSortCriteria>() : previousCriteria.getSortCriteria());
+
         if ("soft".equals(previousCriteria.getMode())) {
             filterBuilder.softFilters();
         }
@@ -1263,6 +1270,11 @@ public class ContentHandler {
 
                 if (searchMap.containsKey("filters")) {
                     Map filtersMap = (Map) searchMap.get("filters");
+                    if (filtersMap.containsKey("contentType")) {
+                        ArrayList<String> contentType = (ArrayList<String>) filtersMap.get("contentType");
+                        builder.contentTypes(contentType.toArray(new String[contentType.size()]));
+                    }
+
                     builder.impliedFilters(mapFilterValues(filtersMap));
                 }
 

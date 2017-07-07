@@ -50,13 +50,14 @@ public class ContentSearchCriteria implements Serializable {
         this.searchType = searchType;
     }
 
-    private ContentSearchCriteria(String query, long limit, String mode, String[] facets,
+    private ContentSearchCriteria(String query, long limit, String mode, String[] facets, String[] contentTypes,
                                   List<ContentSearchFilter> facetFilters, List<ContentSearchFilter> impliedFilters,
                                   List<ContentSortCriteria> sortCriteria, SearchType searchType) {
         this.query = query;
         this.limit = limit;
         this.mode = mode;
         this.facets = facets;
+        this.contentTypes = contentTypes;
         this.facetFilters = facetFilters;
         this.impliedFilters = impliedFilters;
         this.sortCriteria = sortCriteria;
@@ -250,6 +251,7 @@ public class ContentSearchCriteria implements Serializable {
         private long limit;
         private String mode;
         private String[] facets;
+        private String[] contentTypes;
         private List<ContentSearchFilter> facetFilters;
         private List<ContentSearchFilter> impliedFilters;
         private List<ContentSortCriteria> sortCriteria;
@@ -277,6 +279,14 @@ public class ContentSearchCriteria implements Serializable {
             return this;
         }
 
+        /**
+         * Array of contentTypes. i.e. "Story", "Worksheet", "Game", "Collection", "TextBook", "Course", "LessonPlan".
+         */
+        public FilterBuilder contentTypes(String[] contentTypes) {
+            this.contentTypes = contentTypes;
+            return this;
+        }
+
         public FilterBuilder impliedFilters(List<ContentSearchFilter> impliedFilters) {
             this.impliedFilters = impliedFilters;
             return this;
@@ -301,7 +311,12 @@ public class ContentSearchCriteria implements Serializable {
             if (facets == null || facets.length == 0) {
                 this.facets = new String[]{"contentType", "domain", "ageGroup", "language", "gradeLevel"};
             }
-            return new ContentSearchCriteria(query, limit, mode, facets, facetFilters, impliedFilters, sortCriteria, SearchType.FILTER);
+
+            if (contentTypes == null || contentTypes.length == 0) {
+                this.contentTypes = new String[]{"Story", "Worksheet", "Collection", "Game", "TextBook"};
+            }
+
+            return new ContentSearchCriteria(query, limit, mode, facets, contentTypes, facetFilters, impliedFilters, sortCriteria, SearchType.FILTER);
         }
     }
 }
