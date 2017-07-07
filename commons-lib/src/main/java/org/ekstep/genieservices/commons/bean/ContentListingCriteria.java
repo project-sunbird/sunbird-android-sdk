@@ -107,7 +107,7 @@ public class ContentListingCriteria {
             return this;
         }
 
-        public Builder byLanguage(String language) {
+        public Builder forLanguage(String language) {
             this.language = language;
             return this;
         }
