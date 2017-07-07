@@ -36,6 +36,7 @@ import org.ekstep.genieservices.commons.bean.enums.SortOrder;
 import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.contract.ContentEntry;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -1069,7 +1070,7 @@ public class ContentHandler {
     }
 
     private static int indexOf(List<String> facetsOrder, String key) {
-        if (!StringUtil.isNullOrEmpty(key)) {
+        if (!CollectionUtil.isNullOrEmpty(facetsOrder) && !StringUtil.isNullOrEmpty(key)) {
             for (int i = 0; i < facetsOrder.size(); i++) {
                 if (key.equalsIgnoreCase(facetsOrder.get(i))) {
                     return i;
