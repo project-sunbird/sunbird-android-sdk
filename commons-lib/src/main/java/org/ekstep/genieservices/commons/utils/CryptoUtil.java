@@ -33,6 +33,7 @@ public class CryptoUtil {
     public static String checksum(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         MessageDigest md = null;
         md = MessageDigest.getInstance("SHA-1");
+        md.update(text.getBytes("iso-8859-1"), 0, text.length());
         byte[] sha1hash = md.digest();
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < sha1hash.length; i++) {
