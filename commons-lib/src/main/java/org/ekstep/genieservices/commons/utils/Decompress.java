@@ -30,8 +30,6 @@ public class Decompress {
             ZipInputStream zipInputStream = new ZipInputStream(fileInputStream);
             ZipEntry ze = null;
             while ((ze = zipInputStream.getNextEntry()) != null) {
-                System.out.println(TAG + " Unzipping " + ze.getName());
-
                 if (ze.isDirectory()) {
                     FileUtil.createFolders(loc.getPath(), ze.getName());
                 } else {

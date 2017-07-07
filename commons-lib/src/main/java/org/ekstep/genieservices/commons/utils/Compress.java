@@ -24,7 +24,6 @@ public class Compress {
     private final File zipFile;
     private final File sourcePath;
     private String fileIdentifier;
-    private boolean firstPass;
 
     public Compress(File sourcePath, File zipFile) {
         this.sourcePath = sourcePath;
@@ -92,8 +91,6 @@ public class Compress {
                     String unmodifiedFilePath = file.getPath();
                     String relativePath = unmodifiedFilePath.substring(basePathLength);
                     relativePath = relativePath.substring(relativePath.indexOf("/", 1), relativePath.length());
-
-                    System.out.println(TAG + ": ZIP SUBFOLDER -- Relative Path : " + relativePath);
 
                     FileInputStream fi = new FileInputStream(unmodifiedFilePath);
                     origin = new BufferedInputStream(fi, BUFFER);
