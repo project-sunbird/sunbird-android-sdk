@@ -102,7 +102,7 @@ public class ContentListingCriteria {
             return this;
         }
 
-        public Builder byUser(String uid) {
+        public Builder forUser(String uid) {
             this.uid = uid;
             return this;
         }
