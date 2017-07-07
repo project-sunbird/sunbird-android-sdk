@@ -50,12 +50,13 @@ public class ContentSearchCriteria implements Serializable {
         this.searchType = searchType;
     }
 
-    private ContentSearchCriteria(String query, long limit, String mode,
+    private ContentSearchCriteria(String query, long limit, String mode, String[] facets,
                                   List<ContentSearchFilter> facetFilters, List<ContentSearchFilter> impliedFilters,
                                   List<ContentSortCriteria> sortCriteria, SearchType searchType) {
         this.query = query;
         this.limit = limit;
         this.mode = mode;
+        this.facets = facets;
         this.facetFilters = facetFilters;
         this.impliedFilters = impliedFilters;
         this.sortCriteria = sortCriteria;
@@ -248,6 +249,7 @@ public class ContentSearchCriteria implements Serializable {
         private String query;
         private long limit;
         private String mode;
+        private String[] facets;
         private List<ContentSearchFilter> facetFilters;
         private List<ContentSearchFilter> impliedFilters;
         private List<ContentSortCriteria> sortCriteria;
@@ -264,6 +266,14 @@ public class ContentSearchCriteria implements Serializable {
 
         public FilterBuilder limit(long limit) {
             this.limit = limit;
+            return this;
+        }
+
+        /**
+         * Array of facets. i.e. "contentType", "domain", "ageGroup", "language", "gradeLevel"
+         */
+        public FilterBuilder facets(String[] facets) {
+            this.facets = facets;
             return this;
         }
 
@@ -288,7 +298,10 @@ public class ContentSearchCriteria implements Serializable {
         }
 
         public ContentSearchCriteria build() {
-            return new ContentSearchCriteria(query, limit, mode, facetFilters, impliedFilters, sortCriteria, SearchType.FILTER);
+            if (facets == null || facets.length == 0) {
+                this.facets = new String[]{"contentType", "domain", "ageGroup", "language", "gradeLevel"};
+            }
+            return new ContentSearchCriteria(query, limit, mode, facets, facetFilters, impliedFilters, sortCriteria, SearchType.FILTER);
         }
     }
 }

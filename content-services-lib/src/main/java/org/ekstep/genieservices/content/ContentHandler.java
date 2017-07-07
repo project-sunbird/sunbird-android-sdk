@@ -1199,7 +1199,7 @@ public class ContentHandler {
         contentListingModel.save();
     }
 
-    public static ContentListing getContentListingResult(IDBSession dbSession, ContentListingCriteria contentListingCriteria, String jsonStr) {
+    public static ContentListing getContentListingResult(ContentListingCriteria contentListingCriteria, String jsonStr) {
         ContentListing contentListing = null;
 
         LinkedTreeMap map = GsonUtil.fromJson(jsonStr, LinkedTreeMap.class);
@@ -1216,14 +1216,14 @@ public class ContentHandler {
             contentListing.setContentListingId(contentListingCriteria.getContentListingId());
             contentListing.setResponseMessageId(responseMessageId);
             if (result.containsKey("page")) {
-                contentListing.setContentListingSections(getSectionsFromPageMap(dbSession, (Map<String, Object>) result.get("page"), contentListingCriteria));
+                contentListing.setContentListingSections(getSectionsFromPageMap((Map<String, Object>) result.get("page")));
             }
         }
 
         return contentListing;
     }
 
-    private static List<ContentListingSection> getSectionsFromPageMap(IDBSession dbSession, Map<String, Object> pageMap, ContentListingCriteria contentListingCriteria) {
+    private static List<ContentListingSection> getSectionsFromPageMap(Map<String, Object> pageMap) {
         List<ContentListingSection> contentListingSectionList = new ArrayList<>();
 
         List<Map<String, Object>> sections = (List<Map<String, Object>>) pageMap.get("sections");
@@ -1264,6 +1264,11 @@ public class ContentHandler {
                 if (searchMap.containsKey("filters")) {
                     Map filtersMap = (Map) searchMap.get("filters");
                     builder.impliedFilters(mapFilterValues(filtersMap));
+                }
+
+                if (searchMap.containsKey("facets")) {
+                    ArrayList<String> facets = (ArrayList<String>) searchMap.get("facets");
+                    builder.facets(facets.toArray(new String[facets.size()]));
                 }
 
                 contentSearchCriteria = builder.build();

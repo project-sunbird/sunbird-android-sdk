@@ -286,7 +286,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         }
 
         if (jsonStr != null) {
-            ContentListing contentListing = ContentHandler.getContentListingResult(mAppContext.getDBSession(), contentListingCriteria, jsonStr);
+            ContentListing contentListing = ContentHandler.getContentListingResult(contentListingCriteria, jsonStr);
             if (contentListing != null) {
                 GenieResponse<ContentListing> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
                 response.setResult(contentListing);
