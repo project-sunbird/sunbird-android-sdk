@@ -5,13 +5,13 @@ package org.ekstep.genieservices.commons.bean.enums;
  *
  * @author anil
  */
-public enum ContentAccessStatusType {
+public enum ContentAccessStatus {
 
     NOT_PLAYED(0), PLAYED(1);
 
     private int value;
 
-    ContentAccessStatusType(int value) {
+    ContentAccessStatus(int value) {
         this.value = value;
     }
 

@@ -15,7 +15,7 @@ import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
-import org.ekstep.genieservices.commons.bean.enums.ContentAccessStatusType;
+import org.ekstep.genieservices.commons.bean.enums.ContentAccessStatus;
 import org.ekstep.genieservices.commons.bean.telemetry.GECreateProfile;
 import org.ekstep.genieservices.commons.bean.telemetry.GECreateUser;
 import org.ekstep.genieservices.commons.bean.telemetry.GEDeleteProfile;
@@ -481,7 +481,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         if (contentAccessModelInDb == null) {
             ContentAccessModel contentAccessModel = ContentAccessModel.build(mAppContext.getDBSession(),
                     uid, contentAccess.getContentId(), contentLearnerState);
-            contentAccessModel.setStatus(ContentAccessStatusType.PLAYED.getValue());
+            contentAccessModel.setStatus(ContentAccessStatus.PLAYED.getValue());
 
             contentAccessModel.save();
         } else {
