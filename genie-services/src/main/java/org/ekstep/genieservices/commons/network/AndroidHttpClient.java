@@ -1,6 +1,5 @@
 package org.ekstep.genieservices.commons.network;
 
-import com.squareup.okhttp.Authenticator;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -18,14 +17,14 @@ import java.util.concurrent.TimeUnit;
 
 public class AndroidHttpClient implements IHttpClient {
 
-    private OkHttpClient httpClient;
+    private OkHttpClient mHttpClient;
     private Request.Builder requestBuilder;
 
-    private Authenticator authenticator;
+    private IHttpAuthenticator authenticator;
 
-    public AndroidHttpClient(Authenticator authenticator) {
+    public AndroidHttpClient(IHttpAuthenticator authenticator) {
         this.authenticator = authenticator;
-        this.httpClient = new OkHttpClient();
+        this.mHttpClient = new OkHttpClient();
     }
 
     @Override
@@ -50,28 +49,28 @@ public class AndroidHttpClient implements IHttpClient {
     public ApiResponse doGet() throws IOException {
         requestBuilder.get();
         Request request = requestBuilder.build();
-        Response response = httpClient.newCall(request).execute();
-        return new ApiResponse(response.isSuccessful(), response.body() != null ? response.body().string() : "");
+        Response response = mHttpClient.newCall(request).execute();
+        return new ApiResponse(response.isSuccessful(), response.body() != null ? response.body().string() : "", response.code());
     }
 
     @Override
     public ApiResponse doPost(byte[] requestBody) throws IOException {
         requestBuilder.post(RequestBody.create(MediaType.parse("application/json"), requestBody));
         Request request = requestBuilder.build();
-        Response response = httpClient.newCall(request).execute();
-        return new ApiResponse(response.isSuccessful(), response.body() != null ? response.body().string() : "");
+        Response response = mHttpClient.newCall(request).execute();
+        return new ApiResponse(response.isSuccessful(), response.body() != null ? response.body().string() : "", response.code());
     }
 
     @Override
     public Void setTimeouts(int connectionTimeout, int readTimeout) {
-        httpClient.setConnectTimeout(NetworkConstants.NETWORK_CONNECT_TIMEOUT_MINUTES, TimeUnit.MINUTES);
-        httpClient.setReadTimeout(NetworkConstants.NETWORK_READ_TIMEOUT_MINUTES, TimeUnit.MINUTES);
+        mHttpClient.setConnectTimeout(NetworkConstants.NETWORK_CONNECT_TIMEOUT_MINUTES, TimeUnit.MINUTES);
+        mHttpClient.setReadTimeout(NetworkConstants.NETWORK_READ_TIMEOUT_MINUTES, TimeUnit.MINUTES);
         return null;
     }
 
     @Override
-    public Void handleAuth() {
-        httpClient.setAuthenticator(authenticator);
+    public Void setAuthHeaders() {
+        setHeaders(authenticator.getAuthHeaders());
         return null;
     }
 

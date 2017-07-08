@@ -2,6 +2,7 @@ package org.ekstep.genieservices.commons.utils;
 
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -18,6 +19,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
+import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
@@ -29,6 +31,7 @@ public class CryptoUtil {
     private static final String ALGO = "RSA";
     private static final String CIPHER_ALGO = "RSA/ECB/PKCS1Padding";
     private static final String TAG = "org.ekstep.genieservices.util-CryptoUtil";
+    private static final Charset US_ASCII = Charset.forName("US-ASCII");
 
     public static String checksum(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         MessageDigest md = null;
@@ -179,4 +182,16 @@ public class CryptoUtil {
         return new IvParameterSpec(realIV);
     }
 
+    public static byte[] generateHMAC(String payLoad, byte[] key, String algorithm) {
+        Mac mac;
+        byte[] signature;
+        try {
+            mac = Mac.getInstance(algorithm);
+            mac.init(new SecretKeySpec(key, algorithm));
+            signature = mac.doFinal(payLoad.getBytes(US_ASCII));
+        } catch (NoSuchAlgorithmException | InvalidKeyException  e) {
+            return null;
+        }
+        return signature;
+    }
 }

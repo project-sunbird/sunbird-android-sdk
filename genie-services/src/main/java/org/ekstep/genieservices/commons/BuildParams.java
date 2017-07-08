@@ -45,6 +45,9 @@ public class BuildParams implements IParams {
         put(ServiceConstants.Params.API_USER, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.API_USER));
         put(ServiceConstants.Params.API_PASS, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.API_PASS));
         put(ServiceConstants.Params.GID, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.GID));
+        put(ServiceConstants.Params.MOBILE_APP_SECRET, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.MOBILE_APP_SECRET));
+        put(ServiceConstants.Params.MOBILE_APP_KEY, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.MOBILE_APP_KEY));
+        put(ServiceConstants.Params.MOBILE_APP_CONSUMER, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.MOBILE_APP_CONSUMER));
         put(ServiceConstants.Params.LOG_LEVEL, LogLevel.getLogLevel(BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.LOG_LEVEL)).getLevel());
 
         initCompatibilityLevel(packageName);

@@ -47,6 +47,9 @@ public interface ServiceConstants {
         String ANALYTICS_BASE_URL = "ANALYTICS_BASE_URL";
         String API_PASS = "API_PASS";
         String API_USER = "API_USER";
+        String MOBILE_APP_SECRET = "MOBILE_APP_SECRET";
+        String MOBILE_APP_KEY = "MOBILE_APP_KEY";
+        String MOBILE_APP_CONSUMER = "MOBILE_APP_CONSUMER";
         String GID = "GID";
         String LOG_LEVEL = "LOG_LEVEL";
         String MIN_COMPATIBILITY_LEVEL = "MIN_COMPATIBILITY_LEVEL";
@@ -216,5 +219,9 @@ public interface ServiceConstants {
         String CONTENT_ITEMS_KEY = "contents";
         String FILE_SIZE = "FILE_SIZE";
         String FILE_TYPE = "FILE_TYPE";
+    }
+
+    interface Network {
+
     }
 }
