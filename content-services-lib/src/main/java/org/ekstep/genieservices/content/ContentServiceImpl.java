@@ -430,12 +430,12 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             LinkedTreeMap result = (LinkedTreeMap) map.get("result");
 
             String responseMessageId = null;
-            if (responseParams.containsKey("resmsgid")) {
+            if (responseParams != null && responseParams.containsKey("resmsgid")) {
                 responseMessageId = (String) responseParams.get("resmsgid");
             }
 
             List<Map<String, Object>> contentDataList = null;
-            if (result.containsKey("content")) {
+            if (result != null && result.containsKey("content")) {
                 contentDataList = (List<Map<String, Object>>) result.get("content");
             }
 
