@@ -41,7 +41,6 @@ public class ExtractPayloads implements IChainable {
         int contentState = ContentConstants.State.ONLY_SPINE;
         String oldContentPath;
         String artifactUrl, iconURL, posterImage, grayScaleAppIcon, uuid, destination;
-        Decompress stage2;
         File payload;
         File payloadDestination = null;
         ContentModel oldContentModel;
@@ -137,8 +136,7 @@ public class ExtractPayloads implements IChainable {
                         boolean unzipSuccess = false;
                         if (!StringUtil.isNullOrEmpty(artifactUrl)) {
                             payload = new File(importContext.getTmpLocation().getPath(), "/" + artifactUrl);
-                            stage2 = new Decompress(payload, payloadDestination);
-                            unzipSuccess = stage2.unzip();
+                            unzipSuccess = Decompress.unzip(payload, payloadDestination);
                         }
 
                         // Add or update the content_state

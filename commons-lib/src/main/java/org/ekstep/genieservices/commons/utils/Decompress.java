@@ -13,25 +13,17 @@ import java.util.zip.ZipInputStream;
  * @author anil
  */
 public class Decompress {
-    private static final String TAG = "service-Decompress";
-    private File zip;
-    private File loc;
 
-    public Decompress(File zipFile, File location) {
-        zip = zipFile;
-        loc = location;
+    public static boolean unzip(File zipFile, File destinationFolder) {
+        FileUtil.createFolders(destinationFolder.getPath(), "");
 
-        FileUtil.createFolders(loc.getPath(), "");
-    }
-
-    public boolean unzip() {
         try {
-            FileInputStream fileInputStream = new FileInputStream(zip);
+            FileInputStream fileInputStream = new FileInputStream(zipFile);
             ZipInputStream zipInputStream = new ZipInputStream(fileInputStream);
-            ZipEntry ze = null;
+            ZipEntry ze;
             while ((ze = zipInputStream.getNextEntry()) != null) {
                 if (ze.isDirectory()) {
-                    FileUtil.createFolders(loc.getPath(), ze.getName());
+                    FileUtil.createFolders(destinationFolder.getPath(), ze.getName());
                 } else {
                     String relativeFilePath = ze.getName();
                     if (StringUtil.isNullOrEmpty(relativeFilePath)) {
@@ -40,10 +32,10 @@ public class Decompress {
 
                     if (relativeFilePath.contains("/")) {
                         String folderContainingFile = relativeFilePath.substring(0, relativeFilePath.lastIndexOf("/"));
-                        FileUtil.createFolders(loc.getPath(), folderContainingFile);
+                        FileUtil.createFolders(destinationFolder.getPath(), folderContainingFile);
                     }
 
-                    FileOutputStream fileOutputStream = new FileOutputStream(new File(loc, ze.getName()));
+                    FileOutputStream fileOutputStream = new FileOutputStream(new File(destinationFolder, ze.getName()));
                     BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
                     byte[] readBytes = new byte[1024];
                     int readSize;
@@ -64,5 +56,4 @@ public class Decompress {
             return false;
         }
     }
-
 }

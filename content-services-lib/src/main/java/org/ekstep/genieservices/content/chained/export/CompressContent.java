@@ -40,7 +40,6 @@ public class CompressContent implements IChainable<ContentExportResponse> {
 
         List<Map<String, Object>> items = importContext.getItems();
         File path;
-        Compress compressWorker;
         File payload;
         String artifactUrl;
 
@@ -64,20 +63,14 @@ public class CompressContent implements IChainable<ContentExportResponse> {
                 payload = new File(importContext.getTmpLocation(), artifactUrl);
                 path = new File(contentModel.getPath());
 
-                if (artifactUrl.contains("." + ServiceConstants.FileExtension.APK)) {
-                    compressWorker = new Compress(path, importContext.getTmpLocation(), artifactUrl);
-                    try {
-                        compressWorker.zipAPK();
-                    } catch (IOException e) {
-                        return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, e.getMessage(), TAG);
+                try {
+                    if (artifactUrl.contains("." + ServiceConstants.FileExtension.APK)) {
+                        Compress.zipAPK(path, importContext.getTmpLocation(), artifactUrl);
+                    } else {
+                        Compress.zip(path, payload);
                     }
-                } else {
-                    compressWorker = new Compress(path, payload);
-                    try {
-                        compressWorker.zip();
-                    } catch (IOException e) {
-                        return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, e.getMessage(), TAG);
-                    }
+                } catch (IOException e) {
+                    return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, e.getMessage(), TAG);
                 }
 
                 iteration++;

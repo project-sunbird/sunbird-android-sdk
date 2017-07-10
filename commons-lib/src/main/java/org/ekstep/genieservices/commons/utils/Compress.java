@@ -18,28 +18,9 @@ import java.util.zip.ZipOutputStream;
  */
 public class Compress {
 
-    private static final String TAG = "Compress";
     private static final int BUFFER = 2048;
 
-    private final File zipFile;
-    private final File sourcePath;
-    private String fileIdentifier;
-
-    public Compress(File sourcePath, File zipFile) {
-        this.sourcePath = sourcePath;
-        this.zipFile = zipFile;
-    }
-
-    public Compress(File sourcePath, File zipFile, String fileIdentifier) {
-        this.sourcePath = sourcePath;
-        this.zipFile = zipFile;
-        this.fileIdentifier = fileIdentifier;
-    }
-
-    public boolean zip() throws IOException {
-        final int BUFFER = 2048;
-
-        File sourceFile = sourcePath;
+    public static boolean zip(File sourceFolder, File zipFile) throws IOException {
         BufferedInputStream origin;
 
         zipFile.getParentFile().mkdirs();
@@ -48,15 +29,15 @@ public class Compress {
         FileOutputStream dest = new FileOutputStream(zipFile);
         ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest));
 
-        if (sourceFile.isDirectory()) {
-            zipSubFolder(out, sourceFile, sourceFile.getParent().length());
+        if (sourceFolder.isDirectory()) {
+            zipSubFolder(out, sourceFolder, sourceFolder.getParent().length());
         } else {
             byte data[] = new byte[BUFFER];
 
-            FileInputStream fi = new FileInputStream(sourcePath);
+            FileInputStream fi = new FileInputStream(sourceFolder);
             origin = new BufferedInputStream(fi, BUFFER);
 
-            ZipEntry entry = new ZipEntry(getLastPathComponent(sourcePath.getPath()));
+            ZipEntry entry = new ZipEntry(getLastPathComponent(sourceFolder.getPath()));
             out.putNextEntry(entry);
 
             int count;
@@ -69,9 +50,8 @@ public class Compress {
         return true;
     }
 
-    private void zipSubFolder(ZipOutputStream out, File folder, int basePathLength) throws IOException {
-
-        File[] fileList = folder.listFiles();
+    private static void zipSubFolder(ZipOutputStream out, File sourceFolder, int basePathLength) throws IOException {
+        File[] fileList = sourceFolder.listFiles();
         BufferedInputStream origin;
 
         if (fileList != null) {
@@ -109,13 +89,26 @@ public class Compress {
         }
     }
 
-    private String getLastPathComponent(String filePath) {
-        String[] segments = filePath.split("/");
+    private static String getLastPathComponent(String sourceFolderPath) {
+        String[] segments = sourceFolderPath.split("/");
         String lastPathComponent = segments[segments.length - 1];
         return lastPathComponent;
     }
 
-    private void copyFileAssets(File sourceFolder, File payloadFolder, String fileIdentifier) throws IOException {
+    public static void zipAPK(File sourceFolder, File zipFile, String fileIdentifier) throws IOException {
+        fileIdentifier = fileIdentifier.substring(0, fileIdentifier.indexOf("/"));
+
+        File payloadFolder = new File(zipFile, fileIdentifier);
+        payloadFolder.mkdir();
+
+        if (sourceFolder.isDirectory()) {
+            copyFileAssets(sourceFolder, payloadFolder, fileIdentifier);
+        } else {
+            throw new IOException("The source folder is not available in the device");
+        }
+    }
+
+    private static void copyFileAssets(File sourceFolder, File payloadFolder, String fileIdentifier) throws IOException {
         File[] fileList = sourceFolder.listFiles();
         if (fileList != null) {
             for (File file : fileList) {
@@ -139,19 +132,6 @@ public class Compress {
                     FileUtil.cp(childFile, payloadFile);
                 }
             }
-        }
-    }
-
-    public void zipAPK() throws IOException {
-        fileIdentifier = fileIdentifier.substring(0, fileIdentifier.indexOf("/"));
-
-        File payloadFolder = new File(zipFile, fileIdentifier);
-        payloadFolder.mkdir();
-
-        if (sourcePath.isDirectory()) {
-            copyFileAssets(sourcePath, payloadFolder, fileIdentifier);
-        } else {
-            throw new IOException("The source folder is not available in the device");
         }
     }
 

@@ -30,10 +30,8 @@ public class EcarBundle implements IChainable<ContentExportResponse> {
         File source = importContext.getTmpLocation();
         File destination = importContext.getEcarFile();
 
-        Compress compressWorker = new Compress(source, destination);
-
         try {
-            compressWorker.zip();
+            Compress.zip(source, destination);
             importContext.getMetadata().put(GETransferEventKnowStructure.FILE_SIZE, destination.length());
         } catch (IOException e) {
             e.printStackTrace();
