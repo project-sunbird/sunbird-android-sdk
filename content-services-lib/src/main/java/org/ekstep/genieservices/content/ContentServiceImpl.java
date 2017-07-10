@@ -156,10 +156,10 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         for (ContentModel contentModel : contentModelListInDB) {
             Content c = ContentHandler.convertContentModelToBean(contentModel);
 
-            if (criteria.attachFeedback()) {
+            if (criteria != null && criteria.attachFeedback()) {
                 c.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, c.getIdentifier(), criteria.getUid()));
             }
-            if (criteria.attachContentAccess()) {
+            if (criteria != null && criteria.attachContentAccess()) {
                 c.setContentAccess(ContentHandler.getContentAccess(userService, c.getIdentifier(), criteria.getUid()));
             }
             contentList.add(c);
