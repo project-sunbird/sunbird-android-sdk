@@ -10,7 +10,7 @@ public class RelatedContentResult {
 
     private String id;
     private String responseMessageId;
-    private List<Content> relatedContents;
+    private List<ContentData> contents;
 
     public String getId() {
         return id;
@@ -28,11 +28,11 @@ public class RelatedContentResult {
         this.responseMessageId = responseMessageId;
     }
 
-    public List<Content> getRelatedContents() {
-        return relatedContents;
+    public List<ContentData> getContents() {
+        return contents;
     }
 
-    public void setRelatedContents(List<Content> relatedContents) {
-        this.relatedContents = relatedContents;
+    public void setContents(List<ContentData> contents) {
+        this.contents = contents;
     }
 }

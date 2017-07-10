@@ -12,15 +12,11 @@ public class ChildContentRequest {
     private String contentId;
     private List<HierarchyInfo> hierarchyInfo;
     private int level;
-    private boolean attachFeedback;
-    private boolean attachContentAccess;
 
-    private ChildContentRequest(String contentId, List<HierarchyInfo> hierarchyInfo, int level, boolean attachFeedback, boolean attachContentAccess) {
+    private ChildContentRequest(String contentId, List<HierarchyInfo> hierarchyInfo, int level) {
         this.contentId = contentId;
         this.hierarchyInfo = hierarchyInfo;
         this.level = level;
-        this.attachFeedback = attachFeedback;
-        this.attachContentAccess = attachContentAccess;
     }
 
     public String getContentId() {
@@ -35,20 +31,10 @@ public class ChildContentRequest {
         return level;
     }
 
-    public boolean attachFeedback() {
-        return attachFeedback;
-    }
-
-    public boolean attachContentAccess() {
-        return attachContentAccess;
-    }
-
     public static class Builder {
         private String contentId;
         private List<HierarchyInfo> hierarchyInfo;
         private int level;
-        private boolean attachFeedback;
-        private boolean attachContentAccess;
 
         public Builder() {
             this.level = -1;
@@ -92,22 +78,6 @@ public class ChildContentRequest {
             return this;
         }
 
-        /**
-         * If want feedback, provided by given uid.
-         */
-        public Builder withFeedback() {
-            this.attachFeedback = true;
-            return this;
-        }
-
-        /**
-         * If want content access by given uid.
-         */
-        public Builder withContentAccess() {
-            this.attachContentAccess = true;
-            return this;
-        }
-
         public ChildContentRequest build() {
             if (StringUtil.isNullOrEmpty(contentId)) {
                 throw new IllegalStateException("contentId required.");
@@ -115,7 +85,7 @@ public class ChildContentRequest {
             if (hierarchyInfo == null) {
                 throw new IllegalStateException("hierarchyInfo required. Set hierarchyInfo of the content which is return in {@link Content}");
             }
-            return new ChildContentRequest(contentId, hierarchyInfo, level, attachFeedback, attachContentAccess);
+            return new ChildContentRequest(contentId, hierarchyInfo, level);
         }
     }
 }

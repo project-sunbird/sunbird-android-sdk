@@ -434,32 +434,20 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 responseMessageId = (String) responseParams.get("resmsgid");
             }
 
-            List<Map<String, Object>> contentDataList = null;
+            String contentDataList = null;
             if (result.containsKey("content")) {
-                contentDataList = (List<Map<String, Object>>) result.get("content");
-            }
-
-            List<ContentModel> allLocalContentModel = ContentHandler.getAllLocalContentModel(mAppContext.getDBSession());
-
-            List<Content> contents = new ArrayList<>();
-            if (contentDataList != null) {
-                for (Map contentDataMap : contentDataList) {
-                    ContentModel contentModel = ContentHandler.convertContentMapToModel(mAppContext.getDBSession(), contentDataMap, null);
-                    Content content = ContentHandler.convertContentModelToBean(contentModel);
-
-                    if (allLocalContentModel.contains(contentModel)) {
-                        content.setAvailableLocally(true);
-                    }
-
-                    contents.add(content);
-                }
+                contentDataList = GsonUtil.toJson(result.get("content"));
             }
 
             RelatedContentResult relatedContentResult = new RelatedContentResult();
             relatedContentResult.setId(id);
             relatedContentResult.setResponseMessageId(responseMessageId);
-            relatedContentResult.setRelatedContents(contents);
-
+            if (!StringUtil.isNullOrEmpty(contentDataList)) {
+                Type type = new TypeToken<List<ContentData>>() {
+                }.getType();
+                List<ContentData> contentData = GsonUtil.getGson().fromJson(contentDataList, type);
+                relatedContentResult.setContents(contentData);
+            }
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(relatedContentResult);
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
