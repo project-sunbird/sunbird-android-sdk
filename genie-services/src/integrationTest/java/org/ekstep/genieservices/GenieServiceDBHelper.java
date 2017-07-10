@@ -9,6 +9,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.db.contract.ProfileEntry;
 import org.ekstep.genieservices.commons.db.core.impl.SQLiteResultSet;
+import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.telemetry.model.EventModel;
 
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import java.util.List;
  */
 
 public class GenieServiceDBHelper {
+    private final static String TAG = GenieServiceDBHelper.class.getSimpleName();
     public static String GS_DB = "/data/data/org.ekstep.genieservices.test/databases/GenieServices.db";
     private static SQLiteDatabase sSqliteDatabase = null;
     private static GenieServiceDBHelper sGSDBHelper;
@@ -47,8 +49,8 @@ public class GenieServiceDBHelper {
         List<EventModel> events = new ArrayList<>();
         if (cursor != null && cursor.moveToFirst())
             do {
-                EventModel eventModel=EventModel.build(sGSDBHelper.mAppContext.getDBSession());
-                eventModel.readWithoutMoving( new SQLiteResultSet(cursor));
+                EventModel eventModel = EventModel.build(sGSDBHelper.mAppContext.getDBSession());
+                eventModel.readWithoutMoving(new SQLiteResultSet(cursor));
                 events.add(eventModel);
             } while (cursor.moveToNext());
         cursor.close();
@@ -56,13 +58,28 @@ public class GenieServiceDBHelper {
         return events;
     }
 
+    public static ContentModel findContentEntryInDB(String identifier) {
+        Cursor cursor = GenieServiceDBHelper.getDatabase().rawQuery(findEcarDBEntry(identifier), null);
+        List<EventModel> events = new ArrayList<>();
+        ContentModel contentModel = ContentModel.build(sGSDBHelper.mAppContext.getDBSession());
+        if (cursor != null && cursor.moveToFirst())
+            do {
+
+                contentModel.readWithoutMoving(new SQLiteResultSet(cursor));
+            } while (cursor.moveToNext());
+        cursor.close();
+
+        return contentModel;
+    }
+
     public static void clearProfileTable() {
 
         try {
-            int count =  GenieServiceDBHelper.getDatabase().delete("profiles", "1", null);
+            int count = getDatabase().delete("profiles", "1", null);
             Log.v("Count:::::", "" + count);
         } catch (SQLiteException e) {
             e.printStackTrace();
+            Log.v(TAG, "error deleting DB entries :: ");
         }
 
     }
@@ -71,7 +88,7 @@ public class GenieServiceDBHelper {
 
         Cursor cursor = GenieServiceDBHelper.getDatabase().rawQuery(generateProfileQuery(), null);
 
-        List<Profile> profiles =null;
+        List<Profile> profiles = null;
 
         if (cursor != null && cursor.moveToFirst())
             do {
@@ -116,7 +133,7 @@ public class GenieServiceDBHelper {
 
     public static void clearTelemetryTableEntry() {
         try {
-            int count = sSqliteDatabase.delete("telemetry", "1", null);
+            int count = getDatabase().delete("telemetry", "1", null);
             Log.v("Count:::::", "" + count);
         } catch (SQLiteException e) {
             e.printStackTrace();
@@ -129,6 +146,41 @@ public class GenieServiceDBHelper {
     }
 
     public static String generateQuery(String eid) {
-        return "SELECT * FROM telemetry  where event_type='" + eid + "'";
+        return "SELECT * FROM telemetry where event_type='" + eid + "'";
+    }
+
+    public static String findEcarDBEntry(String content_id) {
+        Log.e(TAG, "findEcarDBEntry");
+        return "SELECT * FROM content where identifier='" + content_id + "'";
+    }
+
+    public static void clearEcarEntryFromDB() {
+        try {
+            int count = getDatabase().delete("content", "1", null);
+            Log.v("Count:::::", "" + count);
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+            Log.v(TAG, "Unable to delete content DB entry");
+        }
+    }
+
+    public static void clearPartnerDBEntry() {
+        try {
+            int count = getDatabase().delete("partners", "1", null);
+            Log.v("Count:::::", "" + count);
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+            Log.v(TAG, "Unable to delete partner DB entry");
+        }
+    }
+
+    public static void clearUserTableDBEntry() {
+        try {
+            int count = getDatabase().delete("users", "1", null);
+            Log.v("Count:::::", "" + count);
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+            Log.v(TAG, "Unable to delete users DB entry");
+        }
     }
 }

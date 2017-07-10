@@ -1,15 +1,24 @@
 package org.ekstep.genieservices.userprofile;
 
+import android.os.Environment;
+
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
+import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.ImportRequest;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.bean.ProfileExportRequest;
+import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
+import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -17,6 +26,10 @@ import java.util.UUID;
  */
 
 public class UserProfileTest extends GenieServiceTestBase {
+
+    private final String PROFILE_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Sneha.epar";
+    private final String PROFILE_ID = "76c33e90-5b82-4739-af56-78580bb0f91a";
+    private final String PROFILE_FILEPATH_DEST = "/storage/emulated/0/Android/data/org.ekstep.genieservices.test/files/tmp/Sneha.epar";
 
     @Before
     public void setup() throws IOException {
@@ -39,7 +52,7 @@ public class UserProfileTest extends GenieServiceTestBase {
     @Test
     public void shouldCreateUserProfile() {
 
-        Profile profile = new Profile("Happy1 " + UUID.randomUUID().toString(), "@drawable/ic_avatar2", "en");
+        Profile profile = new Profile("Happy1", "@drawable/ic_avatar2", "en");
         profile.setAge(4);
         profile.setDay(12);
         profile.setMonth(11);
@@ -49,7 +62,7 @@ public class UserProfileTest extends GenieServiceTestBase {
         Profile profileinDb = GenieServiceDBHelper.findProfile().get(0);
 
         AssertProfile.verifyProfile(createdProfile, profileinDb);
-
+        AssertProfile.checkTelemtryEventIsLoggedIn("GE_CREATE_PROFILE", createdProfile);
     }
 
     /**
@@ -77,6 +90,7 @@ public class UserProfileTest extends GenieServiceTestBase {
         Profile profileinDb = GenieServiceDBHelper.findProfile().get(0);
 
         AssertProfile.verifyProfile(updatedProfile, profileinDb);
+        AssertProfile.checkTelemtryEventIsLoggedIn("GE_UPDATE_PROFILE", updatedProfile);
     }
 
     /**
@@ -117,13 +131,15 @@ public class UserProfileTest extends GenieServiceTestBase {
 
         Profile profile = new Profile("Happy6", "@drawable/ic_avatar2", "en");
         Profile createdProfile = createNewProfile(profile);
+        AssertProfile.checkTelemtryEventIsLoggedIn("GE_CREATE_PROFILE", createdProfile);
 
         GenieResponse response = activity.deleteUserProfile(createdProfile.getUid());
-
         Assert.assertNotNull(response);
         Assert.assertTrue(response.getStatus());
 
         AssertProfile.verifyProfileisDeleted();
+        AssertProfile.checkTelemetryDataForDeleteProfile("GE_DELETE_PROFILE");
+
     }
 
     /**
@@ -177,6 +193,7 @@ public class UserProfileTest extends GenieServiceTestBase {
         Profile profileinDb = GenieServiceDBHelper.findProfile().get(0);
 
         AssertProfile.verifyProfile(createdProfile, profileinDb);
+        AssertProfile.checkTelemtryEventIsLoggedIn("GE_CREATE_PROFILE", createdProfile);
 
     }
 
@@ -190,17 +207,21 @@ public class UserProfileTest extends GenieServiceTestBase {
     @Test
     public void shouldUpdateGroupUser() {
 
+        GenieServiceDBHelper.clearProfileTable();
+
         Profile profile = new Profile("Group8", "@drawable/ic_avatar2", "en");
         profile.setGroupUser(true);
 
         final Profile createdProfile = createNewProfile(profile);
         profile.setUid(createdProfile.getUid());
         profile.setHandle("Group88");
+        AssertProfile.checkTelemtryEventIsLoggedIn("GE_CREATE_PROFILE", createdProfile);
 
         GenieResponse<Profile> response = activity.updateUserProfile(profile);
         Profile updatedProfile = response.getResult();
 
         AssertProfile.verifyProfile(profile, updatedProfile);
+        AssertProfile.checkTelemtryEventIsLoggedIn("GE_UPDATE_PROFILE", updatedProfile);
 
         Profile profileinDb = GenieServiceDBHelper.findProfile().get(0);
 
@@ -247,8 +268,9 @@ public class UserProfileTest extends GenieServiceTestBase {
         GenieResponse genieResponse = activity.deleteUserProfile(profile.getUid());
         Assert.assertNotNull(genieResponse);
         Assert.assertTrue(genieResponse.getStatus());
-        AssertProfile.verifyProfileisDeleted();
 
+        AssertProfile.verifyProfileisDeleted();
+        AssertProfile.checkTelemetryDataForDeleteProfile("GE_DELETE_PROFILE");
     }
 
     /**
@@ -302,7 +324,6 @@ public class UserProfileTest extends GenieServiceTestBase {
 
         Assert.assertNotNull(genieResponse);
         Assert.assertFalse(genieResponse.getStatus());
-        AssertProfile.verifyProfileisDeleted();
         Assert.assertEquals("[invalid date, field: -1/12/2017]", genieResponse.getErrorMessages().get(0));
     }
 
@@ -323,7 +344,6 @@ public class UserProfileTest extends GenieServiceTestBase {
 
         Assert.assertNotNull(genieResponse);
         Assert.assertFalse(genieResponse.getStatus());
-        AssertProfile.verifyProfileisDeleted();
         Assert.assertEquals("[invalid date, field: 2/14/2009]", genieResponse.getErrorMessages().get(0));
 
         //TODO verify GE_ERROR event
@@ -409,5 +429,86 @@ public class UserProfileTest extends GenieServiceTestBase {
         Profile anonymousProfile = response.getResult();
         Assert.assertNotNull(anonymousProfile);
         AssertProfile.verifyAnonymousUser(anonymousProfile);
+    }
+
+    /**
+     * Scenario: To get the list of all the created profiles.
+     * Given : To get the list of all profiles.
+     * Then: On Successful fetching of the profiles, the response will status as TRUE and
+     * list of profiles.
+     */
+    @Test
+    public void shouldGetAllUserProfile() {
+
+        GenieServiceDBHelper.clearProfileTable();
+
+        final Profile profile1 = new Profile("Happy21", "@drawable/ic_avatar2", "en");
+        final Profile profile2 = new Profile("Happy31", "@drawable/ic_avatar2", "en");
+        createNewProfile(profile1);
+        createNewProfile(profile2);
+
+        GenieResponse<List<Profile>> genieResponse = activity.getAllUserProfile();
+        Profile saved_profile1 = genieResponse.getResult().get(0);
+        Profile saved_profile2 = genieResponse.getResult().get(1);
+
+        Assert.assertEquals(profile1.getHandle(), saved_profile1.getHandle());
+        Assert.assertEquals(profile2.getHandle(), saved_profile2.getHandle());
+
+        Assert.assertEquals(profile1.getUid(), saved_profile1.getUid());
+        Assert.assertEquals(profile2.getUid(), saved_profile2.getUid());
+
+    }
+
+    @Test
+    public void shouldImportProfile() {
+
+        GenieServiceDBHelper.clearProfileTable();
+        GenieServiceDBHelper.clearUserTableDBEntry();
+
+        ImportRequest.Builder importRequest = new ImportRequest.Builder().fromFilePath(PROFILE_FILEPATH);
+
+        activity.importProfile(importRequest.build(), new IResponseHandler<ProfileImportResponse>() {
+            @Override
+            public void onSuccess(GenieResponse<ProfileImportResponse> genieResponse) {
+                Assert.assertTrue("true", genieResponse.getStatus());
+                Assert.assertEquals(0, genieResponse.getResult().getFailed());
+                Assert.assertEquals(1, genieResponse.getResult().getImported());
+            }
+
+            @Override
+            public void onError(GenieResponse<ProfileImportResponse> genieResponse) {
+                Assert.assertFalse(genieResponse.getStatus());
+            }
+        });
+
+        waitForGenieToBecomeIdle();
+    }
+
+    @Test
+    public void shouldExportProfile() {
+
+        GenieServiceDBHelper.clearProfileTable();
+        GenieServiceDBHelper.clearUserTableDBEntry();
+
+        List<String> userIds = new ArrayList<>();
+        userIds.add(PROFILE_ID);
+
+        //import profile
+        shouldImportProfile();
+
+        ProfileExportRequest.Builder exportRequest = new ProfileExportRequest.Builder().exportUsers(userIds).toFolder(activity.getExternalFilesDir(null).toString());
+
+        activity.exportProfile(exportRequest.build(), new IResponseHandler<ProfileExportResponse>() {
+            @Override
+            public void onSuccess(GenieResponse<ProfileExportResponse> genieResponse) {
+                Assert.assertTrue(genieResponse.getStatus());
+                Assert.assertEquals(PROFILE_FILEPATH_DEST, genieResponse.getResult().getExportedFilePath());
+            }
+
+            @Override
+            public void onError(GenieResponse<ProfileExportResponse> genieResponse) {
+                Assert.assertFalse(genieResponse.getStatus());
+            }
+        });
     }
 }
