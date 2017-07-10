@@ -130,7 +130,7 @@ public class Profile implements Serializable, IValidate {
     }
 
     public int getYear() {
-        int year = this.age == -1 ? Calendar.getInstance().get(1) : Calendar.getInstance().get(1) - this.age;
+        int year = this.age == -1 ? Calendar.getInstance().get(Calendar.YEAR) : Calendar.getInstance().get(Calendar.YEAR) - this.age;
         return year;
     }
 
@@ -181,14 +181,14 @@ public class Profile implements Serializable, IValidate {
     @Override
     public boolean isValid() {
         this.initializeValidation();
-        Boolean isValid = Boolean.valueOf(true);
+        boolean isValid = true;
 
         IValidate validator;
-        for (Iterator var2 = this.validators.iterator(); var2.hasNext(); isValid = Boolean.valueOf(isValid.booleanValue() & validator.isValid())) {
+        for (Iterator var2 = this.validators.iterator(); var2.hasNext(); isValid = (isValid & validator.isValid())) {
             validator = (IValidate) var2.next();
         }
 
-        return isValid.booleanValue();
+        return isValid;
     }
 
     private void initializeValidation() {
@@ -199,22 +199,18 @@ public class Profile implements Serializable, IValidate {
         StringValidator stringValidator = new StringValidator(validationStringFields);
 
         DayMonth dayMonth = new DayMonth(this.day, this.month, this.getYear());
-        HashMap validationDateFields = new HashMap();
+        Map<String, DayMonth> validationDateFields = new HashMap<>();
         validationDateFields.put("daymonth", dayMonth);
         DateValidator dateValidator = new DateValidator(validationDateFields);
-        this.validators = Arrays.asList(new IValidate[]{stringValidator, dateValidator});
+        this.validators = Arrays.asList(stringValidator, dateValidator);
     }
 
     @Override
     public List<String> getErrors() {
-        ArrayList errors = new ArrayList();
-        Iterator var2 = this.validators.iterator();
-
-        while (var2.hasNext()) {
-            IValidate validator = (IValidate) var2.next();
+        List<String> errors = new ArrayList<>();
+        for (IValidate validator : this.validators) {
             errors.addAll(validator.getErrors());
         }
-
         return errors;
     }
 }

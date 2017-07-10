@@ -22,5 +22,5 @@ public interface IDownloadManager {
 
     void cancel(long downloadId);
 
-    String getDownloadPath(long downloadId);
+    String getDownloadPath(long downloadId, String desitnationFolder);
 }

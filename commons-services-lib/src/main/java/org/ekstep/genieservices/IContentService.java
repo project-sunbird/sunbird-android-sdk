@@ -181,7 +181,7 @@ public interface IContentService {
      * <p>
      * On successful importing the content, the response will return status as TRUE
      *
-     * @param contentImportRequest
+     * @param contentImportRequest - {@link ContentImportRequest}
      * @return - {@link GenieResponse<Void>}
      */
     GenieResponse<Void> importContent(ContentImportRequest contentImportRequest);
@@ -192,10 +192,10 @@ public interface IContentService {
      * <p>
      * Response will always be status set TRUE, with {@link ContentImportResponse} set in result.
      *
-     * @param identifier
+     * @param contentId Content id.
      * @return {@link GenieResponse<ContentImportResponse>}
      */
-    GenieResponse<ContentImportResponse> getImportStatus(String identifier);
+    GenieResponse<ContentImportResponse> getImportStatus(String contentId);
 
     /**
      * This api is used to cancel the on-going download
@@ -203,10 +203,10 @@ public interface IContentService {
      * <p>
      * Response will always be status set TRUE.
      *
-     * @param identifier
-     * @return
+     * @param contentId Content id.
+     * @return {@link GenieResponse<Void>}
      */
-    GenieResponse<Void> cancelDownload(String identifier);
+    GenieResponse<Void> cancelDownload(String contentId);
 
     /**
      * This api is used to export the list of contentId's needed.
@@ -218,8 +218,8 @@ public interface IContentService {
      * On failing to export the content, the response will be with return status as FALSE and with the following error
      * <p>EXPORT_FAILED
      *
-     * @param contentExportRequest
-     * @return
+     * @param contentExportRequest {@link ContentExportRequest}
+     * @return {@link GenieResponse<ContentExportResponse>}
      */
     GenieResponse<ContentExportResponse> exportContent(ContentExportRequest contentExportRequest);
 

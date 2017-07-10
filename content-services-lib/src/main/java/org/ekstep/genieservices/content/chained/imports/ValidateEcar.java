@@ -74,7 +74,7 @@ public class ValidateEcar implements IChainable {
             //Draft content expiry .To prevent import of draft content if the expires-date is expired from the current date
             String expiryDate = (String) item.get("expires");
             String status = (String) item.get("status");
-            if (!StringUtil.isNullOrEmpty(expiryDate) && (!StringUtil.isNullOrEmpty(status) && status.equalsIgnoreCase(ServiceConstants.ContentStatus.DRAFT))) {
+            if (!StringUtil.isNullOrEmpty(expiryDate) && (!StringUtil.isNullOrEmpty(status) && status.equalsIgnoreCase(ContentConstants.ContentStatus.DRAFT))) {
                 long millis = DateUtil.getTime(expiryDate);
                 if (millis > 0 && System.currentTimeMillis() > millis) {
                     return getErrorResponse(importContext, ContentConstants.DRAFT_ECAR_FILE_EXPIRED, "The ECAR file is expired!!!");
@@ -121,7 +121,7 @@ public class ValidateEcar implements IChainable {
 
     private boolean isDuplicateCheckRequired(Double pkgVersion, String status) {
         //if status is DRAFT and pkgVersion == 0 then don't do the duplicate check..
-        return !(!StringUtil.isNullOrEmpty(status) && status.equalsIgnoreCase(ServiceConstants.ContentStatus.DRAFT) && pkgVersion == 0);
+        return !(!StringUtil.isNullOrEmpty(status) && status.equalsIgnoreCase(ContentConstants.ContentStatus.DRAFT) && pkgVersion == 0);
     }
 
     private GenieResponse<Void> getErrorResponse(ImportContext importContext, String error, String errorMessage) {

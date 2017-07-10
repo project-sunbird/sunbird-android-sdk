@@ -1,14 +1,11 @@
 package org.ekstep.genieservices.commons.bean;
 
-import org.ekstep.genieservices.commons.bean.enums.SearchType;
 import org.ekstep.genieservices.commons.bean.enums.SortOrder;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * Sort criteria
- *
  */
 public class ContentSortCriteria implements Serializable {
 

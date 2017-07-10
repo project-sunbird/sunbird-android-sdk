@@ -1,6 +1,7 @@
 package org.ekstep.genieservices.config.db.model;
 
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.db.contract.MasterDataEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
@@ -8,7 +9,6 @@ import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.commons.db.contract.MasterDataEntry;
 
 import java.util.Locale;
 
@@ -47,16 +47,6 @@ public class MasterDataModel implements IReadable, ICleanable, IWritable,IUpdata
             return masterDataModel;
         }
     }
-
-//    public static MasterDataModel find(AppContext appContext) {
-//        MasterDataModel masterDataModel = new MasterDataModel(appContext, null, null);
-//        appContext.getDBSession().read(masterDataModel);
-//        if (masterDataModel.getMasterDataJson() == null) {
-//            return null;
-//        } else {
-//            return masterDataModel;
-//        }
-//    }
 
     private void readWithoutMoving(IResultSet resultSet) {
         id = resultSet.getLong(0);
@@ -154,7 +144,4 @@ public class MasterDataModel implements IReadable, ICleanable, IWritable,IUpdata
         return mType;
     }
 
-    public boolean exists() {
-        return this.id != null && this.id != -1L;
-    }
 }

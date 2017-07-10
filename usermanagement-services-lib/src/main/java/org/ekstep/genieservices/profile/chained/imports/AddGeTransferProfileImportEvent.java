@@ -45,7 +45,7 @@ public class AddGeTransferProfileImportEvent implements IChainable<ProfileImport
                     aggregateCount,
                     LongUtil.tryParseToLong((String) importContext.getMetadata().get(GETransferEventKnowStructure.FILE_SIZE), 0),
                     contents);
-            GETransfer geTransfer = new GETransfer(new GameData(appContext.getParams().getGid(), appContext.getParams().getVersionName()), eks);
+            GETransfer geTransfer = new GETransfer(new GameData(appContext.getParams().getString(ServiceConstants.Params.GID), appContext.getParams().getString(ServiceConstants.Params.VERSION_NAME)), eks);
             TelemetryLogger.log(geTransfer);
 
             ProfileImportResponse profileImportResponse = new ProfileImportResponse();

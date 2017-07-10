@@ -15,14 +15,15 @@ import java.util.Map;
 public class ResourceBundleAPI extends BaseAPI {
 
     private static final String TAG = "service-RBAPI";
-    private static final String ENDPOINT = "config/resourcebundles";
-    private static final CharSequence SERVICE_ENDPOINTS = "config";
 
+    private static final String ENDPOINT = "config/resourcebundles";
 
     public ResourceBundleAPI(AppContext appContext) {
-        super(appContext, String.format(Locale.US, "%s/%s",
-                String.format(Locale.US, appContext.getParams().getBaseApiUrl() + ServiceConstants.API.LP_EXTENSION, SERVICE_ENDPOINTS),
-                ENDPOINT), TAG);
+        super(appContext,
+                String.format(Locale.US, "%s/%s",
+                        appContext.getParams().getString(ServiceConstants.Params.CONFIG_BASE_URL),
+                        ENDPOINT),
+                TAG);
     }
 
     @Override

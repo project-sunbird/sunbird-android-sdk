@@ -1,30 +1,31 @@
 package org.ekstep.genieservices.telemetry.model;
 
+import org.ekstep.genieservices.commons.db.contract.EventPriorityEntry;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.commons.db.contract.EventPriorityEntry;
 
 import java.util.Locale;
 
 /**
- * Created by swayangjit on 26/4/17.
+ * Created on 26/4/17.
+ *
+ * @author swayangjit
  */
-
 public class PriorityModel implements IReadable {
 
-    private final int DEFAULT_PRIORITY = 2;
-    private IDBSession mDBSession;
+    private static final int DEFAULT_PRIORITY = 2;
+    private IDBSession dBSession;
     private Integer priority;
     private String eventType;
 
     private PriorityModel(IDBSession dbSession, String eventType) {
-        this.mDBSession = dbSession;
+        this.dBSession = dbSession;
         this.eventType = eventType;
     }
 
     private PriorityModel(IDBSession dbSession, String eventType, int priority) {
-        this.mDBSession = dbSession;
+        this.dBSession = dbSession;
         this.eventType = eventType;
         this.priority = priority;
     }
@@ -79,8 +80,9 @@ public class PriorityModel implements IReadable {
     }
 
     public int getPriority() {
-        if (priority != null)
+        if (priority != null) {
             return priority;
+        }
         return DEFAULT_PRIORITY;
     }
 

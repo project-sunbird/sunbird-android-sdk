@@ -8,6 +8,7 @@ import org.ekstep.genieservices.commons.AndroidLogger;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IDeviceInfo;
 import org.ekstep.genieservices.commons.IDownloadManager;
+import org.ekstep.genieservices.commons.ILocationInfo;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.download.DownloadServiceImpl;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
@@ -64,14 +65,14 @@ public class GenieService {
     }
 
     public static GenieAsyncService getAsyncService() {
-        return GenieAsyncService.getAsyncService();
+        return sAsyncService;
     }
 
     public static GenieService init(Context context, String packageName) {
         if (sService == null) {
             AppContext<Context> applicationContext = AndroidAppContext.buildAppContext(context, packageName);
             Logger.init(new AndroidLogger());
-            ContentPlayer.init(applicationContext.getParams().getQualifier());
+            ContentPlayer.init(applicationContext.getParams().getString(ServiceConstants.Params.APP_QUALIFIER));
             TelemetryLogger.init(new TelemetryServiceImpl(applicationContext, new UserServiceImpl(applicationContext)));
             //initializing event bus for Telemetry
             TelemetryListener.init(applicationContext);
@@ -79,7 +80,7 @@ public class GenieService {
             sService = new GenieService(applicationContext);
         }
 
-        GenieAsyncService.init(sService);
+        sAsyncService = GenieAsyncService.init(sService);
 
         return sService;
     }
@@ -288,6 +289,10 @@ public class GenieService {
 
     public IDownloadManager getDownloadManager() {
         return mAppContext.getDownloadManager();
+    }
+
+    public ILocationInfo getLocationInfo() {
+        return mAppContext.getLocationInfo();
     }
 
     public FileImporter getFileImporter() {

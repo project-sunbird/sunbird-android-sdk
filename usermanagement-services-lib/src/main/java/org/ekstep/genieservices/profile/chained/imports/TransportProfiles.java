@@ -35,7 +35,7 @@ public class TransportProfiles implements IChainable<ProfileImportResponse> {
         UserProfilesModel userProfilesModel = UserProfilesModel.find(importContext.getDBSession());
 
         if (userProfilesModel != null) {
-            GameData gameData = new GameData(appContext.getParams().getGid(), appContext.getParams().getVersionName());
+            GameData gameData = new GameData(appContext.getParams().getString(ServiceConstants.Params.GID), appContext.getParams().getString(ServiceConstants.Params.VERSION_NAME));
 
             for (Profile profile : userProfilesModel.getProfileList()) {
                 UserProfileModel userProfileModel = UserProfileModel.find(appContext.getDBSession(), profile.getUid());

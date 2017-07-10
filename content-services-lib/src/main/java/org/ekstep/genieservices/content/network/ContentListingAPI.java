@@ -21,15 +21,14 @@ public class ContentListingAPI extends BaseAPI {
     private static final String TAG = ContentListingAPI.class.getSimpleName();
 
     private static final String VERSION = "1.0";
-    private static final String SERVICE_ENDPOINTS = "page";
 
     private String pageIdentifier;
     private Map<String, Object> requestMap;
 
     public ContentListingAPI(AppContext appContext, String pageIdentifier, Map<String, Object> requestMap) {
-        super(appContext, String.format(Locale.US, "%s/assemble/%s",
-                String.format(Locale.US, appContext.getParams().getBaseApiUrl() + ServiceConstants.API.EP_EXTENSION, SERVICE_ENDPOINTS),
-                pageIdentifier), TAG);
+        super(appContext,
+                String.format(Locale.US, "%s/assemble/%s", appContext.getParams().getString(ServiceConstants.Params.CONTENT_LISTING_BASE_URL), pageIdentifier),
+                TAG);
 
         this.pageIdentifier = pageIdentifier;
         this.requestMap = requestMap;

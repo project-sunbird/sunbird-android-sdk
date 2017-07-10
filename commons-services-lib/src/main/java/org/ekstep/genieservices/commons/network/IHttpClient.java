@@ -12,7 +12,7 @@ public interface IHttpClient {
 
     Void setTimeouts(int connectionTimeout, int readTimeout);
 
-    Void handleAuth();
+    Void setAuthHeaders();
 
     Void createRequest(String url);
 

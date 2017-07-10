@@ -1,5 +1,6 @@
 package org.ekstep.genieservices.commons.db.migration.impl;
 
+import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.contract.GameEntry;
 import org.ekstep.genieservices.commons.db.contract.LanguageEntry;
@@ -35,7 +36,7 @@ public class _09_SdkMigration extends Migration {
         appContext.getDBSession().execute(ProfileEntry.getAlterEntryForProfileImage());
 
         //update profile image with respective avatar
-        List<String> updateProfileImageQueries = ProfileEntry.getUpdateProfileImage(appContext.getParams().getProfilePath());
+        List<String> updateProfileImageQueries = ProfileEntry.getUpdateProfileImage(appContext.getParams().getString(ServiceConstants.Params.PROFILE_PATH));
         for (String updateQuery : updateProfileImageQueries) {
             appContext.getDBSession().execute(updateQuery);
         }

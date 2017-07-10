@@ -4,7 +4,6 @@ import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 /**
  * This class accepts language and limit when requesting for a recommended content with respect to a particular language.
- *
  */
 public class RecommendedContentRequest {
 
@@ -40,7 +39,7 @@ public class RecommendedContentRequest {
             this.limit = DEFAULT_LIMIT;
         }
 
-        public Builder language(String language) {
+        public Builder byLanguage(String language) {
             this.language = language;
             return this;
         }

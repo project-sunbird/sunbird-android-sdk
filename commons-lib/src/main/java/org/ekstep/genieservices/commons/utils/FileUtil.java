@@ -36,12 +36,12 @@ public class FileUtil {
         return result;
     }
 
-    public static String getDownloadedFileLocation(FileInputStream fileInputStream) {
+    public static String getDownloadedFileLocation(FileInputStream fileInputStream, String destinationFolder) {
         File targetFile = null;
         try {
             byte[] buffer = new byte[fileInputStream.available()];
             fileInputStream.read(buffer);
-            targetFile = getTempLocation(new File(System.currentTimeMillis() + ".ecar"));
+            targetFile = getTempLocation(new File(destinationFolder), System.currentTimeMillis() + ".ecar");
             OutputStream outStream = new FileOutputStream(targetFile);
             outStream.write(buffer);
         } catch (final IOException e) {

@@ -48,7 +48,7 @@ public class AddGeTransferTelemetryImportEvent implements IChainable {
                         LongUtil.tryParseToLong((String) importContext.getMetadata().get(GETransferEventKnowStructure.FILE_SIZE), 0),
                         transferMapList);
 
-                GETransfer geTransfer = new GETransfer(new GameData(appContext.getParams().getGid(), appContext.getParams().getVersionName()), eks);
+                GETransfer geTransfer = new GETransfer(new GameData(appContext.getParams().getString(ServiceConstants.Params.GID), appContext.getParams().getString(ServiceConstants.Params.VERSION_NAME)), eks);
                 TelemetryLogger.log(geTransfer);
                 return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             }

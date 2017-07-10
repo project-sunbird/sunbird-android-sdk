@@ -5,7 +5,6 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
-import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.Decompress;
 import org.ekstep.genieservices.commons.utils.FileUtil;
@@ -18,7 +17,6 @@ import org.ekstep.genieservices.content.db.model.ContentModel;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -43,7 +41,6 @@ public class ExtractPayloads implements IChainable {
         int contentState = ContentConstants.State.ONLY_SPINE;
         String oldContentPath;
         String artifactUrl, iconURL, posterImage, grayScaleAppIcon, uuid, destination;
-        Decompress stage2;
         File payload;
         File payloadDestination = null;
         ContentModel oldContentModel;
@@ -78,7 +75,7 @@ public class ExtractPayloads implements IChainable {
             boolean isContentExist = ContentHandler.isContentExist(oldContentModel, identifier, pkgVersion);
 
             //Apk files
-            if ((!StringUtil.isNullOrEmpty(mimeType) && mimeType.equalsIgnoreCase(ContentConstants.MimeType.APPLICATION)) ||
+            if ((!StringUtil.isNullOrEmpty(mimeType) && mimeType.equalsIgnoreCase(ContentConstants.MimeType.APK)) ||
                     (!StringUtil.isNullOrEmpty(artifactUrl) && artifactUrl.contains("." + ServiceConstants.FileExtension.APK))) {
 
                 List<Map<String, Object>> preRequisites = (List<Map<String, Object>>) item.get("pre_requisites");
@@ -101,7 +98,7 @@ public class ExtractPayloads implements IChainable {
 
                     try {
                         // If compatibility level is not in range then do not copy artifact
-                        if (ContentHandler.isCompatible(compatibilityLevel)) {
+                        if (ContentHandler.isCompatible(appContext, compatibilityLevel)) {
                             copyAssets(importContext.getTmpLocation().getPath(), artifactUrl, payloadDestination);
                             contentState = ContentConstants.State.ARTIFACT_AVAILABLE;
                         }
@@ -116,10 +113,10 @@ public class ExtractPayloads implements IChainable {
 
                 // TODO: 5/18/2017 - Revisit this - handling the APK while importing ECAR.
                 //launch system prompt for Install apk...
-                appContext.getmAPKInstaller().showInstallAPKPrompt(path, artifactUrl, preRequisites);
+                appContext.getAPKInstaller().showInstallAPKPrompt(path, artifactUrl, preRequisites);
             } else {
                 //If the content is exist then copy the old content data and add it into new content.
-                if (isContentExist && !(ServiceConstants.ContentStatus.DRAFT.equalsIgnoreCase(ContentHandler.readStatus(item)))) {
+                if (isContentExist && !(ContentConstants.ContentStatus.DRAFT.equalsIgnoreCase(ContentHandler.readStatus(item)))) {
                     if (oldContentModel.getVisibility().equalsIgnoreCase(ContentConstants.Visibility.DEFAULT)) {
                         Map<String, Object> oldContentLocalDataMap = GsonUtil.fromJson(oldContentModel.getLocalData(), Map.class);
 
@@ -135,19 +132,16 @@ public class ExtractPayloads implements IChainable {
                     payloadDestination.mkdirs();
 
                     // If compatibility level is not in range then do not copy artifact
-                    if (ContentHandler.isCompatible(compatibilityLevel)) {
+                    if (ContentHandler.isCompatible(appContext, compatibilityLevel)) {
                         boolean unzipSuccess = false;
                         if (!StringUtil.isNullOrEmpty(artifactUrl)) {
                             payload = new File(importContext.getTmpLocation().getPath(), "/" + artifactUrl);
-                            stage2 = new Decompress(payload, payloadDestination);
-                            unzipSuccess = stage2.unzip();
+                            unzipSuccess = Decompress.unzip(payload, payloadDestination);
                         }
 
                         // Add or update the content_state
                         if (unzipSuccess    // If unzip is success it means artifact is available.
-                                || ContentType.COLLECTION.getValue().equalsIgnoreCase(contentType)
-                                || ContentType.TEXTBOOK.getValue().equalsIgnoreCase(contentType)
-                                || ContentType.TEXTBOOK_UNIT.getValue().equalsIgnoreCase(contentType)) {
+                                || ContentConstants.MimeType.COLLECTION.equals(mimeType)) {
 
                             contentState = ContentConstants.State.ARTIFACT_AVAILABLE;
                         } else {

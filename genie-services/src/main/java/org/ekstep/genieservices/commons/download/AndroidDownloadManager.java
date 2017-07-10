@@ -41,30 +41,34 @@ public class AndroidDownloadManager implements IDownloadManager {
 
     @Override
     public DownloadProgress getProgress(long downloadId) {
+        DownloadProgress downloadProgress = new DownloadProgress(downloadId);
+
         android.app.DownloadManager.Query query = new android.app.DownloadManager.Query();
         query.setFilterById(downloadId);
 
         Cursor cursor = mDownloadManager.query(query);
-        DownloadProgress downloadProgress = new DownloadProgress(downloadId);
-        if (cursor.moveToFirst()) {
-            int bytesDownloaded = cursor.getInt(cursor.getColumnIndex(android.app.DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
-            int bytesTotal = cursor.getInt(cursor.getColumnIndex(android.app.DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
-            int downloadStatus = cursor.getInt(cursor.getColumnIndex(android.app.DownloadManager.COLUMN_STATUS));
-            if (downloadStatus == DownloadManager.STATUS_PENDING) {
-                downloadProgress.setStatus(NOT_STARTED);
-            } else if (downloadStatus == DownloadManager.STATUS_FAILED) {
-                downloadProgress.setStatus(FAILED);
-            } else if (downloadStatus == DownloadManager.STATUS_RUNNING || downloadStatus == DownloadManager.STATUS_PAUSED) {
-                int progress = (int) ((bytesDownloaded * 100L) / bytesTotal);
-                --progress; //to ensure that 100% is set only after the download is actually successful
-                downloadProgress.setStatus(STARTED);
-                downloadProgress.setDownloadProgress(progress);
-            } else if (downloadStatus == DownloadManager.STATUS_SUCCESSFUL) {
-                downloadProgress.setStatus(COMPLETED);
-                downloadProgress.setDownloadProgress(100);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                int bytesDownloaded = cursor.getInt(cursor.getColumnIndex(android.app.DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+                int bytesTotal = cursor.getInt(cursor.getColumnIndex(android.app.DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+                int downloadStatus = cursor.getInt(cursor.getColumnIndex(android.app.DownloadManager.COLUMN_STATUS));
+                if (downloadStatus == DownloadManager.STATUS_PENDING) {
+                    downloadProgress.setStatus(NOT_STARTED);
+                } else if (downloadStatus == DownloadManager.STATUS_FAILED) {
+                    downloadProgress.setStatus(FAILED);
+                } else if (downloadStatus == DownloadManager.STATUS_RUNNING || downloadStatus == DownloadManager.STATUS_PAUSED) {
+                    int progress = (int) ((bytesDownloaded * 100L) / bytesTotal);
+                    --progress; //to ensure that 100% is set only after the download is actually successful
+                    downloadProgress.setStatus(STARTED);
+                    downloadProgress.setDownloadProgress(progress);
+                } else if (downloadStatus == DownloadManager.STATUS_SUCCESSFUL) {
+                    downloadProgress.setStatus(COMPLETED);
+                    downloadProgress.setDownloadProgress(100);
+                }
             }
+            cursor.close();
         }
-        cursor.close();
+
         return downloadProgress;
     }
 
@@ -74,7 +78,7 @@ public class AndroidDownloadManager implements IDownloadManager {
     }
 
     @Override
-    public String getDownloadPath(long downloadId) {
+    public String getDownloadPath(long downloadId, String destinationFolder) {
         String downloadPath = null;
         android.app.DownloadManager.Query query = new android.app.DownloadManager.Query();
         query.setFilterById(downloadId);
@@ -89,15 +93,15 @@ public class AndroidDownloadManager implements IDownloadManager {
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
-                    downloadPath = FileUtil.getDownloadedFileLocation(new ParcelFileDescriptor.AutoCloseInputStream(fileDescriptor));
+                    downloadPath = FileUtil.getDownloadedFileLocation(new ParcelFileDescriptor.AutoCloseInputStream(fileDescriptor), destinationFolder);
                 } else {
 
                     String filepath = cursor.getString(cursor.getColumnIndex(android.app.DownloadManager.COLUMN_LOCAL_URI));
                     downloadPath = getRealPathFromURI(mContext, Uri.parse(filepath));
-
                 }
             }
         }
+
         return downloadPath;
     }
 

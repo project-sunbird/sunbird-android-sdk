@@ -34,6 +34,30 @@ public interface ServiceConstants {
     String EXPORT_TYPE_TELEMETRY = "telemetry";
     String EXPORT_TYPE_PROFILE = "userprofile";
 
+    interface Params {
+        String VERSION_CODE = "VERSION_CODE";
+        String VERSION_NAME = "VERSION_NAME";
+        String APP_QUALIFIER = "QUALIFIER";
+        String TELEMETRY_BASE_URL = "TELEMETRY_BASE_URL";
+        String LANGUAGE_PLATFORM_BASE_URL = "LANGUAGE_PLATFORM_BASE_URL";
+        String LEARNING_PLATFORM_BASE_URL = "LEARNING_PLATFORM_BASE_URL";
+        String CONFIG_BASE_URL = "CONFIG_BASE_URL";
+        String SEARCH_BASE_URL = "SEARCH_BASE_URL";
+        String CONTENT_LISTING_BASE_URL = "CONTENT_LISTING_BASE_URL";
+        String ANALYTICS_BASE_URL = "ANALYTICS_BASE_URL";
+        String API_PASS = "API_PASS";
+        String API_USER = "API_USER";
+        String MOBILE_APP_SECRET = "MOBILE_APP_SECRET";
+        String MOBILE_APP_KEY = "MOBILE_APP_KEY";
+        String MOBILE_APP_CONSUMER = "MOBILE_APP_CONSUMER";
+        String GID = "GID";
+        String LOG_LEVEL = "LOG_LEVEL";
+        String MIN_COMPATIBILITY_LEVEL = "MIN_COMPATIBILITY_LEVEL";
+        String MAX_COMPATIBILITY_LEVEL = "MAX_COMPATIBILITY_LEVEL";
+        String PROFILE_CONFIG = "PROFILE_CONFIG";
+        String PROFILE_PATH = "PROFILE_PATH";
+    }
+
     interface BundleKey {
         //ContentPlayer
         String BUNDLE_KEY_ORIGIN = "origin";
@@ -66,12 +90,6 @@ public interface ServiceConstants {
         String KEY_ACTIVE_PARTNER_ID = "partner.activeid";
         String SHARED_PREF_SESSION_KEY = "partnersessionid";
         String SHARED_PREF_PARTNERSET_EPOCH = "partnerSET";
-    }
-
-    interface API {
-        String LP_EXTENSION = "/%s/v2";
-        String EP_EXTENSION = "/%s/v1";
-        String ANALYTICS_EXTENSION = "/analytics";
     }
 
     interface Partner {
@@ -191,11 +209,6 @@ public interface ServiceConstants {
         String FAILED_TO_ADD_UPDATE_NOTIFICATION = "Failed to add/update  notification";
     }
 
-    interface ContentStatus {
-        String LIVE = "LIVE";
-        String DRAFT = "DRAFT";
-    }
-
     interface GeTransferEvent {
         String TRANSFER_DIRECTION_EXPORT = "EXPORT";
         String TRANSFER_DIRECTION_IMPORT = "IMPORT";
@@ -206,5 +219,9 @@ public interface ServiceConstants {
         String CONTENT_ITEMS_KEY = "contents";
         String FILE_SIZE = "FILE_SIZE";
         String FILE_TYPE = "FILE_TYPE";
+    }
+
+    interface Network {
+
     }
 }

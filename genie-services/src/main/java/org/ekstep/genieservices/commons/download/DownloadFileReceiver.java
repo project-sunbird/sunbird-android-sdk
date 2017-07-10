@@ -28,9 +28,9 @@ public class DownloadFileReceiver extends BroadcastReceiver {
         DownloadRequest request = downloadService.getDownloadRequest(downloadId);
         if (request != null) {
             DownloadProgress progress = downloadService.getProgress(request.getIdentifier());
-            String localFilePath = progress.getDownloadPath();
             switch (progress.getStatus()) {
                 case IDownloadManager.COMPLETED:
+                    String localFilePath = progress.getDownloadPath();
                     downloadService.onDownloadComplete(request.getIdentifier());
                     //Ideally get the service class from Reflection utils with a service name provided in the downloadRequest
                     Class _class = ReflectionUtil.getClass(request.getProcessorClass());
@@ -40,10 +40,10 @@ public class DownloadFileReceiver extends BroadcastReceiver {
                     serviceIntent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_DESTINATION_FILE_PATH, request.getDestinationFolder());
                     context.startService(serviceIntent);
                     break;
+
                 case IDownloadManager.FAILED:
                     downloadService.onDownloadFailed(request.getIdentifier());
                     break;
-
             }
         }
     }

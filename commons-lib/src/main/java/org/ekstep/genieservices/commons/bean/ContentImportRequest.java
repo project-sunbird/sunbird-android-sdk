@@ -8,7 +8,8 @@ import java.util.List;
  * - destinationFolder - where the contents are to be stored
  * - contentIds - list of contentIds to be imported
  * - correlationData - list of correlationData
- *
+ * - status - list of status i.e. "Live", "Draft"
+ * - contentType - List of contentType. "Story", "Worksheet", "Collection", "Game", "TextBook", "Course", "LessonPlan".
  */
 public class ContentImportRequest {
 

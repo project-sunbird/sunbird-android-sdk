@@ -1,35 +1,50 @@
 package org.ekstep.genieservices.commons.bean;
 
 /**
- * This class accepts contentListingId, subject, {@link Profile}, and list of {@link PartnerFilter} while building the criteria for content listing request.
- *
+ * This class accepts contentListingId, subject, age, grade, medium, board, audience array, channel array and device id while building the criteria for content listing request.
  */
 public class ContentListingCriteria {
 
     private String contentListingId;
+    private String uid;
+    private String language;
     private String subject;
     private int age;
     private int grade;
     private String medium;
     private String board;
+    private String did;
     private String[] audience;
     private String[] channel;
-    private String did;
+    private String[] facets;
 
-    public ContentListingCriteria(String contentListingId, String subject, int age, int grade, String medium, String board, String did, String[] audience, String[] channel) {
+    private ContentListingCriteria(String contentListingId, String uid, String language, String subject,
+                                   int age, int grade, String medium, String board, String did,
+                                   String[] audience, String[] channel, String[] facets) {
         this.contentListingId = contentListingId;
+        this.uid = uid;
+        this.language = language;
         this.subject = subject;
         this.age = age;
         this.grade = grade;
         this.medium = medium;
         this.board = board;
+        this.did = did;
         this.audience = audience;
         this.channel = channel;
-        this.did = did;
+        this.facets = facets;
     }
 
     public String getContentListingId() {
         return contentListingId;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public String getLanguage() {
+        return language;
     }
 
     public String getSubject() {
@@ -52,6 +67,10 @@ public class ContentListingCriteria {
         return board;
     }
 
+    public String getDid() {
+        return did;
+    }
+
     public String[] getAudience() {
         return audience;
     }
@@ -60,24 +79,36 @@ public class ContentListingCriteria {
         return channel;
     }
 
-    public String getDid() {
-        return did;
+    public String[] getFacets() {
+        return facets;
     }
 
     public static class Builder {
-
         private String contentListingId;
+        private String uid;
+        private String language;
         private String subject;
         private int age;
         private int grade;
         private String medium;
         private String board;
+        private String did;
         private String[] audience;
         private String[] channel;
-        private String did;
+        private String[] facets;
 
         public Builder listingId(String contentListingId) {
             this.contentListingId = contentListingId;
+            return this;
+        }
+
+        public Builder forUser(String uid) {
+            this.uid = uid;
+            return this;
+        }
+
+        public Builder forLanguage(String language) {
+            this.language = language;
             return this;
         }
 
@@ -121,8 +152,19 @@ public class ContentListingCriteria {
             return this;
         }
 
+        /**
+         * Array of facets. i.e. "contentType", "domain", "ageGroup", "language", "gradeLevel"
+         */
+        public Builder facets(String[] facets) {
+            this.facets = facets;
+            return this;
+        }
+
         public ContentListingCriteria build() {
-            return new ContentListingCriteria(contentListingId, subject, age, grade, medium, board, did, audience, channel);
+            if (facets == null || facets.length == 0) {
+                this.facets = new String[]{"contentType", "domain", "ageGroup", "language", "gradeLevel"};
+            }
+            return new ContentListingCriteria(contentListingId, uid, language, subject, age, grade, medium, board, did, audience, channel, facets);
         }
     }
 }

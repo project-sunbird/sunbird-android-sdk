@@ -6,18 +6,14 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * This class accepts query string, {@link List<ContentSearchFilter>}, {@link List<PartnerFilter>}, sort by string, limit and profileFilter for searching a content with all
+ * This class accepts query string, {@link List<ContentSearchFilter>}, age, grade, medium, board, audience array, channel array, sort criteria, limit and mode for searching a content with all
  * set criteria
- *
  */
 public class ContentSearchCriteria implements Serializable {
 
     private static final int DEFAULT_LIMIT = 100;
 
     private String query;
-    private List<ContentSearchFilter> facetFilters;
-    private List<ContentSearchFilter> impliedFilters;
-    private List<ContentSortCriteria> sortCriteria;
     private long limit;
     private String mode;
     private int age;
@@ -26,10 +22,18 @@ public class ContentSearchCriteria implements Serializable {
     private String board;
     private String[] audience;
     private String[] channel;
+    private String[] contentStatusArray;
+    private String[] facets;
+    private String[] contentTypes;
+    private List<ContentSearchFilter> facetFilters;
+    private List<ContentSearchFilter> impliedFilters;
+    private List<ContentSortCriteria> sortCriteria;
     // 1 - indicates search, 2 - filter
     private SearchType searchType;
 
-    private ContentSearchCriteria(String query, long limit, String mode, int age, int grade, String medium, String board, String[] audience, String[] channel, List<ContentSortCriteria> sortCriteria, SearchType searchType) {
+    private ContentSearchCriteria(String query, long limit, String mode, int age, int grade, String medium, String board,
+                                  String[] audience, String[] channel, String[] contentStatusArray, String[] facets, String[] contentTypes,
+                                  List<ContentSortCriteria> sortCriteria, SearchType searchType) {
         this.query = query;
         this.limit = limit;
         this.mode = mode;
@@ -39,14 +43,21 @@ public class ContentSearchCriteria implements Serializable {
         this.board = board;
         this.audience = audience;
         this.channel = channel;
+        this.contentStatusArray = contentStatusArray;
+        this.facets = facets;
+        this.contentTypes = contentTypes;
         this.sortCriteria = sortCriteria;
         this.searchType = searchType;
     }
 
-    private ContentSearchCriteria(String query, long limit, String mode, List<ContentSearchFilter> facetFilters, List<ContentSearchFilter> impliedFilters, List<ContentSortCriteria> sortCriteria, SearchType searchType) {
+    private ContentSearchCriteria(String query, long limit, String mode, String[] facets, String[] contentTypes,
+                                  List<ContentSearchFilter> facetFilters, List<ContentSearchFilter> impliedFilters,
+                                  List<ContentSortCriteria> sortCriteria, SearchType searchType) {
         this.query = query;
         this.limit = limit;
         this.mode = mode;
+        this.facets = facets;
+        this.contentTypes = contentTypes;
         this.facetFilters = facetFilters;
         this.impliedFilters = impliedFilters;
         this.sortCriteria = sortCriteria;
@@ -81,6 +92,22 @@ public class ContentSearchCriteria implements Serializable {
         return channel;
     }
 
+    public String[] getContentStatusArray() {
+        return contentStatusArray;
+    }
+
+    public String[] getFacets() {
+        return facets;
+    }
+
+    public String[] getContentTypes() {
+        return contentTypes;
+    }
+
+    public List<ContentSearchFilter> getFacetFilters() {
+        return facetFilters;
+    }
+
     public List<ContentSearchFilter> getImpliedFilters() {
         return impliedFilters;
     }
@@ -91,10 +118,6 @@ public class ContentSearchCriteria implements Serializable {
 
     public SearchType getSearchType() {
         return searchType;
-    }
-
-    public List<ContentSearchFilter> getFacetFilters() {
-        return facetFilters;
     }
 
     public long getLimit() {
@@ -116,6 +139,9 @@ public class ContentSearchCriteria implements Serializable {
         private String board;
         private String[] audience;
         private String[] channel;
+        private String[] contentStatusArray;
+        private String[] facets;
+        private String[] contentTypes;
         private List<ContentSortCriteria> sortCriteria;
 
         public SearchBuilder() {
@@ -163,6 +189,9 @@ public class ContentSearchCriteria implements Serializable {
             return this;
         }
 
+        /**
+         * Array of audience. i.e. "Learner", "Instructor".
+         */
         public SearchBuilder audience(String[] audience) {
             this.audience = audience;
             return this;
@@ -173,8 +202,45 @@ public class ContentSearchCriteria implements Serializable {
             return this;
         }
 
+        /**
+         * Array of status. i.e. "Live", "Draft"
+         */
+        public SearchBuilder contentStatusArray(String[] contentStatusArray) {
+            this.contentStatusArray = contentStatusArray;
+            return this;
+        }
+
+        /**
+         * Array of facets. i.e. "contentType", "domain", "ageGroup", "language", "gradeLevel"
+         */
+        public SearchBuilder facets(String[] facets) {
+            this.facets = facets;
+            return this;
+        }
+
+        /**
+         * Array of contentTypes. i.e. "Story", "Worksheet", "Game", "Collection", "TextBook", "Course", "LessonPlan".
+         */
+        public SearchBuilder contentTypes(String[] contentTypes) {
+            this.contentTypes = contentTypes;
+            return this;
+        }
+
         public ContentSearchCriteria build() {
-            return new ContentSearchCriteria(query, limit, mode, age, grade, medium, board, audience, channel, sortCriteria, SearchType.SEARCH);
+            if (contentStatusArray == null || contentStatusArray.length == 0) {
+                this.contentStatusArray = new String[]{"Live"};
+            }
+
+            if (facets == null || facets.length == 0) {
+                this.facets = new String[]{"contentType", "domain", "ageGroup", "language", "gradeLevel"};
+            }
+
+            if (contentTypes == null || contentTypes.length == 0) {
+                this.contentTypes = new String[]{"Story", "Worksheet", "Collection", "Game", "TextBook"};
+            }
+
+            return new ContentSearchCriteria(query, limit, mode, age, grade, medium, board,
+                    audience, channel, contentStatusArray, facets, contentTypes, sortCriteria, SearchType.SEARCH);
         }
     }
 
@@ -182,9 +248,10 @@ public class ContentSearchCriteria implements Serializable {
     public static class FilterBuilder {
 
         private String query;
-        private String sortBy;
         private long limit;
         private String mode;
+        private String[] facets;
+        private String[] contentTypes;
         private List<ContentSearchFilter> facetFilters;
         private List<ContentSearchFilter> impliedFilters;
         private List<ContentSortCriteria> sortCriteria;
@@ -201,6 +268,22 @@ public class ContentSearchCriteria implements Serializable {
 
         public FilterBuilder limit(long limit) {
             this.limit = limit;
+            return this;
+        }
+
+        /**
+         * Array of facets. i.e. "contentType", "domain", "ageGroup", "language", "gradeLevel"
+         */
+        public FilterBuilder facets(String[] facets) {
+            this.facets = facets;
+            return this;
+        }
+
+        /**
+         * Array of contentTypes. i.e. "Story", "Worksheet", "Game", "Collection", "TextBook", "Course", "LessonPlan".
+         */
+        public FilterBuilder contentTypes(String[] contentTypes) {
+            this.contentTypes = contentTypes;
             return this;
         }
 
@@ -225,7 +308,15 @@ public class ContentSearchCriteria implements Serializable {
         }
 
         public ContentSearchCriteria build() {
-            return new ContentSearchCriteria(query, limit, mode, facetFilters, impliedFilters, sortCriteria, SearchType.FILTER);
+            if (facets == null || facets.length == 0) {
+                this.facets = new String[]{"contentType", "domain", "ageGroup", "language", "gradeLevel"};
+            }
+
+            if (contentTypes == null || contentTypes.length == 0) {
+                this.contentTypes = new String[]{"Story", "Worksheet", "Collection", "Game", "TextBook"};
+            }
+
+            return new ContentSearchCriteria(query, limit, mode, facets, contentTypes, facetFilters, impliedFilters, sortCriteria, SearchType.FILTER);
         }
     }
 }

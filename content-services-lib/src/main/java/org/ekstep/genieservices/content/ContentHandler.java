@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import org.ekstep.genieservices.IConfigService;
 import org.ekstep.genieservices.IContentFeedbackService;
 import org.ekstep.genieservices.IUserService;
+import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
@@ -14,6 +15,7 @@ import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
 import org.ekstep.genieservices.commons.bean.ContentFeedbackFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
+import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingSection;
@@ -25,17 +27,16 @@ import org.ekstep.genieservices.commons.bean.FilterValue;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.MasterDataValues;
-import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.UserSession;
-import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
 import org.ekstep.genieservices.commons.bean.enums.SearchType;
 import org.ekstep.genieservices.commons.bean.enums.SortOrder;
 import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.contract.ContentEntry;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -102,8 +103,7 @@ public class ContentHandler {
     private static final int DEFAULT_PACKAGE_VERSION = -1;
     private static final int INITIAL_VALUE_FOR_TRANSFER_COUNT = 0;
     private static final int MAX_CONTENT_NAME = 30;
-    public static int minCompatibilityLevel = 1;
-    public static int maxCompatibilityLevel = 3;
+
     // TODO: 02-03-2017 : We can remove this later after few release
     public static int defaultCompatibilityLevel = 1;
 
@@ -384,23 +384,11 @@ public class ContentHandler {
         return null;
     }
 
-    public static Profile getCurrentProfile(IUserService userService) {
-        Profile profile = null;
-        if (userService != null) {
-            GenieResponse<Profile> profileGenieResponse = userService.getCurrentUser();
-            if (profileGenieResponse.getStatus()) {
-                profile = profileGenieResponse.getResult();
-            }
-        }
-        return profile;
-    }
-
     public static List<ContentFeedback> getContentFeedback(IContentFeedbackService contentFeedbackService, String contentIdentifier, String uid) {
         if (contentFeedbackService != null) {
             ContentFeedbackFilterCriteria.Builder builder = new ContentFeedbackFilterCriteria.Builder().byUser(uid).forContent(contentIdentifier);
             return contentFeedbackService.getFeedback(builder.build()).getResult();
         }
-
         return null;
     }
 
@@ -409,7 +397,6 @@ public class ContentHandler {
             ContentAccessFilterCriteria.Builder builder = new ContentAccessFilterCriteria.Builder().byUser(uid).forContent(contentIdentifier);
             return userService.getAllContentAccess(builder.build()).getResult();
         }
-
         return null;
     }
 
@@ -432,14 +419,20 @@ public class ContentHandler {
         return contentState == ContentConstants.State.ARTIFACT_AVAILABLE;
     }
 
+    private static String[] getDefaultContentTypes() {
+        return new String[]{"Story", "Worksheet", "Collection", "Game", "TextBook"};
+    }
+
     public static List<ContentModel> getAllLocalContent(IDBSession dbSession, ContentFilterCriteria criteria) {
         String uid = null;
-        ContentType[] contentTypes = null;
+        String[] contentTypes;
         if (criteria != null) {
             uid = criteria.getUid();
             contentTypes = criteria.getContentTypes();
+        } else {
+            contentTypes = getDefaultContentTypes();
         }
-        String contentTypesStr = ContentType.getCommaSeparatedContentTypes(contentTypes);
+        String contentTypesStr = StringUtil.join("','", contentTypes);
 
         StringBuilder audienceFilterBuilder = new StringBuilder();
         if (criteria != null && criteria.getAudience() != null && criteria.getAudience().length > 0) {
@@ -449,7 +442,7 @@ public class ContentHandler {
             }
         }
 
-        String contentTypeFilter = String.format(Locale.US, "c.%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr);
+        String contentTypeFilter = String.format(Locale.US, "c.%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr.toLowerCase());
         String contentVisibilityFilter = String.format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
         String artifactAvailabilityFilter = String.format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
         String filter = audienceFilterBuilder.length() == 0
@@ -458,7 +451,7 @@ public class ContentHandler {
 
         String orderBy = String.format(Locale.US, "ORDER BY ca.%s desc, c.%s desc, c.%s desc", ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP, ContentEntry.COLUMN_NAME_LOCAL_LAST_UPDATED_ON, ContentEntry.COLUMN_NAME_SERVER_LAST_UPDATED_ON);
 
-        String query = null;
+        String query;
         if (uid != null) {
             query = String.format(Locale.US, "SELECT c.* FROM  %s c LEFT JOIN %s ca ON c.%s = ca.%s AND ca.%s = '%s' %s %s;",
                     ContentEntry.TABLE_NAME, ContentAccessEntry.TABLE_NAME, ContentEntry.COLUMN_NAME_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_UID, uid,
@@ -479,15 +472,12 @@ public class ContentHandler {
         return contentModelListInDB;
     }
 
-    public static List<ContentModel> getAllLocalContentModel(IDBSession dbSession, ContentType[] contentTypes) {
-        String contentTypesStr = ContentType.getCommaSeparatedContentTypes(contentTypes);
-
-        String contentTypeFilter = String.format(Locale.US, "%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr);
+    public static List<ContentModel> getAllLocalContentModel(IDBSession dbSession) {
         String contentVisibilityFilter = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
         // For hiding the non compatible imported content, which visibility is DEFAULT.
         String artifactAvailabilityFilter = String.format(Locale.US, "%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
 
-        String filter = String.format(Locale.US, " where (%s AND %s AND %s)", contentVisibilityFilter, artifactAvailabilityFilter, contentTypeFilter);
+        String filter = String.format(Locale.US, " where (%s AND %s)", contentVisibilityFilter, artifactAvailabilityFilter);
 
         List<ContentModel> contentModelListInDB;
         ContentsModel contentsModel = ContentsModel.find(dbSession, filter);
@@ -516,10 +506,8 @@ public class ContentHandler {
             }
 
             // Update the contentState
-            // Do not update the content state if contentType is Collection / TextBook / TextBookUnit
-            if (ContentType.COLLECTION.getValue().equalsIgnoreCase(contentModel.getContentType())
-                    || ContentType.TEXTBOOK.getValue().equalsIgnoreCase(contentModel.getContentType())
-                    || ContentType.TEXTBOOK_UNIT.getValue().equalsIgnoreCase(contentModel.getContentType())) {
+            // Do not update the content state if mimeType is "application/vnd.ekstep.content-collection"
+            if (ContentConstants.MimeType.COLLECTION.equals(contentModel.getMimeType())) {
                 contentState = ContentConstants.State.ARTIFACT_AVAILABLE;
             } else {
                 contentState = ContentConstants.State.ONLY_SPINE;
@@ -527,11 +515,8 @@ public class ContentHandler {
 
         } else {
             // TODO: This check should be before updating the existing refCount.
-            // Do not update the content state if contentType is Collection / TextBook / TextBookUnit and refCount is more than 1.
-            if ((ContentType.COLLECTION.getValue().equalsIgnoreCase(contentModel.getContentType())
-                    || ContentType.TEXTBOOK.getValue().equalsIgnoreCase(contentModel.getContentType())
-                    || ContentType.TEXTBOOK_UNIT.getValue().equalsIgnoreCase(contentModel.getContentType()))
-                    && refCount > 1) {
+            // Do not update the content state if mimeType is "application/vnd.ekstep.content-collection" and refCount is more than 1.
+            if (ContentConstants.MimeType.COLLECTION.equals(contentModel.getMimeType()) && refCount > 1) {
                 contentState = ContentConstants.State.ARTIFACT_AVAILABLE;
             } else if (refCount > 1 && isChildItems) {  //contentModel.isVisibilityDefault() &&
                 // Visibility will remain Default only.
@@ -618,8 +603,9 @@ public class ContentHandler {
      *
      * @return true if compatible else false.
      */
-    public static boolean isCompatible(Double compatibilityLevel) {
-        return (compatibilityLevel >= minCompatibilityLevel) && (compatibilityLevel <= maxCompatibilityLevel);
+    public static boolean isCompatible(AppContext appContext, Double compatibilityLevel) {
+        return (compatibilityLevel >= appContext.getParams().getInt(ServiceConstants.Params.MIN_COMPATIBILITY_LEVEL))
+                && (compatibilityLevel <= appContext.getParams().getInt(ServiceConstants.Params.MAX_COMPATIBILITY_LEVEL));
     }
 
     public static boolean isImportFileExist(ContentModel oldContentModel, ContentModel newContentModel) {
@@ -800,10 +786,6 @@ public class ContentHandler {
                     filter = String.format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ONLY_SPINE);
                     break;
 
-//            case CHILD_CONTENTS_FIRST_LEVEL_TEXTBOOK_UNIT:
-//                filter = String.format(Locale.US, " AND %s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_TYPE, ContentType.TEXTBOOK_UNIT.getValue());
-//                break;
-
                 case ContentConstants.ChildContents.ALL:
                 default:
                     filter = "";
@@ -825,13 +807,11 @@ public class ContentHandler {
         return contentModelListInDB;
     }
 
-    public static Map<String, Object> getSearchRequest(List<String> contentIdentifiers) {
+    public static Map<String, Object> getSearchRequest(AppContext appContext, ContentImportRequest importRequest) {
         Map<String, Object> filterMap = new HashMap<>();
-        filterMap.put("compatibilityLevel", getCompatibilityLevelFilter());
-        filterMap.put("identifier", contentIdentifiers);
-        filterMap.put("status", Collections.singletonList("Live"));
+        filterMap.put("compatibilityLevel", getCompatibilityLevelFilter(appContext));
+        filterMap.put("identifier", importRequest.getContentIds());
         filterMap.put("objectType", Collections.singletonList("Content"));
-        addFiltersIfNotAvailable(filterMap, "contentType", Arrays.asList("Story", "Worksheet", "Collection", "Game", "TextBook"));
 
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("filters", filterMap);
@@ -840,17 +820,17 @@ public class ContentHandler {
         return requestMap;
     }
 
-    public static Map<String, Object> getSearchRequest(IUserService userService, IConfigService configService, ContentSearchCriteria criteria) {
+    public static Map<String, Object> getSearchRequest(AppContext appContext, IUserService userService, IConfigService configService, ContentSearchCriteria criteria) {
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("query", criteria.getQuery());
         requestMap.put("limit", criteria.getLimit());
         requestMap.put("mode", criteria.getMode());
-        requestMap.put("facets", getFacetList());
+        requestMap.put("facets", Arrays.asList(criteria.getFacets()));
         addSortCriteria(requestMap, criteria);
         if (SearchType.SEARCH.equals(criteria.getSearchType())) {
-            requestMap.put("filters", getSearchRequest(configService, criteria));
+            requestMap.put("filters", getSearchRequest(appContext, configService, criteria));
         } else {
-            requestMap.put("filters", getFilterRequest(configService, criteria));
+            requestMap.put("filters", getFilterRequest(appContext, criteria));
         }
         return requestMap;
     }
@@ -865,16 +845,16 @@ public class ContentHandler {
         }
     }
 
-    private static Map<String, Object> getSearchRequest(IConfigService configService, ContentSearchCriteria criteria) {
+    private static Map<String, Object> getSearchRequest(AppContext appContext, IConfigService configService, ContentSearchCriteria criteria) {
         Map<String, Object> filterMap = new HashMap<>();
 
         // Populating implicit search criteria.
-        filterMap.put("compatibilityLevel", getCompatibilityLevelFilter());
-        filterMap.put("status", Collections.singletonList("Live"));
+        filterMap.put("compatibilityLevel", getCompatibilityLevelFilter(appContext));
+        filterMap.put("status", Arrays.asList(criteria.getContentStatusArray()));
         filterMap.put("objectType", Collections.singletonList("Content"));
-        filterMap.put("contentType", Arrays.asList("Story", "Worksheet", "Collection", "Game", "TextBook"));
+        filterMap.put("contentType", Arrays.asList(criteria.getContentTypes()));
 
-        //Add filters for criteria atributes
+        //Add filters for criteria attributes
         // Add subject filter
         if (criteria.getAge() > 0)
             applyListingFilter(configService, MasterDataType.AGEGROUP, String.valueOf(criteria.getAge()), filterMap);
@@ -908,9 +888,9 @@ public class ContentHandler {
         return filterMap;
     }
 
-    private static Map<String, Object> getFilterRequest(IConfigService configService, ContentSearchCriteria criteria) {
+    private static Map<String, Object> getFilterRequest(AppContext appContext, ContentSearchCriteria criteria) {
         Map<String, Object> filterMap = new HashMap<>();
-        filterMap.put("compatibilityLevel", getCompatibilityLevelFilter());
+        filterMap.put("compatibilityLevel", getCompatibilityLevelFilter(appContext));
         if (criteria.getFacetFilters() != null) {
             for (ContentSearchFilter filter : criteria.getFacetFilters()) {
                 List<String> filterValueList = new ArrayList<>();
@@ -941,17 +921,17 @@ public class ContentHandler {
             }
         }
 
+        if (!filterMap.containsKey("contentType")) {
+            filterMap.put("contentType", Arrays.asList(criteria.getContentTypes()));
+        }
+
         return filterMap;
     }
 
-    private static List<String> getFacetList() {
-        return Arrays.asList("contentType", "domain", "ageGroup", "language", "gradeLevel");
-    }
-
-    private static Map<String, Integer> getCompatibilityLevelFilter() {
+    private static Map<String, Integer> getCompatibilityLevelFilter(AppContext appContext) {
         Map<String, Integer> compatibilityLevelMap = new HashMap<>();
-        compatibilityLevelMap.put("max", maxCompatibilityLevel);
-        compatibilityLevelMap.put("min", minCompatibilityLevel);
+        compatibilityLevelMap.put("min", appContext.getParams().getInt(ServiceConstants.Params.MIN_COMPATIBILITY_LEVEL));
+        compatibilityLevelMap.put("max", appContext.getParams().getInt(ServiceConstants.Params.MAX_COMPATIBILITY_LEVEL));
         return compatibilityLevelMap;
     }
 
@@ -1001,8 +981,11 @@ public class ContentHandler {
     public static ContentSearchCriteria createFilterCriteria(IConfigService configService, ContentSearchCriteria previousCriteria, List<Map<String, Object>> facets, Map<String, Object> appliedFilterMap) {
         List<ContentSearchFilter> facetFilters = new ArrayList<>();
         ContentSearchCriteria.FilterBuilder filterBuilder = new ContentSearchCriteria.FilterBuilder();
-        filterBuilder.query(previousCriteria.getQuery()).limit(previousCriteria.getLimit());
-        filterBuilder.sort(previousCriteria.getSortCriteria() == null ? new ArrayList<ContentSortCriteria>() : previousCriteria.getSortCriteria());
+        filterBuilder.query(previousCriteria.getQuery())
+                .limit(previousCriteria.getLimit())
+                .contentTypes(previousCriteria.getContentTypes())
+                .sort(previousCriteria.getSortCriteria() == null ? new ArrayList<ContentSortCriteria>() : previousCriteria.getSortCriteria());
+
         if ("soft".equals(previousCriteria.getMode())) {
             filterBuilder.softFilters();
         }
@@ -1087,7 +1070,7 @@ public class ContentHandler {
     }
 
     private static int indexOf(List<String> facetsOrder, String key) {
-        if (!StringUtil.isNullOrEmpty(key)) {
+        if (!CollectionUtil.isNullOrEmpty(facetsOrder) && !StringUtil.isNullOrEmpty(key)) {
             for (int i = 0; i < facetsOrder.size(); i++) {
                 if (key.equalsIgnoreCase(facetsOrder.get(i))) {
                     return i;
@@ -1110,23 +1093,21 @@ public class ContentHandler {
         return requestMap;
     }
 
-    public static HashMap<String, Object> getRelatedContentRequest(IUserService userService, RelatedContentRequest request, String did) {
+    public static HashMap<String, Object> getRelatedContentRequest(RelatedContentRequest request, String did) {
         String dlang = "";
         String uid = "";
-        if (userService != null) {
-            GenieResponse<Profile> profileGenieResponse = userService.getCurrentUser();
-            if (profileGenieResponse.getStatus()) {
-                Profile profile = profileGenieResponse.getResult();
-                uid = profile.getUid();
-                dlang = profile.getLanguage();
-            }
+        if (!StringUtil.isNullOrEmpty(request.getUid())) {
+            uid = request.getUid();
+        }
+        if (!StringUtil.isNullOrEmpty(request.getLanguage())) {
+            dlang = request.getLanguage();
         }
 
         HashMap<String, Object> contextMap = new HashMap<>();
-        contextMap.put("did", did);
-        contextMap.put("dlang", dlang);
         contextMap.put("contentid", request.getContentId());
         contextMap.put("uid", uid);
+        contextMap.put("dlang", dlang);
+        contextMap.put("did", did);
 
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("context", contextMap);
@@ -1135,41 +1116,41 @@ public class ContentHandler {
         return requestMap;
     }
 
-    public static void refreshContentListingFromServer(final AppContext appContext, final IConfigService configService, final ContentListingCriteria contentListingCriteria,
-                                                       final Profile profile, final String did) {
+    public static void refreshContentListingFromServer(final AppContext appContext, final IConfigService configService, final ContentListingCriteria contentListingCriteria, final String did) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                fetchContentListingFromServer(appContext, configService, contentListingCriteria, profile, did);
+                fetchContentListingFromServer(appContext, configService, contentListingCriteria, did);
             }
         }).start();
     }
 
-    public static String fetchContentListingFromServer(AppContext appContext, IConfigService configService, ContentListingCriteria contentListingCriteria, Profile profile, String did) {
-        Map<String, Object> requestMap = ContentHandler.getContentListingRequest(configService, contentListingCriteria, profile, did);
+    public static String fetchContentListingFromServer(AppContext appContext, IConfigService configService, ContentListingCriteria contentListingCriteria, String did) {
+        Map<String, Object> requestMap = getContentListingRequest(appContext, configService, contentListingCriteria, did);
         ContentListingAPI api = new ContentListingAPI(appContext, contentListingCriteria.getContentListingId(), requestMap);
         GenieResponse apiResponse = api.post();
         String jsonStr = null;
         if (apiResponse.getStatus()) {
             jsonStr = apiResponse.getResult().toString();
-            ContentHandler.saveContentListingDataInDB(appContext, contentListingCriteria, jsonStr);
+            saveContentListingDataInDB(appContext, contentListingCriteria, jsonStr);
         }
         return jsonStr;
     }
 
-
-    public static Map<String, Object> getContentListingRequest(IConfigService configService, ContentListingCriteria contentListingCriteria, Profile profile, String did) {
+    private static Map<String, Object> getContentListingRequest(AppContext appContext, IConfigService configService, ContentListingCriteria contentListingCriteria, String did) {
         HashMap<String, Object> contextMap = new HashMap<>();
 
-        if (profile != null) {
-            contextMap.put("uid", profile.getUid());
-            contextMap.put("dlang", profile.getLanguage());
+        if (!StringUtil.isNullOrEmpty(contentListingCriteria.getUid())) {
+            contextMap.put("uid", contentListingCriteria.getUid());
+        }
+        if (!StringUtil.isNullOrEmpty(contentListingCriteria.getLanguage())) {
+            contextMap.put("dlang", contentListingCriteria.getLanguage());
         }
         contextMap.put("did", did);
         contextMap.put("contentid", "");
 
         Map<String, Object> filterMap = new HashMap<>();
-        filterMap.put("compatibilityLevel", getCompatibilityLevelFilter());
+        filterMap.put("compatibilityLevel", getCompatibilityLevelFilter(appContext));
 
         // Add subject filter
         if (!StringUtil.isNullOrEmpty(contentListingCriteria.getSubject()))
@@ -1211,7 +1192,7 @@ public class ContentHandler {
         return requestMap;
     }
 
-    public static void saveContentListingDataInDB(AppContext appContext, ContentListingCriteria contentListingCriteria, String jsonStr) {
+    private static void saveContentListingDataInDB(AppContext appContext, ContentListingCriteria contentListingCriteria, String jsonStr) {
         if (jsonStr == null) {
             return;
         }
@@ -1226,7 +1207,7 @@ public class ContentHandler {
         contentListingModel.save();
     }
 
-    public static ContentListing getContentListingResult(IDBSession dbSession, ContentListingCriteria contentListingCriteria, String jsonStr) {
+    public static ContentListing getContentListingResult(ContentListingCriteria contentListingCriteria, String jsonStr) {
         ContentListing contentListing = null;
 
         LinkedTreeMap map = GsonUtil.fromJson(jsonStr, LinkedTreeMap.class);
@@ -1243,14 +1224,14 @@ public class ContentHandler {
             contentListing.setContentListingId(contentListingCriteria.getContentListingId());
             contentListing.setResponseMessageId(responseMessageId);
             if (result.containsKey("page")) {
-                contentListing.setContentListingSections(getSectionsFromPageMap(dbSession, (Map<String, Object>) result.get("page"), contentListingCriteria));
+                contentListing.setContentListingSections(getSectionsFromPageMap((Map<String, Object>) result.get("page")));
             }
         }
 
         return contentListing;
     }
 
-    private static List<ContentListingSection> getSectionsFromPageMap(IDBSession dbSession, Map<String, Object> pageMap, ContentListingCriteria contentListingCriteria) {
+    private static List<ContentListingSection> getSectionsFromPageMap(Map<String, Object> pageMap) {
         List<ContentListingSection> contentListingSectionList = new ArrayList<>();
 
         List<Map<String, Object>> sections = (List<Map<String, Object>>) pageMap.get("sections");
@@ -1290,7 +1271,17 @@ public class ContentHandler {
 
                 if (searchMap.containsKey("filters")) {
                     Map filtersMap = (Map) searchMap.get("filters");
+                    if (filtersMap.containsKey("contentType")) {
+                        ArrayList<String> contentType = (ArrayList<String>) filtersMap.get("contentType");
+                        builder.contentTypes(contentType.toArray(new String[contentType.size()]));
+                    }
+
                     builder.impliedFilters(mapFilterValues(filtersMap));
+                }
+
+                if (searchMap.containsKey("facets")) {
+                    ArrayList<String> facets = (ArrayList<String>) searchMap.get("facets");
+                    builder.facets(facets.toArray(new String[facets.size()]));
                 }
 
                 contentSearchCriteria = builder.build();
@@ -1355,9 +1346,7 @@ public class ContentHandler {
     public static String getDownloadUrl(Map<String, Object> dataMap) {
         String downloadUrl = null;
 
-        String contentType = (String) dataMap.get(KEY_CONTENT_TYPE);
-        if ((ContentType.TEXTBOOK.getValue().equalsIgnoreCase(contentType)
-                || ContentType.COLLECTION.getValue().equalsIgnoreCase(contentType))) {
+        if (ContentConstants.MimeType.COLLECTION.equals(readMimeType(dataMap))) {
             ContentVariant spineContentVariant = getVariant(dataMap, "spine");
             if (spineContentVariant != null) {
                 downloadUrl = spineContentVariant.getEcarUrl();
@@ -1437,7 +1426,6 @@ public class ContentHandler {
             }
 
             double pkgVersion;
-
             try {
                 pkgVersion = pkgVersion(firstContent.getLocalData());
             } catch (Exception e) {

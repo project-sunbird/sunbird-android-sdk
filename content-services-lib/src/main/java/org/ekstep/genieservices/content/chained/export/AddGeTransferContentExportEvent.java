@@ -35,7 +35,7 @@ public class AddGeTransferContentExportEvent implements IChainable<ContentExport
                 ((List) metadata.get(GETransferEventKnowStructure.CONTENT_ITEMS_KEY)).size(),
                 (Long) metadata.get(GETransferEventKnowStructure.FILE_SIZE),
                 buildContentsMetadata(importContext.getItems()));
-        GETransfer geTransfer = new GETransfer(new GameData(appContext.getParams().getGid(), appContext.getParams().getVersionName()), eks);
+        GETransfer geTransfer = new GETransfer(new GameData(appContext.getParams().getString(ServiceConstants.Params.GID), appContext.getParams().getString(ServiceConstants.Params.VERSION_NAME)), eks);
         TelemetryLogger.log(geTransfer);
 
         ContentExportResponse contentExportResponse = new ContentExportResponse();

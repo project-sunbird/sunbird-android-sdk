@@ -1,6 +1,6 @@
 package org.ekstep.genieservices.commons.bean;
 
-import org.ekstep.genieservices.commons.bean.enums.ContentAccessStatusType;
+import org.ekstep.genieservices.commons.bean.enums.ContentAccessStatus;
 
 import java.io.Serializable;
 
@@ -14,20 +14,20 @@ public class ContentAccess implements Serializable {
     private String contentId;
     private ContentLearnerState contentLearnerState;
 
-    public ContentAccessStatusType getStatus() {
-        ContentAccessStatusType contentAccessStatusType;
+    public ContentAccessStatus getStatus() {
+        ContentAccessStatus contentAccessStatus;
 
         switch (status) {
             case 1:
-                contentAccessStatusType = ContentAccessStatusType.PLAYED;
+                contentAccessStatus = ContentAccessStatus.PLAYED;
                 break;
 
             default:
-                contentAccessStatusType = ContentAccessStatusType.NOT_PLAYED;
+                contentAccessStatus = ContentAccessStatus.NOT_PLAYED;
                 break;
         }
 
-        return contentAccessStatusType;
+        return contentAccessStatus;
     }
 
     public void setStatus(int status) {

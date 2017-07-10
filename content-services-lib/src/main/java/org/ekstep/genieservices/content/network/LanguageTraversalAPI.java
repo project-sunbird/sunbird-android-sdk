@@ -16,13 +16,12 @@ public class LanguageTraversalAPI extends BaseAPI {
 
     private static final String TAG = LanguageTraversalAPI.class.getSimpleName();
 
-    private static final CharSequence SERVICE_ENDPOINTS = "language";
     private static final String ENDPOINT = "language/traversals";
 
     public LanguageTraversalAPI(AppContext appContext, String languageId) {
-        super(appContext, String.format(Locale.US, "%s/%s/%s",
-                String.format(Locale.US, appContext.getParams().getBaseApiUrl() + ServiceConstants.API.LP_EXTENSION, SERVICE_ENDPOINTS),
-                ENDPOINT, languageId), TAG);
+        super(appContext,
+                String.format(Locale.US, "%s/%s/%s", appContext.getParams().getString(ServiceConstants.Params.LANGUAGE_PLATFORM_BASE_URL), ENDPOINT, languageId),
+                TAG);
     }
 
     @Override

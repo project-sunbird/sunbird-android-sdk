@@ -3,8 +3,6 @@ package org.ekstep.genieresolvers.partner;
 import android.content.Context;
 
 import org.ekstep.genieresolvers.BaseService;
-import org.ekstep.genieresolvers.BaseTask;
-import org.ekstep.genieresolvers.TaskHandler;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.PartnerData;
 
@@ -12,7 +10,6 @@ import org.ekstep.genieservices.commons.bean.PartnerData;
  * Created on 24/5/17.
  * shriharsh
  */
-
 public class PartnerService extends BaseService{
 
     private String appQualifier;

@@ -2,7 +2,6 @@ package org.ekstep.genieservices.commons;
 
 import android.content.Context;
 
-import org.ekstep.genieservices.Constants;
 import org.ekstep.genieservices.commons.db.ServiceDbHelper;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.cache.PreferenceWrapper;
@@ -18,32 +17,44 @@ import org.ekstep.genieservices.commons.network.IHttpClientFactory;
  */
 public class AndroidAppContext extends AppContext<Context> {
 
+    private static final String SHARED_PREFERENCE_NAME = "org.ekstep.genieservices.preference_file";
+
+    private IParams mParams;
     private IDBSession mDBSession;
     private IConnectionInfo mConnectionInfo;
     private IHttpClientFactory mHttpClientFactory;
     private IKeyValueStore mKeyValueOperation;
     private IDeviceInfo mDeviceInfo;
     private ILocationInfo mLocationInfo;
-    private IParams mParams;
     private IDownloadManager mDownloadManager;
     private IAPKInstaller mAPKInstaller;
 
-    private AndroidAppContext(Context context, String appPackage) {
-        super(context, appPackage);
+    private AndroidAppContext(Context context) {
+        super(context);
     }
 
     public static AppContext<Context> buildAppContext(Context context, String appPackage) {
-        AndroidAppContext appContext = new AndroidAppContext(context, appPackage);
+        AndroidAppContext appContext = new AndroidAppContext(context);
         appContext.setParams(new BuildParams(context, appPackage));
         appContext.setDBSession(ServiceDbHelper.getGSDBSession(appContext));
         appContext.setConnectionInfo(new AndroidNetworkConnectivity(appContext));
         appContext.setHttpClientFactory(new AndroidHttpClientFactory(appContext));
-        appContext.setKeyValueStore(new PreferenceWrapper(context, Constants.SHARED_PREFERENCE_NAME));
+        appContext.setKeyValueStore(new PreferenceWrapper(context, SHARED_PREFERENCE_NAME));
         appContext.setDeviceInfo(new DeviceInfo(context));
-        appContext.setLocationInfo(new LocationInfo(context));
+        // Initialize this after KeyValueStore initialization.
+        appContext.setLocationInfo(new LocationInfo(appContext));
         appContext.setDownloadManager(new AndroidDownloadManager(context));
         appContext.setAPKInstaller(new APKInstaller(appContext));
         return appContext;
+    }
+
+    @Override
+    public IParams getParams() {
+        return mParams;
+    }
+
+    private void setParams(IParams params) {
+        this.mParams = params;
     }
 
     @Override
@@ -94,15 +105,6 @@ public class AndroidAppContext extends AppContext<Context> {
     }
 
     @Override
-    public IParams getParams() {
-        return mParams;
-    }
-
-    private void setParams(IParams params) {
-        this.mParams = params;
-    }
-
-    @Override
     public IDeviceInfo getDeviceInfo() {
         return mDeviceInfo;
     }
@@ -121,7 +123,7 @@ public class AndroidAppContext extends AppContext<Context> {
     }
 
     @Override
-    public IAPKInstaller getmAPKInstaller() {
+    public IAPKInstaller getAPKInstaller() {
         return mAPKInstaller;
     }
 

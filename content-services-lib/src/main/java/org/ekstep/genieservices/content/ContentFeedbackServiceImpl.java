@@ -36,7 +36,7 @@ public class ContentFeedbackServiceImpl extends BaseService implements IContentF
         super(appContext);
 
         this.userService = userService;
-        mGameData = new GameData(mAppContext.getParams().getGid(), mAppContext.getParams().getVersionName());
+        mGameData = new GameData(mAppContext.getParams().getString(ServiceConstants.Params.GID), mAppContext.getParams().getString(ServiceConstants.Params.VERSION_NAME));
     }
 
     @Override

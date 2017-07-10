@@ -1,24 +1,31 @@
 package org.ekstep.genieservices.commons;
 
 /**
- * Created by swayangjit on 27/4/17.
+ * Created on 27/4/17.
+ *
+ * @author swayangjit
  */
-
 public interface IParams {
 
-     String getBaseApiUrl();
+    /**
+     * Adds a value to the set.
+     *
+     * @param key   the name of the value to put
+     * @param value the data for the value to put
+     */
+    void put(String key, Object value);
 
-     String getUserName();
+    String getString(String key);
 
-     String getPassword();
+    long getLong(String key);
 
-     String getVersionName();
+    int getInt(String key);
 
-     String getGid();
+    boolean getBoolean(String key);
 
-     int getLogLevel();
+    boolean contains(String key);
 
-     String getQualifier();
+    void remove(String key);
 
-     String getProfilePath();
+    void clear();
 }

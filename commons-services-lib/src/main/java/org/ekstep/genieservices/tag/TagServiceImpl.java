@@ -9,7 +9,6 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Tag;
 import org.ekstep.genieservices.commons.utils.CryptoUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
-import org.ekstep.genieservices.commons.utils.SecurityUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.tag.cache.TelemetryTagCache;
 import org.ekstep.genieservices.tag.model.TagModel;
@@ -47,10 +46,13 @@ public class TagServiceImpl extends BaseService implements ITagService {
         if (tag != null && !StringUtil.isNullOrEmpty(tag.getName())) {
             TagModel existingTagModel = find(mAppContext.getDBSession(), tag.getName());
             String tagHash = null;
+
             try {
-                tagHash = SecurityUtil.toSha1(tag.getName().trim());
-            } catch (NoSuchAlgorithmException e) {
+                tagHash = CryptoUtil.checksum(tag.getName().trim());
+            } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+                //This will never occur as the algo and encoding are hardcoded.
             }
+
             TagModel tagModel = TagModel.build(mAppContext.getDBSession(), tag.getName().trim(), tagHash,
                     tag.getDescription(),
                     tag.getStartDate(),

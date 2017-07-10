@@ -12,18 +12,17 @@ import org.ekstep.genieservices.commons.network.IHttpClientFactory;
  */
 public abstract class AppContext<C> {
 
-    private C mContext;
+    private C context;
 
-    private String mAppPackage;
-
-    protected AppContext(C context, String appPackage) {
-        this.mContext = context;
-        this.mAppPackage = appPackage;
+    protected AppContext(C context) {
+        this.context = context;
     }
 
     public C getContext() {
-        return mContext;
+        return context;
     }
+
+    public abstract IParams getParams();
 
     public abstract IDBSession getDBSession();
 
@@ -37,12 +36,10 @@ public abstract class AppContext<C> {
 
     public abstract IDeviceInfo getDeviceInfo();
 
-    public abstract IParams getParams();
-
     public abstract ILocationInfo getLocationInfo();
 
     public abstract IDownloadManager getDownloadManager();
 
-    public abstract IAPKInstaller getmAPKInstaller();
+    public abstract IAPKInstaller getAPKInstaller();
 
 }

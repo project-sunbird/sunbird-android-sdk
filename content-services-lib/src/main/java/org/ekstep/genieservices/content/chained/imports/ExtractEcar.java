@@ -22,9 +22,8 @@ public class ExtractEcar implements IChainable {
     @Override
     public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
         importContext.getTmpLocation().mkdirs();
-        Decompress stage1 = new Decompress(importContext.getEcarFile(), importContext.getTmpLocation());
 
-        if (stage1.unzip() && nextLink != null) {
+        if (Decompress.unzip(importContext.getEcarFile(), importContext.getTmpLocation()) && nextLink != null) {
             importContext.getMetadata().put(ServiceConstants.GeTransferEvent.FILE_SIZE, importContext.getEcarFile().length());
             return nextLink.execute(appContext, importContext);
         } else {

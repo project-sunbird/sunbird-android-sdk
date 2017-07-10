@@ -73,15 +73,15 @@ public class DownloadServiceImpl implements IDownloadService {
                     mDownloadQueueManager.removeFromCurrentDownloadQueue(request.getIdentifier());
                     mDownloadQueueManager.updateDownload(request.getIdentifier(), -1);
                     resumeDownloads();
+                } else {
+                    mDownloadQueueManager.removeFromCurrentDownloadQueue(request.getIdentifier());
                 }
-            } else {
-                mDownloadQueueManager.removeFromCurrentDownloadQueue(request.getIdentifier());
             }
         }
     }
 
     private GEInteract buildGEInteractEvent(InteractionType type, String subType, List<CorrelationData> correlationDataList, String contendId) {
-        GEInteract geInteract = new GEInteract.Builder(new GameData(mAppContext.getParams().getGid(), mAppContext.getParams().getVersionName()))
+        GEInteract geInteract = new GEInteract.Builder(new GameData(mAppContext.getParams().getString(ServiceConstants.Params.GID), mAppContext.getParams().getString(ServiceConstants.Params.VERSION_NAME)))
                 .interActionType(type)
                 .stageId(ServiceConstants.Telemetry.CONTENT_DETAIL)
                 .subType(subType)
@@ -90,7 +90,6 @@ public class DownloadServiceImpl implements IDownloadService {
                 .build();
         return geInteract;
     }
-
 
     private void startTrackingProgress(final String identifier, final long downloadId) {
         mExecutor = Executors.newScheduledThreadPool(1);
@@ -119,7 +118,9 @@ public class DownloadServiceImpl implements IDownloadService {
         DownloadRequest request = mDownloadQueueManager.getRequestByIdentifier(identifier);
         if (request != null) {
             if (request.getDownloadId() != -1) {
-                mExecutor.shutdown();
+                if (mExecutor != null) {
+                    mExecutor.shutdown();
+                }
                 mDownloadManager.cancel(request.getDownloadId());
                 mDownloadQueueManager.removeFromCurrentDownloadQueue(identifier);
             }
@@ -149,7 +150,7 @@ public class DownloadServiceImpl implements IDownloadService {
             } else {
                 progress = mDownloadManager.getProgress(request.getDownloadId());
                 if (progress.getStatus() == IDownloadManager.COMPLETED) {
-                    progress.setDownloadPath(mDownloadManager.getDownloadPath(request.getDownloadId()));
+                    progress.setDownloadPath(mDownloadManager.getDownloadPath(request.getDownloadId(), request.getDestinationFolder()));
                 }
             }
         }

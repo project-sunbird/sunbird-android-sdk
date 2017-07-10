@@ -19,7 +19,6 @@ public class RecommendedContentAPI extends BaseAPI {
 
     private static final String TAG = RecommendedContentAPI.class.getSimpleName();
 
-    private static final String SERVICE_ENDPOINTS = "content";
     private static final String ENDPOINT = "recommend";
 
     private static final String VERSION = "1.0";
@@ -28,9 +27,9 @@ public class RecommendedContentAPI extends BaseAPI {
     private Map<String, Object> requestMap;
 
     public RecommendedContentAPI(AppContext appContext, Map<String, Object> requestMap) {
-        super(appContext, String.format(Locale.US, "%s/%s",
-                String.format(Locale.US, appContext.getParams().getBaseApiUrl() + ServiceConstants.API.LP_EXTENSION, SERVICE_ENDPOINTS),
-                ENDPOINT), TAG);
+        super(appContext,
+                String.format(Locale.US, "%s/%s", appContext.getParams().getString(ServiceConstants.Params.ANALYTICS_BASE_URL), ENDPOINT),
+                TAG);
 
         this.requestMap = requestMap;
     }
