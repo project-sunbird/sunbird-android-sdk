@@ -63,7 +63,6 @@ import java.util.UUID;
  *
  * @author shriharsh
  */
-
 public class UserServiceImpl extends BaseService implements IUserService {
 
     private static final String TAG = UserServiceImpl.class.getSimpleName();
@@ -388,7 +387,9 @@ public class UserServiceImpl extends BaseService implements IUserService {
         }
 
         GenieResponse<UserSession> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-        response.setResult(userSessionModel.getUserSessionBean());
+        if (userSessionModel != null) {
+            response.setResult(userSessionModel.getUserSessionBean());
+        }
         return response;
     }
 
