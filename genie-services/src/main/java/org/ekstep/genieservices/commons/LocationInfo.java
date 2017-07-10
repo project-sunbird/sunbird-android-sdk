@@ -116,46 +116,13 @@ public class LocationInfo implements ILocationInfo {
     public LocationInfo(AppContext<Context> appContext) {
         this.mAppContext = appContext;
 
-        mGoogleApiClient = new GoogleApiClient.Builder(mAppContext.getContext())
-                .addApi(LocationServices.API).build();
-
-        connectLocationService();
-
-        if (ActivityCompat.checkSelfPermission(mAppContext.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if (location != null) {
-            double latitude = location.getLatitude();
-            double longitude = location.getLongitude();
-
-            if (latitude != 0.0 && longitude != 0.0) {
-                String locationString = latitude + "," + longitude;
-                mAppContext.getKeyValueStore().putString(LAST_KNOWN_LOCATION, locationString);
-                mAppContext.getKeyValueStore().putLong(LAST_KNOWN_LOCATION_TIME, location.getTime());
-            }
-
-            Logger.i(TAG, "Time: " + location.getTime());
-            Logger.i(TAG, "Latitude: " + location.getLatitude());
-            Logger.i(TAG, "Longitude: " + location.getLongitude());
-            Logger.i(TAG, "Accuracy: " + location.getAccuracy());
-
-            disconnectLocationService();
-        }
-
         // Build google api client
-//        buildGoogleApiClient(mAppContext.getContext());
+        buildGoogleApiClient(mAppContext.getContext());
 
         // create a location request
-//        create();
+        create();
 
-//        connectLocationService();
+        connectLocationService();
     }
 
     @Override
@@ -172,8 +139,8 @@ public class LocationInfo implements ILocationInfo {
      */
     private synchronized void buildGoogleApiClient(Context context) {
         mGoogleApiClient = new GoogleApiClient.Builder(context)
-//                .addConnectionCallbacks(mConnectionCallbacks)
-//                .addOnConnectionFailedListener(mConnectionFailedListener)
+                .addConnectionCallbacks(mConnectionCallbacks)
+                .addOnConnectionFailedListener(mConnectionFailedListener)
                 .addApi(LocationServices.API).build();
     }
 
@@ -189,7 +156,7 @@ public class LocationInfo implements ILocationInfo {
      */
     private void disconnectLocationService() {
         if (mGoogleApiClient.isConnected()) {
-//            stopLocationUpdates();
+            stopLocationUpdates();
         }
 
         mGoogleApiClient.disconnect();
