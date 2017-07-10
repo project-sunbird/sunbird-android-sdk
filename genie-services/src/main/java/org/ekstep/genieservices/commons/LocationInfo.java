@@ -119,6 +119,8 @@ public class LocationInfo implements ILocationInfo {
         mGoogleApiClient = new GoogleApiClient.Builder(mAppContext.getContext())
                 .addApi(LocationServices.API).build();
 
+        connectLocationService();
+
         if (ActivityCompat.checkSelfPermission(mAppContext.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -143,6 +145,8 @@ public class LocationInfo implements ILocationInfo {
             Logger.i(TAG, "Latitude: " + location.getLatitude());
             Logger.i(TAG, "Longitude: " + location.getLongitude());
             Logger.i(TAG, "Accuracy: " + location.getAccuracy());
+
+            disconnectLocationService();
         }
 
         // Build google api client
@@ -185,7 +189,7 @@ public class LocationInfo implements ILocationInfo {
      */
     private void disconnectLocationService() {
         if (mGoogleApiClient.isConnected()) {
-            stopLocationUpdates();
+//            stopLocationUpdates();
         }
 
         mGoogleApiClient.disconnect();
