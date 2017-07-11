@@ -16,6 +16,11 @@ import java.util.HashMap;
  */
 public class BuildParams implements IParams {
 
+    private static final int CONTENT_MIN_COMPATIBILITY_LEVEL = 1;
+    private static final int CONTENT_MAX_COMPATIBILITY_LEVEL = 3;
+    private static final int NETWORK_READ_TIMEOUT = 10;
+    private static final int NETWORK_CONNECT_TIMEOUT = 10;
+
     /**
      * Holds the actual values
      */
@@ -25,9 +30,7 @@ public class BuildParams implements IParams {
      * Creates an empty set of values using the default initial size
      */
     public BuildParams(Context context, String packageName) {
-        // Choosing a default size of 16 based on analysis of typical
-        // consumption by applications.
-        mValues = new HashMap<>(16);
+        mValues = new HashMap<>();
 
         init(context, packageName);
     }
@@ -52,6 +55,8 @@ public class BuildParams implements IParams {
 
         initCompatibilityLevel(packageName);
 
+        initNetworkParam(packageName);
+
         String profileConfigClass = BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.PROFILE_CONFIG);
         if (profileConfigClass != null) {
             Class<?> classInstance = ReflectionUtil.getClass(profileConfigClass);
@@ -69,7 +74,7 @@ public class BuildParams implements IParams {
             minCompatibilityLevel = (int) min;
         }
         if (minCompatibilityLevel <= 0) {
-            minCompatibilityLevel = 1;
+            minCompatibilityLevel = CONTENT_MIN_COMPATIBILITY_LEVEL;
         }
 
         Object max = BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.MAX_COMPATIBILITY_LEVEL);
@@ -78,7 +83,7 @@ public class BuildParams implements IParams {
             maxCompatibilityLevel = (int) max;
         }
         if (maxCompatibilityLevel <= 0) {
-            maxCompatibilityLevel = 3;
+            maxCompatibilityLevel = CONTENT_MAX_COMPATIBILITY_LEVEL;
         }
 
         if (maxCompatibilityLevel < minCompatibilityLevel) {
@@ -87,6 +92,29 @@ public class BuildParams implements IParams {
 
         put(ServiceConstants.Params.MIN_COMPATIBILITY_LEVEL, minCompatibilityLevel);
         put(ServiceConstants.Params.MAX_COMPATIBILITY_LEVEL, maxCompatibilityLevel);
+    }
+
+    private void initNetworkParam(String packageName) {
+        Object connectTimeoutObj = BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.NETWORK_CONNECT_TIMEOUT);
+        int connectTimeout = 0;
+        if (connectTimeoutObj != null) {
+            connectTimeout = (int) connectTimeoutObj;
+        }
+        if (connectTimeout <= 0) {
+            connectTimeout = NETWORK_CONNECT_TIMEOUT;
+        }
+
+        Object readTimeoutObj = BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.NETWORK_READ_TIMEOUT);
+        int readTimeout = 0;
+        if (readTimeoutObj != null) {
+            readTimeout = (int) readTimeoutObj;
+        }
+        if (readTimeout <= 0) {
+            readTimeout = NETWORK_READ_TIMEOUT;
+        }
+
+        put(ServiceConstants.Params.NETWORK_CONNECT_TIMEOUT, connectTimeout);
+        put(ServiceConstants.Params.NETWORK_READ_TIMEOUT, readTimeout);
     }
 
     @Override
