@@ -7,14 +7,14 @@ public class GenieAsyncService {
 
     private static GenieService sService;
 
-    private static ConfigService sConfigService;
-    private static SyncService sSyncService;
-    private static TelemetryService sTelemetryService;
-    private static UserService sUserService;
-    private static ContentService sContentService;
-    private static TagService sTagService;
-    private static NotificationService sNotificationService;
-    private static SummarizerService sSummarizerService;
+    private ConfigService mConfigService;
+    private SyncService mSyncService;
+    private TelemetryService mTelemetryService;
+    private UserService mUserService;
+    private ContentService mContentService;
+    private TagService mTagService;
+    private NotificationService mNotificationService;
+    private SummarizerService mSummarizerService;
 
     private GenieAsyncService(GenieService genieService) {
         sService = genieService;
@@ -25,59 +25,59 @@ public class GenieAsyncService {
     }
 
     public ConfigService getConfigService() {
-        if (sConfigService == null) {
-            sConfigService = new ConfigService(sService);
+        if (mConfigService == null) {
+            mConfigService = new ConfigService(sService);
         }
-        return sConfigService;
+        return mConfigService;
     }
 
     public UserService getUserService() {
-        if (sUserService == null) {
-            sUserService = new UserService(sService);
+        if (mUserService == null) {
+            mUserService = new UserService(sService);
         }
-        return sUserService;
+        return mUserService;
     }
 
     public SyncService getSyncService() {
-        if (sSyncService == null) {
-            sSyncService = new SyncService(sService);
+        if (mSyncService == null) {
+            mSyncService = new SyncService(sService);
         }
-        return sSyncService;
+        return mSyncService;
     }
 
     public TelemetryService getTelemetryService() {
-        if (sTelemetryService == null) {
-            sTelemetryService = new TelemetryService(sService);
+        if (mTelemetryService == null) {
+            mTelemetryService = new TelemetryService(sService);
         }
-        return sTelemetryService;
+        return mTelemetryService;
     }
 
     public TagService getTagService() {
-        if (sTagService == null) {
-            sTagService = new TagService(sService);
+        if (mTagService == null) {
+            mTagService = new TagService(sService);
         }
-        return sTagService;
+        return mTagService;
     }
 
     public NotificationService getNotificationService() {
-        if (sNotificationService == null) {
-            sNotificationService = new NotificationService(sService);
+        if (mNotificationService == null) {
+            mNotificationService = new NotificationService(sService);
         }
-        return sNotificationService;
+        return mNotificationService;
     }
 
     public ContentService getContentService() {
-        if (sContentService == null) {
-            sContentService = new ContentService(sService);
+        if (mContentService == null) {
+            mContentService = new ContentService(sService);
         }
-        return sContentService;
+        return mContentService;
     }
 
     public SummarizerService getSummarizerService() {
-        if (sSummarizerService == null) {
-            sSummarizerService = new SummarizerService(sService);
+        if (mSummarizerService == null) {
+            mSummarizerService = new SummarizerService(sService);
         }
-        return sSummarizerService;
+        return mSummarizerService;
     }
 
 }
