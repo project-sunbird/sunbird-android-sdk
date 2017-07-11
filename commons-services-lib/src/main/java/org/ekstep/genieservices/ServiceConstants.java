@@ -56,6 +56,8 @@ public interface ServiceConstants {
         String MAX_COMPATIBILITY_LEVEL = "MAX_COMPATIBILITY_LEVEL";
         String PROFILE_CONFIG = "PROFILE_CONFIG";
         String PROFILE_PATH = "PROFILE_PATH";
+        String NETWORK_CONNECT_TIMEOUT = "NETWORK_CONNECT_TIMEOUT";
+        String NETWORK_READ_TIMEOUT = "NETWORK_READ_TIMEOUT";
     }
 
     interface BundleKey {

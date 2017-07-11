@@ -1,5 +1,7 @@
 package org.ekstep.genieservices.async;
 
+import android.os.AsyncTask;
+
 import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.IContentFeedbackService;
 import org.ekstep.genieservices.IContentService;
@@ -141,7 +143,7 @@ public class ContentService {
      * @param responseHandler       - {@link IResponseHandler<ContentSearchResult>}
      */
     public void searchContent(final ContentSearchCriteria contentSearchCriteria, IResponseHandler<ContentSearchResult> responseHandler) {
-        new AsyncHandler<ContentSearchResult>(responseHandler).execute(new IPerformable<ContentSearchResult>() {
+        new AsyncHandler<ContentSearchResult>(responseHandler).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new IPerformable<ContentSearchResult>() {
             @Override
             public GenieResponse<ContentSearchResult> perform() {
                 return contentService.searchContent(contentSearchCriteria);
@@ -165,7 +167,7 @@ public class ContentService {
      * @param responseHandler           - {@link IResponseHandler<RecommendedContentResult>}
      */
     public void getRecommendedContent(final RecommendedContentRequest recommendedContentRequest, IResponseHandler<RecommendedContentResult> responseHandler) {
-        new AsyncHandler<RecommendedContentResult>(responseHandler).execute(new IPerformable<RecommendedContentResult>() {
+        new AsyncHandler<RecommendedContentResult>(responseHandler).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new IPerformable<RecommendedContentResult>() {
             @Override
             public GenieResponse<RecommendedContentResult> perform() {
                 return contentService.getRecommendedContent(recommendedContentRequest);
@@ -190,7 +192,7 @@ public class ContentService {
      * @param responseHandler       - {@link IResponseHandler<RelatedContentResult>}
      */
     public void getRelatedContent(final RelatedContentRequest relatedContentRequest, IResponseHandler<RelatedContentResult> responseHandler) {
-        new AsyncHandler<RelatedContentResult>(responseHandler).execute(new IPerformable<RelatedContentResult>() {
+        new AsyncHandler<RelatedContentResult>(responseHandler).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new IPerformable<RelatedContentResult>() {
             @Override
             public GenieResponse<RelatedContentResult> perform() {
                 return contentService.getRelatedContent(relatedContentRequest);
@@ -230,7 +232,7 @@ public class ContentService {
      * @param responseHandler      - {@link IResponseHandler<Void>}
      */
     public void importContent(final ContentImportRequest contentImportRequest, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+        new AsyncHandler<Void>(responseHandler).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
                 return contentService.importContent(contentImportRequest);
@@ -273,7 +275,7 @@ public class ContentService {
      * @param responseHandler        - {@link ContentListingCriteria}
      */
     public void getContentListing(final ContentListingCriteria contentListingCriteria, IResponseHandler<ContentListing> responseHandler) {
-        new AsyncHandler<ContentListing>(responseHandler).execute(new IPerformable<ContentListing>() {
+        new AsyncHandler<ContentListing>(responseHandler).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new IPerformable<ContentListing>() {
             @Override
             public GenieResponse<ContentListing> perform() {
                 return contentService.getContentListing(contentListingCriteria);

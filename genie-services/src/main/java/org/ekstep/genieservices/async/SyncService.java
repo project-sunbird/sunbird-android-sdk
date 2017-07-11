@@ -1,5 +1,7 @@
 package org.ekstep.genieservices.async;
 
+import android.os.AsyncTask;
+
 import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.ISyncService;
 import org.ekstep.genieservices.commons.IResponseHandler;
@@ -32,7 +34,7 @@ public class SyncService {
      * @param responseHandler -{@link IResponseHandler<SyncStat>}
      */
     public void sync(IResponseHandler<SyncStat> responseHandler) {
-        new AsyncHandler<SyncStat>(responseHandler).execute(new IPerformable<SyncStat>() {
+        new AsyncHandler<SyncStat>(responseHandler).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new IPerformable<SyncStat>() {
             @Override
             public GenieResponse<SyncStat> perform() {
                 return syncService.sync();

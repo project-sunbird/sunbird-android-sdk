@@ -1,5 +1,7 @@
 package org.ekstep.genieservices.async;
 
+import android.os.AsyncTask;
+
 import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.ITelemetryService;
 import org.ekstep.genieservices.commons.IResponseHandler;
@@ -59,7 +61,7 @@ public class TelemetryService {
      * @param responseHandler - {@link IResponseHandler<Void>}
      */
     public void saveTelemetry(final Telemetry event, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+        new AsyncHandler<Void>(responseHandler).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
                 return telemetryService.saveTelemetry(event);

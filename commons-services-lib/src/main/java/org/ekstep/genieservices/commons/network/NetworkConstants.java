@@ -7,8 +7,8 @@ package org.ekstep.genieservices.commons.network;
  */
 public interface NetworkConstants {
 
-    int NETWORK_READ_TIMEOUT_MINUTES = 3;
-    int NETWORK_CONNECT_TIMEOUT_MINUTES = 3;
+    int NETWORK_READ_TIMEOUT = 10;
+    int NETWORK_CONNECT_TIMEOUT = 10;
 
     String CONNECTION_ERROR = "CONNECTION_ERROR";
     String CONNECTION_ERROR_MESSAGE = "No internet connection, please try again later.";

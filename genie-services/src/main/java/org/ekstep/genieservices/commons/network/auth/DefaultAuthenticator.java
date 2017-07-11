@@ -1,7 +1,5 @@
 package org.ekstep.genieservices.commons.network.auth;
 
-import com.squareup.okhttp.Credentials;
-
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.network.IHttpAuthenticator;
@@ -10,6 +8,8 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import okhttp3.Credentials;
 
 /**
  * Created on 4/19/2017.

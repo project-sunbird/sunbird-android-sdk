@@ -73,7 +73,6 @@ public abstract class BaseAPI {
 
     private IHttpClient prepareClient() {
         IHttpClient httpClient = httpClientFactory.getClient();
-        httpClient.setTimeouts(NetworkConstants.NETWORK_CONNECT_TIMEOUT_MINUTES, NetworkConstants.NETWORK_CONNECT_TIMEOUT_MINUTES);
         httpClient.createRequest(url);
         if (shouldAuthenticate()) {
             httpClient.setAuthHeaders();

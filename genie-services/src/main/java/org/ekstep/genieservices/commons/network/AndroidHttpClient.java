@@ -1,15 +1,15 @@
 package org.ekstep.genieservices.commons.network;
 
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
-
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 /**
  * Created on 20/4/17.
@@ -22,9 +22,9 @@ public class AndroidHttpClient implements IHttpClient {
 
     private IHttpAuthenticator authenticator;
 
-    public AndroidHttpClient(IHttpAuthenticator authenticator) {
+    public AndroidHttpClient(OkHttpClient httpClient, IHttpAuthenticator authenticator) {
         this.authenticator = authenticator;
-        this.mHttpClient = new OkHttpClient();
+        this.mHttpClient = httpClient;
     }
 
     @Override
@@ -50,7 +50,9 @@ public class AndroidHttpClient implements IHttpClient {
         requestBuilder.get();
         Request request = requestBuilder.build();
         Response response = mHttpClient.newCall(request).execute();
-        return new ApiResponse(response.isSuccessful(), response.body() != null ? response.body().string() : "", response.code());
+        ApiResponse apiResponse = new ApiResponse(response.isSuccessful(), response.body() != null ? response.body().string() : "", response.code());
+        response.close();
+        return apiResponse;
     }
 
     @Override
@@ -58,14 +60,9 @@ public class AndroidHttpClient implements IHttpClient {
         requestBuilder.post(RequestBody.create(MediaType.parse("application/json"), requestBody));
         Request request = requestBuilder.build();
         Response response = mHttpClient.newCall(request).execute();
-        return new ApiResponse(response.isSuccessful(), response.body() != null ? response.body().string() : "", response.code());
-    }
-
-    @Override
-    public Void setTimeouts(int connectionTimeout, int readTimeout) {
-        mHttpClient.setConnectTimeout(NetworkConstants.NETWORK_CONNECT_TIMEOUT_MINUTES, TimeUnit.MINUTES);
-        mHttpClient.setReadTimeout(NetworkConstants.NETWORK_READ_TIMEOUT_MINUTES, TimeUnit.MINUTES);
-        return null;
+        ApiResponse apiResponse = new ApiResponse(response.isSuccessful(), response.body() != null ? response.body().string() : "", response.code());
+        response.close();
+        return apiResponse;
     }
 
     @Override
