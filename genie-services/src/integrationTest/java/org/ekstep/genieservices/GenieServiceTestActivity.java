@@ -22,6 +22,7 @@ import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.HierarchyInfo;
 import org.ekstep.genieservices.commons.bean.ImportRequest;
 import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.PartnerData;
@@ -151,7 +152,7 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
-    public void importProfile(final ImportRequest importRequest,IResponseHandler<ProfileImportResponse> responseHandler) {
+    public void importProfile(final ImportRequest importRequest, IResponseHandler<ProfileImportResponse> responseHandler) {
         GenieService.getAsyncService().getUserService().importProfile(importRequest, responseHandler);
     }
 
@@ -256,9 +257,9 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
-    public GenieResponse<List<Content>> nextContent(List<String> identifiers) {
+    public GenieResponse<Content> nextContent(List<HierarchyInfo> contentHierarchy, String currentContentIdentifier) {
         idle = false;
-        GenieResponse<List<Content>> genieResponse = mGenieService.getContentService().nextContent(identifiers);
+        GenieResponse<Content> genieResponse = mGenieService.getContentService().nextContent(contentHierarchy, currentContentIdentifier);
         return genieResponse;
     }
 
