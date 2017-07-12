@@ -4,8 +4,8 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.telemetry.bean.ImportTelemetryContext;
 import org.ekstep.genieservices.telemetry.model.ProcessedEventModel;
 import org.ekstep.genieservices.telemetry.model.ProcessedEventsModel;
 
@@ -14,13 +14,13 @@ import org.ekstep.genieservices.telemetry.model.ProcessedEventsModel;
  *
  * @author anil
  */
-public class TransportProcessedEventsImportEvent implements IChainable {
+public class TransportProcessedEventsImportEvent implements IChainable<Void, ImportTelemetryContext> {
 
     private static final String TAG = TransportProcessedEventsImportEvent.class.getSimpleName();
-    private IChainable nextLink;
+    private IChainable<Void, ImportTelemetryContext> nextLink;
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<Void> execute(AppContext appContext, ImportTelemetryContext importContext) {
         ProcessedEventsModel processedEventsModel = ProcessedEventsModel.find(importContext.getDBSession());
         if (processedEventsModel != null) {
             for (ProcessedEventModel model : processedEventsModel.getProcessedEventList()) {
@@ -37,7 +37,7 @@ public class TransportProcessedEventsImportEvent implements IChainable {
     }
 
     @Override
-    public IChainable then(IChainable link) {
+    public IChainable<Void, ImportTelemetryContext> then(IChainable<Void, ImportTelemetryContext> link) {
         nextLink = link;
         return link;
     }

@@ -33,6 +33,10 @@ public class EcarImportRequest {
         return sourceFilePath;
     }
 
+    public List<CorrelationData> getCorrelationData() {
+        return correlationData;
+    }
+
     public static class Builder {
         private boolean isChildContent;
         private String destinationFolder;

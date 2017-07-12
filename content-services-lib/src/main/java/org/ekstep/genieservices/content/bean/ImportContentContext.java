@@ -1,6 +1,5 @@
-package org.ekstep.genieservices.commons.bean;
+package org.ekstep.genieservices.content.bean;
 
-import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 
 import java.io.File;
@@ -14,7 +13,7 @@ import java.util.Map;
  *
  * @author anil
  */
-public class ImportContext {
+public class ImportContentContext {
 
     private File ecarFile;
     private File tmpLocation;
@@ -25,32 +24,8 @@ public class ImportContext {
     private boolean isChildContent;
     private Map<String, Object> metadata;
     private List<String> identifiers = new ArrayList<>();
-    private IDBSession dbSession;   // External DB
 
-    private int imported;
-    private int failed;
-
-    private Map<String, Object> manifest;
-
-    // Used for import/export
-    public ImportContext(IDBSession dbSession, Map<String, Object> metadata) {
-        this.dbSession = dbSession;
-        this.metadata = metadata;
-    }
-
-    /**
-     * Used for Export Content
-     */
-    public ImportContext(Map<String, Object> metadata, File destinationFolder, File ecarFile) {
-        this.metadata = metadata;
-        this.destinationFolder = destinationFolder;
-        this.ecarFile = ecarFile;
-
-        this.manifest = new HashMap<>();
-        this.tmpLocation = FileUtil.getTempLocation(destinationFolder);
-    }
-
-    public ImportContext(boolean isChildContent, String ecarFilePath, File destinationFolder) {
+    public ImportContentContext(boolean isChildContent, String ecarFilePath, File destinationFolder) {
         this.ecarFile = new File(ecarFilePath);
         this.tmpLocation = FileUtil.getTempLocation(destinationFolder);
 
@@ -101,14 +76,6 @@ public class ImportContext {
         return isChildContent;
     }
 
-    public IDBSession getDBSession() {
-        return dbSession;
-    }
-
-    public void setDbSession(IDBSession dbSession) {
-        this.dbSession = dbSession;
-    }
-
     public List<String> getIdentifiers() {
         return identifiers;
     }
@@ -117,23 +84,4 @@ public class ImportContext {
         this.identifiers.add(identifier);
     }
 
-    public int getImported() {
-        return imported;
-    }
-
-    public void setImported(int imported) {
-        this.imported = imported;
-    }
-
-    public int getFailed() {
-        return failed;
-    }
-
-    public void setFailed(int failed) {
-        this.failed = failed;
-    }
-
-    public Map<String, Object> getManifest() {
-        return manifest;
-    }
 }

@@ -7,12 +7,10 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
-import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
@@ -26,12 +24,14 @@ import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.eventbus.EventPublisher;
 import org.ekstep.genieservices.tag.cache.TelemetryTagCache;
+import org.ekstep.genieservices.telemetry.bean.ExportTelemetryContext;
+import org.ekstep.genieservices.telemetry.bean.ImportTelemetryContext;
 import org.ekstep.genieservices.telemetry.chained.export.AddGeTransferTelemetryExportEvent;
+import org.ekstep.genieservices.telemetry.chained.export.CleanCurrentDatabase;
 import org.ekstep.genieservices.telemetry.chained.export.CleanupExportedFile;
 import org.ekstep.genieservices.telemetry.chained.export.CopyDatabase;
 import org.ekstep.genieservices.telemetry.chained.export.CreateMetadata;
 import org.ekstep.genieservices.telemetry.chained.imports.AddGeTransferTelemetryImportEvent;
-import org.ekstep.genieservices.telemetry.chained.imports.TelemetryImportStep;
 import org.ekstep.genieservices.telemetry.chained.imports.TransportProcessedEventsImportEvent;
 import org.ekstep.genieservices.telemetry.chained.imports.UpdateImportedTelemetryMetadata;
 import org.ekstep.genieservices.telemetry.chained.imports.ValidateTelemetryMetadata;
@@ -163,14 +163,13 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
 
     @Override
     public GenieResponse<Void> importTelemetry(IDBSession dbSession, Map<String, Object> metadata) {
-        ImportContext importContext = new ImportContext(dbSession, metadata);
-        IChainable telemetryImportSteps = TelemetryImportStep.initImport();
-        telemetryImportSteps.then(new ValidateTelemetryMetadata())
-                .then(new TransportProcessedEventsImportEvent())
+        ImportTelemetryContext importContext = new ImportTelemetryContext(dbSession, metadata);
+        ValidateTelemetryMetadata validateTelemetryMetadata = new ValidateTelemetryMetadata();
+        validateTelemetryMetadata.then(new TransportProcessedEventsImportEvent())
                 .then(new UpdateImportedTelemetryMetadata())
                 .then(new AddGeTransferTelemetryImportEvent());
 
-        return telemetryImportSteps.execute(mAppContext, importContext);
+        return validateTelemetryMetadata.execute(mAppContext, importContext);
     }
 
     @Override
@@ -183,17 +182,18 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
 
         EventProcessorFactory.processEvents(mAppContext);
 
-        ImportContext importContext = new ImportContext(null, metadata);
+        ExportTelemetryContext exportContext = new ExportTelemetryContext(metadata);
 
         CopyDatabase copyDatabase = new CopyDatabase(sourceDBFilePath, destinationDBFilePath, dataSource);
         copyDatabase.then(new CreateMetadata(destinationDBFilePath))
                 .then(new CleanupExportedFile(destinationDBFilePath))
+                .then(new CleanCurrentDatabase())
                 .then(new AddGeTransferTelemetryExportEvent(destinationDBFilePath));
 
         // TODO: 6/12/2017 - if export failed.
 //                .then(new RemoveExportFile(destinationDBFilePath));
 
-        return copyDatabase.execute(mAppContext, importContext);
+        return copyDatabase.execute(mAppContext, exportContext);
     }
 
 }

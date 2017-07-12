@@ -83,6 +83,7 @@ public class ContentHandler {
     private static final String KEY_POSTER_IMAGE = "posterImage";
     private static final String KEY_GRAY_SCALE_APP_ICON = "grayScaleAppIcon";
     private static final String KEY_STATUS = "status";
+    private static final String KEY_EXPIRES = "expires";
     private static final String KEY_OBJECT_TYPE = "objectType";
     private static final String KEY_VARIANTS = "variants";
     private static final String KEY_DOWNLOAD_URL = "downloadUrl";
@@ -228,6 +229,27 @@ public class ContentHandler {
             return (String) contentData.get(KEY_STATUS);
         }
         return null;
+    }
+
+    public static boolean isDraftContent(String status) {
+        return !StringUtil.isNullOrEmpty(status) && status.equalsIgnoreCase(ContentConstants.ContentStatus.DRAFT);
+    }
+
+    public static String readExpiryDate(Map contentData) {
+        if (contentData.containsKey(KEY_EXPIRES)) {
+            return (String) contentData.get(KEY_EXPIRES);
+        }
+        return null;
+    }
+
+    public static boolean isExpired(String expiryDate) {
+        if (!StringUtil.isNullOrEmpty(expiryDate)) {
+            long millis = DateUtil.getTime(expiryDate);
+            if (System.currentTimeMillis() > millis) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static String readObjectType(Map contentData) {

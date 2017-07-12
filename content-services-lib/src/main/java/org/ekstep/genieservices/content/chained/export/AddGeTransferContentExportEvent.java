@@ -6,12 +6,12 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentExportResponse;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransfer;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferMap;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.content.ContentHandler;
+import org.ekstep.genieservices.content.bean.ExportContentContext;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.util.ArrayList;
@@ -23,23 +23,23 @@ import java.util.Map;
  *
  * @author anil
  */
-public class AddGeTransferContentExportEvent implements IChainable<ContentExportResponse> {
+public class AddGeTransferContentExportEvent implements IChainable<ContentExportResponse, ExportContentContext> {
 
     @Override
-    public GenieResponse<ContentExportResponse> execute(AppContext appContext, ImportContext importContext) {
-        Map<String, Object> metadata = importContext.getMetadata();
+    public GenieResponse<ContentExportResponse> execute(AppContext appContext, ExportContentContext exportContext) {
+        Map<String, Object> metadata = exportContext.getMetadata();
 
         GETransferEventKnowStructure eks = new GETransferEventKnowStructure(
                 GETransferEventKnowStructure.TRANSFER_DIRECTION_EXPORT,
                 GETransferEventKnowStructure.DATATYPE_CONTENT,
                 ((List) metadata.get(GETransferEventKnowStructure.CONTENT_ITEMS_KEY)).size(),
                 (Long) metadata.get(GETransferEventKnowStructure.FILE_SIZE),
-                buildContentsMetadata(importContext.getItems()));
+                buildContentsMetadata(exportContext.getItems()));
         GETransfer geTransfer = new GETransfer(new GameData(appContext.getParams().getString(ServiceConstants.Params.GID), appContext.getParams().getString(ServiceConstants.Params.VERSION_NAME)), eks);
         TelemetryLogger.log(geTransfer);
 
         ContentExportResponse contentExportResponse = new ContentExportResponse();
-        contentExportResponse.setExportedFilePath(importContext.getEcarFile().toString());
+        contentExportResponse.setExportedFilePath(exportContext.getEcarFile().toString());
 
         GenieResponse<ContentExportResponse> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(contentExportResponse);
@@ -47,7 +47,7 @@ public class AddGeTransferContentExportEvent implements IChainable<ContentExport
     }
 
     @Override
-    public IChainable<ContentExportResponse> then(IChainable<ContentExportResponse> link) {
+    public IChainable<ContentExportResponse, ExportContentContext> then(IChainable<ContentExportResponse, ExportContentContext> link) {
         return link;
     }
 

@@ -5,13 +5,13 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransfer;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferMap;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.LongUtil;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
+import org.ekstep.genieservices.telemetry.bean.ImportTelemetryContext;
 import org.ekstep.genieservices.telemetry.model.ImportedMetadataListModel;
 import org.ekstep.genieservices.telemetry.model.ImportedMetadataModel;
 
@@ -22,13 +22,12 @@ import java.util.ArrayList;
  *
  * @author anil
  */
-public class AddGeTransferTelemetryImportEvent implements IChainable {
+public class AddGeTransferTelemetryImportEvent implements IChainable<Void, ImportTelemetryContext> {
 
     private static final String TAG = AddGeTransferTelemetryImportEvent.class.getSimpleName();
-    private IChainable nextLink;
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<Void> execute(AppContext appContext, ImportTelemetryContext importContext) {
 
         try {
             ImportedMetadataListModel importedMetadataListModel = ImportedMetadataListModel.findAll(appContext.getDBSession());
@@ -60,7 +59,7 @@ public class AddGeTransferTelemetryImportEvent implements IChainable {
     }
 
     @Override
-    public IChainable then(IChainable link) {
+    public IChainable<Void, ImportTelemetryContext> then(IChainable<Void, ImportTelemetryContext> link) {
         return null;
     }
 }

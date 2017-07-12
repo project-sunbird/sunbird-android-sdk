@@ -4,10 +4,10 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.profile.bean.ImportProfileContext;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,13 +18,13 @@ import java.util.Map;
  *
  * @author anil
  */
-public class ValidateProfileMetadata implements IChainable<ProfileImportResponse> {
+public class ValidateProfileMetadata implements IChainable<ProfileImportResponse, ImportProfileContext> {
 
     private static final String TAG = ValidateProfileMetadata.class.getSimpleName();
-    private IChainable<ProfileImportResponse> nextLink;
+    private IChainable<ProfileImportResponse, ImportProfileContext> nextLink;
 
     @Override
-    public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportProfileContext importContext) {
 
         if (importContext.getMetadata() != null && !importContext.getMetadata().isEmpty()) {
             List<String> importTypes = getImportTypes(importContext.getMetadata());
@@ -43,7 +43,7 @@ public class ValidateProfileMetadata implements IChainable<ProfileImportResponse
     }
 
     @Override
-    public IChainable<ProfileImportResponse> then(IChainable<ProfileImportResponse> link) {
+    public IChainable<ProfileImportResponse, ImportProfileContext> then(IChainable<ProfileImportResponse, ImportProfileContext> link) {
         nextLink = link;
         return link;
     }

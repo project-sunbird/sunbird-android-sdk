@@ -10,7 +10,6 @@ import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentLearnerState;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
@@ -32,6 +31,8 @@ import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
+import org.ekstep.genieservices.profile.bean.ExportProfileContext;
+import org.ekstep.genieservices.profile.bean.ImportProfileContext;
 import org.ekstep.genieservices.profile.chained.export.AddGeTransferProfileExportEvent;
 import org.ekstep.genieservices.profile.chained.export.CleanupExportedFile;
 import org.ekstep.genieservices.profile.chained.export.CopyDatabase;
@@ -498,7 +499,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
     @Override
     public GenieResponse<ProfileImportResponse> importProfile(IDBSession dbSession, Map<String, Object> metadata) {
-        ImportContext importContext = new ImportContext(dbSession, metadata);
+        ImportProfileContext importContext = new ImportProfileContext(dbSession, metadata);
 
         ValidateProfileMetadata validateProfileMetadata = new ValidateProfileMetadata();
         validateProfileMetadata.then(new TransportProfiles())
@@ -516,7 +517,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "File already exists.", TAG);
         }
 
-        ImportContext importContext = new ImportContext(null, metadata);
+        ExportProfileContext exportContext = new ExportProfileContext(null, metadata);
 
         CopyDatabase copyDatabase = new CopyDatabase(sourceDBFilePath, destinationDBFilePath, dataSource);
         copyDatabase.then(new CreateMetadata(destinationDBFilePath, userIds))
@@ -526,7 +527,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         // TODO: 6/12/2017 - if export failed.
 //                .then(new RemoveExportFile(destinationDBFilePath));
 
-        return copyDatabase.execute(mAppContext, importContext);
+        return copyDatabase.execute(mAppContext, exportContext);
     }
 
 }

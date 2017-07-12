@@ -5,13 +5,13 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransfer;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferMap;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.LongUtil;
+import org.ekstep.genieservices.profile.bean.ImportProfileContext;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 import org.ekstep.genieservices.telemetry.model.ImportedMetadataListModel;
 import org.ekstep.genieservices.telemetry.model.ImportedMetadataModel;
@@ -23,12 +23,12 @@ import java.util.ArrayList;
  *
  * @author anil
  */
-public class AddGeTransferProfileImportEvent implements IChainable<ProfileImportResponse> {
+public class AddGeTransferProfileImportEvent implements IChainable<ProfileImportResponse, ImportProfileContext> {
 
     private static final String TAG = AddGeTransferProfileImportEvent.class.getSimpleName();
 
     @Override
-    public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportProfileContext importContext) {
 
         ImportedMetadataListModel importedMetadataListModel = ImportedMetadataListModel.findAll(appContext.getDBSession());
         if (importedMetadataListModel != null) {
@@ -61,7 +61,7 @@ public class AddGeTransferProfileImportEvent implements IChainable<ProfileImport
     }
 
     @Override
-    public IChainable<ProfileImportResponse> then(IChainable<ProfileImportResponse> link) {
+    public IChainable<ProfileImportResponse, ImportProfileContext> then(IChainable<ProfileImportResponse, ImportProfileContext> link) {
         return link;
     }
 }

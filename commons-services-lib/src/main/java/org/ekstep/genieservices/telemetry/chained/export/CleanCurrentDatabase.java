@@ -4,8 +4,9 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
+import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.telemetry.bean.ExportTelemetryContext;
 import org.ekstep.genieservices.telemetry.model.ProcessedEventsModel;
 
 /**
@@ -13,26 +14,26 @@ import org.ekstep.genieservices.telemetry.model.ProcessedEventsModel;
  *
  * @author anil
  */
-public class CleanCurrentDatabase implements IChainable {
+public class CleanCurrentDatabase implements IChainable<TelemetryExportResponse, ExportTelemetryContext> {
 
     private static final String TAG = CleanCurrentDatabase.class.getSimpleName();
-    private IChainable nextLink;
+    private IChainable<TelemetryExportResponse, ExportTelemetryContext> nextLink;
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<TelemetryExportResponse> execute(AppContext appContext, ExportTelemetryContext exportContext) {
 
         ProcessedEventsModel processedEventsModel = ProcessedEventsModel.build(appContext.getDBSession());
         processedEventsModel.deleteAll();
 
         if (nextLink != null) {
-            return nextLink.execute(appContext, importContext);
+            return nextLink.execute(appContext, exportContext);
         } else {
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "Import profile failed", TAG);
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "Export telemetry failed", TAG);
         }
     }
 
     @Override
-    public IChainable then(IChainable link) {
+    public IChainable<TelemetryExportResponse, ExportTelemetryContext> then(IChainable<TelemetryExportResponse, ExportTelemetryContext> link) {
         nextLink = link;
         return link;
     }

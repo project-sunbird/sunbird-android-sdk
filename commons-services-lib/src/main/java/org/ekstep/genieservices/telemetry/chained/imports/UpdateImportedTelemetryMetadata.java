@@ -4,8 +4,8 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.telemetry.bean.ImportTelemetryContext;
 import org.ekstep.genieservices.telemetry.model.ImportedMetadataModel;
 
 /**
@@ -13,13 +13,13 @@ import org.ekstep.genieservices.telemetry.model.ImportedMetadataModel;
  *
  * @author anil
  */
-public class UpdateImportedTelemetryMetadata implements IChainable {
+public class UpdateImportedTelemetryMetadata implements IChainable<Void, ImportTelemetryContext> {
 
     private static final String TAG = UpdateImportedTelemetryMetadata.class.getSimpleName();
-    private IChainable nextLink;
+    private IChainable<Void, ImportTelemetryContext> nextLink;
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<Void> execute(AppContext appContext, ImportTelemetryContext importContext) {
 
         String importId = (String) importContext.getMetadata().get(ServiceConstants.EXPORT_ID);
         String did = (String) importContext.getMetadata().get(ServiceConstants.DID);
@@ -40,7 +40,7 @@ public class UpdateImportedTelemetryMetadata implements IChainable {
     }
 
     @Override
-    public IChainable then(IChainable link) {
+    public IChainable<Void, ImportTelemetryContext> then(IChainable<Void, ImportTelemetryContext> link) {
         nextLink = link;
         return link;
     }

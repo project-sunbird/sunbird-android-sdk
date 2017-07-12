@@ -5,12 +5,12 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentExportResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.content.ContentConstants;
 import org.ekstep.genieservices.content.ContentHandler;
+import org.ekstep.genieservices.content.bean.ExportContentContext;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 
 import java.util.ArrayList;
@@ -23,11 +23,11 @@ import java.util.Map;
  *
  * @author anil
  */
-public class CreateContentExportManifest implements IChainable<ContentExportResponse> {
+public class CreateContentExportManifest implements IChainable<ContentExportResponse, ExportContentContext> {
 
     private static final String TAG = CreateContentExportManifest.class.getSimpleName();
 
-    private IChainable<ContentExportResponse> nextLink;
+    private IChainable<ContentExportResponse, ExportContentContext> nextLink;
     private List<ContentModel> contentModelsToExport;
     private List<Map<String, Object>> items;
 
@@ -37,7 +37,7 @@ public class CreateContentExportManifest implements IChainable<ContentExportResp
     }
 
     @Override
-    public GenieResponse<ContentExportResponse> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<ContentExportResponse> execute(AppContext appContext, ExportContentContext exportContext) {
         Map<String, Object> item;
         Map<String, Map<String, Object>> contentIndex = new HashMap<>();
         List<String> childIdentifiers = new ArrayList<>();
@@ -72,7 +72,7 @@ public class CreateContentExportManifest implements IChainable<ContentExportResp
             items.add(contentData);
         }
 
-        importContext.setItems(items);
+        exportContext.setItems(items);
 
         HashMap<String, Object> archive = new HashMap<>();
         archive.put("ttl", ContentConstants.TTL);
@@ -80,20 +80,20 @@ public class CreateContentExportManifest implements IChainable<ContentExportResp
         archive.put("items", this.items);
 
         // Initialize manifest
-        importContext.getManifest().put("id", ContentConstants.EKSTEP_CONTENT_ARCHIVE);
-        importContext.getManifest().put("ver", ContentConstants.SUPPORTED_MANIFEST_VERSION);
-        importContext.getManifest().put("ts", DateUtil.getFormattedDateWithTimeZone(DateUtil.TIME_ZONE_GMT));
-        importContext.getManifest().put("archive", archive);
+        exportContext.getManifest().put("id", ContentConstants.EKSTEP_CONTENT_ARCHIVE);
+        exportContext.getManifest().put("ver", ContentConstants.SUPPORTED_MANIFEST_VERSION);
+        exportContext.getManifest().put("ts", DateUtil.getFormattedDateWithTimeZone(DateUtil.TIME_ZONE_GMT));
+        exportContext.getManifest().put("archive", archive);
 
         if (nextLink != null) {
-            return nextLink.execute(appContext, importContext);
+            return nextLink.execute(appContext, exportContext);
         } else {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "Export content failed", TAG);
         }
     }
 
     @Override
-    public IChainable<ContentExportResponse> then(IChainable<ContentExportResponse> link) {
+    public IChainable<ContentExportResponse, ExportContentContext> then(IChainable<ContentExportResponse, ExportContentContext> link) {
         nextLink = link;
         return link;
     }

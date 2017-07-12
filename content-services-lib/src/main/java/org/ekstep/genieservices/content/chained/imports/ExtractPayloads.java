@@ -4,7 +4,6 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.Decompress;
 import org.ekstep.genieservices.commons.utils.FileUtil;
@@ -13,6 +12,7 @@ import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.ContentConstants;
 import org.ekstep.genieservices.content.ContentHandler;
+import org.ekstep.genieservices.content.bean.ImportContentContext;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 
 import java.io.File;
@@ -26,14 +26,14 @@ import java.util.UUID;
  *
  * @author anil
  */
-public class ExtractPayloads implements IChainable {
+public class ExtractPayloads implements IChainable<Void, ImportContentContext> {
 
     private static final String TAG = ExtractPayloads.class.getSimpleName();
 
-    private IChainable nextLink;
+    private IChainable<Void, ImportContentContext> nextLink;
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<Void> execute(AppContext appContext, ImportContentContext importContext) {
 
         String identifier, mimeType, contentType, visibility, audience, path;
         Double compatibilityLevel, pkgVersion;
@@ -223,7 +223,7 @@ public class ExtractPayloads implements IChainable {
     }
 
     @Override
-    public IChainable then(IChainable link) {
+    public IChainable<Void, ImportContentContext> then(IChainable<Void, ImportContentContext> link) {
         nextLink = link;
         return link;
     }

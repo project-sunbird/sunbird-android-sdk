@@ -31,7 +31,6 @@ import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
-import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
@@ -45,6 +44,8 @@ import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
+import org.ekstep.genieservices.content.bean.ExportContentContext;
+import org.ekstep.genieservices.content.bean.ImportContentContext;
 import org.ekstep.genieservices.content.chained.export.AddGeTransferContentExportEvent;
 import org.ekstep.genieservices.content.chained.export.CleanTempLoc;
 import org.ekstep.genieservices.content.chained.export.CompressContent;
@@ -55,7 +56,6 @@ import org.ekstep.genieservices.content.chained.export.DeleteTemporaryEcar;
 import org.ekstep.genieservices.content.chained.export.EcarBundle;
 import org.ekstep.genieservices.content.chained.export.WriteManifest;
 import org.ekstep.genieservices.content.chained.imports.AddGeTransferContentImportEvent;
-import org.ekstep.genieservices.content.chained.imports.ContentImportStep;
 import org.ekstep.genieservices.content.chained.imports.DeviceMemoryCheck;
 import org.ekstep.genieservices.content.chained.imports.EcarCleanUp;
 import org.ekstep.genieservices.content.chained.imports.ExtractEcar;
@@ -103,7 +103,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     @Override
     public GenieResponse<Content> getContentDetails(ContentDetailsRequest contentDetailsRequest) {
         String methodName = "getContentDetails@ContentServiceImpl";
-        HashMap params = new HashMap();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(contentDetailsRequest));
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
 
@@ -145,7 +145,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     @Override
     public GenieResponse<List<Content>> getAllLocalContent(ContentFilterCriteria criteria) {
         String methodName = "getAllLocalContent@ContentServiceImpl";
-        HashMap params = new HashMap();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("criteria", GsonUtil.toJson(criteria));
 
         GenieResponse<List<Content>> response;
@@ -174,7 +174,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     @Override
     public GenieResponse<Content> getChildContents(ChildContentRequest childContentRequest) {
         String methodName = "getChildContents@ContentServiceImpl";
-        HashMap params = new HashMap();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(childContentRequest));
 
         GenieResponse<Content> response;
@@ -232,8 +232,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
     @Override
     public GenieResponse<Void> deleteContent(ContentDeleteRequest deleteRequest) {
-
-        HashMap params = new HashMap();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(deleteRequest));
         String methodName = "deleteContent@ContentServiceImpl";
 
@@ -266,11 +265,12 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
     @Override
     public GenieResponse<ContentListing> getContentListing(ContentListingCriteria contentListingCriteria) {
-        HashMap params = new HashMap();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("criteria", GsonUtil.toJson(contentListingCriteria));
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
         String methodName = "getContentListing@ContentServiceImpl";
 
+        GenieResponse<ContentListing> response;
         String jsonStr = null;
 
         ContentListingModel contentListingModelInDB = ContentListingModel.find(mAppContext.getDBSession(), contentListingCriteria);
@@ -288,20 +288,21 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         if (jsonStr != null) {
             ContentListing contentListing = ContentHandler.getContentListingResult(contentListingCriteria, jsonStr);
             if (contentListing != null) {
-                GenieResponse<ContentListing> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+                response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
                 response.setResult(contentListing);
                 TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
                 return response;
             }
         }
-        GenieResponse response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.DATA_NOT_FOUND_ERROR, ServiceConstants.ErrorMessage.NO_CONTENT_LISTING_DATA, TAG);
+
+        response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.DATA_NOT_FOUND_ERROR, ServiceConstants.ErrorMessage.NO_CONTENT_LISTING_DATA, TAG);
         TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.NO_CONTENT_LISTING_DATA);
         return response;
     }
 
     @Override
     public GenieResponse<ContentSearchResult> searchContent(ContentSearchCriteria contentSearchCriteria) {
-        HashMap params = new HashMap();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(contentSearchCriteria));
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
         String methodName = "searchContent@ContentServiceImpl";
@@ -365,7 +366,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
     @Override
     public GenieResponse<RecommendedContentResult> getRecommendedContent(RecommendedContentRequest request) {
-        HashMap params = new HashMap();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(request));
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
         String methodName = "getRecommendedContents@ContentServiceImpl";
@@ -413,7 +414,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
     @Override
     public GenieResponse<RelatedContentResult> getRelatedContent(RelatedContentRequest request) {
-        HashMap params = new HashMap();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(request));
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
         String methodName = "getRelatedContent@ContentServiceImpl";
@@ -558,7 +559,6 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
     @Override
     public GenieResponse<Void> importEcar(EcarImportRequest importRequest) {
-
         String methodName = "importEcar@ContentServiceImpl";
         HashMap<String, Object> params = new HashMap<>();
         params.put("importContent", importRequest.getSourceFilePath());
@@ -581,21 +581,20 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNSUPPORTED_FILE);
             return response;
         } else {
-            ImportContext importContext = new ImportContext(importRequest.isChildContent(), importRequest.getSourceFilePath(), new File(importRequest.getDestinationFolder()));
+            ImportContentContext importContentContext = new ImportContentContext(importRequest.isChildContent(), importRequest.getSourceFilePath(), new File(importRequest.getDestinationFolder()));
 
             buildInitiateEvent();
 
-            IChainable importContentSteps = ContentImportStep.initImportContent();
-            importContentSteps.then(new DeviceMemoryCheck())
-                    .then(new ExtractEcar())
+            IChainable<Void, ImportContentContext> deviceMemoryCheck = new DeviceMemoryCheck();
+            deviceMemoryCheck.then(new ExtractEcar())
                     .then(new ValidateEcar())
                     .then(new ExtractPayloads())
                     .then(new EcarCleanUp())
                     .then(new AddGeTransferContentImportEvent());
+            response = deviceMemoryCheck.execute(mAppContext, importContentContext);
 
-            response = importContentSteps.execute(mAppContext, importContext);
             if (response.getStatus()) {
-                String identifier = importContext.getIdentifiers() != null ? importContext.getIdentifiers().get(0) : "";
+                String identifier = importContentContext.getIdentifiers() != null ? importContentContext.getIdentifiers().get(0) : "";
                 buildSuccessEvent(identifier);
                 TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
 
@@ -609,7 +608,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     @Override
     public GenieResponse<ContentImportResponse> getImportStatus(String contentId) {
         String methodName = "getImportStatus@ContentServiceImpl";
-        HashMap params = new HashMap<>();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("identifier", contentId);
         params.put("logLevel", "2");
         DownloadRequest request = downloadService.getDownloadRequest(contentId);
@@ -627,7 +626,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     @Override
     public GenieResponse<Void> importContent(ContentImportRequest importRequest) {
         String methodName = "importContent@ContentServiceImpl";
-        HashMap params = new HashMap<>();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(importRequest));
         params.put("logLevel", "2");
 
@@ -677,11 +676,11 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     @Override
     public GenieResponse<Void> cancelDownload(String contentId) {
         String methodName = "cancelDownload@ContentServiceImpl";
-        HashMap params = new HashMap<>();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("identifier", contentId);
         params.put("logLevel", "2");
         downloadService.cancel(contentId);
-        GenieResponse response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        GenieResponse<Void> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;
     }
@@ -721,7 +720,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         Map<String, Object> metadata = new HashMap<>();
         metadata.put(GETransferEventKnowStructure.CONTENT_ITEMS_KEY, contentModelsToExport);
 
-        ImportContext importContext = new ImportContext(metadata, destinationFolder, ecarFile);
+        ExportContentContext exportContentContext = new ExportContentContext(metadata, destinationFolder, ecarFile);
 
         CleanTempLoc cleanTempLoc = new CleanTempLoc();
         cleanTempLoc.then(new CreateTempLoc())
@@ -734,7 +733,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 .then(new DeleteTemporaryEcar())
                 .then(new AddGeTransferContentExportEvent());
 
-        return cleanTempLoc.execute(mAppContext, importContext);
+        return cleanTempLoc.execute(mAppContext, exportContentContext);
     }
 
 }

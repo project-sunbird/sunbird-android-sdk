@@ -5,12 +5,12 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentExportResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.Compress;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.ContentHandler;
+import org.ekstep.genieservices.content.bean.ExportContentContext;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 
 import java.io.File;
@@ -23,11 +23,11 @@ import java.util.Map;
  *
  * @author anil
  */
-public class CompressContent implements IChainable<ContentExportResponse> {
+public class CompressContent implements IChainable<ContentExportResponse, ExportContentContext> {
 
     private static final String TAG = CompressContent.class.getSimpleName();
 
-    private IChainable<ContentExportResponse> nextLink;
+    private IChainable<ContentExportResponse, ExportContentContext> nextLink;
     private List<ContentModel> contentModelsToExport;
 
     public CompressContent(List<ContentModel> contentModelsToExport) {
@@ -35,10 +35,10 @@ public class CompressContent implements IChainable<ContentExportResponse> {
     }
 
     @Override
-    public GenieResponse<ContentExportResponse> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<ContentExportResponse> execute(AppContext appContext, ExportContentContext exportContext) {
         int progressPercent = 0;
 
-        List<Map<String, Object>> items = importContext.getItems();
+        List<Map<String, Object>> items = exportContext.getItems();
         File path;
         File payload;
         String artifactUrl;
@@ -60,12 +60,12 @@ public class CompressContent implements IChainable<ContentExportResponse> {
             artifactUrl = ContentHandler.readArtifactUrl(GsonUtil.fromJson(contentModel.getLocalData(), Map.class));
 
             if (!StringUtil.isNullOrEmpty(artifactUrl)) {
-                payload = new File(importContext.getTmpLocation(), artifactUrl);
+                payload = new File(exportContext.getTmpLocation(), artifactUrl);
                 path = new File(contentModel.getPath());
 
                 try {
                     if (artifactUrl.contains("." + ServiceConstants.FileExtension.APK)) {
-                        Compress.zipAPK(path, importContext.getTmpLocation(), artifactUrl);
+                        Compress.zipAPK(path, exportContext.getTmpLocation(), artifactUrl);
                     } else {
                         Compress.zip(path, payload);
                     }
@@ -81,14 +81,14 @@ public class CompressContent implements IChainable<ContentExportResponse> {
         progressPercent = 90;
 
         if (nextLink != null) {
-            return nextLink.execute(appContext, importContext);
+            return nextLink.execute(appContext, exportContext);
         } else {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "Export content failed", TAG);
         }
     }
 
     @Override
-    public IChainable<ContentExportResponse> then(IChainable<ContentExportResponse> link) {
+    public IChainable<ContentExportResponse, ExportContentContext> then(IChainable<ContentExportResponse, ExportContentContext> link) {
         nextLink = link;
         return link;
     }

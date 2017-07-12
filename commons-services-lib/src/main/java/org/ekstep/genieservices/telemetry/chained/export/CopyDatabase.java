@@ -4,11 +4,11 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.operations.IDataSource;
 import org.ekstep.genieservices.commons.utils.FileUtil;
+import org.ekstep.genieservices.telemetry.bean.ExportTelemetryContext;
 
 import java.io.IOException;
 
@@ -17,10 +17,10 @@ import java.io.IOException;
  *
  * @author anil
  */
-public class CopyDatabase implements IChainable<TelemetryExportResponse> {
+public class CopyDatabase implements IChainable<TelemetryExportResponse, ExportTelemetryContext> {
 
     private static final String TAG = CopyDatabase.class.getSimpleName();
-    private IChainable<TelemetryExportResponse> nextLink;
+    private IChainable<TelemetryExportResponse, ExportTelemetryContext> nextLink;
 
     private String sourceDB;
     private String destinationDB;
@@ -33,7 +33,7 @@ public class CopyDatabase implements IChainable<TelemetryExportResponse> {
     }
 
     @Override
-    public GenieResponse<TelemetryExportResponse> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<TelemetryExportResponse> execute(AppContext appContext, ExportTelemetryContext exportContext) {
         try {
             FileUtil.cp(sourceDB, destinationDB);
         } catch (IOException e) {
@@ -42,17 +42,17 @@ public class CopyDatabase implements IChainable<TelemetryExportResponse> {
         }
 
         // Set the external DB.
-        importContext.setDbSession(dataSource.getExportDataSource(destinationDB));
+        exportContext.setDbSession(dataSource.getExportDataSource(destinationDB));
 
         if (nextLink != null) {
-            return nextLink.execute(appContext, importContext);
+            return nextLink.execute(appContext, exportContext);
         } else {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "Import profile failed", TAG);
         }
     }
 
     @Override
-    public IChainable<TelemetryExportResponse> then(IChainable<TelemetryExportResponse> link) {
+    public IChainable<TelemetryExportResponse, ExportTelemetryContext> then(IChainable<TelemetryExportResponse, ExportTelemetryContext> link) {
         nextLink = link;
         return link;
     }

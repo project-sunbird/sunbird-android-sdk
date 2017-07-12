@@ -4,8 +4,9 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
+import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.profile.bean.ExportProfileContext;
 
 import java.io.File;
 
@@ -14,10 +15,10 @@ import java.io.File;
  *
  * @author anil
  */
-public class RemoveExportFile implements IChainable {
+public class RemoveExportFile implements IChainable<ProfileExportResponse, ExportProfileContext> {
 
     private static final String TAG = RemoveExportFile.class.getSimpleName();
-    private IChainable nextLink;
+    private IChainable<ProfileExportResponse, ExportProfileContext> nextLink;
 
     private String destinationDBFilePath;
 
@@ -26,20 +27,20 @@ public class RemoveExportFile implements IChainable {
     }
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<ProfileExportResponse> execute(AppContext appContext, ExportProfileContext exportContext) {
 
         File file = new File(destinationDBFilePath);
         file.delete();
 
         if (nextLink != null) {
-            return nextLink.execute(appContext, importContext);
+            return nextLink.execute(appContext, exportContext);
         } else {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "Export profile failed", TAG);
         }
     }
 
     @Override
-    public IChainable then(IChainable link) {
+    public IChainable<ProfileExportResponse, ExportProfileContext> then(IChainable<ProfileExportResponse, ExportProfileContext> link) {
         nextLink = link;
         return link;
     }

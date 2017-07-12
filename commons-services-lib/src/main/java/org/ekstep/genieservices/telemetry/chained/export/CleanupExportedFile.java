@@ -4,7 +4,6 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.contract.MetaEntry;
@@ -12,6 +11,7 @@ import org.ekstep.genieservices.commons.db.contract.TelemetryProcessedEntry;
 import org.ekstep.genieservices.commons.db.model.CustomReadersModel;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.Logger;
+import org.ekstep.genieservices.telemetry.bean.ExportTelemetryContext;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,10 +23,10 @@ import java.util.Locale;
  *
  * @author anil
  */
-public class CleanupExportedFile implements IChainable<TelemetryExportResponse> {
+public class CleanupExportedFile implements IChainable<TelemetryExportResponse, ExportTelemetryContext> {
 
     private static final String TAG = CleanupExportedFile.class.getSimpleName();
-    private IChainable<TelemetryExportResponse> nextLink;
+    private IChainable<TelemetryExportResponse, ExportTelemetryContext> nextLink;
 
     private String destinationDBFilePath;
 
@@ -35,12 +35,12 @@ public class CleanupExportedFile implements IChainable<TelemetryExportResponse> 
     }
 
     @Override
-    public GenieResponse<TelemetryExportResponse> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<TelemetryExportResponse> execute(AppContext appContext, ExportTelemetryContext exportContext) {
 
-        List<String> allTables = getAllTables(importContext.getDBSession());
+        List<String> allTables = getAllTables(exportContext.getDBSession());
         List<String> allTableToExclude = getAllTableToExclude();
 
-        removeTables(importContext.getDBSession(), allTables, allTableToExclude);
+        removeTables(exportContext.getDBSession(), allTables, allTableToExclude);
 
         try {
             removeJournalFile();
@@ -52,14 +52,14 @@ public class CleanupExportedFile implements IChainable<TelemetryExportResponse> 
         }
 
         if (nextLink != null) {
-            return nextLink.execute(appContext, importContext);
+            return nextLink.execute(appContext, exportContext);
         } else {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "Export telemetry failed", TAG);
         }
     }
 
     @Override
-    public IChainable<TelemetryExportResponse> then(IChainable<TelemetryExportResponse> link) {
+    public IChainable<TelemetryExportResponse, ExportTelemetryContext> then(IChainable<TelemetryExportResponse, ExportTelemetryContext> link) {
         nextLink = link;
         return link;
     }

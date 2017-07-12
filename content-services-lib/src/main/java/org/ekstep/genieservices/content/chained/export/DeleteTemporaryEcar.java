@@ -5,9 +5,9 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentExportResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.Logger;
+import org.ekstep.genieservices.content.bean.ExportContentContext;
 
 import java.io.File;
 
@@ -16,17 +16,17 @@ import java.io.File;
  *
  * @author anil
  */
-public class DeleteTemporaryEcar implements IChainable<ContentExportResponse> {
+public class DeleteTemporaryEcar implements IChainable<ContentExportResponse, ExportContentContext> {
 
     private static final String TAG = DeleteTemporaryEcar.class.getSimpleName();
 
-    private IChainable<ContentExportResponse> nextLink;
+    private IChainable<ContentExportResponse, ExportContentContext> nextLink;
 
     @Override
-    public GenieResponse<ContentExportResponse> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<ContentExportResponse> execute(AppContext appContext, ExportContentContext exportContext) {
 
         try {
-            File filePath = importContext.getTmpLocation();
+            File filePath = exportContext.getTmpLocation();
             if (filePath.isDirectory()) {
                 Logger.i(TAG, "Folder Deleted - " + filePath.getName());
                 deleteRecursive(filePath);
@@ -36,14 +36,14 @@ public class DeleteTemporaryEcar implements IChainable<ContentExportResponse> {
         }
 
         if (nextLink != null) {
-            return nextLink.execute(appContext, importContext);
+            return nextLink.execute(appContext, exportContext);
         } else {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "Export content failed", TAG);
         }
     }
 
     @Override
-    public IChainable<ContentExportResponse> then(IChainable<ContentExportResponse> link) {
+    public IChainable<ContentExportResponse, ExportContentContext> then(IChainable<ContentExportResponse, ExportContentContext> link) {
         nextLink = link;
         return link;
     }

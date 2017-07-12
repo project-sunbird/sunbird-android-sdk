@@ -4,9 +4,9 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.telemetry.bean.ImportTelemetryContext;
 import org.ekstep.genieservices.telemetry.model.ImportedMetadataModel;
 
 import java.util.Arrays;
@@ -18,13 +18,13 @@ import java.util.Map;
  *
  * @author anil
  */
-public class ValidateTelemetryMetadata implements IChainable {
+public class ValidateTelemetryMetadata implements IChainable<Void, ImportTelemetryContext> {
 
     private static final String TAG = ValidateTelemetryMetadata.class.getSimpleName();
-    private IChainable nextLink;
+    private IChainable<Void, ImportTelemetryContext> nextLink;
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<Void> execute(AppContext appContext, ImportTelemetryContext importContext) {
         if (importContext.getMetadata() != null && !importContext.getMetadata().isEmpty()) {
             List<String> importTypes = getImportTypes(importContext.getMetadata());
             if (importTypes != null && importTypes.contains(ServiceConstants.EXPORT_TYPE_TELEMETRY)) {
@@ -50,7 +50,7 @@ public class ValidateTelemetryMetadata implements IChainable {
     }
 
     @Override
-    public IChainable then(IChainable link) {
+    public IChainable<Void, ImportTelemetryContext> then(IChainable<Void, ImportTelemetryContext> link) {
         nextLink = link;
         return link;
     }

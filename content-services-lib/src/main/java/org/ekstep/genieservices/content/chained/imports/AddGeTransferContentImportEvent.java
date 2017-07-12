@@ -5,13 +5,13 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransfer;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferMap;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.ContentHandler;
+import org.ekstep.genieservices.content.bean.ImportContentContext;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.util.ArrayList;
@@ -23,10 +23,10 @@ import java.util.Map;
  *
  * @author anil
  */
-public class AddGeTransferContentImportEvent implements IChainable {
+public class AddGeTransferContentImportEvent implements IChainable<Void, ImportContentContext> {
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<Void> execute(AppContext appContext, ImportContentContext importContext) {
         Map<String, Object> metadata = importContext.getMetadata();
         String contentDataType = (String) metadata.get(GETransferEventKnowStructure.FILE_TYPE);
         if (StringUtil.isNullOrEmpty(contentDataType)) {
@@ -48,7 +48,7 @@ public class AddGeTransferContentImportEvent implements IChainable {
     }
 
     @Override
-    public IChainable then(IChainable link) {
+    public IChainable<Void, ImportContentContext> then(IChainable<Void, ImportContentContext> link) {
         return link;
     }
 
