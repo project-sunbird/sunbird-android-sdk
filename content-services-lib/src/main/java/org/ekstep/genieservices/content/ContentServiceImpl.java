@@ -187,9 +187,14 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         List<HierarchyInfo> hierarchyInfoList = childContentRequest.getHierarchyInfo();
         if (hierarchyInfoList == null) {
             hierarchyInfoList = new ArrayList<>();
-        }
-        if (hierarchyInfoList.isEmpty()) {
-            hierarchyInfoList.add(new HierarchyInfo(contentModel.getIdentifier(), contentModel.getContentType()));
+        } else if (!hierarchyInfoList.isEmpty()) {
+            /* If the nested collection is C/C1/C11 and somebody is asking for C1's children they would be sending the hierarchy of C1 which is C/C1.
+             * We are removing the last element here so that the further processing can continue to add it back
+             * In other words, the checkAndFetchChildrenOfContent method assumes that the sourceInfoList is the parent's hierarchy info
+             */
+            if (hierarchyInfoList.get(hierarchyInfoList.size() - 1).getIdentifier().equalsIgnoreCase(childContentRequest.getContentId())) {
+                hierarchyInfoList.remove(hierarchyInfoList.size() - 1);
+            }
         }
 
         //check and fetch all children of this content
@@ -203,30 +208,25 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
     private Content checkAndFetchChildrenOfContent(ContentModel contentModel, List<HierarchyInfo> sourceInfoList, int currentLevel, int level) {
         Content content = ContentHandler.convertContentModelToBean(contentModel);
-        content.setHierarchyInfo(sourceInfoList);
 
         // check if the content model has immediate children
         List<ContentModel> contentModelList = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), contentModel.getLocalData(), ContentConstants.ChildContents.ALL);
-        if (contentModelList.size() > 0
-                && (level == -1 || currentLevel < level)) {
-            currentLevel = currentLevel + 1;
-            List<Content> childContents = new ArrayList<>();
-
-            for (ContentModel perContentModel : contentModelList) {
-                Content perContent = ContentHandler.convertContentModelToBean(perContentModel);
-                List<HierarchyInfo> hierarchyInfoList = new ArrayList<>(sourceInfoList);
-                hierarchyInfoList.add(new HierarchyInfo(perContent.getIdentifier(), perContent.getContentType()));
-                perContent.setHierarchyInfo(hierarchyInfoList);
-                Content iteratedContent = checkAndFetchChildrenOfContent(perContentModel, hierarchyInfoList, currentLevel, level);
-                perContent.setChildren(iteratedContent.getChildren());
-
-                childContents.add(perContent);
+        if (contentModelList.size() > 0) {
+            List<HierarchyInfo> hierarchyInfoList = new ArrayList<>(sourceInfoList);
+            hierarchyInfoList.add(new HierarchyInfo(contentModel.getIdentifier(), contentModel.getContentType()));
+            content.setHierarchyInfo(hierarchyInfoList);
+            if (level == -1 || currentLevel < level) {
+                List<Content> childContents = new ArrayList<>();
+                for (ContentModel perContentModel : contentModelList) {
+                    Content iteratedContent = checkAndFetchChildrenOfContent(perContentModel, hierarchyInfoList, currentLevel + 1, level);
+                    childContents.add(iteratedContent);
+                }
+                //add children to the main content
+                content.setChildren(childContents);
             }
-
-            //add children to the main content
-            content.setChildren(childContents);
+        } else {
+            content.setHierarchyInfo(sourceInfoList);
         }
-
         return content;
     }
 
@@ -460,21 +460,21 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<List<Content>> nextContent(List<String> contentIdentifiers) {
+    public GenieResponse<Content> nextContent(List<HierarchyInfo> hierarchyInfo, String currentContentIdentifier) {
 
         String methodName = "nextContent@ContentServiceImpl";
         HashMap<String, Object> params = new HashMap<>();
-        params.put("contentIdentifiers", GsonUtil.toJson(contentIdentifiers));
+        params.put("contentIdentifiers", GsonUtil.toJson(hierarchyInfo));
         params.put("logLevel", "2");
 
-        List<Content> contentList = new ArrayList<>();
-
+        List<HierarchyInfo> nextContentHierarchyList = new ArrayList<>();
+        Content nextContent = null;
         try {
             List<String> contentsKeyList = new ArrayList<>();
             List<String> parentChildRelation = new ArrayList<>();
             String key = null;
 
-            ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), contentIdentifiers.get(0));
+            ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), hierarchyInfo.get(0).getIdentifier());
 
             Stack<ContentModel> stack = new Stack<>();
             stack.push(contentModel);
@@ -522,13 +522,14 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             }
 
             String currentIdentifiers = null;
-            for (String identifier : contentIdentifiers) {
+            for (HierarchyInfo hierarchyItem : hierarchyInfo) {
                 if (StringUtil.isNullOrEmpty(currentIdentifiers)) {
-                    currentIdentifiers = identifier;
+                    currentIdentifiers = hierarchyItem.getIdentifier();
                 } else {
-                    currentIdentifiers = currentIdentifiers + "/" + identifier;
+                    currentIdentifiers = currentIdentifiers + "/" + hierarchyItem.getIdentifier();
                 }
             }
+            currentIdentifiers += "/" + currentContentIdentifier;
 
             int indexOfCurrentContentIdentifier = contentsKeyList.indexOf(currentIdentifiers);
             String nextContentIdentifier = null;
@@ -539,19 +540,21 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             if (!StringUtil.isNullOrEmpty(nextContentIdentifier)) {
 
                 String nextContentIdentifierList[] = nextContentIdentifier.split("/");
-                for (String identifier : nextContentIdentifierList) {
-                    ContentModel nextContentModel = ContentModel.find(mAppContext.getDBSession(), identifier);
-
-                    Content content = ContentHandler.convertContentModelToBean(nextContentModel);
-                    contentList.add(content);
+                int idCount = nextContentIdentifierList.length;
+                for (int i = 0 ; i < (idCount - 1) ; i++) {
+                    ContentModel contentModelObj = ContentModel.find(mAppContext.getDBSession(), nextContentIdentifierList[i]);
+                    nextContentHierarchyList.add(new HierarchyInfo(contentModelObj.getIdentifier(), contentModelObj.getContentType()));
                 }
+                ContentModel nextContentModel = ContentModel.find(mAppContext.getDBSession(), nextContentIdentifierList[idCount - 1]);
+                nextContent = ContentHandler.convertContentModelToBean(nextContentModel);
+                nextContent.setHierarchyInfo(nextContentHierarchyList);
             }
         } catch (Exception e) {
             Logger.e(TAG, "" + e.getMessage());
         }
 
-        GenieResponse<List<Content>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-        response.setResult(contentList);
+        GenieResponse<Content> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        response.setResult(nextContent);
         TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;
     }

@@ -6,7 +6,6 @@ import android.database.MatrixCursor;
 import android.net.Uri;
 
 import org.ekstep.genieproviders.BaseContentProvider;
-import org.ekstep.genieproviders.content.AllContentsUriHandler;
 import org.ekstep.genieproviders.util.Constants;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -76,7 +75,7 @@ public abstract class AbstractSummarizerProvider extends BaseContentProvider {
     }
 
     protected Cursor getErrorResponse(MatrixCursor cursor) {
-        GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(Constants.PROCESSING_ERROR, "Could not get learner assessments!", AllContentsUriHandler.class.getSimpleName());
+        GenieResponse errorResponse = GenieResponseBuilder.getErrorResponse(Constants.PROCESSING_ERROR, "Could not get learner assessments!", AbstractSummarizerProvider.class.getSimpleName());
         cursor.addRow(new String[]{GsonUtil.toJson(errorResponse)});
         return cursor;
     }

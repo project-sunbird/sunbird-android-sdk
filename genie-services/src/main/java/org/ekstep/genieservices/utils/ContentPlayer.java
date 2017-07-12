@@ -8,11 +8,14 @@ import android.widget.Toast;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentData;
+import org.ekstep.genieservices.commons.bean.HierarchyInfo;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.ReflectionUtil;
 import org.ekstep.genieservices.content.ContentConstants;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -77,7 +80,7 @@ public class ContentPlayer {
         intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_ORIGIN, "Genie");
         intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_MODE, "play");
         if (!CollectionUtil.isNullOrEmpty(content.getHierarchyInfo())) {
-            intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_CONTENT_EXTRAS, GsonUtil.toJson(content.getHierarchyInfo()));
+            intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_CONTENT_EXTRAS, GsonUtil.toJson(createHierarchyData(content.getHierarchyInfo())));
         }
         intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_APP_INFO, GsonUtil.toJson(contentData));
         intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_LANGUAGE_INFO, GsonUtil.toJson(resourceBundle));
@@ -95,5 +98,21 @@ public class ContentPlayer {
 
     private static boolean isApk(String mimeType) {
         return ContentConstants.MimeType.APK.equals(mimeType);
+    }
+
+    private static Map createHierarchyData(List<HierarchyInfo> hierarchyInfo) {
+        Map hierarchyData = new HashMap();
+        String id = "";
+        String identifierType = null;
+        for (HierarchyInfo infoItem : hierarchyInfo) {
+            if (identifierType == null) {
+                identifierType = infoItem.getContentType();
+            }
+            id += id.length() == 0 ? "" : "/";
+            id += infoItem.getIdentifier();
+        }
+        hierarchyData.put("id", id);
+        hierarchyData.put("type", identifierType);
+        return hierarchyData;
     }
 }
