@@ -6,9 +6,9 @@ import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.ITelemetryService;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryExportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
+import org.ekstep.genieservices.commons.bean.TelemetryImportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.importexport.FileExporter;
@@ -93,14 +93,14 @@ public class TelemetryService {
      * <p>On failing to importing the telemetry, the response will return status as FALSE and the error be the following:
      * <p>INVALID_FILE
      *
-     * @param importRequest   - {@link ImportRequest}
+     * @param telemetryImportRequest   - {@link TelemetryImportRequest}
      * @param responseHandler - {@link IResponseHandler<Void>}
      */
-    public void importTelemetry(final ImportRequest importRequest, IResponseHandler<Void> responseHandler) {
+    public void importTelemetry(final TelemetryImportRequest telemetryImportRequest, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
-                return fileImporter.importTelemetry(importRequest, telemetryService);
+                return fileImporter.importTelemetry(telemetryImportRequest, telemetryService);
             }
         });
     }
