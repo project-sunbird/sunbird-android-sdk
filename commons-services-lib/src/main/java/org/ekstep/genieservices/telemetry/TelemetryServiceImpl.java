@@ -137,7 +137,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         //Patch the event with current Sid and Uid
         if (mUserService != null) {
             UserSession currentUserSession = mUserService.getCurrentUserSession().getResult();
-            if (currentUserSession.isValid()) {
+            if (currentUserSession != null && currentUserSession.isValid()) {
                 event.updateSessionDetails(currentUserSession.getSid(), currentUserSession.getUid());
             }
         }

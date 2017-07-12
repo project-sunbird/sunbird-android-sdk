@@ -156,10 +156,10 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         for (ContentModel contentModel : contentModelListInDB) {
             Content c = ContentHandler.convertContentModelToBean(contentModel);
 
-            if (criteria.attachFeedback()) {
+            if (criteria != null && criteria.attachFeedback()) {
                 c.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, c.getIdentifier(), criteria.getUid()));
             }
-            if (criteria.attachContentAccess()) {
+            if (criteria != null && criteria.attachContentAccess()) {
                 c.setContentAccess(ContentHandler.getContentAccess(userService, c.getIdentifier(), criteria.getUid()));
             }
             contentList.add(c);
@@ -430,12 +430,12 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             LinkedTreeMap result = (LinkedTreeMap) map.get("result");
 
             String responseMessageId = null;
-            if (responseParams.containsKey("resmsgid")) {
+            if (responseParams != null && responseParams.containsKey("resmsgid")) {
                 responseMessageId = (String) responseParams.get("resmsgid");
             }
 
             String contentDataList = null;
-            if (result.containsKey("content")) {
+            if (result != null && result.containsKey("content")) {
                 contentDataList = GsonUtil.toJson(result.get("content"));
             }
 
