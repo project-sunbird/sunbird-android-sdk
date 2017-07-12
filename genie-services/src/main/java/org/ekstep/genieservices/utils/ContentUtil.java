@@ -6,24 +6,31 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 
+import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
 /**
- * Created by swayangjit on 1/6/17.
+ * Created on 1/6/17.
+ *
+ * @author swayangjit
  */
-
 public class ContentUtil {
+
+    private static final String TAG = ContentUtil.class.getSimpleName();
 
     public static boolean isAppInstalled(Context context, String packageName) {
         if (StringUtil.isNullOrEmpty(packageName)) {
             return false;
         }
-        PackageManager pm = context.getPackageManager();
+
         boolean isInstalled;
         try {
+            PackageManager pm = context.getPackageManager();
             pm.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES);
             isInstalled = true;
         } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            Logger.e(TAG, e.getMessage(), e);
             isInstalled = false;
         }
 

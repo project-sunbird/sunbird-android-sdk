@@ -40,6 +40,7 @@ import org.ekstep.genieservices.telemetry.processors.EventProcessorFactory;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,11 +71,10 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         GenieResponse<Void> response;
         try {
             response = saveEvent(eventString);
-//            saveEvent(TelemetryLogger.create(mAppContext, response, new HashMap(), TAG, methodName, params).toString());
             return response;
         } catch (InvalidDataException e) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.VALIDATION_ERROR, ServiceConstants.ErrorMessage.UNABLE_TO_SAVE_EVENT, TAG, Void.class);
-            saveEvent(TelemetryLogger.create(mAppContext, response, new HashMap(), TAG, methodName, params).toString());
+            saveEvent(TelemetryLogger.create(mAppContext, response, TAG, methodName, params, new HashMap()).toString());
             return response;
         }
     }
@@ -112,53 +112,110 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         GenieResponse<TelemetryStat> genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         genieResponse.setResult(new TelemetryStat(unSyncedEventCount, lastSyncTime));
 
-        saveEvent(TelemetryLogger.create(mAppContext, genieResponse, new HashMap(), TAG, methodName, params).toString());
+        saveEvent(TelemetryLogger.create(mAppContext, genieResponse, TAG, methodName, params, new HashMap()).toString());
         return genieResponse;
     }
 
     private GenieResponse<Void> saveEvent(String eventString) {
-        EventModel event = EventModel.build(mAppContext.getDBSession(), eventString);
+        Map<String, Object> event = GsonUtil.fromJson(eventString, Map.class, ServiceConstants.Event.ERROR_INVALID_EVENT);
+        String eventType = (String) event.get("eid");
+        if (StringUtil.isNullOrEmpty(eventType)) {
+            throw new InvalidDataException(ServiceConstants.Event.ERROR_INVALID_JSON);
+        }
+
         decorateEvent(event);
-        event.save();
-        EventPublisher.postTelemetryEvent(GsonUtil.fromMap(event.getEventMap(), Telemetry.class));
+
+        EventModel eventModel = EventModel.build(mAppContext.getDBSession(), event, eventType);
+        eventModel.save();
+
+        EventPublisher.postTelemetryEvent(GsonUtil.fromMap(eventModel.getEventMap(), Telemetry.class));
         Logger.i(TAG, "Event saved successfully");
         return GenieResponseBuilder.getSuccessResponse("Event Saved Successfully", Void.class);
     }
 
-    private void decorateEvent(EventModel event) {
+    private void decorateEvent(Map<String, Object> event) {
         //Patch the event with proper timestamp
-        String version = event.getVersion();
+        String version = readVersion(event);
         if (version.equals("1.0")) {
-            event.updateTs(DateUtil.getCurrentTimestamp());
+            updateTs(event, DateUtil.getCurrentTimestamp());
         } else if (version.equals("2.0")) {
-            event.updateEts(DateUtil.getEpochTime());
+            updateEts(event, DateUtil.getEpochTime());
         }
 
         //Patch the event with current Sid and Uid
         if (mUserService != null) {
             UserSession currentUserSession = mUserService.getCurrentUserSession().getResult();
             if (currentUserSession != null && currentUserSession.isValid()) {
-                event.updateSessionDetails(currentUserSession.getSid(), currentUserSession.getUid());
+                updateSessionDetails(event, currentUserSession.getSid(), currentUserSession.getUid());
             }
         }
 
         //Patch the event with did
-        event.updateDeviceInfo(mAppContext.getDeviceInfo().getDeviceID());
+        updateDeviceInfo(event, mAppContext.getDeviceInfo().getDeviceID());
 
-        //Patch Partner tagss
+        //Patch Partner tags
         String values = mAppContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.KEY_ACTIVE_PARTNER_ID, "");
-        List<Map<String, Object>> tags = (List<Map<String, Object>>) event.getEventMap().get("tags");
+        List<Map<String, Object>> tags = (List<Map<String, Object>>) event.get("tags");
         if (!StringUtil.isNullOrEmpty(values) && !CollectionUtil.containsMap(tags, ServiceConstants.Partner.KEY_PARTNER_ID)) {
-            event.addTag(ServiceConstants.Partner.KEY_PARTNER_ID, values);
+            addTag(event, ServiceConstants.Partner.KEY_PARTNER_ID, values);
         }
 
         //Patch Program tags
         Set<String> activeProgramTags = TelemetryTagCache.activeTags(mAppContext);
         List<String> tagList = new ArrayList<>();
-        for (String tag : activeProgramTags) {
-            tagList.add(tag);
+        Collections.addAll(activeProgramTags);
+        addTag(event, "genie", tagList);
+    }
+
+    private String readVersion(Map<String, Object> event) {
+        return String.valueOf(event.get("ver"));
+    }
+
+    private void updateTs(Map<String, Object> event, String timestamp) {
+        String ts = (String) event.get("ts");
+        if (ts == null || ts.isEmpty()) {
+            event.put("ts", timestamp);
         }
-        event.addTag("genie", tagList);
+    }
+
+    private void updateEts(Map<String, Object> event, long ets) {
+        Double _ets;
+        try {
+            _ets = (Double) event.get("ets");
+        } catch (java.lang.ClassCastException e) {
+            _ets = null;
+        }
+        if (_ets == null) {
+            event.put("ets", ets);
+        } else {
+            event.put("ets", Math.round(_ets));
+        }
+    }
+
+    private void updateSessionDetails(Map<String, Object> event, String sid, String uid) {
+        event.put("uid", uid);
+        event.put("sid", sid);
+    }
+
+    private void updateDeviceInfo(Map<String, Object> event, String did) {
+        event.put("did", did);
+    }
+
+    private void addTag(Map<String, Object> event, String key, Object value) {
+        Logger.i(TAG, String.format("addTag %s:%s", key, value));
+        Map<String, Object> map = new HashMap<>();
+        map.put(key, value);
+        List<Map<String, Object>> tags = (List<Map<String, Object>>) event.get("tags");
+        if (tags == null) {
+            Logger.i(TAG, "CREATE TAG");
+            tags = new ArrayList<>();
+            tags.add(map);
+
+            event.put("tags", tags);
+        } else {
+            Logger.i(TAG, "EDIT TAG");
+            tags.add(map);
+        }
     }
 
     @Override

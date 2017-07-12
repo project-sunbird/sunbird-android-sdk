@@ -70,15 +70,15 @@ public class TelemetryLogger {
         log(appContext, response, service, method, params, result);
     }
 
-    public static void log(AppContext appContext, GenieResponse response, String service, String method, HashMap params, HashMap result) {
-        save(create(appContext, response, result, service, method, params));
+    private static void log(AppContext appContext, GenieResponse response, String service, String method, HashMap params, HashMap result) {
+        save(create(appContext, response, service, method, params, result));
     }
 
     public static void log(Telemetry telemetry) {
         save(telemetry);
     }
 
-    public static Telemetry create(AppContext appContext, GenieResponse response, HashMap result, String service, String method, HashMap params) {
+    public static Telemetry create(AppContext appContext, GenieResponse response, String service, String method, HashMap params, HashMap result) {
         GEServiceAPICall.Builder eventBuilder = new GEServiceAPICall.Builder(new GameData(appContext.getParams().getString(ServiceConstants.Params.GID), appContext.getParams().getString(ServiceConstants.Params.VERSION_NAME)));
         return eventBuilder.service(service)
                 .method(method)
@@ -94,7 +94,6 @@ public class TelemetryLogger {
         // Have purposefully kept it this way so that the caller knows that init has not happened during testing.
         sTelemetryLogger.mTelemetryService.saveTelemetry(event);
     }
-
 
     public static String getNetworkMode(IConnectionInfo connectionInfo) {
         if (connectionInfo.isConnectedOverWifi()) {
