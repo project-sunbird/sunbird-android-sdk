@@ -36,7 +36,11 @@ public class BuildParams implements IParams {
     }
 
     private void init(Context context, String packageName) {
+        // TODO: 7/13/2017 - throw IllegalArgumentException for mandatory params.
         put(ServiceConstants.Params.VERSION_NAME, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.VERSION_NAME));
+        put(ServiceConstants.Params.APPLICATION_ID, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.APPLICATION_ID));
+        put(ServiceConstants.Params.PRODUCER_ID, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.PRODUCER_ID));
+        put(ServiceConstants.Params.CHANNEL_ID, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.CHANNEL_ID));
         put(ServiceConstants.Params.APP_QUALIFIER, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.APP_QUALIFIER));
         put(ServiceConstants.Params.TELEMETRY_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.TELEMETRY_BASE_URL));
         put(ServiceConstants.Params.LANGUAGE_PLATFORM_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.LANGUAGE_PLATFORM_BASE_URL));
@@ -47,7 +51,6 @@ public class BuildParams implements IParams {
         put(ServiceConstants.Params.ANALYTICS_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.ANALYTICS_BASE_URL));
         put(ServiceConstants.Params.API_USER, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.API_USER));
         put(ServiceConstants.Params.API_PASS, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.API_PASS));
-        put(ServiceConstants.Params.GID, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.GID));
         put(ServiceConstants.Params.MOBILE_APP_SECRET, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.MOBILE_APP_SECRET));
         put(ServiceConstants.Params.MOBILE_APP_KEY, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.MOBILE_APP_KEY));
         put(ServiceConstants.Params.MOBILE_APP_CONSUMER, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.MOBILE_APP_CONSUMER));

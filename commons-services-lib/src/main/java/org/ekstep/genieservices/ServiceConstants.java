@@ -35,8 +35,11 @@ public interface ServiceConstants {
     String EXPORT_TYPE_PROFILE = "userprofile";
 
     interface Params {
+        String APPLICATION_ID = "APPLICATION_ID";
         String VERSION_CODE = "VERSION_CODE";
         String VERSION_NAME = "VERSION_NAME";
+        String PRODUCER_ID = "PRODUCER_ID";
+        String CHANNEL_ID = "CHANNEL_ID";
         String APP_QUALIFIER = "QUALIFIER";
         String TELEMETRY_BASE_URL = "TELEMETRY_BASE_URL";
         String LANGUAGE_PLATFORM_BASE_URL = "LANGUAGE_PLATFORM_BASE_URL";
@@ -50,7 +53,6 @@ public interface ServiceConstants {
         String MOBILE_APP_SECRET = "MOBILE_APP_SECRET";
         String MOBILE_APP_KEY = "MOBILE_APP_KEY";
         String MOBILE_APP_CONSUMER = "MOBILE_APP_CONSUMER";
-        String GID = "GID";
         String LOG_LEVEL = "LOG_LEVEL";
         String MIN_COMPATIBILITY_LEVEL = "MIN_COMPATIBILITY_LEVEL";
         String MAX_COMPATIBILITY_LEVEL = "MAX_COMPATIBILITY_LEVEL";

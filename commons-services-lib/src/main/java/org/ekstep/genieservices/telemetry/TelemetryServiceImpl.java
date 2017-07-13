@@ -141,16 +141,20 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         String version = readVersion(event);
         if (version.equals("1.0")) {
             updateTs(event, DateUtil.getCurrentTimestamp());
-        } else if (version.equals("2.0")) {
+        } else if (version.equals("2.0") || version.equals("2.1")) {
             updateEts(event, DateUtil.getEpochTime());
         }
 
-        // Patch the channel
+        if (version.equals("2.1")) {
+            // Patch the channel
+            addChannel(event);
+
+            // Patch the pdata - ProducerData
+            addProducerData(event);
+        }
 
         // Patch the gdata - GameData
-        addGDataIfNotAvailable(event);
-
-        // Patch the pdata - ProducerData
+        addGameDataIfNotAvailable(event);
 
         //Patch the event with current Sid and Uid
         if (mUserService != null) {
@@ -202,14 +206,27 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         }
     }
 
-    private void addGDataIfNotAvailable(Map<String, Object> event) {
+    private void addChannel(Map<String, Object> event) {
+        event.put("channel", mAppContext.getParams().getString(ServiceConstants.Params.CHANNEL_ID));
+    }
+
+    private void addProducerData(Map<String, Object> event) {
+        if (!event.containsKey("pdata")) {
+            Map<String, Object> pdata = new HashMap<>();
+            pdata.put("id", mAppContext.getParams().getString(ServiceConstants.Params.PRODUCER_ID));
+            pdata.put("ver", mAppContext.getParams().getString(ServiceConstants.Params.VERSION_NAME));
+
+            event.put("pdata", pdata);
+        }
+    }
+
+    private void addGameDataIfNotAvailable(Map<String, Object> event) {
         Map<String, Object> gdata;
         if (event.containsKey("gdata")) {
             gdata = (Map<String, Object>) event.get("gdata");
         } else {
             gdata = new HashMap<>();
-            // TODO: 7/13/2017 - id should be applicationId instead of GID
-            gdata.put("id", mAppContext.getParams().getString(ServiceConstants.Params.GID));
+            gdata.put("id", mAppContext.getParams().getString(ServiceConstants.Params.APPLICATION_ID));
             gdata.put("ver", mAppContext.getParams().getString(ServiceConstants.Params.VERSION_NAME));
 
             event.put("gdata", gdata);
