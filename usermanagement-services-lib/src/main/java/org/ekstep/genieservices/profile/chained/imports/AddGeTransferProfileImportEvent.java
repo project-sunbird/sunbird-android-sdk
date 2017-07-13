@@ -3,7 +3,6 @@ package org.ekstep.genieservices.profile.chained.imports;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
-import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
@@ -45,7 +44,7 @@ public class AddGeTransferProfileImportEvent implements IChainable<ProfileImport
                     aggregateCount,
                     LongUtil.tryParseToLong((String) importContext.getMetadata().get(GETransferEventKnowStructure.FILE_SIZE), 0),
                     contents);
-            GETransfer geTransfer = new GETransfer(new GameData(appContext.getParams().getString(ServiceConstants.Params.GID), appContext.getParams().getString(ServiceConstants.Params.VERSION_NAME)), eks);
+            GETransfer geTransfer = new GETransfer(eks);
             TelemetryLogger.log(geTransfer);
 
             ProfileImportResponse profileImportResponse = new ProfileImportResponse();

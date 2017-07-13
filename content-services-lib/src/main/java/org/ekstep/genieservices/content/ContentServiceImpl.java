@@ -28,7 +28,6 @@ import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
-import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
 import org.ekstep.genieservices.commons.bean.ImportContext;
@@ -541,7 +540,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
                 String nextContentIdentifierList[] = nextContentIdentifier.split("/");
                 int idCount = nextContentIdentifierList.length;
-                for (int i = 0 ; i < (idCount - 1) ; i++) {
+                for (int i = 0; i < (idCount - 1); i++) {
                     ContentModel contentModelObj = ContentModel.find(mAppContext.getDBSession(), nextContentIdentifierList[i]);
                     nextContentHierarchyList.add(new HierarchyInfo(contentModelObj.getIdentifier(), contentModelObj.getContentType()));
                 }
@@ -690,7 +689,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     private void buildInitiateEvent() {
-        GEInteract geInteract = new GEInteract.Builder(new GameData(mAppContext.getParams().getString(ServiceConstants.Params.GID), mAppContext.getParams().getString(ServiceConstants.Params.VERSION_NAME))).
+        GEInteract geInteract = new GEInteract.Builder().
                 stageId(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID).
                 subType(ServiceConstants.Telemetry.CONTENT_IMPORT_INITIATED_SUB_TYPE).
                 interActionType(InteractionType.TOUCH).
@@ -699,7 +698,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     private void buildSuccessEvent(String identifier) {
-        GEInteract geInteract = new GEInteract.Builder(new GameData(mAppContext.getParams().getString(ServiceConstants.Params.GID), mAppContext.getParams().getString(ServiceConstants.Params.VERSION_NAME))).
+        GEInteract geInteract = new GEInteract.Builder().
                 stageId(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID).
                 subType(ServiceConstants.Telemetry.CONTENT_IMPORT_SUCCESS_SUB_TYPE).
                 interActionType(InteractionType.OTHER).

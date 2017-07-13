@@ -1,24 +1,20 @@
 package org.ekstep.genieservices.commons.bean.telemetry;
 
-import org.ekstep.genieservices.commons.bean.GameData;
-import org.ekstep.genieservices.commons.utils.DateUtil;
-
 import java.util.HashMap;
 
 /**
- * Created by swayangjit on 2/5/17.
+ * Created on 2/5/17.
+ *
+ * @author swayangjit
  */
-
 public class GETerminatePartnerSession extends Telemetry {
 
     private static final String EID = "GE_STOP_PARTNER_SESSION";
 
-    public GETerminatePartnerSession(GameData gameData, String partnerID,
-                                     String deviceId, Long length, String partnerSID) {
-        super(gameData,EID);
+    public GETerminatePartnerSession(String partnerID, String deviceId, Long length, String partnerSID) {
+        super(EID);
         setEks(createEKS(partnerID, length, partnerSID));
         setDid(deviceId);
-        setTs(DateUtil.getCurrentTimestamp());
     }
 
     protected HashMap<String, Object> createEKS(String partnerID, Long length, String partnerSID) {
@@ -29,4 +25,3 @@ public class GETerminatePartnerSession extends Telemetry {
         return eks;
     }
 }
-

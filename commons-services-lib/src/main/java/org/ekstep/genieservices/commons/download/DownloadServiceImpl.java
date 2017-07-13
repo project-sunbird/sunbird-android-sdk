@@ -7,7 +7,6 @@ import org.ekstep.genieservices.commons.IDownloadManager;
 import org.ekstep.genieservices.commons.bean.CorrelationData;
 import org.ekstep.genieservices.commons.bean.DownloadProgress;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
-import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
 import org.ekstep.genieservices.eventbus.EventPublisher;
@@ -25,15 +24,13 @@ import java.util.concurrent.TimeUnit;
  */
 public class DownloadServiceImpl implements IDownloadService {
 
-    private AppContext mAppContext;
     private DownloadQueueManager mDownloadQueueManager;
     private IDownloadManager mDownloadManager;
     private ScheduledExecutorService mExecutor;
 
     public DownloadServiceImpl(AppContext appContext) {
-        this.mAppContext = appContext;
-        this.mDownloadQueueManager = new DownloadQueueManager(mAppContext.getKeyValueStore());
-        this.mDownloadManager = mAppContext.getDownloadManager();
+        this.mDownloadQueueManager = new DownloadQueueManager(appContext.getKeyValueStore());
+        this.mDownloadManager = appContext.getDownloadManager();
         // TODO: 14/6/17  Figure it out later
 //        resumeDownloads();
     }
@@ -81,7 +78,7 @@ public class DownloadServiceImpl implements IDownloadService {
     }
 
     private GEInteract buildGEInteractEvent(InteractionType type, String subType, List<CorrelationData> correlationDataList, String contendId) {
-        GEInteract geInteract = new GEInteract.Builder(new GameData(mAppContext.getParams().getString(ServiceConstants.Params.GID), mAppContext.getParams().getString(ServiceConstants.Params.VERSION_NAME)))
+        GEInteract geInteract = new GEInteract.Builder()
                 .interActionType(type)
                 .stageId(ServiceConstants.Telemetry.CONTENT_DETAIL)
                 .subType(subType)

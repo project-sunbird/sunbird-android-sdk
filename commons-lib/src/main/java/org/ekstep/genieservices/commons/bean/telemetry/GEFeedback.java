@@ -1,7 +1,5 @@
 package org.ekstep.genieservices.commons.bean.telemetry;
 
-import org.ekstep.genieservices.commons.bean.GameData;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,8 +12,8 @@ public class GEFeedback extends Telemetry {
 
     private static final String EID = "GE_FEEDBACK";
 
-    public GEFeedback(GameData gameData, String feedbackType, String contentId, float rating, String comments, String contextType, String stageId) {
-        super(gameData, EID);
+    public GEFeedback(String feedbackType, String contentId, float rating, String comments, String contextType, String stageId) {
+        super(EID);
         setEks(createEKS(feedbackType, contentId, rating, comments, contextType, stageId));
     }
 

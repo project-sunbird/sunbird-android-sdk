@@ -1,6 +1,5 @@
 package org.ekstep.genieservices.commons.bean.telemetry;
 
-import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
@@ -8,15 +7,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by swayangjit on 1/5/17.
+ * Created on 1/5/17.
+ *
+ * @author swayangjit
  */
-
 public class GECreateProfile extends Telemetry {
 
     private static final String EID = "GE_CREATE_PROFILE";
 
-    public GECreateProfile(GameData gameData, Profile profile, String loc) {
-        super(gameData, EID);
+    public GECreateProfile(Profile profile, String loc) {
+        super(EID);
         setEks(createEKS(profile, loc));
         setUid(profile.getUid());
     }
@@ -35,7 +35,7 @@ public class GECreateProfile extends Telemetry {
         map.put("is_group_user", profile.isGroupUser());
         if (!StringUtil.isNullOrEmpty(profile.getAvatar())) {
             String[] avatarArr = profile.getAvatar().split("/");
-            if (avatarArr != null && avatarArr.length > 1) {
+            if (avatarArr.length > 1) {
                 map.put("avatar", avatarArr[1]);
             }
         }

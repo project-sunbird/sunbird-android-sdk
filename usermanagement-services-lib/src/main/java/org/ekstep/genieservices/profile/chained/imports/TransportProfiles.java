@@ -3,7 +3,6 @@ package org.ekstep.genieservices.profile.chained.imports;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
-import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.Profile;
@@ -35,8 +34,6 @@ public class TransportProfiles implements IChainable<ProfileImportResponse> {
         UserProfilesModel userProfilesModel = UserProfilesModel.find(importContext.getDBSession());
 
         if (userProfilesModel != null) {
-            GameData gameData = new GameData(appContext.getParams().getString(ServiceConstants.Params.GID), appContext.getParams().getString(ServiceConstants.Params.VERSION_NAME));
-
             for (Profile profile : userProfilesModel.getProfileList()) {
                 UserProfileModel userProfileModel = UserProfileModel.find(appContext.getDBSession(), profile.getUid());
                 if (userProfileModel == null) {
@@ -49,7 +46,7 @@ public class TransportProfiles implements IChainable<ProfileImportResponse> {
 //                    final GECreateUser geCreateUser = new GECreateUser(gameData, profile.getUid(), appContext.getLocationInfo().getLocation());
 
                     final UserProfileModel profileModel = UserProfileModel.build(appContext.getDBSession(), profile);
-                    final GECreateProfile geCreateProfile = new GECreateProfile(gameData, profile, appContext.getLocationInfo().getLocation());
+                    final GECreateProfile geCreateProfile = new GECreateProfile(profile, appContext.getLocationInfo().getLocation());
                     appContext.getDBSession().executeInTransaction(new IDBTransaction() {
                         @Override
                         public Void perform(IDBSession dbSession) {

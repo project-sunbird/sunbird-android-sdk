@@ -5,7 +5,6 @@ import org.ekstep.genieservices.IPartnerService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
-import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.PartnerData;
 import org.ekstep.genieservices.commons.bean.telemetry.GERegisterPartner;
@@ -50,7 +49,6 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
 
     private static final String TEST = "test";
     private AppContext appContext;
-    private GameData mGameData = null;
 
     /**
      * Constructor of PartnerServiceImpl
@@ -60,7 +58,6 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
     public PartnerServiceImpl(AppContext appContext) {
         super(appContext);
         this.appContext = appContext;
-        this.mGameData = new GameData(mAppContext.getParams().getString(ServiceConstants.Params.GID), mAppContext.getParams().getString(ServiceConstants.Params.VERSION_NAME));
     }
 
     @Override
@@ -78,7 +75,7 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
                 partnerModel = PartnerModel.build(appContext.getDBSession(), partnerData.getPartnerID(), partnerData.getPublicKey(), getPublicKeyId(partnerData));
                 partnerModel.save();
 
-                GERegisterPartner geRegisterPartner = new GERegisterPartner(mGameData, partnerData.getPartnerID(), partnerData.getPublicKey(), getPublicKeyId(partnerData), mAppContext.getDeviceInfo().getDeviceID());
+                GERegisterPartner geRegisterPartner = new GERegisterPartner(partnerData.getPartnerID(), partnerData.getPublicKey(), getPublicKeyId(partnerData), mAppContext.getDeviceInfo().getDeviceID());
                 TelemetryLogger.log(geRegisterPartner);
 
                 response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
@@ -133,14 +130,14 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
         if (partnerModel != null) {
             PartnerSessionModel partnerSessionModel = PartnerSessionModel.find(appContext);
             if (partnerSessionModel != null) {
-                GETerminatePartnerSession geTerminatePartnerSession = new GETerminatePartnerSession(mGameData, partnerSessionModel.getPartnerID(), mAppContext.getDeviceInfo().getDeviceID(), DateUtil.getEpochDiff(partnerSessionModel.getEpochTime()), partnerSessionModel.getPartnerSessionId());
+                GETerminatePartnerSession geTerminatePartnerSession = new GETerminatePartnerSession(partnerSessionModel.getPartnerID(), mAppContext.getDeviceInfo().getDeviceID(), DateUtil.getEpochDiff(partnerSessionModel.getEpochTime()), partnerSessionModel.getPartnerSessionId());
                 TelemetryLogger.log(geTerminatePartnerSession);
                 partnerSessionModel.clear();
             }
             partnerSessionModel = PartnerSessionModel.build(appContext, partnerData.getPartnerID());
             partnerSessionModel.save();
 
-            GEStartPartnerSession geStartPartnerSession = new GEStartPartnerSession(mGameData, partnerSessionModel.getPartnerID(), mAppContext.getDeviceInfo().getDeviceID(), partnerSessionModel.getPartnerSessionId());
+            GEStartPartnerSession geStartPartnerSession = new GEStartPartnerSession(partnerSessionModel.getPartnerID(), mAppContext.getDeviceInfo().getDeviceID(), partnerSessionModel.getPartnerSessionId());
             TelemetryLogger.log(geStartPartnerSession);
 
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
@@ -192,8 +189,8 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
         if (partnerModel != null) {
             try {
                 Map<String, String> data = processData(partnerData);
-                GESendPartnerData geSendPartnerData = new GESendPartnerData(mGameData, partnerModel.getPartnerID(),
-                        partnerModel.getPublicKeyId(), mAppContext.getDeviceInfo().getDeviceID(), data.get("encrypted_data"), data.get("encrypted_key"), data.get("iv"));
+                GESendPartnerData geSendPartnerData = new GESendPartnerData(partnerModel.getPartnerID(), partnerModel.getPublicKeyId(),
+                        mAppContext.getDeviceInfo().getDeviceID(), data.get("encrypted_data"), data.get("encrypted_key"), data.get("iv"));
                 TelemetryLogger.log(geSendPartnerData);
                 response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, String.class);
                 response.setResult(data.toString());

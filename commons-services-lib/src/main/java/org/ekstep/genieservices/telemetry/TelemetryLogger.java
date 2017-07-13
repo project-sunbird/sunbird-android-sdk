@@ -3,7 +3,6 @@ package org.ekstep.genieservices.telemetry;
 import org.ekstep.genieservices.ITelemetryService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.telemetry.GEServiceAPICall;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
@@ -12,7 +11,7 @@ import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import java.util.HashMap;
 
 /**
- * Created by swayangjit on 27/4/17.
+ * Created on 27/4/17.
  *
  * @author swayangjit
  */
@@ -79,7 +78,7 @@ public class TelemetryLogger {
     }
 
     public static Telemetry create(AppContext appContext, GenieResponse response, String service, String method, HashMap params, HashMap result) {
-        GEServiceAPICall.Builder eventBuilder = new GEServiceAPICall.Builder(new GameData(appContext.getParams().getString(ServiceConstants.Params.GID), appContext.getParams().getString(ServiceConstants.Params.VERSION_NAME)));
+        GEServiceAPICall.Builder eventBuilder = new GEServiceAPICall.Builder();
         return eventBuilder.service(service)
                 .method(method)
                 .mode(getNetworkMode(appContext.getConnectionInfo()))

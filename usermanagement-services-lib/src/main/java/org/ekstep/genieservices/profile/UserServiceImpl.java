@@ -8,7 +8,6 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentLearnerState;
-import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.Profile;
@@ -67,11 +66,8 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
     private static final String TAG = UserServiceImpl.class.getSimpleName();
 
-    private GameData mGameData;
-
     public UserServiceImpl(AppContext appContext) {
         super(appContext);
-        mGameData = new GameData(mAppContext.getParams().getString(ServiceConstants.Params.GID), mAppContext.getParams().getString(ServiceConstants.Params.VERSION_NAME));
     }
 
     /**
@@ -114,9 +110,9 @@ public class UserServiceImpl extends BaseService implements IUserService {
         }
         final UserModel userModel = UserModel.build(dbSession, uid);
 
-        final GECreateUser geCreateUser = new GECreateUser(mGameData, uid, mAppContext.getLocationInfo().getLocation());
+        final GECreateUser geCreateUser = new GECreateUser(uid, mAppContext.getLocationInfo().getLocation());
         final UserProfileModel profileModel = UserProfileModel.build(dbSession, profile);
-        final GECreateProfile geCreateProfile = new GECreateProfile(mGameData, profile, mAppContext.getLocationInfo().getLocation());
+        final GECreateProfile geCreateProfile = new GECreateProfile(profile, mAppContext.getLocationInfo().getLocation());
         dbSession.executeInTransaction(new IDBTransaction() {
             @Override
             public Void perform(IDBSession dbSession) {
@@ -152,7 +148,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     }
 
     private void logGEError(GenieResponse response, String id) {
-        GEError geError = new GEError(mGameData, response.getError(), id, "", response.getErrorMessages().toString());
+        GEError geError = new GEError(response.getError(), id, "", response.getErrorMessages().toString());
         TelemetryLogger.log(geError);
     }
 
@@ -185,7 +181,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         // TODO: 6/6/2017 - check if profile exists or not before updating.
         userProfileModel.update();
 
-        GEUpdateProfile geUpdateProfile = new GEUpdateProfile(mGameData, profile, mAppContext.getDeviceInfo().getDeviceID());
+        GEUpdateProfile geUpdateProfile = new GEUpdateProfile(profile, mAppContext.getDeviceInfo().getDeviceID());
         TelemetryLogger.log(geUpdateProfile);
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Profile.class);
@@ -227,7 +223,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
             Profile profile = new Profile("", "", "");
             profile.setUid(uid);
-            final GEDeleteProfile geDeleteProfile = new GEDeleteProfile(mGameData, profile);
+            final GEDeleteProfile geDeleteProfile = new GEDeleteProfile(profile);
             mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
                 @Override
                 public Void perform(IDBSession dbSession) {
@@ -281,7 +277,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         String uid = getAnonymousUserId();
         if (uid == null) {
             uid = createAnonymousUser();
-            GECreateUser geCreateUser = new GECreateUser(mGameData, uid, mAppContext.getLocationInfo().getLocation());
+            GECreateUser geCreateUser = new GECreateUser(uid, mAppContext.getLocationInfo().getLocation());
             TelemetryLogger.log(geCreateUser);
         }
         Profile profile = new Profile(uid);
@@ -323,7 +319,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         if (session == null) {
             sessionCreationRequired = true;
         } else if (!session.getUserSessionBean().getUid().equals(uid)) {
-            GESessionEnd geSessionEnd = new GESessionEnd(mGameData, session.getUserSessionBean(), mAppContext.getDeviceInfo().getDeviceID());
+            GESessionEnd geSessionEnd = new GESessionEnd(session.getUserSessionBean(), mAppContext.getDeviceInfo().getDeviceID());
             TelemetryLogger.log(geSessionEnd);
             session.endSession();
             sessionCreationRequired = true;
@@ -332,7 +328,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         if (sessionCreationRequired) {
             UserSessionModel userSessionModel = UserSessionModel.buildUserSession(mAppContext, uid);
             userSessionModel.startSession();
-            GESessionStart geSessionStart = new GESessionStart(mGameData, userSessionModel.getUserSessionBean(), mAppContext.getLocationInfo().getLocation(), mAppContext.getDeviceInfo().getDeviceID());
+            GESessionStart geSessionStart = new GESessionStart(userSessionModel.getUserSessionBean(), mAppContext.getLocationInfo().getLocation(), mAppContext.getDeviceInfo().getDeviceID());
             TelemetryLogger.log(geSessionStart);
         }
 
@@ -398,7 +394,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         if (uid == null) {
             uid = createAnonymousUser();
             setCurrentUser(uid);
-            GECreateUser geCreateUser = new GECreateUser(mGameData, uid, mAppContext.getLocationInfo().getLocation());
+            GECreateUser geCreateUser = new GECreateUser(uid, mAppContext.getLocationInfo().getLocation());
             TelemetryLogger.log(geCreateUser);
         }
     }

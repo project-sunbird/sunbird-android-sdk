@@ -54,6 +54,9 @@ import java.util.Set;
 public class TelemetryServiceImpl extends BaseService implements ITelemetryService {
 
     private static final String TAG = TelemetryServiceImpl.class.getSimpleName();
+
+    private static final String GENIE_SERVICE_GID = "genieservice.android";
+
     private IUserService mUserService;
 
     public TelemetryServiceImpl(AppContext appContext, IUserService userService) {
@@ -142,6 +145,13 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
             updateEts(event, DateUtil.getEpochTime());
         }
 
+        // Patch the channel
+
+        // Patch the gdata - GameData
+        addGDataIfNotAvailable(event);
+
+        // Patch the pdata - ProducerData
+
         //Patch the event with current Sid and Uid
         if (mUserService != null) {
             UserSession currentUserSession = mUserService.getCurrentUserSession().getResult();
@@ -190,6 +200,29 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         } else {
             event.put("ets", Math.round(_ets));
         }
+    }
+
+    private void addGDataIfNotAvailable(Map<String, Object> event) {
+        Map<String, Object> gdata;
+        if (event.containsKey("gdata")) {
+            gdata = (Map<String, Object>) event.get("gdata");
+        } else {
+            gdata = new HashMap<>();
+            // TODO: 7/13/2017 - id should be applicationId instead of GID
+            gdata.put("id", mAppContext.getParams().getString(ServiceConstants.Params.GID));
+            gdata.put("ver", mAppContext.getParams().getString(ServiceConstants.Params.VERSION_NAME));
+
+            event.put("gdata", gdata);
+        }
+
+        String id = (String) gdata.get("id");
+        if (!isValidId(id)) {
+            gdata.put("id", GENIE_SERVICE_GID);
+        }
+    }
+
+    private boolean isValidId(String gameID) {
+        return gameID != null && !gameID.trim().isEmpty();
     }
 
     private void updateSessionDetails(Map<String, Object> event, String sid, String uid) {

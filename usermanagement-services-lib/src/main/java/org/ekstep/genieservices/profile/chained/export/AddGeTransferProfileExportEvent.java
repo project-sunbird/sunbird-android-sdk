@@ -3,7 +3,6 @@ package org.ekstep.genieservices.profile.chained.export;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
-import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
@@ -60,7 +59,7 @@ public class AddGeTransferProfileExportEvent implements IChainable<ProfileExport
                     aggregateCount,
                     new File(destinationDBFilePath).length(),
                     contents);
-            GETransfer geTransfer = new GETransfer(new GameData(appContext.getParams().getString(ServiceConstants.Params.GID), appContext.getParams().getString(ServiceConstants.Params.VERSION_NAME)), eks);
+            GETransfer geTransfer = new GETransfer(eks);
             TelemetryLogger.log(geTransfer);
 
         } catch (NumberFormatException ex) {

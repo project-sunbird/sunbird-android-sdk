@@ -8,7 +8,6 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
 import org.ekstep.genieservices.commons.bean.ContentFeedbackFilterCriteria;
-import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.telemetry.GEFeedback;
 import org.ekstep.genieservices.commons.db.contract.ContentFeedbackEntry;
@@ -30,13 +29,11 @@ public class ContentFeedbackServiceImpl extends BaseService implements IContentF
     private static final String TAG = ContentFeedbackServiceImpl.class.getSimpleName();
 
     private IUserService userService;
-    private GameData mGameData;
 
     public ContentFeedbackServiceImpl(AppContext appContext, IUserService userService) {
         super(appContext);
 
         this.userService = userService;
-        mGameData = new GameData(mAppContext.getParams().getString(ServiceConstants.Params.GID), mAppContext.getParams().getString(ServiceConstants.Params.VERSION_NAME));
     }
 
     @Override
@@ -63,8 +60,7 @@ public class ContentFeedbackServiceImpl extends BaseService implements IContentF
     }
 
     private void saveContentFeedbackEvent(ContentFeedback feedback) {
-        GEFeedback geFeedback = new GEFeedback(mGameData, "RATING",
-                feedback.getContentId(), feedback.getRating(), feedback.getComments(),
+        GEFeedback geFeedback = new GEFeedback("RATING", feedback.getContentId(), feedback.getRating(), feedback.getComments(),
                 GEFeedbackContextType.CONTENT.getValue(), feedback.getStageId());
 
         TelemetryLogger.log(geFeedback);
