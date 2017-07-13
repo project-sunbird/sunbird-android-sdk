@@ -90,7 +90,6 @@ public interface ServiceConstants {
         String SYNC_FILE_SIZE = "SYNC_FILE_SIZE";
 
         //Partner
-        String KEY_PARTNER_ID = "partnerid";
         String KEY_ACTIVE_PARTNER_ID = "partner.activeid";
         String SHARED_PREF_SESSION_KEY = "partnersessionid";
         String SHARED_PREF_PARTNERSET_EPOCH = "partnerSET";

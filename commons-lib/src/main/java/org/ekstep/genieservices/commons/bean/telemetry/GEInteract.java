@@ -19,20 +19,12 @@ import java.util.Map;
 public class GEInteract extends Telemetry {
 
     private static final String EID = "GE_INTERACT";
-    private String fileSize;
 
-    public GEInteract(String subType, String stageId, String type) {
-        this(subType, stageId, type, null);
-    }
-
-    public GEInteract(String subType, String stageId, String type, String fileSize) {
+    private GEInteract(String stageId, String type, String subType, String extType, List positionList, List<Map<String, Object>> valueList,
+                       String id, String tid, String uri, GameData gameData, ETags eTags) {
         super(EID);
-        this.fileSize = fileSize;
-        setEks(createEKS(subType, stageId, type));
-    }
-
-    public GEInteract(String stageId, String type, String subType, String extType, List positionList, List<Map<String, Object>> valueList, String id, String tid, String uri) {
-        super(EID);
+        setGdata(gameData);
+        setEtags(eTags);
         setEks(createEKS(stageId, type, subType, extType, positionList, valueList, id, tid, uri));
     }
 
@@ -49,32 +41,6 @@ public class GEInteract extends Telemetry {
         eks.put("values", !CollectionUtil.isNullOrEmpty(valueList) ? valueList : new ArrayList<>());
 
         return eks;
-    }
-
-    protected HashMap<String, Object> createEKS(String subType, String stageId, String type) {
-        HashMap<String, Object> eks = new HashMap<>();
-        eks.put("extype", "");
-        eks.put("id", "");
-        eks.put("pos", new ArrayList<>());
-        eks.put("stageid", stageId);
-        eks.put("subtype", subType);
-        eks.put("tid", "");
-        eks.put("type", type);
-        eks.put("uri", "");
-        eks.put("values", createValues());
-
-        return eks;
-    }
-
-    private List<Map> createValues() {
-        List<Map> values = new ArrayList<>();
-        if (!StringUtil.isNullOrEmpty(fileSize)) {
-            Map<String, Object> objectMap = new HashMap<>();
-            objectMap.put("SizeOfDataInKB", fileSize);
-            values.add(objectMap);
-        }
-
-        return values;
     }
 
     @Override
@@ -94,6 +60,8 @@ public class GEInteract extends Telemetry {
         private String targetResourceId = "";
         private String uri = "";
         private List<CorrelationData> correlationData;
+        private GameData gameData;
+        private ETags eTags;
 
         public Builder stageId(String stageId) {
             this.stageId = stageId;
@@ -165,8 +133,18 @@ public class GEInteract extends Telemetry {
             return this;
         }
 
+        public Builder gameData(GameData gameData) {
+            this.gameData = gameData;
+            return this;
+        }
+
+        public Builder eTags(ETags eTags) {
+            this.eTags = eTags;
+            return this;
+        }
+
         public GEInteract build() {
-            GEInteract event = new GEInteract(stageId, type, subType, exType, pos, values, id, targetResourceId, uri);
+            GEInteract event = new GEInteract(stageId, type, subType, exType, pos, values, id, targetResourceId, uri, gameData, eTags);
             event.addCorrelationData(correlationData);
             return event;
         }

@@ -23,8 +23,8 @@ public class SummaryListener {
         register();
     }
 
-    public static void init(AppContext context) {
-        instance = new SummaryListener(context);
+    public static void init(AppContext appContext) {
+        instance = new SummaryListener(appContext);
     }
 
     public static void destroy() {

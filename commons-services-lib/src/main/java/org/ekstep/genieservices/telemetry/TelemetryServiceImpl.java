@@ -40,7 +40,6 @@ import org.ekstep.genieservices.telemetry.processors.EventProcessorFactory;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -151,10 +150,51 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
 
             // Patch the pdata - ProducerData
             addProducerData(event);
+
+            // Patch etags if missing.
+            if (!event.containsKey("etags")) {
+                event.put("etags", new HashMap<>());
+            }
+
+            Map<String, Object> etags = (Map<String, Object>) event.get("etags");
+            // Patch the app tags.
+            Set<String> activeProgramTags = TelemetryTagCache.activeTags(mAppContext);
+            List<String> tagList = new ArrayList<>();
+            tagList.addAll(activeProgramTags);
+            etags.put("app", tagList);
+
+            // Patch the partner tags if missing.
+            String partnerId = mAppContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.KEY_ACTIVE_PARTNER_ID, "");
+            if (!StringUtil.isNullOrEmpty(partnerId)) {
+                List<String> partnerTagList;
+                if (etags.containsKey("partner")) {
+                    partnerTagList = (List<String>) etags.get("partner");
+                } else {
+                    partnerTagList = new ArrayList<>();
+                }
+
+                if (!partnerTagList.contains(partnerId)) {
+                    partnerTagList.add(partnerId);
+                    event.put("partner", partnerTagList);
+                }
+            }
+        } else {
+            //Patch Partner tags
+            String partnerId = mAppContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.KEY_ACTIVE_PARTNER_ID, "");
+            List<Map<String, Object>> tags = (List<Map<String, Object>>) event.get("tags");
+            if (!StringUtil.isNullOrEmpty(partnerId) && !CollectionUtil.containsMap(tags, ServiceConstants.Partner.KEY_PARTNER_ID)) {
+                addTagIfMissing(event, ServiceConstants.Partner.KEY_PARTNER_ID, partnerId);
+            }
+
+            //Patch Program tags
+            Set<String> activeProgramTags = TelemetryTagCache.activeTags(mAppContext);
+            List<String> tagList = new ArrayList<>();
+            tagList.addAll(activeProgramTags);
+            addTagIfMissing(event, "genie", tagList);
         }
 
         // Patch the gdata - GameData
-        addGameDataIfNotAvailable(event);
+        addGameDataIfMissing(event);
 
         //Patch the event with current Sid and Uid
         if (mUserService != null) {
@@ -166,19 +206,6 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
 
         //Patch the event with did
         updateDeviceInfo(event, mAppContext.getDeviceInfo().getDeviceID());
-
-        //Patch Partner tags
-        String values = mAppContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.KEY_ACTIVE_PARTNER_ID, "");
-        List<Map<String, Object>> tags = (List<Map<String, Object>>) event.get("tags");
-        if (!StringUtil.isNullOrEmpty(values) && !CollectionUtil.containsMap(tags, ServiceConstants.Partner.KEY_PARTNER_ID)) {
-            addTag(event, ServiceConstants.Partner.KEY_PARTNER_ID, values);
-        }
-
-        //Patch Program tags
-        Set<String> activeProgramTags = TelemetryTagCache.activeTags(mAppContext);
-        List<String> tagList = new ArrayList<>();
-        Collections.addAll(activeProgramTags);
-        addTag(event, "genie", tagList);
     }
 
     private String readVersion(Map<String, Object> event) {
@@ -220,7 +247,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         }
     }
 
-    private void addGameDataIfNotAvailable(Map<String, Object> event) {
+    private void addGameDataIfMissing(Map<String, Object> event) {
         Map<String, Object> gdata;
         if (event.containsKey("gdata")) {
             gdata = (Map<String, Object>) event.get("gdata");
@@ -251,7 +278,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         event.put("did", did);
     }
 
-    private void addTag(Map<String, Object> event, String key, Object value) {
+    private void addTagIfMissing(Map<String, Object> event, String key, Object value) {
         Logger.i(TAG, String.format("addTag %s:%s", key, value));
         Map<String, Object> map = new HashMap<>();
         map.put(key, value);

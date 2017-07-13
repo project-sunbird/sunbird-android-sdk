@@ -14,7 +14,6 @@ import java.util.UUID;
  */
 public class PartnerSessionModel {
 
-
     private static final String TAG = PartnerSessionModel.class.getSimpleName();
     private AppContext appContext;
     private String partnerID;
@@ -47,7 +46,6 @@ public class PartnerSessionModel {
         this.sessionId = appContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.SHARED_PREF_SESSION_KEY, "");
     }
 
-
     public void save() {
         appContext.getKeyValueStore().putString(ServiceConstants.PreferenceKey.KEY_ACTIVE_PARTNER_ID, partnerID);
         appContext.getKeyValueStore().putLong(ServiceConstants.PreferenceKey.SHARED_PREF_PARTNERSET_EPOCH, DateUtil.getEpochTime());
@@ -55,7 +53,6 @@ public class PartnerSessionModel {
     }
 
     public void clear() {
-        appContext.getKeyValueStore().remove(ServiceConstants.PreferenceKey.KEY_PARTNER_ID);
         appContext.getKeyValueStore().putString(ServiceConstants.PreferenceKey.KEY_ACTIVE_PARTNER_ID, "");
         appContext.getKeyValueStore().remove(ServiceConstants.PreferenceKey.SHARED_PREF_PARTNERSET_EPOCH);
         appContext.getKeyValueStore().remove(ServiceConstants.PreferenceKey.SHARED_PREF_SESSION_KEY);

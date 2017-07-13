@@ -56,8 +56,8 @@ public class GenieService {
     private ISummarizerService mSummarizerService;
     private ITagService mTagService;
 
-    private GenieService(AppContext<Context> applicationContext) {
-        this.mAppContext = applicationContext;
+    private GenieService(AppContext<Context> appContext) {
+        this.mAppContext = appContext;
     }
 
     public static GenieService getService() {
@@ -70,14 +70,14 @@ public class GenieService {
 
     public static GenieService init(Context context, String packageName) {
         if (sService == null) {
-            AppContext<Context> applicationContext = AndroidAppContext.buildAppContext(context, packageName);
+            AppContext<Context> appContext = AndroidAppContext.buildAppContext(context, packageName);
             Logger.init(new AndroidLogger());
-            ContentPlayer.init(applicationContext.getParams().getString(ServiceConstants.Params.APP_QUALIFIER));
-            TelemetryLogger.init(new TelemetryServiceImpl(applicationContext, new UserServiceImpl(applicationContext)));
+            ContentPlayer.init(appContext.getParams().getString(ServiceConstants.Params.APP_QUALIFIER));
+            TelemetryLogger.init(new TelemetryServiceImpl(appContext, new UserServiceImpl(appContext)));
             //initializing event bus for Telemetry
-            TelemetryListener.init(applicationContext);
-            SummaryListener.init(applicationContext);
-            sService = new GenieService(applicationContext);
+            TelemetryListener.init(appContext);
+            SummaryListener.init(appContext);
+            sService = new GenieService(appContext);
         }
 
         sAsyncService = GenieAsyncService.init(sService);

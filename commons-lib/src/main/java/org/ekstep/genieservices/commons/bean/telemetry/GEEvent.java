@@ -9,15 +9,17 @@ import java.util.Map;
  */
 public class GEEvent extends Telemetry {
 
-    private GEEvent(GameData gameData, String eid, Map<String, Object> eks) {
+    private GEEvent(String eid, GameData gameData, ETags eTags, Map<String, Object> eks) {
         super(eid);
         setGdata(gameData);
+        setEtags(eTags);
         setEks(eks);
     }
 
     public static class Builder {
-        private GameData gameData;
         private String eid;
+        private GameData gameData;
+        private ETags eTags;
         private Map<String, Object> eks;
 
         public Builder(String eid) {
@@ -29,13 +31,18 @@ public class GEEvent extends Telemetry {
             return this;
         }
 
+        public Builder eTags(ETags eTags) {
+            this.eTags = eTags;
+            return this;
+        }
+
         public Builder eks(Map<String, Object> eks) {
             this.eks = eks;
             return this;
         }
 
         public GEEvent build() {
-            return new GEEvent(gameData, eid, eks);
+            return new GEEvent(eid, gameData, eTags, eks);
         }
     }
 }

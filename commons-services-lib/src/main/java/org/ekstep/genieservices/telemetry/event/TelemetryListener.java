@@ -23,8 +23,8 @@ public class TelemetryListener {
         register();
     }
 
-    public static void init(AppContext context) {
-        instance = new TelemetryListener(context);
+    public static void init(AppContext appContext) {
+        instance = new TelemetryListener(appContext);
     }
 
     public static void destroy() {

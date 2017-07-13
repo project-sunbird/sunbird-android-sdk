@@ -8,9 +8,4 @@ package org.ekstep.genieservices.commons;
 public interface CommonConstants {
 
     String GENIE_EXTRACTED_ECAR_FOLDER_PATH = "/Ekstep/org.ekstep.genieservices";
-
-    interface PartnerPreference {
-        String KEY_PARTNER_ID = "partnerid";
-    }
-
 }

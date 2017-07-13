@@ -47,9 +47,7 @@ public class Telemetry {
     private String uid = "";
     private String did;
     private Map<String, Object> edata = new HashMap<>();
-
-    // TODO: 7/13/2017 - Remove tag and etag
-    private List<Map<String, Object>> tags = new ArrayList<>();
+    private ETags etags;
 
     public Telemetry(String eid) {
         this.eid = eid;
@@ -121,16 +119,16 @@ public class Telemetry {
         return this.edata;
     }
 
-    public void addTag(Map<String, Object> map) {
-        this.tags.add(map);
-    }
-
     public void setEks(Map<String, Object> eks) {
         edata.put("eks", eks);
     }
 
     public void setEks(Object eks) {
         edata.put("eks", eks);
+    }
+
+    public void setEtags(ETags etags) {
+        this.etags = etags;
     }
 
     @Override
