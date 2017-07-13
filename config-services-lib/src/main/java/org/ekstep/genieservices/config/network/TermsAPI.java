@@ -21,7 +21,7 @@ public class TermsAPI extends BaseAPI {
     public TermsAPI(AppContext appContext) {
         super(appContext,
                 String.format(Locale.US, "%s/%s",
-                        appContext.getParams().getString(ServiceConstants.Params.LEARNING_PLATFORM_BASE_URL),
+                        appContext.getParams().getString(ServiceConstants.Params.TERMS_BASE_URL),
                         ENDPOINT),
                 TAG);
     }

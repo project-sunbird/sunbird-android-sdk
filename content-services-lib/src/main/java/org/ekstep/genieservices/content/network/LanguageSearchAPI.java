@@ -18,7 +18,7 @@ public class LanguageSearchAPI extends BaseAPI {
 
     private static final String TAG = LanguageSearchAPI.class.getSimpleName();
 
-    private static final String ENDPOINT = "language/search";
+    private static final String ENDPOINT = "search";
 
     private String requestData;
 

@@ -16,7 +16,7 @@ public class OrdinalsAPI extends BaseAPI {
 
     private static final String TAG = OrdinalsAPI.class.getSimpleName();
 
-    private static final String ENDPOINT = "config/ordinals";
+    private static final String ENDPOINT = "ordinals/list";
 
     public OrdinalsAPI(AppContext appContext) {
         super(appContext,

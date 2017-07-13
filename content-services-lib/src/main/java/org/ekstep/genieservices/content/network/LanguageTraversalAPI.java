@@ -16,7 +16,7 @@ public class LanguageTraversalAPI extends BaseAPI {
 
     private static final String TAG = LanguageTraversalAPI.class.getSimpleName();
 
-    private static final String ENDPOINT = "language/traversals";
+    private static final String ENDPOINT = "traversals/list";
 
     public LanguageTraversalAPI(AppContext appContext, String languageId) {
         super(appContext,

@@ -44,11 +44,12 @@ public class BuildParams implements IParams {
         put(ServiceConstants.Params.APP_QUALIFIER, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.APP_QUALIFIER));
         put(ServiceConstants.Params.TELEMETRY_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.TELEMETRY_BASE_URL));
         put(ServiceConstants.Params.LANGUAGE_PLATFORM_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.LANGUAGE_PLATFORM_BASE_URL));
-        put(ServiceConstants.Params.LEARNING_PLATFORM_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.LEARNING_PLATFORM_BASE_URL));
+        put(ServiceConstants.Params.TERMS_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.TERMS_BASE_URL));
         put(ServiceConstants.Params.CONFIG_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.CONFIG_BASE_URL));
         put(ServiceConstants.Params.SEARCH_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.SEARCH_BASE_URL));
         put(ServiceConstants.Params.CONTENT_LISTING_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.CONTENT_LISTING_BASE_URL));
-        put(ServiceConstants.Params.ANALYTICS_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.ANALYTICS_BASE_URL));
+        put(ServiceConstants.Params.CONTENT_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.CONTENT_BASE_URL));
+        put(ServiceConstants.Params.APIGATEWAY_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.APIGATEWAY_BASE_URL));
         put(ServiceConstants.Params.API_USER, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.API_USER));
         put(ServiceConstants.Params.API_PASS, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.API_PASS));
         put(ServiceConstants.Params.MOBILE_APP_SECRET, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.MOBILE_APP_SECRET));
