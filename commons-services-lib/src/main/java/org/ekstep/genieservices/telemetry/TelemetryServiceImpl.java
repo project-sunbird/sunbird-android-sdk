@@ -239,11 +239,19 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
 
     private void addProducerData(Map<String, Object> event) {
         if (!event.containsKey("pdata")) {
-            Map<String, Object> pdata = new HashMap<>();
-            pdata.put("id", mAppContext.getParams().getString(ServiceConstants.Params.PRODUCER_ID));
-            pdata.put("ver", mAppContext.getParams().getString(ServiceConstants.Params.VERSION_NAME));
+            event.put("pdata", new HashMap<>());
+        }
 
-            event.put("pdata", pdata);
+        Map<String, Object> pdata = (Map<String, Object>) event.get("pdata");
+
+        if (!pdata.containsKey("id") ||
+                (pdata.containsKey("id") && StringUtil.isNullOrEmpty(String.valueOf(pdata.containsKey("id"))))) {
+            pdata.put("id", mAppContext.getParams().getString(ServiceConstants.Params.PRODUCER_ID));
+        }
+
+        if (!pdata.containsKey("ver") ||
+                (pdata.containsKey("ver") && StringUtil.isNullOrEmpty(String.valueOf(pdata.containsKey("ver"))))) {
+            pdata.put("ver", mAppContext.getParams().getString(ServiceConstants.Params.VERSION_NAME));
         }
     }
 
