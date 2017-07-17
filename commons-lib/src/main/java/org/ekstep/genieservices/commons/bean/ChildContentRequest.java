@@ -55,9 +55,6 @@ public class ChildContentRequest {
          * Hierarchy info of the content which is return in {@link Content}.
          */
         public Builder hierarchyInfo(List<HierarchyInfo> hierarchyInfo) {
-            if (hierarchyInfo == null) {
-                throw new IllegalArgumentException("hierarchyInfo required. Set hierarchyInfo of the content which is return in {@link Content}");
-            }
             this.hierarchyInfo = hierarchyInfo;
             return this;
         }
@@ -81,9 +78,6 @@ public class ChildContentRequest {
         public ChildContentRequest build() {
             if (StringUtil.isNullOrEmpty(contentId)) {
                 throw new IllegalStateException("contentId required.");
-            }
-            if (hierarchyInfo == null) {
-                throw new IllegalStateException("hierarchyInfo required. Set hierarchyInfo of the content which is return in {@link Content}");
             }
             return new ChildContentRequest(contentId, hierarchyInfo, level);
         }
