@@ -9,6 +9,7 @@ import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -17,16 +18,16 @@ import java.util.Map;
  */
 
 class LearnerAssessmentTask extends BaseTask {
-    private String uid;
-    private String contentId;
+    private String userId;
+    private String currentContentIdentifier;
     private String appQualifier;
-    private String hierarchyData;
+    private Map hierarchyData;
 
-    public LearnerAssessmentTask(Context context, String appQualifier, String uid, String contentId, String hierarchyData) {
+    public LearnerAssessmentTask(Context context, String appQualifier, String userId, String currentContentIdentifier, Map hierarchyData) {
         super(context);
         this.appQualifier = appQualifier;
-        this.uid = uid;
-        this.contentId = contentId;
+        this.userId = userId;
+        this.currentContentIdentifier = currentContentIdentifier;
         this.hierarchyData = hierarchyData;
     }
 
@@ -37,7 +38,13 @@ class LearnerAssessmentTask extends BaseTask {
 
     @Override
     protected GenieResponse<Map> execute() {
-        Cursor cursor = contentResolver.query(getUri(), null, null, new String[]{uid, contentId, hierarchyData}, null);
+        Map data = new HashMap();
+        data.put("hierarchyData", hierarchyData);
+        data.put("userId", userId);
+        data.put("currentContentIdentifier", currentContentIdentifier);
+
+        String requestData = GsonUtil.toJson(data);
+        Cursor cursor = contentResolver.query(getUri(), null, requestData, null, null);
         if (cursor == null || cursor.getCount() == 0) {
             return getErrorResponse(Constants.PROCESSING_ERROR, getErrorMessage(), LearnerAssessmentTask.class.getSimpleName());
         }

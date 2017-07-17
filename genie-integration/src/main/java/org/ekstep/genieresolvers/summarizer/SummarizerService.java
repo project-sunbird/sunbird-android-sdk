@@ -24,19 +24,8 @@ public class SummarizerService extends BaseService {
         this.appQualifier = appQualifier;
     }
 
-    public void getLearnerAssessment(String uid, String contentId, List<Map> hierarchyData, IResponseHandler responseHandler) {
-        List<String> idList = new ArrayList<>();
-        String hierarchyDataInString = null;
-        if (hierarchyData != null && hierarchyData.size() > 0) {
-            for (int i = 0 ; i < hierarchyData.size() - 1 ; i++) {
-                Object identifier = hierarchyData.get(i).get("identifier");
-                idList.add(identifier == null ? null : identifier.toString());
-            }
-        }
-
-        hierarchyDataInString = idList.size() > 0 ? StringUtil.join("/", idList) : null;
-
-        LearnerAssessmentTask createUserTask = new LearnerAssessmentTask(context, appQualifier, uid, contentId, hierarchyDataInString);
+    public void getLearnerAssessment(String userId, String currentContentIdentifier, Map hierarchyData, IResponseHandler responseHandler) {
+        LearnerAssessmentTask createUserTask = new LearnerAssessmentTask(context, appQualifier, userId, currentContentIdentifier, hierarchyData);
         createAndExecuteTask(responseHandler, createUserTask);
     }
 

@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
 
+import com.google.gson.reflect.TypeToken;
+
 import org.ekstep.genieproviders.BaseContentProvider;
 import org.ekstep.genieproviders.util.Constants;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
@@ -13,6 +15,7 @@ import org.ekstep.genieservices.commons.bean.LearnerAssessmentDetails;
 import org.ekstep.genieservices.commons.bean.SummaryRequest;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,13 +39,22 @@ public abstract class AbstractSummarizerProvider extends BaseContentProvider {
         if (selectionArgs != null) {
             cursor = getMatrixCursor();
 
-            String uid = selectionArgs[0];
-            String contentId = selectionArgs[1];
-            String hierarchyData = selectionArgs[2];
+            Type type = new TypeToken<Map>() {
+            }.getType();
+            Map data = GsonUtil.getGson().fromJson(selection, type);
+
+            Map hierarchyData = (Map) data.get("hierarchyData");
+
+            String currentContentIdentifier = data.get("currentContentIdentifier").toString();
+            String userId = data.get("userId").toString();
             SummaryRequest.Builder summaryRequestBuilder = new SummaryRequest.Builder();
-            summaryRequestBuilder.contentId(contentId);
-            summaryRequestBuilder.uid(uid);
-            summaryRequestBuilder.hierarchyData(hierarchyData);
+            summaryRequestBuilder.contentId(currentContentIdentifier);
+            summaryRequestBuilder.uid(userId);
+            String hierarchyDataString = null;
+            if (hierarchyData != null) {
+                hierarchyDataString = hierarchyData.get("id") != null ? hierarchyData.get("id").toString() : null;
+            }
+            summaryRequestBuilder.hierarchyData(hierarchyDataString);
             genieResponse = getService().getSummarizerService().getLearnerAssessmentDetails(summaryRequestBuilder.build());
 
             if (genieResponse != null && genieResponse.getStatus()) {
