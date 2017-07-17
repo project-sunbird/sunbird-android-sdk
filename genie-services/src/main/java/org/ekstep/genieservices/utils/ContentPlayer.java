@@ -28,14 +28,14 @@ public class ContentPlayer {
 
     private static ContentPlayer sContentPlayer;
     private String mQualifier;
-    private Object playerConfig;
+    private IPlayerConfig playerConfig;
 
-    private ContentPlayer(String qualifier, Object playerConfig) {
+    private ContentPlayer(String qualifier, IPlayerConfig playerConfig) {
         this.mQualifier = qualifier;
         this.playerConfig = playerConfig;
     }
 
-    public static void init(String qualifier, Object playerConfig) {
+    public static void init(String qualifier, IPlayerConfig playerConfig) {
         if (sContentPlayer == null) {
             sContentPlayer = new ContentPlayer(qualifier, playerConfig);
         }
@@ -47,14 +47,13 @@ public class ContentPlayer {
             Toast.makeText(context, "App qualifier not found", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (sContentPlayer.playerConfig == null || !(sContentPlayer.playerConfig instanceof IPlayerConfig)) {
+        if (sContentPlayer.playerConfig == null) {
             Toast.makeText(context, "Implement IPlayerConfig and define in build.config", Toast.LENGTH_SHORT).show();
             Logger.e(TAG, "Implement IPlayerConfig and define in build.config");
             return;
         }
 
-        IPlayerConfig playerConfig = (IPlayerConfig) sContentPlayer.playerConfig;
-        Intent intent = playerConfig.getPlayerIntent(context, content);
+        Intent intent = sContentPlayer.playerConfig.getPlayerIntent(context, content);
         if (intent == null) {
             return;
         }
