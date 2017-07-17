@@ -69,6 +69,15 @@ public class BuildParams implements IParams {
                 put(ServiceConstants.Params.PROFILE_PATH, profileConfiguration.getProfilePath(context));
             }
         }
+
+        String playerConfigClass = BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.PLAYER_CONFIG);
+        if (playerConfigClass != null) {
+            Class<?> classInstance = ReflectionUtil.getClass(playerConfigClass);
+            if (classInstance != null) {
+                IPlayerConfig playerConfiguration = (IPlayerConfig) ReflectionUtil.getInstance(classInstance);
+                put(ServiceConstants.Params.PLAYER_CONFIG, playerConfiguration);
+            }
+        }
     }
 
     private void initCompatibilityLevel(String packageName) {
@@ -124,6 +133,11 @@ public class BuildParams implements IParams {
     @Override
     public void put(String key, Object value) {
         mValues.put(key, value);
+    }
+
+    @Override
+    public Object get(String key) {
+        return mValues.get(key);
     }
 
     @Override
