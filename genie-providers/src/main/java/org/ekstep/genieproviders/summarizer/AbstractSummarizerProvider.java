@@ -36,7 +36,7 @@ public abstract class AbstractSummarizerProvider extends BaseContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         MatrixCursor cursor = null;
         GenieResponse genieResponse;
-        if (selectionArgs != null) {
+        if (selection != null) {
             cursor = getMatrixCursor();
 
             Type type = new TypeToken<Map>() {
