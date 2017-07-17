@@ -75,7 +75,7 @@ public class RelatedContentUriHandler implements IUriHandler {
                 Content content = genieService.getContentService().nextContent(createHierarchyInfo(hierarchyData), currentContentIdentifier).getResult();
                 resultMap.put("nextContent", content);
                 if (content != null) {
-                    resultMap.put("hierarchyData", createHierarchyData(content.getHierarchyInfo()));
+                    resultMap.put("contentExtras", createHierarchyData(content.getHierarchyInfo()));
                 }
             }
             genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
