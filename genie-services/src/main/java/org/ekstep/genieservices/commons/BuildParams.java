@@ -42,6 +42,7 @@ public class BuildParams implements IParams {
         put(ServiceConstants.Params.PRODUCER_ID, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.PRODUCER_ID));
         put(ServiceConstants.Params.CHANNEL_ID, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.CHANNEL_ID));
         put(ServiceConstants.Params.APP_QUALIFIER, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.APP_QUALIFIER));
+        put(ServiceConstants.Params.PLAYER_CONFIG, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.PLAYER_CONFIG));
         put(ServiceConstants.Params.TELEMETRY_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.TELEMETRY_BASE_URL));
         put(ServiceConstants.Params.LANGUAGE_PLATFORM_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.LANGUAGE_PLATFORM_BASE_URL));
         put(ServiceConstants.Params.TERMS_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.TERMS_BASE_URL));
@@ -67,15 +68,6 @@ public class BuildParams implements IParams {
             if (classInstance != null) {
                 IProfileConfig profileConfiguration = (IProfileConfig) ReflectionUtil.getInstance(classInstance);
                 put(ServiceConstants.Params.PROFILE_PATH, profileConfiguration.getProfilePath(context));
-            }
-        }
-
-        String playerConfigClass = BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.PLAYER_CONFIG);
-        if (playerConfigClass != null) {
-            Class<?> classInstance = ReflectionUtil.getClass(playerConfigClass);
-            if (classInstance != null) {
-                IPlayerConfig playerConfiguration = (IPlayerConfig) ReflectionUtil.getInstance(classInstance);
-                put(ServiceConstants.Params.PLAYER_CONFIG, playerConfiguration);
             }
         }
     }
@@ -133,11 +125,6 @@ public class BuildParams implements IParams {
     @Override
     public void put(String key, Object value) {
         mValues.put(key, value);
-    }
-
-    @Override
-    public Object get(String key) {
-        return mValues.get(key);
     }
 
     @Override

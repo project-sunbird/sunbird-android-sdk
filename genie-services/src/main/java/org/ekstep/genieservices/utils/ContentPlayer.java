@@ -12,6 +12,7 @@ import org.ekstep.genieservices.commons.bean.HierarchyInfo;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
+import org.ekstep.genieservices.commons.utils.ReflectionUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,8 +36,16 @@ public class ContentPlayer {
         this.playerConfig = playerConfig;
     }
 
-    public static void init(String qualifier, IPlayerConfig playerConfig) {
+    public static void init(String qualifier, String playerConfigClass) {
         if (sContentPlayer == null) {
+            IPlayerConfig playerConfig = null;
+            if (playerConfigClass != null) {
+                Class<?> classInstance = ReflectionUtil.getClass(playerConfigClass);
+                if (classInstance != null) {
+                    playerConfig = (IPlayerConfig) ReflectionUtil.getInstance(classInstance);
+                }
+            }
+
             sContentPlayer = new ContentPlayer(qualifier, playerConfig);
         }
     }

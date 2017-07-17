@@ -15,8 +15,6 @@ public interface IParams {
      */
     void put(String key, Object value);
 
-    Object get(String key);
-
     String getString(String key);
 
     long getLong(String key);
