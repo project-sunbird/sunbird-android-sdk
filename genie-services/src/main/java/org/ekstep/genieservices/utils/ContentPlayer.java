@@ -11,6 +11,7 @@ import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.commons.utils.Logger;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,12 +49,16 @@ public class ContentPlayer {
         }
         if (sContentPlayer.playerConfig == null || !(sContentPlayer.playerConfig instanceof IPlayerConfig)) {
             Toast.makeText(context, "Implement IPlayerConfig and define in build.config", Toast.LENGTH_SHORT).show();
+            Logger.e(TAG, "Implement IPlayerConfig and define in build.config");
             return;
         }
 
         IPlayerConfig playerConfig = (IPlayerConfig) sContentPlayer.playerConfig;
-
         Intent intent = playerConfig.getPlayerIntent(context, content);
+        if (intent == null) {
+            return;
+        }
+
         intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_ORIGIN, "Genie");
         intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_MODE, "play");
         if (!CollectionUtil.isNullOrEmpty(content.getHierarchyInfo())) {
