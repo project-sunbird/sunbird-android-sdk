@@ -815,7 +815,7 @@ public class ContentHandler {
 
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("filters", filterMap);
-        requestMap.put("fields", Arrays.asList(KEY_DOWNLOAD_URL, KEY_VARIANTS));
+        requestMap.put("fields", Arrays.asList(KEY_DOWNLOAD_URL, KEY_VARIANTS, KEY_MIME_TYPE));
 
         return requestMap;
     }
