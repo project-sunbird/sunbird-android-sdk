@@ -1,12 +1,9 @@
 package org.ekstep.genieservices.commons.network;
 
-import org.ekstep.genieservices.ServiceConstants;
+import org.ekstep.genieservices.auth.AuthHandler;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.enums.JWTokenType;
-import org.ekstep.genieservices.commons.utils.GsonUtil;
-import org.ekstep.genieservices.commons.utils.JWTUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 
 import java.io.IOException;

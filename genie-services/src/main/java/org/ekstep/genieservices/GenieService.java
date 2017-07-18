@@ -11,7 +11,7 @@ import org.ekstep.genieservices.commons.IDownloadManager;
 import org.ekstep.genieservices.commons.ILocationInfo;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.download.DownloadServiceImpl;
-import org.ekstep.genieservices.commons.network.AuthServiceImpl;
+import org.ekstep.genieservices.auth.AuthServiceImpl;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.config.ConfigServiceImpl;

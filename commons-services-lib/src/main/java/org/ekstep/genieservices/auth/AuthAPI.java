@@ -1,7 +1,8 @@
-package org.ekstep.genieservices.commons.network;
+package org.ekstep.genieservices.auth;
 
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.network.BaseAPI;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 

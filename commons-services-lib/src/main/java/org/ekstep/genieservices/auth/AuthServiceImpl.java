@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.commons.network;
+package org.ekstep.genieservices.auth;
 
 import org.ekstep.genieservices.BaseService;
 import org.ekstep.genieservices.IAuthService;
@@ -6,6 +6,7 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.network.NetworkConstants;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
 /**
