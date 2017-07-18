@@ -9,7 +9,7 @@ import org.ekstep.genieservices.commons.bean.DownloadProgress;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
-import org.ekstep.genieservices.eventbus.EventPublisher;
+import org.ekstep.genieservices.eventbus.EventBus;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.util.List;
@@ -98,12 +98,12 @@ public class DownloadServiceImpl implements IDownloadService {
                 if (downloadProgress.getStatus() == IDownloadManager.UNKNOWN || downloadProgress.getStatus() == IDownloadManager.FAILED) {
                     mExecutor.shutdown();
                 } else if (downloadProgress.getStatus() == IDownloadManager.COMPLETED) {
-                    EventPublisher.postDownloadProgress(downloadProgress);
+                    EventBus.postEvent(downloadProgress);
                     mExecutor.shutdown();
                 } else if (downloadProgress.getStatus() == IDownloadManager.NOT_STARTED) {
                     //do nothing
                 } else if (downloadProgress.getStatus() == IDownloadManager.STARTED) {
-                    EventPublisher.postDownloadProgress(downloadProgress);
+                    EventBus.postEvent(downloadProgress);
                 }
 
             }

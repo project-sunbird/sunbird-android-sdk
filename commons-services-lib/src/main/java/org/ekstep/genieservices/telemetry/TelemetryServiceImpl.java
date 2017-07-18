@@ -24,7 +24,7 @@ import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
-import org.ekstep.genieservices.eventbus.EventPublisher;
+import org.ekstep.genieservices.eventbus.EventBus;
 import org.ekstep.genieservices.tag.cache.TelemetryTagCache;
 import org.ekstep.genieservices.telemetry.chained.export.AddGeTransferTelemetryExportEvent;
 import org.ekstep.genieservices.telemetry.chained.export.CleanupExportedFile;
@@ -130,7 +130,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         EventModel eventModel = EventModel.build(mAppContext.getDBSession(), event, eventType);
         eventModel.save();
 
-        EventPublisher.postTelemetryEvent(GsonUtil.fromMap(eventModel.getEventMap(), Telemetry.class));
+        EventBus.postEvent(GsonUtil.fromMap(eventModel.getEventMap(), Telemetry.class));
         Logger.i(TAG, "Event saved successfully");
         return GenieResponseBuilder.getSuccessResponse("Event Saved Successfully", Void.class);
     }

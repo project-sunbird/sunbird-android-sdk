@@ -29,7 +29,6 @@ import org.ekstep.genieservices.tag.TagServiceImpl;
 import org.ekstep.genieservices.telemetry.SyncServiceImpl;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 import org.ekstep.genieservices.telemetry.TelemetryServiceImpl;
-import org.ekstep.genieservices.telemetry.event.TelemetryListener;
 import org.ekstep.genieservices.utils.ContentPlayer;
 
 /**
@@ -77,7 +76,6 @@ public class GenieService {
             ContentPlayer.init(appContext.getParams().getString(ServiceConstants.Params.APP_QUALIFIER), appContext.getParams().getString(ServiceConstants.Params.PLAYER_CONFIG));
             TelemetryLogger.init(new TelemetryServiceImpl(appContext, new UserServiceImpl(appContext)));
             //initializing event bus for Telemetry
-            TelemetryListener.init(appContext);
             SummaryListener.init(appContext);
             sService = new GenieService(appContext);
         }

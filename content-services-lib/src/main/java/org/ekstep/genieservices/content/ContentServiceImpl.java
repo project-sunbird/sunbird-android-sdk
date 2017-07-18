@@ -65,7 +65,7 @@ import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.network.ContentSearchAPI;
 import org.ekstep.genieservices.content.network.RecommendedContentAPI;
 import org.ekstep.genieservices.content.network.RelatedContentAPI;
-import org.ekstep.genieservices.eventbus.EventPublisher;
+import org.ekstep.genieservices.eventbus.EventBus;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.io.File;
@@ -569,7 +569,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         GenieResponse<Void> response;
 
-        EventPublisher.postContentImportStatus(new ContentImportResponse(null, 1, importRequest.getSourceFilePath()));
+        EventBus.postEvent(new ContentImportResponse(null, 1, importRequest.getSourceFilePath()));
 
         if (!FileUtil.doesFileExists(importRequest.getSourceFilePath())) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.ECAR_NOT_FOUND, ServiceConstants.ErrorMessage.FILE_DOESNT_EXIST, TAG);
@@ -601,7 +601,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 buildSuccessEvent(identifier);
                 TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
 
-                EventPublisher.postContentImportStatus(new ContentImportResponse(identifier, 2, importRequest.getSourceFilePath()));
+                EventBus.postEvent(new ContentImportResponse(identifier, 2, importRequest.getSourceFilePath()));
             }
 
             return response;
