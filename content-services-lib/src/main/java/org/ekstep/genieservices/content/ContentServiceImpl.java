@@ -307,7 +307,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         GenieResponse<ContentSearchResult> response;
 
-        Map<String, Object> requestMap = ContentHandler.getSearchRequest(mAppContext, userService, configService, contentSearchCriteria);
+        Map<String, Object> requestMap = ContentHandler.getSearchContentRequest(mAppContext, configService, contentSearchCriteria);
 
         ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, requestMap);
         GenieResponse apiResponse = contentSearchAPI.post();

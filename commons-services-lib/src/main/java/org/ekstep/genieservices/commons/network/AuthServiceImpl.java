@@ -22,7 +22,8 @@ public class AuthServiceImpl extends BaseService implements IAuthService {
 
     @Override
     public GenieResponse<String> getMobileDeviceBearerToken() {
-        String mobileDeviceConsumerBearerToken = AuthHandler.generateMobileDeviceConsumerBearerToken(mAppContext);
+        AuthHandler.resetAuthToken(mAppContext);
+        String mobileDeviceConsumerBearerToken = mAppContext.getKeyValueStore().getString(NetworkConstants.API_BEARER_TOKEN, "");
         if (!StringUtil.isNullOrEmpty(mobileDeviceConsumerBearerToken)) {
             GenieResponse<String> response = GenieResponseBuilder.getSuccessResponse("", String.class);
             response.setResult(mobileDeviceConsumerBearerToken);

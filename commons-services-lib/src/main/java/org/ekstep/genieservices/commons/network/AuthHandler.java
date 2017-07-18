@@ -12,9 +12,7 @@ import java.util.Map;
 /**
  * Created on 18/7/17.
  */
-
 public class AuthHandler {
-
 
     public static void resetAuthToken(AppContext appContext) {
         String mobileDeviceConsumerBearerToken = generateMobileDeviceConsumerBearerToken(appContext);

@@ -156,7 +156,7 @@ public class ContentHandler {
         return null;
     }
 
-    public static String readName(Map contentData) {
+    private static String readName(Map contentData) {
         if (contentData.containsKey(KEY_NAME)) {
             return (String) contentData.get(KEY_NAME);
         }
@@ -359,7 +359,7 @@ public class ContentHandler {
         Object variants = contentDataMap.get(KEY_VARIANTS);
         ContentVariant contentVariant = null;
         if (variants != null) {
-            Map variantData = null;
+            Map variantData;
             if (variants instanceof Map) {
                 variantData = (Map) variants;
             } else {
@@ -815,12 +815,12 @@ public class ContentHandler {
 
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("filters", filterMap);
-        requestMap.put("fields", Arrays.asList("downloadUrl", "variants"));
+        requestMap.put("fields", Arrays.asList(KEY_DOWNLOAD_URL, KEY_VARIANTS));
 
         return requestMap;
     }
 
-    public static Map<String, Object> getSearchRequest(AppContext appContext, IUserService userService, IConfigService configService, ContentSearchCriteria criteria) {
+    public static Map<String, Object> getSearchContentRequest(AppContext appContext, IConfigService configService, ContentSearchCriteria criteria) {
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("query", criteria.getQuery());
         requestMap.put("limit", criteria.getLimit());
