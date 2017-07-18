@@ -89,13 +89,26 @@ public class DeviceSpec {
     }
 
     public static String getDeviceName() {
-        String manufacturer = Build.MANUFACTURER;
-        String model = Build.MODEL;
+        String manufacturer = getDeviceMaker();
+        String model = getDeviceModel();
         if (model.startsWith(manufacturer)) {
             return model;
         } else {
             return capitalize(manufacturer) + " " + model;
         }
+    }
+
+    public static String getDeviceMaker() {
+        return Build.MANUFACTURER;
+    }
+
+    public static String getDeviceModel() {
+        return Build.MODEL;
+    }
+
+    public static int getDeviceDensityInDpi(Context context) {
+        DisplayMetrics dm = context.getResources().getDisplayMetrics();
+        return dm.densityDpi;
     }
 
     public static String getAndroidId(Context context) {
@@ -292,7 +305,7 @@ public class DeviceSpec {
         return Math.ceil(camerapixel);
     }
 
-    public  static String getCpuInfo() {
+    public static String getCpuInfo() {
         StringBuffer sb = new StringBuffer();
         sb.append("abi: ").append(Build.CPU_ABI).append("\n");
         if (new File("/proc/cpuinfo").exists()) {
