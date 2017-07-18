@@ -1,6 +1,7 @@
 package org.ekstep.genieservices.auth;
 
 import org.ekstep.genieservices.ServiceConstants;
+import org.ekstep.genieservices.auth.network.AuthAPI;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.enums.JWTokenType;

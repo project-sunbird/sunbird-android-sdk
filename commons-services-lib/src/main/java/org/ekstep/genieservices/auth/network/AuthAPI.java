@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.auth;
+package org.ekstep.genieservices.auth.network;
 
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
