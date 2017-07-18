@@ -127,6 +127,11 @@ public class DownloadServiceImpl implements IDownloadService {
     }
 
     @Override
+    public void removeDownloadedFile(long downloadId) {
+        mDownloadManager.cancel(downloadId);
+    }
+
+    @Override
     public DownloadRequest getDownloadRequest(String identifier) {
         return mDownloadQueueManager.getRequestByIdentifier(identifier);
     }

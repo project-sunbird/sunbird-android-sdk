@@ -23,6 +23,7 @@ public class ContentImportService extends Service {
         boolean isChild = intent.getBooleanExtra(ServiceConstants.BundleKey.BUNDLE_KEY_IS_CHILD, false);
         String localFilePath = intent.getStringExtra(ServiceConstants.BundleKey.BUNDLE_KEY_LOCAL_FILE_PATH);
         String destination = intent.getStringExtra(ServiceConstants.BundleKey.BUNDLE_KEY_DESTINATION_FILE_PATH);
+        long downloadId = intent.getLongExtra(ServiceConstants.BundleKey.BUNDLE_KEY_DOWNLOAD_ID, 0);
         IContentService contentService = GenieService.getService().getContentService();
         EcarImportRequest.Builder builder = new EcarImportRequest.Builder();
         if (isChild) {
@@ -33,6 +34,7 @@ public class ContentImportService extends Service {
         EcarImportRequest ecarImportRequest = builder.build();
 
         contentService.importEcar(ecarImportRequest);
+        downloadService.removeDownloadedFile(downloadId);
         downloadService.resumeDownloads();
         stopSelf();
         return Service.START_REDELIVER_INTENT;
