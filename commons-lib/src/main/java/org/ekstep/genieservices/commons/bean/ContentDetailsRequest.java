@@ -11,11 +11,13 @@ public class ContentDetailsRequest {
     private String contentId;
     private boolean attachFeedback;
     private boolean attachContentAccess;
+    private boolean refreshContentDetails;
 
-    private ContentDetailsRequest(String contentId, boolean attachFeedback, boolean attachContentAccess) {
+    private ContentDetailsRequest(String contentId, boolean attachFeedback, boolean attachContentAccess, boolean refreshContentDetails) {
         this.contentId = contentId;
         this.attachFeedback = attachFeedback;
         this.attachContentAccess = attachContentAccess;
+        this.refreshContentDetails = refreshContentDetails;
     }
 
     public String getContentId() {
@@ -30,10 +32,15 @@ public class ContentDetailsRequest {
         return attachContentAccess;
     }
 
+    public boolean isRefreshContentDetails() {
+        return refreshContentDetails;
+    }
+
     public static class Builder {
         private String contentId;
         private boolean attachFeedback;
         private boolean attachContentAccess;
+        private boolean refreshContentDetails;
 
         public Builder forContent(String contentId) {
             if (StringUtil.isNullOrEmpty(contentId)) {
@@ -52,10 +59,18 @@ public class ContentDetailsRequest {
         }
 
         /**
-         * If want content access by given uid.
+         * If want content access history by given uid.
          */
         public Builder withContentAccess() {
             this.attachContentAccess = true;
+            return this;
+        }
+
+        /**
+         * The content details are refreshed from the server only if this flag is set.
+         */
+        public Builder refreshContentDetailsFromServer() {
+            this.refreshContentDetails = true;
             return this;
         }
 
@@ -63,7 +78,7 @@ public class ContentDetailsRequest {
             if (StringUtil.isNullOrEmpty(contentId)) {
                 throw new IllegalStateException("contentId required.");
             }
-            return new ContentDetailsRequest(contentId, attachFeedback, attachContentAccess);
+            return new ContentDetailsRequest(contentId, attachFeedback, attachContentAccess, refreshContentDetails);
         }
     }
 }

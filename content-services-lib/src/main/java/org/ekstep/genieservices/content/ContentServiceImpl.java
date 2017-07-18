@@ -118,7 +118,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             }
 
             contentModelInDB = ContentHandler.convertContentMapToModel(mAppContext.getDBSession(), contentData, null);
-        } else {
+        } else if (contentDetailsRequest.isRefreshContentDetails()){
             ContentHandler.refreshContentDetailsFromServer(mAppContext, contentDetailsRequest.getContentId(), contentModelInDB);
         }
 
