@@ -161,6 +161,8 @@ public interface ServiceConstants {
         String UPDATE_FAILED = "UPDATE_FAILED";
         String DELETE_FAILED = "DELETE_FAILED";
 
+        // Authentication
+        String TOKEN_GENERATION_FAILED = "TOKEN_GENERATION_FAILED";
     }
 
     interface ErrorMessage {
@@ -212,6 +214,10 @@ public interface ServiceConstants {
         String FAILED_TO_DELETE_NOTIFICATION = "Failed to delete notification";
         String ERROR_WHILE_GETTING_NOTIFICATIONS = "Error while getting notifications";
         String FAILED_TO_ADD_UPDATE_NOTIFICATION = "Failed to add/update  notification";
+
+        //Authentication
+        String FAILED_TO_GENERATE_TOKEN = "Failed to generate the bearer token";
+
     }
 
     interface GeTransferEvent {

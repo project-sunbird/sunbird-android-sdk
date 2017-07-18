@@ -8,4 +8,6 @@ public interface IHttpClientFactory {
 
     public IHttpClient getClient();
 
+    public IHttpAuthenticator getHttpAuthenticator();
+
 }

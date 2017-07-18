@@ -15,6 +15,7 @@ public class GenieAsyncService {
     private TagService mTagService;
     private NotificationService mNotificationService;
     private SummarizerService mSummarizerService;
+    private AuthService mAuthService;
 
     private GenieAsyncService(GenieService genieService) {
         sService = genieService;
@@ -78,6 +79,13 @@ public class GenieAsyncService {
             mSummarizerService = new SummarizerService(sService);
         }
         return mSummarizerService;
+    }
+
+    public AuthService getAuthService() {
+        if (mAuthService == null) {
+            mAuthService = new AuthService(sService);
+        }
+        return mAuthService;
     }
 
 }

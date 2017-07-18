@@ -30,6 +30,11 @@ public class AndroidHttpClientFactory implements IHttpClientFactory {
 
     @Override
     public IHttpClient getClient() {
-        return new AndroidHttpClient(httpClient, new DefaultAuthenticator(mAppContext));
+        return new AndroidHttpClient(httpClient);
+    }
+
+    @Override
+    public IHttpAuthenticator getHttpAuthenticator() {
+        return new DefaultAuthenticator(mAppContext);
     }
 }

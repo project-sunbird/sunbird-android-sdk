@@ -20,10 +20,7 @@ public class AndroidHttpClient implements IHttpClient {
     private OkHttpClient mHttpClient;
     private Request.Builder requestBuilder;
 
-    private IHttpAuthenticator authenticator;
-
-    public AndroidHttpClient(OkHttpClient httpClient, IHttpAuthenticator authenticator) {
-        this.authenticator = authenticator;
+    public AndroidHttpClient(OkHttpClient httpClient) {
         this.mHttpClient = httpClient;
     }
 
@@ -63,12 +60,6 @@ public class AndroidHttpClient implements IHttpClient {
         ApiResponse apiResponse = new ApiResponse(response.isSuccessful(), response.body() != null ? response.body().string() : "", response.code());
         response.close();
         return apiResponse;
-    }
-
-    @Override
-    public Void setAuthHeaders() {
-        setHeaders(authenticator.getAuthHeaders());
-        return null;
     }
 
 }

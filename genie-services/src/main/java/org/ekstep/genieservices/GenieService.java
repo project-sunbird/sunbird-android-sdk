@@ -11,6 +11,7 @@ import org.ekstep.genieservices.commons.IDownloadManager;
 import org.ekstep.genieservices.commons.ILocationInfo;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.download.DownloadServiceImpl;
+import org.ekstep.genieservices.commons.network.AuthServiceImpl;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.config.ConfigServiceImpl;
@@ -54,6 +55,7 @@ public class GenieService {
     private ILanguageService mLanguageService;
     private INotificationService mNotificationService;
     private ISummarizerService mSummarizerService;
+    private IAuthService mAuthService;
     private ITagService mTagService;
 
     private GenieService(AppContext<Context> appContext) {
@@ -248,6 +250,21 @@ public class GenieService {
             mSummarizerService = new SummarizerServiceImpl(mAppContext);
         }
         return mSummarizerService;
+    }
+
+    /**
+     * This api gets the {@link AuthServiceImpl}, when accessed in the below way
+     * <p>
+     * getService().getAuthService()
+     * <p><p>
+     *
+     * @return {@link IAuthService}
+     */
+    public IAuthService getAuthService() {
+        if (mAuthService == null) {
+            mAuthService = new AuthServiceImpl(mAppContext);
+        }
+        return mAuthService;
     }
 
 
