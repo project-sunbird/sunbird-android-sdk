@@ -5,7 +5,6 @@ import android.content.Context;
 import org.ekstep.genieresolvers.BaseService;
 import org.ekstep.genieservices.commons.IResponseHandler;
 
-import java.util.List;
 import java.util.Map;
 
 /**

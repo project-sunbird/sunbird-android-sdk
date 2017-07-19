@@ -1,11 +1,6 @@
 package org.ekstep.genieservices;
 
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.MasterData;
-import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * This is the interface with all the required APIs to get security tokens for API management

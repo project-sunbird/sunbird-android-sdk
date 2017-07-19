@@ -4,10 +4,7 @@ import android.content.Context;
 
 import org.ekstep.genieresolvers.BaseService;
 import org.ekstep.genieservices.commons.IResponseHandler;
-import org.ekstep.genieservices.commons.utils.StringUtil;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**

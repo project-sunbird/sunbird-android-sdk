@@ -3,6 +3,7 @@ package org.ekstep.genieservices;
 import android.content.Context;
 
 import org.ekstep.genieservices.async.GenieAsyncService;
+import org.ekstep.genieservices.auth.AuthServiceImpl;
 import org.ekstep.genieservices.commons.AndroidAppContext;
 import org.ekstep.genieservices.commons.AndroidLogger;
 import org.ekstep.genieservices.commons.AppContext;
@@ -11,7 +12,6 @@ import org.ekstep.genieservices.commons.IDownloadManager;
 import org.ekstep.genieservices.commons.ILocationInfo;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.download.DownloadServiceImpl;
-import org.ekstep.genieservices.auth.AuthServiceImpl;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.config.ConfigServiceImpl;
