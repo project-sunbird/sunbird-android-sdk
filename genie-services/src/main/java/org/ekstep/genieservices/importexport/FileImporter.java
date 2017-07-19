@@ -14,6 +14,7 @@ import org.ekstep.genieservices.commons.bean.TelemetryImportRequest;
 import org.ekstep.genieservices.commons.db.operations.IDataSource;
 import org.ekstep.genieservices.commons.db.operations.impl.SQLiteDataSource;
 import org.ekstep.genieservices.commons.utils.FileUtil;
+import org.ekstep.genieservices.importexport.bean.ImportProfileContext;
 import org.ekstep.genieservices.importexport.bean.ImportTelemetryContext;
 
 /**
@@ -57,7 +58,8 @@ public class FileImporter {
 
         String ext = FileUtil.getFileExtension(profileImportRequest.getSourceFilePath());
         if (ServiceConstants.FileExtension.PROFILE.equals(ext)) {
-            return userService.importProfile(profileImportRequest, dataSource);
+            ImportProfileContext importContext = new ImportProfileContext(dataSource, profileImportRequest.getSourceFilePath());
+            return userService.importProfile(importContext);
         } else {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Profile import failed, unsupported file extension", TAG);
             return response;

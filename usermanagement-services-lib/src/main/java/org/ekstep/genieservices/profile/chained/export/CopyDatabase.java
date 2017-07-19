@@ -8,7 +8,7 @@ import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.operations.IDataSource;
 import org.ekstep.genieservices.commons.utils.FileUtil;
-import org.ekstep.genieservices.profile.bean.ExportProfileContext;
+import org.ekstep.genieservices.importexport.bean.ExportProfileContext;
 
 import java.io.IOException;
 

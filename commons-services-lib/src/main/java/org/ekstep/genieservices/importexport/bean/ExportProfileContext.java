@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.profile.bean;
+package org.ekstep.genieservices.importexport.bean;
 
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 

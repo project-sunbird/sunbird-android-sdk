@@ -11,7 +11,6 @@ import org.ekstep.genieservices.commons.bean.ContentLearnerState;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
-import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.enums.ContentAccessStatus;
@@ -31,8 +30,8 @@ import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
-import org.ekstep.genieservices.profile.bean.ExportProfileContext;
-import org.ekstep.genieservices.profile.bean.ImportProfileContext;
+import org.ekstep.genieservices.importexport.bean.ExportProfileContext;
+import org.ekstep.genieservices.importexport.bean.ImportProfileContext;
 import org.ekstep.genieservices.profile.chained.export.AddGeTransferProfileExportEvent;
 import org.ekstep.genieservices.profile.chained.export.CleanupExportedFile;
 import org.ekstep.genieservices.profile.chained.export.CopyDatabase;
@@ -496,9 +495,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     }
 
     @Override
-    public GenieResponse<ProfileImportResponse> importProfile(ProfileImportRequest profileImportRequest, IDataSource dataSource) {
-        ImportProfileContext importContext = new ImportProfileContext(dataSource, profileImportRequest.getSourceFilePath());
-
+    public GenieResponse<ProfileImportResponse> importProfile(ImportProfileContext importProfileContext) {
         ValidateProfileMetadata validateProfileMetadata = new ValidateProfileMetadata();
         validateProfileMetadata.then(new TransportProfiles())
                 .then(new TransportUser())
@@ -506,7 +503,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
                 .then(new UpdateImportedProfileMetadata())
                 .then(new AddGeTransferProfileImportEvent());
 
-        return validateProfileMetadata.execute(mAppContext, importContext);
+        return validateProfileMetadata.execute(mAppContext, importProfileContext);
     }
 
     @Override

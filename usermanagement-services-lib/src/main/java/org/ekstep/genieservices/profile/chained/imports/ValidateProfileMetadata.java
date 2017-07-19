@@ -8,8 +8,8 @@ import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.importexport.bean.ImportProfileContext;
 import org.ekstep.genieservices.importexport.db.model.MetadataModel;
-import org.ekstep.genieservices.profile.bean.ImportProfileContext;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,7 +27,7 @@ public class ValidateProfileMetadata implements IChainable<ProfileImportResponse
 
     @Override
     public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportProfileContext importContext) {
-        IDBSession externalDBSession = importContext.getDataSource().getReadOnlyDataSource(importContext.getSourceFilePath());
+        IDBSession externalDBSession = importContext.getDataSource().getReadOnlyDataSource(importContext.getSourceDBFilePath());
         // Read from imported DB
         Map<String, Object> metadata = getMetadataNeedsToBeImport(externalDBSession);
 

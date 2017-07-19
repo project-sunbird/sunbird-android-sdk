@@ -8,8 +8,8 @@ import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.contract.MetaEntry;
+import org.ekstep.genieservices.importexport.bean.ExportProfileContext;
 import org.ekstep.genieservices.importexport.db.model.MetadataModel;
-import org.ekstep.genieservices.profile.bean.ExportProfileContext;
 
 import java.io.File;
 import java.util.List;

@@ -12,7 +12,7 @@ import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
 import org.ekstep.genieservices.commons.db.contract.LearnerSummaryEntry;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.profile.bean.ImportProfileContext;
+import org.ekstep.genieservices.importexport.bean.ImportProfileContext;
 import org.ekstep.genieservices.profile.db.model.LearnerAssessmentDetailsModel;
 import org.ekstep.genieservices.profile.db.model.LearnerSummaryEventsModel;
 import org.ekstep.genieservices.profile.db.model.LearnerSummaryModel;
@@ -31,7 +31,7 @@ public class TransportSummarizer implements IChainable<ProfileImportResponse, Im
 
     @Override
     public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportProfileContext importContext) {
-        IDBSession externalDBSession = importContext.getDataSource().getReadOnlyDataSource(importContext.getSourceFilePath());
+        IDBSession externalDBSession = importContext.getDataSource().getReadOnlyDataSource(importContext.getSourceDBFilePath());
 
         //check table exist
         if (isTableExist(externalDBSession, LearnerAssessmentsEntry.TABLE_NAME) &&

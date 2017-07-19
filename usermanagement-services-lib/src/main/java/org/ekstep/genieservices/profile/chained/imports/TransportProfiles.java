@@ -11,7 +11,7 @@ import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.commons.utils.DateUtil;
-import org.ekstep.genieservices.profile.bean.ImportProfileContext;
+import org.ekstep.genieservices.importexport.bean.ImportProfileContext;
 import org.ekstep.genieservices.profile.db.model.UserProfileModel;
 import org.ekstep.genieservices.profile.db.model.UserProfilesModel;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
@@ -28,7 +28,7 @@ public class TransportProfiles implements IChainable<ProfileImportResponse, Impo
 
     @Override
     public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportProfileContext importContext) {
-        IDBSession externalDBSession = importContext.getDataSource().getReadOnlyDataSource(importContext.getSourceFilePath());
+        IDBSession externalDBSession = importContext.getDataSource().getReadOnlyDataSource(importContext.getSourceDBFilePath());
         int imported = 0;
         int failed = 0;
 

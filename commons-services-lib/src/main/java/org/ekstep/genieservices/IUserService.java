@@ -5,10 +5,10 @@ import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
-import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.db.operations.IDataSource;
+import org.ekstep.genieservices.importexport.bean.ImportProfileContext;
 
 import java.io.File;
 import java.util.List;
@@ -157,11 +157,10 @@ public interface IUserService {
      * <p>On failing to importing the profile, the response will return status as FALSE and the error be the following:
      * <p>IMPORT_FAILED
      *
-     * @param profileImportRequest - {@link ProfileImportRequest}
-     * @param dataSource           - {@link IDataSource}
+     * @param importProfileContext - {@link ImportProfileContext}
      * @return {@link GenieResponse<ProfileImportResponse>}
      */
-    GenieResponse<ProfileImportResponse> importProfile(ProfileImportRequest profileImportRequest, IDataSource dataSource);
+    GenieResponse<ProfileImportResponse> importProfile(ImportProfileContext importProfileContext);
 
     /**
      * This api is used to export the profile.

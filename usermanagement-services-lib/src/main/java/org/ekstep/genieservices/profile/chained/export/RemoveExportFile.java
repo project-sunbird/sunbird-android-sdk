@@ -6,7 +6,7 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
-import org.ekstep.genieservices.profile.bean.ExportProfileContext;
+import org.ekstep.genieservices.importexport.bean.ExportProfileContext;
 
 import java.io.File;
 
