@@ -20,16 +20,10 @@ public class RemoveExportFile implements IChainable<ProfileExportResponse, Expor
     private static final String TAG = RemoveExportFile.class.getSimpleName();
     private IChainable<ProfileExportResponse, ExportProfileContext> nextLink;
 
-    private String destinationDBFilePath;
-
-    public RemoveExportFile(String destinationDBFilePath) {
-        this.destinationDBFilePath = destinationDBFilePath;
-    }
-
     @Override
     public GenieResponse<ProfileExportResponse> execute(AppContext appContext, ExportProfileContext exportContext) {
 
-        File file = new File(destinationDBFilePath);
+        File file = new File(exportContext.getDestinationDBFilePath());
         file.delete();
 
         if (nextLink != null) {

@@ -33,7 +33,7 @@ public class CopyDatabase implements IChainable<TelemetryExportResponse, ExportT
         if (nextLink != null) {
             return nextLink.execute(appContext, exportContext);
         } else {
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "Import profile failed", TAG);
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "Export telemetry failed", TAG);
         }
     }
 

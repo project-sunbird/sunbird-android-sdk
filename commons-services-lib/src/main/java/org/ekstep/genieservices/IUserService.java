@@ -7,12 +7,10 @@ import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
-import org.ekstep.genieservices.commons.db.operations.IDataSource;
+import org.ekstep.genieservices.importexport.bean.ExportProfileContext;
 import org.ekstep.genieservices.importexport.bean.ImportProfileContext;
 
-import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This is the interface with all the required APIs to perform necessary operations related to Users
@@ -170,15 +168,9 @@ public interface IUserService {
      * <p>On failing to exporting the telemetry, the response will return status as FALSE and the error be the following:
      * <p>EXPORT_FAILED
      *
-     * @param userIds
-     * @param userIds
-     * @param destinationFolder
-     * @param sourceDBFilePath
-     * @param destinationDBFilePath
-     * @param dataSource
-     * @param metadata
+     * @param exportProfileContext - {@link ExportProfileContext}
      * @return - {@link GenieResponse<ProfileExportResponse>}
      */
-    GenieResponse<ProfileExportResponse> exportProfile(List<String> userIds, File destinationFolder, String sourceDBFilePath, String destinationDBFilePath, IDataSource dataSource, Map<String, Object> metadata);
+    GenieResponse<ProfileExportResponse> exportProfile(ExportProfileContext exportProfileContext);
 
 }

@@ -8,11 +8,15 @@ import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.contract.MetaEntry;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.importexport.bean.ExportProfileContext;
 import org.ekstep.genieservices.importexport.db.model.MetadataModel;
 
 import java.io.File;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -25,27 +29,25 @@ public class CreateMetadata implements IChainable<ProfileExportResponse, ExportP
     private static final String TAG = CreateMetadata.class.getSimpleName();
     private IChainable<ProfileExportResponse, ExportProfileContext> nextLink;
 
-    private List<String> userIds;
-    private String destinationDBFilePath;
-
-    public CreateMetadata(String destinationDBFilePath, List<String> userIds) {
-        this.destinationDBFilePath = destinationDBFilePath;
-        this.userIds = userIds;
-    }
-
     @Override
     public GenieResponse<ProfileExportResponse> execute(AppContext appContext, ExportProfileContext exportContext) {
+        IDBSession destinationDBSession = exportContext.getDataSource().getReadWriteDataSource(exportContext.getDestinationDBFilePath());
 
-        exportContext.getDBSession().execute(MetaEntry.getCreateEntry());
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put(ServiceConstants.VERSION, String.valueOf(exportContext.getSourceDBVersion()));
+        metadata.put(ServiceConstants.EXPORT_TYPES, GsonUtil.toJson(Collections.singletonList(ServiceConstants.EXPORT_TYPE_PROFILE)));
+        metadata.put(ServiceConstants.DID, appContext.getDeviceInfo().getDeviceID());
+        metadata.put(ServiceConstants.EXPORT_ID, UUID.randomUUID().toString());
+        metadata.put(GETransferEventKnowStructure.FILE_SIZE, new File(exportContext.getDestinationDBFilePath()).length());
+        metadata.put(ServiceConstants.PROFILES_COUNT, String.valueOf(exportContext.getUserIds().size()));
 
-        exportContext.getMetadata().put(ServiceConstants.EXPORT_ID, UUID.randomUUID().toString());
-        exportContext.getMetadata().put(GETransferEventKnowStructure.FILE_SIZE, new File(destinationDBFilePath).length());
-        exportContext.getMetadata().put(ServiceConstants.PROFILES_COUNT, String.valueOf(userIds.size()));
-
+        destinationDBSession.execute(MetaEntry.getCreateEntry());
         for (String key : exportContext.getMetadata().keySet()) {
-            MetadataModel metadataModel = MetadataModel.build(exportContext.getDBSession(), key, String.valueOf(exportContext.getMetadata().get(key)));
+            MetadataModel metadataModel = MetadataModel.build(destinationDBSession, key, String.valueOf(exportContext.getMetadata().get(key)));
             metadataModel.save();
         }
+
+        exportContext.setMetadata(metadata);
 
         if (nextLink != null) {
             return nextLink.execute(appContext, exportContext);

@@ -36,27 +36,19 @@ public class CleanupExportedFile implements IChainable<ProfileExportResponse, Ex
     private static final String TAG = CleanupExportedFile.class.getSimpleName();
     private IChainable<ProfileExportResponse, ExportProfileContext> nextLink;
 
-    private List<String> userIds;
-    private String destinationDBFilePath;
-
-    public CleanupExportedFile(String destinationDBFilePath, List<String> userIds) {
-        this.destinationDBFilePath = destinationDBFilePath;
-        this.userIds = userIds;
-    }
-
     @Override
     public GenieResponse<ProfileExportResponse> execute(AppContext appContext, ExportProfileContext exportContext) {
-
-        List<String> allTables = getAllTables(exportContext.getDBSession());
+        IDBSession destinationDBSession = exportContext.getDataSource().getReadWriteDataSource(exportContext.getDestinationDBFilePath());
+        List<String> allTables = getAllTables(destinationDBSession);
         List<String> allTableToExclude = getAllTableToExclude();
 
-        removeTables(exportContext.getDBSession(), allTables, allTableToExclude);
+        removeTables(destinationDBSession, allTables, allTableToExclude);
 
-        deleteUnwantedProfilesAndUsers(exportContext.getDBSession());
-        deleteUnwantedProfileSummary(exportContext.getDBSession());
+        deleteUnwantedProfilesAndUsers(destinationDBSession, exportContext.getUserIds());
+        deleteUnwantedProfileSummary(destinationDBSession, exportContext.getUserIds());
 
         try {
-            removeJournalFile();
+            removeJournalFile(exportContext.getDestinationDBFilePath());
         } catch (Exception e) {
             e.printStackTrace();
             Logger.e(TAG, e.getMessage());
@@ -113,7 +105,7 @@ public class CleanupExportedFile implements IChainable<ProfileExportResponse, Ex
         }
     }
 
-    private void deleteUnwantedProfilesAndUsers(IDBSession dbSession) {
+    private void deleteUnwantedProfilesAndUsers(IDBSession dbSession, List<String> userIds) {
         List<Profile> profilesToRetain = new ArrayList<>();
         List<UserModel> userToRetain = new ArrayList<>();
 
@@ -148,7 +140,7 @@ public class CleanupExportedFile implements IChainable<ProfileExportResponse, Ex
         dbSession.execute(deleteProfilesTable);
     }
 
-    private void deleteUnwantedProfileSummary(IDBSession dbSession) {
+    private void deleteUnwantedProfileSummary(IDBSession dbSession, final List<String> userIds) {
         dbSession.executeInTransaction(new IDBTransaction() {
             @Override
             public Void perform(IDBSession dbSession) {
@@ -163,7 +155,7 @@ public class CleanupExportedFile implements IChainable<ProfileExportResponse, Ex
         });
     }
 
-    private void removeJournalFile() throws Exception {
+    private void removeJournalFile(String destinationDBFilePath) throws Exception {
         File file = new File(destinationDBFilePath + "-journal");
         file.delete();
     }

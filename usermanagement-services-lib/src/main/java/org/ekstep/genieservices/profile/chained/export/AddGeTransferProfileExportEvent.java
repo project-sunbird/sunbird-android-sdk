@@ -27,12 +27,6 @@ public class AddGeTransferProfileExportEvent implements IChainable<ProfileExport
 
     private static final String TAG = AddGeTransferProfileExportEvent.class.getSimpleName();
 
-    private String destinationDBFilePath;
-
-    public AddGeTransferProfileExportEvent(String destinationDBFilePath) {
-        this.destinationDBFilePath = destinationDBFilePath;
-    }
-
     @Override
     public GenieResponse<ProfileExportResponse> execute(AppContext appContext, ExportProfileContext exportContext) {
         try {
@@ -57,7 +51,7 @@ public class AddGeTransferProfileExportEvent implements IChainable<ProfileExport
                     GETransferEventKnowStructure.TRANSFER_DIRECTION_EXPORT,
                     GETransferEventKnowStructure.DATATYPE_PROFILE,
                     aggregateCount,
-                    new File(destinationDBFilePath).length(),
+                    new File(exportContext.getDestinationDBFilePath()).length(),
                     contents);
             GETransfer geTransfer = new GETransfer(eks);
             TelemetryLogger.log(geTransfer);
@@ -67,7 +61,7 @@ public class AddGeTransferProfileExportEvent implements IChainable<ProfileExport
         }
 
         ProfileExportResponse profileExportResponse = new ProfileExportResponse();
-        profileExportResponse.setExportedFilePath(destinationDBFilePath);
+        profileExportResponse.setExportedFilePath(exportContext.getDestinationDBFilePath());
 
         GenieResponse<ProfileExportResponse> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(profileExportResponse);
