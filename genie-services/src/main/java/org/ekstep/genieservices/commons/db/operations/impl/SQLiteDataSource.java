@@ -21,13 +21,13 @@ public class SQLiteDataSource implements IDataSource {
     }
 
     @Override
-    public IDBSession getImportDataSource(String filePath) {
+    public IDBSession getReadOnlyDataSource(String filePath) {
         SQLiteDatabase database = SQLiteDatabase.openDatabase(filePath, null, SQLiteDatabase.OPEN_READONLY);
         return new SQLiteSession(appContext, database);
     }
 
     @Override
-    public IDBSession getExportDataSource(String filePath) {
+    public IDBSession getReadWriteDataSource(String filePath) {
         SQLiteDatabase database = SQLiteDatabase.openDatabase(filePath, null, SQLiteDatabase.OPEN_READWRITE);
         return new SQLiteSession(appContext, database);
     }

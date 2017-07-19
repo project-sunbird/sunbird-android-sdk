@@ -42,7 +42,7 @@ public class CopyDatabase implements IChainable<TelemetryExportResponse, ExportT
         }
 
         // Set the external DB.
-        exportContext.setDbSession(dataSource.getExportDataSource(destinationDB));
+        exportContext.setDbSession(dataSource.getReadWriteDataSource(destinationDB));
 
         if (nextLink != null) {
             return nextLink.execute(appContext, exportContext);

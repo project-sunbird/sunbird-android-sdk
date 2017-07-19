@@ -27,7 +27,7 @@ public class ValidateTelemetryMetadata implements IChainable<Void, ImportTelemet
 
     @Override
     public GenieResponse<Void> execute(AppContext appContext, ImportTelemetryContext importContext) {
-        IDBSession externalDBSession = importContext.getDataSource().getImportDataSource(importContext.getSourceFilePath());
+        IDBSession externalDBSession = importContext.getDataSource().getReadOnlyDataSource(importContext.getSourceFilePath());
         Map<String, Object> metadata = getMetadataNeedsToBeImport(externalDBSession);
 
         if (metadata != null && !metadata.isEmpty()) {

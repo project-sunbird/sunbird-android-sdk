@@ -28,7 +28,7 @@ public class TransportProfiles implements IChainable<ProfileImportResponse, Impo
 
     @Override
     public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportProfileContext importContext) {
-        IDBSession externalDBSession = importContext.getDataSource().getImportDataSource(importContext.getSourceFilePath());
+        IDBSession externalDBSession = importContext.getDataSource().getReadOnlyDataSource(importContext.getSourceFilePath());
         int imported = 0;
         int failed = 0;
 

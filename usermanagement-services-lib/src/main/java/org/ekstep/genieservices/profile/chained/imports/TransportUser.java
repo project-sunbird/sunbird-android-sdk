@@ -23,7 +23,7 @@ public class TransportUser implements IChainable<ProfileImportResponse, ImportPr
 
     @Override
     public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportProfileContext importContext) {
-        IDBSession externalDBSession = importContext.getDataSource().getImportDataSource(importContext.getSourceFilePath());
+        IDBSession externalDBSession = importContext.getDataSource().getReadOnlyDataSource(importContext.getSourceFilePath());
         // Read from imported DB
         UsersModel usersModel = UsersModel.findAll(externalDBSession);
 

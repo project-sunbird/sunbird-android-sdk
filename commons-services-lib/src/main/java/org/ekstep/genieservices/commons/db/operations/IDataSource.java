@@ -6,7 +6,7 @@ package org.ekstep.genieservices.commons.db.operations;
  * @author anil
  */
 public interface IDataSource {
-    IDBSession getImportDataSource(String filePath);
+    IDBSession getReadOnlyDataSource(String filePath);
 
-    IDBSession getExportDataSource(String filePath);
+    IDBSession getReadWriteDataSource(String filePath);
 }

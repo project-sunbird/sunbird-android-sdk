@@ -27,7 +27,7 @@ public class ValidateProfileMetadata implements IChainable<ProfileImportResponse
 
     @Override
     public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportProfileContext importContext) {
-        IDBSession externalDBSession = importContext.getDataSource().getImportDataSource(importContext.getSourceFilePath());
+        IDBSession externalDBSession = importContext.getDataSource().getReadOnlyDataSource(importContext.getSourceFilePath());
         // Read from imported DB
         Map<String, Object> metadata = getMetadataNeedsToBeImport(externalDBSession);
 
