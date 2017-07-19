@@ -7,8 +7,8 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.importexport.bean.ImportTelemetryContext;
 import org.ekstep.genieservices.importexport.db.model.MetadataModel;
-import org.ekstep.genieservices.telemetry.bean.ImportTelemetryContext;
 import org.ekstep.genieservices.telemetry.model.ImportedMetadataModel;
 
 import java.util.Arrays;
@@ -27,7 +27,7 @@ public class ValidateTelemetryMetadata implements IChainable<Void, ImportTelemet
 
     @Override
     public GenieResponse<Void> execute(AppContext appContext, ImportTelemetryContext importContext) {
-        IDBSession externalDBSession = importContext.getDataSource().getReadOnlyDataSource(importContext.getSourceFilePath());
+        IDBSession externalDBSession = importContext.getDataSource().getReadOnlyDataSource(importContext.getSourceDBFilePath());
         Map<String, Object> metadata = getMetadataNeedsToBeImport(externalDBSession);
 
         if (metadata != null && !metadata.isEmpty()) {

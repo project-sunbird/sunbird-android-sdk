@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.telemetry.bean;
+package org.ekstep.genieservices.importexport.bean;
 
 import org.ekstep.genieservices.commons.db.operations.IDataSource;
 
@@ -12,20 +12,20 @@ import java.util.Map;
 public class ImportTelemetryContext {
 
     private IDataSource dataSource;
-    private String sourceFilePath;
+    private String sourceDBFilePath;
     private Map<String, Object> metadata;
 
-    public ImportTelemetryContext(IDataSource dataSource, String sourceFilePath) {
+    public ImportTelemetryContext(IDataSource dataSource, String sourceDBFilePath) {
         this.dataSource = dataSource;
-        this.sourceFilePath = sourceFilePath;
+        this.sourceDBFilePath = sourceDBFilePath;
     }
 
     public IDataSource getDataSource() {
         return dataSource;
     }
 
-    public String getSourceFilePath() {
-        return sourceFilePath;
+    public String getSourceDBFilePath() {
+        return sourceDBFilePath;
     }
 
     public Map<String, Object> getMetadata() {

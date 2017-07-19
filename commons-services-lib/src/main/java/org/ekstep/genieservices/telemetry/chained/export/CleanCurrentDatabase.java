@@ -6,7 +6,7 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
-import org.ekstep.genieservices.telemetry.bean.ExportTelemetryContext;
+import org.ekstep.genieservices.importexport.bean.ExportTelemetryContext;
 import org.ekstep.genieservices.telemetry.model.ProcessedEventsModel;
 
 /**

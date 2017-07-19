@@ -11,7 +11,7 @@ import org.ekstep.genieservices.commons.db.contract.TelemetryProcessedEntry;
 import org.ekstep.genieservices.commons.db.model.CustomReadersModel;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.Logger;
-import org.ekstep.genieservices.telemetry.bean.ExportTelemetryContext;
+import org.ekstep.genieservices.importexport.bean.ExportTelemetryContext;
 
 import java.io.File;
 import java.util.ArrayList;

@@ -14,6 +14,7 @@ import org.ekstep.genieservices.commons.bean.TelemetryImportRequest;
 import org.ekstep.genieservices.commons.db.operations.IDataSource;
 import org.ekstep.genieservices.commons.db.operations.impl.SQLiteDataSource;
 import org.ekstep.genieservices.commons.utils.FileUtil;
+import org.ekstep.genieservices.importexport.bean.ImportTelemetryContext;
 
 /**
  * Created on 6/8/2017.
@@ -39,7 +40,8 @@ public class FileImporter {
 
         String ext = FileUtil.getFileExtension(telemetryImportRequest.getSourceFilePath());
         if (ServiceConstants.FileExtension.TELEMETRY.equals(ext)) {
-            return telemetryService.importTelemetry(telemetryImportRequest, dataSource);
+            ImportTelemetryContext importTelemetryContext = new ImportTelemetryContext(dataSource, telemetryImportRequest.getSourceFilePath());
+            return telemetryService.importTelemetry(importTelemetryContext);
         } else {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Telemetry event import failed, unsupported file extension", TAG);
             return response;

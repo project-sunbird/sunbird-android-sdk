@@ -10,8 +10,8 @@ import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.contract.MetaEntry;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.importexport.bean.ExportTelemetryContext;
 import org.ekstep.genieservices.importexport.db.model.MetadataModel;
-import org.ekstep.genieservices.telemetry.bean.ExportTelemetryContext;
 import org.ekstep.genieservices.telemetry.model.ProcessedEventsModel;
 
 import java.io.File;

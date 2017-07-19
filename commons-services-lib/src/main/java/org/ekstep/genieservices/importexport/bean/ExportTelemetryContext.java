@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.telemetry.bean;
+package org.ekstep.genieservices.importexport.bean;
 
 import org.ekstep.genieservices.commons.db.operations.IDataSource;
 

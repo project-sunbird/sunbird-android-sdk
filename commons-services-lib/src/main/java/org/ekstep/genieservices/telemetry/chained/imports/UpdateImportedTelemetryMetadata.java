@@ -5,7 +5,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
-import org.ekstep.genieservices.telemetry.bean.ImportTelemetryContext;
+import org.ekstep.genieservices.importexport.bean.ImportTelemetryContext;
 import org.ekstep.genieservices.telemetry.model.ImportedMetadataModel;
 
 /**

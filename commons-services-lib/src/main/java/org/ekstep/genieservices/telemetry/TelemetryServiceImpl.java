@@ -8,13 +8,11 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
-import org.ekstep.genieservices.commons.bean.TelemetryImportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
-import org.ekstep.genieservices.commons.db.operations.IDataSource;
 import org.ekstep.genieservices.commons.exception.InvalidDataException;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
@@ -23,9 +21,9 @@ import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.eventbus.EventBus;
+import org.ekstep.genieservices.importexport.bean.ExportTelemetryContext;
+import org.ekstep.genieservices.importexport.bean.ImportTelemetryContext;
 import org.ekstep.genieservices.tag.cache.TelemetryTagCache;
-import org.ekstep.genieservices.telemetry.bean.ExportTelemetryContext;
-import org.ekstep.genieservices.telemetry.bean.ImportTelemetryContext;
 import org.ekstep.genieservices.telemetry.chained.export.AddGeTransferTelemetryExportEvent;
 import org.ekstep.genieservices.telemetry.chained.export.CleanCurrentDatabase;
 import org.ekstep.genieservices.telemetry.chained.export.CleanupExportedFile;
@@ -304,14 +302,13 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
     }
 
     @Override
-    public GenieResponse<Void> importTelemetry(TelemetryImportRequest telemetryImportRequest, IDataSource dataSource) {
-        ImportTelemetryContext importContext = new ImportTelemetryContext(dataSource, telemetryImportRequest.getSourceFilePath());
+    public GenieResponse<Void> importTelemetry(ImportTelemetryContext importTelemetryContext) {
         ValidateTelemetryMetadata validateTelemetryMetadata = new ValidateTelemetryMetadata();
         validateTelemetryMetadata.then(new TransportProcessedEventsImportEvent())
                 .then(new UpdateImportedTelemetryMetadata())
                 .then(new AddGeTransferTelemetryImportEvent());
 
-        return validateTelemetryMetadata.execute(mAppContext, importContext);
+        return validateTelemetryMetadata.execute(mAppContext, importTelemetryContext);
     }
 
     @Override

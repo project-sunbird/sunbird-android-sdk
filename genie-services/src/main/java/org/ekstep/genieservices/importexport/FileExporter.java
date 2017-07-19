@@ -19,8 +19,8 @@ import org.ekstep.genieservices.commons.db.operations.IDataSource;
 import org.ekstep.genieservices.commons.db.operations.impl.SQLiteDataSource;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.importexport.bean.ExportTelemetryContext;
 import org.ekstep.genieservices.profile.db.model.UserProfileModel;
-import org.ekstep.genieservices.telemetry.bean.ExportTelemetryContext;
 
 import java.io.File;
 import java.util.Collections;
