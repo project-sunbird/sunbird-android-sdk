@@ -315,27 +315,29 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
     }
 
     @Override
-    public GenieResponse<TelemetryExportResponse> exportTelemetry(File destinationFolder, String sourceDBFilePath, IDataSource dataSource, Map<String, Object> metadata) {
+    public GenieResponse<TelemetryExportResponse> exportTelemetry(ExportTelemetryContext exportTelemetryContext) {
+        File destinationFolder = new File(exportTelemetryContext.getDestinationFolder());
         String destinationDBFilePath = FileUtil.getExportTelemetryFilePath(destinationFolder);
 
         if (FileUtil.doesFileExists(destinationDBFilePath)) {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "File already exists.", TAG);
         }
+        // Set the destination DB file path.
+        exportTelemetryContext.setDestinationDBFilePath(destinationDBFilePath);
 
+        // Process the event before exporting.
         EventProcessorFactory.processEvents(mAppContext);
 
-        ExportTelemetryContext exportContext = new ExportTelemetryContext(metadata);
-
-        CopyDatabase copyDatabase = new CopyDatabase(sourceDBFilePath, destinationDBFilePath, dataSource);
-        copyDatabase.then(new CreateMetadata(destinationDBFilePath))
-                .then(new CleanupExportedFile(destinationDBFilePath))
+        CopyDatabase copyDatabase = new CopyDatabase();
+        copyDatabase.then(new CreateMetadata())
+                .then(new CleanupExportedFile())
                 .then(new CleanCurrentDatabase())
-                .then(new AddGeTransferTelemetryExportEvent(destinationDBFilePath));
+                .then(new AddGeTransferTelemetryExportEvent());
 
         // TODO: 6/12/2017 - if export failed.
 //                .then(new RemoveExportFile(destinationDBFilePath));
 
-        return copyDatabase.execute(mAppContext, exportContext);
+        return copyDatabase.execute(mAppContext, exportTelemetryContext);
     }
 
 }

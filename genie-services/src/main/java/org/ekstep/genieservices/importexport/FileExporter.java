@@ -20,6 +20,7 @@ import org.ekstep.genieservices.commons.db.operations.impl.SQLiteDataSource;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.profile.db.model.UserProfileModel;
+import org.ekstep.genieservices.telemetry.bean.ExportTelemetryContext;
 
 import java.io.File;
 import java.util.Collections;
@@ -39,17 +40,19 @@ public class FileExporter {
 
     private AppContext<Context> appContext;
     private IDataSource dataSource;
+    private IDBContext dbContext;
+    private String sourceDBFilePath;
 
     public FileExporter(AppContext<Context> appContext) {
         this.appContext = appContext;
         this.dataSource = new SQLiteDataSource(appContext);
+        dbContext = new GSDBContext();
+        sourceDBFilePath = appContext.getContext().getDatabasePath(dbContext.getDBName()).getPath();
     }
 
-    public GenieResponse<TelemetryExportResponse> exportTelemetry(TelemetryExportRequest exportRequest, ITelemetryService telemetryService) {
-        IDBContext dbContext = new GSDBContext();
-        String sourceDBFilePath = appContext.getContext().getDatabasePath(dbContext.getDBName()).getPath();
-        return telemetryService.exportTelemetry(new File(exportRequest.getDestinationFolder()), sourceDBFilePath,
-                dataSource, getMetadata(dbContext, ServiceConstants.EXPORT_TYPE_TELEMETRY));
+    public GenieResponse<TelemetryExportResponse> exportTelemetry(TelemetryExportRequest telemetryExportRequest, ITelemetryService telemetryService) {
+        ExportTelemetryContext exportTelemetryContext = new ExportTelemetryContext(telemetryExportRequest.getDestinationFolder(), dataSource, sourceDBFilePath, dbContext.getDBVersion());
+        return telemetryService.exportTelemetry(exportTelemetryContext);
     }
 
     public GenieResponse<ProfileExportResponse> exportProfile(ProfileExportRequest exportRequest, IUserService userService) {
@@ -59,11 +62,7 @@ public class FileExporter {
             // Read the first profile and get the temp location path
             String destinationDBFilePath = getEparFilePath(exportRequest.getUserIds(), destinationFolder);
 
-            IDBContext dbContext = new GSDBContext();
-            String sourceDBFilePath = appContext.getContext().getDatabasePath(dbContext.getDBName()).getPath();
-
-            return userService.exportProfile(exportRequest.getUserIds(), destinationFolder, sourceDBFilePath,
-                    destinationDBFilePath, dataSource, getMetadata(dbContext, ServiceConstants.EXPORT_TYPE_PROFILE));
+            return userService.exportProfile(exportRequest.getUserIds(), destinationFolder, sourceDBFilePath, destinationDBFilePath, dataSource, getMetadata(dbContext, ServiceConstants.EXPORT_TYPE_PROFILE));
         } else {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "There are no profile to export.", TAG);
         }

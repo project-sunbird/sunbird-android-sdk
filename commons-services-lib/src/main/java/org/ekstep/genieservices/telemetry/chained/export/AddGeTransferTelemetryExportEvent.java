@@ -27,12 +27,6 @@ public class AddGeTransferTelemetryExportEvent implements IChainable<TelemetryEx
 
     private static final String TAG = AddGeTransferTelemetryExportEvent.class.getSimpleName();
 
-    private String destinationDBFilePath;
-
-    public AddGeTransferTelemetryExportEvent(String destinationDBFilePath) {
-        this.destinationDBFilePath = destinationDBFilePath;
-    }
-
     @Override
     public GenieResponse<TelemetryExportResponse> execute(AppContext appContext, ExportTelemetryContext exportContext) {
         try {
@@ -57,7 +51,7 @@ public class AddGeTransferTelemetryExportEvent implements IChainable<TelemetryEx
                     GETransferEventKnowStructure.TRANSFER_DIRECTION_EXPORT,
                     GETransferEventKnowStructure.DATATYPE_TELEMETRY,
                     aggregateCount,
-                    new File(destinationDBFilePath).length(),
+                    new File(exportContext.getDestinationDBFilePath()).length(),
                     contents);
             GETransfer geTransfer = new GETransfer(eks);
             TelemetryLogger.log(geTransfer);
@@ -67,7 +61,7 @@ public class AddGeTransferTelemetryExportEvent implements IChainable<TelemetryEx
         }
 
         TelemetryExportResponse telemetryExportResponse = new TelemetryExportResponse();
-        telemetryExportResponse.setExportedFilePath(destinationDBFilePath);
+        telemetryExportResponse.setExportedFilePath(exportContext.getDestinationDBFilePath());
 
         GenieResponse<TelemetryExportResponse> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(telemetryExportResponse);

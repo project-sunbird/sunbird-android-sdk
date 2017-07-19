@@ -6,9 +6,7 @@ import org.ekstep.genieservices.commons.bean.TelemetryImportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.db.operations.IDataSource;
-
-import java.io.File;
-import java.util.Map;
+import org.ekstep.genieservices.telemetry.bean.ExportTelemetryContext;
 
 /**
  * This is the interface with all the required APIs to perform necessary operations related to Telemetry
@@ -60,6 +58,12 @@ public interface ITelemetryService {
      */
     GenieResponse<Void> importTelemetry(TelemetryImportRequest telemetryImportRequest, IDataSource dataSource);
 
-    GenieResponse<TelemetryExportResponse> exportTelemetry(File destinationFolder, String sourceDBFilePath, IDataSource dataSource, Map<String, Object> metadata);
+    /**
+     * This API is used to export telemetry.
+     *
+     * @param exportTelemetryContext - {@link ExportTelemetryContext}
+     * @return {@link GenieResponse<TelemetryExportResponse>}
+     */
+    GenieResponse<TelemetryExportResponse> exportTelemetry(ExportTelemetryContext exportTelemetryContext);
 
 }

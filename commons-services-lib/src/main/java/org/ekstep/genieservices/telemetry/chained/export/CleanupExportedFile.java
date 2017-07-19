@@ -28,22 +28,16 @@ public class CleanupExportedFile implements IChainable<TelemetryExportResponse, 
     private static final String TAG = CleanupExportedFile.class.getSimpleName();
     private IChainable<TelemetryExportResponse, ExportTelemetryContext> nextLink;
 
-    private String destinationDBFilePath;
-
-    public CleanupExportedFile(String destinationDBFilePath) {
-        this.destinationDBFilePath = destinationDBFilePath;
-    }
-
     @Override
     public GenieResponse<TelemetryExportResponse> execute(AppContext appContext, ExportTelemetryContext exportContext) {
-
-        List<String> allTables = getAllTables(exportContext.getDBSession());
+        IDBSession destinationDBSession = exportContext.getDataSource().getReadWriteDataSource(exportContext.getDestinationDBFilePath());
+        List<String> allTables = getAllTables(destinationDBSession);
         List<String> allTableToExclude = getAllTableToExclude();
 
-        removeTables(exportContext.getDBSession(), allTables, allTableToExclude);
+        removeTables(destinationDBSession, allTables, allTableToExclude);
 
         try {
-            removeJournalFile();
+            removeJournalFile(exportContext.getDestinationDBFilePath());
         } catch (Exception e) {
             e.printStackTrace();
             Logger.e(TAG, e.getMessage());
@@ -97,7 +91,7 @@ public class CleanupExportedFile implements IChainable<TelemetryExportResponse, 
         }
     }
 
-    private void removeJournalFile() throws Exception {
+    private void removeJournalFile(String destinationDBFilePath) throws Exception {
         File file = new File(destinationDBFilePath + "-journal");
         file.delete();
     }

@@ -6,7 +6,6 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
-import org.ekstep.genieservices.commons.db.operations.IDataSource;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.telemetry.bean.ExportTelemetryContext;
 
@@ -22,27 +21,14 @@ public class CopyDatabase implements IChainable<TelemetryExportResponse, ExportT
     private static final String TAG = CopyDatabase.class.getSimpleName();
     private IChainable<TelemetryExportResponse, ExportTelemetryContext> nextLink;
 
-    private String sourceDB;
-    private String destinationDB;
-    private IDataSource dataSource;
-
-    public CopyDatabase(String sourceDB, String destinationDB, IDataSource dataSource) {
-        this.sourceDB = sourceDB;
-        this.destinationDB = destinationDB;
-        this.dataSource = dataSource;
-    }
-
     @Override
     public GenieResponse<TelemetryExportResponse> execute(AppContext appContext, ExportTelemetryContext exportContext) {
         try {
-            FileUtil.cp(sourceDB, destinationDB);
+            FileUtil.cp(exportContext.getSourceDBFilePath(), exportContext.getDestinationDBFilePath());
         } catch (IOException e) {
             e.printStackTrace();
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, e.getMessage(), TAG);
         }
-
-        // Set the external DB.
-        exportContext.setDbSession(dataSource.getReadWriteDataSource(destinationDB));
 
         if (nextLink != null) {
             return nextLink.execute(appContext, exportContext);
