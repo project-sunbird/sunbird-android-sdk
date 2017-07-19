@@ -8,12 +8,12 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
+import org.ekstep.genieservices.commons.bean.TelemetryImportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
-import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDataSource;
 import org.ekstep.genieservices.commons.exception.InvalidDataException;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
@@ -304,8 +304,8 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
     }
 
     @Override
-    public GenieResponse<Void> importTelemetry(IDBSession dbSession, Map<String, Object> metadata) {
-        ImportTelemetryContext importContext = new ImportTelemetryContext(dbSession, metadata);
+    public GenieResponse<Void> importTelemetry(TelemetryImportRequest telemetryImportRequest, IDataSource dataSource) {
+        ImportTelemetryContext importContext = new ImportTelemetryContext(dataSource, telemetryImportRequest.getSourceFilePath());
         ValidateTelemetryMetadata validateTelemetryMetadata = new ValidateTelemetryMetadata();
         validateTelemetryMetadata.then(new TransportProcessedEventsImportEvent())
                 .then(new UpdateImportedTelemetryMetadata())

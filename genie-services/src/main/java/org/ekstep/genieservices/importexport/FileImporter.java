@@ -43,8 +43,7 @@ public class FileImporter {
 
         String ext = FileUtil.getFileExtension(telemetryImportRequest.getSourceFilePath());
         if (ServiceConstants.FileExtension.TELEMETRY.equals(ext)) {
-            IDBSession dbSession = dataSource.getImportDataSource(telemetryImportRequest.getSourceFilePath());
-            return telemetryService.importTelemetry(dbSession, getMetadata(dbSession));
+            return telemetryService.importTelemetry(telemetryImportRequest, dataSource);
         } else {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Telemetry event import failed, unsupported file extension", TAG);
             return response;

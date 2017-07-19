@@ -5,6 +5,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.telemetry.bean.ImportTelemetryContext;
 import org.ekstep.genieservices.telemetry.model.ProcessedEventModel;
 import org.ekstep.genieservices.telemetry.model.ProcessedEventsModel;
@@ -21,7 +22,8 @@ public class TransportProcessedEventsImportEvent implements IChainable<Void, Imp
 
     @Override
     public GenieResponse<Void> execute(AppContext appContext, ImportTelemetryContext importContext) {
-        ProcessedEventsModel processedEventsModel = ProcessedEventsModel.find(importContext.getDBSession());
+        IDBSession externalDBSession = importContext.getDataSource().getImportDataSource(importContext.getSourceFilePath());
+        ProcessedEventsModel processedEventsModel = ProcessedEventsModel.find(externalDBSession);
         if (processedEventsModel != null) {
             for (ProcessedEventModel model : processedEventsModel.getProcessedEventList()) {
                 ProcessedEventModel processedEventModel = ProcessedEventModel.build(appContext.getDBSession(), model.getMsgId(), model.getData(), model.getNumberOfEvents(), model.getPriority());

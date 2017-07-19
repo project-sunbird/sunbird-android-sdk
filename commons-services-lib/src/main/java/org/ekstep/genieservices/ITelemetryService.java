@@ -2,9 +2,9 @@ package org.ekstep.genieservices;
 
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
+import org.ekstep.genieservices.commons.bean.TelemetryImportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
-import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDataSource;
 
 import java.io.File;
@@ -54,11 +54,11 @@ public interface ITelemetryService {
     /**
      * This API is used to import telemetry.
      *
-     * @param dbSession
-     * @param metadata
+     * @param telemetryImportRequest
+     * @param dataSource
      * @return
      */
-    GenieResponse<Void> importTelemetry(IDBSession dbSession, Map<String, Object> metadata);
+    GenieResponse<Void> importTelemetry(TelemetryImportRequest telemetryImportRequest, IDataSource dataSource);
 
     GenieResponse<TelemetryExportResponse> exportTelemetry(File destinationFolder, String sourceDBFilePath, IDataSource dataSource, Map<String, Object> metadata);
 
