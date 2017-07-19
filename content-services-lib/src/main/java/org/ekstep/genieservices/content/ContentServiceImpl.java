@@ -28,7 +28,6 @@ import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
-import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
@@ -66,7 +65,7 @@ import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.network.ContentSearchAPI;
 import org.ekstep.genieservices.content.network.RecommendedContentAPI;
 import org.ekstep.genieservices.content.network.RelatedContentAPI;
-import org.ekstep.genieservices.eventbus.EventPublisher;
+import org.ekstep.genieservices.eventbus.EventBus;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.io.File;
@@ -119,7 +118,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             }
 
             contentModelInDB = ContentHandler.convertContentMapToModel(mAppContext.getDBSession(), contentData, null);
-        } else {
+        } else if (contentDetailsRequest.isRefreshContentDetails()){
             ContentHandler.refreshContentDetailsFromServer(mAppContext, contentDetailsRequest.getContentId(), contentModelInDB);
         }
 
@@ -156,10 +155,10 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         for (ContentModel contentModel : contentModelListInDB) {
             Content c = ContentHandler.convertContentModelToBean(contentModel);
 
-            if (criteria.attachFeedback()) {
+            if (criteria != null && criteria.attachFeedback()) {
                 c.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, c.getIdentifier(), criteria.getUid()));
             }
-            if (criteria.attachContentAccess()) {
+            if (criteria != null && criteria.attachContentAccess()) {
                 c.setContentAccess(ContentHandler.getContentAccess(userService, c.getIdentifier(), criteria.getUid()));
             }
             contentList.add(c);
@@ -187,9 +186,14 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         List<HierarchyInfo> hierarchyInfoList = childContentRequest.getHierarchyInfo();
         if (hierarchyInfoList == null) {
             hierarchyInfoList = new ArrayList<>();
-        }
-        if (hierarchyInfoList.isEmpty()) {
-            hierarchyInfoList.add(new HierarchyInfo(contentModel.getIdentifier(), contentModel.getContentType()));
+        } else if (!hierarchyInfoList.isEmpty()) {
+            /* If the nested collection is C/C1/C11 and somebody is asking for C1's children they would be sending the hierarchy of C1 which is C/C1.
+             * We are removing the last element here so that the further processing can continue to add it back
+             * In other words, the checkAndFetchChildrenOfContent method assumes that the sourceInfoList is the parent's hierarchy info
+             */
+            if (hierarchyInfoList.get(hierarchyInfoList.size() - 1).getIdentifier().equalsIgnoreCase(childContentRequest.getContentId())) {
+                hierarchyInfoList.remove(hierarchyInfoList.size() - 1);
+            }
         }
 
         //check and fetch all children of this content
@@ -203,30 +207,25 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
     private Content checkAndFetchChildrenOfContent(ContentModel contentModel, List<HierarchyInfo> sourceInfoList, int currentLevel, int level) {
         Content content = ContentHandler.convertContentModelToBean(contentModel);
-        content.setHierarchyInfo(sourceInfoList);
 
         // check if the content model has immediate children
         List<ContentModel> contentModelList = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), contentModel.getLocalData(), ContentConstants.ChildContents.ALL);
-        if (contentModelList.size() > 0
-                && (level == -1 || currentLevel < level)) {
-            currentLevel = currentLevel + 1;
-            List<Content> childContents = new ArrayList<>();
-
-            for (ContentModel perContentModel : contentModelList) {
-                Content perContent = ContentHandler.convertContentModelToBean(perContentModel);
-                List<HierarchyInfo> hierarchyInfoList = new ArrayList<>(sourceInfoList);
-                hierarchyInfoList.add(new HierarchyInfo(perContent.getIdentifier(), perContent.getContentType()));
-                perContent.setHierarchyInfo(hierarchyInfoList);
-                Content iteratedContent = checkAndFetchChildrenOfContent(perContentModel, hierarchyInfoList, currentLevel, level);
-                perContent.setChildren(iteratedContent.getChildren());
-
-                childContents.add(perContent);
+        if (contentModelList.size() > 0) {
+            List<HierarchyInfo> hierarchyInfoList = new ArrayList<>(sourceInfoList);
+            hierarchyInfoList.add(new HierarchyInfo(contentModel.getIdentifier(), contentModel.getContentType()));
+            content.setHierarchyInfo(hierarchyInfoList);
+            if (level == -1 || currentLevel < level) {
+                List<Content> childContents = new ArrayList<>();
+                for (ContentModel perContentModel : contentModelList) {
+                    Content iteratedContent = checkAndFetchChildrenOfContent(perContentModel, hierarchyInfoList, currentLevel + 1, level);
+                    childContents.add(iteratedContent);
+                }
+                //add children to the main content
+                content.setChildren(childContents);
             }
-
-            //add children to the main content
-            content.setChildren(childContents);
+        } else {
+            content.setHierarchyInfo(sourceInfoList);
         }
-
         return content;
     }
 
@@ -309,7 +308,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         GenieResponse<ContentSearchResult> response;
 
-        Map<String, Object> requestMap = ContentHandler.getSearchRequest(mAppContext, userService, configService, contentSearchCriteria);
+        Map<String, Object> requestMap = ContentHandler.getSearchContentRequest(mAppContext, configService, contentSearchCriteria);
 
         ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, requestMap);
         GenieResponse apiResponse = contentSearchAPI.post();
@@ -431,12 +430,12 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             LinkedTreeMap result = (LinkedTreeMap) map.get("result");
 
             String responseMessageId = null;
-            if (responseParams.containsKey("resmsgid")) {
+            if (responseParams != null && responseParams.containsKey("resmsgid")) {
                 responseMessageId = (String) responseParams.get("resmsgid");
             }
 
             String contentDataList = null;
-            if (result.containsKey("content")) {
+            if (result != null && result.containsKey("content")) {
                 contentDataList = GsonUtil.toJson(result.get("content"));
             }
 
@@ -461,21 +460,21 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<List<Content>> nextContent(List<String> contentIdentifiers) {
+    public GenieResponse<Content> nextContent(List<HierarchyInfo> hierarchyInfo, String currentContentIdentifier) {
 
         String methodName = "nextContent@ContentServiceImpl";
         HashMap<String, Object> params = new HashMap<>();
-        params.put("contentIdentifiers", GsonUtil.toJson(contentIdentifiers));
+        params.put("contentIdentifiers", GsonUtil.toJson(hierarchyInfo));
         params.put("logLevel", "2");
 
-        List<Content> contentList = new ArrayList<>();
-
+        List<HierarchyInfo> nextContentHierarchyList = new ArrayList<>();
+        Content nextContent = null;
         try {
             List<String> contentsKeyList = new ArrayList<>();
             List<String> parentChildRelation = new ArrayList<>();
             String key = null;
 
-            ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), contentIdentifiers.get(0));
+            ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), hierarchyInfo.get(0).getIdentifier());
 
             Stack<ContentModel> stack = new Stack<>();
             stack.push(contentModel);
@@ -523,13 +522,14 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             }
 
             String currentIdentifiers = null;
-            for (String identifier : contentIdentifiers) {
+            for (HierarchyInfo hierarchyItem : hierarchyInfo) {
                 if (StringUtil.isNullOrEmpty(currentIdentifiers)) {
-                    currentIdentifiers = identifier;
+                    currentIdentifiers = hierarchyItem.getIdentifier();
                 } else {
-                    currentIdentifiers = currentIdentifiers + "/" + identifier;
+                    currentIdentifiers = currentIdentifiers + "/" + hierarchyItem.getIdentifier();
                 }
             }
+            currentIdentifiers += "/" + currentContentIdentifier;
 
             int indexOfCurrentContentIdentifier = contentsKeyList.indexOf(currentIdentifiers);
             String nextContentIdentifier = null;
@@ -540,19 +540,21 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             if (!StringUtil.isNullOrEmpty(nextContentIdentifier)) {
 
                 String nextContentIdentifierList[] = nextContentIdentifier.split("/");
-                for (String identifier : nextContentIdentifierList) {
-                    ContentModel nextContentModel = ContentModel.find(mAppContext.getDBSession(), identifier);
-
-                    Content content = ContentHandler.convertContentModelToBean(nextContentModel);
-                    contentList.add(content);
+                int idCount = nextContentIdentifierList.length;
+                for (int i = 0; i < (idCount - 1); i++) {
+                    ContentModel contentModelObj = ContentModel.find(mAppContext.getDBSession(), nextContentIdentifierList[i]);
+                    nextContentHierarchyList.add(new HierarchyInfo(contentModelObj.getIdentifier(), contentModelObj.getContentType()));
                 }
+                ContentModel nextContentModel = ContentModel.find(mAppContext.getDBSession(), nextContentIdentifierList[idCount - 1]);
+                nextContent = ContentHandler.convertContentModelToBean(nextContentModel);
+                nextContent.setHierarchyInfo(nextContentHierarchyList);
             }
         } catch (Exception e) {
             Logger.e(TAG, "" + e.getMessage());
         }
 
-        GenieResponse<List<Content>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-        response.setResult(contentList);
+        GenieResponse<Content> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        response.setResult(nextContent);
         TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;
     }
@@ -567,7 +569,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         GenieResponse<Void> response;
 
-        EventPublisher.postContentImportStatus(new ContentImportResponse(null, 1, importRequest.getSourceFilePath()));
+        EventBus.postEvent(new ContentImportResponse(null, 1, importRequest.getSourceFilePath()));
 
         if (!FileUtil.doesFileExists(importRequest.getSourceFilePath())) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.ECAR_NOT_FOUND, ServiceConstants.ErrorMessage.FILE_DOESNT_EXIST, TAG);
@@ -598,7 +600,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 buildSuccessEvent(identifier);
                 TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
 
-                EventPublisher.postContentImportStatus(new ContentImportResponse(identifier, 2, importRequest.getSourceFilePath()));
+                EventBus.postEvent(new ContentImportResponse(identifier, 2, importRequest.getSourceFilePath()));
             }
 
             return response;
@@ -686,7 +688,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     private void buildInitiateEvent() {
-        GEInteract geInteract = new GEInteract.Builder(new GameData(mAppContext.getParams().getString(ServiceConstants.Params.GID), mAppContext.getParams().getString(ServiceConstants.Params.VERSION_NAME))).
+        GEInteract geInteract = new GEInteract.Builder().
                 stageId(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID).
                 subType(ServiceConstants.Telemetry.CONTENT_IMPORT_INITIATED_SUB_TYPE).
                 interActionType(InteractionType.TOUCH).
@@ -695,7 +697,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     private void buildSuccessEvent(String identifier) {
-        GEInteract geInteract = new GEInteract.Builder(new GameData(mAppContext.getParams().getString(ServiceConstants.Params.GID), mAppContext.getParams().getString(ServiceConstants.Params.VERSION_NAME))).
+        GEInteract geInteract = new GEInteract.Builder().
                 stageId(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID).
                 subType(ServiceConstants.Telemetry.CONTENT_IMPORT_SUCCESS_SUB_TYPE).
                 interActionType(InteractionType.OTHER).

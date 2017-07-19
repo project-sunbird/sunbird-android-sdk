@@ -15,6 +15,7 @@ import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.HierarchyInfo;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
@@ -155,10 +156,11 @@ public interface IContentService {
      * <p>
      * On successful finding the next list of contents, the response will return status as TRUE and the result will be set with {@link List<Content>}
      *
-     * @param contentIdentifiers - {@link List<String>}
-     * @return - {@link GenieResponse<List<Content>>}
+     * @param contentHierarchy - {@link List<HierarchyInfo>}
+     * @param currentContentIdentifier The current content identifier
+     * @return - {@link GenieResponse<Content>}
      */
-    GenieResponse<List<Content>> nextContent(List<String> contentIdentifiers);
+    GenieResponse<Content> nextContent(List<HierarchyInfo> contentHierarchy, String currentContentIdentifier);
 
     /**
      * This api is used to import the ecar.

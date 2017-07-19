@@ -8,13 +8,13 @@ import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.SyncStat;
 
-
 /**
- * This class provides APIs for performing Sync related operations on a separate thread
- *
+ * This class provides APIs for performing Sync related operations on a separate thread.
  */
 public class SyncService {
+
     private ISyncService syncService;
+
     public SyncService(GenieService genieService) {
         this.syncService = genieService.getSyncService();
     }

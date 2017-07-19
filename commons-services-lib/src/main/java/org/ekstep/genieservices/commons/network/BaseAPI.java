@@ -1,12 +1,9 @@
 package org.ekstep.genieservices.commons.network;
 
-import org.ekstep.genieservices.ServiceConstants;
+import org.ekstep.genieservices.auth.AuthHandler;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.enums.JWTokenType;
-import org.ekstep.genieservices.commons.utils.GsonUtil;
-import org.ekstep.genieservices.commons.utils.JWTUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 
 import java.io.IOException;
@@ -57,7 +54,7 @@ public abstract class BaseAPI {
                 return getSuccessResponse(apiResponse.getResponseBody());
             } else if (apiResponse.getResponseCode() == AUTHENTICATION_FAILURE) {
                 if (retryForAuthError) {
-                    resetAuthToken();
+                    AuthHandler.resetAuthToken(mAppContext);
                     return fetchFromServer(requestType, false);
                 } else {
                     return getErrorResponse(NetworkConstants.SERVERAUTH_ERROR, NetworkConstants.SERVERAUTH_ERROR_MESSAGE);
@@ -71,11 +68,23 @@ public abstract class BaseAPI {
         }
     }
 
+    private ApiResponse invokeApi(String requestType) throws IOException {
+        IHttpClient httpClient = prepareClient();
+        ApiResponse apiResponse = null;
+        if (GET.equals(requestType)) {
+            apiResponse = httpClient.doGet();
+        } else if (POST.equals(requestType)) {
+            apiResponse = httpClient.doPost(getRequestData());
+        }
+        return apiResponse;
+    }
+
     private IHttpClient prepareClient() {
         IHttpClient httpClient = httpClientFactory.getClient();
         httpClient.createRequest(url);
         if (shouldAuthenticate()) {
-            httpClient.setAuthHeaders();
+            IHttpAuthenticator authenticator = httpClientFactory.getHttpAuthenticator();
+            httpClient.setHeaders(authenticator.getAuthHeaders());
         }
         httpClient.setHeaders(headers);
         httpClient.setHeaders(getRequestHeaders());
@@ -90,43 +99,6 @@ public abstract class BaseAPI {
 
     private GenieResponse<String> getErrorResponse(String error, String errorMessage) {
         return GenieResponseBuilder.getErrorResponse(error, errorMessage, TAG, String.class);
-    }
-
-    private ApiResponse invokeApi(String requestType) throws IOException {
-        IHttpClient httpClient = prepareClient();
-        ApiResponse apiResponse = null;
-        if (GET.equals(requestType)) {
-            apiResponse = httpClient.doGet();
-        } else if (POST.equals(requestType)) {
-            apiResponse = httpClient.doPost(getRequestData());
-        }
-        return apiResponse;
-    }
-
-    private void resetAuthToken() {
-        String key = mAppContext.getParams().getString(ServiceConstants.Params.MOBILE_APP_KEY);
-        String secret = mAppContext.getParams().getString(ServiceConstants.Params.MOBILE_APP_SECRET);
-        String deviceSecret = createDeviceSecret(JWTUtil.createJWToken(key, secret, JWTokenType.HS256));
-        if (deviceSecret != null) {
-            String deviceKey = mAppContext.getDeviceInfo().getDeviceID();
-            mAppContext.getKeyValueStore().putString(NetworkConstants.API_BEARER_TOKEN, JWTUtil.createJWToken(deviceKey, deviceSecret, JWTokenType.HS256));
-        }
-    }
-
-    private String createDeviceSecret(String bearerToken) {
-        AuthAPI authAPI = new AuthAPI(mAppContext, bearerToken);
-        GenieResponse<String> response = authAPI.post();
-        String deviceSecret = null;
-        if (response.getStatus()) {
-            String body = response.getResult().toString();
-            Map responseMap = GsonUtil.fromJson(body, Map.class);
-            Map result = (Map) responseMap.get("result");
-            if (result != null) {
-                Object keyObj = result.get("secret");
-                deviceSecret = keyObj == null ? "" : keyObj.toString();
-            }
-        }
-        return deviceSecret;
     }
 
     protected boolean shouldAuthenticate() {

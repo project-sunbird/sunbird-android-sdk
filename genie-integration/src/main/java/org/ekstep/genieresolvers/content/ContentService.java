@@ -26,13 +26,8 @@ public class ContentService extends BaseService {
         createAndExecuteTask(responseHandler, getContentTask);
     }
 
-    public void getContents(IResponseHandler<Map> responseHandler) {
-        GetContentsTask getContentsTask = new GetContentsTask(context, appQualifier);
-        createAndExecuteTask(responseHandler, getContentsTask);
-    }
-
-    public void getRelatedContent(List<Map> hierarchyData, String userId, IResponseHandler<Map> responseHandler) {
-        GetRelatedContentTask getRelatedContentTask = new GetRelatedContentTask(context, appQualifier, hierarchyData, userId);
+    public void getRelatedContent(Map hierarchyData, String currentContentIdentifier, String userId, IResponseHandler<Map> responseHandler) {
+        GetRelatedContentTask getRelatedContentTask = new GetRelatedContentTask(context, appQualifier, hierarchyData, currentContentIdentifier, userId);
         createAndExecuteTask(responseHandler, getRelatedContentTask);
     }
 

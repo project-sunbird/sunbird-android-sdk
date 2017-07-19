@@ -1,10 +1,13 @@
-package org.ekstep.genieservices.commons.network;
+package org.ekstep.genieservices.auth.network;
 
+import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.network.BaseAPI;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -16,14 +19,18 @@ public class AuthAPI extends BaseAPI {
     private static final String VERSION = "1.0";
     private static final String ID = "ekstep.genie.device.register";
 
-    private AppContext mAppContext;
-    private String bearerToken;
+    private static final CharSequence SERVICE_ENDPOINTS = "credential/register";
 
-    public AuthAPI(AppContext appContext, String bearerToken) {
-        super(appContext, null, TAG);
-        this.mAppContext = appContext;
-        this.bearerToken = bearerToken;
-        //TODO 07/07/17 URL creation is pending as the URL was not available on dev/qa.
+    private String mobileAppConsumerBearerToken;
+    private String mobileDeviceConsumerKey;
+
+    public AuthAPI(AppContext appContext, String mobileDeviceConsumerKey, String mobileAppConsumerBearerToken) {
+        super(appContext,
+                String.format(Locale.US, "%s/consumer/%s/%s", appContext.getParams().getString(ServiceConstants.Params.APIGATEWAY_BASE_URL),
+                        appContext.getParams().getString(ServiceConstants.Params.MOBILE_APP_CONSUMER), SERVICE_ENDPOINTS)
+                    , TAG);
+        this.mobileDeviceConsumerKey = mobileDeviceConsumerKey;
+        this.mobileAppConsumerBearerToken = mobileAppConsumerBearerToken;
     }
 
     @Override
@@ -31,14 +38,14 @@ public class AuthAPI extends BaseAPI {
         Map<String, String> headerMap = new HashMap<>();
         headerMap.put("Content-Encoding", "gzip");
         //set the authentication header
-        headerMap.put("Authorization", "Bearer " + bearerToken);
+        headerMap.put("Authorization", "Bearer " + mobileAppConsumerBearerToken);
         return headerMap;
     }
 
     @Override
     protected String createRequestData() {
         Map<String, String> requestMap = new HashMap<>();
-        requestMap.put("did", mAppContext.getDeviceInfo().getDeviceID());
+        requestMap.put("key", mobileDeviceConsumerKey);
 
         Map<String, Object> request = new HashMap<>();
         request.put("id", ID);

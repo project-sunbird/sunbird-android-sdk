@@ -16,12 +16,12 @@ public class ContentDetailsAPI extends BaseAPI {
 
     private static final String TAG = ContentDetailsAPI.class.getSimpleName();
 
-    private static final CharSequence SERVICE_ENDPOINTS = "learning";
+    private static final CharSequence SERVICE_ENDPOINTS = "read";
 
     public ContentDetailsAPI(AppContext appContext, String contentId) {
         super(appContext,
-                String.format(Locale.US, "%s/content/%s",
-                        String.format(Locale.US, appContext.getParams().getString(ServiceConstants.Params.LANGUAGE_PLATFORM_BASE_URL), SERVICE_ENDPOINTS),
+                String.format(Locale.US, "%s/%s/%s",
+                        appContext.getParams().getString(ServiceConstants.Params.CONTENT_BASE_URL), SERVICE_ENDPOINTS,
                         contentId),
                 TAG);
     }

@@ -14,7 +14,9 @@ import org.ekstep.genieproviders.util.Constants;
 import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.HierarchyInfo;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
@@ -53,25 +55,31 @@ public class RelatedContentUriHandler implements IUriHandler {
         if (genieService != null && selection != null) {
             cursor = getMatrixCursor();
             Logger.i(TAG, "Content Identifier - " + selection);
-            Type type = new TypeToken<List<Map>>() {
+            Type type = new TypeToken<Map>() {
             }.getType();
-            List<Map> hierarchyData = GsonUtil.getGson().fromJson(selection, type);
+            Map data = GsonUtil.getGson().fromJson(selection, type);
+
+            Map hierarchyData = (Map) data.get("hierarchyData");
+
+            String currentContentIdentifier = data.get("currentContentIdentifier").toString();
+            String userId = data.get("userId").toString();
 
             GenieResponse genieResponse = null;
-            if (hierarchyData != null && hierarchyData.size() == 1) {
-                RelatedContentRequest request = new RelatedContentRequest.Builder().forContent(hierarchyData.get(0).get("identifier").toString()).build();
+            Map<String, Object> resultMap = new HashMap<>();
+            if (hierarchyData == null) {
+                RelatedContentRequest request = new RelatedContentRequest.Builder().forContent(currentContentIdentifier).byUser(userId).build();
                 genieResponse = genieService.getContentService().getRelatedContent(request);
-            } else if (hierarchyData != null && hierarchyData.size() > 1) {
+                resultMap.put("nextContent", genieResponse.getResult());
+            } else if (hierarchyData != null) {
                 // TODO: 29/5/17 NEED TO DECIDE RESULT MAP KEY FOR NEXT CONTENT
-                Map<String, Object> resultMap = new HashMap<>();
-                List<String> contentIdentifiers = new ArrayList<>();
-                for (Map hierarchyItem : hierarchyData) {
-                    contentIdentifiers.add(hierarchyItem.get("identifier").toString());
+                Content content = genieService.getContentService().nextContent(createHierarchyInfo(hierarchyData), currentContentIdentifier).getResult();
+                resultMap.put("nextContent", content);
+                if (content != null) {
+                    resultMap.put("contentExtras", createHierarchyData(content.getHierarchyInfo()));
                 }
-                resultMap.put("nextContent", genieService.getContentService().nextContent(contentIdentifiers).getResult());
-                genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-                genieResponse.setResult(resultMap);
             }
+            genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+            genieResponse.setResult(resultMap);
 
             if (genieResponse != null) {
                 cursor.addRow(new String[]{GsonUtil.toJson(genieResponse)});
@@ -81,6 +89,35 @@ public class RelatedContentUriHandler implements IUriHandler {
         }
 
         return cursor;
+    }
+
+    private Map createHierarchyData(List<HierarchyInfo> hierarchyInfo) {
+        Map hierarchyData = new HashMap();
+        String id = "";
+        String identifierType = null;
+        for (HierarchyInfo infoItem : hierarchyInfo) {
+            if (identifierType == null) {
+                identifierType = infoItem.getContentType();
+            }
+            id += id.length() == 0 ? "" : "/";
+            id += infoItem.getIdentifier();
+        }
+        hierarchyData.put("id", id);
+        hierarchyData.put("type", identifierType);
+
+        return hierarchyData;
+    }
+
+    private List<HierarchyInfo> createHierarchyInfo(Map hierarchyData) {
+        List<HierarchyInfo> hierarchyInfo = new ArrayList<>();
+        String[] identifiers = hierarchyData.get("id").toString().split("/");
+        String identifierType = hierarchyData.get("type").toString();
+        for (String id : identifiers) {
+            hierarchyInfo.add(new HierarchyInfo(id, identifierType));
+            //reset identifierType to null as we only get the root elements identifierType and we dont have to set idnetifier for the other elements
+            identifierType = null;
+        }
+        return hierarchyInfo;
     }
 
     @NonNull

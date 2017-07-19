@@ -16,7 +16,7 @@ public class ResourceBundleAPI extends BaseAPI {
 
     private static final String TAG = "service-RBAPI";
 
-    private static final String ENDPOINT = "config/resourcebundles";
+    private static final String ENDPOINT = "resourcebundles/list";
 
     public ResourceBundleAPI(AppContext appContext) {
         super(appContext,

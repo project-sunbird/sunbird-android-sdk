@@ -3,7 +3,7 @@ package org.ekstep.genieservices.profile.event;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.utils.Logger;
-import org.greenrobot.eventbus.EventBus;
+import org.ekstep.genieservices.eventbus.EventBus;
 import org.greenrobot.eventbus.NoSubscriberEvent;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.util.ThrowableFailureEvent;
@@ -23,8 +23,8 @@ public class SummaryListener {
         register();
     }
 
-    public static void init(AppContext context) {
-        instance = new SummaryListener(context);
+    public static void init(AppContext appContext) {
+        instance = new SummaryListener(appContext);
     }
 
     public static void destroy() {
@@ -32,11 +32,11 @@ public class SummaryListener {
     }
 
     private void register() {
-        EventBus.getDefault().register(this);
+        EventBus.registerSubscriber(this);
     }
 
     private void unregister() {
-        EventBus.getDefault().unregister(this);
+        EventBus.unregisterSubscriber(this);
     }
 
     @Subscribe

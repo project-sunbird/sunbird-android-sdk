@@ -3,7 +3,6 @@ package org.ekstep.genieservices.telemetry.chained.imports;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
-import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransfer;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
@@ -47,7 +46,7 @@ public class AddGeTransferTelemetryImportEvent implements IChainable<Void, Impor
                         LongUtil.tryParseToLong((String) importContext.getMetadata().get(GETransferEventKnowStructure.FILE_SIZE), 0),
                         transferMapList);
 
-                GETransfer geTransfer = new GETransfer(new GameData(appContext.getParams().getString(ServiceConstants.Params.GID), appContext.getParams().getString(ServiceConstants.Params.VERSION_NAME)), eks);
+                GETransfer geTransfer = new GETransfer(eks);
                 TelemetryLogger.log(geTransfer);
                 return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             }

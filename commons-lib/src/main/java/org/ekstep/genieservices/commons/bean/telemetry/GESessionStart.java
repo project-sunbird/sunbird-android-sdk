@@ -1,8 +1,6 @@
 package org.ekstep.genieservices.commons.bean.telemetry;
 
-import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.UserSession;
-import org.ekstep.genieservices.commons.utils.DateUtil;
 
 import java.util.HashMap;
 
@@ -15,14 +13,12 @@ public class GESessionStart extends Telemetry {
 
     private static final String EID = "GE_SESSION_START";
 
-    public GESessionStart(GameData gameData, UserSession session, String loc, String deviceId) {
-        super(gameData,EID);
+    public GESessionStart(UserSession session, String loc, String deviceId) {
+        super(EID);
         setEks(createEKS(loc));
-        setEts(DateUtil.getEpochTime());
         setSid(session.getSid());
         setUid(session.getUid());
         setDid(deviceId);
-        setTs(DateUtil.getCurrentTimestamp());
     }
 
     protected HashMap<String, Object> createEKS(String loc) {
@@ -31,4 +27,3 @@ public class GESessionStart extends Telemetry {
         return eks;
     }
 }
-

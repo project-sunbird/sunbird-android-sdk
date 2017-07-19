@@ -12,7 +12,7 @@ import org.ekstep.genieservices.commons.utils.GsonUtil;
 import java.util.Map;
 
 public class GetContentTask extends BaseTask {
-    private static final String TAG = GetContentsTask.class.getSimpleName();
+    private static final String TAG = GetContentTask.class.getSimpleName();
     private String contentId;
     private String appQualifier;
 

@@ -28,7 +28,7 @@ public class RecommendedContentAPI extends BaseAPI {
 
     public RecommendedContentAPI(AppContext appContext, Map<String, Object> requestMap) {
         super(appContext,
-                String.format(Locale.US, "%s/%s", appContext.getParams().getString(ServiceConstants.Params.ANALYTICS_BASE_URL), ENDPOINT),
+                String.format(Locale.US, "%s/%s", appContext.getParams().getString(ServiceConstants.Params.CONTENT_BASE_URL), ENDPOINT),
                 TAG);
 
         this.requestMap = requestMap;

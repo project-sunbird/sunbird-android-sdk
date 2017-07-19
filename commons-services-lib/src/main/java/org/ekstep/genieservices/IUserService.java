@@ -33,7 +33,8 @@ public interface IUserService {
     GenieResponse<Profile> createUserProfile(Profile profile);
 
     /**
-     * @return
+     * This api returns the list of all user profiles. It does not include the anonymous user.
+     * @return {@Link GenieResponse<List<Profile>>}
      */
     GenieResponse<List<Profile>> getAllUserProfile();
 

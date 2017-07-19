@@ -1,6 +1,5 @@
 package org.ekstep.genieservices.commons.bean.telemetry;
 
-import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 
 import java.util.HashMap;
@@ -8,16 +7,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by swayangjit on 27/4/17.
+ * Created on 27/4/17.
+ *
+ * @author swayangjit
  */
-
 public class GEServiceAPICall extends Telemetry {
 
     private static final String EID = "GE_SERVICE_API_CALL";
 
-    public GEServiceAPICall(GameData gameData, String service, String method, boolean status, String error,
-                            String message, List<String> errorMessages, Object result) {
-        super(gameData, EID);
+    private GEServiceAPICall(String service, String method, boolean status, String error, String message, List<String> errorMessages, Object result) {
+        super(EID);
         setEks(createEKS(service, method, status ? "Successful" : "Failed", error, message, errorMessages, result));
     }
 
@@ -41,7 +40,6 @@ public class GEServiceAPICall extends Telemetry {
         return eks;
     }
 
-
     public void setMode(String mode) {
         HashMap<String, Object> eks = (HashMap<String, Object>) getEData().get("eks");
         if (eks != null) {
@@ -50,20 +48,12 @@ public class GEServiceAPICall extends Telemetry {
     }
 
     public static class Builder {
-
-        private GameData gameData;
         private String service;
         private String method;
         private GenieResponse response;
         private HashMap result;
-        private String gameID;
-        private String gameVersion;
         private Map params;
         private String mode;
-
-        public Builder(GameData gameData) {
-            this.gameData = gameData;
-        }
 
         public Builder service(String service) {
             this.service = service;
@@ -96,7 +86,7 @@ public class GEServiceAPICall extends Telemetry {
         }
 
         public GEServiceAPICall build() {
-            GEServiceAPICall event = new GEServiceAPICall(gameData, service, method, response.getStatus(), response.getError(),
+            GEServiceAPICall event = new GEServiceAPICall(service, method, response.getStatus(), response.getError(),
                     response.getMessage(), response.getErrorMessages(), result);
             event.setParams(this.params);
             event.setMode(mode);

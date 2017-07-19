@@ -1,31 +1,28 @@
 package org.ekstep.genieservices.commons.bean.telemetry;
 
-import org.ekstep.genieservices.commons.bean.GameData;
-
 import java.util.HashMap;
 
 /**
- * Created by swayangjit on 2/5/17.
+ * Created on 2/5/17.
+ *
+ * @author swayangjit
  */
-
 public class GEError extends Telemetry {
 
     private static final String EID = "GE_ERROR";
 
-    public GEError(GameData gameData, String err, String id, String eventId, String data) {
-        super(gameData,EID);
-        String type = isValidId(gameData.getId()) ? "GENIESERVICES" : "PARTNERAPP";
-        setEks(createEKS(err, id, eventId, data, type));
-
+    public GEError(String err, String id, String eventId, String data) {
+        super(EID);
+        setEks(createEKS(err, id, eventId, data));
     }
 
-    protected HashMap<String, Object> createEKS(String err, String id, String eventId, String data, String type) {
+    protected HashMap<String, Object> createEKS(String err, String id, String eventId, String data) {
         HashMap<String, Object> eks = new HashMap<>();
         eks.put("err", err);
         eks.put("id", id);
         eks.put("eventId", eventId);
         eks.put("data", data);
-        eks.put("type", type);
+        eks.put("type", "GENIESDK");
         return eks;
     }
 }

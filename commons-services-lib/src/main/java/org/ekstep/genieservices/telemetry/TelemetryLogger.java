@@ -3,7 +3,6 @@ package org.ekstep.genieservices.telemetry;
 import org.ekstep.genieservices.ITelemetryService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.telemetry.GEServiceAPICall;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
@@ -12,7 +11,7 @@ import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import java.util.HashMap;
 
 /**
- * Created by swayangjit on 27/4/17.
+ * Created on 27/4/17.
  *
  * @author swayangjit
  */
@@ -70,16 +69,16 @@ public class TelemetryLogger {
         log(appContext, response, service, method, params, result);
     }
 
-    public static void log(AppContext appContext, GenieResponse response, String service, String method, HashMap params, HashMap result) {
-        save(create(appContext, response, result, service, method, params));
+    private static void log(AppContext appContext, GenieResponse response, String service, String method, HashMap params, HashMap result) {
+        save(create(appContext, response, service, method, params, result));
     }
 
     public static void log(Telemetry telemetry) {
         save(telemetry);
     }
 
-    public static Telemetry create(AppContext appContext, GenieResponse response, HashMap result, String service, String method, HashMap params) {
-        GEServiceAPICall.Builder eventBuilder = new GEServiceAPICall.Builder(new GameData(appContext.getParams().getString(ServiceConstants.Params.GID), appContext.getParams().getString(ServiceConstants.Params.VERSION_NAME)));
+    public static Telemetry create(AppContext appContext, GenieResponse response, String service, String method, HashMap params, HashMap result) {
+        GEServiceAPICall.Builder eventBuilder = new GEServiceAPICall.Builder();
         return eventBuilder.service(service)
                 .method(method)
                 .mode(getNetworkMode(appContext.getConnectionInfo()))
@@ -94,7 +93,6 @@ public class TelemetryLogger {
         // Have purposefully kept it this way so that the caller knows that init has not happened during testing.
         sTelemetryLogger.mTelemetryService.saveTelemetry(event);
     }
-
 
     public static String getNetworkMode(IConnectionInfo connectionInfo) {
         if (connectionInfo.isConnectedOverWifi()) {

@@ -9,6 +9,7 @@ import org.ekstep.genieresolvers.util.Constants;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,13 +22,15 @@ public class GetRelatedContentTask extends BaseTask {
 
     private String userId;
     private String appQualifier;
-    private List<Map> hierarchyData;
+    private String currentContentIdentifier;
+    private Map hierarchyData;
 
-    public GetRelatedContentTask(Context context, String appQualifier, List<Map> hierarchyData, String userId) {
+    public GetRelatedContentTask(Context context, String appQualifier, Map hierarchyData, String currentContentIdentifier, String userId) {
         super(context);
         this.appQualifier = appQualifier;
         this.hierarchyData = hierarchyData;
         this.userId = userId;
+        this.currentContentIdentifier = currentContentIdentifier;
     }
 
     @Override
@@ -37,7 +40,11 @@ public class GetRelatedContentTask extends BaseTask {
 
     @Override
     protected GenieResponse<Map> execute() {
-        String requestData = GsonUtil.toJson(hierarchyData);
+        Map data = new HashMap();
+        data.put("hierarchyData", hierarchyData);
+        data.put("userId", userId);
+        data.put("currentContentIdentifier", currentContentIdentifier);
+        String requestData = GsonUtil.toJson(data);
         Cursor cursor = contentResolver.query(getUri(), null, requestData, null, null);
         if (cursor == null || cursor.getCount() == 0) {
             return getErrorResponse(Constants.PROCESSING_ERROR,

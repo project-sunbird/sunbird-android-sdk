@@ -244,7 +244,7 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
         LinkedTreeMap map = GsonUtil.fromJson(response, LinkedTreeMap.class);
         LinkedTreeMap resultLinkedTreeMap = (LinkedTreeMap) map.get("result");
         if (resultLinkedTreeMap.containsKey("ordinals")) {
-            Double ttl = (Double) map.get("ttl");
+            Double ttl = (Double) resultLinkedTreeMap.get("ttl");
             saveDataExpirationTime(ttl, ConfigConstants.PreferenceKey.ORDINAL_API_EXPIRATION_KEY);
             OrdinalsModel ordinals = OrdinalsModel.build(mAppContext.getDBSession(), DB_KEY_ORDINALS, GsonUtil.toJson(resultLinkedTreeMap.get("ordinals")));
             OrdinalsModel ordinalsInDb = OrdinalsModel.findById(mAppContext.getDBSession(), DB_KEY_ORDINALS);

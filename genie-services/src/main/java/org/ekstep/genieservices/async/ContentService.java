@@ -23,6 +23,7 @@ import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.HierarchyInfo;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
@@ -206,14 +207,15 @@ public class ContentService {
      * <p>
      * On successful finding the next list of contents, the response will return status as TRUE and the result will be set with {@link List<Content>}
      *
-     * @param contentIdentifiers - {@link List<String>}
-     * @param responseHandler    - {@link IResponseHandler<List<Content>>}
+     * @param contentHierarchy - {@link List<HierarchyInfo>}
+     * @param currentContentIdentifier The current content identifier
+     * @param responseHandler    - {@link IResponseHandler<Content>}
      */
-    public void nextContent(final List<String> contentIdentifiers, IResponseHandler<List<Content>> responseHandler) {
-        new AsyncHandler<List<Content>>(responseHandler).execute(new IPerformable<List<Content>>() {
+    public void nextContent(final List<HierarchyInfo> contentHierarchy, final String currentContentIdentifier, IResponseHandler<Content> responseHandler) {
+        new AsyncHandler<Content>(responseHandler).execute(new IPerformable<Content>() {
             @Override
-            public GenieResponse<List<Content>> perform() {
-                return contentService.nextContent(contentIdentifiers);
+            public GenieResponse<Content> perform() {
+                return contentService.nextContent(contentHierarchy, currentContentIdentifier);
             }
         });
     }

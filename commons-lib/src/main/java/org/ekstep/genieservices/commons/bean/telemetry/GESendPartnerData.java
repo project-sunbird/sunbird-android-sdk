@@ -1,30 +1,24 @@
 package org.ekstep.genieservices.commons.bean.telemetry;
 
-import org.ekstep.genieservices.commons.CommonConstants;
-import org.ekstep.genieservices.commons.bean.GameData;
-import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 
 /**
- * Created by swayangjit on 2/5/17.
+ * Created on 2/5/17.
+ *
+ * @author swayangjit
  */
-
 public class GESendPartnerData extends Telemetry {
 
     private static final String EID = "GE_PARTNER_DATA";
 
-    public GESendPartnerData(GameData gameData, String partnerID, String publicKeyID,
-                             String deviceId, String data, String encryptedKey, String iv) {
-        super(gameData, EID);
+    public GESendPartnerData(String partnerID, String publicKeyID, String deviceId, String data, String encryptedKey, String iv) {
+        super(EID);
         setEks(createEKS(partnerID, publicKeyID, data, encryptedKey, iv));
         setTags(partnerID);
         setDid(deviceId);
-        setTs(DateUtil.getCurrentTimestamp());
     }
 
     protected HashMap<String, String> createEKS(String partnerID, String publicKeyID, String data, String encryptedKey, String iv) {
@@ -42,11 +36,10 @@ public class GESendPartnerData extends Telemetry {
         return GsonUtil.toJson(this);
     }
 
-    public void setTags(String partnerId) {
-        HashSet<String> partnerTags = new HashSet<>(Arrays.asList(partnerId));
-        Map<String, Object> tag = new HashMap<>();
-        tag.put(CommonConstants.PartnerPreference.KEY_PARTNER_ID, partnerTags);
-        this.addTag(tag);
+    private void setTags(String partnerId) {
+        ETags ETags = new ETags();
+        ETags.setPartner(Collections.singletonList(partnerId));
+        this.setEtags(ETags);
     }
 }
 

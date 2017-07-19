@@ -11,6 +11,7 @@ import org.ekstep.genieservices.commons.IDownloadManager;
 import org.ekstep.genieservices.commons.ILocationInfo;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.download.DownloadServiceImpl;
+import org.ekstep.genieservices.auth.AuthServiceImpl;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.config.ConfigServiceImpl;
@@ -28,7 +29,6 @@ import org.ekstep.genieservices.tag.TagServiceImpl;
 import org.ekstep.genieservices.telemetry.SyncServiceImpl;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 import org.ekstep.genieservices.telemetry.TelemetryServiceImpl;
-import org.ekstep.genieservices.telemetry.event.TelemetryListener;
 import org.ekstep.genieservices.utils.ContentPlayer;
 
 /**
@@ -54,10 +54,11 @@ public class GenieService {
     private ILanguageService mLanguageService;
     private INotificationService mNotificationService;
     private ISummarizerService mSummarizerService;
+    private IAuthService mAuthService;
     private ITagService mTagService;
 
-    private GenieService(AppContext<Context> applicationContext) {
-        this.mAppContext = applicationContext;
+    private GenieService(AppContext<Context> appContext) {
+        this.mAppContext = appContext;
     }
 
     public static GenieService getService() {
@@ -70,14 +71,13 @@ public class GenieService {
 
     public static GenieService init(Context context, String packageName) {
         if (sService == null) {
-            AppContext<Context> applicationContext = AndroidAppContext.buildAppContext(context, packageName);
+            AppContext<Context> appContext = AndroidAppContext.buildAppContext(context, packageName);
             Logger.init(new AndroidLogger());
-            ContentPlayer.init(applicationContext.getParams().getString(ServiceConstants.Params.APP_QUALIFIER));
-            TelemetryLogger.init(new TelemetryServiceImpl(applicationContext, new UserServiceImpl(applicationContext)));
+            ContentPlayer.init(appContext.getParams().getString(ServiceConstants.Params.APP_QUALIFIER), appContext.getParams().getString(ServiceConstants.Params.PLAYER_CONFIG));
+            TelemetryLogger.init(new TelemetryServiceImpl(appContext, new UserServiceImpl(appContext)));
             //initializing event bus for Telemetry
-            TelemetryListener.init(applicationContext);
-            SummaryListener.init(applicationContext);
-            sService = new GenieService(applicationContext);
+            SummaryListener.init(appContext);
+            sService = new GenieService(appContext);
         }
 
         sAsyncService = GenieAsyncService.init(sService);
@@ -248,6 +248,21 @@ public class GenieService {
             mSummarizerService = new SummarizerServiceImpl(mAppContext);
         }
         return mSummarizerService;
+    }
+
+    /**
+     * This api gets the {@link AuthServiceImpl}, when accessed in the below way
+     * <p>
+     * getService().getAuthService()
+     * <p><p>
+     *
+     * @return {@link IAuthService}
+     */
+    public IAuthService getAuthService() {
+        if (mAuthService == null) {
+            mAuthService = new AuthServiceImpl(mAppContext);
+        }
+        return mAuthService;
     }
 
 

@@ -1,9 +1,7 @@
 package org.ekstep.genieservices.commons.bean;
 
-
 /**
  * This class holds the details about the telemetry stats.
- *
  */
 public class TelemetryStat {
 
@@ -22,6 +20,5 @@ public class TelemetryStat {
     public long getLastSyncTime() {
         return lastSyncTime;
     }
-
 
 }

@@ -4,7 +4,6 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentExportResponse;
-import org.ekstep.genieservices.commons.bean.GameData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransfer;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
@@ -35,7 +34,7 @@ public class AddGeTransferContentExportEvent implements IChainable<ContentExport
                 ((List) metadata.get(GETransferEventKnowStructure.CONTENT_ITEMS_KEY)).size(),
                 (Long) metadata.get(GETransferEventKnowStructure.FILE_SIZE),
                 buildContentsMetadata(exportContext.getItems()));
-        GETransfer geTransfer = new GETransfer(new GameData(appContext.getParams().getString(ServiceConstants.Params.GID), appContext.getParams().getString(ServiceConstants.Params.VERSION_NAME)), eks);
+        GETransfer geTransfer = new GETransfer(eks);
         TelemetryLogger.log(geTransfer);
 
         ContentExportResponse contentExportResponse = new ContentExportResponse();

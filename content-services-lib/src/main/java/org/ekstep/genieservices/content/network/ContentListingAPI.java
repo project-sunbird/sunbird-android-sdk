@@ -21,13 +21,12 @@ public class ContentListingAPI extends BaseAPI {
     private static final String TAG = ContentListingAPI.class.getSimpleName();
 
     private static final String VERSION = "1.0";
-
     private String pageIdentifier;
     private Map<String, Object> requestMap;
 
     public ContentListingAPI(AppContext appContext, String pageIdentifier, Map<String, Object> requestMap) {
         super(appContext,
-                String.format(Locale.US, "%s/assemble/%s", appContext.getParams().getString(ServiceConstants.Params.CONTENT_LISTING_BASE_URL), pageIdentifier),
+                String.format(Locale.US, "%s/pageApi/assemble/%s", appContext.getParams().getString(ServiceConstants.Params.CONTENT_LISTING_BASE_URL), pageIdentifier),
                 TAG);
 
         this.pageIdentifier = pageIdentifier;

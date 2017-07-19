@@ -35,26 +35,30 @@ public interface ServiceConstants {
     String EXPORT_TYPE_PROFILE = "userprofile";
 
     interface Params {
+        String APPLICATION_ID = "APPLICATION_ID";
         String VERSION_CODE = "VERSION_CODE";
         String VERSION_NAME = "VERSION_NAME";
+        String PRODUCER_ID = "PRODUCER_ID";
+        String CHANNEL_ID = "CHANNEL_ID";
         String APP_QUALIFIER = "QUALIFIER";
         String TELEMETRY_BASE_URL = "TELEMETRY_BASE_URL";
         String LANGUAGE_PLATFORM_BASE_URL = "LANGUAGE_PLATFORM_BASE_URL";
-        String LEARNING_PLATFORM_BASE_URL = "LEARNING_PLATFORM_BASE_URL";
+        String TERMS_BASE_URL = "TERMS_BASE_URL";
         String CONFIG_BASE_URL = "CONFIG_BASE_URL";
         String SEARCH_BASE_URL = "SEARCH_BASE_URL";
         String CONTENT_LISTING_BASE_URL = "CONTENT_LISTING_BASE_URL";
-        String ANALYTICS_BASE_URL = "ANALYTICS_BASE_URL";
+        String CONTENT_BASE_URL = "CONTENT_BASE_URL";
+        String APIGATEWAY_BASE_URL = "APIGATEWAY_BASE_URL";
         String API_PASS = "API_PASS";
         String API_USER = "API_USER";
         String MOBILE_APP_SECRET = "MOBILE_APP_SECRET";
         String MOBILE_APP_KEY = "MOBILE_APP_KEY";
         String MOBILE_APP_CONSUMER = "MOBILE_APP_CONSUMER";
-        String GID = "GID";
         String LOG_LEVEL = "LOG_LEVEL";
         String MIN_COMPATIBILITY_LEVEL = "MIN_COMPATIBILITY_LEVEL";
         String MAX_COMPATIBILITY_LEVEL = "MAX_COMPATIBILITY_LEVEL";
         String PROFILE_CONFIG = "PROFILE_CONFIG";
+        String PLAYER_CONFIG = "PLAYER_CONFIG";
         String PROFILE_PATH = "PROFILE_PATH";
         String NETWORK_CONNECT_TIMEOUT = "NETWORK_CONNECT_TIMEOUT";
         String NETWORK_READ_TIMEOUT = "NETWORK_READ_TIMEOUT";
@@ -72,6 +76,7 @@ public interface ServiceConstants {
         String BUNDLE_KEY_IS_CHILD = "is_child";
         String BUNDLE_KEY_LOCAL_FILE_PATH = "local_file_path";
         String BUNDLE_KEY_DESTINATION_FILE_PATH = "destination_file_path";
+        String BUNDLE_KEY_DOWNLOAD_ID = "download_id";
     }
 
     interface FileExtension {
@@ -88,7 +93,6 @@ public interface ServiceConstants {
         String SYNC_FILE_SIZE = "SYNC_FILE_SIZE";
 
         //Partner
-        String KEY_PARTNER_ID = "partnerid";
         String KEY_ACTIVE_PARTNER_ID = "partner.activeid";
         String SHARED_PREF_SESSION_KEY = "partnersessionid";
         String SHARED_PREF_PARTNERSET_EPOCH = "partnerSET";
@@ -158,6 +162,8 @@ public interface ServiceConstants {
         String UPDATE_FAILED = "UPDATE_FAILED";
         String DELETE_FAILED = "DELETE_FAILED";
 
+        // Authentication
+        String TOKEN_GENERATION_FAILED = "TOKEN_GENERATION_FAILED";
     }
 
     interface ErrorMessage {
@@ -209,6 +215,10 @@ public interface ServiceConstants {
         String FAILED_TO_DELETE_NOTIFICATION = "Failed to delete notification";
         String ERROR_WHILE_GETTING_NOTIFICATIONS = "Error while getting notifications";
         String FAILED_TO_ADD_UPDATE_NOTIFICATION = "Failed to add/update  notification";
+
+        //Authentication
+        String FAILED_TO_GENERATE_TOKEN = "Failed to generate the bearer token";
+
     }
 
     interface GeTransferEvent {

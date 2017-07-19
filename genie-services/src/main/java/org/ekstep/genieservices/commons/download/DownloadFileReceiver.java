@@ -38,6 +38,7 @@ public class DownloadFileReceiver extends BroadcastReceiver {
                     serviceIntent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_IS_CHILD, request.isChildContent());
                     serviceIntent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_LOCAL_FILE_PATH, localFilePath);
                     serviceIntent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_DESTINATION_FILE_PATH, request.getDestinationFolder());
+                    serviceIntent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_DOWNLOAD_ID, request.getDownloadId());
                     context.startService(serviceIntent);
                     break;
 
