@@ -1,6 +1,6 @@
 package org.ekstep.genieservices.profile.bean;
 
-import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.commons.db.operations.IDataSource;
 
 import java.util.Map;
 
@@ -11,28 +11,32 @@ import java.util.Map;
  */
 public class ImportProfileContext {
 
+    private IDataSource dataSource;
+    private String sourceFilePath;
     private Map<String, Object> metadata;
-    private IDBSession dbSession;   // External DB
 
     private int imported;
     private int failed;
 
-    // Used for import/export
-    public ImportProfileContext(IDBSession dbSession, Map<String, Object> metadata) {
-        this.dbSession = dbSession;
-        this.metadata = metadata;
+    public ImportProfileContext(IDataSource dataSource, String sourceFilePath) {
+        this.dataSource = dataSource;
+        this.sourceFilePath = sourceFilePath;
+    }
+
+    public IDataSource getDataSource() {
+        return dataSource;
+    }
+
+    public String getSourceFilePath() {
+        return sourceFilePath;
     }
 
     public Map<String, Object> getMetadata() {
         return metadata;
     }
 
-    public IDBSession getDBSession() {
-        return dbSession;
-    }
-
-    public void setDbSession(IDBSession dbSession) {
-        this.dbSession = dbSession;
+    public void setMetadata(Map<String, Object> metadata) {
+        this.metadata = metadata;
     }
 
     public int getImported() {

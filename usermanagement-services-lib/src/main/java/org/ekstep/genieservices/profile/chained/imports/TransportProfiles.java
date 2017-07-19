@@ -28,10 +28,12 @@ public class TransportProfiles implements IChainable<ProfileImportResponse, Impo
 
     @Override
     public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportProfileContext importContext) {
+        IDBSession externalDBSession = importContext.getDataSource().getImportDataSource(importContext.getSourceFilePath());
         int imported = 0;
         int failed = 0;
 
-        UserProfilesModel userProfilesModel = UserProfilesModel.find(importContext.getDBSession());
+        // Read from imported DB
+        UserProfilesModel userProfilesModel = UserProfilesModel.find(externalDBSession);
 
         if (userProfilesModel != null) {
             for (Profile profile : userProfilesModel.getProfileList()) {

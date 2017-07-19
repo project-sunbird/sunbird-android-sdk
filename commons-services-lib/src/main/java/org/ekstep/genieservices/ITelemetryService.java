@@ -54,9 +54,9 @@ public interface ITelemetryService {
     /**
      * This API is used to import telemetry.
      *
-     * @param telemetryImportRequest
-     * @param dataSource
-     * @return
+     * @param telemetryImportRequest - {@link TelemetryImportRequest}
+     * @param dataSource             - {@link IDataSource}
+     * @return {@link GenieResponse<Void>}
      */
     GenieResponse<Void> importTelemetry(TelemetryImportRequest telemetryImportRequest, IDataSource dataSource);
 

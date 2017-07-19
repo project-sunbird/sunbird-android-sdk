@@ -21,7 +21,6 @@ public class UpdateImportedProfileMetadata implements IChainable<ProfileImportRe
 
     @Override
     public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportProfileContext importContext) {
-
         String importId = (String) importContext.getMetadata().get(ServiceConstants.EXPORT_ID);
         String did = (String) importContext.getMetadata().get(ServiceConstants.DID);
         int count = Integer.valueOf((String) importContext.getMetadata().get(ServiceConstants.PROFILES_COUNT));

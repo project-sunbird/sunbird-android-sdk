@@ -5,9 +5,9 @@ import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
+import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
-import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDataSource;
 
 import java.io.File;
@@ -34,7 +34,8 @@ public interface IUserService {
 
     /**
      * This api returns the list of all user profiles. It does not include the anonymous user.
-     * @return {@Link GenieResponse<List<Profile>>}
+     *
+     * @return {@link GenieResponse<List<Profile>>}
      */
     GenieResponse<List<Profile>> getAllUserProfile();
 
@@ -64,7 +65,7 @@ public interface IUserService {
      * @param uid - {@link String}
      * @return {@link String}
      */
-    public GenieResponse<Void> setCurrentUser(String uid);
+    GenieResponse<Void> setCurrentUser(String uid);
 
     /**
      * This api gets the current active user.
@@ -75,7 +76,7 @@ public interface IUserService {
      *
      * @return {@link GenieResponse<Profile>}
      */
-    public GenieResponse<Profile> getCurrentUser();
+    GenieResponse<Profile> getCurrentUser();
 
     /**
      * This api gets the current active user session.
@@ -86,7 +87,7 @@ public interface IUserService {
      *
      * @return {@link GenieResponse<UserSession>}
      */
-    public GenieResponse<UserSession> getCurrentUserSession();
+    GenieResponse<UserSession> getCurrentUserSession();
 
     /**
      * This api gets the anonymous user the one if exists or a new anonymous user will be created.
@@ -97,7 +98,7 @@ public interface IUserService {
      *
      * @return {@link GenieResponse<Profile>}
      */
-    public GenieResponse<Profile> getAnonymousUser();
+    GenieResponse<Profile> getAnonymousUser();
 
     /**
      * This api gets the anonymous user from getAnonymousUser() api and sets it to current active user.
@@ -108,7 +109,7 @@ public interface IUserService {
      *
      * @return {@link GenieResponse<String>}
      */
-    public GenieResponse<String> setAnonymousUser();
+    GenieResponse<String> setAnonymousUser();
 
     /**
      * This api updates the specific profile that is possed to it.
@@ -120,10 +121,10 @@ public interface IUserService {
      * <p>INVALID_PROFILE
      * <p>VALIDATION_ERROR
      *
-     * @param profile
-     * @return
+     * @param profile - {@link Profile}
+     * @return {@link GenieResponse<Profile>}
      */
-    public GenieResponse<Profile> updateUserProfile(Profile profile);
+    GenieResponse<Profile> updateUserProfile(Profile profile);
 
     /**
      * This api gives the status each content of being accessed.
@@ -143,8 +144,8 @@ public interface IUserService {
      * <p> On failing to set the learner state, the response will have status as FALSE with the following error:
      * <p>PROFILE_NOT_FOUND
      *
-     * @param contentAccess
-     * @return
+     * @param contentAccess - {@link ContentAccess}
+     * @return {@link GenieResponse<Void>}
      */
     GenieResponse<Void> addContentAccess(ContentAccess contentAccess);
 
@@ -156,11 +157,11 @@ public interface IUserService {
      * <p>On failing to importing the profile, the response will return status as FALSE and the error be the following:
      * <p>IMPORT_FAILED
      *
-     * @param dbSession - {@link IDBSession}
-     * @param metadata  - {@link Map<String, Object>}
-     * @return {@link GenieResponse<Void>}
+     * @param profileImportRequest - {@link ProfileImportRequest}
+     * @param dataSource           - {@link IDataSource}
+     * @return {@link GenieResponse<ProfileImportResponse>}
      */
-    GenieResponse<ProfileImportResponse> importProfile(IDBSession dbSession, Map<String, Object> metadata);
+    GenieResponse<ProfileImportResponse> importProfile(ProfileImportRequest profileImportRequest, IDataSource dataSource);
 
     /**
      * This api is used to export the profile.

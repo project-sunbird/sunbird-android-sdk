@@ -11,6 +11,7 @@ import org.ekstep.genieservices.commons.bean.ContentLearnerState;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
+import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.enums.ContentAccessStatus;
@@ -495,8 +496,8 @@ public class UserServiceImpl extends BaseService implements IUserService {
     }
 
     @Override
-    public GenieResponse<ProfileImportResponse> importProfile(IDBSession dbSession, Map<String, Object> metadata) {
-        ImportProfileContext importContext = new ImportProfileContext(dbSession, metadata);
+    public GenieResponse<ProfileImportResponse> importProfile(ProfileImportRequest profileImportRequest, IDataSource dataSource) {
+        ImportProfileContext importContext = new ImportProfileContext(dataSource, profileImportRequest.getSourceFilePath());
 
         ValidateProfileMetadata validateProfileMetadata = new ValidateProfileMetadata();
         validateProfileMetadata.then(new TransportProfiles())

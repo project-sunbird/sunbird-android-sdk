@@ -6,6 +6,7 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.profile.bean.ImportProfileContext;
 import org.ekstep.genieservices.profile.db.model.UserModel;
 import org.ekstep.genieservices.profile.db.model.UsersModel;
@@ -22,8 +23,9 @@ public class TransportUser implements IChainable<ProfileImportResponse, ImportPr
 
     @Override
     public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportProfileContext importContext) {
+        IDBSession externalDBSession = importContext.getDataSource().getImportDataSource(importContext.getSourceFilePath());
         // Read from imported DB
-        UsersModel usersModel = UsersModel.findAll(importContext.getDBSession());
+        UsersModel usersModel = UsersModel.findAll(externalDBSession);
 
         if (usersModel != null) {
             for (UserModel userModel : usersModel.getUserModelList()) {

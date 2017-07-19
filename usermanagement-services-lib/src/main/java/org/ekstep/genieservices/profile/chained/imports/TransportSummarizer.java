@@ -31,12 +31,14 @@ public class TransportSummarizer implements IChainable<ProfileImportResponse, Im
 
     @Override
     public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportProfileContext importContext) {
+        IDBSession externalDBSession = importContext.getDataSource().getImportDataSource(importContext.getSourceFilePath());
+
         //check table exist
-        if (isTableExist(importContext.getDBSession(), LearnerAssessmentsEntry.TABLE_NAME) &&
-                isTableExist(importContext.getDBSession(), LearnerSummaryEntry.TABLE_NAME)) {
+        if (isTableExist(externalDBSession, LearnerAssessmentsEntry.TABLE_NAME) &&
+                isTableExist(externalDBSession, LearnerSummaryEntry.TABLE_NAME)) {
 
             // Read the learner assessment data from imported DB and insert into GS DB.
-            LearnerAssessmentDetailsModel importedLearnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.find(importContext.getDBSession(), "");
+            LearnerAssessmentDetailsModel importedLearnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.find(externalDBSession, "");
             if (importedLearnerAssessmentDetailsModel != null) {
                 for (LearnerAssessmentDetails learnerAssessmentDetails : importedLearnerAssessmentDetailsModel.getAllAssessments()) {
                     LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.build(appContext.getDBSession(), learnerAssessmentDetails);
@@ -45,7 +47,7 @@ public class TransportSummarizer implements IChainable<ProfileImportResponse, Im
             }
 
             // Read the learner content summary data from imported DB and insert into GS DB.
-            LearnerSummaryEventsModel learnerSummaryEventsModel = LearnerSummaryEventsModel.find(importContext.getDBSession(), "");
+            LearnerSummaryEventsModel learnerSummaryEventsModel = LearnerSummaryEventsModel.find(externalDBSession, "");
             if (learnerSummaryEventsModel != null) {
                 for (LearnerSummaryModel l : learnerSummaryEventsModel.getAllLearnerSummaryModelList()) {
                     LearnerContentSummaryDetails learnerContentSummaryDetails = new LearnerContentSummaryDetails();
