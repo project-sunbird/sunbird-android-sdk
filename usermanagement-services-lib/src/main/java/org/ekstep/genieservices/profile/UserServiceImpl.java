@@ -507,6 +507,10 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
     @Override
     public GenieResponse<ProfileExportResponse> exportProfile(ExportProfileContext exportProfileContext) {
+        if (exportProfileContext.getUserIds() == null || exportProfileContext.getUserIds().size() == 0) {
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "There are no profile to export.", TAG);
+        }
+
         File destinationFolder = new File(exportProfileContext.getDestinationFolder());
 
         // Read the first profile and get the temp location path
