@@ -9,6 +9,8 @@ import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.content.ContentConstants;
 import org.ekstep.genieservices.content.bean.ImportContentContext;
 
+import java.io.File;
+
 /**
  * Created on 5/16/2017.
  *
@@ -17,13 +19,18 @@ import org.ekstep.genieservices.content.bean.ImportContentContext;
 public class EcarCleanUp implements IChainable<Void, ImportContentContext> {
 
     private static final String TAG = EcarCleanUp.class.getSimpleName();
+    private final File tmpLocation;
 
     private IChainable<Void, ImportContentContext> nextLink;
 
+    public EcarCleanUp(File tmpLocation) {
+        this.tmpLocation = tmpLocation;
+    }
+
     @Override
     public GenieResponse<Void> execute(AppContext appContext, ImportContentContext importContext) {
-        Logger.d(TAG, importContext.getTmpLocation().getPath());
-        FileUtil.rm(importContext.getTmpLocation());
+        Logger.d(TAG, tmpLocation.getPath());
+        FileUtil.rm(tmpLocation);
 
         if (nextLink != null) {
             return nextLink.execute(appContext, importContext);

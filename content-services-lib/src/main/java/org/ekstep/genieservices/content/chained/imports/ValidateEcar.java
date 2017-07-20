@@ -16,6 +16,7 @@ import org.ekstep.genieservices.content.ContentHandler;
 import org.ekstep.genieservices.content.bean.ImportContentContext;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -27,12 +28,17 @@ import java.util.Map;
 public class ValidateEcar implements IChainable<Void, ImportContentContext> {
 
     private static final String TAG = ValidateEcar.class.getSimpleName();
+    private final File tmpLocation;
 
     private IChainable<Void, ImportContentContext> nextLink;
 
+    public ValidateEcar(File tmpLocation) {
+        this.tmpLocation = tmpLocation;
+    }
+
     @Override
     public GenieResponse<Void> execute(AppContext appContext, ImportContentContext importContext) {
-        String manifestJson = FileUtil.readManifest(importContext.getTmpLocation());
+        String manifestJson = FileUtil.readManifest(tmpLocation);
         if (manifestJson == null) {
             return getErrorResponse(importContext, ContentConstants.NO_CONTENT_TO_IMPORT, "Empty ecar, cannot import!");
         }
@@ -122,7 +128,7 @@ public class ValidateEcar implements IChainable<Void, ImportContentContext> {
 
     private GenieResponse<Void> getErrorResponse(ImportContentContext importContext, String error, String errorMessage) {
         Logger.e(TAG, errorMessage);
-        FileUtil.rm(importContext.getTmpLocation());
+        FileUtil.rm(tmpLocation);
         return GenieResponseBuilder.getErrorResponse(error, errorMessage, TAG);
     }
 

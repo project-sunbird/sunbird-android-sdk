@@ -10,6 +10,8 @@ import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.content.ContentConstants;
 import org.ekstep.genieservices.content.bean.ImportContentContext;
 
+import java.io.File;
+
 /**
  * Created on 5/16/2017.
  *
@@ -22,8 +24,9 @@ public class DeviceMemoryCheck implements IChainable<Void, ImportContentContext>
 
     @Override
     public GenieResponse<Void> execute(AppContext appContext, ImportContentContext importContext) {
-        long deviceUsableSpace = FileUtil.getFreeUsableSpace(importContext.getDestinationFolder());
-        long ecarFileSpace = importContext.getEcarFile().length();
+        long deviceUsableSpace = FileUtil.getFreeUsableSpace(new File(importContext.getDestinationFolder()));
+        File ecarFile = new File(importContext.getEcarFilePath());
+        long ecarFileSpace = ecarFile.length();
         long bufferSize = calculateBufferSize(ecarFileSpace);
         if (deviceUsableSpace < (ecarFileSpace + bufferSize)) {
             Logger.e(TAG, "Import failed. Device memory full!!!");

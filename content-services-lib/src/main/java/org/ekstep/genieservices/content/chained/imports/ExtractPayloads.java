@@ -29,12 +29,18 @@ import java.util.UUID;
 public class ExtractPayloads implements IChainable<Void, ImportContentContext> {
 
     private static final String TAG = ExtractPayloads.class.getSimpleName();
+    private final File tmpLocation;
 
     private IChainable<Void, ImportContentContext> nextLink;
+
+    public ExtractPayloads(File tmpLocation) {
+        this.tmpLocation = tmpLocation;
+    }
 
     @Override
     public GenieResponse<Void> execute(AppContext appContext, ImportContentContext importContext) {
 
+        File destinationFolder = new File(importContext.getDestinationFolder());
         String identifier, mimeType, contentType, visibility, audience, path;
         Double compatibilityLevel, pkgVersion;
         int refCount;
@@ -87,11 +93,11 @@ public class ExtractPayloads implements IChainable<Void, ImportContentContext> {
                     uuid = UUID.randomUUID().toString();
                     // TODO: can remove uuid from destination
                     destination = identifier + "-" + uuid;
-                    payloadDestination = new File(FileUtil.getContentRootDir(importContext.getDestinationFolder()), destination);
+                    payloadDestination = new File(FileUtil.getContentRootDir(destinationFolder), destination);
                     payloadDestination.mkdirs();
 
                     try {
-                        copyAssets(importContext.getTmpLocation().getPath(), iconURL, payloadDestination);
+                        copyAssets(tmpLocation.getPath(), iconURL, payloadDestination);
                     } catch (IOException e) {
                         Logger.e(TAG, "Cannot copy asset!", e);
                     }
@@ -99,7 +105,7 @@ public class ExtractPayloads implements IChainable<Void, ImportContentContext> {
                     try {
                         // If compatibility level is not in range then do not copy artifact
                         if (ContentHandler.isCompatible(appContext, compatibilityLevel)) {
-                            copyAssets(importContext.getTmpLocation().getPath(), artifactUrl, payloadDestination);
+                            copyAssets(tmpLocation.getPath(), artifactUrl, payloadDestination);
                             contentState = ContentConstants.State.ARTIFACT_AVAILABLE;
                         }
                     } catch (IOException e) {
@@ -128,14 +134,14 @@ public class ExtractPayloads implements IChainable<Void, ImportContentContext> {
                     uuid = UUID.randomUUID().toString();
                     // TODO: can remove uuid from destination
                     destination = identifier + "-" + uuid;
-                    payloadDestination = new File(FileUtil.getContentRootDir(importContext.getDestinationFolder()), destination);
+                    payloadDestination = new File(FileUtil.getContentRootDir(destinationFolder), destination);
                     payloadDestination.mkdirs();
 
                     // If compatibility level is not in range then do not copy artifact
                     if (ContentHandler.isCompatible(appContext, compatibilityLevel)) {
                         boolean unzipSuccess = false;
                         if (!StringUtil.isNullOrEmpty(artifactUrl)) {
-                            payload = new File(importContext.getTmpLocation().getPath(), "/" + artifactUrl);
+                            payload = new File(tmpLocation.getPath(), "/" + artifactUrl);
                             unzipSuccess = Decompress.unzip(payload, payloadDestination);
                         }
 
@@ -150,9 +156,9 @@ public class ExtractPayloads implements IChainable<Void, ImportContentContext> {
                     }
 
                     try {
-                        copyAssets(importContext.getTmpLocation().getPath(), iconURL, payloadDestination);
-                        copyAssets(importContext.getTmpLocation().getPath(), posterImage, payloadDestination);
-                        copyAssets(importContext.getTmpLocation().getPath(), grayScaleAppIcon, payloadDestination);
+                        copyAssets(tmpLocation.getPath(), iconURL, payloadDestination);
+                        copyAssets(tmpLocation.getPath(), posterImage, payloadDestination);
+                        copyAssets(tmpLocation.getPath(), grayScaleAppIcon, payloadDestination);
                     } catch (IOException e) {
                         Logger.e(TAG, "Cannot copy asset!", e);
                     }

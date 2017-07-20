@@ -1,8 +1,5 @@
 package org.ekstep.genieservices.content.bean;
 
-import org.ekstep.genieservices.commons.utils.FileUtil;
-
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,45 +12,40 @@ import java.util.Map;
  */
 public class ImportContentContext {
 
-    private File ecarFile;
-    private File tmpLocation;
-    private File destinationFolder;
-    private List<String> skippedItemsIdentifier;
-    private String manifestVersion;
-    private List<Map<String, Object>> items;
     private boolean isChildContent;
+    private String ecarFilePath;
+    private String destinationFolder;
+
     private Map<String, Object> metadata;
+    private String manifestVersion;
+    private List<String> skippedItemsIdentifier;
+    private List<Map<String, Object>> items;
     private List<String> identifiers = new ArrayList<>();
 
-    public ImportContentContext(boolean isChildContent, String ecarFilePath, File destinationFolder) {
-        this.ecarFile = new File(ecarFilePath);
-        this.tmpLocation = FileUtil.getTempLocation(destinationFolder);
-
-        this.destinationFolder = destinationFolder;
-        this.metadata = new HashMap<>();
-        this.skippedItemsIdentifier = new ArrayList<>();
-        this.items = new ArrayList<>();
+    public ImportContentContext(boolean isChildContent, String ecarFilePath, String destinationFolder) {
         this.isChildContent = isChildContent;
+        this.ecarFilePath = ecarFilePath;
+        this.destinationFolder = destinationFolder;
+
+        this.metadata = new HashMap<>();
+        this.items = new ArrayList<>();
+        this.skippedItemsIdentifier = new ArrayList<>();
     }
 
-    public File getEcarFile() {
-        return ecarFile;
+    public boolean isChildContent() {
+        return isChildContent;
     }
 
-    public File getTmpLocation() {
-        return tmpLocation;
+    public String getEcarFilePath() {
+        return ecarFilePath;
     }
 
-    public File getDestinationFolder() {
+    public String getDestinationFolder() {
         return destinationFolder;
     }
 
     public Map<String, Object> getMetadata() {
         return metadata;
-    }
-
-    public List<String> getSkippedItemsIdentifier() {
-        return skippedItemsIdentifier;
     }
 
     public String getManifestVersion() {
@@ -72,8 +64,8 @@ public class ImportContentContext {
         this.items = items;
     }
 
-    public boolean isChildContent() {
-        return isChildContent;
+    public List<String> getSkippedItemsIdentifier() {
+        return skippedItemsIdentifier;
     }
 
     public List<String> getIdentifiers() {

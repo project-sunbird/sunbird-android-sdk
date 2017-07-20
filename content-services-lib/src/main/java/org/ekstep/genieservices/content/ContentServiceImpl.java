@@ -117,7 +117,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             }
 
             contentModelInDB = ContentHandler.convertContentMapToModel(mAppContext.getDBSession(), contentData, null);
-        } else if (contentDetailsRequest.isRefreshContentDetails()){
+        } else if (contentDetailsRequest.isRefreshContentDetails()) {
             ContentHandler.refreshContentDetailsFromServer(mAppContext, contentDetailsRequest.getContentId(), contentModelInDB);
         }
 
@@ -582,15 +582,15 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNSUPPORTED_FILE);
             return response;
         } else {
-            ImportContentContext importContentContext = new ImportContentContext(importRequest.isChildContent(), importRequest.getSourceFilePath(), new File(importRequest.getDestinationFolder()));
-
             buildInitiateEvent();
 
+            File tmpLocation = FileUtil.getTempLocation(new File(importRequest.getDestinationFolder()));
+            ImportContentContext importContentContext = new ImportContentContext(importRequest.isChildContent(), importRequest.getSourceFilePath(), importRequest.getDestinationFolder());
             IChainable<Void, ImportContentContext> deviceMemoryCheck = new DeviceMemoryCheck();
-            deviceMemoryCheck.then(new ExtractEcar())
-                    .then(new ValidateEcar())
-                    .then(new ExtractPayloads())
-                    .then(new EcarCleanUp())
+            deviceMemoryCheck.then(new ExtractEcar(tmpLocation))
+                    .then(new ValidateEcar(tmpLocation))
+                    .then(new ExtractPayloads(tmpLocation))
+                    .then(new EcarCleanUp(tmpLocation))
                     .then(new AddGeTransferContentImportEvent());
             response = deviceMemoryCheck.execute(mAppContext, importContentContext);
 
