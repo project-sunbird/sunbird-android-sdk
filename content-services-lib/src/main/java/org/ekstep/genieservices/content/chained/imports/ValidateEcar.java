@@ -56,7 +56,7 @@ public class ValidateEcar implements IChainable<Void, ImportContentContext> {
 
         importContext.setManifestVersion(manifestVersion);
         importContext.setItems(items);
-        importContext.getMetadata().put(ServiceConstants.GeTransferEvent.CONTENT_ITEMS_KEY, items);
+        // importContext.getMetadata().put(ServiceConstants.CONTENT_ITEMS_KEY, items);
         Logger.d(TAG, items.toString());
 
         for (Map<String, Object> item : items) {
