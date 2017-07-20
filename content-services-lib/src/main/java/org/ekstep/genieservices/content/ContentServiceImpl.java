@@ -36,7 +36,6 @@ import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
-import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
@@ -720,7 +719,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         File ecarFile = FileUtil.getTempLocation(destinationFolder, fileName);
 
         Map<String, Object> metadata = new HashMap<>();
-        metadata.put(GETransferEventKnowStructure.CONTENT_ITEMS_KEY, contentModelsToExport);
+        metadata.put(ServiceConstants.CONTENT_ITEMS_KEY, contentModelsToExport);
 
         ExportContentContext exportContentContext = new ExportContentContext(metadata, destinationFolder, ecarFile);
 

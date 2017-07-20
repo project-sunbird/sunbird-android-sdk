@@ -6,8 +6,6 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransfer;
-import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
-import org.ekstep.genieservices.commons.bean.telemetry.GETransferMap;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.importexport.bean.ExportTelemetryContext;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
@@ -30,7 +28,6 @@ public class AddGeTransferTelemetryExportEvent implements IChainable<TelemetryEx
     @Override
     public GenieResponse<TelemetryExportResponse> execute(AppContext appContext, ExportTelemetryContext exportContext) {
         try {
-            int aggregateCount = 0;
             ImportedMetadataListModel importedMetadataListModel = ImportedMetadataListModel.findAll(appContext.getDBSession());
 
             List<ImportedMetadataModel> importedMetadataModelList;
@@ -40,21 +37,7 @@ public class AddGeTransferTelemetryExportEvent implements IChainable<TelemetryEx
                 importedMetadataModelList = new ArrayList<>();
             }
 
-            ArrayList<GETransferMap> contents = new ArrayList<>();
-            for (ImportedMetadataModel importedMetadataModel : importedMetadataModelList) {
-                aggregateCount += importedMetadataModel.getCount();
-                contents.add(GETransferMap.createMapForTelemetry(importedMetadataModel.getDeviceId(),
-                        importedMetadataModel.getImportedId(), importedMetadataModel.getCount()));
-            }
-            aggregateCount += Integer.valueOf(exportContext.getMetadata().get(ServiceConstants.EVENTS_COUNT).toString());
-            GETransferEventKnowStructure eks = new GETransferEventKnowStructure(
-                    GETransferEventKnowStructure.TRANSFER_DIRECTION_EXPORT,
-                    GETransferEventKnowStructure.DATATYPE_TELEMETRY,
-                    aggregateCount,
-                    new File(exportContext.getDestinationDBFilePath()).length(),
-                    contents);
-            GETransfer geTransfer = new GETransfer(eks);
-            TelemetryLogger.log(geTransfer);
+            logGETransferEvent(exportContext, importedMetadataModelList);
 
         } catch (NumberFormatException ex) {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, ex.getMessage(), TAG);
@@ -71,5 +54,24 @@ public class AddGeTransferTelemetryExportEvent implements IChainable<TelemetryEx
     @Override
     public IChainable<TelemetryExportResponse, ExportTelemetryContext> then(IChainable<TelemetryExportResponse, ExportTelemetryContext> link) {
         return link;
+    }
+
+    private void logGETransferEvent(ExportTelemetryContext exportContext, List<ImportedMetadataModel> importedMetadataModelList) {
+        int aggregateCount = 0;
+        GETransfer.Builder geTransfer = new GETransfer.Builder();
+        geTransfer.directionExport()
+                .dataTypeTelemetry()
+                .size(new File(exportContext.getDestinationDBFilePath()).length());
+
+        for (ImportedMetadataModel importedMetadataModel : importedMetadataModelList) {
+            aggregateCount += importedMetadataModel.getCount();
+
+            geTransfer.addContent(importedMetadataModel.getDeviceId(), importedMetadataModel.getImportedId(), importedMetadataModel.getCount());
+        }
+        aggregateCount += Integer.valueOf(exportContext.getMetadata().get(ServiceConstants.EVENTS_COUNT).toString());
+
+        geTransfer.count(aggregateCount);
+
+        TelemetryLogger.log(geTransfer.build());
     }
 }

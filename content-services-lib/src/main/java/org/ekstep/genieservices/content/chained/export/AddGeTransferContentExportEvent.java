@@ -6,14 +6,11 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentExportResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransfer;
-import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
-import org.ekstep.genieservices.commons.bean.telemetry.GETransferMap;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.content.ContentHandler;
 import org.ekstep.genieservices.content.bean.ExportContentContext;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -26,16 +23,7 @@ public class AddGeTransferContentExportEvent implements IChainable<ContentExport
 
     @Override
     public GenieResponse<ContentExportResponse> execute(AppContext appContext, ExportContentContext exportContext) {
-        Map<String, Object> metadata = exportContext.getMetadata();
-
-        GETransferEventKnowStructure eks = new GETransferEventKnowStructure(
-                GETransferEventKnowStructure.TRANSFER_DIRECTION_EXPORT,
-                GETransferEventKnowStructure.DATATYPE_CONTENT,
-                ((List) metadata.get(GETransferEventKnowStructure.CONTENT_ITEMS_KEY)).size(),
-                (Long) metadata.get(GETransferEventKnowStructure.FILE_SIZE),
-                buildContentsMetadata(exportContext.getItems()));
-        GETransfer geTransfer = new GETransfer(eks);
-        TelemetryLogger.log(geTransfer);
+        logGETransferEvent(exportContext);
 
         ContentExportResponse contentExportResponse = new ContentExportResponse();
         contentExportResponse.setExportedFilePath(exportContext.getEcarFile().toString());
@@ -50,17 +38,20 @@ public class AddGeTransferContentExportEvent implements IChainable<ContentExport
         return link;
     }
 
-    private List<GETransferMap> buildContentsMetadata(List<Map<String, Object>> items) {
-        List<GETransferMap> contentsMetadata = new ArrayList<>();
+    private void logGETransferEvent(ExportContentContext exportContext) {
+        Map<String, Object> metadata = exportContext.getMetadata();
 
-        for (Map item : items) {
-            contentsMetadata.add(GETransferMap.createMapForContent(
-                    ContentHandler.readIdentifier(item),
-                    ContentHandler.readPkgVersion(item),
-                    ContentHandler.readTransferCountFromContentMap(item),
-                    ContentHandler.readOriginFromContentMap(item)));
+        GETransfer.Builder geTransfer = new GETransfer.Builder();
+        geTransfer.directionExport()
+                .dataTypeContent()
+                .count(((List) metadata.get(ServiceConstants.CONTENT_ITEMS_KEY)).size())
+                .size((Long) metadata.get(ServiceConstants.FILE_SIZE));
+
+        for (Map item : exportContext.getItems()) {
+            geTransfer.addContent(ContentHandler.readOriginFromContentMap(item), ContentHandler.readIdentifier(item), ContentHandler.readPkgVersion(item), ContentHandler.readTransferCountFromContentMap(item));
         }
 
-        return contentsMetadata;
+        TelemetryLogger.log(geTransfer.build());
     }
+
 }

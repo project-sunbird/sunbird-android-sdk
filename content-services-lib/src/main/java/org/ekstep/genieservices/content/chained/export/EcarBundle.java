@@ -5,7 +5,6 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentExportResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.Compress;
 import org.ekstep.genieservices.content.bean.ExportContentContext;
@@ -32,7 +31,7 @@ public class EcarBundle implements IChainable<ContentExportResponse, ExportConte
 
         try {
             Compress.zip(source, destination);
-            exportContext.getMetadata().put(GETransferEventKnowStructure.FILE_SIZE, destination.length());
+            exportContext.getMetadata().put(ServiceConstants.FILE_SIZE, destination.length());
         } catch (IOException e) {
             e.printStackTrace();
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, e.getMessage(), TAG);

@@ -5,7 +5,6 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
-import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.contract.MetaEntry;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
@@ -38,7 +37,7 @@ public class CreateMetadata implements IChainable<ProfileExportResponse, ExportP
         metadata.put(ServiceConstants.EXPORT_TYPES, GsonUtil.toJson(Collections.singletonList(ServiceConstants.EXPORT_TYPE_PROFILE)));
         metadata.put(ServiceConstants.DID, appContext.getDeviceInfo().getDeviceID());
         metadata.put(ServiceConstants.EXPORT_ID, UUID.randomUUID().toString());
-        metadata.put(GETransferEventKnowStructure.FILE_SIZE, new File(exportContext.getDestinationDBFilePath()).length());
+        metadata.put(ServiceConstants.FILE_SIZE, new File(exportContext.getDestinationDBFilePath()).length());
         metadata.put(ServiceConstants.PROFILES_COUNT, String.valueOf(exportContext.getUserIds().size()));
 
         destinationDBSession.execute(MetaEntry.getCreateEntry());

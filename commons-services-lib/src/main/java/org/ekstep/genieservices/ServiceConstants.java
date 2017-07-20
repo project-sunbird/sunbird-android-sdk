@@ -33,6 +33,9 @@ public interface ServiceConstants {
     String EXPORT_TYPES = "types";
     String EXPORT_TYPE_TELEMETRY = "telemetry";
     String EXPORT_TYPE_PROFILE = "userprofile";
+    String FILE_SIZE = "FILE_SIZE";
+    String FILE_TYPE = "FILE_TYPE";
+    String CONTENT_ITEMS_KEY = "contents";
 
     interface Params {
         String APPLICATION_ID = "APPLICATION_ID";
@@ -218,22 +221,5 @@ public interface ServiceConstants {
 
         //Authentication
         String FAILED_TO_GENERATE_TOKEN = "Failed to generate the bearer token";
-
-    }
-
-    interface GeTransferEvent {
-        String TRANSFER_DIRECTION_EXPORT = "EXPORT";
-        String TRANSFER_DIRECTION_IMPORT = "IMPORT";
-        String DATATYPE_TELEMETRY = "TELEMETRY";
-        String DATATYPE_CONTENT = "CONTENT";
-        String DATATYPE_EXPLODED_CONTENT = "EXPLODEDCONTENT";
-        String DATATYPE_PROFILE = "PROFILE";
-        String CONTENT_ITEMS_KEY = "contents";
-        String FILE_SIZE = "FILE_SIZE";
-        String FILE_TYPE = "FILE_TYPE";
-    }
-
-    interface Network {
-
     }
 }

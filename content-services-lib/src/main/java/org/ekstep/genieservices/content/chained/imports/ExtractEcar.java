@@ -24,7 +24,7 @@ public class ExtractEcar implements IChainable<Void, ImportContentContext> {
         importContext.getTmpLocation().mkdirs();
 
         if (Decompress.unzip(importContext.getEcarFile(), importContext.getTmpLocation()) && nextLink != null) {
-            importContext.getMetadata().put(ServiceConstants.GeTransferEvent.FILE_SIZE, importContext.getEcarFile().length());
+            importContext.getMetadata().put(ServiceConstants.FILE_SIZE, importContext.getEcarFile().length());
             return nextLink.execute(appContext, importContext);
         } else {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "Import content failed while extracting ecar.", TAG);
