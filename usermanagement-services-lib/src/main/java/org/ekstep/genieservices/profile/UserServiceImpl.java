@@ -167,14 +167,14 @@ public class UserServiceImpl extends BaseService implements IUserService {
         if (profile == null || StringUtil.isNullOrEmpty(profile.getUid())) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROFILE_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_PROFILE, TAG, Profile.class);
             logGEError(response, "updateUserProfile");
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_UPDTAE_PROFILE);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_UPDATE_PROFILE);
             return response;
         }
 
         if (!profile.isValid()) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.VALIDATION_ERROR, profile.getErrors().toString(), TAG, Profile.class);
             logGEError(response, "updateUserProfile");
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_UPDTAE_PROFILE);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_UPDATE_PROFILE);
             return response;
         }
         UserProfileModel userProfileModel = UserProfileModel.build(mAppContext.getDBSession(), profile);

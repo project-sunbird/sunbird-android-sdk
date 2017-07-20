@@ -571,8 +571,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         EventBus.postEvent(new ContentImportResponse(null, 1, importRequest.getSourceFilePath()));
 
         if (!FileUtil.doesFileExists(importRequest.getSourceFilePath())) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.ECAR_NOT_FOUND, ServiceConstants.ErrorMessage.FILE_DOESNT_EXIST, TAG);
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.FILE_DOESNT_EXIST);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.ECAR_NOT_FOUND, ServiceConstants.ErrorMessage.FILE_DOES_NOT_EXIST, TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.FILE_DOES_NOT_EXIST);
             return response;
         }
 
