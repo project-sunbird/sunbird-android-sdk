@@ -35,6 +35,7 @@ import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
+import org.ekstep.genieservices.commons.bean.enums.ContentImportStatus;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
@@ -118,7 +119,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             }
 
             contentModelInDB = ContentHandler.convertContentMapToModel(mAppContext.getDBSession(), contentData, null);
-        } else if (contentDetailsRequest.isRefreshContentDetails()){
+        } else if (contentDetailsRequest.isRefreshContentDetails()) {
             ContentHandler.refreshContentDetailsFromServer(mAppContext, contentDetailsRequest.getContentId(), contentModelInDB);
         }
 
@@ -569,7 +570,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         GenieResponse<Void> response;
 
-        EventBus.postEvent(new ContentImportResponse(null, 1, importRequest.getSourceFilePath()));
+        // TODO: 7/21/2017 - Needs to move in ValidateEcar task.
+        EventBus.postEvent(new ContentImportResponse(null, ContentImportStatus.IMPORT_STARTED));
 
         if (!FileUtil.doesFileExists(importRequest.getSourceFilePath())) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.ECAR_NOT_FOUND, ServiceConstants.ErrorMessage.FILE_DOESNT_EXIST, TAG);
@@ -601,7 +603,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 buildSuccessEvent(identifier);
                 TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
 
-                EventBus.postEvent(new ContentImportResponse(identifier, 2, importRequest.getSourceFilePath()));
+                EventBus.postEvent(new ContentImportResponse(identifier, ContentImportStatus.IMPORT_COMPLETED));
             }
 
             return response;
@@ -615,11 +617,11 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         params.put("identifier", contentId);
         params.put("logLevel", "2");
         DownloadRequest request = downloadService.getDownloadRequest(contentId);
-        int status = -1;
+        ContentImportStatus status = ContentImportStatus.NOT_FOUND;
         if (request != null) {
-            status = request.getDownloadId() == -1 ? 0 : 1;
+            status = request.getDownloadId() == -1 ? ContentImportStatus.ENQUEUED_FOR_DOWNLOAD : ContentImportStatus.DOWNLOAD_STARTED;
         }
-        ContentImportResponse contentImportResponse = new ContentImportResponse(contentId, status, null);
+        ContentImportResponse contentImportResponse = new ContentImportResponse(contentId, status);
         GenieResponse<ContentImportResponse> response = GenieResponseBuilder.getSuccessResponse("", ContentImportResponse.class);
         response.setResult(contentImportResponse);
         TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
@@ -627,13 +629,15 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<Void> importContent(ContentImportRequest importRequest) {
+    public GenieResponse<List<ContentImportResponse>> importContent(ContentImportRequest importRequest) {
         String methodName = "importContent@ContentServiceImpl";
         HashMap params = new HashMap<>();
         params.put("request", GsonUtil.toJson(importRequest));
         params.put("logLevel", "2");
 
-        GenieResponse<Void> response;
+        GenieResponse<List<ContentImportResponse>> response;
+        List<ContentImportResponse> contentImportResponseList = new ArrayList<>();
+        List<String> contentIds = importRequest.getContentIds();
 
         ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, ContentHandler.getSearchRequest(mAppContext, importRequest));
         GenieResponse apiResponse = contentSearchAPI.post();
@@ -651,26 +655,36 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             if (contentDataList != null) {
                 DownloadRequest[] downloadRequests = new DownloadRequest[contentDataList.size()];
                 for (int i = 0; i < contentDataList.size(); i++) {
-                    Map dataMap = contentDataList.get(i);
+                    Map<String, Object> dataMap = contentDataList.get(i);
                     String downloadUrl = ContentHandler.getDownloadUrl(dataMap);
                     if (downloadUrl != null) {
                         downloadUrl = downloadUrl.trim();
                     }
 
+                    String contentId = ContentHandler.readIdentifier(dataMap);
+                    ContentImportStatus status = ContentImportStatus.NOT_FOUND;
                     if (!StringUtil.isNullOrEmpty(downloadUrl) && ServiceConstants.FileExtension.CONTENT.equalsIgnoreCase(FileUtil.getFileExtension(downloadUrl))) {
-                        String contentIdentifier = ContentHandler.readIdentifier(dataMap);
-                        DownloadRequest downloadRequest = new DownloadRequest(contentIdentifier, downloadUrl,
-                                ContentConstants.MimeType.ECAR, importRequest.getDestinationFolder(), importRequest.isChildContent());
+                        status = ContentImportStatus.ENQUEUED_FOR_DOWNLOAD;
+                        DownloadRequest downloadRequest = new DownloadRequest(contentId, downloadUrl, ContentConstants.MimeType.ECAR, importRequest.getDestinationFolder(), importRequest.isChildContent());
                         downloadRequest.setCorrelationData(importRequest.getCorrelationData());
                         downloadRequest.setProcessorClass("org.ekstep.genieservices.commons.download.ContentImportService");
                         downloadRequests[i] = downloadRequest;
                     }
+
+                    contentIds.remove(contentId);
+                    contentImportResponseList.add(new ContentImportResponse(contentId, status));
                 }
 
                 downloadService.enqueue(downloadRequests);
             }
         }
+
+        for (String contentId : contentIds) {
+            contentImportResponseList.add(new ContentImportResponse(contentId, ContentImportStatus.NOT_FOUND));
+        }
+
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        response.setResult(contentImportResponseList);
         TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
 
         return response;

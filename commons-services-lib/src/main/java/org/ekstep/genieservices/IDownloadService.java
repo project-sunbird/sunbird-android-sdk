@@ -4,9 +4,8 @@ import org.ekstep.genieservices.commons.bean.DownloadProgress;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 
 /**
- * Created by swayangjit on 17/5/17.
+ * This is the interface with all the required APIs for performing download content.
  */
-
 public interface IDownloadService {
 
     void enqueue(DownloadRequest... downloadRequest);
@@ -23,7 +22,7 @@ public interface IDownloadService {
 
     DownloadProgress getProgress(String identifier);
 
-    void onDownloadComplete(String identiifer);
+    void onDownloadComplete(String identifier);
 
-    void onDownloadFailed(String identiifer);
+    void onDownloadFailed(String identifier);
 }

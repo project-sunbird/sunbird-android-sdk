@@ -25,7 +25,7 @@ public class DownloadQueueManager {
         this.mKeyValueStore = keyValueStore;
     }
 
-    public List<DownloadRequest> getAllRequests() {
+    private List<DownloadRequest> getAllRequests() {
         List<DownloadRequest> requestList=new ArrayList<>();
         String jsonContents = mKeyValueStore.getString(DOWNLOAD_QUEUE, null);
         if (!StringUtil.isNullOrEmpty(jsonContents)) {
@@ -35,7 +35,7 @@ public class DownloadQueueManager {
         return requestList;
     }
 
-    public DownloadRequest popDownloadrequest() {
+    public DownloadRequest popDownloadRequest() {
         DownloadRequest request = null;
         List<DownloadRequest> requestList = getAllRequests();
         if (requestList.size() > 0) {
@@ -85,11 +85,11 @@ public class DownloadQueueManager {
         }
     }
 
-    public void removeFromQueue(String identififer) {
+    public void removeFromQueue(String identifier) {
         List<DownloadRequest> contentList = getAllRequests();
         for (int i = 0; i < contentList.size(); i++) {
             DownloadRequest downloadingRequest = contentList.get(i);
-            if (identififer.equals(downloadingRequest.getIdentifier())) {
+            if (identifier.equals(downloadingRequest.getIdentifier())) {
                 contentList.remove(i);
                 save(contentList);
             }
@@ -133,7 +133,7 @@ public class DownloadQueueManager {
         }
     }
 
-    public void saveCurrentDownloads(List<String> identifiers) {
+    private void saveCurrentDownloads(List<String> identifiers) {
         String jsonContents = GsonUtil.getGson().toJson(identifiers);
         mKeyValueStore.putString(CURRENT_DOWNLOAD, jsonContents);
     }

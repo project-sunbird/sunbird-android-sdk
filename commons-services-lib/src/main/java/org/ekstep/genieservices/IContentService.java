@@ -156,7 +156,7 @@ public interface IContentService {
      * <p>
      * On successful finding the next list of contents, the response will return status as TRUE and the result will be set with {@link List<Content>}
      *
-     * @param contentHierarchy - {@link List<HierarchyInfo>}
+     * @param contentHierarchy         - {@link List<HierarchyInfo>}
      * @param currentContentIdentifier The current content identifier
      * @return - {@link GenieResponse<Content>}
      */
@@ -184,9 +184,9 @@ public interface IContentService {
      * On successful importing the content, the response will return status as TRUE
      *
      * @param contentImportRequest - {@link ContentImportRequest}
-     * @return - {@link GenieResponse<Void>}
+     * @return - {@link GenieResponse<List<ContentImportResponse>>}
      */
-    GenieResponse<Void> importContent(ContentImportRequest contentImportRequest);
+    GenieResponse<List<ContentImportResponse>> importContent(ContentImportRequest contentImportRequest);
 
     /**
      * This api is used to get the status of when importing a content

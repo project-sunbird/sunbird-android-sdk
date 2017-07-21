@@ -47,10 +47,16 @@ public class DownloadServiceImpl implements IDownloadService {
 
     @Override
     public void resumeDownloads() {
-        //Assumption is that only 1 download happens at a time. This method will need refactoring whenever this assumption changes
+        resume();
+    }
+
+    /**
+     * Assumption is that only 1 download happens at a time. This method will need refactoring whenever this assumption changes
+     */
+    private synchronized void resume() {
         List<String> currentDownloads = mDownloadQueueManager.getCurrentDownloads();
         if (currentDownloads.size() == 0) {
-            DownloadRequest request = mDownloadQueueManager.popDownloadrequest();
+            DownloadRequest request = mDownloadQueueManager.popDownloadRequest();
             if (request != null) {
                 long downloadId = mDownloadManager.enqueue(request);
                 TelemetryLogger.log(buildGEInteractEvent(InteractionType.TOUCH, ServiceConstants.Telemetry.CONTENT_DOWNLOAD_INITIATE, request.getCorrelationData(), request.getIdentifier()));
@@ -65,7 +71,7 @@ public class DownloadServiceImpl implements IDownloadService {
                 //make this more intelligent to detect if a download is not really working out. For now I am just checking if the request is not recognised by the download manager or if it is 100% done
                 DownloadProgress progress = mDownloadManager.getProgress(request.getDownloadId());
                 if (progress.getStatus() == IDownloadManager.UNKNOWN || progress.getStatus() == IDownloadManager.FAILED || progress.getStatus() == IDownloadManager.COMPLETED) {
-                    //clear and restart the download. this means the ondownloadComplete did not fire for some reason
+                    //clear and restart the download. this means the onDownloadComplete did not fire for some reason
                     mDownloadManager.cancel(request.getDownloadId());
                     mDownloadQueueManager.removeFromCurrentDownloadQueue(request.getIdentifier());
                     mDownloadQueueManager.updateDownload(request.getIdentifier(), -1);
@@ -168,7 +174,7 @@ public class DownloadServiceImpl implements IDownloadService {
     }
 
     @Override
-    public void onDownloadFailed(String identiifer) {
-        mDownloadQueueManager.removeFromQueue(identiifer);
+    public void onDownloadFailed(String identifier) {
+        mDownloadQueueManager.removeFromQueue(identifier);
     }
 }

@@ -126,5 +126,4 @@ public class AndroidDownloadManager implements IDownloadManager {
         }
     }
 
-
 }
