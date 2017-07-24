@@ -41,8 +41,8 @@ public class CreateMetadata implements IChainable<ProfileExportResponse, ExportP
         metadata.put(ServiceConstants.PROFILES_COUNT, String.valueOf(exportContext.getUserIds().size()));
 
         destinationDBSession.execute(MetaEntry.getCreateEntry());
-        for (String key : exportContext.getMetadata().keySet()) {
-            MetadataModel metadataModel = MetadataModel.build(destinationDBSession, key, String.valueOf(exportContext.getMetadata().get(key)));
+        for (String key : metadata.keySet()) {
+            MetadataModel metadataModel = MetadataModel.build(destinationDBSession, key, String.valueOf(metadata.get(key)));
             metadataModel.save();
         }
 
