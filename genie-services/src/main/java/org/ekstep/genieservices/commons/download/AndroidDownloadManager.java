@@ -4,16 +4,13 @@ import android.app.DownloadManager;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
-import android.os.ParcelFileDescriptor;
-import android.provider.MediaStore;
+import android.os.Environment;
 
+import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.IDownloadManager;
 import org.ekstep.genieservices.commons.bean.DownloadProgress;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
-import org.ekstep.genieservices.commons.utils.FileUtil;
-
-import java.io.FileNotFoundException;
+import org.ekstep.genieservices.content.ContentConstants;
 
 /**
  * Created on 17/5/17.
@@ -36,6 +33,14 @@ public class AndroidDownloadManager implements IDownloadManager {
         managerRequest.setTitle(request.getIdentifier());
         managerRequest.setMimeType(request.getMimeType());
         managerRequest.setNotificationVisibility(android.app.DownloadManager.Request.VISIBILITY_VISIBLE);
+
+        String fileName = request.getIdentifier();
+        // TODO: 7/24/2017 - Can we remove file extension? Or is file extension required while extracting ecar?
+        if (ContentConstants.MimeType.ECAR.equals(request.getMimeType())) {
+            fileName += "." + ServiceConstants.FileExtension.CONTENT;
+        }
+        managerRequest.setDestinationInExternalFilesDir(mContext, Environment.DIRECTORY_DOWNLOADS, fileName);
+
         return mDownloadManager.enqueue(managerRequest);
     }
 
@@ -75,55 +80,6 @@ public class AndroidDownloadManager implements IDownloadManager {
     @Override
     public void cancel(long downloadId) {
         this.mDownloadManager.remove(downloadId);
-    }
-
-    @Override
-    public String getDownloadPath(long downloadId, String destinationFolder) {
-        String downloadPath = null;
-        android.app.DownloadManager.Query query = new android.app.DownloadManager.Query();
-        query.setFilterById(downloadId);
-        Cursor cursor = mDownloadManager.query(query);
-        if (cursor.moveToFirst()) {
-            int downloadStatus = cursor.getInt(cursor.getColumnIndex(android.app.DownloadManager.COLUMN_STATUS));
-            if (downloadStatus == DownloadManager.STATUS_SUCCESSFUL) {
-                if (Build.VERSION.SDK_INT >= 24) {
-                    ParcelFileDescriptor fileDescriptor = null;
-                    try {
-                        fileDescriptor = mDownloadManager.openDownloadedFile(downloadId);
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                    downloadPath = FileUtil.getDownloadedFileLocation(new ParcelFileDescriptor.AutoCloseInputStream(fileDescriptor), destinationFolder);
-                } else {
-
-                    String filepath = cursor.getString(cursor.getColumnIndex(android.app.DownloadManager.COLUMN_LOCAL_URI));
-                    downloadPath = getRealPathFromURI(mContext, Uri.parse(filepath));
-                }
-            }
-        }
-
-        return downloadPath;
-    }
-
-    private String getRealPathFromURI(Context context, Uri contentUri) {
-        Cursor cursor = null;
-        String path = null;
-        try {
-            String[] proj = {MediaStore.Images.Media.DATA};
-            cursor = context.getContentResolver().query(contentUri, proj, null, null, null);
-
-            if (cursor != null && cursor.getCount() > 0) {
-                int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                cursor.moveToFirst();
-                path = cursor.getString(index);
-            }
-
-            return path;
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
     }
 
 }

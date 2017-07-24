@@ -21,6 +21,4 @@ public interface IDownloadManager {
     DownloadProgress getProgress(long downloadId);
 
     void cancel(long downloadId);
-
-    String getDownloadPath(long downloadId, String desitnationFolder);
 }

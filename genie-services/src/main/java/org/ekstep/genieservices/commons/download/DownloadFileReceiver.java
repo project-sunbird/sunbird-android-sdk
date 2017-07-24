@@ -10,6 +10,7 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.IDownloadManager;
 import org.ekstep.genieservices.commons.bean.DownloadProgress;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
+import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.ReflectionUtil;
 
 /**
@@ -28,17 +29,14 @@ public class DownloadFileReceiver extends BroadcastReceiver {
         DownloadRequest request = downloadService.getDownloadRequest(downloadId);
         if (request != null) {
             DownloadProgress progress = downloadService.getProgress(request.getIdentifier());
+            Logger.d(TAG, "Download status : " + progress.getStatus());
             switch (progress.getStatus()) {
                 case IDownloadManager.COMPLETED:
-                    String localFilePath = progress.getDownloadPath();
                     downloadService.onDownloadComplete(request.getIdentifier());
                     //Ideally get the service class from Reflection utils with a service name provided in the downloadRequest
                     Class _class = ReflectionUtil.getClass(request.getProcessorClass());
                     Intent serviceIntent = new Intent(context, _class);
-                    serviceIntent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_IS_CHILD, request.isChildContent());
-                    serviceIntent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_LOCAL_FILE_PATH, localFilePath);
-                    serviceIntent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_DESTINATION_FILE_PATH, request.getDestinationFolder());
-                    serviceIntent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_DOWNLOAD_ID, request.getDownloadId());
+                    serviceIntent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_DOWNLOAD_REQUEST, request);
                     context.startService(serviceIntent);
                     break;
 

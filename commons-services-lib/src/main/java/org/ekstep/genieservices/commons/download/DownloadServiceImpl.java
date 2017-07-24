@@ -159,9 +159,6 @@ public class DownloadServiceImpl implements IDownloadService {
                 progress.setStatus(0);
             } else {
                 progress = mDownloadManager.getProgress(request.getDownloadId());
-                if (progress.getStatus() == IDownloadManager.COMPLETED) {
-                    progress.setDownloadPath(mDownloadManager.getDownloadPath(request.getDownloadId(), request.getDestinationFolder()));
-                }
             }
         }
         return progress;

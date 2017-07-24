@@ -73,10 +73,7 @@ public interface ServiceConstants {
         String BUNDLE_KEY_LANGUAGE_INFO = "languageInfo";
         String BUNDLE_KEY_APP_QUALIFIER = "appQualifier";
 
-        String BUNDLE_KEY_IS_CHILD = "is_child";
-        String BUNDLE_KEY_LOCAL_FILE_PATH = "local_file_path";
-        String BUNDLE_KEY_DESTINATION_FILE_PATH = "destination_file_path";
-        String BUNDLE_KEY_DOWNLOAD_ID = "download_id";
+        String BUNDLE_KEY_DOWNLOAD_REQUEST = "download_request";
     }
 
     interface FileExtension {

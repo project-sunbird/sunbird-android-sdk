@@ -18,18 +18,8 @@ public class DownloadProgress {
     //Status -1 unknown, 0 - not started, 1 - started, 2- success, 3- failed
     private int status = -1;
 
-    private String downloadPath;
-
     public DownloadProgress(long downloadId) {
         this.downloadId = downloadId;
-    }
-
-    public String getDownloadPath() {
-        return downloadPath;
-    }
-
-    public void setDownloadPath(String downloadPath) {
-        this.downloadPath = downloadPath;
     }
 
     public int getStatus() {
