@@ -26,7 +26,7 @@ public class DownloadQueueManager {
     }
 
     private List<DownloadRequest> getAllRequests() {
-        List<DownloadRequest> requestList=new ArrayList<>();
+        List<DownloadRequest> requestList = new ArrayList<>();
         String jsonContents = mKeyValueStore.getString(DOWNLOAD_QUEUE, null);
         if (!StringUtil.isNullOrEmpty(jsonContents)) {
             DownloadRequest[] contentItems = GsonUtil.fromJson(jsonContents, DownloadRequest[].class);
@@ -64,13 +64,12 @@ public class DownloadQueueManager {
         return null;
     }
 
-    public void updateDownload(String identifier, long downloadId) {
-        List<DownloadRequest> contentList = getAllRequests();
-        for (DownloadRequest request : contentList) {
-            if (identifier.equals(request.getIdentifier())) {
-                request.setDownloadId(downloadId);
-                save(contentList);
-            }
+    public void updateDownload(DownloadRequest downloadRequest) {
+        List<DownloadRequest> downloadRequestList = getAllRequests();
+        int index = downloadRequestList.indexOf(downloadRequest);
+        if (index != -1) {
+            downloadRequestList.set(index, downloadRequest);
+            save(downloadRequestList);
         }
     }
 
@@ -108,7 +107,7 @@ public class DownloadQueueManager {
     }
 
     public List<String> getCurrentDownloads() {
-        List<String> downloadingList=new ArrayList<>();
+        List<String> downloadingList = new ArrayList<>();
         String jsonContents = mKeyValueStore.getString(CURRENT_DOWNLOAD, null);
         if (!StringUtil.isNullOrEmpty(jsonContents)) {
             String[] items = GsonUtil.fromJson(jsonContents, String[].class);

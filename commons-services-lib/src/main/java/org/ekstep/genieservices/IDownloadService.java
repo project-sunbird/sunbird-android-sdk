@@ -14,7 +14,7 @@ public interface IDownloadService {
 
     void cancel(String identifier);
 
-    void removeDownloadedFile(long downloadId);
+    void removeDownloadedFile(long downloadId, String downloadedFilePath);
 
     DownloadRequest getDownloadRequest(String identifier);
 

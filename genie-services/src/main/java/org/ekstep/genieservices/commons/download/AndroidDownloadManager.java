@@ -6,11 +6,11 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
 
-import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.IDownloadManager;
 import org.ekstep.genieservices.commons.bean.DownloadProgress;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
-import org.ekstep.genieservices.content.ContentConstants;
+
+import java.io.File;
 
 /**
  * Created on 17/5/17.
@@ -28,20 +28,19 @@ public class AndroidDownloadManager implements IDownloadManager {
     }
 
     @Override
-    public long enqueue(DownloadRequest request) {
-        android.app.DownloadManager.Request managerRequest = new android.app.DownloadManager.Request(Uri.parse(request.getDownloadUrl()));
-        managerRequest.setTitle(request.getIdentifier());
-        managerRequest.setMimeType(request.getMimeType());
+    public void enqueue(DownloadRequest downloadRequest) {
+        android.app.DownloadManager.Request managerRequest = new android.app.DownloadManager.Request(Uri.parse(downloadRequest.getDownloadUrl()));
+        managerRequest.setTitle(downloadRequest.getIdentifier());
+        managerRequest.setMimeType(downloadRequest.getMimeType());
         managerRequest.setNotificationVisibility(android.app.DownloadManager.Request.VISIBILITY_VISIBLE);
+        managerRequest.setDestinationInExternalFilesDir(mContext, Environment.DIRECTORY_DOWNLOADS, downloadRequest.getFilename());
 
-        String fileName = request.getIdentifier();
-        // TODO: 7/24/2017 - Can we remove file extension? Or is file extension required while extracting ecar?
-        if (ContentConstants.MimeType.ECAR.equals(request.getMimeType())) {
-            fileName += "." + ServiceConstants.FileExtension.CONTENT;
-        }
-        managerRequest.setDestinationInExternalFilesDir(mContext, Environment.DIRECTORY_DOWNLOADS, fileName);
+        long downloadId = mDownloadManager.enqueue(managerRequest);
+        downloadRequest.setDownloadId(downloadId);
 
-        return mDownloadManager.enqueue(managerRequest);
+        File file = mContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+        String localFilePath = file.getAbsolutePath() + "/" + downloadRequest.getFilename();
+        downloadRequest.setDownloadedFilePath(localFilePath);
     }
 
     @Override

@@ -1,7 +1,5 @@
 package org.ekstep.genieservices.commons.bean;
 
-import org.ekstep.genieservices.commons.utils.DateUtil;
-
 import java.io.Serializable;
 import java.util.List;
 
@@ -13,13 +11,13 @@ public class DownloadRequest implements Serializable {
     private long downloadId = -1;
     private String identifier;
     private String downloadUrl;
-    private String name;
     private String mimeType;
     private String destinationFolder;
-    private long createdAt;
     private boolean isChildContent;
-    private String processorClass;
     private List<CorrelationData> correlationData;
+    private String processorClass;
+    private String filename;
+    private String downloadedFilePath;
 
     public DownloadRequest(String identifier, String downloadUrl, String mimeType, String destinationFolder, boolean isChildContent) {
         this.identifier = identifier;
@@ -27,7 +25,6 @@ public class DownloadRequest implements Serializable {
         this.mimeType = mimeType;
         this.destinationFolder = destinationFolder;
         this.isChildContent = isChildContent;
-        this.createdAt = DateUtil.getEpochTime();
     }
 
     public long getDownloadId() {
@@ -46,24 +43,24 @@ public class DownloadRequest implements Serializable {
         return downloadUrl;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getMimeType() {
         return mimeType;
+    }
+
+    public String getDestinationFolder() {
+        return destinationFolder;
     }
 
     public boolean isChildContent() {
         return isChildContent;
     }
 
-    public String getDestinationFolder() {
-        return destinationFolder;
+    public List<CorrelationData> getCorrelationData() {
+        return correlationData;
+    }
+
+    public void setCorrelationData(List<CorrelationData> correlationData) {
+        this.correlationData = correlationData;
     }
 
     public String getProcessorClass() {
@@ -74,12 +71,20 @@ public class DownloadRequest implements Serializable {
         this.processorClass = processorClass;
     }
 
-    public List<CorrelationData> getCorrelationData() {
-        return correlationData;
+    public String getFilename() {
+        return filename;
     }
 
-    public void setCorrelationData(List<CorrelationData> correlationData) {
-        this.correlationData = correlationData;
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
+
+    public String getDownloadedFilePath() {
+        return downloadedFilePath;
+    }
+
+    public void setDownloadedFilePath(String downloadedFilePath) {
+        this.downloadedFilePath = downloadedFilePath;
     }
 
     @Override

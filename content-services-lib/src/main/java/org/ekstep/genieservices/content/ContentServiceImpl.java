@@ -666,6 +666,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                     if (!StringUtil.isNullOrEmpty(downloadUrl) && ServiceConstants.FileExtension.CONTENT.equalsIgnoreCase(FileUtil.getFileExtension(downloadUrl))) {
                         status = ContentImportStatus.ENQUEUED_FOR_DOWNLOAD;
                         DownloadRequest downloadRequest = new DownloadRequest(contentId, downloadUrl, ContentConstants.MimeType.ECAR, importRequest.getDestinationFolder(), importRequest.isChildContent());
+                        downloadRequest.setFilename(contentId + "." + ServiceConstants.FileExtension.CONTENT);
                         downloadRequest.setCorrelationData(importRequest.getCorrelationData());
                         downloadRequest.setProcessorClass("org.ekstep.genieservices.commons.download.ContentImportService");
                         downloadRequests[i] = downloadRequest;

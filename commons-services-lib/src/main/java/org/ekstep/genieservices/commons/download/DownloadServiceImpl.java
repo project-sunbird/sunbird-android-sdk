@@ -11,9 +11,11 @@ import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.enums.ContentImportStatus;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
+import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.eventbus.EventBus;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -60,11 +62,11 @@ public class DownloadServiceImpl implements IDownloadService {
         if (currentDownloads.size() == 0) {
             DownloadRequest request = mDownloadQueueManager.popDownloadRequest();
             if (request != null) {
-                long downloadId = mDownloadManager.enqueue(request);
+                mDownloadManager.enqueue(request);
                 TelemetryLogger.log(buildGEInteractEvent(InteractionType.TOUCH, ServiceConstants.Telemetry.CONTENT_DOWNLOAD_INITIATE, request.getCorrelationData(), request.getIdentifier()));
-                mDownloadQueueManager.updateDownload(request.getIdentifier(), downloadId);
+                mDownloadQueueManager.updateDownload(request);
                 mDownloadQueueManager.addToCurrentDownloadQueue(request.getIdentifier());
-                startTrackingProgress(request.getIdentifier(), downloadId);
+                startTrackingProgress(request);
             }
 
         } else {
@@ -74,9 +76,10 @@ public class DownloadServiceImpl implements IDownloadService {
                 DownloadProgress progress = mDownloadManager.getProgress(request.getDownloadId());
                 if (progress.getStatus() == IDownloadManager.UNKNOWN || progress.getStatus() == IDownloadManager.FAILED || progress.getStatus() == IDownloadManager.COMPLETED) {
                     //clear and restart the download. this means the onDownloadComplete did not fire for some reason
-                    mDownloadManager.cancel(request.getDownloadId());
+                    removeDownloadedFile(request.getDownloadId(), request.getDownloadedFilePath());
                     mDownloadQueueManager.removeFromCurrentDownloadQueue(request.getIdentifier());
-                    mDownloadQueueManager.updateDownload(request.getIdentifier(), -1);
+                    request.setDownloadId(-1);
+                    mDownloadQueueManager.updateDownload(request);
                     resumeDownloads();
                 } else {
                     mDownloadQueueManager.removeFromCurrentDownloadQueue(request.getIdentifier());
@@ -96,13 +99,13 @@ public class DownloadServiceImpl implements IDownloadService {
         return geInteract;
     }
 
-    private void startTrackingProgress(final String identifier, final long downloadId) {
+    private void startTrackingProgress(final DownloadRequest request) {
         mExecutor = Executors.newScheduledThreadPool(1);
         mExecutor.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                DownloadProgress downloadProgress = mDownloadManager.getProgress(downloadId);
-                downloadProgress.setIdentifier(identifier);
+                DownloadProgress downloadProgress = mDownloadManager.getProgress(request.getDownloadId());
+                downloadProgress.setIdentifier(request.getIdentifier());
                 if (downloadProgress.getStatus() == IDownloadManager.UNKNOWN || downloadProgress.getStatus() == IDownloadManager.FAILED) {
                     mExecutor.shutdown();
                 } else if (downloadProgress.getStatus() == IDownloadManager.COMPLETED) {
@@ -113,7 +116,6 @@ public class DownloadServiceImpl implements IDownloadService {
                 } else if (downloadProgress.getStatus() == IDownloadManager.STARTED) {
                     EventBus.postEvent(downloadProgress);
                 }
-
             }
         }, 0, 1, TimeUnit.SECONDS);
     }
@@ -126,7 +128,7 @@ public class DownloadServiceImpl implements IDownloadService {
                 if (mExecutor != null) {
                     mExecutor.shutdown();
                 }
-                mDownloadManager.cancel(request.getDownloadId());
+                removeDownloadedFile(request.getDownloadId(), request.getDownloadedFilePath());
                 mDownloadQueueManager.removeFromCurrentDownloadQueue(identifier);
             }
             mDownloadQueueManager.removeFromQueue(identifier);
@@ -135,8 +137,11 @@ public class DownloadServiceImpl implements IDownloadService {
     }
 
     @Override
-    public void removeDownloadedFile(long downloadId) {
+    public void removeDownloadedFile(long downloadId, String downloadedFilePath) {
         mDownloadManager.cancel(downloadId);
+
+        // Delete the downloaded file.
+        FileUtil.rm(new File(downloadedFilePath));
     }
 
     @Override

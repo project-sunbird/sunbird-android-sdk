@@ -56,9 +56,16 @@ public class FileUtil {
     }
 
     public static boolean rm(File fileOrDirectory) {
+        if (fileOrDirectory == null || !fileOrDirectory.exists()) {
+            return false;
+        }
+
         if (fileOrDirectory.isDirectory()) {
-            for (File child : fileOrDirectory.listFiles()) {
-                rm(child);
+            File[] files = fileOrDirectory.listFiles();
+            if (files != null) {
+                for (File child : files) {
+                    rm(child);
+                }
             }
         }
 
@@ -67,9 +74,12 @@ public class FileUtil {
 
     public static boolean rm(File fileOrDirectory, String skippDirectory) {
         if (fileOrDirectory.isDirectory()) {
-            for (File child : fileOrDirectory.listFiles()) {
-                if (!skippDirectory.equals(child.getName())) {
-                    rm(child, skippDirectory);
+            File[] files = fileOrDirectory.listFiles();
+            if (files != null) {
+                for (File child : files) {
+                    if (!skippDirectory.equals(child.getName())) {
+                        rm(child, skippDirectory);
+                    }
                 }
             }
         }
