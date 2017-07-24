@@ -207,9 +207,9 @@ public class ContentService {
      * <p>
      * On successful finding the next list of contents, the response will return status as TRUE and the result will be set with {@link List<Content>}
      *
-     * @param contentHierarchy - {@link List<HierarchyInfo>}
+     * @param contentHierarchy         - {@link List<HierarchyInfo>}
      * @param currentContentIdentifier The current content identifier
-     * @param responseHandler    - {@link IResponseHandler<Content>}
+     * @param responseHandler          - {@link IResponseHandler<Content>}
      */
     public void nextContent(final List<HierarchyInfo> contentHierarchy, final String currentContentIdentifier, IResponseHandler<Content> responseHandler) {
         new AsyncHandler<Content>(responseHandler).execute(new IPerformable<Content>() {
@@ -231,12 +231,12 @@ public class ContentService {
      * <p>INVALID_FILE
      *
      * @param contentImportRequest - {@link ContentImportRequest}
-     * @param responseHandler      - {@link IResponseHandler<Void>}
+     * @param responseHandler      - {@link IResponseHandler<List<ContentImportResponse>>}
      */
-    public void importContent(final ContentImportRequest contentImportRequest, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new IPerformable<Void>() {
+    public void importContent(final ContentImportRequest contentImportRequest, IResponseHandler<List<ContentImportResponse>> responseHandler) {
+        new AsyncHandler<List<ContentImportResponse>>(responseHandler).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new IPerformable<List<ContentImportResponse>>() {
             @Override
-            public GenieResponse<Void> perform() {
+            public GenieResponse<List<ContentImportResponse>> perform() {
                 return contentService.importContent(contentImportRequest);
             }
         });
