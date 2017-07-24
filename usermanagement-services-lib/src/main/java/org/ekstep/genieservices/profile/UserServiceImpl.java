@@ -10,7 +10,9 @@ import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentLearnerState;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.bean.ProfileExportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
+import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.enums.ContentAccessStatus;
@@ -494,34 +496,46 @@ public class UserServiceImpl extends BaseService implements IUserService {
     }
 
     @Override
-    public GenieResponse<ProfileImportResponse> importProfile(ImportProfileContext importProfileContext) {
-        ValidateProfileMetadata validateProfileMetadata = new ValidateProfileMetadata();
-        validateProfileMetadata.then(new TransportProfiles())
-                .then(new TransportUser())
-                .then(new TransportSummarizer())
-                .then(new UpdateImportedProfileMetadata())
-                .then(new AddGeTransferProfileImportEvent());
+    public GenieResponse<ProfileImportResponse> importProfile(ProfileImportRequest profileImportRequest) {
+        GenieResponse<ProfileImportResponse> response;
+        if (!FileUtil.doesFileExists(profileImportRequest.getSourceFilePath())) {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Profile import failed, file doesn't exists", TAG);
+            return response;
+        }
 
-        return validateProfileMetadata.execute(mAppContext, importProfileContext);
+        String ext = FileUtil.getFileExtension(profileImportRequest.getSourceFilePath());
+        if (ServiceConstants.FileExtension.PROFILE.equals(ext)) {
+            ImportProfileContext importProfileContext = new ImportProfileContext(profileImportRequest.getSourceFilePath());
+            ValidateProfileMetadata validateProfileMetadata = new ValidateProfileMetadata();
+            validateProfileMetadata.then(new TransportProfiles())
+                    .then(new TransportUser())
+                    .then(new TransportSummarizer())
+                    .then(new UpdateImportedProfileMetadata())
+                    .then(new AddGeTransferProfileImportEvent());
+
+            return validateProfileMetadata.execute(mAppContext, importProfileContext);
+        } else {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Profile import failed, unsupported file extension", TAG);
+            return response;
+        }
     }
 
     @Override
-    public GenieResponse<ProfileExportResponse> exportProfile(ExportProfileContext exportProfileContext) {
-        if (exportProfileContext.getUserIds() == null || exportProfileContext.getUserIds().size() == 0) {
+    public GenieResponse<ProfileExportResponse> exportProfile(ProfileExportRequest profileExportRequest) {
+        if (profileExportRequest.getUserIds() == null || profileExportRequest.getUserIds().size() == 0) {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "There are no profile to export.", TAG);
         }
 
-        File destinationFolder = new File(exportProfileContext.getDestinationFolder());
+        File destinationFolder = new File(profileExportRequest.getDestinationFolder());
 
-        // Read the first profile and get the temp location path
-        String destinationDBFilePath = getEparFilePath(exportProfileContext.getUserIds(), destinationFolder);
+        // Read the first profile and get the destination DB file path
+        String destinationDBFilePath = getEparFilePath(profileExportRequest.getUserIds(), destinationFolder);
 
         if (FileUtil.doesFileExists(destinationDBFilePath)) {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "File already exists.", TAG);
         }
-        // Set the destination DB file path.
-        exportProfileContext.setDestinationDBFilePath(destinationDBFilePath);
 
+        ExportProfileContext exportProfileContext = new ExportProfileContext(profileExportRequest.getUserIds(), profileExportRequest.getDestinationFolder(), destinationDBFilePath);
         CopyDatabase copyDatabase = new CopyDatabase();
         copyDatabase.then(new CreateMetadata())
                 .then(new CleanupExportedFile())

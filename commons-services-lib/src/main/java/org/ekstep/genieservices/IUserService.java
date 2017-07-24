@@ -4,11 +4,11 @@ import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.bean.ProfileExportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
+import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
-import org.ekstep.genieservices.importexport.bean.ExportProfileContext;
-import org.ekstep.genieservices.importexport.bean.ImportProfileContext;
 
 import java.util.List;
 
@@ -155,10 +155,10 @@ public interface IUserService {
      * <p>On failing to importing the profile, the response will return status as FALSE and the error be the following:
      * <p>IMPORT_FAILED
      *
-     * @param importProfileContext - {@link ImportProfileContext}
+     * @param profileImportRequest - {@link ProfileImportRequest}
      * @return {@link GenieResponse<ProfileImportResponse>}
      */
-    GenieResponse<ProfileImportResponse> importProfile(ImportProfileContext importProfileContext);
+    GenieResponse<ProfileImportResponse> importProfile(ProfileImportRequest profileImportRequest);
 
     /**
      * This api is used to export the profile.
@@ -168,9 +168,9 @@ public interface IUserService {
      * <p>On failing to exporting the telemetry, the response will return status as FALSE and the error be the following:
      * <p>EXPORT_FAILED
      *
-     * @param exportProfileContext - {@link ExportProfileContext}
+     * @param profileExportRequest - {@link ProfileExportRequest}
      * @return - {@link GenieResponse<ProfileExportResponse>}
      */
-    GenieResponse<ProfileExportResponse> exportProfile(ExportProfileContext exportProfileContext);
+    GenieResponse<ProfileExportResponse> exportProfile(ProfileExportRequest profileExportRequest);
 
 }

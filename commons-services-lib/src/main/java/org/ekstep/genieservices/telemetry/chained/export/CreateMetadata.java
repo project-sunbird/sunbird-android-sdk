@@ -31,10 +31,10 @@ public class CreateMetadata implements IChainable<TelemetryExportResponse, Expor
 
     @Override
     public GenieResponse<TelemetryExportResponse> execute(AppContext appContext, ExportTelemetryContext exportContext) {
-        IDBSession destinationDBSession = exportContext.getDataSource().getReadWriteDataSource(exportContext.getDestinationDBFilePath());
+        IDBSession destinationDBSession = appContext.getExternalDBSession(exportContext.getDestinationDBFilePath());
 
         Map<String, Object> metadata = new HashMap<>();
-        metadata.put(ServiceConstants.VERSION, String.valueOf(exportContext.getSourceDBVersion()));
+        metadata.put(ServiceConstants.VERSION, String.valueOf(appContext.getDBSession().getDBVersion()));
         metadata.put(ServiceConstants.EXPORT_TYPES, GsonUtil.toJson(Collections.singletonList(ServiceConstants.EXPORT_TYPE_TELEMETRY)));
         metadata.put(ServiceConstants.DID, appContext.getDeviceInfo().getDeviceID());
         metadata.put(ServiceConstants.EXPORT_ID, UUID.randomUUID().toString());

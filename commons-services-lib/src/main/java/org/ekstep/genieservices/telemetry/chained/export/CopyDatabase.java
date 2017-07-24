@@ -24,7 +24,7 @@ public class CopyDatabase implements IChainable<TelemetryExportResponse, ExportT
     @Override
     public GenieResponse<TelemetryExportResponse> execute(AppContext appContext, ExportTelemetryContext exportContext) {
         try {
-            FileUtil.cp(exportContext.getSourceDBFilePath(), exportContext.getDestinationDBFilePath());
+            FileUtil.cp(appContext.getDBSession().getDatabasePath(), exportContext.getDestinationDBFilePath());
         } catch (IOException e) {
             e.printStackTrace();
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, e.getMessage(), TAG);

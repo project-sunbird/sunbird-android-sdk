@@ -1,11 +1,11 @@
 package org.ekstep.genieservices;
 
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.TelemetryExportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
+import org.ekstep.genieservices.commons.bean.TelemetryImportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
-import org.ekstep.genieservices.importexport.bean.ExportTelemetryContext;
-import org.ekstep.genieservices.importexport.bean.ImportTelemetryContext;
 
 /**
  * This is the interface with all the required APIs to perform necessary operations related to Telemetry
@@ -51,17 +51,17 @@ public interface ITelemetryService {
     /**
      * This API is used to import telemetry.
      *
-     * @param importTelemetryContext - {@link ImportTelemetryContext}
+     * @param telemetryImportRequest - {@link TelemetryImportRequest}
      * @return {@link GenieResponse<Void>}
      */
-    GenieResponse<Void> importTelemetry(ImportTelemetryContext importTelemetryContext);
+    GenieResponse<Void> importTelemetry(TelemetryImportRequest telemetryImportRequest);
 
     /**
      * This API is used to export telemetry.
      *
-     * @param exportTelemetryContext - {@link ExportTelemetryContext}
+     * @param telemetryExportRequest - {@link TelemetryExportRequest}
      * @return {@link GenieResponse<TelemetryExportResponse>}
      */
-    GenieResponse<TelemetryExportResponse> exportTelemetry(ExportTelemetryContext exportTelemetryContext);
+    GenieResponse<TelemetryExportResponse> exportTelemetry(TelemetryExportRequest telemetryExportRequest);
 
 }

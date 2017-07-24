@@ -31,7 +31,7 @@ public class TransportSummarizer implements IChainable<ProfileImportResponse, Im
 
     @Override
     public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportProfileContext importContext) {
-        IDBSession externalDBSession = importContext.getDataSource().getReadOnlyDataSource(importContext.getSourceDBFilePath());
+        IDBSession externalDBSession = appContext.getExternalDBSession(importContext.getSourceDBFilePath());
 
         //check table exist
         if (isTableExist(externalDBSession, LearnerAssessmentsEntry.TABLE_NAME) &&

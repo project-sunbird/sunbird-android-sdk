@@ -38,7 +38,7 @@ public class CleanupExportedFile implements IChainable<ProfileExportResponse, Ex
 
     @Override
     public GenieResponse<ProfileExportResponse> execute(AppContext appContext, ExportProfileContext exportContext) {
-        IDBSession destinationDBSession = exportContext.getDataSource().getReadWriteDataSource(exportContext.getDestinationDBFilePath());
+        IDBSession destinationDBSession = appContext.getExternalDBSession(exportContext.getDestinationDBFilePath());
         List<String> allTables = getAllTables(destinationDBSession);
         List<String> allTableToExclude = getAllTableToExclude();
 

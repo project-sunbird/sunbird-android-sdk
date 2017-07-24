@@ -16,13 +16,32 @@ import org.ekstep.genieservices.commons.utils.Logger;
 public class SQLiteSession implements IDBSession {
 
     private static final String LOG_TAG = SQLiteSession.class.getSimpleName();
-    private AppContext appContext;
+    private AppContext<Context> appContext;
     private SQLiteDatabase database;
     private boolean isOperationSuccessful;
+    private String dbName;
+    private int dbVersion;
 
-    public SQLiteSession(AppContext<Context> appContext, SQLiteDatabase database) {
+    public SQLiteSession(AppContext<Context> appContext, SQLiteDatabase database, String dbName, int dbVersion) {
         this.appContext = appContext;
         this.database = database;
+        this.dbName = dbName;
+        this.dbVersion = dbVersion;
+    }
+
+    @Override
+    public String getDBName() {
+        return this.dbName;
+    }
+
+    @Override
+    public int getDBVersion() {
+        return dbVersion;
+    }
+
+    @Override
+    public String getDatabasePath() {
+        return appContext.getContext().getDatabasePath(dbName).getPath();
     }
 
     private Void execute(IDBOperation<SQLiteDatabase> operate) {

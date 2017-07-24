@@ -1,7 +1,5 @@
 package org.ekstep.genieservices.importexport.bean;
 
-import org.ekstep.genieservices.commons.db.operations.IDataSource;
-
 import java.util.Map;
 
 /**
@@ -12,41 +10,20 @@ import java.util.Map;
 public class ExportTelemetryContext {
 
     private String destinationFolder;
-    private IDataSource dataSource;
-    private String sourceDBFilePath;
-    private int sourceDBVersion;
     private String destinationDBFilePath;
     private Map<String, Object> metadata;
 
-    public ExportTelemetryContext(String destinationFolder, IDataSource dataSource, String sourceDBFilePath, int sourceDBVersion) {
+    public ExportTelemetryContext(String destinationFolder, String destinationDBFilePath) {
         this.destinationFolder = destinationFolder;
-        this.dataSource = dataSource;
-        this.sourceDBFilePath = sourceDBFilePath;
-        this.sourceDBVersion = sourceDBVersion;
+        this.destinationDBFilePath = destinationDBFilePath;
     }
 
     public String getDestinationFolder() {
         return destinationFolder;
     }
 
-    public IDataSource getDataSource() {
-        return dataSource;
-    }
-
-    public String getSourceDBFilePath() {
-        return sourceDBFilePath;
-    }
-
-    public int getSourceDBVersion() {
-        return sourceDBVersion;
-    }
-
     public String getDestinationDBFilePath() {
         return destinationDBFilePath;
-    }
-
-    public void setDestinationDBFilePath(String destinationDBFilePath) {
-        this.destinationDBFilePath = destinationDBFilePath;
     }
 
     public Map<String, Object> getMetadata() {

@@ -1,7 +1,5 @@
 package org.ekstep.genieservices.importexport.bean;
 
-import org.ekstep.genieservices.commons.db.operations.IDataSource;
-
 import java.util.Map;
 
 /**
@@ -11,20 +9,14 @@ import java.util.Map;
  */
 public class ImportProfileContext {
 
-    private IDataSource dataSource;
     private String sourceDBFilePath;
     private Map<String, Object> metadata;
 
     private int imported;
     private int failed;
 
-    public ImportProfileContext(IDataSource dataSource, String sourceDBFilePath) {
-        this.dataSource = dataSource;
+    public ImportProfileContext(String sourceDBFilePath) {
         this.sourceDBFilePath = sourceDBFilePath;
-    }
-
-    public IDataSource getDataSource() {
-        return dataSource;
     }
 
     public String getSourceDBFilePath() {

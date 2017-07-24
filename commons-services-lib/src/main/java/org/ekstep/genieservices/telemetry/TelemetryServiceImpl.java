@@ -7,7 +7,9 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.TelemetryExportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
+import org.ekstep.genieservices.commons.bean.TelemetryImportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
@@ -302,29 +304,42 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
     }
 
     @Override
-    public GenieResponse<Void> importTelemetry(ImportTelemetryContext importTelemetryContext) {
-        ValidateTelemetryMetadata validateTelemetryMetadata = new ValidateTelemetryMetadata();
-        validateTelemetryMetadata.then(new TransportProcessedEventsImportEvent())
-                .then(new UpdateImportedTelemetryMetadata())
-                .then(new AddGeTransferTelemetryImportEvent());
+    public GenieResponse<Void> importTelemetry(TelemetryImportRequest telemetryImportRequest) {
+        GenieResponse<Void> response;
+        if (!FileUtil.doesFileExists(telemetryImportRequest.getSourceFilePath())) {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Telemetry event import failed, file doesn't exists", TAG);
+            return response;
+        }
 
-        return validateTelemetryMetadata.execute(mAppContext, importTelemetryContext);
+        String ext = FileUtil.getFileExtension(telemetryImportRequest.getSourceFilePath());
+        if (ServiceConstants.FileExtension.TELEMETRY.equals(ext)) {
+            ImportTelemetryContext importTelemetryContext = new ImportTelemetryContext(telemetryImportRequest.getSourceFilePath());
+
+            ValidateTelemetryMetadata validateTelemetryMetadata = new ValidateTelemetryMetadata();
+            validateTelemetryMetadata.then(new TransportProcessedEventsImportEvent())
+                    .then(new UpdateImportedTelemetryMetadata())
+                    .then(new AddGeTransferTelemetryImportEvent());
+
+            return validateTelemetryMetadata.execute(mAppContext, importTelemetryContext);
+        } else {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Telemetry event import failed, unsupported file extension", TAG);
+            return response;
+        }
     }
 
     @Override
-    public GenieResponse<TelemetryExportResponse> exportTelemetry(ExportTelemetryContext exportTelemetryContext) {
-        File destinationFolder = new File(exportTelemetryContext.getDestinationFolder());
+    public GenieResponse<TelemetryExportResponse> exportTelemetry(TelemetryExportRequest telemetryExportRequest) {
+        File destinationFolder = new File(telemetryExportRequest.getDestinationFolder());
         String destinationDBFilePath = FileUtil.getExportTelemetryFilePath(destinationFolder);
 
         if (FileUtil.doesFileExists(destinationDBFilePath)) {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "File already exists.", TAG);
         }
-        // Set the destination DB file path.
-        exportTelemetryContext.setDestinationDBFilePath(destinationDBFilePath);
 
         // Process the event before exporting.
         EventProcessorFactory.processEvents(mAppContext);
 
+        ExportTelemetryContext exportTelemetryContext = new ExportTelemetryContext(telemetryExportRequest.getDestinationFolder(), destinationDBFilePath);
         CopyDatabase copyDatabase = new CopyDatabase();
         copyDatabase.then(new CreateMetadata())
                 .then(new CleanupExportedFile())

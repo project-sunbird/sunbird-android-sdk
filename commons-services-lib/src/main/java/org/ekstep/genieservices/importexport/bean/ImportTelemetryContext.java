@@ -1,7 +1,5 @@
 package org.ekstep.genieservices.importexport.bean;
 
-import org.ekstep.genieservices.commons.db.operations.IDataSource;
-
 import java.util.Map;
 
 /**
@@ -11,17 +9,11 @@ import java.util.Map;
  */
 public class ImportTelemetryContext {
 
-    private IDataSource dataSource;
     private String sourceDBFilePath;
     private Map<String, Object> metadata;
 
-    public ImportTelemetryContext(IDataSource dataSource, String sourceDBFilePath) {
-        this.dataSource = dataSource;
+    public ImportTelemetryContext(String sourceDBFilePath) {
         this.sourceDBFilePath = sourceDBFilePath;
-    }
-
-    public IDataSource getDataSource() {
-        return dataSource;
     }
 
     public String getSourceDBFilePath() {

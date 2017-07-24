@@ -24,7 +24,7 @@ public class CopyDatabase implements IChainable<ProfileExportResponse, ExportPro
     @Override
     public GenieResponse<ProfileExportResponse> execute(AppContext appContext, ExportProfileContext exportContext) {
         try {
-            FileUtil.cp(exportContext.getSourceDBFilePath(), exportContext.getDestinationDBFilePath());
+            FileUtil.cp(appContext.getDBSession().getDatabasePath(), exportContext.getDestinationDBFilePath());
         } catch (IOException e) {
             e.printStackTrace();
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, e.getMessage(), TAG);

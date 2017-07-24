@@ -1,11 +1,13 @@
 package org.ekstep.genieservices.commons;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 
 import org.ekstep.genieservices.commons.db.ServiceDbHelper;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.cache.PreferenceWrapper;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.commons.db.operations.impl.SQLiteSession;
 import org.ekstep.genieservices.commons.download.AndroidDownloadManager;
 import org.ekstep.genieservices.commons.network.AndroidHttpClientFactory;
 import org.ekstep.genieservices.commons.network.AndroidNetworkConnectivity;
@@ -64,6 +66,12 @@ public class AndroidAppContext extends AppContext<Context> {
 
     private void setLocationInfo(ILocationInfo mLocationInfo) {
         this.mLocationInfo = mLocationInfo;
+    }
+
+    @Override
+    public IDBSession getExternalDBSession(String filePath) {
+        SQLiteDatabase database = SQLiteDatabase.openDatabase(filePath, null, SQLiteDatabase.OPEN_READWRITE);
+        return new SQLiteSession(this, database, null, 0);
     }
 
     @Override

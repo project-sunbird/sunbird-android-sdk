@@ -22,7 +22,7 @@ public class TransportProcessedEventsImportEvent implements IChainable<Void, Imp
 
     @Override
     public GenieResponse<Void> execute(AppContext appContext, ImportTelemetryContext importContext) {
-        IDBSession externalDBSession = importContext.getDataSource().getReadOnlyDataSource(importContext.getSourceDBFilePath());
+        IDBSession externalDBSession = appContext.getExternalDBSession(importContext.getSourceDBFilePath());
         ProcessedEventsModel processedEventsModel = ProcessedEventsModel.find(externalDBSession);
         if (processedEventsModel != null) {
             for (ProcessedEventModel model : processedEventsModel.getProcessedEventList()) {

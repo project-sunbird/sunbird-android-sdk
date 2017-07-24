@@ -18,8 +18,6 @@ import org.ekstep.genieservices.config.ConfigServiceImpl;
 import org.ekstep.genieservices.content.ContentFeedbackServiceImpl;
 import org.ekstep.genieservices.content.ContentServiceImpl;
 import org.ekstep.genieservices.content.LanguageServiceImpl;
-import org.ekstep.genieservices.importexport.FileExporter;
-import org.ekstep.genieservices.importexport.FileImporter;
 import org.ekstep.genieservices.notification.NotificationServiceImpl;
 import org.ekstep.genieservices.partner.PartnerServiceImpl;
 import org.ekstep.genieservices.profile.SummarizerServiceImpl;
@@ -58,8 +56,6 @@ public class GenieService {
     private IAuthService mAuthService;
     private ITagService mTagService;
     private IDownloadService mDownloadService;
-    private FileImporter mFileImporter;
-    private FileExporter mFileExporter;
 
     private GenieService(AppContext<Context> appContext) {
         this.mAppContext = appContext;
@@ -329,17 +325,4 @@ public class GenieService {
         return mAppContext.getLocationInfo();
     }
 
-    public FileImporter getFileImporter() {
-        if (mFileImporter == null) {
-            mFileImporter = new FileImporter(mAppContext);
-        }
-        return mFileImporter;
-    }
-
-    public FileExporter getFileExporter() {
-        if (mFileExporter == null) {
-            mFileExporter = new FileExporter(mAppContext);
-        }
-        return mFileExporter;
-    }
 }

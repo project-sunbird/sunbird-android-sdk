@@ -30,7 +30,7 @@ public class CleanupExportedFile implements IChainable<TelemetryExportResponse, 
 
     @Override
     public GenieResponse<TelemetryExportResponse> execute(AppContext appContext, ExportTelemetryContext exportContext) {
-        IDBSession destinationDBSession = exportContext.getDataSource().getReadWriteDataSource(exportContext.getDestinationDBFilePath());
+        IDBSession destinationDBSession = appContext.getExternalDBSession(exportContext.getDestinationDBFilePath());
         List<String> allTables = getAllTables(destinationDBSession);
         List<String> allTableToExclude = getAllTableToExclude();
 

@@ -11,8 +11,6 @@ import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
 import org.ekstep.genieservices.commons.bean.TelemetryImportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
-import org.ekstep.genieservices.importexport.FileExporter;
-import org.ekstep.genieservices.importexport.FileImporter;
 
 /**
  * This class provides all the required APIs to perform necessary operations related to Telemetry on a separate thread.
@@ -20,13 +18,9 @@ import org.ekstep.genieservices.importexport.FileImporter;
 public class TelemetryService {
 
     private ITelemetryService telemetryService;
-    private FileImporter fileImporter;
-    private FileExporter fileExporter;
 
     public TelemetryService(GenieService genieService) {
         this.telemetryService = genieService.getTelemetryService();
-        this.fileImporter = genieService.getFileImporter();
-        this.fileExporter = genieService.getFileExporter();
     }
 
     /**
@@ -57,7 +51,7 @@ public class TelemetryService {
      * <p>On failing to save the telemetry details, the response will return status as FALSE and the error be the following:
      * <p>PROCESSING_ERROR
      *
-     * @param event - {@link Telemetry}
+     * @param event           - {@link Telemetry}
      * @param responseHandler - {@link IResponseHandler<Void>}
      */
     public void saveTelemetry(final Telemetry event, IResponseHandler<Void> responseHandler) {
@@ -93,20 +87,20 @@ public class TelemetryService {
      * <p>On failing to importing the telemetry, the response will return status as FALSE and the error be the following:
      * <p>INVALID_FILE
      *
-     * @param telemetryImportRequest   - {@link TelemetryImportRequest}
-     * @param responseHandler - {@link IResponseHandler<Void>}
+     * @param telemetryImportRequest - {@link TelemetryImportRequest}
+     * @param responseHandler        - {@link IResponseHandler<Void>}
      */
     public void importTelemetry(final TelemetryImportRequest telemetryImportRequest, IResponseHandler<Void> responseHandler) {
         new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
-                return fileImporter.importTelemetry(telemetryImportRequest, telemetryService);
+                return telemetryService.importTelemetry(telemetryImportRequest);
             }
         });
     }
 
     /**
-     *  This api is used to export the telemetry.
+     * This api is used to export the telemetry.
      * <p>
      * <p> On successful exporting the telemetry, the response will return status as TRUE.
      * <p>
@@ -114,13 +108,13 @@ public class TelemetryService {
      * <p>EXPORT_FAILED
      *
      * @param telemetryExportRequest - {@link TelemetryExportRequest}
-     * @param responseHandler - {@link IResponseHandler<TelemetryExportResponse>}
+     * @param responseHandler        - {@link IResponseHandler<TelemetryExportResponse>}
      */
     public void exportTelemetry(final TelemetryExportRequest telemetryExportRequest, IResponseHandler<TelemetryExportResponse> responseHandler) {
         new AsyncHandler<TelemetryExportResponse>(responseHandler).execute(new IPerformable<TelemetryExportResponse>() {
             @Override
             public GenieResponse<TelemetryExportResponse> perform() {
-                return fileExporter.exportTelemetry(telemetryExportRequest, telemetryService);
+                return telemetryService.exportTelemetry(telemetryExportRequest);
             }
         });
     }

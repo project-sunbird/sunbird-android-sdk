@@ -12,8 +12,6 @@ import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
-import org.ekstep.genieservices.importexport.FileExporter;
-import org.ekstep.genieservices.importexport.FileImporter;
 
 import java.util.List;
 
@@ -23,13 +21,9 @@ import java.util.List;
 public class UserService {
 
     private IUserService userService;
-    private FileImporter fileImporter;
-    private FileExporter fileExporter;
 
     public UserService(GenieService genieService) {
         this.userService = genieService.getUserService();
-        this.fileImporter = genieService.getFileImporter();
-        this.fileExporter = genieService.getFileExporter();
     }
 
     /**
@@ -252,14 +246,14 @@ public class UserService {
      * <p>On failing to importing the profile, the response will return status as FALSE and the error be the following:
      * <p>IMPORT_FAILED
      *
-     * @param profileImportRequest   - {@link ProfileImportRequest}
-     * @param responseHandler - {@link IResponseHandler<Void>}
+     * @param profileImportRequest - {@link ProfileImportRequest}
+     * @param responseHandler      - {@link IResponseHandler<Void>}
      */
     public void importProfile(final ProfileImportRequest profileImportRequest, IResponseHandler<ProfileImportResponse> responseHandler) {
         new AsyncHandler<ProfileImportResponse>(responseHandler).execute(new IPerformable<ProfileImportResponse>() {
             @Override
             public GenieResponse<ProfileImportResponse> perform() {
-                return fileImporter.importProfile(profileImportRequest, userService);
+                return userService.importProfile(profileImportRequest);
             }
         });
     }
@@ -279,7 +273,7 @@ public class UserService {
         new AsyncHandler<ProfileExportResponse>(responseHandler).execute(new IPerformable<ProfileExportResponse>() {
             @Override
             public GenieResponse<ProfileExportResponse> perform() {
-                return fileExporter.exportProfile(profileExportRequest, userService);
+                return userService.exportProfile(profileExportRequest);
             }
         });
     }

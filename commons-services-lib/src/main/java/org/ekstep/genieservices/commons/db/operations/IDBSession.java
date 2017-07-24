@@ -12,6 +12,12 @@ import org.ekstep.genieservices.commons.db.core.IWritable;
  */
 public interface IDBSession {
 
+    String getDBName();
+
+    int getDBVersion();
+
+    String getDatabasePath();
+
     Void beginTransaction();
 
     Void endTransaction();
