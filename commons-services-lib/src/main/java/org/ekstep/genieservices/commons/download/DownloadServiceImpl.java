@@ -4,9 +4,11 @@ import org.ekstep.genieservices.IDownloadService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IDownloadManager;
+import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.CorrelationData;
 import org.ekstep.genieservices.commons.bean.DownloadProgress;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
+import org.ekstep.genieservices.commons.bean.enums.ContentImportStatus;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
 import org.ekstep.genieservices.eventbus.EventBus;
@@ -167,6 +169,7 @@ public class DownloadServiceImpl implements IDownloadService {
 
     @Override
     public void onDownloadComplete(String identifier) {
+        EventBus.postEvent(new ContentImportResponse(identifier, ContentImportStatus.DOWNLOAD_COMPLETED));
         DownloadRequest request = mDownloadQueueManager.getRequestByIdentifier(identifier);
         TelemetryLogger.log(buildGEInteractEvent(InteractionType.OTHER, ServiceConstants.Telemetry.CONTENT_DOWNLOAD_SUCCESS, request.getCorrelationData(), request.getIdentifier()));
         mDownloadQueueManager.removeFromQueue(identifier);
@@ -175,6 +178,7 @@ public class DownloadServiceImpl implements IDownloadService {
 
     @Override
     public void onDownloadFailed(String identifier) {
+        EventBus.postEvent(new ContentImportResponse(identifier, ContentImportStatus.DOWNLOAD_FAILED));
         mDownloadQueueManager.removeFromQueue(identifier);
     }
 }
