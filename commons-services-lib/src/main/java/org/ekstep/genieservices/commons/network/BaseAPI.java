@@ -1,5 +1,6 @@
 package org.ekstep.genieservices.commons.network;
 
+import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.auth.AuthHandler;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
@@ -34,6 +35,8 @@ public abstract class BaseAPI {
         this.httpClientFactory = appContext.getHttpClientFactory();
         this.headers = new HashMap<>();
         this.headers.put("Accept-Encoding", "gzip, deflate");
+        this.headers.put("X-Channel-Id", mAppContext.getParams().getString(ServiceConstants.Params.CHANNEL_ID));
+        this.headers.put("X-App-Id", mAppContext.getParams().getString(ServiceConstants.Params.PRODUCER_ID));
     }
 
     public GenieResponse get() {
