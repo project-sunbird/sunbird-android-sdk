@@ -76,7 +76,7 @@ public class DownloadServiceImpl implements IDownloadService {
                 DownloadProgress progress = mDownloadManager.getProgress(request.getDownloadId());
                 if (progress.getStatus() == IDownloadManager.UNKNOWN || progress.getStatus() == IDownloadManager.FAILED || progress.getStatus() == IDownloadManager.COMPLETED) {
                     //clear and restart the download. this means the onDownloadComplete did not fire for some reason
-                    removeDownloadedFile(request.getDownloadId(), request.getDownloadedFilePath());
+                    removeDownloadedFile(request.getDownloadId());
                     mDownloadQueueManager.removeFromCurrentDownloadQueue(request.getIdentifier());
                     request.setDownloadId(-1);
                     mDownloadQueueManager.updateDownload(request);
@@ -128,7 +128,7 @@ public class DownloadServiceImpl implements IDownloadService {
                 if (mExecutor != null) {
                     mExecutor.shutdown();
                 }
-                removeDownloadedFile(request.getDownloadId(), request.getDownloadedFilePath());
+                removeDownloadedFile(request.getDownloadId());
                 mDownloadQueueManager.removeFromCurrentDownloadQueue(identifier);
             }
             mDownloadQueueManager.removeFromQueue(identifier);
@@ -137,11 +137,12 @@ public class DownloadServiceImpl implements IDownloadService {
     }
 
     @Override
-    public void removeDownloadedFile(long downloadId, String downloadedFilePath) {
-        mDownloadManager.cancel(downloadId);
-
+    public void removeDownloadedFile(long downloadId) {
         // Delete the downloaded file.
-        FileUtil.rm(new File(downloadedFilePath));
+        DownloadRequest downloadRequest = mDownloadQueueManager.getRequestByDownloadId(downloadId);
+        FileUtil.rm(new File(downloadRequest.getDownloadedFilePath()));
+
+        mDownloadManager.cancel(downloadId);
     }
 
     @Override

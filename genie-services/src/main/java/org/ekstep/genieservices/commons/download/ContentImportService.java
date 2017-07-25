@@ -33,7 +33,7 @@ public class ContentImportService extends Service {
         contentService.importEcar(ecarImportRequest.build());
 
         IDownloadService downloadService = GenieService.getService().getDownloadService();
-        downloadService.removeDownloadedFile(downloadRequest.getDownloadId(), downloadRequest.getDownloadedFilePath());
+        downloadService.removeDownloadedFile(downloadRequest.getDownloadId());
         downloadService.resumeDownloads();
 
         stopSelf();
