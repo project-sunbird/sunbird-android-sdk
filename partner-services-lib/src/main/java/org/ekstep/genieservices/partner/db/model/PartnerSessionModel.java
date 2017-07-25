@@ -42,19 +42,19 @@ public class PartnerSessionModel {
 
     private void read() {
         this.partnerID = appContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.KEY_ACTIVE_PARTNER_ID, "");
-        this.epochTime = appContext.getKeyValueStore().getLong(ServiceConstants.PreferenceKey.SHARED_PREF_PARTNERSET_EPOCH, 0L);
+        this.epochTime = appContext.getKeyValueStore().getLong(ServiceConstants.PreferenceKey.SHARED_PREF_PARTNER_SET_EPOCH, 0L);
         this.sessionId = appContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.SHARED_PREF_SESSION_KEY, "");
     }
 
     public void save() {
         appContext.getKeyValueStore().putString(ServiceConstants.PreferenceKey.KEY_ACTIVE_PARTNER_ID, partnerID);
-        appContext.getKeyValueStore().putLong(ServiceConstants.PreferenceKey.SHARED_PREF_PARTNERSET_EPOCH, DateUtil.getEpochTime());
+        appContext.getKeyValueStore().putLong(ServiceConstants.PreferenceKey.SHARED_PREF_PARTNER_SET_EPOCH, DateUtil.getEpochTime());
         appContext.getKeyValueStore().putString(ServiceConstants.PreferenceKey.SHARED_PREF_SESSION_KEY, UUID.randomUUID().toString());
     }
 
     public void clear() {
         appContext.getKeyValueStore().putString(ServiceConstants.PreferenceKey.KEY_ACTIVE_PARTNER_ID, "");
-        appContext.getKeyValueStore().remove(ServiceConstants.PreferenceKey.SHARED_PREF_PARTNERSET_EPOCH);
+        appContext.getKeyValueStore().remove(ServiceConstants.PreferenceKey.SHARED_PREF_PARTNER_SET_EPOCH);
         appContext.getKeyValueStore().remove(ServiceConstants.PreferenceKey.SHARED_PREF_SESSION_KEY);
     }
 

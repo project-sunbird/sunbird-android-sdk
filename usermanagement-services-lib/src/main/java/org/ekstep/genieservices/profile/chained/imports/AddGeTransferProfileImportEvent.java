@@ -4,48 +4,32 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransfer;
-import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
-import org.ekstep.genieservices.commons.bean.telemetry.GETransferMap;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.LongUtil;
+import org.ekstep.genieservices.importexport.bean.ImportProfileContext;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 import org.ekstep.genieservices.telemetry.model.ImportedMetadataListModel;
 import org.ekstep.genieservices.telemetry.model.ImportedMetadataModel;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created on 6/8/2017.
  *
  * @author anil
  */
-public class AddGeTransferProfileImportEvent implements IChainable<ProfileImportResponse> {
+public class AddGeTransferProfileImportEvent implements IChainable<ProfileImportResponse, ImportProfileContext> {
 
     private static final String TAG = AddGeTransferProfileImportEvent.class.getSimpleName();
 
     @Override
-    public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportProfileContext importContext) {
 
         ImportedMetadataListModel importedMetadataListModel = ImportedMetadataListModel.findAll(appContext.getDBSession());
         if (importedMetadataListModel != null) {
-            int aggregateCount = 0;
-            ArrayList<GETransferMap> contents = new ArrayList<>();
-            for (ImportedMetadataModel importMetadata : importedMetadataListModel.getImportedMetadataModelList()) {
-                aggregateCount += importMetadata.getCount();
-                contents.add(GETransferMap.createMapForTelemetry(importMetadata.getDeviceId(),
-                        importMetadata.getImportedId(), importMetadata.getCount()));
-            }
-            GETransferEventKnowStructure eks = new GETransferEventKnowStructure(
-                    GETransferEventKnowStructure.TRANSFER_DIRECTION_IMPORT,
-                    GETransferEventKnowStructure.DATATYPE_PROFILE,
-                    aggregateCount,
-                    LongUtil.tryParseToLong((String) importContext.getMetadata().get(GETransferEventKnowStructure.FILE_SIZE), 0),
-                    contents);
-            GETransfer geTransfer = new GETransfer(eks);
-            TelemetryLogger.log(geTransfer);
+            logGETransferEvent(importContext, importedMetadataListModel.getImportedMetadataModelList());
 
             ProfileImportResponse profileImportResponse = new ProfileImportResponse();
             profileImportResponse.setImported(importContext.getImported());
@@ -60,7 +44,25 @@ public class AddGeTransferProfileImportEvent implements IChainable<ProfileImport
     }
 
     @Override
-    public IChainable<ProfileImportResponse> then(IChainable<ProfileImportResponse> link) {
+    public IChainable<ProfileImportResponse, ImportProfileContext> then(IChainable<ProfileImportResponse, ImportProfileContext> link) {
         return link;
+    }
+
+    private void logGETransferEvent(ImportProfileContext importContext, List<ImportedMetadataModel> importedMetadataModelList) {
+        int aggregateCount = 0;
+        GETransfer.Builder geTransfer = new GETransfer.Builder();
+        geTransfer.directionImport()
+                .dataTypeProfile()
+                .size(LongUtil.tryParseToLong((String) importContext.getMetadata().get(ServiceConstants.FILE_SIZE), 0));
+
+        for (ImportedMetadataModel importedMetadataModel : importedMetadataModelList) {
+            aggregateCount += importedMetadataModel.getCount();
+
+            geTransfer.addContent(importedMetadataModel.getDeviceId(), importedMetadataModel.getImportedId(), importedMetadataModel.getCount());
+        }
+
+        geTransfer.count(aggregateCount);
+
+        TelemetryLogger.log(geTransfer.build());
     }
 }

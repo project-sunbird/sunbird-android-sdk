@@ -6,21 +6,11 @@ package org.ekstep.genieservices;
  * @author swayangjit
  */
 public interface ServiceConstants {
-    String SERVICE_ERROR = "SERVICE_ERROR";
-    String INVALID_JSON = "invalid json";
     String UNABLE_TO_CREATE_ANONYMOUS_USER = "unable to create anonymous user";
     String SUCCESS_RESPONSE = "successful";
     String FAILED_RESPONSE = "failed";
     String ERROR_DELETING_A_USER = "Error when deleting user profile";
-
-    String INVALID_USER = "INVALID_USER";
-    String NO_USER_WITH_SPECIFIED_ID = "There is no user with specified id exists";
     String VALIDATION_ERROR = "VALIDATION_ERROR";
-    String INVALID_PROFILE = "INVALID_PROFILE";
-    String UNABLE_TO_FIND_PROFILE = "unable to find profile";
-
-    String NOT_EXISTS = "NOT_EXISTS";
-    String NO_CURRENT_USER = "There is no current user";
 
     /* Key Constants for all the key value store */
     String KEY_USER_SESSION = "session";
@@ -33,10 +23,12 @@ public interface ServiceConstants {
     String EXPORT_TYPES = "types";
     String EXPORT_TYPE_TELEMETRY = "telemetry";
     String EXPORT_TYPE_PROFILE = "userprofile";
+    String FILE_SIZE = "FILE_SIZE";
+    String FILE_TYPE = "FILE_TYPE";
+    String CONTENT_ITEMS_KEY = "contents";
 
     interface Params {
         String APPLICATION_ID = "APPLICATION_ID";
-        String VERSION_CODE = "VERSION_CODE";
         String VERSION_NAME = "VERSION_NAME";
         String PRODUCER_ID = "PRODUCER_ID";
         String CHANNEL_ID = "CHANNEL_ID";
@@ -85,14 +77,12 @@ public interface ServiceConstants {
 
     interface PreferenceKey {
         //Sync service pref keys
-        String SYNC_CONFIG_SHARED_PREFERENCE_KEY = "syncConfig";
         String LAST_SYNC_TIME = "lastSyncTime";
-        String SYNC_FILE_SIZE = "SYNC_FILE_SIZE";
 
         //Partner
         String KEY_ACTIVE_PARTNER_ID = "partner.activeid";
         String SHARED_PREF_SESSION_KEY = "partnersessionid";
-        String SHARED_PREF_PARTNERSET_EPOCH = "partnerSET";
+        String SHARED_PREF_PARTNER_SET_EPOCH = "partnerSET";
     }
 
     interface Partner {
@@ -106,10 +96,6 @@ public interface ServiceConstants {
     interface Event {
         String ERROR_INVALID_EVENT = "Invalid event";
         String ERROR_INVALID_JSON = "Invalid Json";
-    }
-
-    interface Tags {
-        String KEY_GENIE_TAGS = "GENIE_TAGS";
     }
 
     interface APIExecutionMode {
@@ -164,8 +150,8 @@ public interface ServiceConstants {
     }
 
     interface ErrorMessage {
-        String UNABLE_TO_FIND_PROFILE = "unable to find profile";
-        String UNABLE_TO_FIND_SUMMARY = "unable to find summary";
+        String UNABLE_TO_FIND_PROFILE = "Unable to find profile";
+        String UNABLE_TO_FIND_SUMMARY = "Unable to find summary";
         String UNABLE_TO_SAVE_LEARNER_ASSESSMENT = "unable to save learner assessment";
         String NO_USER_WITH_SPECIFIED_ID = "There is no user with specified id exists";
 
@@ -177,23 +163,23 @@ public interface ServiceConstants {
         String UNABLE_TO_CREATE_PROFILE = "Unable to create profile";
         String INVALID_PROFILE = "Invalid profile";
         String UNABLE_TO_FIND_ALL_PROFILE = "Unable to find all profile";
-        String UNABLE_TO_UPDTAE_PROFILE = "Unable to update profile";
+        String UNABLE_TO_UPDATE_PROFILE = "Unable to update profile";
         String UNABLE_TO_DELETE_PROFILE = "Unable to delete profile";
         String UNABLE_TO_SET_ANONYMOUS = "Unable to set anonymous profile";
         String UNABLE_TO_GET_ANONYMOUS = "Unable to get anonymous profile";
         String UNABLE_TO_SET_CURRENT_USER = "Unable to set current user";
 
         //Config
-        String UNABLE_TO_FIND_MASTER_DATA = "Unable to find masterdata";
-        String UNABLE_TO_FIND_RESOURCE_BUNDLE = "Unable to find resourcebundle";
-        String UNABLE_TO_FIND_ORDINALS = "Unable to find ordinals";
+        String UNABLE_TO_FIND_MASTER_DATA = "Unable to find master data.";
+        String UNABLE_TO_FIND_RESOURCE_BUNDLE = "Unable to find resource bundle.";
+        String UNABLE_TO_FIND_ORDINALS = "Unable to find ordinals.";
 
         //Tag
-        String TAG_NAME_SHOULD_NOT_BE_EMPTY = "Tag name can't be null or empty";
-        String UNABLE_TO_FIND_TAG = "Tag name not found";
+        String TAG_NAME_SHOULD_NOT_BE_EMPTY = "Tag name can't be null or empty.";
+        String UNABLE_TO_FIND_TAG = "Tag name not found.";
 
         //Sync
-        String UNABLE_TO_SYNC = "Sync Failed";
+        String UNABLE_TO_SYNC = "Sync Failed.";
 
         //Telemetry
         String UNABLE_TO_SAVE_EVENT = "Not able to save event";
@@ -202,7 +188,7 @@ public interface ServiceConstants {
         String IMPORT_PROFILE_FAILED = "Import profile failed.";
         String IMPORT_CONTENT_FAILED = "Import content failed.";
         String IMPORT_TELEMETRY_FAILED = "Import telemetry failed.";
-        String FILE_DOESNT_EXIST = "Content import failed, file doesn't exist.";
+        String FILE_DOES_NOT_EXIST = "Content import failed, file doesn't exist.";
         String UNSUPPORTED_FILE = "Content import failed, unsupported file extension";
         String CONTENT_NOT_FOUND = "No content found for identifier = ";
         String CONTENT_NOT_FOUND_TO_DELETE = "No content found to delete for identifier = ";
@@ -215,22 +201,5 @@ public interface ServiceConstants {
 
         //Authentication
         String FAILED_TO_GENERATE_TOKEN = "Failed to generate the bearer token";
-
-    }
-
-    interface GeTransferEvent {
-        String TRANSFER_DIRECTION_EXPORT = "EXPORT";
-        String TRANSFER_DIRECTION_IMPORT = "IMPORT";
-        String DATATYPE_TELEMETRY = "TELEMETRY";
-        String DATATYPE_CONTENT = "CONTENT";
-        String DATATYPE_EXPLODED_CONTENT = "EXPLODEDCONTENT";
-        String DATATYPE_PROFILE = "PROFILE";
-        String CONTENT_ITEMS_KEY = "contents";
-        String FILE_SIZE = "FILE_SIZE";
-        String FILE_TYPE = "FILE_TYPE";
-    }
-
-    interface Network {
-
     }
 }

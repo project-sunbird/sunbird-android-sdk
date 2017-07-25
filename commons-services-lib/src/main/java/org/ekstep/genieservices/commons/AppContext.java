@@ -24,6 +24,8 @@ public abstract class AppContext<C> {
 
     public abstract IParams getParams();
 
+    public abstract IDBSession getExternalDBSession(String filePath);
+
     public abstract IDBSession getDBSession();
 
     public abstract Void setDBSession(IDBSession session);

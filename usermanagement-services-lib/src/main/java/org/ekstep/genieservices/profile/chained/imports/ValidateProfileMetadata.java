@@ -4,10 +4,12 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.importexport.bean.ImportProfileContext;
+import org.ekstep.genieservices.importexport.db.model.MetadataModel;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,17 +20,22 @@ import java.util.Map;
  *
  * @author anil
  */
-public class ValidateProfileMetadata implements IChainable<ProfileImportResponse> {
+public class ValidateProfileMetadata implements IChainable<ProfileImportResponse, ImportProfileContext> {
 
     private static final String TAG = ValidateProfileMetadata.class.getSimpleName();
-    private IChainable<ProfileImportResponse> nextLink;
+    private IChainable<ProfileImportResponse, ImportProfileContext> nextLink;
 
     @Override
-    public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportProfileContext importContext) {
+        IDBSession externalDBSession = appContext.getExternalDBSession(importContext.getSourceDBFilePath());
+        // Read from imported DB
+        Map<String, Object> metadata = getMetadataNeedsToBeImport(externalDBSession);
 
-        if (importContext.getMetadata() != null && !importContext.getMetadata().isEmpty()) {
+        if (metadata != null && !metadata.isEmpty()) {
+            importContext.setMetadata(metadata);
+
             List<String> importTypes = getImportTypes(importContext.getMetadata());
-            if (!importTypes.contains(ServiceConstants.EXPORT_TYPE_PROFILE)) {
+            if (importTypes != null && !importTypes.contains(ServiceConstants.EXPORT_TYPE_PROFILE)) {
                 return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "Profile event import failed, type mismatch.", TAG);
             }
         } else {
@@ -43,13 +50,25 @@ public class ValidateProfileMetadata implements IChainable<ProfileImportResponse
     }
 
     @Override
-    public IChainable<ProfileImportResponse> then(IChainable<ProfileImportResponse> link) {
+    public IChainable<ProfileImportResponse, ImportProfileContext> then(IChainable<ProfileImportResponse, ImportProfileContext> link) {
         nextLink = link;
         return link;
     }
 
+    private Map<String, Object> getMetadataNeedsToBeImport(IDBSession externalDBSession) {
+        MetadataModel metadataModel = MetadataModel.findAll(externalDBSession);
+        Map<String, Object> metadata = null;
+        if (metadataModel != null) {
+            metadata = metadataModel.getMetadata();
+        }
+        return metadata;
+    }
+
     private List<String> getImportTypes(Map<String, Object> metadata) {
-        String importedDataType = (String) metadata.get(ServiceConstants.EXPORT_TYPES);
-        return Arrays.asList(GsonUtil.fromJson(importedDataType, String[].class));
+        if (metadata.containsKey(ServiceConstants.EXPORT_TYPES)) {
+            String importedDataType = (String) metadata.get(ServiceConstants.EXPORT_TYPES);
+            return Arrays.asList(GsonUtil.fromJson(importedDataType, String[].class));
+        }
+        return null;
     }
 }

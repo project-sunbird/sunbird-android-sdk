@@ -5,11 +5,11 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentExportResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.ContentHandler;
+import org.ekstep.genieservices.content.bean.ExportContentContext;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 
 import java.io.File;
@@ -23,11 +23,11 @@ import java.util.Map;
  *
  * @author anil
  */
-public class CopyAsset implements IChainable<ContentExportResponse> {
+public class CopyAsset implements IChainable<ContentExportResponse, ExportContentContext> {
 
     private static final String TAG = CopyAsset.class.getSimpleName();
 
-    private IChainable<ContentExportResponse> nextLink;
+    private IChainable<ContentExportResponse, ExportContentContext> nextLink;
     private List<ContentModel> contentModelsToExport;
 
     public CopyAsset(List<ContentModel> contentModelsToExport) {
@@ -35,14 +35,14 @@ public class CopyAsset implements IChainable<ContentExportResponse> {
     }
 
     @Override
-    public GenieResponse<ContentExportResponse> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<ContentExportResponse> execute(AppContext appContext, ExportContentContext exportContext) {
 
         List<String> assets;
         int i = 0;
 
         for (ContentModel contentModel : contentModelsToExport) {
             assets = new ArrayList<>();
-            Map item = importContext.getItems().get(i);
+            Map item = exportContext.getItems().get(i);
 
             String appIcon = ContentHandler.readAppIcon(item);
             if (!StringUtil.isNullOrEmpty(appIcon)) {
@@ -64,7 +64,7 @@ public class CopyAsset implements IChainable<ContentExportResponse> {
                     File source = new File(contentModel.getPath(), asset);
 
                     if (source.exists()) {
-                        File dest = new File(importContext.getTmpLocation(), asset);
+                        File dest = new File(exportContext.getTmpLocation(), asset);
                         dest.getParentFile().mkdirs();
 
                         try {
@@ -80,14 +80,14 @@ public class CopyAsset implements IChainable<ContentExportResponse> {
         }
 
         if (nextLink != null) {
-            return nextLink.execute(appContext, importContext);
+            return nextLink.execute(appContext, exportContext);
         } else {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "Export content failed", TAG);
         }
     }
 
     @Override
-    public IChainable<ContentExportResponse> then(IChainable<ContentExportResponse> link) {
+    public IChainable<ContentExportResponse, ExportContentContext> then(IChainable<ContentExportResponse, ExportContentContext> link) {
         nextLink = link;
         return link;
     }

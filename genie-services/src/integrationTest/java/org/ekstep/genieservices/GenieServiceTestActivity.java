@@ -23,12 +23,12 @@ import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
-import org.ekstep.genieservices.commons.bean.ImportRequest;
 import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.PartnerData;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
+import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
@@ -152,8 +152,8 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
-    public void importProfile(final ImportRequest importRequest, IResponseHandler<ProfileImportResponse> responseHandler) {
-        GenieService.getAsyncService().getUserService().importProfile(importRequest, responseHandler);
+    public void importProfile(final ProfileImportRequest profileImportRequest, IResponseHandler<ProfileImportResponse> responseHandler) {
+        GenieService.getAsyncService().getUserService().importProfile(profileImportRequest, responseHandler);
     }
 
     public void exportProfile(final ProfileExportRequest profileExportRequest, IResponseHandler<ProfileExportResponse> responseHandler) {

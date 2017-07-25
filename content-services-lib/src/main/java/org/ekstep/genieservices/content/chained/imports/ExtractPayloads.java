@@ -4,7 +4,6 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.Decompress;
 import org.ekstep.genieservices.commons.utils.FileUtil;
@@ -13,6 +12,7 @@ import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.ContentConstants;
 import org.ekstep.genieservices.content.ContentHandler;
+import org.ekstep.genieservices.content.bean.ImportContentContext;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 
 import java.io.File;
@@ -26,15 +26,21 @@ import java.util.UUID;
  *
  * @author anil
  */
-public class ExtractPayloads implements IChainable {
+public class ExtractPayloads implements IChainable<Void, ImportContentContext> {
 
     private static final String TAG = ExtractPayloads.class.getSimpleName();
+    private final File tmpLocation;
 
-    private IChainable nextLink;
+    private IChainable<Void, ImportContentContext> nextLink;
+
+    public ExtractPayloads(File tmpLocation) {
+        this.tmpLocation = tmpLocation;
+    }
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<Void> execute(AppContext appContext, ImportContentContext importContext) {
 
+        File destinationFolder = new File(importContext.getDestinationFolder());
         String identifier, mimeType, contentType, visibility, audience, path;
         Double compatibilityLevel, pkgVersion;
         int refCount;
@@ -87,11 +93,11 @@ public class ExtractPayloads implements IChainable {
                     uuid = UUID.randomUUID().toString();
                     // TODO: can remove uuid from destination
                     destination = identifier + "-" + uuid;
-                    payloadDestination = new File(FileUtil.getContentRootDir(importContext.getDestinationFolder()), destination);
+                    payloadDestination = new File(FileUtil.getContentRootDir(destinationFolder), destination);
                     payloadDestination.mkdirs();
 
                     try {
-                        copyAssets(importContext.getTmpLocation().getPath(), iconURL, payloadDestination);
+                        copyAssets(tmpLocation.getPath(), iconURL, payloadDestination);
                     } catch (IOException e) {
                         Logger.e(TAG, "Cannot copy asset!", e);
                     }
@@ -99,7 +105,7 @@ public class ExtractPayloads implements IChainable {
                     try {
                         // If compatibility level is not in range then do not copy artifact
                         if (ContentHandler.isCompatible(appContext, compatibilityLevel)) {
-                            copyAssets(importContext.getTmpLocation().getPath(), artifactUrl, payloadDestination);
+                            copyAssets(tmpLocation.getPath(), artifactUrl, payloadDestination);
                             contentState = ContentConstants.State.ARTIFACT_AVAILABLE;
                         }
                     } catch (IOException e) {
@@ -128,14 +134,14 @@ public class ExtractPayloads implements IChainable {
                     uuid = UUID.randomUUID().toString();
                     // TODO: can remove uuid from destination
                     destination = identifier + "-" + uuid;
-                    payloadDestination = new File(FileUtil.getContentRootDir(importContext.getDestinationFolder()), destination);
+                    payloadDestination = new File(FileUtil.getContentRootDir(destinationFolder), destination);
                     payloadDestination.mkdirs();
 
                     // If compatibility level is not in range then do not copy artifact
                     if (ContentHandler.isCompatible(appContext, compatibilityLevel)) {
                         boolean unzipSuccess = false;
                         if (!StringUtil.isNullOrEmpty(artifactUrl)) {
-                            payload = new File(importContext.getTmpLocation().getPath(), "/" + artifactUrl);
+                            payload = new File(tmpLocation.getPath(), "/" + artifactUrl);
                             unzipSuccess = Decompress.unzip(payload, payloadDestination);
                         }
 
@@ -150,9 +156,9 @@ public class ExtractPayloads implements IChainable {
                     }
 
                     try {
-                        copyAssets(importContext.getTmpLocation().getPath(), iconURL, payloadDestination);
-                        copyAssets(importContext.getTmpLocation().getPath(), posterImage, payloadDestination);
-                        copyAssets(importContext.getTmpLocation().getPath(), grayScaleAppIcon, payloadDestination);
+                        copyAssets(tmpLocation.getPath(), iconURL, payloadDestination);
+                        copyAssets(tmpLocation.getPath(), posterImage, payloadDestination);
+                        copyAssets(tmpLocation.getPath(), grayScaleAppIcon, payloadDestination);
                     } catch (IOException e) {
                         Logger.e(TAG, "Cannot copy asset!", e);
                     }
@@ -223,7 +229,7 @@ public class ExtractPayloads implements IChainable {
     }
 
     @Override
-    public IChainable then(IChainable link) {
+    public IChainable<Void, ImportContentContext> then(IChainable<Void, ImportContentContext> link) {
         nextLink = link;
         return link;
     }

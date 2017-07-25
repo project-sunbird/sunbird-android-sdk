@@ -6,11 +6,11 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
  * This class accepts sourceFilePath while requesting for import.
  *
  */
-public class ImportRequest {
+public class TelemetryImportRequest {
 
     private String sourceFilePath;
 
-    private ImportRequest(String sourceFilePath) {
+    private TelemetryImportRequest(String sourceFilePath) {
         this.sourceFilePath = sourceFilePath;
     }
 
@@ -32,12 +32,12 @@ public class ImportRequest {
             return this;
         }
 
-        public ImportRequest build() {
+        public TelemetryImportRequest build() {
             if (sourceFilePath == null) {
                 throw new IllegalStateException("filePath required.");
             }
 
-            return new ImportRequest(sourceFilePath);
+            return new TelemetryImportRequest(sourceFilePath);
         }
     }
 }

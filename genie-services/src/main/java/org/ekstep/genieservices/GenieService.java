@@ -3,6 +3,7 @@ package org.ekstep.genieservices;
 import android.content.Context;
 
 import org.ekstep.genieservices.async.GenieAsyncService;
+import org.ekstep.genieservices.auth.AuthServiceImpl;
 import org.ekstep.genieservices.commons.AndroidAppContext;
 import org.ekstep.genieservices.commons.AndroidLogger;
 import org.ekstep.genieservices.commons.AppContext;
@@ -11,15 +12,12 @@ import org.ekstep.genieservices.commons.IDownloadManager;
 import org.ekstep.genieservices.commons.ILocationInfo;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.download.DownloadServiceImpl;
-import org.ekstep.genieservices.auth.AuthServiceImpl;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.config.ConfigServiceImpl;
 import org.ekstep.genieservices.content.ContentFeedbackServiceImpl;
 import org.ekstep.genieservices.content.ContentServiceImpl;
 import org.ekstep.genieservices.content.LanguageServiceImpl;
-import org.ekstep.genieservices.importexport.FileExporter;
-import org.ekstep.genieservices.importexport.FileImporter;
 import org.ekstep.genieservices.notification.NotificationServiceImpl;
 import org.ekstep.genieservices.partner.PartnerServiceImpl;
 import org.ekstep.genieservices.profile.SummarizerServiceImpl;
@@ -44,6 +42,7 @@ public class GenieService {
     private static GenieAsyncService sAsyncService;
 
     private AppContext<Context> mAppContext;
+
     private IConfigService mConfigService;
     private ITelemetryService mTelemetryService;
     private IUserService mUserService;
@@ -56,6 +55,7 @@ public class GenieService {
     private ISummarizerService mSummarizerService;
     private IAuthService mAuthService;
     private ITagService mTagService;
+    private IDownloadService mDownloadService;
 
     private GenieService(AppContext<Context> appContext) {
         this.mAppContext = appContext;
@@ -265,11 +265,10 @@ public class GenieService {
         return mAuthService;
     }
 
-
     /**
      * This api gets the {@link IKeyValueStore} set in the {@link AndroidAppContext}
      *
-     * @return
+     * @return {@link IKeyValueStore}
      */
     public IKeyValueStore getKeyStore() {
         return mAppContext.getKeyValueStore();
@@ -278,7 +277,7 @@ public class GenieService {
     /**
      * This api gets the {@link IDeviceInfo} set in the {@link AndroidAppContext}
      *
-     * @return
+     * @return {@link IDeviceInfo}
      */
     public IDeviceInfo getDeviceInfo() {
         return mAppContext.getDeviceInfo();
@@ -287,34 +286,43 @@ public class GenieService {
     /**
      * This api gets the {@link IConnectionInfo} set in the {@link AndroidAppContext}
      *
-     * @return
+     * @return {@link IConnectionInfo}
      */
     public IConnectionInfo getConnectionInfo() {
         return mAppContext.getConnectionInfo();
     }
 
     /**
-     * This api gets the {@link IDownloadService} set in the {@link AndroidAppContext}
+     * This api gets the {@link DownloadServiceImpl}, when accessed in the below way
+     * <p>
+     * getService().getDownloadService()
+     * <p><p>
      *
-     * @return
+     * @return {@link IDownloadService}
      */
     public IDownloadService getDownloadService() {
-        return new DownloadServiceImpl(mAppContext);
+        if (mDownloadService == null) {
+            mDownloadService = new DownloadServiceImpl(mAppContext);
+        }
+        return mDownloadService;
     }
 
+    /**
+     * This api gets the {@link IDownloadManager} set in the {@link AndroidAppContext}
+     *
+     * @return {@link IDownloadManager}
+     */
     public IDownloadManager getDownloadManager() {
         return mAppContext.getDownloadManager();
     }
 
+    /**
+     * This api gets the {@link ILocationInfo} set in the {@link AndroidAppContext}
+     *
+     * @return {@link ILocationInfo}
+     */
     public ILocationInfo getLocationInfo() {
         return mAppContext.getLocationInfo();
     }
 
-    public FileImporter getFileImporter() {
-        return new FileImporter(mAppContext);
-    }
-
-    public FileExporter getFileExporter() {
-        return new FileExporter(mAppContext);
-    }
 }

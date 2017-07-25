@@ -29,6 +29,7 @@ public class ContentData implements Serializable {
     private String osId;
     private String contentType;
     private List<ContentVariant> contentVariantList;
+    private List<String> screenshots;
 
     public String getIdentifier() {
         return identifier;
@@ -118,10 +119,14 @@ public class ContentData implements Serializable {
         return contentType;
     }
 
+    public List<String> getScreenshots() {
+        return screenshots;
+    }
+
     @Override
     public String toString() {
         return "ContentData{" +
-                ", identifier='" + identifier + '\'' +
+                "identifier='" + identifier + '\'' +
                 ", name='" + name + '\'' +
                 ", appIcon='" + appIcon + '\'' +
                 ", description='" + description + '\'' +
@@ -131,16 +136,18 @@ public class ContentData implements Serializable {
                 ", owner='" + owner + '\'' +
                 ", subject='" + subject + '\'' +
                 ", publisher='" + publisher + '\'' +
-                ", totalRatings='" + me_totalRatings + '\'' +
-                ", averageRating='" + me_averageRating + '\'' +
+                ", me_totalRatings='" + me_totalRatings + '\'' +
+                ", me_averageRating='" + me_averageRating + '\'' +
                 ", copyright='" + copyright + '\'' +
                 ", license='" + license + '\'' +
                 ", expires='" + expires + '\'' +
                 ", downloadUrl='" + downloadUrl + '\'' +
-                ", language='" + language + '\'' +
-                ", gradeLevel='" + gradeLevel + '\'' +
+                ", language=" + language +
+                ", gradeLevel=" + gradeLevel +
                 ", osId='" + osId + '\'' +
+                ", contentType='" + contentType + '\'' +
+                ", contentVariantList=" + contentVariantList +
+                ", screenshots=" + screenshots +
                 '}';
     }
-
 }

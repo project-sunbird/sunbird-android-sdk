@@ -6,10 +6,10 @@ import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportRequest;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
+import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.junit.After;
 import org.junit.Assert;
@@ -22,9 +22,10 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Created by Sneha on 5/12/2017.
+ * Created on 5/12/2017.
+ *
+ * @author Sneha
  */
-
 public class UserProfileTest extends GenieServiceTestBase {
 
     private final String PROFILE_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Sneha.epar";
@@ -465,9 +466,9 @@ public class UserProfileTest extends GenieServiceTestBase {
         GenieServiceDBHelper.clearProfileTable();
         GenieServiceDBHelper.clearUserTableDBEntry();
 
-        ImportRequest.Builder importRequest = new ImportRequest.Builder().fromFilePath(PROFILE_FILEPATH);
+        ProfileImportRequest.Builder profileImportRequest = new ProfileImportRequest.Builder().fromFilePath(PROFILE_FILEPATH);
 
-        activity.importProfile(importRequest.build(), new IResponseHandler<ProfileImportResponse>() {
+        activity.importProfile(profileImportRequest.build(), new IResponseHandler<ProfileImportResponse>() {
             @Override
             public void onSuccess(GenieResponse<ProfileImportResponse> genieResponse) {
                 Assert.assertTrue("true", genieResponse.getStatus());

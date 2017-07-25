@@ -5,9 +5,9 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentExportResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.Logger;
+import org.ekstep.genieservices.content.bean.ExportContentContext;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -17,16 +17,16 @@ import java.io.FilenameFilter;
  *
  * @author anil
  */
-public class CleanTempLoc implements IChainable<ContentExportResponse> {
+public class CleanTempLoc implements IChainable<ContentExportResponse, ExportContentContext> {
 
     private static final String TAG = CleanTempLoc.class.getSimpleName();
 
-    private IChainable<ContentExportResponse> nextLink;
+    private IChainable<ContentExportResponse, ExportContentContext> nextLink;
 
     @Override
-    public GenieResponse<ContentExportResponse> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<ContentExportResponse> execute(AppContext appContext, ExportContentContext exportContext) {
 
-        File[] oldEcarFiles = importContext.getDestinationFolder().listFiles(new FilenameFilter() {
+        File[] oldEcarFiles = exportContext.getDestinationFolder().listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String filename) {
                 return filename.endsWith(ServiceConstants.FileExtension.CONTENT);
@@ -52,14 +52,14 @@ public class CleanTempLoc implements IChainable<ContentExportResponse> {
         }
 
         if (nextLink != null) {
-            return nextLink.execute(appContext, importContext);
+            return nextLink.execute(appContext, exportContext);
         } else {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "Export content failed", TAG);
         }
     }
 
     @Override
-    public IChainable<ContentExportResponse> then(IChainable<ContentExportResponse> link) {
+    public IChainable<ContentExportResponse, ExportContentContext> then(IChainable<ContentExportResponse, ExportContentContext> link) {
         nextLink = link;
         return link;
     }

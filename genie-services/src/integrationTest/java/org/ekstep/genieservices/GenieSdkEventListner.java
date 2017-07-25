@@ -2,13 +2,10 @@ package org.ekstep.genieservices;
 
 import android.content.Context;
 
-import com.google.gson.Gson;
-
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.DownloadProgress;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
-import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.eventbus.EventBus;
 import org.greenrobot.eventbus.NoSubscriberEvent;
 import org.greenrobot.eventbus.Subscribe;

@@ -7,16 +7,14 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
+import org.ekstep.genieservices.commons.bean.TelemetryExportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
+import org.ekstep.genieservices.commons.bean.TelemetryImportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
-import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
-import org.ekstep.genieservices.commons.db.operations.IDBSession;
-import org.ekstep.genieservices.commons.db.operations.IDataSource;
 import org.ekstep.genieservices.commons.exception.InvalidDataException;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
@@ -25,13 +23,15 @@ import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.eventbus.EventBus;
+import org.ekstep.genieservices.importexport.bean.ExportTelemetryContext;
+import org.ekstep.genieservices.importexport.bean.ImportTelemetryContext;
 import org.ekstep.genieservices.tag.cache.TelemetryTagCache;
 import org.ekstep.genieservices.telemetry.chained.export.AddGeTransferTelemetryExportEvent;
+import org.ekstep.genieservices.telemetry.chained.export.CleanCurrentDatabase;
 import org.ekstep.genieservices.telemetry.chained.export.CleanupExportedFile;
 import org.ekstep.genieservices.telemetry.chained.export.CopyDatabase;
 import org.ekstep.genieservices.telemetry.chained.export.CreateMetadata;
 import org.ekstep.genieservices.telemetry.chained.imports.AddGeTransferTelemetryImportEvent;
-import org.ekstep.genieservices.telemetry.chained.imports.TelemetryImportStep;
 import org.ekstep.genieservices.telemetry.chained.imports.TransportProcessedEventsImportEvent;
 import org.ekstep.genieservices.telemetry.chained.imports.UpdateImportedTelemetryMetadata;
 import org.ekstep.genieservices.telemetry.chained.imports.ValidateTelemetryMetadata;
@@ -304,38 +304,52 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
     }
 
     @Override
-    public GenieResponse<Void> importTelemetry(IDBSession dbSession, Map<String, Object> metadata) {
-        ImportContext importContext = new ImportContext(dbSession, metadata);
-        IChainable telemetryImportSteps = TelemetryImportStep.initImport();
-        telemetryImportSteps.then(new ValidateTelemetryMetadata())
-                .then(new TransportProcessedEventsImportEvent())
-                .then(new UpdateImportedTelemetryMetadata())
-                .then(new AddGeTransferTelemetryImportEvent());
+    public GenieResponse<Void> importTelemetry(TelemetryImportRequest telemetryImportRequest) {
+        GenieResponse<Void> response;
+        if (!FileUtil.doesFileExists(telemetryImportRequest.getSourceFilePath())) {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Telemetry event import failed, file doesn't exists", TAG);
+            return response;
+        }
 
-        return telemetryImportSteps.execute(mAppContext, importContext);
+        String ext = FileUtil.getFileExtension(telemetryImportRequest.getSourceFilePath());
+        if (ServiceConstants.FileExtension.TELEMETRY.equals(ext)) {
+            ImportTelemetryContext importTelemetryContext = new ImportTelemetryContext(telemetryImportRequest.getSourceFilePath());
+
+            ValidateTelemetryMetadata validateTelemetryMetadata = new ValidateTelemetryMetadata();
+            validateTelemetryMetadata.then(new TransportProcessedEventsImportEvent())
+                    .then(new UpdateImportedTelemetryMetadata())
+                    .then(new AddGeTransferTelemetryImportEvent());
+
+            return validateTelemetryMetadata.execute(mAppContext, importTelemetryContext);
+        } else {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Telemetry event import failed, unsupported file extension", TAG);
+            return response;
+        }
     }
 
     @Override
-    public GenieResponse<TelemetryExportResponse> exportTelemetry(File destinationFolder, String sourceDBFilePath, IDataSource dataSource, Map<String, Object> metadata) {
+    public GenieResponse<TelemetryExportResponse> exportTelemetry(TelemetryExportRequest telemetryExportRequest) {
+        File destinationFolder = new File(telemetryExportRequest.getDestinationFolder());
         String destinationDBFilePath = FileUtil.getExportTelemetryFilePath(destinationFolder);
 
         if (FileUtil.doesFileExists(destinationDBFilePath)) {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "File already exists.", TAG);
         }
 
+        // Process the event before exporting.
         EventProcessorFactory.processEvents(mAppContext);
 
-        ImportContext importContext = new ImportContext(null, metadata);
-
-        CopyDatabase copyDatabase = new CopyDatabase(sourceDBFilePath, destinationDBFilePath, dataSource);
-        copyDatabase.then(new CreateMetadata(destinationDBFilePath))
-                .then(new CleanupExportedFile(destinationDBFilePath))
-                .then(new AddGeTransferTelemetryExportEvent(destinationDBFilePath));
+        ExportTelemetryContext exportTelemetryContext = new ExportTelemetryContext(telemetryExportRequest.getDestinationFolder(), destinationDBFilePath);
+        CopyDatabase copyDatabase = new CopyDatabase();
+        copyDatabase.then(new CreateMetadata())
+                .then(new CleanupExportedFile())
+                .then(new CleanCurrentDatabase())
+                .then(new AddGeTransferTelemetryExportEvent());
 
         // TODO: 6/12/2017 - if export failed.
 //                .then(new RemoveExportFile(destinationDBFilePath));
 
-        return copyDatabase.execute(mAppContext, importContext);
+        return copyDatabase.execute(mAppContext, exportTelemetryContext);
     }
 
 }

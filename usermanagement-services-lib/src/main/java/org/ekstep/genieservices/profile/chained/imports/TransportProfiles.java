@@ -4,7 +4,6 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.telemetry.GECreateProfile;
@@ -12,6 +11,7 @@ import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.commons.utils.DateUtil;
+import org.ekstep.genieservices.importexport.bean.ImportProfileContext;
 import org.ekstep.genieservices.profile.db.model.UserProfileModel;
 import org.ekstep.genieservices.profile.db.model.UserProfilesModel;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
@@ -21,17 +21,19 @@ import org.ekstep.genieservices.telemetry.TelemetryLogger;
  *
  * @author anil
  */
-public class TransportProfiles implements IChainable<ProfileImportResponse> {
+public class TransportProfiles implements IChainable<ProfileImportResponse, ImportProfileContext> {
 
     private static final String TAG = TransportProfiles.class.getSimpleName();
-    private IChainable<ProfileImportResponse> nextLink;
+    private IChainable<ProfileImportResponse, ImportProfileContext> nextLink;
 
     @Override
-    public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportProfileContext importContext) {
+        IDBSession externalDBSession = appContext.getExternalDBSession(importContext.getSourceDBFilePath());
         int imported = 0;
         int failed = 0;
 
-        UserProfilesModel userProfilesModel = UserProfilesModel.find(importContext.getDBSession());
+        // Read from imported DB
+        UserProfilesModel userProfilesModel = UserProfilesModel.find(externalDBSession);
 
         if (userProfilesModel != null) {
             for (Profile profile : userProfilesModel.getProfileList()) {
@@ -76,7 +78,7 @@ public class TransportProfiles implements IChainable<ProfileImportResponse> {
     }
 
     @Override
-    public IChainable<ProfileImportResponse> then(IChainable<ProfileImportResponse> link) {
+    public IChainable<ProfileImportResponse, ImportProfileContext> then(IChainable<ProfileImportResponse, ImportProfileContext> link) {
         nextLink = link;
         return link;
     }

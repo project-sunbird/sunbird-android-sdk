@@ -4,12 +4,10 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransfer;
-import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
-import org.ekstep.genieservices.commons.bean.telemetry.GETransferMap;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.importexport.bean.ExportProfileContext;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 import org.ekstep.genieservices.telemetry.model.ImportedMetadataListModel;
 import org.ekstep.genieservices.telemetry.model.ImportedMetadataModel;
@@ -23,20 +21,13 @@ import java.util.List;
  *
  * @author anil
  */
-public class AddGeTransferProfileExportEvent implements IChainable<ProfileExportResponse> {
+public class AddGeTransferProfileExportEvent implements IChainable<ProfileExportResponse, ExportProfileContext> {
 
     private static final String TAG = AddGeTransferProfileExportEvent.class.getSimpleName();
 
-    private String destinationDBFilePath;
-
-    public AddGeTransferProfileExportEvent(String destinationDBFilePath) {
-        this.destinationDBFilePath = destinationDBFilePath;
-    }
-
     @Override
-    public GenieResponse<ProfileExportResponse> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<ProfileExportResponse> execute(AppContext appContext, ExportProfileContext exportContext) {
         try {
-            int aggregateCount = 0;
             ImportedMetadataListModel importedMetadataListModel = ImportedMetadataListModel.findAll(appContext.getDBSession());
 
             List<ImportedMetadataModel> importedMetadataModelList;
@@ -46,28 +37,14 @@ public class AddGeTransferProfileExportEvent implements IChainable<ProfileExport
                 importedMetadataModelList = new ArrayList<>();
             }
 
-            ArrayList<GETransferMap> contents = new ArrayList<>();
-            for (ImportedMetadataModel importedMetadataModel : importedMetadataModelList) {
-                aggregateCount += importedMetadataModel.getCount();
-                contents.add(GETransferMap.createMapForTelemetry(importedMetadataModel.getDeviceId(),
-                        importedMetadataModel.getImportedId(), importedMetadataModel.getCount()));
-            }
-            aggregateCount += Integer.valueOf(importContext.getMetadata().get(ServiceConstants.PROFILES_COUNT).toString());
-            GETransferEventKnowStructure eks = new GETransferEventKnowStructure(
-                    GETransferEventKnowStructure.TRANSFER_DIRECTION_EXPORT,
-                    GETransferEventKnowStructure.DATATYPE_PROFILE,
-                    aggregateCount,
-                    new File(destinationDBFilePath).length(),
-                    contents);
-            GETransfer geTransfer = new GETransfer(eks);
-            TelemetryLogger.log(geTransfer);
+            logGETransferEvent(exportContext, importedMetadataModelList);
 
         } catch (NumberFormatException ex) {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, ex.getMessage(), TAG);
         }
 
         ProfileExportResponse profileExportResponse = new ProfileExportResponse();
-        profileExportResponse.setExportedFilePath(destinationDBFilePath);
+        profileExportResponse.setExportedFilePath(exportContext.getDestinationDBFilePath());
 
         GenieResponse<ProfileExportResponse> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(profileExportResponse);
@@ -75,7 +52,26 @@ public class AddGeTransferProfileExportEvent implements IChainable<ProfileExport
     }
 
     @Override
-    public IChainable<ProfileExportResponse> then(IChainable<ProfileExportResponse> link) {
+    public IChainable<ProfileExportResponse, ExportProfileContext> then(IChainable<ProfileExportResponse, ExportProfileContext> link) {
         return link;
+    }
+
+    private void logGETransferEvent(ExportProfileContext exportContext, List<ImportedMetadataModel> importedMetadataModelList) {
+        int aggregateCount = 0;
+        GETransfer.Builder geTransfer = new GETransfer.Builder();
+        geTransfer.directionExport()
+                .dataTypeProfile()
+                .size(new File(exportContext.getDestinationDBFilePath()).length());
+
+        for (ImportedMetadataModel importedMetadataModel : importedMetadataModelList) {
+            aggregateCount += importedMetadataModel.getCount();
+
+            geTransfer.addContent(importedMetadataModel.getDeviceId(), importedMetadataModel.getImportedId(), importedMetadataModel.getCount());
+        }
+        aggregateCount += Integer.valueOf(exportContext.getMetadata().get(ServiceConstants.PROFILES_COUNT).toString());
+
+        geTransfer.count(aggregateCount);
+
+        TelemetryLogger.log(geTransfer.build());
     }
 }

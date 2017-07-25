@@ -4,15 +4,18 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
-import org.ekstep.genieservices.commons.bean.telemetry.GETransferEventKnowStructure;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.contract.MetaEntry;
+import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.importexport.bean.ExportProfileContext;
 import org.ekstep.genieservices.importexport.db.model.MetadataModel;
 
 import java.io.File;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -20,42 +23,40 @@ import java.util.UUID;
  *
  * @author anil
  */
-public class CreateMetadata implements IChainable<ProfileExportResponse> {
+public class CreateMetadata implements IChainable<ProfileExportResponse, ExportProfileContext> {
 
     private static final String TAG = CreateMetadata.class.getSimpleName();
-    private IChainable<ProfileExportResponse> nextLink;
-
-    private List<String> userIds;
-    private String destinationDBFilePath;
-
-    public CreateMetadata(String destinationDBFilePath, List<String> userIds) {
-        this.destinationDBFilePath = destinationDBFilePath;
-        this.userIds = userIds;
-    }
+    private IChainable<ProfileExportResponse, ExportProfileContext> nextLink;
 
     @Override
-    public GenieResponse<ProfileExportResponse> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<ProfileExportResponse> execute(AppContext appContext, ExportProfileContext exportContext) {
+        IDBSession destinationDBSession = appContext.getExternalDBSession(exportContext.getDestinationDBFilePath());
 
-        importContext.getDBSession().execute(MetaEntry.getCreateEntry());
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put(ServiceConstants.VERSION, String.valueOf(appContext.getDBSession().getDBVersion()));
+        metadata.put(ServiceConstants.EXPORT_TYPES, GsonUtil.toJson(Collections.singletonList(ServiceConstants.EXPORT_TYPE_PROFILE)));
+        metadata.put(ServiceConstants.DID, appContext.getDeviceInfo().getDeviceID());
+        metadata.put(ServiceConstants.EXPORT_ID, UUID.randomUUID().toString());
+        metadata.put(ServiceConstants.FILE_SIZE, new File(exportContext.getDestinationDBFilePath()).length());
+        metadata.put(ServiceConstants.PROFILES_COUNT, String.valueOf(exportContext.getUserIds().size()));
 
-        importContext.getMetadata().put(ServiceConstants.EXPORT_ID, UUID.randomUUID().toString());
-        importContext.getMetadata().put(GETransferEventKnowStructure.FILE_SIZE, new File(destinationDBFilePath).length());
-        importContext.getMetadata().put(ServiceConstants.PROFILES_COUNT, String.valueOf(userIds.size()));
-
-        for (String key : importContext.getMetadata().keySet()) {
-            MetadataModel metadataModel = MetadataModel.build(importContext.getDBSession(), key, String.valueOf(importContext.getMetadata().get(key)));
+        destinationDBSession.execute(MetaEntry.getCreateEntry());
+        for (String key : metadata.keySet()) {
+            MetadataModel metadataModel = MetadataModel.build(destinationDBSession, key, String.valueOf(metadata.get(key)));
             metadataModel.save();
         }
 
+        exportContext.setMetadata(metadata);
+
         if (nextLink != null) {
-            return nextLink.execute(appContext, importContext);
+            return nextLink.execute(appContext, exportContext);
         } else {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "Export profile failed", TAG);
         }
     }
 
     @Override
-    public IChainable<ProfileExportResponse> then(IChainable<ProfileExportResponse> link) {
+    public IChainable<ProfileExportResponse, ExportProfileContext> then(IChainable<ProfileExportResponse, ExportProfileContext> link) {
         nextLink = link;
         return link;
     }

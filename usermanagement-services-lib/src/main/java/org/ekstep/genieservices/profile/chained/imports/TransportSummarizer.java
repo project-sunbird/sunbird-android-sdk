@@ -4,7 +4,6 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ImportContext;
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentDetails;
 import org.ekstep.genieservices.commons.bean.LearnerContentSummaryDetails;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
@@ -13,6 +12,7 @@ import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
 import org.ekstep.genieservices.commons.db.contract.LearnerSummaryEntry;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.importexport.bean.ImportProfileContext;
 import org.ekstep.genieservices.profile.db.model.LearnerAssessmentDetailsModel;
 import org.ekstep.genieservices.profile.db.model.LearnerSummaryEventsModel;
 import org.ekstep.genieservices.profile.db.model.LearnerSummaryModel;
@@ -24,19 +24,21 @@ import java.util.Locale;
  *
  * @author anil
  */
-public class TransportSummarizer implements IChainable<ProfileImportResponse> {
+public class TransportSummarizer implements IChainable<ProfileImportResponse, ImportProfileContext> {
 
     private static final String TAG = TransportSummarizer.class.getSimpleName();
-    private IChainable<ProfileImportResponse> nextLink;
+    private IChainable<ProfileImportResponse, ImportProfileContext> nextLink;
 
     @Override
-    public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportContext importContext) {
+    public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportProfileContext importContext) {
+        IDBSession externalDBSession = appContext.getExternalDBSession(importContext.getSourceDBFilePath());
+
         //check table exist
-        if (isTableExist(importContext.getDBSession(), LearnerAssessmentsEntry.TABLE_NAME) &&
-                isTableExist(importContext.getDBSession(), LearnerSummaryEntry.TABLE_NAME)) {
+        if (isTableExist(externalDBSession, LearnerAssessmentsEntry.TABLE_NAME) &&
+                isTableExist(externalDBSession, LearnerSummaryEntry.TABLE_NAME)) {
 
             // Read the learner assessment data from imported DB and insert into GS DB.
-            LearnerAssessmentDetailsModel importedLearnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.find(importContext.getDBSession(), "");
+            LearnerAssessmentDetailsModel importedLearnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.find(externalDBSession, "");
             if (importedLearnerAssessmentDetailsModel != null) {
                 for (LearnerAssessmentDetails learnerAssessmentDetails : importedLearnerAssessmentDetailsModel.getAllAssessments()) {
                     LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.build(appContext.getDBSession(), learnerAssessmentDetails);
@@ -45,7 +47,7 @@ public class TransportSummarizer implements IChainable<ProfileImportResponse> {
             }
 
             // Read the learner content summary data from imported DB and insert into GS DB.
-            LearnerSummaryEventsModel learnerSummaryEventsModel = LearnerSummaryEventsModel.find(importContext.getDBSession(), "");
+            LearnerSummaryEventsModel learnerSummaryEventsModel = LearnerSummaryEventsModel.find(externalDBSession, "");
             if (learnerSummaryEventsModel != null) {
                 for (LearnerSummaryModel l : learnerSummaryEventsModel.getAllLearnerSummaryModelList()) {
                     LearnerContentSummaryDetails learnerContentSummaryDetails = new LearnerContentSummaryDetails();
@@ -73,7 +75,7 @@ public class TransportSummarizer implements IChainable<ProfileImportResponse> {
     }
 
     @Override
-    public IChainable<ProfileImportResponse> then(IChainable<ProfileImportResponse> link) {
+    public IChainable<ProfileImportResponse, ImportProfileContext> then(IChainable<ProfileImportResponse, ImportProfileContext> link) {
         nextLink = link;
         return link;
     }
