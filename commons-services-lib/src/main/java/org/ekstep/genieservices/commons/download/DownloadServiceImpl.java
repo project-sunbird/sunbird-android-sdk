@@ -141,7 +141,8 @@ public class DownloadServiceImpl implements IDownloadService {
     public void removeDownloadedFile(long downloadId) {
         // Delete the downloaded file.
         DownloadRequest downloadRequest = mDownloadQueueManager.getRequestByDownloadId(downloadId);
-        if (!StringUtil.isNullOrEmpty(downloadRequest.getDownloadedFilePath())) {
+        // TODO: 7/25/2017 - Need to discuss
+        if (downloadRequest != null && !StringUtil.isNullOrEmpty(downloadRequest.getDownloadedFilePath())) {
             FileUtil.rm(new File(downloadRequest.getDownloadedFilePath()));
         }
 
@@ -178,6 +179,7 @@ public class DownloadServiceImpl implements IDownloadService {
         EventBus.postEvent(new ContentImportResponse(identifier, ContentImportStatus.DOWNLOAD_COMPLETED));
         DownloadRequest request = mDownloadQueueManager.getRequestByIdentifier(identifier);
         TelemetryLogger.log(buildGEInteractEvent(InteractionType.OTHER, ServiceConstants.Telemetry.CONTENT_DOWNLOAD_SUCCESS, request.getCorrelationData(), request.getIdentifier()));
+        // TODO: 7/25/2017 - Needs to discuss
         mDownloadQueueManager.removeFromQueue(identifier);
         mDownloadQueueManager.removeFromCurrentDownloadQueue(identifier);
     }

@@ -10,6 +10,10 @@ import org.ekstep.genieservices.IDownloadService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
+import org.ekstep.genieservices.commons.utils.FileUtil;
+import org.ekstep.genieservices.commons.utils.StringUtil;
+
+import java.io.File;
 
 /**
  * Created on 13/6/17.
@@ -31,6 +35,11 @@ public class ContentImportService extends Service {
 
         IContentService contentService = GenieService.getService().getContentService();
         contentService.importEcar(ecarImportRequest.build());
+
+        // TODO: 7/25/2017 - Need to discuss with Mathew
+        if (!StringUtil.isNullOrEmpty(downloadRequest.getDownloadedFilePath())) {
+            FileUtil.rm(new File(downloadRequest.getDownloadedFilePath()));
+        }
 
         IDownloadService downloadService = GenieService.getService().getDownloadService();
         downloadService.removeDownloadedFile(downloadRequest.getDownloadId());
