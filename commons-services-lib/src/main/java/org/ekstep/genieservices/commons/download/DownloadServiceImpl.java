@@ -12,6 +12,7 @@ import org.ekstep.genieservices.commons.bean.enums.ContentImportStatus;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
 import org.ekstep.genieservices.commons.utils.FileUtil;
+import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.eventbus.EventBus;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
@@ -140,7 +141,9 @@ public class DownloadServiceImpl implements IDownloadService {
     public void removeDownloadedFile(long downloadId) {
         // Delete the downloaded file.
         DownloadRequest downloadRequest = mDownloadQueueManager.getRequestByDownloadId(downloadId);
-        FileUtil.rm(new File(downloadRequest.getDownloadedFilePath()));
+        if (!StringUtil.isNullOrEmpty(downloadRequest.getDownloadedFilePath())) {
+            FileUtil.rm(new File(downloadRequest.getDownloadedFilePath()));
+        }
 
         mDownloadManager.cancel(downloadId);
     }
