@@ -23,7 +23,7 @@ public class AuthHandler {
         }
     }
 
-    public static String generateMobileDeviceConsumerBearerToken(AppContext appContext) {
+    private static String generateMobileDeviceConsumerBearerToken(AppContext appContext) {
         String mobileAppConsumerKey = appContext.getParams().getString(ServiceConstants.Params.MOBILE_APP_KEY);
         String mobileAppConsumerSecret = appContext.getParams().getString(ServiceConstants.Params.MOBILE_APP_SECRET);
         String mobileDeviceConsumerKey = appContext.getDeviceInfo().getDeviceID();
@@ -35,10 +35,10 @@ public class AuthHandler {
         return mobileDeviceConsumerBearerToken;
     }
 
-    public static String getMobileDeviceConsumerSecret(AppContext appContext, String mobileDeviceConsumerKey, String mobileAppConsumerKey, String mobileAppConsumerSecret) {
+    private static String getMobileDeviceConsumerSecret(AppContext appContext, String mobileDeviceConsumerKey, String mobileAppConsumerKey, String mobileAppConsumerSecret) {
         String mobileAppConsumerBearerToken = JWTUtil.createJWToken(mobileAppConsumerKey, mobileAppConsumerSecret, JWTokenType.HS256);
         AuthAPI authAPI = new AuthAPI(appContext, mobileDeviceConsumerKey, mobileAppConsumerBearerToken);
-        GenieResponse<String> response = authAPI.post();
+        GenieResponse response = authAPI.post();
         String deviceSecret = null;
         if (response.getStatus()) {
             String body = response.getResult().toString();
@@ -46,7 +46,7 @@ public class AuthHandler {
             Map result = (Map) responseMap.get("result");
             if (result != null) {
                 Object keyObj = result.get("secret");
-                deviceSecret = keyObj == null ? "" : keyObj.toString();
+                deviceSecret = keyObj == null ? null : keyObj.toString();
             }
         }
         return deviceSecret;

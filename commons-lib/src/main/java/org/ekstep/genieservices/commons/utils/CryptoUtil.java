@@ -26,11 +26,11 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public class CryptoUtil {
-    public static final String AES = "AES";
-    public static final String CIPHER_AES = "AES/CBC/PKCS7Padding";
+
+    private static final String AES = "AES";
+    private static final String CIPHER_AES = "AES/CBC/PKCS7Padding";
     private static final String ALGO = "RSA";
     private static final String CIPHER_ALGO = "RSA/ECB/PKCS1Padding";
-    private static final String TAG = "org.ekstep.genieservices.util-CryptoUtil";
     private static final Charset US_ASCII = Charset.forName("US-ASCII");
 
     public static String checksum(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException {
@@ -189,7 +189,7 @@ public class CryptoUtil {
             mac = Mac.getInstance(algorithm);
             mac.init(new SecretKeySpec(key, algorithm));
             signature = mac.doFinal(payLoad.getBytes(US_ASCII));
-        } catch (NoSuchAlgorithmException | InvalidKeyException  e) {
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             return null;
         }
         return signature;
