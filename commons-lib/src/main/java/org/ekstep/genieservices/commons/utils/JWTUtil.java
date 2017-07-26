@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class JWTUtil {
 
-    private static String SEPARATOR = ".";
+    private static final String SEPARATOR = ".";
 
     public static String createJWToken(String subject, String secretKey, JWTokenType tokenType) {
         if (tokenType == null) {

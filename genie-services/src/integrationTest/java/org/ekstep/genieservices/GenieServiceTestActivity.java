@@ -62,7 +62,7 @@ public class GenieServiceTestActivity extends Activity {
         mGenieService = GenieService.init(getApplicationContext(), getPackageName());
         mAppContext = AndroidAppContext.buildAppContext(getApplicationContext(), getPackageName());
         GenieServiceDBHelper.init(mAppContext);
-        GenieSdkEventListner.init(mAppContext);
+        GenieSdkEventListener.init();
 
     }
 

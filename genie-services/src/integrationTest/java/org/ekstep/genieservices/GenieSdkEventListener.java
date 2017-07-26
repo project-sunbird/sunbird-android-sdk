@@ -1,8 +1,5 @@
 package org.ekstep.genieservices;
 
-import android.content.Context;
-
-import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.DownloadProgress;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
@@ -12,25 +9,20 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 /**
- * Created by Sneha on 6/27/2017.
+ * Created on 6/27/2017.
+ *
+ * @author Sneha
  */
+public class GenieSdkEventListener {
 
-public class GenieSdkEventListner {
+    private static GenieSdkEventListener instance = null;
 
-    private static org.ekstep.genieservices.GenieSdkEventListner instance = null;
-    private static int randomNumber;
-    private static Context context = null;
-    private static AppContext appContext = null;
-    private final String TAG = org.ekstep.genieservices.GenieSdkEventListner.class.getSimpleName();
-
-    private GenieSdkEventListner(Context context) {
-        this.context = context;
+    private GenieSdkEventListener() {
         register();
     }
 
-    public static void init(AppContext appcontext) {
-        appContext = appcontext;
-        instance = new org.ekstep.genieservices.GenieSdkEventListner(context);
+    public static void init() {
+        instance = new GenieSdkEventListener();
     }
 
     public static void destroy() {
