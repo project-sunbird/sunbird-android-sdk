@@ -614,11 +614,18 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         HashMap<String, Object> params = new HashMap<>();
         params.put("identifier", contentId);
         params.put("logLevel", "2");
+
         DownloadRequest request = downloadService.getDownloadRequest(contentId);
         ContentImportStatus status = ContentImportStatus.NOT_FOUND;
         if (request != null) {
             status = request.getDownloadId() == -1 ? ContentImportStatus.ENQUEUED_FOR_DOWNLOAD : ContentImportStatus.DOWNLOAD_STARTED;
+        } else {
+            ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), contentId);
+            if (contentModel != null) {
+                status = ContentImportStatus.IMPORT_COMPLETED;
+            }
         }
+
         ContentImportResponse contentImportResponse = new ContentImportResponse(contentId, status);
         GenieResponse<ContentImportResponse> response = GenieResponseBuilder.getSuccessResponse("", ContentImportResponse.class);
         response.setResult(contentImportResponse);

@@ -16,7 +16,7 @@ public interface IDownloadManager {
     int COMPLETED = 2;
     int FAILED = 3;
 
-    void enqueue(DownloadRequest request);
+    long enqueue(DownloadRequest request);
 
     DownloadProgress getProgress(long downloadId);
 

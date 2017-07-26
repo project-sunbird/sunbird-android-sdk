@@ -36,8 +36,6 @@ public class DownloadServiceImpl implements IDownloadService {
     public DownloadServiceImpl(AppContext appContext) {
         this.mDownloadQueueManager = new DownloadQueueManager(appContext.getKeyValueStore());
         this.mDownloadManager = appContext.getDownloadManager();
-        // TODO: 14/6/17  Figure it out later
-//        resumeDownloads();
     }
 
     @Override
@@ -55,6 +53,77 @@ public class DownloadServiceImpl implements IDownloadService {
         resume();
     }
 
+    @Override
+    public void cancel(String identifier) {
+        DownloadRequest request = mDownloadQueueManager.getRequestByIdentifier(identifier);
+        if (request != null) {
+            if (request.getDownloadId() != -1) {
+                if (mExecutor != null) {
+                    mExecutor.shutdown();
+                }
+            }
+            resetDownload(request.getDownloadId(), false, false);
+        }
+        resumeDownloads();
+    }
+
+    @Override
+    public void removeDownloadedFile(long downloadId) {
+        resetDownload(downloadId, false, true);
+    }
+
+    @Override
+    public DownloadRequest getDownloadRequest(String identifier) {
+        return mDownloadQueueManager.getRequestByIdentifier(identifier);
+    }
+
+    @Override
+    public DownloadRequest getDownloadRequest(long downloadId) {
+        return mDownloadQueueManager.getRequestByDownloadId(downloadId);
+    }
+
+    @Override
+    public DownloadProgress getProgress(String identifier) {
+        DownloadProgress progress = new DownloadProgress(-1);
+        progress.setIdentifier(identifier);
+
+        DownloadRequest request = mDownloadQueueManager.getRequestByIdentifier(identifier);
+        if (request != null) {
+            if (request.getDownloadId() == -1) {
+                progress.setStatus(0);
+            } else {
+                progress = mDownloadManager.getProgress(request.getDownloadId());
+            }
+        }
+        return progress;
+    }
+
+    @Override
+    public void onDownloadComplete(String identifier) {
+        EventBus.postEvent(new ContentImportResponse(identifier, ContentImportStatus.DOWNLOAD_COMPLETED));
+        DownloadRequest request = mDownloadQueueManager.getRequestByIdentifier(identifier);
+        TelemetryLogger.log(buildGEInteractEvent(InteractionType.OTHER, ServiceConstants.Telemetry.CONTENT_DOWNLOAD_SUCCESS, request.getCorrelationData(), request.getIdentifier()));
+    }
+
+    @Override
+    public void onDownloadFailed(String identifier) {
+        EventBus.postEvent(new ContentImportResponse(identifier, ContentImportStatus.DOWNLOAD_FAILED));
+        DownloadRequest request = mDownloadQueueManager.getRequestByIdentifier(identifier);
+        resetDownload(request.getDownloadId(), false, true);
+        mDownloadQueueManager.removeFromQueue(identifier);
+    }
+
+    private GEInteract buildGEInteractEvent(InteractionType type, String subType, List<CorrelationData> correlationDataList, String contendId) {
+        GEInteract.Builder geInteract = new GEInteract.Builder();
+        geInteract.interActionType(type)
+                .stageId(ServiceConstants.Telemetry.CONTENT_DETAIL)
+                .subType(subType)
+                .id(contendId)
+                .correlationData(correlationDataList);
+        return geInteract.build();
+    }
+
+
     /**
      * Assumption is that only 1 download happens at a time. This method will need refactoring whenever this assumption changes
      */
@@ -63,41 +132,25 @@ public class DownloadServiceImpl implements IDownloadService {
         if (currentDownloads.size() == 0) {
             DownloadRequest request = mDownloadQueueManager.popDownloadRequest();
             if (request != null) {
-                mDownloadManager.enqueue(request);
                 TelemetryLogger.log(buildGEInteractEvent(InteractionType.TOUCH, ServiceConstants.Telemetry.CONTENT_DOWNLOAD_INITIATE, request.getCorrelationData(), request.getIdentifier()));
+                long downloadId = mDownloadManager.enqueue(request);
+                request.setDownloadId(downloadId);
                 mDownloadQueueManager.updateDownload(request);
                 mDownloadQueueManager.addToCurrentDownloadQueue(request.getIdentifier());
                 startTrackingProgress(request);
             }
-
         } else {
             DownloadRequest request = mDownloadQueueManager.getRequestByIdentifier(currentDownloads.get(0));
             if (request != null) {
-                //make this more intelligent to detect if a download is not really working out. For now I am just checking if the request is not recognised by the download manager or if it is 100% done
+                //make this more intelligent to detect if a download is not really working out.
+                // For now I am just checking if the request is not recognised by the download manager or if it is 100% done.
                 DownloadProgress progress = mDownloadManager.getProgress(request.getDownloadId());
-                if (progress.getStatus() == IDownloadManager.UNKNOWN || progress.getStatus() == IDownloadManager.FAILED || progress.getStatus() == IDownloadManager.COMPLETED) {
-                    //clear and restart the download. this means the onDownloadComplete did not fire for some reason
-                    removeDownloadedFile(request.getDownloadId());
-                    mDownloadQueueManager.removeFromCurrentDownloadQueue(request.getIdentifier());
-                    request.setDownloadId(-1);
-                    mDownloadQueueManager.updateDownload(request);
-                    resumeDownloads();
-                } else {
-                    mDownloadQueueManager.removeFromCurrentDownloadQueue(request.getIdentifier());
+                if (progress.getStatus() == IDownloadManager.UNKNOWN || progress.getStatus() == IDownloadManager.FAILED) {
+                    //clear and restart the download. this means the onDownloadComplete did not fire for some reason.
+                    resetDownload(request.getDownloadId(), true, true);
                 }
             }
         }
-    }
-
-    private GEInteract buildGEInteractEvent(InteractionType type, String subType, List<CorrelationData> correlationDataList, String contendId) {
-        GEInteract geInteract = new GEInteract.Builder()
-                .interActionType(type)
-                .stageId(ServiceConstants.Telemetry.CONTENT_DETAIL)
-                .subType(subType)
-                .id(contendId)
-                .correlationData(correlationDataList)
-                .build();
-        return geInteract;
     }
 
     private void startTrackingProgress(final DownloadRequest request) {
@@ -121,72 +174,27 @@ public class DownloadServiceImpl implements IDownloadService {
         }, 0, 1, TimeUnit.SECONDS);
     }
 
-    @Override
-    public void cancel(String identifier) {
-        DownloadRequest request = mDownloadQueueManager.getRequestByIdentifier(identifier);
-        if (request != null) {
-            if (request.getDownloadId() != -1) {
-                if (mExecutor != null) {
-                    mExecutor.shutdown();
-                }
-                removeDownloadedFile(request.getDownloadId());
-                mDownloadQueueManager.removeFromCurrentDownloadQueue(identifier);
-            }
-            mDownloadQueueManager.removeFromQueue(identifier);
-        }
-        resumeDownloads();
-    }
-
-    @Override
-    public void removeDownloadedFile(long downloadId) {
-        // Delete the downloaded file.
+    private void resetDownload(long downloadId, boolean updateDownload, boolean resumeDownload) {
         DownloadRequest downloadRequest = mDownloadQueueManager.getRequestByDownloadId(downloadId);
-        // TODO: 7/25/2017 - Need to discuss
-        if (downloadRequest != null && !StringUtil.isNullOrEmpty(downloadRequest.getDownloadedFilePath())) {
-            FileUtil.rm(new File(downloadRequest.getDownloadedFilePath()));
+        if (downloadRequest != null) {
+            // Delete the downloaded file.
+            if (!StringUtil.isNullOrEmpty(downloadRequest.getDownloadedFilePath())) {
+                FileUtil.rm(new File(downloadRequest.getDownloadedFilePath()));
+            }
+
+            if (updateDownload) {
+                downloadRequest.setDownloadId(-1);
+                mDownloadQueueManager.updateDownload(downloadRequest);
+            } else {
+                mDownloadQueueManager.removeFromQueue(downloadRequest.getIdentifier());
+            }
+            mDownloadQueueManager.removeFromCurrentDownloadQueue(downloadRequest.getIdentifier());
         }
 
         mDownloadManager.cancel(downloadId);
-    }
 
-    @Override
-    public DownloadRequest getDownloadRequest(String identifier) {
-        return mDownloadQueueManager.getRequestByIdentifier(identifier);
-    }
-
-    @Override
-    public DownloadRequest getDownloadRequest(long downloadId) {
-        return mDownloadQueueManager.getRequestByDownloadId(downloadId);
-    }
-
-    @Override
-    public DownloadProgress getProgress(String identifier) {
-        DownloadRequest request = mDownloadQueueManager.getRequestByIdentifier(identifier);
-        DownloadProgress progress = new DownloadProgress(-1);
-        progress.setIdentifier(identifier);
-        if (request != null) {
-            if (request.getDownloadId() == -1) {
-                progress.setStatus(0);
-            } else {
-                progress = mDownloadManager.getProgress(request.getDownloadId());
-            }
+        if (resumeDownload) {
+            resumeDownloads();
         }
-        return progress;
-    }
-
-    @Override
-    public void onDownloadComplete(String identifier) {
-        EventBus.postEvent(new ContentImportResponse(identifier, ContentImportStatus.DOWNLOAD_COMPLETED));
-        DownloadRequest request = mDownloadQueueManager.getRequestByIdentifier(identifier);
-        TelemetryLogger.log(buildGEInteractEvent(InteractionType.OTHER, ServiceConstants.Telemetry.CONTENT_DOWNLOAD_SUCCESS, request.getCorrelationData(), request.getIdentifier()));
-        // TODO: 7/25/2017 - Needs to discuss
-        mDownloadQueueManager.removeFromQueue(identifier);
-        mDownloadQueueManager.removeFromCurrentDownloadQueue(identifier);
-    }
-
-    @Override
-    public void onDownloadFailed(String identifier) {
-        EventBus.postEvent(new ContentImportResponse(identifier, ContentImportStatus.DOWNLOAD_FAILED));
-        mDownloadQueueManager.removeFromQueue(identifier);
     }
 }

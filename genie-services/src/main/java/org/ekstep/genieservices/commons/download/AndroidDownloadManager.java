@@ -28,7 +28,7 @@ public class AndroidDownloadManager implements IDownloadManager {
     }
 
     @Override
-    public void enqueue(DownloadRequest downloadRequest) {
+    public long enqueue(DownloadRequest downloadRequest) {
         android.app.DownloadManager.Request managerRequest = new android.app.DownloadManager.Request(Uri.parse(downloadRequest.getDownloadUrl()));
         managerRequest.setTitle(downloadRequest.getIdentifier());
         managerRequest.setMimeType(downloadRequest.getMimeType());
@@ -36,11 +36,12 @@ public class AndroidDownloadManager implements IDownloadManager {
         managerRequest.setDestinationInExternalFilesDir(mContext, Environment.DIRECTORY_DOWNLOADS, downloadRequest.getFilename());
 
         long downloadId = mDownloadManager.enqueue(managerRequest);
-        downloadRequest.setDownloadId(downloadId);
 
         File file = mContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
         String localFilePath = file.getAbsolutePath() + "/" + downloadRequest.getFilename();
         downloadRequest.setDownloadedFilePath(localFilePath);
+
+        return downloadId;
     }
 
     @Override
