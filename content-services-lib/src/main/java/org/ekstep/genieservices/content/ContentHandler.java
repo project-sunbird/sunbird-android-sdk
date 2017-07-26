@@ -275,11 +275,15 @@ public class ContentHandler {
         return GsonUtil.fromJson(localData, Map.class).get(KEY_PRE_REQUISITES) != null;
     }
 
+    public static List<Map<String, Object>> readPreRequisites(Map contentData) {
+        return (List<Map<String, Object>>) contentData.get(KEY_PRE_REQUISITES);
+    }
+
     public static List<String> getPreRequisitesIdentifiers(String localData) {
-        List<Map> children = (List) GsonUtil.fromJson(localData, Map.class).get(KEY_PRE_REQUISITES);
+        List<Map<String, Object>> preRequisites = readPreRequisites(GsonUtil.fromJson(localData, Map.class));
 
         List<String> childIdentifiers = new ArrayList<>();
-        for (Map child : children) {
+        for (Map child : preRequisites) {
             String childIdentifier = readIdentifier(child);
             childIdentifiers.add(childIdentifier);
         }

@@ -84,7 +84,7 @@ public class ExtractPayloads implements IChainable<Void, ImportContentContext> {
             if ((!StringUtil.isNullOrEmpty(mimeType) && mimeType.equalsIgnoreCase(ContentConstants.MimeType.APK)) ||
                     (!StringUtil.isNullOrEmpty(artifactUrl) && artifactUrl.contains("." + ServiceConstants.FileExtension.APK))) {
 
-                List<Map<String, Object>> preRequisites = (List<Map<String, Object>>) item.get("pre_requisites");
+                List<Map<String, Object>> preRequisites = ContentHandler.readPreRequisites(item);
 
                 if (isContentExist) {
                     payloadDestination = null;
