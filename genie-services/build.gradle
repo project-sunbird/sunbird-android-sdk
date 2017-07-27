@@ -22,7 +22,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
     productFlavors {
         production {
 
@@ -53,8 +52,6 @@ android {
     }
 }
 
-
-
 dependencies {
     compile project(':commons-lib')
     compile project(path: ':commons-services-lib')
@@ -65,10 +62,10 @@ dependencies {
     compile project(path: ':notification-services-lib')
 
     compile "com.android.support:appcompat-v7:$rootProject.ext.supportLibraryVersion"
-    compile "com.google.android.gms:play-services-location:9.4.0"
-    compile "com.squareup.okhttp3:okhttp:3.8.1"
-    androidTestCompile 'com.jayway.awaitility:awaitility:1.7.0'
+    compile "com.google.android.gms:play-services-location:$rootProject.ext.playServiceVersion"
+    compile "com.squareup.okhttp3:okhttp:$rootProject.ext.okhttpVersion"
 
+    androidTestCompile 'com.jayway.awaitility:awaitility:1.7.0'
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
@@ -82,4 +79,3 @@ def getRepositoryUsername() {
 def getRepositoryPassword() {
     return hasProperty('nexusPassword') ? nexusPassword : ""
 }
-

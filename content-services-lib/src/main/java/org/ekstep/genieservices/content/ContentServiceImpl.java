@@ -661,13 +661,10 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 DownloadRequest[] downloadRequests = new DownloadRequest[contentDataList.size()];
                 for (int i = 0; i < contentDataList.size(); i++) {
                     Map<String, Object> dataMap = contentDataList.get(i);
-                    String downloadUrl = ContentHandler.getDownloadUrl(dataMap);
-                    if (downloadUrl != null) {
-                        downloadUrl = downloadUrl.trim();
-                    }
-
                     String contentId = ContentHandler.readIdentifier(dataMap);
+                    String downloadUrl = ContentHandler.getDownloadUrl(dataMap);
                     ContentImportStatus status = ContentImportStatus.NOT_FOUND;
+
                     if (!StringUtil.isNullOrEmpty(downloadUrl) && ServiceConstants.FileExtension.CONTENT.equalsIgnoreCase(FileUtil.getFileExtension(downloadUrl))) {
                         status = ContentImportStatus.ENQUEUED_FOR_DOWNLOAD;
                         DownloadRequest downloadRequest = new DownloadRequest(contentId, downloadUrl, ContentConstants.MimeType.ECAR, importRequest.getDestinationFolder(), importRequest.isChildContent());

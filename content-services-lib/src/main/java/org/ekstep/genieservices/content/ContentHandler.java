@@ -1382,6 +1382,11 @@ public class ContentHandler {
         if (StringUtil.isNullOrEmpty(downloadUrl)) {
             downloadUrl = (String) dataMap.get(KEY_DOWNLOAD_URL);
         }
+
+        if (downloadUrl != null) {
+            downloadUrl = downloadUrl.trim();
+        }
+
         return downloadUrl;
     }
 
