@@ -141,8 +141,20 @@ public class ExtractPayloads implements IChainable<Void, ImportContentContext> {
                     if (ContentHandler.isCompatible(appContext, compatibilityLevel)) {
                         boolean unzipSuccess = false;
                         if (!StringUtil.isNullOrEmpty(artifactUrl)) {
-                            payload = new File(tmpLocation.getPath(), "/" + artifactUrl);
-                            unzipSuccess = Decompress.unzip(payload, payloadDestination);
+                            if (isVideoOrPDFContent(mimeType)) {
+                                try {
+                                    copyAssets(tmpLocation.getPath(), artifactUrl, payloadDestination);
+                                    unzipSuccess = true;
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                    unzipSuccess = false;
+                                }
+                            } else if (isVideoOrPDFContent(mimeType)) {
+                                unzipSuccess = false;
+                            } else {
+                                payload = new File(tmpLocation.getPath(), "/" + artifactUrl);
+                                unzipSuccess = Decompress.unzip(payload, payloadDestination);
+                            }
                         }
 
                         // Add or update the content_state
@@ -250,5 +262,15 @@ public class ExtractPayloads implements IChainable<Void, ImportContentContext> {
             // If source icon is not available then copy assets is failing and throwing exception.
             FileUtil.cp(iconSrc, iconDestination);
         }
+    }
+
+    private boolean isVideoOrPDFContent(String mimeType) {
+        return !StringUtil.isNullOrEmpty(mimeType)
+                && (mimeType.equalsIgnoreCase(ContentConstants.MimeType.PDF) || mimeType.equalsIgnoreCase(ContentConstants.MimeType.VIDEO_MP4));
+    }
+
+    private boolean isYouTubeContent(String mimeType) {
+        return !StringUtil.isNullOrEmpty(mimeType)
+                && mimeType.equalsIgnoreCase(ContentConstants.MimeType.VIDEO_YOU_TUBE);
     }
 }

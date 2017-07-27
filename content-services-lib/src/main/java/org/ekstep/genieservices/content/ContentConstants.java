@@ -34,6 +34,9 @@ public interface ContentConstants {
 
     interface MimeType {
         String APK = "application/vnd.android.package-archive";
+        String PDF = "application/pdf";
+        String VIDEO_MP4 = "video/mp4";
+        String VIDEO_YOU_TUBE = "video/youtube";
         String ECML = "application/vnd.ekstep.ecml-archive";
         String HTML = "application/vnd.ekstep.html-archive";
         String COLLECTION = "application/vnd.ekstep.content-collection";
