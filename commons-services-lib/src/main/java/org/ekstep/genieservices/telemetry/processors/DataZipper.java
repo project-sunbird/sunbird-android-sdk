@@ -7,13 +7,14 @@ import java.io.IOException;
 import java.util.zip.GZIPOutputStream;
 
 /**
- * Created by swayangjit on 26/4/17.
+ * Created on 26/4/17.
+ *
+ * @author swayangjit
  */
-
 public class DataZipper implements IProcessEvent {
+
     @Override
     public ProcessedEventModel process(ProcessedEventModel processedEvent) {
-
         String data = new String(processedEvent.getData());
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length());
         try {

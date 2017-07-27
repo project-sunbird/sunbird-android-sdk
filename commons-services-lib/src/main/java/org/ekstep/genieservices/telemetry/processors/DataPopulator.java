@@ -11,16 +11,17 @@ import java.util.HashMap;
 import java.util.UUID;
 
 /**
- * Created by swayangjit on 26/4/17.
+ * Created on 26/4/17.
+ *
+ * @author swayangjit
  */
-
 public class DataPopulator implements IProcessEvent {
     private EventsModel events;
     private IDeviceInfo deviceInfo;
     private IDBSession mDbSession;
 
-    public DataPopulator(IDBSession dbSession,EventsModel events, IDeviceInfo deviceInfo) {
-        this.mDbSession=dbSession;
+    public DataPopulator(IDBSession dbSession, EventsModel events, IDeviceInfo deviceInfo) {
+        this.mDbSession = dbSession;
         this.events = events;
         this.deviceInfo = deviceInfo;
     }
@@ -35,7 +36,7 @@ public class DataPopulator implements IProcessEvent {
         processedEventMap.put("params", getParams(msgId));
         processedEventMap.put("events", events.getEventsMap());
         byte[] data = GsonUtil.toJson(processedEventMap).getBytes();
-        return ProcessedEventModel.build(mDbSession,msgId, data, events.size(), events.getPriority());
+        return ProcessedEventModel.build(mDbSession, msgId, data, events.size(), events.getPriority());
     }
 
     private HashMap<String, String> getParams(String msgId) {
