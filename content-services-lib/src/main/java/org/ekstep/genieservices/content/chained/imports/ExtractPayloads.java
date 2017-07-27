@@ -149,7 +149,7 @@ public class ExtractPayloads implements IChainable<Void, ImportContentContext> {
                                     e.printStackTrace();
                                     unzipSuccess = false;
                                 }
-                            } else if (isVideoOrPDFContent(mimeType)) {
+                            } else if (isYouTubeContent(mimeType)) {
                                 unzipSuccess = false;
                             } else {
                                 payload = new File(tmpLocation.getPath(), "/" + artifactUrl);
@@ -247,8 +247,6 @@ public class ExtractPayloads implements IChainable<Void, ImportContentContext> {
     }
 
     private void copyAssets(String tempLocationPath, String asset, File payloadDestination) throws IOException {
-        String folderContainingFile;
-
         if (asset != null && asset.length() > 0) {
 
             File iconSrc = new File(tempLocationPath, "/" + asset);
@@ -256,7 +254,7 @@ public class ExtractPayloads implements IChainable<Void, ImportContentContext> {
 
             Logger.d(TAG, "Copy: " + iconSrc + "To: " + iconDestination);
 
-            folderContainingFile = asset.substring(0, asset.lastIndexOf("/"));
+            String folderContainingFile = asset.substring(0, asset.lastIndexOf("/"));
             FileUtil.createFolders(payloadDestination.getPath(), folderContainingFile);
 
             // If source icon is not available then copy assets is failing and throwing exception.
