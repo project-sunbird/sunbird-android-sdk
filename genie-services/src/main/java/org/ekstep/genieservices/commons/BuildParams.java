@@ -5,6 +5,7 @@ import android.content.Context;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.enums.LogLevel;
 import org.ekstep.genieservices.commons.utils.ReflectionUtil;
+import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.utils.BuildConfigUtil;
 
 import java.util.HashMap;
@@ -36,7 +37,10 @@ public class BuildParams implements IParams {
     }
 
     private void init(Context context, String packageName) {
-        // TODO: 7/13/2017 - throw IllegalArgumentException for mandatory params.
+        if (StringUtil.isNullOrEmpty(packageName)) {
+            throw new IllegalArgumentException("packageName is mandatory, can not be null or empty.");
+        }
+
         put(ServiceConstants.Params.VERSION_NAME, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.VERSION_NAME));
         put(ServiceConstants.Params.APPLICATION_ID, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.APPLICATION_ID));
         put(ServiceConstants.Params.PRODUCER_ID, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.PRODUCER_ID));

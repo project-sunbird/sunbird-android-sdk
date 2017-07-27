@@ -14,7 +14,12 @@ public class BuildConfigUtil {
     }
 
     public static <T> T getBuildConfigValue(String packageName, String property) {
-        Object value = ReflectionUtil.getStaticFieldValue(getBuildConfigClass(packageName), property);
+        Class<?> clazz = getBuildConfigClass(packageName);
+        if (clazz == null) {
+            throw new IllegalStateException("packageName, can not be null or empty.");
+        }
+
+        Object value = ReflectionUtil.getStaticFieldValue(clazz, property);
         return (T) value;
     }
 }
