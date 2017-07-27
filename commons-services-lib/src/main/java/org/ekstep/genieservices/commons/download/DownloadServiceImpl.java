@@ -63,14 +63,14 @@ public class DownloadServiceImpl implements IDownloadService {
                     mExecutor.shutdown();
                 }
             }
-            resetDownload(request.getDownloadId(), false, false);
+            resetDownload(request.getDownloadId(), true, false);
         }
         resumeDownloads();
     }
 
     @Override
     public void removeDownloadedFile(long downloadId) {
-        resetDownload(downloadId, false, true);
+        resetDownload(downloadId, true, true);
     }
 
     @Override
@@ -110,7 +110,7 @@ public class DownloadServiceImpl implements IDownloadService {
     public void onDownloadFailed(String identifier) {
         EventBus.postEvent(new ContentImportResponse(identifier, ContentImportStatus.DOWNLOAD_FAILED));
         DownloadRequest request = mDownloadQueueManager.getRequestByIdentifier(identifier);
-        resetDownload(request.getDownloadId(), false, true);
+        resetDownload(request.getDownloadId(), true, true);
         mDownloadQueueManager.removeFromQueue(identifier);
     }
 
@@ -148,13 +148,13 @@ public class DownloadServiceImpl implements IDownloadService {
                 DownloadProgress progress = mDownloadManager.getProgress(request.getDownloadId());
                 if (progress.getStatus() == IDownloadManager.UNKNOWN || progress.getStatus() == IDownloadManager.FAILED) {
                     //clear and restart the download. this means the onDownloadComplete did not fire for some reason.
-                    resetDownload(request.getDownloadId(), true, true);
+                    resetDownload(request.getDownloadId(), false, true);
                 } else if (progress.getStatus() == IDownloadManager.COMPLETED) {
                     // reset download if its download time is more than 1hr.
                     if (!StringUtil.isNullOrEmpty(request.getDownloadedFilePath())) {
                         long lastModified = new File(request.getDownloadedFilePath()).lastModified();
                         if (DateUtil.getTimeDifferenceInHours(lastModified, DateUtil.getEpochTime()) > 1) {
-                            resetDownload(request.getDownloadId(), true, true);
+                            resetDownload(request.getDownloadId(), false, true);
                         }
                     }
                 }
@@ -183,7 +183,7 @@ public class DownloadServiceImpl implements IDownloadService {
         }, 0, 1, TimeUnit.SECONDS);
     }
 
-    private void resetDownload(long downloadId, boolean updateDownload, boolean resumeDownload) {
+    private void resetDownload(long downloadId, boolean removeFromQueue, boolean resumeDownload) {
         DownloadRequest downloadRequest = mDownloadQueueManager.getRequestByDownloadId(downloadId);
         if (downloadRequest != null) {
             // Delete the downloaded file.
@@ -191,11 +191,11 @@ public class DownloadServiceImpl implements IDownloadService {
                 FileUtil.rm(new File(downloadRequest.getDownloadedFilePath()));
             }
 
-            if (updateDownload) {
+            if (removeFromQueue) {
+                mDownloadQueueManager.removeFromQueue(downloadRequest.getIdentifier());
+            } else {
                 downloadRequest.setDownloadId(-1);
                 mDownloadQueueManager.updateDownload(downloadRequest);
-            } else {
-                mDownloadQueueManager.removeFromQueue(downloadRequest.getIdentifier());
             }
             mDownloadQueueManager.removeFromCurrentDownloadQueue(downloadRequest.getIdentifier());
         }
