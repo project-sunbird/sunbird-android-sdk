@@ -11,6 +11,7 @@ import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.enums.ContentImportStatus;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
+import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.eventbus.EventBus;
@@ -148,6 +149,14 @@ public class DownloadServiceImpl implements IDownloadService {
                 if (progress.getStatus() == IDownloadManager.UNKNOWN || progress.getStatus() == IDownloadManager.FAILED) {
                     //clear and restart the download. this means the onDownloadComplete did not fire for some reason.
                     resetDownload(request.getDownloadId(), true, true);
+                } else if (progress.getStatus() == IDownloadManager.COMPLETED) {
+                    // reset download if its download time is more than 1hr.
+                    if (!StringUtil.isNullOrEmpty(request.getDownloadedFilePath())) {
+                        long lastModified = new File(request.getDownloadedFilePath()).lastModified();
+                        if (DateUtil.getTimeDifferenceInHours(lastModified, DateUtil.getEpochTime()) > 1) {
+                            resetDownload(request.getDownloadId(), true, true);
+                        }
+                    }
                 }
             }
         }
