@@ -58,6 +58,7 @@ public class DownloadServiceImpl implements IDownloadService {
     public void cancel(String identifier) {
         DownloadRequest request = mDownloadQueueManager.getRequestByIdentifier(identifier);
         if (request != null) {
+            TelemetryLogger.log(buildGEInteractEvent(InteractionType.TOUCH, ServiceConstants.Telemetry.CONTENT_DOWNLOAD_CANCEL, request.getCorrelationData(), request.getIdentifier()));
             if (request.getDownloadId() != -1) {
                 if (mExecutor != null) {
                     mExecutor.shutdown();
