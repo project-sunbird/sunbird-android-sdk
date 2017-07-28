@@ -381,7 +381,9 @@ public class ContentHandler {
         content.setMimeType(contentModel.getMimeType());
         content.setBasePath(contentModel.getPath());
         content.setContentType(contentModel.getContentType());
-        content.setAvailableLocally(isAvailableLocally(contentModel.getContentState()));
+        // TODO: 7/28/2017 - Need design discussion in case of mimeType youtube content.
+//        content.setAvailableLocally(isAvailableLocally(contentModel.getContentState()));
+        content.setAvailableLocally(isAvailableLocally(contentModel.getContentState(), contentModel.getMimeType()));
         content.setReferenceCount(contentModel.getRefCount());
 
         long contentCreationTime = 0;
@@ -465,6 +467,11 @@ public class ContentHandler {
 
     public static boolean isAvailableLocally(int contentState) {
         return contentState == ContentConstants.State.ARTIFACT_AVAILABLE;
+    }
+
+    private static boolean isAvailableLocally(int contentState, String mimeType) {
+        return (contentState == ContentConstants.State.ARTIFACT_AVAILABLE)
+                || (contentState == ContentConstants.State.ONLY_SPINE && ContentConstants.MimeType.VIDEO_YOU_TUBE.equals(mimeType));
     }
 
     private static String[] getDefaultContentTypes() {
