@@ -54,11 +54,11 @@ public class CreateContentExportManifest implements IChainable<ContentExportResp
             // get item's children only to mark children with visibility as Parent
             if (ContentHandler.hasChildren(contentModel.getLocalData())) {
                 // store children identifiers
-                childIdentifiers.addAll(ContentHandler.getChildContentsIdentifiers(contentModel.getLocalData()));
+                childIdentifiers.addAll(ContentHandler.getChildContentsIdentifiers(item));
             }
             if (ContentHandler.hasPreRequisites(contentModel.getLocalData())) {
                 // store children identifiers
-                childIdentifiers.addAll(ContentHandler.getPreRequisitesIdentifiers(contentModel.getLocalData()));
+                childIdentifiers.addAll(ContentHandler.getPreRequisitesIdentifiers(item));
             }
 
             allContents.add(contentModel.getIdentifier());

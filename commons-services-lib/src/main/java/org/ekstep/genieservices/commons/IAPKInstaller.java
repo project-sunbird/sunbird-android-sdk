@@ -1,11 +1,15 @@
 package org.ekstep.genieservices.commons;
 
-import java.util.List;
-import java.util.Map;
-
 /**
- * Created by anil on 6/23/2017.
+ * Created on 6/23/2017.
+ *
+ * @author anil
  */
 public interface IAPKInstaller {
-    void showInstallAPKPrompt(String destPath, String downloadUrl, List<Map<String, Object>> preRequisites);
+    /**
+     * show install apk prompt, if the apk is not installed...
+     *
+     * @param apkFilePath APK file path
+     */
+    void installApk(String apkFilePath);
 }

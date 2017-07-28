@@ -17,9 +17,7 @@ import org.ekstep.genieservices.content.db.model.ContentModel;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Created on 5/16/2017.
@@ -46,7 +44,7 @@ public class ExtractPayloads implements IChainable<Void, ImportContentContext> {
         int refCount;
         int contentState = ContentConstants.State.ONLY_SPINE;
         String oldContentPath;
-        String artifactUrl, iconURL, posterImage, grayScaleAppIcon, uuid, destination;
+        String artifactUrl, iconURL, posterImage, grayScaleAppIcon;
         File payload;
         File payloadDestination = null;
         ContentModel oldContentModel;
@@ -84,16 +82,11 @@ public class ExtractPayloads implements IChainable<Void, ImportContentContext> {
             if ((!StringUtil.isNullOrEmpty(mimeType) && mimeType.equalsIgnoreCase(ContentConstants.MimeType.APK)) ||
                     (!StringUtil.isNullOrEmpty(artifactUrl) && artifactUrl.contains("." + ServiceConstants.FileExtension.APK))) {
 
-                List<Map<String, Object>> preRequisites = ContentHandler.readPreRequisites(item);
-
                 if (isContentExist) {
                     payloadDestination = null;
                     path = oldContentPath;
                 } else {
-                    uuid = UUID.randomUUID().toString();
-                    // TODO: can remove uuid from destination
-                    destination = identifier + "-" + uuid;
-                    payloadDestination = new File(FileUtil.getContentRootDir(destinationFolder), destination);
+                    payloadDestination = new File(FileUtil.getContentRootDir(destinationFolder), identifier);
                     payloadDestination.mkdirs();
 
                     try {
@@ -117,9 +110,13 @@ public class ExtractPayloads implements IChainable<Void, ImportContentContext> {
                     path = payloadDestination.getPath();
                 }
 
-                // TODO: 5/18/2017 - Revisit this - handling the APK while importing ECAR.
-                //launch system prompt for Install apk...
-                appContext.getAPKInstaller().showInstallAPKPrompt(path, artifactUrl, preRequisites);
+                try {
+                    //launch system prompt for Install apk...
+                    File apkFile = new File(path, artifactUrl);
+                    appContext.getAPKInstaller().installApk(apkFile.getAbsolutePath());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             } else {
                 //If the content is exist then copy the old content data and add it into new content.
                 if (isContentExist && !(ContentConstants.ContentStatus.DRAFT.equalsIgnoreCase(ContentHandler.readStatus(item)))) {
@@ -131,10 +128,7 @@ public class ExtractPayloads implements IChainable<Void, ImportContentContext> {
                     }
                 } else {
                     isContentExist = false;
-                    uuid = UUID.randomUUID().toString();
-                    // TODO: can remove uuid from destination
-                    destination = identifier + "-" + uuid;
-                    payloadDestination = new File(FileUtil.getContentRootDir(destinationFolder), destination);
+                    payloadDestination = new File(FileUtil.getContentRootDir(destinationFolder), identifier);
                     payloadDestination.mkdirs();
 
                     // If compatibility level is not in range then do not copy artifact

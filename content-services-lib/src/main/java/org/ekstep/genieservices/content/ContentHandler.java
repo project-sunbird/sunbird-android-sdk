@@ -275,17 +275,26 @@ public class ContentHandler {
         return GsonUtil.fromJson(localData, Map.class).get(KEY_PRE_REQUISITES) != null;
     }
 
-    public static List<Map<String, Object>> readPreRequisites(Map contentData) {
-        return (List<Map<String, Object>>) contentData.get(KEY_PRE_REQUISITES);
+    private static List<Map<String, Object>> readPreRequisites(Map contentData) {
+        if (contentData.containsKey(KEY_PRE_REQUISITES)) {
+            return (List<Map<String, Object>>) contentData.get(KEY_PRE_REQUISITES);
+        }
+        return null;
     }
 
-    public static List<String> getPreRequisitesIdentifiers(String localData) {
-        List<Map<String, Object>> preRequisites = readPreRequisites(GsonUtil.fromJson(localData, Map.class));
+    private static List<String> getPreRequisitesIdentifiers(String localData) {
+        return getPreRequisitesIdentifiers(GsonUtil.fromJson(localData, Map.class));
+    }
 
+    public static List<String> getPreRequisitesIdentifiers(Map contentData) {
         List<String> childIdentifiers = new ArrayList<>();
-        for (Map child : preRequisites) {
-            String childIdentifier = readIdentifier(child);
-            childIdentifiers.add(childIdentifier);
+
+        List<Map<String, Object>> preRequisites = readPreRequisites(contentData);
+        if (preRequisites != null) {
+            for (Map child : preRequisites) {
+                String childIdentifier = readIdentifier(child);
+                childIdentifiers.add(childIdentifier);
+            }
         }
 
         // Return the pre_requisites in DB
@@ -296,13 +305,26 @@ public class ContentHandler {
         return GsonUtil.fromJson(localData, Map.class).get(KEY_CHILDREN) != null;
     }
 
-    public static List<String> getChildContentsIdentifiers(String localData) {
-        List<Map> children = (List) GsonUtil.fromJson(localData, Map.class).get(KEY_CHILDREN);
+    private static List<Map<String, Object>> readChildren(Map contentData) {
+        if (contentData.containsKey(KEY_CHILDREN)) {
+            return (List<Map<String, Object>>) contentData.get(KEY_CHILDREN);
+        }
+        return null;
+    }
 
+    private static List<String> getChildContentsIdentifiers(String localData) {
+        return getChildContentsIdentifiers(GsonUtil.fromJson(localData, Map.class));
+    }
+
+    public static List<String> getChildContentsIdentifiers(Map contentData) {
         List<String> childIdentifiers = new ArrayList<>();
-        for (Map child : children) {
-            String childIdentifier = readIdentifier(child);
-            childIdentifiers.add(childIdentifier);
+
+        List<Map<String, Object>> children = readChildren(contentData);
+        if (children != null) {
+            for (Map child : children) {
+                String childIdentifier = readIdentifier(child);
+                childIdentifiers.add(childIdentifier);
+            }
         }
 
         // Return the childrenInDB
@@ -1364,7 +1386,6 @@ public class ContentHandler {
 //                  filterSet.addAll(Arrays.asList(stringArray));
                 }
             }
-
         }
         return filters;
     }
@@ -1411,9 +1432,9 @@ public class ContentHandler {
                 }
             } else if (hasPreRequisites(node.getLocalData())) {
                 List<String> preRequisitesIdentifiers = getPreRequisitesIdentifiers(node.getLocalData());
-                List<ContentModel> preRequisitiesListInDB = findAllContentsWithIdentifiers(dbSession, preRequisitesIdentifiers);
-                if (preRequisitiesListInDB != null) {
-                    queue.addAll(preRequisitiesListInDB);
+                List<ContentModel> preRequisitesListInDB = findAllContentsWithIdentifiers(dbSession, preRequisitesIdentifiers);
+                if (preRequisitesListInDB != null) {
+                    queue.addAll(preRequisitesListInDB);
                 }
             }
 
