@@ -27,7 +27,6 @@ import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
-import org.ekstep.genieservices.commons.bean.enums.ContentType;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.contentservice.AssertImportTelemetryEvent;
@@ -148,7 +147,7 @@ public class ContentServiceTest extends GenieServiceTestBase {
         Assert.assertTrue("true", genieResponse.getStatus());
         AssertCollection.verifyContentEntryAndVisibility(CONTENT_ID, VISIBILITY_DEFAULT);
 
-        ContentFilterCriteria.Builder contentFilterCriteria = new ContentFilterCriteria.Builder().contentTypes(new ContentType[]{ContentType.COLLECTION, ContentType.WORKSHEET});
+        ContentFilterCriteria.Builder contentFilterCriteria = new ContentFilterCriteria.Builder().contentTypes(new String[]{"Worksheet", "Collection"});
         GenieResponse<List<Content>> genieGetLocalResponse = activity.getAllLocalContent(contentFilterCriteria.build());
         Assert.assertTrue(genieGetLocalResponse.getStatus());
         Assert.assertNotNull(genieGetLocalResponse.getResult());
@@ -170,7 +169,7 @@ public class ContentServiceTest extends GenieServiceTestBase {
     @Test
     public void shouldGetAllRecommendedContent() {
 
-        RecommendedContentRequest.Builder contentRequest = new RecommendedContentRequest.Builder().language("en");
+        RecommendedContentRequest.Builder contentRequest = new RecommendedContentRequest.Builder().byLanguage("en");
 
         GenieResponse<RecommendedContentResult> genieResponse = activity.getRecommendedContent(contentRequest.build());
         Assert.assertTrue(genieResponse.getStatus());
@@ -179,7 +178,7 @@ public class ContentServiceTest extends GenieServiceTestBase {
 
     public void shouldGetRelatedContent() {
 
-        RelatedContentRequest.Builder contentRequest = new RelatedContentRequest.Builder().contentId(CONTENT_ID);
+        RelatedContentRequest.Builder contentRequest = new RelatedContentRequest.Builder().forContent(CONTENT_ID);
 
         GenieResponse<RelatedContentResult> genieResponse = activity.getRelatedContent(contentRequest.build());
         Assert.assertTrue(genieResponse.getStatus());

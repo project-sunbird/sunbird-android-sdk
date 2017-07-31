@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <application android:allowBackup="true" android:label="@string/app_name"
         android:supportsRtl="true">
-        <activity android:name="org.ekstep.genieservices.MainActivity">
+        <activity android:name="org.ekstep.genieservices.GenieServiceTestActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
