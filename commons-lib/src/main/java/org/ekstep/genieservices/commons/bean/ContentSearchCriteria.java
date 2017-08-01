@@ -197,7 +197,7 @@ public class ContentSearchCriteria implements Serializable {
             return this;
         }
 
-        public SearchBuilder channel(String[] audience) {
+        public SearchBuilder channel(String[] channel) {
             this.channel = channel;
             return this;
         }

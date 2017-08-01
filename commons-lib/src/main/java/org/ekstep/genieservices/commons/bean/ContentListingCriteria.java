@@ -147,7 +147,7 @@ public class ContentListingCriteria {
             return this;
         }
 
-        public Builder channel(String[] audience) {
+        public Builder channel(String[] channel) {
             this.channel = channel;
             return this;
         }
