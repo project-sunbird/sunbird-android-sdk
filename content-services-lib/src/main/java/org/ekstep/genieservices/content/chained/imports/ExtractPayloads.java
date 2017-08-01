@@ -218,14 +218,13 @@ public class ExtractPayloads implements IChainable<Void, ImportContentContext> {
             }
 
             //Delete the content
-            if (oldContentPath != null && !isContentExist) {
+            if (oldContentPath != null && payloadDestination != null && !oldContentPath.equals(payloadDestination.getPath()) && !isContentExist) {
                 if (!StringUtil.isNullOrEmpty(artifactUrl) && !artifactUrl.contains("." + ServiceConstants.FileExtension.APK)) {
                     FileUtil.rm(new File(oldContentPath));
                 }
             }
             importContext.setIdentifiers(identifier);
         }
-
 
         if (nextLink != null) {
             return nextLink.execute(appContext, importContext);
