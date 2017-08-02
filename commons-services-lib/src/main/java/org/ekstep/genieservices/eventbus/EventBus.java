@@ -22,12 +22,39 @@ public class EventBus {
                 });
     }
 
+    public static void postStickyEvent(final Object eventObject) {
+        EventPublisherThreadPool
+                .getInstance()
+                .execute(new AsyncExecutor.RunnableEx() {
+                    @Override
+                    public void run() throws Exception {
+                        org.greenrobot.eventbus.EventBus.getDefault().postSticky(eventObject);
+                    }
+                });
+    }
+
+    public static void removeStickyEvent(final Object eventObject) {
+        EventPublisherThreadPool
+                .getInstance()
+                .execute(new AsyncExecutor.RunnableEx() {
+                    @Override
+                    public void run() throws Exception {
+                        org.greenrobot.eventbus.EventBus.getDefault().removeStickyEvent(eventObject);
+                    }
+                });
+    }
+
+
     public static void registerSubscriber(final Object subscriber) {
         org.greenrobot.eventbus.EventBus.getDefault().register(subscriber);
     }
 
     public static void unregisterSubscriber(final Object subscriber) {
         org.greenrobot.eventbus.EventBus.getDefault().unregister(subscriber);
+    }
+
+    public static boolean isSubscriberRegistered(final Object eventObject) {
+        return org.greenrobot.eventbus.EventBus.getDefault().isRegistered(eventObject);
     }
 
 }
