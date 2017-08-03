@@ -9,6 +9,7 @@ import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created on 27/4/17.
@@ -39,7 +40,7 @@ public class TelemetryLogger {
         }
     }
 
-    public static void logSuccess(AppContext appContext, GenieResponse response, String service, String method, HashMap params) {
+    public static void logSuccess(AppContext appContext, GenieResponse response, String service, String method, Map<String, Object> params) {
         appLoggingLevel = appContext.getParams().getInt(ServiceConstants.Params.LOG_LEVEL);
         int parsedLogLevel = 3;
         if (params != null & params.get("logLevel") != null) {
@@ -57,19 +58,19 @@ public class TelemetryLogger {
         }
     }
 
-    public static void logFailure(AppContext appContext, GenieResponse response, String service, String method, HashMap params, Exception e) {
+    public static void logFailure(AppContext appContext, GenieResponse response, String service, String method, Map<String, Object> params, Exception e) {
         HashMap<String, Object> result = new HashMap<>();
         result.put("error", e.getMessage());
         log(appContext, response, service, method, params, result);
     }
 
-    public static void logFailure(AppContext appContext, GenieResponse response, String service, String method, HashMap params, String message) {
+    public static void logFailure(AppContext appContext, GenieResponse response, String service, String method, Map<String, Object> params, String message) {
         HashMap<String, Object> result = new HashMap<>();
         result.put("message", message);
         log(appContext, response, service, method, params, result);
     }
 
-    private static void log(AppContext appContext, GenieResponse response, String service, String method, HashMap params, HashMap result) {
+    private static void log(AppContext appContext, GenieResponse response, String service, String method, Map<String, Object> params, HashMap result) {
         save(create(appContext, response, service, method, params, result));
     }
 
@@ -77,7 +78,7 @@ public class TelemetryLogger {
         save(telemetry);
     }
 
-    public static Telemetry create(AppContext appContext, GenieResponse response, String service, String method, HashMap params, HashMap result) {
+    public static Telemetry create(AppContext appContext, GenieResponse response, String service, String method, Map<String, Object> params, HashMap result) {
         GEServiceAPICall.Builder eventBuilder = new GEServiceAPICall.Builder();
         return eventBuilder.service(service)
                 .method(method)

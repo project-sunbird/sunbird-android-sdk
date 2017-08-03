@@ -48,7 +48,7 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
     public GenieResponse<MasterData> getMasterData(MasterDataType type) {
 
         String methodName = "getMasterData@ConfigServiceImpl";
-        HashMap params = new HashMap();
+        Map<String, Object> params = new HashMap<>();
         params.put("type", type.getValue());
         params.put("logLevel", "2");
 
@@ -59,13 +59,13 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
         }
 
         MasterDataModel masterDataModel = MasterDataModel.findByType(mAppContext.getDBSession(), type.getValue());
-
-        String result = masterDataModel.getMasterDataJson();
-
-        MasterData masterData = GsonUtil.fromJson(result, MasterData.class);
+        MasterData masterData = null;
+        if (masterDataModel != null) {
+            masterData = GsonUtil.fromJson(masterDataModel.getMasterDataJson(), MasterData.class);
+        }
 
         GenieResponse<MasterData> response;
-        if (result != null) {
+        if (masterData != null) {
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(masterData);
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
@@ -121,7 +121,7 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
     @Override
     public GenieResponse<Map<String, Object>> getResourceBundle(String languageIdentifier) {
         String methodName = "getResourceBundle@ConfigServiceImpl";
-        HashMap params = new HashMap();
+        Map<String, Object> params = new HashMap<>();
         params.put("ResourceBundle", languageIdentifier);
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
         params.put("logLevel", "2");
@@ -136,26 +136,30 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
         if (resourceBundle == null) {
             //language data not available in the resources API
             resourceBundle = ResourceBundleModel.findById(mAppContext.getDBSession(), "en");
-            if (resourceBundle == null) {
+            if (resourceBundle != null) {
                 result = resourceBundle.getResourceString();
             }
         } else {
             result = resourceBundle.getResourceString();
         }
-        Map<String, Object> resourceBundleMap = new HashMap<>();
-        resourceBundleMap.put(resourceBundle.getIdentifier(), resourceBundle.getResourceString());
+
+        Map<String, Object> resourceBundleMap = null;
+        if (result != null) {
+            resourceBundleMap = new HashMap<>();
+            resourceBundleMap.put(resourceBundle.getIdentifier(), resourceBundle.getResourceString());
+        }
 
         GenieResponse<Map<String, Object>> response;
-        if (result != null) {
+        if (resourceBundleMap != null) {
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(resourceBundleMap);
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
-            return response;
         } else {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_RESOURCE_BUNDLE, TAG);
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_RESOURCE_BUNDLE);
-            return response;
         }
+
+        return response;
     }
 
     private void initializeResourceBundle() {
@@ -206,7 +210,7 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
 
     public GenieResponse<Map<String, Object>> getOrdinals() {
         String methodName = "getOrdinals@ConfigServiceImpl";
-        HashMap params = new HashMap();
+        Map<String, Object> params = new HashMap<>();
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
         params.put("logLevel", "2");
 
@@ -217,19 +221,22 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
         }
 
         OrdinalsModel ordinals = OrdinalsModel.findById(mAppContext.getDBSession(), DB_KEY_ORDINALS);
-        HashMap ordinalsMap = GsonUtil.fromJson(ordinals.getJSON(), HashMap.class);
+        Map<String, Object> ordinalsMap = null;
+        if (ordinals != null) {
+            ordinalsMap = GsonUtil.fromJson(ordinals.getJSON(), HashMap.class);
+        }
 
         GenieResponse<Map<String, Object>> response;
         if (ordinalsMap != null) {
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(ordinalsMap);
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
-            return response;
         } else {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_ORDINALS, TAG);
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_ORDINALS);
-            return response;
         }
+
+        return response;
     }
 
     private void initializeOrdinalsData() {
