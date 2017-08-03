@@ -1,9 +1,9 @@
 {
-  "id": "ekstep.domain.terms.list",
-  "ver": "2.0",
-  "ts": "2017-03-08T09:42:47ZZ",
+  "id": "ekstep.learning.terms.list",
+  "ver": "3.0",
+  "ts": "2017-08-02T10:19:39ZZ",
   "params": {
-    "resmsgid": "ad3e9da2-1cea-4aaa-aa71-637491c57999",
+    "resmsgid": "b064bc17-9410-4892-b03d-650dc2bbd9e3",
     "msgid": null,
     "err": null,
     "status": "successful",
@@ -96,11 +96,140 @@
           }
         },
         {
+          "label": "Grade 6",
+          "value": "6",
+          "telemetry": "6",
+          "description": "",
+          "search": {
+            "filters": {
+              "gradeLevel": [
+                "Grade 6"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Grade 7",
+          "value": "7",
+          "telemetry": "7",
+          "description": "",
+          "search": {
+            "filters": {
+              "gradeLevel": [
+                "Grade 7"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Grade 8",
+          "value": "8",
+          "telemetry": "8",
+          "description": "",
+          "search": {
+            "filters": {
+              "gradeLevel": [
+                "Grade 8"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Grade 9",
+          "value": "9",
+          "telemetry": "9",
+          "description": "",
+          "search": {
+            "filters": {
+              "gradeLevel": [
+                "Grade 9"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Grade 10",
+          "value": "10",
+          "telemetry": "10",
+          "description": "",
+          "search": {
+            "filters": {
+              "gradeLevel": [
+                "Grade 10"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Grade 11",
+          "value": "11",
+          "telemetry": "11",
+          "description": "",
+          "search": {
+            "filters": {
+              "gradeLevel": [
+                "Grade 11"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Grade 12",
+          "value": "12",
+          "telemetry": "12",
+          "description": "",
+          "search": {
+            "filters": {
+              "gradeLevel": [
+                "Grade 12"
+              ]
+            }
+          }
+        },
+        {
           "label": "Others",
           "value": "-1",
           "telemetry": "-1",
           "description": "",
-          "search": {}
+          "search": {
+            "filters": {
+
+            }
+          }
+        }
+      ]
+    },
+    "audience": {
+      "label": "audience",
+      "value": "audience",
+      "language": "en",
+      "description": "Purpose of the content",
+      "values": [
+        {
+          "label": "Learner",
+          "value": "learner",
+          "telemetry": "learner",
+          "description": "",
+          "search": {
+            "filters": {
+              "audience": [
+                "learner"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Instructor",
+          "value": "instructor",
+          "telemetry": "instructor",
+          "description": "",
+          "search": {
+            "filters": {
+              "audience": [
+                "instructor"
+              ]
+            }
+          }
         }
       ]
     },
@@ -301,6 +430,40 @@
             "filters": {
               "subject": [
                 "Urdu"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "channel": {
+      "label": "Channel",
+      "value": "channel",
+      "language": "en",
+      "description": "List of partner channels",
+      "values": [
+        {
+          "label": "APSSDC",
+          "value": "AP_1",
+          "telemetry": "AP_1",
+          "description": "",
+          "search": {
+            "filters": {
+              "tags": [
+                "APSSDC"
+              ]
+            }
+          }
+        },
+        {
+          "label": "GPF",
+          "value": "GP_1",
+          "telemetry": "GP_1",
+          "description": "",
+          "search": {
+            "filters": {
+              "tags": [
+                "GPF"
               ]
             }
           }
@@ -596,9 +759,7 @@
           "description": "",
           "search": {
             "filters": {
-              "ageGroup": [
-                "Other"
-              ]
+
             }
           }
         }
@@ -669,6 +830,9 @@
           "telemetry": "",
           "description": "",
           "search": {
+            "filters": {
+
+            }
           }
         }
       ]
@@ -871,60 +1035,9 @@
           "value": "-1",
           "telemetry": "-1",
           "description": "",
-          "search": {}
-        }
-      ]
-    },
-    "channel": {
-      "label": "Channel",
-      "value": "channel",
-      "language": "en",
-      "description": "List of partner channels",
-      "values": [
-        {
-          "label": "APSSDC",
-          "value": "AP_1",
-          "telemetry": "AP_1",
-          "description": "",
           "search": {
             "filters": {
-              "tags": [
-                "APSSDC"
-              ]
-            }
-          }
-        }
-      ]
-    },
-    "audience": {
-      "label": "audience",
-      "value": "audience",
-      "language": "en",
-      "description": "Purpose of the content",
-      "values": [
-        {
-          "label": "Learner",
-          "value": "learner",
-          "telemetry": "learner",
-          "description": "",
-          "search": {
-            "filters": {
-              "audience": [
-                "learner"
-              ]
-            }
-          }
-        },
-        {
-          "label": "Instructor",
-          "value": "instructor",
-          "telemetry": "instructor",
-          "description": "",
-          "search": {
-            "filters": {
-              "audience": [
-                "instructor"
-              ]
+
             }
           }
         }
