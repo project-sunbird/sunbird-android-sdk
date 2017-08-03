@@ -33,12 +33,12 @@ public class NotificationService {
      * @param responseHandler - {@link IResponseHandler<Void>}
      */
     public void addNotification(final Notification notification, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
                 return notificationService.addNotification(notification);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -57,12 +57,12 @@ public class NotificationService {
      * @param responseHandler - {@link IResponseHandler<Notification>}
      */
     public void updateNotification(final Notification notification, IResponseHandler<Notification> responseHandler) {
-        new AsyncHandler<Notification>(responseHandler).execute(new IPerformable<Notification>() {
+        ThreadPool.getInstance().execute(new IPerformable<Notification>() {
             @Override
             public GenieResponse<Notification> perform() {
                 return notificationService.updateNotification(notification);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -80,12 +80,12 @@ public class NotificationService {
      * @param responseHandler - {@link IResponseHandler<Void>}
      */
     public void deleteNotification(final int msgId, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
                 return notificationService.deleteNotification(msgId);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -103,12 +103,12 @@ public class NotificationService {
      * @param responseHandler - {@link IResponseHandler<List<Notification>>}
      */
     public void getAllNotifications(final NotificationFilterCriteria criteria, IResponseHandler<List<Notification>> responseHandler) {
-        new AsyncHandler<List<Notification>>(responseHandler).execute(new IPerformable<List<Notification>>() {
+        ThreadPool.getInstance().execute(new IPerformable<List<Notification>>() {
             @Override
             public GenieResponse<List<Notification>> perform() {
                 return notificationService.getAllNotifications(criteria);
             }
-        });
+        }, responseHandler);
     }
 
 }

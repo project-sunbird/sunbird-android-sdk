@@ -38,12 +38,12 @@ public class UserService {
      * @param responseHandler - {@link IResponseHandler<Profile>}
      */
     public void createUserProfile(final Profile profile, IResponseHandler<Profile> responseHandler) {
-        new AsyncHandler<Profile>(responseHandler).execute(new IPerformable<Profile>() {
+        ThreadPool.getInstance().execute(new IPerformable<Profile>() {
             @Override
             public GenieResponse<Profile> perform() {
                 return userService.createUserProfile(profile);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -57,12 +57,12 @@ public class UserService {
      * @param responseHandler {@link IResponseHandler<List<Profile>>}
      */
     public void getAllUserProfile(IResponseHandler<List<Profile>> responseHandler) {
-        new AsyncHandler<List<Profile>>(responseHandler).execute(new IPerformable<List<Profile>>() {
+        ThreadPool.getInstance().execute(new IPerformable<List<Profile>>() {
             @Override
             public GenieResponse<List<Profile>> perform() {
                 return userService.getAllUserProfile();
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -78,12 +78,12 @@ public class UserService {
      * @param responseHandler - {@link IResponseHandler<Void>}
      */
     public void deleteUser(final String uid, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
                 return userService.deleteUser(uid);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -99,12 +99,12 @@ public class UserService {
      * @param responseHandler - {@link IResponseHandler<Void>}
      */
     public void setCurrentUser(final String uid, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
                 return userService.setCurrentUser(uid);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -117,12 +117,12 @@ public class UserService {
      * @param responseHandler - {@link IResponseHandler<Profile>}
      */
     public void getCurrentUser(IResponseHandler<Profile> responseHandler) {
-        new AsyncHandler<Profile>(responseHandler).execute(new IPerformable<Profile>() {
+        ThreadPool.getInstance().execute(new IPerformable<Profile>() {
             @Override
             public GenieResponse<Profile> perform() {
                 return userService.getCurrentUser();
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -135,12 +135,12 @@ public class UserService {
      * @param responseHandler - {@link IResponseHandler<UserSession>}
      */
     public void getCurrentUserSession(IResponseHandler<UserSession> responseHandler) {
-        new AsyncHandler<UserSession>(responseHandler).execute(new IPerformable<UserSession>() {
+        ThreadPool.getInstance().execute(new IPerformable<UserSession>() {
             @Override
             public GenieResponse<UserSession> perform() {
                 return userService.getCurrentUserSession();
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -153,12 +153,12 @@ public class UserService {
      * @param responseHandler - {@link IResponseHandler<Profile>}
      */
     public void getAnonymousUser(IResponseHandler<Profile> responseHandler) {
-        new AsyncHandler<Profile>(responseHandler).execute(new IPerformable<Profile>() {
+        ThreadPool.getInstance().execute(new IPerformable<Profile>() {
             @Override
             public GenieResponse<Profile> perform() {
                 return userService.getAnonymousUser();
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -171,12 +171,12 @@ public class UserService {
      * @param responseHandler - {@link IResponseHandler<String>}
      */
     public void setAnonymousUser(IResponseHandler<String> responseHandler) {
-        new AsyncHandler<String>(responseHandler).execute(new IPerformable<String>() {
+        ThreadPool.getInstance().execute(new IPerformable<String>() {
             @Override
             public GenieResponse<String> perform() {
                 return userService.setAnonymousUser();
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -193,12 +193,12 @@ public class UserService {
      * @param responseHandler - {@link IResponseHandler<Profile>}
      */
     public void updateUserProfile(final Profile profile, IResponseHandler<Profile> responseHandler) {
-        new AsyncHandler<Profile>(responseHandler).execute(new IPerformable<Profile>() {
+        ThreadPool.getInstance().execute(new IPerformable<Profile>() {
             @Override
             public GenieResponse<Profile> perform() {
                 return userService.updateUserProfile(profile);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -213,12 +213,12 @@ public class UserService {
      * @param responseHandler - {@link IResponseHandler<Void>}
      */
     public void addContentAccess(final ContentAccess contentAccess, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
                 return userService.addContentAccess(contentAccess);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -230,12 +230,12 @@ public class UserService {
      * @param responseHandler - {@link IResponseHandler<List<ContentAccess>>}
      */
     public void getAllContentAccess(final ContentAccessFilterCriteria criteria, IResponseHandler<List<ContentAccess>> responseHandler) {
-        new AsyncHandler<List<ContentAccess>>(responseHandler).execute(new IPerformable<List<ContentAccess>>() {
+        ThreadPool.getInstance().execute(new IPerformable<List<ContentAccess>>() {
             @Override
             public GenieResponse<List<ContentAccess>> perform() {
                 return userService.getAllContentAccess(criteria);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -250,12 +250,12 @@ public class UserService {
      * @param responseHandler      - {@link IResponseHandler<Void>}
      */
     public void importProfile(final ProfileImportRequest profileImportRequest, IResponseHandler<ProfileImportResponse> responseHandler) {
-        new AsyncHandler<ProfileImportResponse>(responseHandler).execute(new IPerformable<ProfileImportResponse>() {
+        ThreadPool.getInstance().execute(new IPerformable<ProfileImportResponse>() {
             @Override
             public GenieResponse<ProfileImportResponse> perform() {
                 return userService.importProfile(profileImportRequest);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -270,12 +270,12 @@ public class UserService {
      * @param responseHandler      - {@link IResponseHandler<ProfileExportResponse>}
      */
     public void exportProfile(final ProfileExportRequest profileExportRequest, IResponseHandler<ProfileExportResponse> responseHandler) {
-        new AsyncHandler<ProfileExportResponse>(responseHandler).execute(new IPerformable<ProfileExportResponse>() {
+        ThreadPool.getInstance().execute(new IPerformable<ProfileExportResponse>() {
             @Override
             public GenieResponse<ProfileExportResponse> perform() {
                 return userService.exportProfile(profileExportRequest);
             }
-        });
+        }, responseHandler);
     }
 
 }

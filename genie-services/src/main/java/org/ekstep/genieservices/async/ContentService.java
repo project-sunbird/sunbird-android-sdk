@@ -57,13 +57,14 @@ public class ContentService {
      * @param contentDetailsRequest - {@link ContentDetailsRequest}
      * @param responseHandler       - {@link IResponseHandler<Content>}
      */
-    public void getContentDetails(final ContentDetailsRequest contentDetailsRequest, IResponseHandler<Content> responseHandler) {
-        new AsyncHandler<Content>(responseHandler).execute(new IPerformable<Content>() {
+    public void getContentDetails(final ContentDetailsRequest contentDetailsRequest,
+                                  IResponseHandler<Content> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<Content>() {
             @Override
             public GenieResponse<Content> perform() {
                 return contentService.getContentDetails(contentDetailsRequest);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -75,13 +76,14 @@ public class ContentService {
      * @param criteria        - {@link ContentFilterCriteria}
      * @param responseHandler - {@link IResponseHandler<List<Content>>}
      */
-    public void getAllLocalContent(final ContentFilterCriteria criteria, IResponseHandler<List<Content>> responseHandler) {
-        new AsyncHandler<List<Content>>(responseHandler).execute(new IPerformable<List<Content>>() {
+    public void getAllLocalContent(final ContentFilterCriteria criteria,
+                                   IResponseHandler<List<Content>> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<List<Content>>() {
             @Override
             public GenieResponse<List<Content>> perform() {
                 return contentService.getAllLocalContent(criteria);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -98,12 +100,12 @@ public class ContentService {
      * @param responseHandler     - {@link IResponseHandler<Content>}
      */
     public void getChildContents(final ChildContentRequest childContentRequest, IResponseHandler<Content> responseHandler) {
-        new AsyncHandler<Content>(responseHandler).execute(new IPerformable<Content>() {
+        ThreadPool.getInstance().execute(new IPerformable<Content>() {
             @Override
             public GenieResponse<Content> perform() {
                 return contentService.getChildContents(childContentRequest);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -120,12 +122,12 @@ public class ContentService {
      * @param responseHandler      - {@link IResponseHandler<Void>}
      */
     public void deleteContent(final ContentDeleteRequest contentDeleteRequest, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
                 return contentService.deleteContent(contentDeleteRequest);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -144,12 +146,12 @@ public class ContentService {
      * @param responseHandler       - {@link IResponseHandler<ContentSearchResult>}
      */
     public void searchContent(final ContentSearchCriteria contentSearchCriteria, IResponseHandler<ContentSearchResult> responseHandler) {
-        new AsyncHandler<ContentSearchResult>(responseHandler).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new IPerformable<ContentSearchResult>() {
+        ThreadPool.getInstance().execute(new IPerformable<ContentSearchResult>() {
             @Override
             public GenieResponse<ContentSearchResult> perform() {
                 return contentService.searchContent(contentSearchCriteria);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -168,12 +170,12 @@ public class ContentService {
      * @param responseHandler           - {@link IResponseHandler<RecommendedContentResult>}
      */
     public void getRecommendedContent(final RecommendedContentRequest recommendedContentRequest, IResponseHandler<RecommendedContentResult> responseHandler) {
-        new AsyncHandler<RecommendedContentResult>(responseHandler).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new IPerformable<RecommendedContentResult>() {
+        ThreadPool.getInstance().execute(new IPerformable<RecommendedContentResult>() {
             @Override
             public GenieResponse<RecommendedContentResult> perform() {
                 return contentService.getRecommendedContent(recommendedContentRequest);
             }
-        });
+        }, responseHandler);
     }
 
 
@@ -193,12 +195,12 @@ public class ContentService {
      * @param responseHandler       - {@link IResponseHandler<RelatedContentResult>}
      */
     public void getRelatedContent(final RelatedContentRequest relatedContentRequest, IResponseHandler<RelatedContentResult> responseHandler) {
-        new AsyncHandler<RelatedContentResult>(responseHandler).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new IPerformable<RelatedContentResult>() {
+        ThreadPool.getInstance().execute(new IPerformable<RelatedContentResult>() {
             @Override
             public GenieResponse<RelatedContentResult> perform() {
                 return contentService.getRelatedContent(relatedContentRequest);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -212,12 +214,12 @@ public class ContentService {
      * @param responseHandler          - {@link IResponseHandler<Content>}
      */
     public void nextContent(final List<HierarchyInfo> contentHierarchy, final String currentContentIdentifier, IResponseHandler<Content> responseHandler) {
-        new AsyncHandler<Content>(responseHandler).execute(new IPerformable<Content>() {
+        ThreadPool.getInstance().execute(new IPerformable<Content>() {
             @Override
             public GenieResponse<Content> perform() {
                 return contentService.nextContent(contentHierarchy, currentContentIdentifier);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -234,12 +236,12 @@ public class ContentService {
      * @param responseHandler      - {@link IResponseHandler<List<ContentImportResponse>>}
      */
     public void importContent(final ContentImportRequest contentImportRequest, IResponseHandler<List<ContentImportResponse>> responseHandler) {
-        new AsyncHandler<List<ContentImportResponse>>(responseHandler).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new IPerformable<List<ContentImportResponse>>() {
+        ThreadPool.getInstance().execute(new IPerformable<List<ContentImportResponse>>() {
             @Override
             public GenieResponse<List<ContentImportResponse>> perform() {
                 return contentService.importContent(contentImportRequest);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -256,12 +258,12 @@ public class ContentService {
      * @param responseHandler   - {@link IResponseHandler<Void>}
      */
     public void importEcar(final EcarImportRequest ecarImportRequest, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
                 return contentService.importEcar(ecarImportRequest);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -276,13 +278,14 @@ public class ContentService {
      * @param contentListingCriteria - {@link ContentListingCriteria}
      * @param responseHandler        - {@link ContentListingCriteria}
      */
-    public void getContentListing(final ContentListingCriteria contentListingCriteria, IResponseHandler<ContentListing> responseHandler) {
-        new AsyncHandler<ContentListing>(responseHandler).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new IPerformable<ContentListing>() {
+    public void getContentListing(final ContentListingCriteria contentListingCriteria,
+                                  IResponseHandler<ContentListing> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<ContentListing>() {
             @Override
             public GenieResponse<ContentListing> perform() {
                 return contentService.getContentListing(contentListingCriteria);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -298,12 +301,12 @@ public class ContentService {
      * @param responseHandler - {@link IResponseHandler<Void>}
      */
     public void sendFeedback(final ContentFeedback contentFeedback, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
                 return contentFeedbackService.sendFeedback(contentFeedback);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -317,12 +320,12 @@ public class ContentService {
      * @param responseHandler               - {@link IResponseHandler<List<ContentFeedback>>}
      */
     public void getFeedback(final ContentFeedbackFilterCriteria contentFeedbackFilterCriteria, IResponseHandler<List<ContentFeedback>> responseHandler) {
-        new AsyncHandler<List<ContentFeedback>>(responseHandler).execute(new IPerformable<List<ContentFeedback>>() {
+        ThreadPool.getInstance().execute(new IPerformable<List<ContentFeedback>>() {
             @Override
             public GenieResponse<List<ContentFeedback>> perform() {
                 return contentFeedbackService.getFeedback(contentFeedbackFilterCriteria);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -335,12 +338,12 @@ public class ContentService {
      * @param responseHandler - {@link IResponseHandler<ContentImportResponse>}
      */
     public void getImportStatus(final String contentId, IResponseHandler<ContentImportResponse> responseHandler) {
-        new AsyncHandler<ContentImportResponse>(responseHandler).execute(new IPerformable<ContentImportResponse>() {
+        ThreadPool.getInstance().execute(new IPerformable<ContentImportResponse>() {
             @Override
             public GenieResponse<ContentImportResponse> perform() {
                 return contentService.getImportStatus(contentId);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -353,12 +356,12 @@ public class ContentService {
      * @param responseHandler - {@link IResponseHandler<Void>}
      */
     public void cancelDownload(final String contentId, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
                 return contentService.cancelDownload(contentId);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -374,13 +377,14 @@ public class ContentService {
      * @param contentExportRequest - {@link ContentExportRequest}
      * @param responseHandler      - {@link IResponseHandler<ContentExportResponse>}
      */
-    public void exportContent(final ContentExportRequest contentExportRequest, IResponseHandler<ContentExportResponse> responseHandler) {
-        new AsyncHandler<ContentExportResponse>(responseHandler).execute(new IPerformable<ContentExportResponse>() {
+    public void exportContent(final ContentExportRequest contentExportRequest,
+                              IResponseHandler<ContentExportResponse> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<ContentExportResponse>() {
             @Override
             public GenieResponse<ContentExportResponse> perform() {
                 return contentService.exportContent(contentExportRequest);
             }
-        });
+        }, responseHandler);
     }
 
 }

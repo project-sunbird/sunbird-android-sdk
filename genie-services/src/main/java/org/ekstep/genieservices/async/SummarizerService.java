@@ -36,12 +36,12 @@ public class SummarizerService {
      * @param responseHandler -{@link IResponseHandler<List<LearnerAssessmentSummary>>}
      */
     public void getSummary(final SummaryRequest summaryRequest, IResponseHandler<List<LearnerAssessmentSummary>> responseHandler) {
-        new AsyncHandler<List<LearnerAssessmentSummary>>(responseHandler).execute(new IPerformable<List<LearnerAssessmentSummary>>() {
+        ThreadPool.getInstance().execute(new IPerformable<List<LearnerAssessmentSummary>>() {
             @Override
             public GenieResponse<List<LearnerAssessmentSummary>> perform() {
                 return summarizerService.getSummary(summaryRequest);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -60,11 +60,11 @@ public class SummarizerService {
      * @param responseHandler - {@link IResponseHandler<List<LearnerAssessmentDetails>>}
      */
     public void getLearnerAssessmentDetails(final SummaryRequest summaryRequest, IResponseHandler<List<LearnerAssessmentDetails>> responseHandler) {
-        new AsyncHandler<List<LearnerAssessmentDetails>>(responseHandler).execute(new IPerformable<List<LearnerAssessmentDetails>>() {
+        ThreadPool.getInstance().execute(new IPerformable<List<LearnerAssessmentDetails>>() {
             @Override
             public GenieResponse<List<LearnerAssessmentDetails>> perform() {
                 return summarizerService.getLearnerAssessmentDetails(summaryRequest);
             }
-        });
+        }, responseHandler);
     }
 }
