@@ -58,9 +58,7 @@ public class PartnerServiceTest extends GenieServiceTestBase {
 
         GenieResponse terminatePartnerSession = activity.terminatePartnerSession(partnerData);
         Assert.assertTrue(terminatePartnerSession.getStatus());
-
-        //TODO : GE_STOP_PARTNER_SESSION FAILS.
-//        checkIfTelemetryEventIsLogged("GE_STOP_PARTNER_SESSION");
+        checkIfTelemetryEventIsLogged("GE_STOP_PARTNER_SESSION");
     }
 
     private void checkIfTelemetryEventIsLogged(String telemetryEvent) {
@@ -68,6 +66,6 @@ public class PartnerServiceTest extends GenieServiceTestBase {
         List<EventModel> eventModelList = GenieServiceDBHelper.findEventById(telemetryEvent);
         Map eventMap = eventModelList.get(0).getEventMap();
         Assert.assertEquals(telemetryEvent, eventMap.get("eid"));
-        Assert.assertEquals("2.0", eventMap.get("ver"));
+        Assert.assertEquals("2.1", eventMap.get("ver"));
     }
 }

@@ -1,6 +1,7 @@
 package org.ekstep.genieservices.configservice;
 
 import android.support.test.runner.AndroidJUnit4;
+import android.util.Log;
 
 import junit.framework.Assert;
 
@@ -181,19 +182,18 @@ public class ConfigServiceTest extends GenieServiceTestBase {
     /**
      * Scenario : To validate the platform specific data, for an invalid locale.
      * When : Validation for invalid locale when SDK is fetching platform specific data.
-     * Then : Error message for invalid locale.
+     * Then : Accepts invalid locale.
      */
     @Test
     public void shouldValidateResourceBundle() {
 
         waitForGenieToBecomeIdle();
 
-        try {
-            GenieResponse<Map<String, Object>> genieResponse = activity.getResourceBundle("se");
-            Assert.assertFalse(genieResponse.getStatus());
-        } catch (Exception e) {
-            Assert.assertTrue(true);
-        }
+        GenieResponse<Map<String, Object>> genieResponse = activity.getResourceBundle("me");
+        Assert.assertTrue(genieResponse.getStatus());
+
+        GenieResponse<Map<String, Object>> genieResponse2 = activity.getResourceBundle("me");
+        Log.e(TAG, "shouldValidateResourceBundle: 2nd call " + genieResponse2.getStatus());
     }
 }
 

@@ -28,9 +28,9 @@ import java.util.UUID;
  */
 public class UserProfileTest extends GenieServiceTestBase {
 
-    private final String PROFILE_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Sneha.epar";
+    private final String PROFILE_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/profile.epar";
     private final String PROFILE_ID = "76c33e90-5b82-4739-af56-78580bb0f91a";
-    private final String PROFILE_FILEPATH_DEST = "/storage/emulated/0/Android/data/org.ekstep.genieservices.test/files/tmp/Sneha.epar";
+    private final String PROFILE_FILEPATH_DEST = "/storage/emulated/0/Android/data/org.ekstep.genieservices.test/files/tmp/profile.epar";
 
     @Before
     public void setup() throws IOException {
@@ -460,6 +460,11 @@ public class UserProfileTest extends GenieServiceTestBase {
 
     }
 
+    /**
+     * Scenario: Import the profile by providing the filepath.
+     * Given: Import the profile by providing the filepath.
+     * Then: Profile gets successfully imported in the app.
+     */
     @Test
     public void shouldImportProfile() {
 
@@ -485,6 +490,11 @@ public class UserProfileTest extends GenieServiceTestBase {
         waitForGenieToBecomeIdle();
     }
 
+    /**
+     * Scenario: Export the profile to a specified filepath.
+     * Given: Export the profile to a specified filepath.
+     * Then: Profile gets successfully exported to the given filepath.
+     */
     @Test
     public void shouldExportProfile() {
 

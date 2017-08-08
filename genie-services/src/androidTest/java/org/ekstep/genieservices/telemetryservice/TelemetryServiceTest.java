@@ -46,15 +46,16 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
 
         Map<String, Object> edata = (Map<String, Object>) eventMap.get("edata");
         Map<String, Object> eks = (Map<String, Object>) edata.get("eks");
+        Map<String, Object> etags = (Map<String, Object>) eventMap.get("etags");
 
         Assert.assertEquals(telemetryEvent, eventMap.get("eid"));
-        Assert.assertEquals("2.0", eventMap.get("ver"));
+        Assert.assertEquals("2.1", eventMap.get("ver"));
         Assert.assertNotNull(eventMap.get("sid"));
         Assert.assertNotNull(eventMap.get("did"));
         Assert.assertEquals(PARTNER_ID, eks.get("partnerid"));
 
-        List<String> partnerId = (List<String>) ((List<Map<String, Object>>) eventMap.get("tags")).get(0).get("partnerid");
-        Assert.assertEquals(PARTNER_ID, partnerId.get(0));
+        List<Object> partnerDataList = ((List<Object>) etags.get("partner"));
+        Assert.assertEquals(PARTNER_ID, partnerDataList.get(0));
     }
 
     private void savePartnerData(PartnerData partnerData) {
@@ -72,8 +73,8 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
 
         GenieResponse sendDataResponse = activity.sendData(partnerData);
         Assert.assertTrue(sendDataResponse.getStatus());
-        checkIfTelemetryEventIsLogged("GE_PARTNER_DATA");
 
+        checkIfTelemetryEventIsLogged("GE_PARTNER_DATA");
     }
 
     /**
@@ -176,10 +177,6 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
         Assert.assertNotNull(telemetryStatGenieResponse.getResult().getUnSyncedEventCount());
         Assert.assertNotEquals(0, telemetryStatGenieResponse.getResult().getUnSyncedEventCount());
 
-        Log.v(TAG, "telemetryStatGenieResponse status:: " + telemetryStatGenieResponse.getStatus());
-        Log.v(TAG, "telemetryStatGenieResponse getUnSyncedEventCount:: " + telemetryStatGenieResponse.getResult().getUnSyncedEventCount());
-        Log.v(TAG, "telemetryStatGenieResponse getLastSyncTime:: " + telemetryStatGenieResponse.getResult().getLastSyncTime());
-
         shouldCheckSyncedTelemetryData(telemetryStatGenieResponse);
     }
 
@@ -193,12 +190,7 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
         Assert.assertNotEquals(0, syncStatGenieResponse.getResult().getSyncTime());
 
         //TODO : check getUnSyncedEventCount and getSyncedEventCount are different.
-        Assert.assertEquals(telemetryStatGenieResponse.getResult().getUnSyncedEventCount() + 1, syncStatGenieResponse.getResult().getSyncedEventCount());
-
-        Log.v(TAG, "syncStatGenieResponse status:: " + syncStatGenieResponse.getStatus());
-        Log.v(TAG, "syncStatGenieResponse syncStatGenieResponse getSyncedEventCount:: " + syncStatGenieResponse.getResult().getSyncedEventCount());
-        Log.v(TAG, "syncStatGenieResponse syncStatGenieResponse getSyncedFileSize:: " + syncStatGenieResponse.getResult().getSyncedFileSize());
-        Log.v(TAG, "syncStatGenieResponse syncStatGenieResponse getSyncTime:: " + syncStatGenieResponse.getResult().getSyncTime());
-
+        Assert.assertEquals(telemetryStatGenieResponse.getResult().getUnSyncedEventCount() + 1,
+                syncStatGenieResponse.getResult().getSyncedEventCount());
     }
 }
