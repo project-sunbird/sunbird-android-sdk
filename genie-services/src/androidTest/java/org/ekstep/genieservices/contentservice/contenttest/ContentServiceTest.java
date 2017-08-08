@@ -240,7 +240,7 @@ public class ContentServiceTest extends GenieServiceTestBase {
         GenieResponse<ContentImportResponse> contentImportStatus = activity.getImportStatus(CONTENT_ID_WITH_CHILD);
         Assert.assertEquals(CONTENT_ID_WITH_CHILD, contentImportStatus.getResult().getIdentifier());
         Assert.assertEquals(CONTENT_ID_WITH_CHILD, contentImportStatus.getResult().getIdentifier());
-        Assert.assertEquals(1, contentImportStatus.getResult().getStatus());
+        Assert.assertEquals(1, contentImportStatus.getResult().getStatus().getValue());
     }
 
     @Test
@@ -262,15 +262,13 @@ public class ContentServiceTest extends GenieServiceTestBase {
 
     @Test
     public void shouldGetContentListing() {
-
-        GenieServiceDBHelper.clearEcarEntryFromDB();
-
-        ContentListingCriteria.Builder contentListingCriteria = new ContentListingCriteria.Builder()
-                .age(5)
-                .medium("en")
-                .board("CBSE");
+        String PARTNER_HOME_IDENTIFIER = "org.ekstep.genie.content.partnerhome";
+        ContentListingCriteria.Builder contentListingCriteria = new ContentListingCriteria.Builder();
+        contentListingCriteria.listingId(PARTNER_HOME_IDENTIFIER);
 
         GenieResponse<ContentListing> genieResponse = activity.getContentListing(contentListingCriteria.build());
+        Assert.assertTrue(genieResponse.getStatus());
+        Assert.assertEquals(PARTNER_HOME_IDENTIFIER,genieResponse.getResult().getContentListingId());
     }
 
     @Test
@@ -282,7 +280,7 @@ public class ContentServiceTest extends GenieServiceTestBase {
         ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder()
                 .toFolder(activity.getExternalFilesDir(null).toString()).contentIds(contentIdList);
         GenieResponse<Void> genieResponse = activity.importContent(contentImportRequest.build());
-        Assert.assertTrue("true", genieResponse.getStatus());
+        Assert.assertTrue(genieResponse.getStatus());
 
         //export content
         ContentExportRequest.Builder contentExportRequest = new ContentExportRequest.Builder()
@@ -300,7 +298,7 @@ public class ContentServiceTest extends GenieServiceTestBase {
         EcarImportRequest.Builder ecarImportRequest = new EcarImportRequest.Builder()
                 .fromFilePath(Environment.getExternalStorageDirectory().toString()).toFolder(CONTENT_WITH_CHILD_FILEPATH);
         GenieResponse importResponse = activity.importEcar(ecarImportRequest.build());
-        Assert.assertTrue("true", importResponse.getStatus());
+        Assert.assertTrue(importResponse.getStatus());
 
     }
 }

@@ -161,7 +161,6 @@ public class ConfigServiceTest extends GenieServiceTestBase {
         GenieResponse<Map<String, Object>> genieResponse = activity.getOrdinals();
         Assert.assertTrue(genieResponse.getStatus());
         Assert.assertNotNull(genieResponse.getResult());
-
     }
 
     /**
@@ -179,10 +178,10 @@ public class ConfigServiceTest extends GenieServiceTestBase {
         Assert.assertNotNull(genieResponse.getResult());
     }
 
-    /**
+    /**TODO : needs to be checked.
      * Scenario : To validate the platform specific data, for an invalid locale.
      * When : Validation for invalid locale when SDK is fetching platform specific data.
-     * Then : Accepts invalid locale.
+     * Then : By default returns the data for "en" language.
      */
     @Test
     public void shouldValidateResourceBundle() {
@@ -191,9 +190,7 @@ public class ConfigServiceTest extends GenieServiceTestBase {
 
         GenieResponse<Map<String, Object>> genieResponse = activity.getResourceBundle("me");
         Assert.assertTrue(genieResponse.getStatus());
-
-        GenieResponse<Map<String, Object>> genieResponse2 = activity.getResourceBundle("me");
-        Log.e(TAG, "shouldValidateResourceBundle: 2nd call " + genieResponse2.getStatus());
+        Log.e(TAG, "shouldValidateResourceBundle: result " + (genieResponse.getResult()).keySet().contains("en"));
     }
 }
 
