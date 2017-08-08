@@ -1,5 +1,7 @@
 package org.ekstep.genieservices.commons.bean;
 
+import org.ekstep.genieservices.commons.utils.StringUtil;
+
 /**
  * This class accepts contentListingId, subject, age, grade, medium, board, audience array, channel array and device id while building the criteria for content listing request.
  */
@@ -98,6 +100,9 @@ public class ContentListingCriteria {
         private String[] facets;
 
         public Builder listingId(String contentListingId) {
+            if (StringUtil.isNullOrEmpty(contentListingId)) {
+                throw new IllegalArgumentException("listingId required.");
+            }
             this.contentListingId = contentListingId;
             return this;
         }
@@ -161,9 +166,14 @@ public class ContentListingCriteria {
         }
 
         public ContentListingCriteria build() {
+            if (StringUtil.isNullOrEmpty(contentListingId)) {
+                throw new IllegalStateException("listingId required.");
+            }
+
             if (facets == null || facets.length == 0) {
                 this.facets = new String[]{"contentType", "domain", "ageGroup", "language", "gradeLevel"};
             }
+
             return new ContentListingCriteria(contentListingId, uid, language, subject, age, grade, medium, board, did, audience, channel, facets);
         }
     }
