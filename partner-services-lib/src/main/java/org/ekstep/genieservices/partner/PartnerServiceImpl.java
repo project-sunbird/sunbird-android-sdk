@@ -42,7 +42,6 @@ import javax.crypto.spec.IvParameterSpec;
 /**
  * This is the implementation of the interface {@link IPartnerService}
  */
-
 public class PartnerServiceImpl extends BaseService implements IPartnerService {
 
     public static final String TAG = PartnerServiceImpl.class.getSimpleName();
@@ -53,7 +52,7 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
     /**
      * Constructor of PartnerServiceImpl
      *
-     * @param appContext
+     * @param appContext {@link AppContext}
      */
     public PartnerServiceImpl(AppContext appContext) {
         super(appContext);
@@ -79,14 +78,14 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
                 TelemetryLogger.log(geRegisterPartner);
 
                 response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
-                TelemetryLogger.logSuccess(mAppContext, response, TAG, "registerPartner@PartnerServiceImpl", new HashMap());
+                TelemetryLogger.logSuccess(mAppContext, response, TAG, "registerPartner@PartnerServiceImpl", new HashMap<String, Object>());
                 return response;
             } else {
                 String errorMessage = "INVALID_DATA";
                 response = GenieResponseBuilder.getErrorResponse(ServiceConstants.FAILED_RESPONSE, errorMessage, TAG, Void.class);
                 response.setErrorMessages(errors);
 
-                TelemetryLogger.logFailure(mAppContext, response, TAG, "registerPartner@PartnerServiceImpl", new HashMap(), errorMessage);
+                TelemetryLogger.logFailure(mAppContext, response, TAG, "registerPartner@PartnerServiceImpl", new HashMap<String, Object>(), errorMessage);
                 return response;
             }
         }
@@ -120,7 +119,7 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
     @Override
     public GenieResponse<Void> startPartnerSession(PartnerData partnerData) {
         String methodName = "startPartnerSession@PartnerServiceImpl";
-        HashMap params = new HashMap();
+        Map<String, Object> params = new HashMap<>();
         params.put("partnerData", GsonUtil.toJson(partnerData));
         params.put("logLevel", "2");
         Logger.i(TAG, "STARTING Partner Session" + partnerData.getPartnerID());
@@ -154,16 +153,21 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
     @Override
     public GenieResponse<Void> terminatePartnerSession(PartnerData partnerData) {
         String methodName = "terminatePartnerSession@PartnerServiceImpl";
-        HashMap params = new HashMap();
+        Map<String, Object> params = new HashMap<>();
         params.put("partnerData", GsonUtil.toJson(partnerData));
         params.put("logLevel", "2");
         String partnerID = partnerData.getPartnerID();
         Logger.i(TAG, "TERMINATING Partner Session" + partnerID);
+
         GenieResponse<Void> response;
         PartnerModel partnerModel = PartnerModel.findByPartnerId(appContext.getDBSession(), partnerID);
         PartnerSessionModel partnerSessionModel = PartnerSessionModel.find(appContext);
         if (partnerModel != null && partnerSessionModel != null && partnerID.equals(partnerSessionModel.getPartnerID())) {
+            GETerminatePartnerSession geTerminatePartnerSession = new GETerminatePartnerSession(partnerSessionModel.getPartnerID(), mAppContext.getDeviceInfo().getDeviceID(), DateUtil.getEpochDiff(partnerSessionModel.getEpochTime()), partnerSessionModel.getPartnerSessionId());
+            TelemetryLogger.log(geTerminatePartnerSession);
+
             partnerSessionModel.clear();
+
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
             return response;
@@ -178,7 +182,7 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
     @Override
     public GenieResponse<String> sendData(PartnerData partnerData) {
         String methodName = "sendData@PartnerServiceImpl";
-        HashMap params = new HashMap();
+        Map<String, Object> params = new HashMap<>();
         params.put("partnerData", GsonUtil.toJson(partnerData));
         params.put("logLevel", "2");
         Logger.i(TAG, "SENDING Partner Data " + partnerData.getPartnerID());
@@ -189,18 +193,16 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
         if (partnerModel != null) {
             try {
                 Map<String, String> data = processData(partnerData);
-                GESendPartnerData geSendPartnerData = new GESendPartnerData(partnerModel.getPartnerID(), partnerModel.getPublicKeyId(),
-                        mAppContext.getDeviceInfo().getDeviceID(), data.get("encrypted_data"), data.get("encrypted_key"), data.get("iv"));
+                GESendPartnerData geSendPartnerData = new GESendPartnerData(partnerModel.getPartnerID(), partnerModel.getPublicKeyId(), mAppContext.getDeviceInfo().getDeviceID(), data.get("encrypted_data"), data.get("encrypted_key"), data.get("iv"));
                 TelemetryLogger.log(geSendPartnerData);
+
                 response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, String.class);
                 response.setResult(data.toString());
                 TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
                 return response;
             } catch (EncryptionException e) {
-                List<String> errorMessages = new ArrayList<>();
-                String errorMessage = e.getMessage();
-                errorMessages.add(errorMessage);
                 String message = String.format(Locale.US, "- Encrypting data failed! Partner: %s", partnerData.getPartnerID());
+                Logger.e(TAG, message, e);
                 response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.ENCRYPTION_FAILURE, message, TAG, String.class);
                 TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, message);
                 return response;
@@ -208,7 +210,7 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
         } else {
             String errorMessage = String.format(Locale.US, "- Sending data failed! Partner: %s", partnerData.getPartnerID());
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.UNREGISTERED_PARTNER, errorMessage, TAG, String.class);
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, new HashMap(), errorMessage);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, new HashMap<String, Object>(), errorMessage);
             return response;
         }
     }
@@ -232,9 +234,9 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
         return data;
     }
 
-    //TODO This should be moved into the bean class using the ivalidate interface
+    //TODO This should be moved into the bean class using the IValidate interface
     private List<String> isValid(PartnerData request) {
-        List<String> errorMessages = new ArrayList<String>();
+        List<String> errorMessages = new ArrayList<>();
         if (request.getPartnerID() == null || request.getPartnerID().isEmpty())
             errorMessages.add(ServiceConstants.ErrorCode.MISSING_PARTNER_ID);
         if (request.getPublicKey() == null || request.getPublicKey().isEmpty())
