@@ -35,7 +35,7 @@ public class CollectionImportWithNChildTest extends GenieServiceTestBase {
     private static final String VISIBILITY_PARENT = "parent";
     private static final String VISIBILITY_DEFAULT = "default";
     private static final String COLLECTION_ASSET_PATH = "Download/Times_Tables_2_to_10.ecar";
-    private static final String CHILD_CONTENT2_ASSET_PATH = "Download/Empty_Collection.ecar";
+    private static final String EMPTY_COLLECTION_ASSET_PATH = "Download/Empty_Collection.ecar";
     final String CONTENT_ID = "do_20045823";
     final String CONTENT_ID_WITH_CHILD = "do_30019820";
     private final String CONTENT_WITH_CHILD_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Times_Tables_2_to_10.ecar";
@@ -45,8 +45,8 @@ public class CollectionImportWithNChildTest extends GenieServiceTestBase {
     public void setup() throws IOException {
         super.setup();
         activity = rule.getActivity();
-        EcarCopyUtil.createFileFromAsset(activity.getApplicationContext(),COLLECTION_ASSET_PATH, DESTINATION);
-        EcarCopyUtil.createFileFromAsset(activity.getApplicationContext(),EMPTY_COLLECTION_FILEPATH, DESTINATION);
+        EcarCopyUtil.createFileFromAsset(activity.getApplicationContext(), COLLECTION_ASSET_PATH, DESTINATION);
+        EcarCopyUtil.createFileFromAsset(activity.getApplicationContext(), EMPTY_COLLECTION_ASSET_PATH, DESTINATION);
         GenieServiceDBHelper.clearEcarEntryFromDB();
     }
 
@@ -65,7 +65,7 @@ public class CollectionImportWithNChildTest extends GenieServiceTestBase {
 
         GenieResponse<Void> response = activity.importEcar(ecarImportRequest.build());
 
-        Assert.assertTrue("true", response.getStatus());
+        Assert.assertTrue(response.getStatus());
         Assert.assertEquals(ServiceConstants.FileExtension.CONTENT, ext);
 
         AssertCollection.verifyNoChildContentEntry(CONTENT_ID);
@@ -132,7 +132,7 @@ public class CollectionImportWithNChildTest extends GenieServiceTestBase {
 
         //assert for the parent in hierarcy
         List<HierarchyInfo> hierarchyInfoList = content.getResult().getChildren().get(0).getHierarchyInfo();
-        Assert.assertEquals(2, hierarchyInfoList.size());
+        Assert.assertEquals(1, hierarchyInfoList.size());
         Assert.assertEquals(CONTENT_ID_WITH_CHILD, hierarchyInfoList.get(0).getIdentifier());
         Assert.assertEquals(content.getResult().getContentType(), hierarchyInfoList.get(0).getContentType());
     }

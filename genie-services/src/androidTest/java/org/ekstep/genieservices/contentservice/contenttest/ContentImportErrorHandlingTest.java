@@ -68,9 +68,6 @@ public class ContentImportErrorHandlingTest extends GenieServiceTestBase {
         }
     }
 
-    /**
-     * Note : This test Throws java.lang.IllegalArgumentException: Invalid format: "2016-08-03T00:00:00.000+0530" is malformed at ".000+0530"
-     */
     @Test
     public void shouldNotImportExpiredEcar() {
 
@@ -79,9 +76,7 @@ public class ContentImportErrorHandlingTest extends GenieServiceTestBase {
 
         GenieResponse<Void> response = activity.importEcar(ecarImportRequest.build());
 
-        Log.v(TAG, "shouldNotImportExpiredEcar getError() :: " + response.getError() + "getErrorMessages()" + response.getErrorMessages().get(0));
-
-        Assert.assertFalse("false", response.getStatus());
+        Assert.assertFalse(response.getStatus());
         Assert.assertEquals("DRAFT_ECAR_FILE_EXPIRED", response.getError());
         Assert.assertEquals("The ECAR file is expired!!!", response.getErrorMessages().get(0));
     }

@@ -2,7 +2,6 @@ package org.ekstep.genieservices.contentservice.collectiontest;
 
 import android.os.Environment;
 import android.support.test.runner.AndroidJUnit4;
-import android.util.Log;
 
 import junit.framework.Assert;
 
@@ -38,8 +37,8 @@ public class CollectionImportWithNewerChildContent extends GenieServiceTestBase 
     public void setup() throws IOException {
         super.setup();
         activity = rule.getActivity();
-        EcarCopyUtil.createFileFromAsset(activity.getApplicationContext(),COLLECTION_ASSET_PATH, DESTINATION);
-        EcarCopyUtil.createFileFromAsset(activity.getApplicationContext(),CHILD_CONTENT2_ASSET_PATH, DESTINATION);
+        EcarCopyUtil.createFileFromAsset(activity.getApplicationContext(), COLLECTION_ASSET_PATH, DESTINATION);
+        EcarCopyUtil.createFileFromAsset(activity.getApplicationContext(), CHILD_CONTENT2_ASSET_PATH, DESTINATION);
         GenieServiceDBHelper.clearEcarEntryFromDB();
     }
 
@@ -49,10 +48,9 @@ public class CollectionImportWithNewerChildContent extends GenieServiceTestBase 
     }
 
     /**
-     * TODO In this test we first,
      * 1. Import older content C1(c1 v1.0) (child version is manually changed/downgraded from v2 to v1)
-     * 2. Then Collection C (C1 v2.0)
-     * 3. Older content version is not upgrading.
+     * 2. Import a collection which has the same content with higher version i.e. 3.0
+     * 3. Older content version should also get upgraded to 3.0.
      */
     @Test
     public void testShouldImportContentAndCollection() {
@@ -73,15 +71,6 @@ public class CollectionImportWithNewerChildContent extends GenieServiceTestBase 
         Assert.assertTrue("true", genieResponse.getStatus());
         AssertCollection.verifyContentEntryAndVisibility(AssertCollection.CHILD_CONTENT2_ECAR_ID, VISIBILITY_DEFAULT);
         AssertCollection.verifyContentVersionToBeUpdated(AssertCollection.CHILD_CONTENT2_ECAR_ID, 1.0, 1);
-
-        //remove it later after testing for version
-        ContentDetailsRequest.Builder contentId = new ContentDetailsRequest.Builder()
-                .forContent(AssertCollection.CHILD_CONTENT2_ECAR_ID);
-        GenieResponse<Content> contentDetailsResponse = activity.getContentDetails(contentId.build());
-        Assert.assertTrue(contentDetailsResponse.getStatus());
-        Log.e("TAG", "content status :: " + contentDetailsResponse.getStatus());
-        String updatedVersion = contentDetailsResponse.getResult().getContentData().getPkgVersion();
-        Log.e("TAG", "content version :: " + updatedVersion);
     }
 
     private void shouldImportCollectionEcar() {
@@ -93,25 +82,14 @@ public class CollectionImportWithNewerChildContent extends GenieServiceTestBase 
         Assert.assertTrue("true", genieResponse.getStatus());
         AssertCollection.verifyCollectionEntryAndVisibility(AssertCollection.COLLECTION_ECAR_ID, VISIBILITY_DEFAULT);
         AssertCollection.verifyContentEntryAndVisibility(AssertCollection.CHILD_C2_ID, VISIBILITY_DEFAULT);
-        AssertCollection.verifyContentVersionToBeUpdated(AssertCollection.CHILD_C2_ID, 2.0, 2);
-
-        ContentDetailsRequest.Builder collectionRequest = new ContentDetailsRequest.Builder()
-                .forContent(AssertCollection.COLLECTION_ECAR_ID);
-        GenieResponse<Content> collectionDetailsResponse = activity.getContentDetails(collectionRequest.build());
-        Assert.assertTrue(collectionDetailsResponse.getStatus());
-        Log.e("TAG", "collection status " + collectionDetailsResponse.getStatus());
-        String collectionVersion = collectionDetailsResponse.getResult().getContentData().getPkgVersion();
-        Log.e("TAG", "collection version " + collectionVersion);
 
         //updated content check
         ContentDetailsRequest.Builder contentDetailsRequest = new ContentDetailsRequest.Builder()
                 .forContent(AssertCollection.CHILD_CONTENT2_ECAR_ID);
         GenieResponse<Content> contentDetailsResponse = activity.getContentDetails(contentDetailsRequest.build());
         Assert.assertTrue(contentDetailsResponse.getStatus());
-        Log.e("TAG", "updated content status " + contentDetailsResponse.getStatus());
         String updatedContentVersion = contentDetailsResponse.getResult().getContentData().getPkgVersion();
-        Log.e("TAG", "updated content version " + updatedContentVersion);
 
-        Assert.assertEquals(collectionVersion, updatedContentVersion);
+        Assert.assertEquals("3.0", updatedContentVersion.toString());
     }
 }
