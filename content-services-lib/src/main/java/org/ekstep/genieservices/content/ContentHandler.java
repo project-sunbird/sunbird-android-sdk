@@ -89,6 +89,7 @@ public class ContentHandler {
     private static final String KEY_DOWNLOAD_URL = "downloadUrl";
     private static final String KEY_COMPATIBILITY_LEVEL = "compatibilityLevel";
     private static final String KEY_MIME_TYPE = "mimeType";
+    private static final String KEY_ARTIFACT_MIME_TYPE = "artifactMimeType";
     private static final Object AUDIENCE_KEY = "audience";
     private static final String KEY_LAST_UPDATED_ON = "lastUpdatedOn";
     private static final String KEY_PRE_REQUISITES = "pre_requisites";
@@ -142,6 +143,13 @@ public class ContentHandler {
     public static String readMimeType(Map contentData) {
         if (contentData.containsKey(KEY_MIME_TYPE)) {
             return (String) contentData.get(KEY_MIME_TYPE);
+        }
+        return null;
+    }
+
+    public static String readArtifactMimeType(Map contentData) {
+        if (contentData.containsKey(KEY_ARTIFACT_MIME_TYPE)) {
+            return (String) contentData.get(KEY_ARTIFACT_MIME_TYPE);
         }
         return null;
     }
@@ -375,10 +383,13 @@ public class ContentHandler {
         Content content = new Content();
         content.setIdentifier(contentModel.getIdentifier());
         ContentData localData = null, serverData = null;
+        String artifactMimeType = null;
         if (contentModel.getLocalData() != null) {
             localData = GsonUtil.fromJson(contentModel.getLocalData(), ContentData.class);
             localData.setVariants(getContentVariants(contentModel.getLocalData()));
             content.setContentData(localData);
+
+            artifactMimeType = localData.getArtifactMimeType();
         } else if (contentModel.getServerData() != null) {
             serverData = GsonUtil.fromJson(contentModel.getServerData(), ContentData.class);
             serverData.setVariants(getContentVariants(contentModel.getServerData()));
@@ -389,9 +400,8 @@ public class ContentHandler {
         content.setMimeType(contentModel.getMimeType());
         content.setBasePath(contentModel.getPath());
         content.setContentType(contentModel.getContentType());
-        // TODO: 7/28/2017 - Need design discussion in case of mimeType youtube content.
-//        content.setAvailableLocally(isAvailableLocally(contentModel.getContentState()));
-        content.setAvailableLocally(isAvailableLocally(contentModel.getContentState(), contentModel.getMimeType()));
+        boolean isAvailableLocally = isAvailableLocally(contentModel.getContentState(), artifactMimeType);
+        content.setAvailableLocally(isAvailableLocally);
         content.setReferenceCount(contentModel.getRefCount());
 
         long contentCreationTime = 0;
@@ -477,9 +487,9 @@ public class ContentHandler {
         return contentState == ContentConstants.State.ARTIFACT_AVAILABLE;
     }
 
-    private static boolean isAvailableLocally(int contentState, String mimeType) {
+    private static boolean isAvailableLocally(int contentState, String artifactMimeType) {
         return (contentState == ContentConstants.State.ARTIFACT_AVAILABLE)
-                || (contentState == ContentConstants.State.ONLY_SPINE && ContentConstants.MimeType.VIDEO_YOU_TUBE.equals(mimeType));
+                || (contentState == ContentConstants.State.ONLY_SPINE && ContentConstants.ArtifactMimeType.CONTENT_WITHOUT_ARTIFACT.equals(artifactMimeType));
     }
 
     private static String[] getDefaultContentTypes() {

@@ -42,7 +42,7 @@ public class ExtractPayloads implements IChainable<List<ContentImportResponse>, 
     public GenieResponse<List<ContentImportResponse>> execute(AppContext appContext, ImportContentContext importContext) {
 
         File destinationFolder = new File(importContext.getDestinationFolder());
-        String identifier, mimeType, contentType, visibility, audience, path;
+        String identifier, mimeType, artifactMimeType, contentType, visibility, audience, path;
         Double compatibilityLevel, pkgVersion;
         int refCount;
         int contentState = ContentConstants.State.ONLY_SPINE;
@@ -62,6 +62,7 @@ public class ExtractPayloads implements IChainable<List<ContentImportResponse>, 
             }
 
             mimeType = ContentHandler.readMimeType(item);
+            artifactMimeType = ContentHandler.readArtifactMimeType(item);
             contentType = ContentHandler.readContentType(item);
             visibility = ContentHandler.readVisibility(item);
             audience = ContentHandler.readAudience(item);
@@ -133,7 +134,12 @@ public class ExtractPayloads implements IChainable<List<ContentImportResponse>, 
                     if (ContentHandler.isCompatible(appContext, compatibilityLevel)) {
                         boolean unzipSuccess = false;
                         if (!StringUtil.isNullOrEmpty(artifactUrl)) {
-                            if (isVideoOrPDFContent(mimeType)) {
+                            if (StringUtil.isNullOrEmpty(artifactMimeType) || artifactMimeType.endsWith(ContentConstants.ArtifactMimeType.CONTENT_WITH_ZIP_ARTIFACT)) {   // Content with zip artifact
+                                payload = new File(tmpLocation.getPath(), "/" + artifactUrl);
+                                unzipSuccess = Decompress.unzip(payload, payloadDestination);
+                            } else if (artifactMimeType.equals(ContentConstants.ArtifactMimeType.CONTENT_WITHOUT_ARTIFACT)) {   // Content with no artifact
+                                unzipSuccess = false;
+                            } else {     // Content with artifact without zip i.e. pfd, mp4
                                 try {
                                     copyAssets(tmpLocation.getPath(), artifactUrl, payloadDestination);
                                     unzipSuccess = true;
@@ -141,11 +147,6 @@ public class ExtractPayloads implements IChainable<List<ContentImportResponse>, 
                                     e.printStackTrace();
                                     unzipSuccess = false;
                                 }
-                            } else if (isYouTubeContent(mimeType)) {
-                                unzipSuccess = false;
-                            } else {
-                                payload = new File(tmpLocation.getPath(), "/" + artifactUrl);
-                                unzipSuccess = Decompress.unzip(payload, payloadDestination);
                             }
                         }
 
@@ -253,13 +254,4 @@ public class ExtractPayloads implements IChainable<List<ContentImportResponse>, 
         }
     }
 
-    private boolean isVideoOrPDFContent(String mimeType) {
-        return !StringUtil.isNullOrEmpty(mimeType)
-                && (mimeType.equalsIgnoreCase(ContentConstants.MimeType.PDF) || mimeType.equalsIgnoreCase(ContentConstants.MimeType.VIDEO_MP4));
-    }
-
-    private boolean isYouTubeContent(String mimeType) {
-        return !StringUtil.isNullOrEmpty(mimeType)
-                && mimeType.equalsIgnoreCase(ContentConstants.MimeType.VIDEO_YOU_TUBE);
-    }
 }

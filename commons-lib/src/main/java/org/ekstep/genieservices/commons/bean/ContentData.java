@@ -28,6 +28,7 @@ public class ContentData implements Serializable {
     private List<String> gradeLevel;
     private String osId;
     private String contentType;
+    private String artifactMimeType;
     private List<ContentVariant> contentVariantList;
     private List<String> screenshots;
 
@@ -119,6 +120,10 @@ public class ContentData implements Serializable {
         return contentType;
     }
 
+    public String getArtifactMimeType() {
+        return artifactMimeType;
+    }
+
     public List<String> getScreenshots() {
         return screenshots;
     }
@@ -146,6 +151,7 @@ public class ContentData implements Serializable {
                 ", gradeLevel=" + gradeLevel +
                 ", osId='" + osId + '\'' +
                 ", contentType='" + contentType + '\'' +
+                ", artifactMimeType='" + artifactMimeType + '\'' +
                 ", contentVariantList=" + contentVariantList +
                 ", screenshots=" + screenshots +
                 '}';
