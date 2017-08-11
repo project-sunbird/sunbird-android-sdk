@@ -29,6 +29,7 @@ public class ContentData implements Serializable {
     private String osId;
     private String contentType;
     private String artifactMimeType;
+    private String versionKey;
     private List<ContentVariant> contentVariantList;
     private List<String> screenshots;
 
@@ -108,20 +109,24 @@ public class ContentData implements Serializable {
         return osId;
     }
 
-    public List<ContentVariant> getVariants() {
-        return contentVariantList;
-    }
-
-    public void setVariants(List<ContentVariant> contentVariantList) {
-        this.contentVariantList = contentVariantList;
-    }
-
     public String getContentType() {
         return contentType;
     }
 
     public String getArtifactMimeType() {
         return artifactMimeType;
+    }
+
+    public String getVersionKey() {
+        return versionKey;
+    }
+
+    public List<ContentVariant> getVariants() {
+        return contentVariantList;
+    }
+
+    public void setVariants(List<ContentVariant> contentVariantList) {
+        this.contentVariantList = contentVariantList;
     }
 
     public List<String> getScreenshots() {
@@ -152,6 +157,7 @@ public class ContentData implements Serializable {
                 ", osId='" + osId + '\'' +
                 ", contentType='" + contentType + '\'' +
                 ", artifactMimeType='" + artifactMimeType + '\'' +
+                ", versionKey='" + versionKey + '\'' +
                 ", contentVariantList=" + contentVariantList +
                 ", screenshots=" + screenshots +
                 '}';
