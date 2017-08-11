@@ -11,8 +11,9 @@ public enum ContentImportStatus {
     ENQUEUED_FOR_DOWNLOAD(0), DOWNLOAD_STARTED(1), DOWNLOAD_FAILED(2), DOWNLOAD_COMPLETED(3),
     IMPORT_STARTED(4),
     IMPORT_FAILED(5),
-    DRAFT_CONTENT_EXPIRED(6),
-    CONTENT_ALREADY_EXIST(7),
+    NOT_COMPATIBLE(6),
+    CONTENT_EXPIRED(7), // This is for draft content.
+    ALREADY_EXIST(8),
     IMPORT_COMPLETED(100);
 
     private int value;

@@ -72,10 +72,16 @@ public class ValidateEcar implements IChainable<List<ContentImportResponse>, Imp
             String visibility = ContentHandler.readVisibility(item);
             boolean isDraftContent = ContentHandler.isDraftContent(ContentHandler.readStatus(item));
 
+            // If compatibility level is not in range then do not copy artifact
+            if (ContentConstants.Visibility.DEFAULT.equals(visibility)
+                    && !ContentHandler.isCompatible(appContext, ContentHandler.readCompatibilityLevel(item))) {
+                skipContent(importContext, identifier, visibility, ContentImportStatus.NOT_COMPATIBLE);
+                continue;
+            }
+
             //Draft content expiry .To prevent import of draft content if the expires date is lesser than from the current date.
             if (isDraftContent && ContentHandler.isExpired(ContentHandler.readExpiryDate(item))) {
-                //Skip the content
-                skipContent(importContext, identifier, visibility, ContentImportStatus.DRAFT_CONTENT_EXPIRED);
+                skipContent(importContext, identifier, visibility, ContentImportStatus.CONTENT_EXPIRED);
                 continue;
             }
 
@@ -88,8 +94,7 @@ public class ValidateEcar implements IChainable<List<ContentImportResponse>, Imp
                     && isDuplicateCheckRequired(isDraftContent, ContentHandler.readPkgVersion(item))     // Check if its draft and pkgVersion is 0.
                     && ContentHandler.isImportFileExist(oldContentModel, item)) {   // Check whether the file is already imported or not.
 
-                //Skip the content
-                skipContent(importContext, identifier, visibility, ContentImportStatus.CONTENT_ALREADY_EXIST);
+                skipContent(importContext, identifier, visibility, ContentImportStatus.ALREADY_EXIST);
             }
         }
 
@@ -106,6 +111,9 @@ public class ValidateEcar implements IChainable<List<ContentImportResponse>, Imp
         return link;
     }
 
+    /**
+     * Skip the content.
+     */
     private void skipContent(ImportContentContext importContext, String identifier, String visibility, ContentImportStatus contentImportStatus) {
         if (ContentConstants.Visibility.DEFAULT.equals(visibility)) {
             importContext.getContentImportResponseList().add(new ContentImportResponse(identifier, contentImportStatus));
