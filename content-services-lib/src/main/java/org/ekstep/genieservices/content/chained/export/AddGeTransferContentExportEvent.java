@@ -11,7 +11,6 @@ import org.ekstep.genieservices.content.ContentHandler;
 import org.ekstep.genieservices.content.bean.ExportContentContext;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -44,7 +43,7 @@ public class AddGeTransferContentExportEvent implements IChainable<ContentExport
         GETransfer.Builder geTransfer = new GETransfer.Builder();
         geTransfer.directionExport()
                 .dataTypeContent()
-                .count(((List) metadata.get(ServiceConstants.CONTENT_ITEMS_KEY)).size())
+                .count((Integer) metadata.get(ServiceConstants.CONTENT_ITEMS_COUNT_KEY))
                 .size((Long) metadata.get(ServiceConstants.FILE_SIZE));
 
         for (Map item : exportContext.getItems()) {

@@ -12,12 +12,11 @@ import org.ekstep.genieservices.content.db.model.ContentModel;
 import java.util.Map;
 
 /**
- * Created by GoodWorkLabs on 08-09-2016.
+ * Created on 08-09-2016.
+ *
+ * @author Syangjit
  */
 public class AssertCollection extends GenieServiceTestBase {
-
-    public static final String VISIBILITY_PARENT = "parent";
-    public static final String VISIBILITY_DEFAULT = "default";
 
     public static final String EMPTY_COLLECTION_ECAR_ID = "do_20045823";
     public static final String EMPTY_COLLECTION_NAME = "TestCollection2682016-01";
@@ -60,7 +59,6 @@ public class AssertCollection extends GenieServiceTestBase {
     }
 
     public static void verifyCollectionEntryAndVisibility(String identifier, String visibility) {
-
         ContentModel content = GenieServiceDBHelper.findContentEntryInDB(identifier);
         Assert.assertNotNull(content);
         Assert.assertTrue(ContentHandler.hasChildren(content.getLocalData()));
@@ -68,14 +66,12 @@ public class AssertCollection extends GenieServiceTestBase {
     }
 
     public static void verifyContentEntryAndVisibility(String identifier, String visibility) {
-
         ContentModel content = GenieServiceDBHelper.findContentEntryInDB(identifier);
         Assert.assertNotNull(content);
         Assert.assertTrue(content.getVisibility().equalsIgnoreCase(visibility));
     }
 
     public static void verifyContentVersionToBeUpdated(String identifier, double version, int refCount) {
-
         ContentModel content = GenieServiceDBHelper.findContentEntryInDB(identifier);
         Assert.assertNotNull(content);
         Assert.assertTrue(refCount == content.getRefCount());
@@ -86,7 +82,6 @@ public class AssertCollection extends GenieServiceTestBase {
     }
 
     public static void verifyContentIsDeleted(String identifier, GenieServiceTestActivity activity, String contentPath) {
-
         Assert.assertFalse(activity.isFilePresent(contentPath));
         ContentModel content = GenieServiceDBHelper.findContentEntryInDB(identifier);
         Assert.assertNotNull(content.getLocalData());

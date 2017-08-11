@@ -6,6 +6,7 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.Decompress;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -53,6 +54,13 @@ public class ExtractPayloads implements IChainable<List<ContentImportResponse>, 
 
         for (Map<String, Object> item : importContext.getItems()) {
             identifier = ContentHandler.readIdentifier(item);
+
+            //skip the content if already imported on the same version
+            if (!CollectionUtil.isNullOrEmpty(importContext.getSkippedItemsIdentifier())
+                    && importContext.getSkippedItemsIdentifier().contains(identifier)) {
+                continue;
+            }
+
             mimeType = ContentHandler.readMimeType(item);
             contentType = ContentHandler.readContentType(item);
             visibility = ContentHandler.readVisibility(item);
@@ -63,18 +71,6 @@ public class ExtractPayloads implements IChainable<List<ContentImportResponse>, 
             iconURL = ContentHandler.readAppIcon(item);
             posterImage = ContentHandler.readPosterImage(item);
             grayScaleAppIcon = ContentHandler.readGrayScaleAppIcon(item);
-
-            //skip the content if already imported on the same version
-            boolean isSkip = false;
-            for (String skipIdentifier : importContext.getSkippedItemsIdentifier()) {
-                if (skipIdentifier.equalsIgnoreCase(identifier)) {
-                    isSkip = true;
-                    break;
-                }
-            }
-            if (isSkip) {
-                continue;
-            }
 
             oldContentModel = ContentModel.find(appContext.getDBSession(), identifier);
             oldContentPath = oldContentModel == null ? null : oldContentModel.getPath();
@@ -225,7 +221,7 @@ public class ExtractPayloads implements IChainable<List<ContentImportResponse>, 
                     FileUtil.rm(new File(oldContentPath));
                 }
             }
-            importContext.setIdentifiers(identifier);
+            importContext.getIdentifiers().add(identifier);
         }
 
         if (nextLink != null) {

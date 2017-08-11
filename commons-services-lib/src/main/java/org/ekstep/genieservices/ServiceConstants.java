@@ -25,7 +25,7 @@ public interface ServiceConstants {
     String EXPORT_TYPE_PROFILE = "userprofile";
     String FILE_SIZE = "FILE_SIZE";
     String FILE_TYPE = "FILE_TYPE";
-    String CONTENT_ITEMS_KEY = "contents";
+    String CONTENT_ITEMS_COUNT_KEY = "content_count";
 
     interface Params {
         String APPLICATION_ID = "APPLICATION_ID";

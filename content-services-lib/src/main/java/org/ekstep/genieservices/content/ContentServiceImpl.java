@@ -738,7 +738,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         File ecarFile = FileUtil.getTempLocation(destinationFolder, fileName);
 
         Map<String, Object> metadata = new HashMap<>();
-        metadata.put(ServiceConstants.CONTENT_ITEMS_KEY, contentModelsToExport);
+        metadata.put(ServiceConstants.CONTENT_ITEMS_COUNT_KEY, contentModelsToExport.size());
 
         ExportContentContext exportContentContext = new ExportContentContext(metadata, destinationFolder, ecarFile);
 

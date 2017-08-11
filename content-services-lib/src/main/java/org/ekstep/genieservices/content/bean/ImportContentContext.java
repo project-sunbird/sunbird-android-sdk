@@ -77,10 +77,6 @@ public class ImportContentContext {
         return identifiers;
     }
 
-    public void setIdentifiers(String identifier) {
-        this.identifiers.add(identifier);
-    }
-
     public List<ContentImportResponse> getContentImportResponseList() {
         return contentImportResponseList;
     }

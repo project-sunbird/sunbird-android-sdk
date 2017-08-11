@@ -263,7 +263,7 @@ public class ContentHandler {
         return (String) serverData.get(KEY_LAST_UPDATED_ON);
     }
 
-    private static Double pkgVersion(String localData) {
+    private static Double readPkgVersion(String localData) {
         return readPkgVersion(GsonUtil.fromJson(localData, Map.class));
     }
 
@@ -273,6 +273,10 @@ public class ContentHandler {
 
     public static boolean hasPreRequisites(String localData) {
         return GsonUtil.fromJson(localData, Map.class).get(KEY_PRE_REQUISITES) != null;
+    }
+
+    public static boolean hasPreRequisites(Map contentData) {
+        return contentData.get(KEY_PRE_REQUISITES) != null;
     }
 
     private static List<Map<String, Object>> readPreRequisites(Map contentData) {
@@ -303,6 +307,10 @@ public class ContentHandler {
 
     public static boolean hasChildren(String localData) {
         return GsonUtil.fromJson(localData, Map.class).get(KEY_CHILDREN) != null;
+    }
+
+    public static boolean hasChildren(Map contentData) {
+        return contentData.get(KEY_CHILDREN) != null;
     }
 
     private static List<Map<String, Object>> readChildren(Map contentData) {
@@ -663,20 +671,20 @@ public class ContentHandler {
                 && (compatibilityLevel <= appContext.getParams().getInt(ServiceConstants.Params.MAX_COMPATIBILITY_LEVEL));
     }
 
-    public static boolean isImportFileExist(ContentModel oldContentModel, ContentModel newContentModel) {
-        if (oldContentModel == null || newContentModel == null) {
+    public static boolean isImportFileExist(ContentModel oldContentModel, Map newContentData) {
+        if (oldContentModel == null || newContentData == null || newContentData.isEmpty()) {
             return false;
         }
 
         boolean isExist = false;
         try {
             String oldIdentifier = oldContentModel.getIdentifier();
-            String newIdentifier = newContentModel.getIdentifier();
+            String newIdentifier = readIdentifier(newContentData);
             String oldVisibility = oldContentModel.getVisibility();
-            String newVisibility = newContentModel.getVisibility();
+            String newVisibility = readVisibility(newContentData);
 
             if (oldIdentifier.equalsIgnoreCase(newIdentifier) && oldVisibility.equalsIgnoreCase(newVisibility)) {
-                isExist = pkgVersion(oldContentModel.getLocalData()) >= pkgVersion(newContentModel.getLocalData());
+                isExist = readPkgVersion(oldContentModel.getLocalData()) >= readPkgVersion(newContentData);
             }
         } catch (Exception e) {
             Logger.e(TAG, "isImportFileExist", e);
@@ -701,7 +709,7 @@ public class ContentHandler {
         try {
             String oldIdentifier = oldContent.getIdentifier();
             if (oldIdentifier.equalsIgnoreCase(newIdentifier)) {
-                if ((pkgVersion(oldContent.getLocalData()) < newPkgVersion) // If old content's pkgVersion is less than the new content then return false.
+                if ((readPkgVersion(oldContent.getLocalData()) < newPkgVersion) // If old content's pkgVersion is less than the new content then return false.
                         || oldContent.getContentState() != ContentConstants.State.ARTIFACT_AVAILABLE) {  //  If content_state is other than artifact available then also return  false.
                     isExist = false;
                 } else {
@@ -1486,7 +1494,7 @@ public class ContentHandler {
 
             double pkgVersion;
             try {
-                pkgVersion = pkgVersion(firstContent.getLocalData());
+                pkgVersion = readPkgVersion(firstContent.getLocalData());
             } catch (Exception e) {
                 pkgVersion = 0;
             }
