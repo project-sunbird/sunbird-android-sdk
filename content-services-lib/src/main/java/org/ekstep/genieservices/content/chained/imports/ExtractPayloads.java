@@ -3,6 +3,7 @@ package org.ekstep.genieservices.content.chained.imports;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.Decompress;
@@ -17,6 +18,7 @@ import org.ekstep.genieservices.content.db.model.ContentModel;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,19 +26,19 @@ import java.util.Map;
  *
  * @author anil
  */
-public class ExtractPayloads implements IChainable<Void, ImportContentContext> {
+public class ExtractPayloads implements IChainable<List<ContentImportResponse>, ImportContentContext> {
 
     private static final String TAG = ExtractPayloads.class.getSimpleName();
     private final File tmpLocation;
 
-    private IChainable<Void, ImportContentContext> nextLink;
+    private IChainable<List<ContentImportResponse>, ImportContentContext> nextLink;
 
     public ExtractPayloads(File tmpLocation) {
         this.tmpLocation = tmpLocation;
     }
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContentContext importContext) {
+    public GenieResponse<List<ContentImportResponse>> execute(AppContext appContext, ImportContentContext importContext) {
 
         File destinationFolder = new File(importContext.getDestinationFolder());
         String identifier, mimeType, contentType, visibility, audience, path;
@@ -234,7 +236,7 @@ public class ExtractPayloads implements IChainable<Void, ImportContentContext> {
     }
 
     @Override
-    public IChainable<Void, ImportContentContext> then(IChainable<Void, ImportContentContext> link) {
+    public IChainable<List<ContentImportResponse>, ImportContentContext> then(IChainable<List<ContentImportResponse>, ImportContentContext> link) {
         nextLink = link;
         return link;
     }

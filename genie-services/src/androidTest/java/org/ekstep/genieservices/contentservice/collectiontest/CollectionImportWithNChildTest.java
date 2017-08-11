@@ -11,6 +11,7 @@ import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
+import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
@@ -63,7 +64,7 @@ public class CollectionImportWithNChildTest extends GenieServiceTestBase {
         EcarImportRequest.Builder ecarImportRequest = new EcarImportRequest.Builder()
                 .fromFilePath(EMPTY_COLLECTION_FILEPATH).toFolder(activity.getExternalFilesDir(null).toString());
 
-        GenieResponse<Void> response = activity.importEcar(ecarImportRequest.build());
+        GenieResponse<List<ContentImportResponse>> response = activity.importEcar(ecarImportRequest.build());
 
         Assert.assertTrue(response.getStatus());
         Assert.assertEquals(ServiceConstants.FileExtension.CONTENT, ext);
@@ -80,7 +81,7 @@ public class CollectionImportWithNChildTest extends GenieServiceTestBase {
         EcarImportRequest.Builder ecarImportRequest = new EcarImportRequest.Builder().isChildContent()
                 .fromFilePath(CONTENT_WITH_CHILD_FILEPATH).toFolder(activity.getExternalFilesDir(null).toString());
 
-        GenieResponse<Void> response = activity.importEcar(ecarImportRequest.build());
+        GenieResponse<List<ContentImportResponse>> response = activity.importEcar(ecarImportRequest.build());
         Assert.assertTrue(response.getStatus());
 
         AssertCollection.verifyCollectionEntryAndVisibility(CONTENT_ID_WITH_CHILD, VISIBILITY_DEFAULT);
@@ -107,7 +108,7 @@ public class CollectionImportWithNChildTest extends GenieServiceTestBase {
         EcarImportRequest.Builder contentImportRequest = new EcarImportRequest.Builder()
                 .fromFilePath(CONTENT_WITH_CHILD_FILEPATH).toFolder(activity.getExternalFilesDir(null).toString());
 
-        GenieResponse<Void> response = activity.importEcar(contentImportRequest.build());
+        GenieResponse<List<ContentImportResponse>> response = activity.importEcar(contentImportRequest.build());
 
         Assert.assertTrue("true", response.getStatus());
         AssertCollection.verifyCollectionEntryAndVisibility(CONTENT_ID_WITH_CHILD, VISIBILITY_DEFAULT);
@@ -142,7 +143,7 @@ public class CollectionImportWithNChildTest extends GenieServiceTestBase {
         EcarImportRequest.Builder ecarImportRequest = new EcarImportRequest.Builder().isChildContent()
                 .fromFilePath(CONTENT_WITH_CHILD_FILEPATH).toFolder(activity.getExternalFilesDir(null).toString());
 
-        GenieResponse<Void> response = activity.importEcar(ecarImportRequest.build());
+        GenieResponse<List<ContentImportResponse>> response = activity.importEcar(ecarImportRequest.build());
         Assert.assertTrue("true", response.getStatus());
         AssertCollection.verifyCollectionEntryAndVisibility(CONTENT_ID_WITH_CHILD, VISIBILITY_DEFAULT);
 

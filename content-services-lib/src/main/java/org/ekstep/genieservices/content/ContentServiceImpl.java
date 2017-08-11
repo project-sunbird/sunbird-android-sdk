@@ -560,14 +560,14 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<Void> importEcar(EcarImportRequest importRequest) {
+    public GenieResponse<List<ContentImportResponse>> importEcar(EcarImportRequest importRequest) {
         String methodName = "importEcar@ContentServiceImpl";
         HashMap<String, Object> params = new HashMap<>();
         params.put("importContent", importRequest.getSourceFilePath());
         params.put("isChildContent", importRequest.isChildContent());
         params.put("logLevel", "2");
 
-        GenieResponse<Void> response;
+        GenieResponse<List<ContentImportResponse>> response;
 
         // TODO: 7/21/2017 - Needs to move in ValidateEcar task.
         EventBus.postEvent(new ContentImportResponse(null, ContentImportStatus.IMPORT_STARTED));
@@ -588,7 +588,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
             File tmpLocation = FileUtil.getTempLocation(new File(importRequest.getDestinationFolder()));
             ImportContentContext importContentContext = new ImportContentContext(importRequest.isChildContent(), importRequest.getSourceFilePath(), importRequest.getDestinationFolder());
-            IChainable<Void, ImportContentContext> deviceMemoryCheck = new DeviceMemoryCheck();
+            IChainable<List<ContentImportResponse>, ImportContentContext> deviceMemoryCheck = new DeviceMemoryCheck();
             deviceMemoryCheck.then(new ExtractEcar(tmpLocation))
                     .then(new ValidateEcar(tmpLocation))
                     .then(new ExtractPayloads(tmpLocation))
@@ -597,7 +597,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             response = deviceMemoryCheck.execute(mAppContext, importContentContext);
 
             if (response.getStatus()) {
-                String identifier = importContentContext.getIdentifiers() != null ? importContentContext.getIdentifiers().get(0) : "";
+                String identifier = importContentContext.getIdentifiers() != null && !importContentContext.getIdentifiers().isEmpty() ? importContentContext.getIdentifiers().get(0) : "";
                 buildSuccessEvent(identifier);
                 TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
 

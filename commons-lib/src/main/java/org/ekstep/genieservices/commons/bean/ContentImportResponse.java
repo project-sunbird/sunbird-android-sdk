@@ -24,4 +24,22 @@ public class ContentImportResponse {
     public String getIdentifier() {
         return identifier;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ContentImportResponse that = (ContentImportResponse) o;
+        return identifier != null ? identifier.equals(that.identifier) : that.identifier == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return identifier != null ? identifier.hashCode() : 0;
+    }
+
 }

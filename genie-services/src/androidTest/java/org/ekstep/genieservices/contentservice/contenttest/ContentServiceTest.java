@@ -42,14 +42,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Sneha on 5/31/2017.
+ * Created on 5/31/2017.
+ *
+ * @author Sneha
  */
 @RunWith(AndroidJUnit4.class)
 public class ContentServiceTest extends GenieServiceTestBase {
-    public static final String VISIBILITY_DEFAULT = "default";
+    private static final String VISIBILITY_DEFAULT = "default";
     private static final String TAG = ContentServiceTest.class.getSimpleName();
-    final String CONTENT_ID = "do_30013486";
-    final String CONTENT_ID_WITH_CHILD = "do_30019820";
+    private final String CONTENT_ID = "do_30013486";
+    private final String CONTENT_ID_WITH_CHILD = "do_30019820";
     private final String CONTENT_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Multiplication2.ecar";
     private final String CONTENT_WITH_CHILD_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Times_Tables_2_to_10.ecar";
     private final String COLLECTION_ASSET_PATH = "Download/Multiplication2.ecar";
@@ -74,7 +76,7 @@ public class ContentServiceTest extends GenieServiceTestBase {
         String ext = FileUtil.getFileExtension(CONTENT_FILEPATH);
 
         EcarImportRequest.Builder importEcar = new EcarImportRequest.Builder().fromFilePath(CONTENT_FILEPATH).toFolder(activity.getExternalFilesDir(null).toString());
-        GenieResponse<Void> response = activity.importEcar(importEcar.build());
+        GenieResponse<List<ContentImportResponse>> response = activity.importEcar(importEcar.build());
         Assert.assertTrue("true", response.getStatus());
         Assert.assertNull(response.getError());
         Assert.assertEquals(ServiceConstants.FileExtension.CONTENT, ext);
@@ -85,16 +87,14 @@ public class ContentServiceTest extends GenieServiceTestBase {
         AssertImportTelemetryEvent.verifyGEInteractIsLoggedForContentImportInitiated("GE_INTERACT");
         AssertImportTelemetryEvent.verifyGeTransferIsLoggedForContentImport("GE_TRANSFER");
         AssertImportTelemetryEvent.verifyGEInteractIsLoggedForContentImportSuccess("GE_INTERACT");
-
     }
 
     @Test
     public void shouldImportEcarHavingChild() {
-
         String ext = FileUtil.getFileExtension(CONTENT_WITH_CHILD_FILEPATH);
 
         EcarImportRequest.Builder contentImportRequest = new EcarImportRequest.Builder().fromFilePath(CONTENT_WITH_CHILD_FILEPATH).toFolder(activity.getExternalFilesDir(null).toString());
-        GenieResponse<Void> genieResponse = activity.importEcar(contentImportRequest.build());
+        GenieResponse<List<ContentImportResponse>> genieResponse = activity.importEcar(contentImportRequest.build());
         Log.v(TAG, "genieresponse :: " + genieResponse.getStatus());
 
         Assert.assertTrue("true", genieResponse.getStatus());
@@ -111,11 +111,10 @@ public class ContentServiceTest extends GenieServiceTestBase {
 
     @Test
     public void shouldGetEcarDetails() {
-
         GenieServiceDBHelper.clearEcarEntryFromDB();
 
         EcarImportRequest.Builder ecarImportReuqest = new EcarImportRequest.Builder().fromFilePath(CONTENT_FILEPATH).toFolder(activity.getExternalFilesDir(null).toString());
-        GenieResponse<Void> response = activity.importEcar(ecarImportReuqest.build());
+        GenieResponse<List<ContentImportResponse>> response = activity.importEcar(ecarImportReuqest.build());
         Assert.assertTrue("true", response.getStatus());
         Assert.assertNull(response.getError());
 
@@ -136,14 +135,13 @@ public class ContentServiceTest extends GenieServiceTestBase {
      */
     @Test
     public void _1shouldGetAllLocalContent() {
-
         EcarImportRequest.Builder ecarImportRequest = new EcarImportRequest.Builder().fromFilePath(CONTENT_WITH_CHILD_FILEPATH).toFolder(activity.getExternalFilesDir(null).toString());
-        GenieResponse<Void> response = activity.importEcar(ecarImportRequest.build());
+        GenieResponse<List<ContentImportResponse>> response = activity.importEcar(ecarImportRequest.build());
         Assert.assertTrue("true", response.getStatus());
         AssertCollection.verifyCollectionEntryAndVisibility(CONTENT_ID_WITH_CHILD, VISIBILITY_DEFAULT);
 
         EcarImportRequest.Builder contentImportRequest = new EcarImportRequest.Builder().fromFilePath(CONTENT_FILEPATH).toFolder(activity.getExternalFilesDir(null).toString());
-        GenieResponse<Void> genieResponse = activity.importEcar(contentImportRequest.build());
+        GenieResponse<List<ContentImportResponse>> genieResponse = activity.importEcar(contentImportRequest.build());
         Assert.assertTrue("true", genieResponse.getStatus());
         AssertCollection.verifyContentEntryAndVisibility(CONTENT_ID, VISIBILITY_DEFAULT);
 
@@ -152,7 +150,6 @@ public class ContentServiceTest extends GenieServiceTestBase {
         Assert.assertTrue(genieGetLocalResponse.getStatus());
         Assert.assertNotNull(genieGetLocalResponse.getResult());
         Assert.assertEquals(2, genieGetLocalResponse.getResult().size());
-
     }
 
     /**
@@ -168,7 +165,6 @@ public class ContentServiceTest extends GenieServiceTestBase {
 
     @Test
     public void shouldGetAllRecommendedContent() {
-
         RecommendedContentRequest.Builder contentRequest = new RecommendedContentRequest.Builder().byLanguage("en");
 
         GenieResponse<RecommendedContentResult> genieResponse = activity.getRecommendedContent(contentRequest.build());
@@ -187,11 +183,10 @@ public class ContentServiceTest extends GenieServiceTestBase {
 
     @Test
     public void shouldDeleteContent() {
-
         EcarImportRequest.Builder importRequest = new EcarImportRequest.Builder()
                 .fromFilePath(CONTENT_FILEPATH).toFolder(activity.getExternalFilesDir(null).toString());
 
-        GenieResponse<Void> response = activity.importEcar(importRequest.build());
+        GenieResponse<List<ContentImportResponse>> response = activity.importEcar(importRequest.build());
         Assert.assertTrue("true", response.getStatus());
 
         ContentDeleteRequest.Builder detailsRequest = new ContentDeleteRequest.Builder().contentId(CONTENT_ID);
@@ -203,7 +198,6 @@ public class ContentServiceTest extends GenieServiceTestBase {
 
     @Test
     public void shouldSearchContent() {
-
         ContentSearchCriteria.SearchBuilder contentSearchCriteria = new ContentSearchCriteria.SearchBuilder().query("collection").limit(10);
         GenieResponse<ContentSearchResult> response = activity.searchContent(contentSearchCriteria.build());
         Assert.assertTrue(response.getStatus());
@@ -220,13 +214,12 @@ public class ContentServiceTest extends GenieServiceTestBase {
 
         ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder()
                 .toFolder(activity.getExternalFilesDir(null).toString()).contentIds(contentIdList);
-        GenieResponse<Void> genieResponse = activity.importContent(contentImportRequest.build());
+        GenieResponse<List<ContentImportResponse>> genieResponse = activity.importContent(contentImportRequest.build());
         Assert.assertTrue("true", genieResponse.getStatus());
     }
 
     @Test
     public void shouldCheckContentImportStatus() {
-
         GenieServiceDBHelper.clearEcarEntryFromDB();
 
         List<String> contentIdList = new ArrayList<>();
@@ -234,7 +227,7 @@ public class ContentServiceTest extends GenieServiceTestBase {
         ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder()
                 .toFolder(activity.getExternalFilesDir(null).toString()).contentIds(contentIdList);
 
-        GenieResponse<Void> genieResponse = activity.importContent(contentImportRequest.build());
+        GenieResponse<List<ContentImportResponse>> genieResponse = activity.importContent(contentImportRequest.build());
         Assert.assertTrue("true", genieResponse.getStatus());
 
         GenieResponse<ContentImportResponse> contentImportStatus = activity.getImportStatus(CONTENT_ID_WITH_CHILD);
@@ -245,7 +238,6 @@ public class ContentServiceTest extends GenieServiceTestBase {
 
     @Test
     public void cancelDownloadOfContent() {
-
         GenieServiceDBHelper.clearEcarEntryFromDB();
 
         List<String> contentIdList = new ArrayList<>();
@@ -253,7 +245,7 @@ public class ContentServiceTest extends GenieServiceTestBase {
 
         ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder()
                 .toFolder(activity.getExternalFilesDir(null).toString()).contentIds(contentIdList);
-        GenieResponse<Void> genieResponse = activity.importContent(contentImportRequest.build());
+        GenieResponse<List<ContentImportResponse>> genieResponse = activity.importContent(contentImportRequest.build());
         Assert.assertTrue("true", genieResponse.getStatus());
 
         GenieResponse<Void> downloadCancelResponse = activity.cancelDownload(CONTENT_ID_WITH_CHILD);
@@ -268,18 +260,17 @@ public class ContentServiceTest extends GenieServiceTestBase {
 
         GenieResponse<ContentListing> genieResponse = activity.getContentListing(contentListingCriteria.build());
         Assert.assertTrue(genieResponse.getStatus());
-        Assert.assertEquals(PARTNER_HOME_IDENTIFIER,genieResponse.getResult().getContentListingId());
+        Assert.assertEquals(PARTNER_HOME_IDENTIFIER, genieResponse.getResult().getContentListingId());
     }
 
     @Test
     public void shouldExportContent() {
-
         //import content
         List<String> contentIdList = new ArrayList<>();
         contentIdList.add(CONTENT_ID_WITH_CHILD);
         ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder()
                 .toFolder(activity.getExternalFilesDir(null).toString()).contentIds(contentIdList);
-        GenieResponse<Void> genieResponse = activity.importContent(contentImportRequest.build());
+        GenieResponse<List<ContentImportResponse>> genieResponse = activity.importContent(contentImportRequest.build());
         Assert.assertTrue(genieResponse.getStatus());
 
         //export content
@@ -299,6 +290,5 @@ public class ContentServiceTest extends GenieServiceTestBase {
                 .fromFilePath(Environment.getExternalStorageDirectory().toString()).toFolder(CONTENT_WITH_CHILD_FILEPATH);
         GenieResponse importResponse = activity.importEcar(ecarImportRequest.build());
         Assert.assertTrue(importResponse.getStatus());
-
     }
 }

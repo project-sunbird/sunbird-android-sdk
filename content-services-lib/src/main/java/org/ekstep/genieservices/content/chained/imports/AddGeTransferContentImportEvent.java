@@ -3,6 +3,7 @@ package org.ekstep.genieservices.content.chained.imports;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.telemetry.GETransfer;
 import org.ekstep.genieservices.commons.chained.IChainable;
@@ -11,6 +12,7 @@ import org.ekstep.genieservices.content.ContentHandler;
 import org.ekstep.genieservices.content.bean.ImportContentContext;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,17 +20,19 @@ import java.util.Map;
  *
  * @author anil
  */
-public class AddGeTransferContentImportEvent implements IChainable<Void, ImportContentContext> {
+public class AddGeTransferContentImportEvent implements IChainable<List<ContentImportResponse>, ImportContentContext> {
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContentContext importContext) {
+    public GenieResponse<List<ContentImportResponse>> execute(AppContext appContext, ImportContentContext importContext) {
         logGETransferEvent(importContext);
 
-        return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        GenieResponse<List<ContentImportResponse>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        response.setResult(importContext.getContentImportResponseList());
+        return response;
     }
 
     @Override
-    public IChainable<Void, ImportContentContext> then(IChainable<Void, ImportContentContext> link) {
+    public IChainable<List<ContentImportResponse>, ImportContentContext> then(IChainable<List<ContentImportResponse>, ImportContentContext> link) {
         return link;
     }
 

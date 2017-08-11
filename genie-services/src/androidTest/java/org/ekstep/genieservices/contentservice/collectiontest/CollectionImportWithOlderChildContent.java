@@ -10,6 +10,7 @@ import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
+import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.junit.After;
@@ -18,6 +19,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by Sneha on 5/30/2017.
@@ -70,7 +72,7 @@ public class CollectionImportWithOlderChildContent extends GenieServiceTestBase 
                 .fromFilePath(CHILD_CONTENT_FILE_PATH).toFolder(activity.getExternalFilesDir(null).toString());
 
         //import newer version content.
-        GenieResponse<Void> genieResponse = activity.importEcar(ecarImportRequest.build());
+        GenieResponse<List<ContentImportResponse>> genieResponse = activity.importEcar(ecarImportRequest.build());
         Assert.assertTrue("true", genieResponse.getStatus());
         AssertCollection.verifyContentEntryAndVisibility(AssertCollection.CHILD_CONTENT_ECAR_ID, VISIBILITY_DEFAULT);
         AssertCollection.verifyContentVersionToBeUpdated(AssertCollection.CHILD_CONTENT_ECAR_ID, 4.0, 1);
@@ -88,7 +90,7 @@ public class CollectionImportWithOlderChildContent extends GenieServiceTestBase 
                 .fromFilePath(COLLECTION_FILE_PATH).toFolder(activity.getExternalFilesDir(null).toString());
 
         //import collection
-        GenieResponse<Void> genieResponse = activity.importEcar(ecarImportRequest.build());
+        GenieResponse<List<ContentImportResponse>> genieResponse = activity.importEcar(ecarImportRequest.build());
         Assert.assertTrue(genieResponse.getStatus());
         AssertCollection.verifyCollectionEntryAndVisibility(AssertCollection.COLLECTION_ECAR_ID, VISIBILITY_DEFAULT);
         AssertCollection.verifyContentEntryAndVisibility(AssertCollection.CHILD_C4_ID, VISIBILITY_DEFAULT);

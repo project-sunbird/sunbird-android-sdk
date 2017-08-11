@@ -1,5 +1,7 @@
 package org.ekstep.genieservices.content.bean;
 
+import org.ekstep.genieservices.commons.bean.ContentImportResponse;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +22,8 @@ public class ImportContentContext {
     private String manifestVersion;
     private List<String> skippedItemsIdentifier;
     private List<Map<String, Object>> items;
-    private List<String> identifiers = new ArrayList<>();
+    private List<String> identifiers;
+    private List<ContentImportResponse> contentImportResponseList;
 
     public ImportContentContext(boolean isChildContent, String ecarFilePath, String destinationFolder) {
         this.isChildContent = isChildContent;
@@ -29,7 +32,9 @@ public class ImportContentContext {
 
         this.metadata = new HashMap<>();
         this.items = new ArrayList<>();
+        this.identifiers = new ArrayList<>();
         this.skippedItemsIdentifier = new ArrayList<>();
+        this.contentImportResponseList = new ArrayList<>();
     }
 
     public boolean isChildContent() {
@@ -76,4 +81,7 @@ public class ImportContentContext {
         this.identifiers.add(identifier);
     }
 
+    public List<ContentImportResponse> getContentImportResponseList() {
+        return contentImportResponseList;
+    }
 }

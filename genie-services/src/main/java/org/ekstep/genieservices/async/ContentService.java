@@ -253,12 +253,12 @@ public class ContentService {
      * <p>INVALID_FILE
      *
      * @param ecarImportRequest - {@link ContentImportRequest}
-     * @param responseHandler   - {@link IResponseHandler<Void>}
+     * @param responseHandler   - {@link IResponseHandler<List<ContentImportResponse>>}
      */
-    public void importEcar(final EcarImportRequest ecarImportRequest, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+    public void importEcar(final EcarImportRequest ecarImportRequest, IResponseHandler<List<ContentImportResponse>> responseHandler) {
+        new AsyncHandler<List<ContentImportResponse>>(responseHandler).execute(new IPerformable<List<ContentImportResponse>>() {
             @Override
-            public GenieResponse<Void> perform() {
+            public GenieResponse<List<ContentImportResponse>> perform() {
                 return contentService.importEcar(ecarImportRequest);
             }
         });

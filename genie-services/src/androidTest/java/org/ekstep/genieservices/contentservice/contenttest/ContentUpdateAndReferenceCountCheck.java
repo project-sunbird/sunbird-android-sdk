@@ -11,6 +11,7 @@ import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
+import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.contentservice.collectiontest.AssertCollection;
@@ -20,11 +21,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by Sneha on 6/8/2017.
  */
-
 @RunWith(AndroidJUnit4.class)
 public class ContentUpdateAndReferenceCountCheck extends GenieServiceTestBase {
 
@@ -57,12 +58,11 @@ public class ContentUpdateAndReferenceCountCheck extends GenieServiceTestBase {
 
     @Test
     public void test1ShouldCheckContentUpdate() {
-
         GenieServiceDBHelper.clearEcarEntryFromDB();
 
         //import collection
         EcarImportRequest.Builder ecarImportRequest = new EcarImportRequest.Builder().fromFilePath(COLLECTION_FILE_PATH).toFolder(activity.getExternalFilesDir(null).toString());
-        GenieResponse<Void> genieImportResponse = activity.importEcar(ecarImportRequest.build());
+        GenieResponse<List<ContentImportResponse>> genieImportResponse = activity.importEcar(ecarImportRequest.build());
         Assert.assertTrue(genieImportResponse.getStatus());
 
         //check for reference count for c4 child
@@ -73,7 +73,7 @@ public class ContentUpdateAndReferenceCountCheck extends GenieServiceTestBase {
 
         //import newer version of c4 content.
         EcarImportRequest.Builder ecarImportRequest2 = new EcarImportRequest.Builder().fromFilePath(CHILD_CONTENT_FILE_PATH).toFolder(activity.getExternalFilesDir(null).toString());
-        GenieResponse<Void> genieResponse = activity.importEcar(ecarImportRequest2.build());
+        GenieResponse<List<ContentImportResponse>> genieResponse = activity.importEcar(ecarImportRequest2.build());
         Assert.assertTrue(genieResponse.getStatus());
 
         //check the reference count

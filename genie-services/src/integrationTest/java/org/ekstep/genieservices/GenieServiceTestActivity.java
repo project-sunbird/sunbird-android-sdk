@@ -214,22 +214,22 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
-    public GenieResponse<Void> importEcar(EcarImportRequest ecarImportRequest) {
+    public GenieResponse<List<ContentImportResponse>> importEcar(EcarImportRequest ecarImportRequest) {
         idle = false;
-        GenieResponse genieResponse = mGenieService.getContentService().importEcar(ecarImportRequest);
+        GenieResponse<List<ContentImportResponse>> genieResponse = mGenieService.getContentService().importEcar(ecarImportRequest);
         return genieResponse;
     }
 
     //to be done
-    public GenieResponse<Void> importContent(ContentImportRequest contentImportRequest) {
+    public GenieResponse<List<ContentImportResponse>> importContent(ContentImportRequest contentImportRequest) {
         idle = false;
-        GenieResponse genieResponse = mGenieService.getContentService().importContent(contentImportRequest);
+        GenieResponse<List<ContentImportResponse>> genieResponse = mGenieService.getContentService().importContent(contentImportRequest);
         return genieResponse;
     }
 
     public GenieResponse<Void> cancelDownload(String identifier) {
         idle = false;
-        GenieResponse genieResponse = mGenieService.getContentService().cancelDownload(identifier);
+        GenieResponse<Void> genieResponse = mGenieService.getContentService().cancelDownload(identifier);
         return genieResponse;
     }
 

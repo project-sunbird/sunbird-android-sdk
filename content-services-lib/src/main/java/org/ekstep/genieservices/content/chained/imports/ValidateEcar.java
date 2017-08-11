@@ -5,7 +5,9 @@ import com.google.gson.internal.LinkedTreeMap;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.enums.ContentImportStatus;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -25,29 +27,29 @@ import java.util.Map;
  *
  * @author anil
  */
-public class ValidateEcar implements IChainable<Void, ImportContentContext> {
+public class ValidateEcar implements IChainable<List<ContentImportResponse>, ImportContentContext> {
 
     private static final String TAG = ValidateEcar.class.getSimpleName();
     private final File tmpLocation;
 
-    private IChainable<Void, ImportContentContext> nextLink;
+    private IChainable<List<ContentImportResponse>, ImportContentContext> nextLink;
 
     public ValidateEcar(File tmpLocation) {
         this.tmpLocation = tmpLocation;
     }
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContentContext importContext) {
+    public GenieResponse<List<ContentImportResponse>> execute(AppContext appContext, ImportContentContext importContext) {
         String manifestJson = FileUtil.readManifest(tmpLocation);
         if (manifestJson == null) {
-            return getErrorResponse(importContext, ContentConstants.NO_CONTENT_TO_IMPORT, "Empty ecar, cannot import!");
+            return getErrorResponse(ContentConstants.NO_CONTENT_TO_IMPORT, "Empty ecar, cannot import!");
         }
 
         LinkedTreeMap map = GsonUtil.fromJson(manifestJson, LinkedTreeMap.class);
 
         String manifestVersion = (String) map.get("ver");
         if (manifestVersion.equals("1.0")) {
-            return getErrorResponse(importContext, ContentConstants.UNSUPPORTED_MANIFEST, "Cannot import outdated ECAR!");
+            return getErrorResponse(ContentConstants.UNSUPPORTED_MANIFEST, "Cannot import outdated ECAR!");
         }
 
         LinkedTreeMap archive = (LinkedTreeMap) map.get("archive");
@@ -57,7 +59,7 @@ public class ValidateEcar implements IChainable<Void, ImportContentContext> {
         }
 
         if (items == null || items.isEmpty()) {
-            return getErrorResponse(importContext, ContentConstants.NO_CONTENT_TO_IMPORT, "Empty ecar, cannot import!");
+            return getErrorResponse(ContentConstants.NO_CONTENT_TO_IMPORT, "Empty ecar, cannot import!");
         }
 
         importContext.setManifestVersion(manifestVersion);
@@ -73,7 +75,7 @@ public class ValidateEcar implements IChainable<Void, ImportContentContext> {
             if (isDraftContent && ContentHandler.isExpired(ContentHandler.readExpiryDate(item))) {
                 //Skip the content
                 importContext.getSkippedItemsIdentifier().add(identifier);
-//  TODO:              return getErrorResponse(importContext, ContentConstants.DRAFT_ECAR_FILE_EXPIRED, "The ECAR file is expired!!!");
+                importContext.getContentImportResponseList().add(new ContentImportResponse(identifier, ContentImportStatus.DRAFT_CONTENT_EXPIRED));
                 continue;
             }
 
@@ -96,12 +98,12 @@ public class ValidateEcar implements IChainable<Void, ImportContentContext> {
 //                deleteChildItemsIfAny(appContext, items, newContentModel);
                 if (items.size() > 1
                         && (ContentHandler.hasChildren(newContentModel.getLocalData()) || ContentHandler.hasPreRequisites(newContentModel.getLocalData()))) {
-                    return getErrorResponse(importContext, ContentConstants.IMPORT_FILE_EXIST, "The ECAR file is imported already!!!");
+                    return getErrorResponse(ContentConstants.IMPORT_FILE_EXIST, "The ECAR file is imported already!!!");
                 }
 
                 //file already imported
                 if (importContext.getSkippedItemsIdentifier().size() == items.size()) {
-                    return getErrorResponse(importContext, ContentConstants.IMPORT_FILE_EXIST, "The ECAR file is imported already!!!");
+                    return getErrorResponse(ContentConstants.IMPORT_FILE_EXIST, "The ECAR file is imported already!!!");
                 }
             }
         }
@@ -109,12 +111,12 @@ public class ValidateEcar implements IChainable<Void, ImportContentContext> {
         if (nextLink != null) {
             return nextLink.execute(appContext, importContext);
         } else {
-            return getErrorResponse(importContext, ServiceConstants.ErrorCode.IMPORT_FAILED, "Import content failed");
+            return getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "Import content failed");
         }
     }
 
     @Override
-    public IChainable<Void, ImportContentContext> then(IChainable<Void, ImportContentContext> link) {
+    public IChainable<List<ContentImportResponse>, ImportContentContext> then(IChainable<List<ContentImportResponse>, ImportContentContext> link) {
         nextLink = link;
         return link;
     }
@@ -126,7 +128,7 @@ public class ValidateEcar implements IChainable<Void, ImportContentContext> {
         return !(isDraftContent && pkgVersion == 0);
     }
 
-    private GenieResponse<Void> getErrorResponse(ImportContentContext importContext, String error, String errorMessage) {
+    private GenieResponse<List<ContentImportResponse>> getErrorResponse(String error, String errorMessage) {
         Logger.e(TAG, errorMessage);
         FileUtil.rm(tmpLocation);
         return GenieResponseBuilder.getErrorResponse(error, errorMessage, TAG);

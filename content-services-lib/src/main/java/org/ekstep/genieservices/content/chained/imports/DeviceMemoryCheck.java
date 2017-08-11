@@ -3,6 +3,7 @@ package org.ekstep.genieservices.content.chained.imports;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.FileUtil;
@@ -11,19 +12,20 @@ import org.ekstep.genieservices.content.ContentConstants;
 import org.ekstep.genieservices.content.bean.ImportContentContext;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * Created on 5/16/2017.
  *
  * @author anil
  */
-public class DeviceMemoryCheck implements IChainable<Void, ImportContentContext> {
+public class DeviceMemoryCheck implements IChainable<List<ContentImportResponse>, ImportContentContext> {
     private static final String TAG = DeviceMemoryCheck.class.getSimpleName();
 
-    private IChainable<Void, ImportContentContext> nextLink;
+    private IChainable<List<ContentImportResponse>, ImportContentContext> nextLink;
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, ImportContentContext importContext) {
+    public GenieResponse<List<ContentImportResponse>> execute(AppContext appContext, ImportContentContext importContext) {
         long deviceUsableSpace = FileUtil.getFreeUsableSpace(new File(importContext.getDestinationFolder()));
         File ecarFile = new File(importContext.getEcarFilePath());
         long ecarFileSpace = ecarFile.length();
@@ -41,7 +43,7 @@ public class DeviceMemoryCheck implements IChainable<Void, ImportContentContext>
     }
 
     @Override
-    public IChainable<Void, ImportContentContext> then(IChainable<Void, ImportContentContext> link) {
+    public IChainable<List<ContentImportResponse>, ImportContentContext> then(IChainable<List<ContentImportResponse>, ImportContentContext> link) {
         nextLink = link;
         return link;
     }

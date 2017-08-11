@@ -173,9 +173,9 @@ public interface IContentService {
      * <p>INVALID_FILE
      *
      * @param ecarImportRequest - {@link ContentImportRequest}
-     * @return - {@link GenieResponse<Void>}
+     * @return - {@link GenieResponse<List<ContentImportResponse>>}
      */
-    GenieResponse<Void> importEcar(EcarImportRequest ecarImportRequest);
+    GenieResponse<List<ContentImportResponse>> importEcar(EcarImportRequest ecarImportRequest);
 
     /**
      * This api is used to import the content of specified contentId's from server.

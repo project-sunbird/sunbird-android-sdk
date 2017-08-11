@@ -10,6 +10,7 @@ import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
+import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.junit.After;
@@ -18,6 +19,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by Sneha on 5/30/2017.
@@ -78,7 +80,7 @@ public class CollectionImportWithNewerChildContent extends GenieServiceTestBase 
         EcarImportRequest.Builder ecarImportRequest = new EcarImportRequest.Builder().isChildContent()
                 .fromFilePath(COLLECTION_FILE_PATH).toFolder(activity.getExternalFilesDir(null).toString());
 
-        GenieResponse<Void> genieResponse = activity.importEcar(ecarImportRequest.build());
+        GenieResponse<List<ContentImportResponse>> genieResponse = activity.importEcar(ecarImportRequest.build());
         Assert.assertTrue("true", genieResponse.getStatus());
         AssertCollection.verifyCollectionEntryAndVisibility(AssertCollection.COLLECTION_ECAR_ID, VISIBILITY_DEFAULT);
         AssertCollection.verifyContentEntryAndVisibility(AssertCollection.CHILD_C2_ID, VISIBILITY_DEFAULT);
