@@ -138,7 +138,7 @@ public class ExtractPayloads implements IChainable<List<ContentImportResponse>, 
                                 payload = new File(tmpLocation.getPath(), "/" + artifactUrl);
                                 unzipSuccess = Decompress.unzip(payload, payloadDestination);
                             } else if (artifactMimeType.equals(ContentConstants.ArtifactMimeType.CONTENT_WITHOUT_ARTIFACT)) {   // Content with no artifact
-                                unzipSuccess = false;
+                                unzipSuccess = true;
                             } else {     // Content with artifact without zip i.e. pfd, mp4
                                 try {
                                     copyAssets(tmpLocation.getPath(), artifactUrl, payloadDestination);
