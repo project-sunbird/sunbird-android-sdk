@@ -383,13 +383,10 @@ public class ContentHandler {
         Content content = new Content();
         content.setIdentifier(contentModel.getIdentifier());
         ContentData localData = null, serverData = null;
-        String artifactMimeType = null;
         if (contentModel.getLocalData() != null) {
             localData = GsonUtil.fromJson(contentModel.getLocalData(), ContentData.class);
             localData.setVariants(getContentVariants(contentModel.getLocalData()));
             content.setContentData(localData);
-
-            artifactMimeType = localData.getArtifactMimeType();
         } else if (contentModel.getServerData() != null) {
             serverData = GsonUtil.fromJson(contentModel.getServerData(), ContentData.class);
             serverData.setVariants(getContentVariants(contentModel.getServerData()));
@@ -400,8 +397,7 @@ public class ContentHandler {
         content.setMimeType(contentModel.getMimeType());
         content.setBasePath(contentModel.getPath());
         content.setContentType(contentModel.getContentType());
-        boolean isAvailableLocally = isAvailableLocally(contentModel.getContentState(), artifactMimeType);
-        content.setAvailableLocally(isAvailableLocally);
+        content.setAvailableLocally(isAvailableLocally(contentModel.getContentState()));
         content.setReferenceCount(contentModel.getRefCount());
 
         long contentCreationTime = 0;
@@ -485,11 +481,6 @@ public class ContentHandler {
 
     public static boolean isAvailableLocally(int contentState) {
         return contentState == ContentConstants.State.ARTIFACT_AVAILABLE;
-    }
-
-    private static boolean isAvailableLocally(int contentState, String artifactMimeType) {
-        return (contentState == ContentConstants.State.ARTIFACT_AVAILABLE)
-                || (contentState == ContentConstants.State.ONLY_SPINE && ContentConstants.ArtifactMimeType.CONTENT_WITHOUT_ARTIFACT.equals(artifactMimeType));
     }
 
     private static String[] getDefaultContentTypes() {
