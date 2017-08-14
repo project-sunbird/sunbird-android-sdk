@@ -4,7 +4,9 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 /**
@@ -21,7 +23,10 @@ public class Decompress {
             FileInputStream fileInputStream = new FileInputStream(zipFile);
             ZipInputStream zipInputStream = new ZipInputStream(fileInputStream);
             ZipEntry ze;
+            int zipEntriesCount = 0;
             while ((ze = zipInputStream.getNextEntry()) != null) {
+                zipEntriesCount++;
+
                 if (ze.isDirectory()) {
                     FileUtil.createFolders(destinationFolder.getPath(), ze.getName());
                 } else {
@@ -50,10 +55,18 @@ public class Decompress {
             }
             zipInputStream.close();
 
-            return true;
+            if (zipEntriesCount > 0) {
+                return true;
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
+
+        return false;
+    }
+
+    private int zipEntriesCount(String path) throws IOException {
+        ZipFile zf = new ZipFile(path);
+        return zf.size();
     }
 }
