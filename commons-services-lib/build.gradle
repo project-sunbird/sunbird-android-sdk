@@ -20,16 +20,27 @@ def getRepositoryPassword() {
     return hasProperty('nexusPassword') ? nexusPassword : ""
 }
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: "https://platform.ekstep.in/downloads/content/repositories/releases") {
-                authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
-            }
-            pom.project {
-                groupId "org.ekstep.genieservices"
-                artifactId 'commons-services'
-                version versionName
+afterEvaluate { project ->
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository(url: "https://platform.ekstep.in/downloads/content/repositories/releases") {
+                    authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+                }
+                pom.project {
+                    groupId "org.ekstep.genieservices"
+                    artifactId 'commons-services'
+                    version versionName
+                }
+
+                pom.whenConfigured { pom ->
+                    pom.dependencies.forEach { dep ->
+                        if (dep.getVersion() == "unspecified") {
+                            dep.setGroupId("org.ekstep.genieservices")
+                            dep.setVersion(versionName)
+                        }
+                    }
+                }
             }
         }
     }

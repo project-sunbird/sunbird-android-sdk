@@ -2,7 +2,6 @@ apply plugin: 'java'
 apply plugin: 'maven'
 
 dependencies {
-    archives "org.ekstep.genieservices:commons:$rootProject.ext.versionName"
     compile "com.google.code.gson:gson:$rootProject.ext.gsonVersion"
     compile "joda-time:joda-time:$rootProject.ext.jodaTimeVersion"
 }
