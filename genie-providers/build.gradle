@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven'
 
 repositories {
     mavenLocal()
@@ -45,6 +46,29 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':commons-lib')
     compile project(':commons-services-lib')
-    compile "org.ekstep.genieservices:genie-services:0.1.343"
+    compile "org.ekstep.genieservices:genie-services:0.1.363"
     compile "com.android.support:appcompat-v7:$rootProject.ext.supportLibraryVersion"
+}
+
+def getRepositoryUsername() {
+    return hasProperty('nexusUsername') ? nexusUsername : ""
+}
+
+def getRepositoryPassword() {
+    return hasProperty('nexusPassword') ? nexusPassword : ""
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "https://platform.ekstep.in/downloads/content/repositories/releases") {
+                authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+            }
+            pom.project {
+                groupId "org.ekstep.genieservices"
+                artifactId 'genie-providers'
+                version android.defaultConfig.versionName
+            }
+        }
+    }
 }
