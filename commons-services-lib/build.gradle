@@ -3,7 +3,6 @@ apply plugin: 'maven'
 
 dependencies {
     compile project(':commons-lib')
-    archives "org.ekstep.genieservices:commons:$rootProject.ext.versionName"
     compile "org.greenrobot:eventbus:$rootProject.ext.eventbusVersion"
 }
 
