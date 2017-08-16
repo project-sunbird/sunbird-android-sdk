@@ -24,6 +24,7 @@ public class ContentData implements Serializable {
     private String license;
     private String expires;
     private String downloadUrl;
+    private String artifactUrl;
     private List<String> language;
     private List<String> gradeLevel;
     private String osId;
@@ -97,6 +98,10 @@ public class ContentData implements Serializable {
         return downloadUrl;
     }
 
+    public String getArtifactUrl() {
+        return artifactUrl;
+    }
+
     public List<String> getLanguage() {
         return language;
     }
@@ -152,6 +157,7 @@ public class ContentData implements Serializable {
                 ", license='" + license + '\'' +
                 ", expires='" + expires + '\'' +
                 ", downloadUrl='" + downloadUrl + '\'' +
+                ", artifactUrl='" + artifactUrl + '\'' +
                 ", language=" + language +
                 ", gradeLevel=" + gradeLevel +
                 ", osId='" + osId + '\'' +
