@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ekstep.genieservices</groupId>
     <artifactId>commons-services</artifactId>
-    <version>${version}</version>
+    <version>$buildNumber</version>
     <dependencies>
         <dependency>
             <groupId>org.ekstep.genieservices</groupId>
             <artifactId>commons</artifactId>
-            <version>${version}</version>
+            <version>${env.buildNumber}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
