@@ -162,6 +162,12 @@ public class ContentHandler {
         return null;
     }
 
+    public static boolean isOnlineContent(Map contentData) {
+        String contentDisposition = ContentHandler.readContentDisposition(contentData);
+
+        return !StringUtil.isNullOrEmpty(contentDisposition) && ContentConstants.ContentDisposition.ONLINE.equals(contentDisposition);
+    }
+
     public static String readContentType(Map contentData) {
         if (contentData.containsKey(KEY_CONTENT_TYPE)) {
             String contentType = (String) contentData.get(KEY_CONTENT_TYPE);

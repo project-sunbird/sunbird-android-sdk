@@ -53,11 +53,14 @@ public class CompressContent implements IChainable<ContentExportResponse, Export
         int iteration = 0;
 
         for (ContentModel contentModel : contentModelsToExport) {
-            if (!ContentHandler.isAvailableLocally(contentModel.getContentState())) {
+            Map contentData = GsonUtil.fromJson(contentModel.getLocalData(), Map.class);
+
+            if (!ContentHandler.isAvailableLocally(contentModel.getContentState())
+                    && ContentHandler.isOnlineContent(contentData)) {
                 continue;
             }
 
-            artifactUrl = ContentHandler.readArtifactUrl(GsonUtil.fromJson(contentModel.getLocalData(), Map.class));
+            artifactUrl = ContentHandler.readArtifactUrl(contentData);
 
             if (!StringUtil.isNullOrEmpty(artifactUrl)) {
                 payload = new File(exportContext.getTmpLocation(), artifactUrl);
