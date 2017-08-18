@@ -68,11 +68,11 @@ android {
 dependencies {
     compile project(':commons-lib')
     compile project(path: ':commons-services-lib')
-    compile project(path: ':usermanagement-services-lib')
     compile project(path: ':config-services-lib')
     compile project(path: ':content-services-lib')
-    compile project(path: ':partner-services-lib')
     compile project(path: ':notification-services-lib')
+    compile project(path: ':partner-services-lib')
+    compile project(path: ':usermanagement-services-lib')
 
     compile "com.android.support:appcompat-v7:$rootProject.ext.supportLibraryVersion"
     compile "com.google.android.gms:play-services-location:$rootProject.ext.playServiceVersion"
