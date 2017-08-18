@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'maven'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -84,27 +83,4 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     testCompile "junit:junit:$rootProject.ext.junitVersion"
-}
-
-def getRepositoryUsername() {
-    return hasProperty('nexusUsername') ? nexusUsername : ""
-}
-
-def getRepositoryPassword() {
-    return hasProperty('nexusPassword') ? nexusPassword : ""
-}
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: "https://platform.ekstep.in/downloads/content/repositories/releases") {
-                authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
-            }
-            pom.project {
-                groupId "org.ekstep.genieservices"
-                artifactId 'genie-services'
-                version android.defaultConfig.versionName
-            }
-        }
-    }
 }

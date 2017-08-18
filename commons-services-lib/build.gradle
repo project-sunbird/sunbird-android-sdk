@@ -1,5 +1,4 @@
 apply plugin: 'java'
-apply plugin: 'maven'
 
 dependencies {
     compile project(':commons-lib')
@@ -11,37 +10,3 @@ jar.archiveName "commons-services-" + versionName + ".jar"
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
-
-def getRepositoryUsername() {
-    return hasProperty('nexusUsername') ? nexusUsername : ""
-}
-
-def getRepositoryPassword() {
-    return hasProperty('nexusPassword') ? nexusPassword : ""
-}
-
-afterEvaluate { project ->
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                repository(url: "https://platform.ekstep.in/downloads/content/repositories/releases") {
-                    authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
-                }
-                pom.project {
-                    groupId "org.ekstep.genieservices"
-                    artifactId 'commons-services'
-                    version versionName
-                }
-
-                pom.whenConfigured { pom ->
-                    pom.dependencies.forEach { dep ->
-                        if (dep.getVersion() == "unspecified") {
-                            dep.setGroupId("org.ekstep.genieservices")
-                            dep.setVersion(versionName)
-                        }
-                    }
-                }
-            }
-        }
-    }
-}

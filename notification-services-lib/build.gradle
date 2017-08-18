@@ -1,36 +1,12 @@
 apply plugin: 'java'
-apply plugin: 'maven'
 
 dependencies {
     compile project(':commons-lib')
     compile project(':commons-services-lib')
 }
 
-def versionName=rootProject.ext.versionName
-jar.archiveName "notification-services-"+versionName+".jar"
+def versionName = rootProject.ext.versionName
+jar.archiveName "notification-services-" + versionName + ".jar"
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
-
-def getRepositoryUsername() {
-    return hasProperty('nexusUsername') ? nexusUsername : ""
-}
-
-def getRepositoryPassword() {
-    return hasProperty('nexusPassword') ? nexusPassword : ""
-}
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: "https://platform.ekstep.in/downloads/content/repositories/releases") {
-                authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
-            }
-            pom.project {
-                groupId "org.ekstep.genieservices"
-                artifactId 'notification-services'
-                version versionName
-            }
-        }
-    }
-}
