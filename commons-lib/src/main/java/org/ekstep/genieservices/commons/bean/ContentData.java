@@ -20,6 +20,7 @@ public class ContentData implements Serializable {
     private String publisher;
     private String me_totalRatings;
     private String me_averageRating;
+    private String me_totalDownloads;
     private String copyright;
     private String license;
     private String expires;
@@ -80,6 +81,10 @@ public class ContentData implements Serializable {
 
     public String getAverageRating() {
         return me_averageRating;
+    }
+
+    public String getTotalDownloads() {
+        return me_totalDownloads;
     }
 
     public String getCopyright() {
@@ -153,6 +158,7 @@ public class ContentData implements Serializable {
                 ", publisher='" + publisher + '\'' +
                 ", me_totalRatings='" + me_totalRatings + '\'' +
                 ", me_averageRating='" + me_averageRating + '\'' +
+                ", me_totalDownloads='" + me_totalDownloads + '\'' +
                 ", copyright='" + copyright + '\'' +
                 ", license='" + license + '\'' +
                 ", expires='" + expires + '\'' +
