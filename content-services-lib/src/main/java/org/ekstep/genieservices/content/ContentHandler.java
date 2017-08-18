@@ -89,13 +89,14 @@ public class ContentHandler {
     private static final String KEY_DOWNLOAD_URL = "downloadUrl";
     private static final String KEY_COMPATIBILITY_LEVEL = "compatibilityLevel";
     private static final String KEY_MIME_TYPE = "mimeType";
-    private static final String KEY_ARTIFACT_MIME_TYPE = "artifactMimeType";
     private static final Object AUDIENCE_KEY = "audience";
     private static final String KEY_LAST_UPDATED_ON = "lastUpdatedOn";
     private static final String KEY_PRE_REQUISITES = "pre_requisites";
     private static final String KEY_CHILDREN = "children";
     private static final String KEY_CONTENT_TYPE = "contentType";
     private static final String KEY_NAME = "name";
+    private static final String KEY_CONTENT_ENCODING = "contentEncoding";
+    private static final String KEY_CONTENT_DISPOSITION = "contentDisposition";
 
     private static final String KEY_CONTENT_METADATA = "contentMetadata";
     private static final String KEY_VIRALITY_METADATA = "virality";
@@ -147,11 +148,24 @@ public class ContentHandler {
         return null;
     }
 
-    public static String readArtifactMimeType(Map contentData) {
-        if (contentData.containsKey(KEY_ARTIFACT_MIME_TYPE)) {
-            return (String) contentData.get(KEY_ARTIFACT_MIME_TYPE);
+    public static String readContentEncoding(Map contentData) {
+        if (contentData.containsKey(KEY_CONTENT_ENCODING)) {
+            return (String) contentData.get(KEY_CONTENT_ENCODING);
         }
         return null;
+    }
+
+    public static String readContentDisposition(Map contentData) {
+        if (contentData.containsKey(KEY_CONTENT_DISPOSITION)) {
+            return (String) contentData.get(KEY_CONTENT_DISPOSITION);
+        }
+        return null;
+    }
+
+    public static boolean isOnlineContent(Map contentData) {
+        String contentDisposition = ContentHandler.readContentDisposition(contentData);
+
+        return !StringUtil.isNullOrEmpty(contentDisposition) && ContentConstants.ContentDisposition.ONLINE.equals(contentDisposition);
     }
 
     public static String readContentType(Map contentData) {

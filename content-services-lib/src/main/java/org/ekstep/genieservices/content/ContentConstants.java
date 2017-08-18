@@ -31,9 +31,15 @@ public interface ContentConstants {
         String DRAFT = "Draft";
     }
 
-    interface ArtifactMimeType {
-        String CONTENT_WITHOUT_ARTIFACT = "text/x-url";
-        String CONTENT_WITH_ZIP_ARTIFACT = "+zip";
+    interface ContentEncoding {
+        String GZIP = "gzip";
+        String IDENTITY = "identity";
+    }
+
+    interface ContentDisposition {
+        String ATTACHMENT = "attachment";
+        String INLINE = "inline";
+        String ONLINE = "online";
     }
 
     interface MimeType {
