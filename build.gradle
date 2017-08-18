@@ -33,7 +33,7 @@ ext {
     junitVersion = '4.12'
     buildNumber = System.getenv("BUILD_NUMBER") ?: "local"
     versionCode = 1
-    versionName = "0.1.$buildNumber"
+    versionName = "1.0.$buildNumber"
 }
 
 task clean(type: Delete) {
