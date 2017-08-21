@@ -1,7 +1,6 @@
 apply plugin: 'java'
 
 dependencies {
-    compile project(':commons-lib')
     compile project(':commons-services-lib')
 }
 

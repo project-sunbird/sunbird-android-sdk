@@ -1,6 +1,8 @@
 apply plugin: 'com.android.library'
 
 android {
+    defaultPublishConfig "productionRelease"
+    publishNonDefault true
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
 
@@ -66,8 +68,6 @@ android {
 }
 
 dependencies {
-    compile project(':commons-lib')
-    compile project(path: ':commons-services-lib')
     compile project(path: ':config-services-lib')
     compile project(path: ':content-services-lib')
     compile project(path: ':notification-services-lib')
