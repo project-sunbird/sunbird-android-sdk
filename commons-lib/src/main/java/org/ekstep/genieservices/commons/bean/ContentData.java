@@ -32,6 +32,8 @@ public class ContentData implements Serializable {
     private String contentType;
     private String artifactMimeType;
     private String versionKey;
+    private String contentEncoding;
+    private String contentDisposition;
     private List<ContentVariant> contentVariantList;
     private List<String> screenshots;
 
@@ -131,6 +133,14 @@ public class ContentData implements Serializable {
         return versionKey;
     }
 
+    public String getContentEncoding() {
+        return contentEncoding;
+    }
+
+    public String getContentDisposition() {
+        return contentDisposition;
+    }
+
     public List<ContentVariant> getVariants() {
         return contentVariantList;
     }
@@ -170,6 +180,8 @@ public class ContentData implements Serializable {
                 ", contentType='" + contentType + '\'' +
                 ", artifactMimeType='" + artifactMimeType + '\'' +
                 ", versionKey='" + versionKey + '\'' +
+                ", contentEncoding='" + contentEncoding + '\'' +
+                ", contentDisposition='" + contentDisposition + '\'' +
                 ", contentVariantList=" + contentVariantList +
                 ", screenshots=" + screenshots +
                 '}';
