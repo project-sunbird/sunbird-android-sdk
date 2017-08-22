@@ -68,6 +68,8 @@ android {
 }
 
 dependencies {
+    compile project(path: ':commons-lib')
+    compile project(path: ':commons-services-lib')
     compile project(path: ':config-services-lib')
     compile project(path: ':content-services-lib')
     compile project(path: ':notification-services-lib')
