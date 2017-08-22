@@ -79,7 +79,9 @@ public class AndroidDownloadManager implements IDownloadManager {
 
     @Override
     public void cancel(long downloadId) {
-        this.mDownloadManager.remove(downloadId);
+        if (downloadId != -1) {
+            this.mDownloadManager.remove(downloadId);
+        }
     }
 
 }
