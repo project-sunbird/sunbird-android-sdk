@@ -175,7 +175,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
 
                 if (!partnerTagList.contains(partnerId)) {
                     partnerTagList.add(partnerId);
-                    event.put("partner", partnerTagList);
+                    etags.put("partner", partnerTagList);
                 }
             }
         } else {
