@@ -93,6 +93,7 @@ public class ValidateEcar implements IChainable<List<ContentImportResponse>, Imp
                     && ContentHandler.isImportFileExist(oldContentModel, item)) {   // Check whether the file is already imported or not.
 
                 skipContent(importContext, identifier, visibility, ContentImportStatus.ALREADY_EXIST);
+                continue;
             }
 
             importContext.getItems().add(item);
