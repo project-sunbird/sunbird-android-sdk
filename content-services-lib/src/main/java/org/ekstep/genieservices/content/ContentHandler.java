@@ -401,10 +401,13 @@ public class ContentHandler {
             localData = GsonUtil.fromJson(contentModel.getLocalData(), ContentData.class);
             localData.setVariants(getContentVariants(contentModel.getLocalData()));
             content.setContentData(localData);
-        } else if (contentModel.getServerData() != null) {
+        }
+        if (contentModel.getServerData() != null) {
             serverData = GsonUtil.fromJson(contentModel.getServerData(), ContentData.class);
             serverData.setVariants(getContentVariants(contentModel.getServerData()));
-            content.setContentData(serverData);
+            if (localData == null) {
+                content.setContentData(serverData);
+            }
         }
 
         content.setUpdateAvailable(isUpdateAvailable(serverData, localData));
