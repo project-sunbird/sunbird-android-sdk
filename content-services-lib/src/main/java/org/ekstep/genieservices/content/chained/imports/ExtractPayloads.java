@@ -225,7 +225,6 @@ public class ExtractPayloads implements IChainable<List<ContentImportResponse>, 
                 }
             }
             importContext.getIdentifiers().add(identifier);
-            importContext.getItems().add(item);
         }
 
         if (nextLink != null) {

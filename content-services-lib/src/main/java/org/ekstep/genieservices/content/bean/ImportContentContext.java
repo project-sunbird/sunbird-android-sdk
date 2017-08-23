@@ -65,10 +65,6 @@ public class ImportContentContext {
         return items;
     }
 
-    public void setItems(List<Map<String, Object>> items) {
-        this.items = items;
-    }
-
     public List<String> getSkippedItemsIdentifier() {
         return skippedItemsIdentifier;
     }

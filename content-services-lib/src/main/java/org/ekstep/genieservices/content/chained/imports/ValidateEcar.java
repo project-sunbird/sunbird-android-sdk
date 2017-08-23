@@ -94,6 +94,8 @@ public class ValidateEcar implements IChainable<List<ContentImportResponse>, Imp
 
                 skipContent(importContext, identifier, visibility, ContentImportStatus.ALREADY_EXIST);
             }
+
+            importContext.getItems().add(item);
         }
 
         if (nextLink != null) {
