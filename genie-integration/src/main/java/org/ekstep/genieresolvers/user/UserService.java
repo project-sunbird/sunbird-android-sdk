@@ -12,7 +12,6 @@ import java.util.Map;
  * Created on 24/5/17.
  * shriharsh
  */
-
 public class UserService extends BaseService {
     private String appQualifier;
     private Context context;

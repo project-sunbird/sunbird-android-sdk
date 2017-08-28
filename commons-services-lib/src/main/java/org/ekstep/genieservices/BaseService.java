@@ -15,18 +15,6 @@ public class BaseService {
         mAppContext = appContext;
     }
 
-    protected void putToKeyValueStore(String key, boolean value) {
-        mAppContext.getKeyValueStore().putBoolean(key, value);
-    }
-
-    protected boolean getBooleanFromKeyValueStore(String key) {
-        return mAppContext.getKeyValueStore().getBoolean(key, false);
-    }
-
-    protected void putToKeyValueStore(String key, long value) {
-        mAppContext.getKeyValueStore().putLong(key, value);
-    }
-
     protected long getLongFromKeyValueStore(String key) {
         return mAppContext.getKeyValueStore().getLong(key, 0);
     }

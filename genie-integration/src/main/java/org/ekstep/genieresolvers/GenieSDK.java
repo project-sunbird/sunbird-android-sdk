@@ -11,7 +11,6 @@ import org.ekstep.genieresolvers.user.UserService;
 
 /**
  * This is the entry point of the GenieSDK
- *
  */
 public class GenieSDK {
 

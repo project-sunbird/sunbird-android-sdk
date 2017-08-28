@@ -4,7 +4,6 @@ package org.ekstep.genieresolvers.util;
  * Created on 26/5/17.
  * shriharsh
  */
-
 public interface Constants {
     String PROCESSING_ERROR = "PROCESSING_ERROR";
     String GENIE_SERVICE_NOT_INSTALLED = "GENIE_SERVICE_NOT_INSTALLED";

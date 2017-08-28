@@ -52,9 +52,10 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
         params.put("type", type.getValue());
         params.put("logLevel", "2");
 
-        if (getLongFromKeyValueStore(ConfigConstants.PreferenceKey.MASTER_DATA_API_EXPIRATION_KEY) == 0) {
+        long expirationTime = getLongFromKeyValueStore(ConfigConstants.PreferenceKey.MASTER_DATA_API_EXPIRATION_KEY);
+        if (expirationTime == 0) {
             initializeMasterData();
-        } else if (hasExpired(ConfigConstants.PreferenceKey.MASTER_DATA_API_EXPIRATION_KEY)) {
+        } else if (hasExpired(expirationTime)) {
             refreshMasterData();
         }
 
@@ -69,12 +70,11 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(masterData);
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
-            return response;
         } else {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_MASTER_DATA, TAG, MasterData.class);
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_MASTER_DATA);
-            return response;
         }
+        return response;
     }
 
     private void initializeMasterData() {
@@ -126,27 +126,29 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
         params.put("logLevel", "2");
 
-        if (getLongFromKeyValueStore(ConfigConstants.PreferenceKey.RESOURCE_BUNDLE_API_EXPIRATION_KEY) == 0) {
+        long expirationTime = getLongFromKeyValueStore(ConfigConstants.PreferenceKey.RESOURCE_BUNDLE_API_EXPIRATION_KEY);
+        if (expirationTime == 0) {
             initializeResourceBundle();
-        } else if (hasExpired(ConfigConstants.PreferenceKey.RESOURCE_BUNDLE_API_EXPIRATION_KEY)) {
+        } else if (hasExpired(expirationTime)) {
             refreshResourceBundle();
         }
-        ResourceBundleModel resourceBundle = ResourceBundleModel.findById(mAppContext.getDBSession(), languageIdentifier);
+
+        ResourceBundleModel resourceBundleModel = ResourceBundleModel.findById(mAppContext.getDBSession(), languageIdentifier);
         String result = null;
-        if (resourceBundle == null) {
+        if (resourceBundleModel == null) {
             //language data not available in the resources API
-            resourceBundle = ResourceBundleModel.findById(mAppContext.getDBSession(), "en");
-            if (resourceBundle != null) {
-                result = resourceBundle.getResourceString();
+            resourceBundleModel = ResourceBundleModel.findById(mAppContext.getDBSession(), "en");
+            if (resourceBundleModel != null) {
+                result = resourceBundleModel.getResourceString();
             }
         } else {
-            result = resourceBundle.getResourceString();
+            result = resourceBundleModel.getResourceString();
         }
 
         Map<String, Object> resourceBundleMap = null;
         if (result != null) {
             resourceBundleMap = new HashMap<>();
-            resourceBundleMap.put(resourceBundle.getIdentifier(), resourceBundle.getResourceString());
+            resourceBundleMap.put(resourceBundleModel.getIdentifier(), resourceBundleModel.getResourceString());
         }
 
         GenieResponse<Map<String, Object>> response;
@@ -214,9 +216,10 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
         params.put("logLevel", "2");
 
-        if (getLongFromKeyValueStore(ConfigConstants.PreferenceKey.ORDINAL_API_EXPIRATION_KEY) == 0) {
+        long expirationTime = getLongFromKeyValueStore(ConfigConstants.PreferenceKey.ORDINAL_API_EXPIRATION_KEY);
+        if (expirationTime == 0) {
             initializeOrdinalsData();
-        } else if (hasExpired(ConfigConstants.PreferenceKey.ORDINAL_API_EXPIRATION_KEY)) {
+        } else if (hasExpired(expirationTime)) {
             refreshOrdinals();
         }
 
@@ -284,13 +287,12 @@ public class ConfigServiceImpl extends BaseService implements IConfigService {
             Long currentTime = DateUtil.getEpochTime();
             long expiration_time = ttlInMilliSeconds + currentTime;
 
-            putToKeyValueStore(key, expiration_time);
+            mAppContext.getKeyValueStore().putLong(key, expiration_time);
         }
     }
 
-    private boolean hasExpired(String key) {
+    private boolean hasExpired(long expirationTime) {
         Long currentTime = DateUtil.getEpochTime();
-        long expirationTime = getLongFromKeyValueStore(key);
         return currentTime > expirationTime;
     }
 

@@ -9,25 +9,25 @@ import java.util.Set;
  */
 public interface IKeyValueStore {
 
-    void putString(String key, String value);
-
-    void putStringSet(String key, Set<String> value);
-
-    void putLong(String key, long value);
-
-    void putBoolean(String key, boolean value);
-
-    void putInt(String key, int value);
-
     String getString(String key, String defValue);
 
-    long getLong(String key, long defValue);
-
-    boolean getBoolean(String key, boolean defValue);
+    void putString(String key, String value);
 
     Set<String> getStringSet(String key, Set<String> defValue);
 
+    void putStringSet(String key, Set<String> value);
+
+    long getLong(String key, long defValue);
+
+    void putLong(String key, long value);
+
+    boolean getBoolean(String key, boolean defValue);
+
+    void putBoolean(String key, boolean value);
+
     int getInt(String key, int defValue);
+
+    void putInt(String key, int value);
 
     boolean contains(String key);
 
