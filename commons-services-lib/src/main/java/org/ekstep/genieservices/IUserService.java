@@ -22,7 +22,7 @@ public interface IUserService {
      * <p>
      * <p>On Successful creation of new profile, the response will return status as TRUE and with successful message
      * <p>
-     * <p>On failing to delete a user, the response will have status as FALSE with the following error:
+     * <p>On failing to create a user, the response will have status as FALSE with the following error:
      * <p>FAILED - createProfile
      *
      * @param profile - {@link Profile}
@@ -110,7 +110,7 @@ public interface IUserService {
     GenieResponse<String> setAnonymousUser();
 
     /**
-     * This api updates the specific profile that is possed to it.
+     * This api updates the specific profile that is passed to it.
      * <p>
      * <p>On successful updating the profile, the response will return status as TRUE and with the updated profile set in result.
      * <p>

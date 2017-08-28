@@ -8,8 +8,7 @@ import org.ekstep.genieservices.commons.IResponseHandler;
 import java.util.Map;
 
 /**
- * Created on 6/6/17.
- * shriharsh
+ * This is the {@link SummarizerService} with all the required APIs for performing summarizer related operations.
  */
 public class SummarizerService extends BaseService {
 
@@ -21,6 +20,22 @@ public class SummarizerService extends BaseService {
         this.appQualifier = appQualifier;
     }
 
+    /**
+     *
+     * This api is used to get the learner assessment details
+     * <p>
+     * <p>
+     * On successful fetching the data, the response will return status as TRUE and with List<LearnerAssessmentDetails> in the result
+     * <p>
+     * <p>
+     * On failing to fetch the data, the response will return status as FALSE with the following error.
+     * <p>PROCESSING_ERROR
+     *
+     * @param userId
+     * @param currentContentIdentifier
+     * @param hierarchyData
+     * @param responseHandler
+     */
     public void getLearnerAssessment(String userId, String currentContentIdentifier, Map hierarchyData, IResponseHandler responseHandler) {
         LearnerAssessmentTask createUserTask = new LearnerAssessmentTask(context, appQualifier, userId, currentContentIdentifier, hierarchyData);
         createAndExecuteTask(responseHandler, createUserTask);

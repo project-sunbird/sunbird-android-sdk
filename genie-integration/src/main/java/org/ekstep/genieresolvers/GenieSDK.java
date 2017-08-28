@@ -12,6 +12,14 @@ import org.ekstep.genieresolvers.user.UserService;
 /**
  * This is the entry point of the GenieSDK
  */
+
+/**
+ * {@link GenieSDK} is the entry point and the point of contact to interact with all the services of the GenieSDK.
+ * <p>
+ * Initially, the application integrating GenieSDK has to initialize the sdk using "init" method by passing in the
+ * {@link Context} and package name of the integrating application. And then it can call "getGenieSDK()" to access the
+ * instance of GenieSDK every time, whenever needed.
+ */
 public class GenieSDK {
 
     private static GenieSDK sGenieSDK;
@@ -41,6 +49,14 @@ public class GenieSDK {
         return sGenieSDK;
     }
 
+    /**
+     * This api gets the {@link UserService}, when accessed in the below way
+     * <p>
+     * getGenieSDK().getUserService()
+     * <p><p>
+     *
+     * @return {@link UserService}
+     */
     public UserService getUserService() {
         if (mUserService == null) {
             mUserService = new UserService(context, appQualifier);
@@ -49,6 +65,14 @@ public class GenieSDK {
         return mUserService;
     }
 
+    /**
+     * This api gets the {@link TelemetryService}, when accessed in the below way
+     * <p>
+     * getGenieSDK().getTelemetryService()
+     * <p><p>
+     *
+     * @return {@link TelemetryService}
+     */
     public TelemetryService getTelemetryService() {
         if (mTelemetryService == null) {
             mTelemetryService = new TelemetryService(context, appQualifier);
@@ -57,6 +81,14 @@ public class GenieSDK {
         return mTelemetryService;
     }
 
+    /**
+     * This api gets the {@link ContentService}, when accessed in the below way
+     * <p>
+     * getGenieSDK().getContentService()
+     * <p><p>
+     *
+     * @return {@link ContentService}
+     */
     public ContentService getContentService() {
         if (mContentService == null) {
             mContentService = new ContentService(context, appQualifier);
@@ -65,6 +97,14 @@ public class GenieSDK {
         return mContentService;
     }
 
+    /**
+     * This api gets the {@link LanguageService}, when accessed in the below way
+     * <p>
+     * getGenieSDK().getLanguageService()
+     * <p><p>
+     *
+     * @return {@link LanguageService}
+     */
     public LanguageService getLanguageService() {
         if (mLanguageService == null) {
             mLanguageService = new LanguageService(context, appQualifier);
@@ -73,6 +113,14 @@ public class GenieSDK {
         return mLanguageService;
     }
 
+    /**
+     * This api gets the {@link PartnerService}, when accessed in the below way
+     * <p>
+     * getGenieSDK().getPartnerService()
+     * <p><p>
+     *
+     * @return {@link PartnerService}
+     */
     public PartnerService getPartnerService() {
         if (mPartnerService == null) {
             mPartnerService = new PartnerService(context, appQualifier);
@@ -81,6 +129,14 @@ public class GenieSDK {
         return mPartnerService;
     }
 
+    /**
+     * This api gets the {@link SummarizerService}, when accessed in the below way
+     * <p>
+     * getGenieSDK().getSummarizerService()
+     * <p><p>
+     *
+     * @return {@link SummarizerService}
+     */
     public SummarizerService getSummarizerService() {
         if (mSummarizerService == null) {
             mSummarizerService = new SummarizerService(context, appQualifier);

@@ -3,9 +3,8 @@ package org.ekstep.genieservices;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 
 /**
- * Created on 5/23/2017.
- *
- * @author anil
+ * This is the interface with all the required APIs for performing Language related
+ * operations.
  */
 public interface ILanguageService {
 
