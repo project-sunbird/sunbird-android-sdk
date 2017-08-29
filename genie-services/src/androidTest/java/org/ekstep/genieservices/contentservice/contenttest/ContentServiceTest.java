@@ -14,6 +14,7 @@ import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentExportRequest;
+import org.ekstep.genieservices.commons.bean.ContentExportResponse;
 import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
@@ -268,26 +269,27 @@ public class ContentServiceTest extends GenieServiceTestBase {
         //import content
         List<String> contentIdList = new ArrayList<>();
         contentIdList.add(CONTENT_ID_WITH_CHILD);
-        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder()
-                .toFolder(activity.getExternalFilesDir(null).toString()).contentIds(contentIdList);
-        GenieResponse<List<ContentImportResponse>> genieResponse = activity.importContent(contentImportRequest.build());
-        Assert.assertTrue(genieResponse.getStatus());
+
+        EcarImportRequest.Builder importRequest = new EcarImportRequest.Builder()
+                .fromFilePath(CONTENT_WITH_CHILD_FILEPATH).toFolder(activity.getExternalFilesDir(null).toString());
+        GenieResponse<List<ContentImportResponse>> response = activity.importEcar(importRequest.build());
+        Assert.assertTrue("true", response.getStatus());
 
         //export content
         ContentExportRequest.Builder contentExportRequest = new ContentExportRequest.Builder()
                 .exportContents(contentIdList)
                 .toFolder(Environment.getExternalStorageDirectory().toString());
-        GenieResponse exportResponse = activity.exportContent(contentExportRequest.build());
+        GenieResponse<ContentExportResponse> exportResponse = activity.exportContent(contentExportRequest.build());
         Assert.assertTrue(exportResponse.getStatus());
 
         //delete content
         ContentDeleteRequest.Builder deleteRequest = new ContentDeleteRequest.Builder().contentId(CONTENT_ID_WITH_CHILD);
-        GenieResponse response = activity.deleteContent(deleteRequest.build());
-        Assert.assertTrue(response.getStatus());
+        GenieResponse deleteResponse = activity.deleteContent(deleteRequest.build());
+        Assert.assertTrue(deleteResponse.getStatus());
 
-        //import the exported profile(in Environment.getExternalStorageDirectory()) to ensure export has happened.
+        //import the exported ecar(in Environment.getExternalStorageDirectory()) to ensure export has happened.
         EcarImportRequest.Builder ecarImportRequest = new EcarImportRequest.Builder()
-                .fromFilePath(Environment.getExternalStorageDirectory().toString()).toFolder(CONTENT_WITH_CHILD_FILEPATH);
+                .fromFilePath(exportResponse.getResult().getExportedFilePath()).toFolder(activity.getExternalFilesDir(null).toString());
         GenieResponse importResponse = activity.importEcar(ecarImportRequest.build());
         Assert.assertTrue(importResponse.getStatus());
     }
