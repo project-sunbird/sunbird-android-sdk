@@ -63,36 +63,57 @@ public class GEInteract extends Telemetry {
         private GameData gameData;
         private ETags eTags;
 
+        /**
+         * Game level, stage or page id on which the event happened
+         */
         public Builder stageId(String stageId) {
             this.stageId = stageId;
             return this;
         }
 
+        /**
+         * Type of interaction TOUCH,DRAG,DROP,PINCH,ZOOM,SHAKE,ROTATE,SPEAK,LISTEN,WRITE,DRAW,START,END,CHOOSE,ACTIVATE,SHOW,HIDE,OTHER
+         */
         public Builder interActionType(InteractionType type) {
             this.type = type.getValue();
             return this;
         }
 
+        /**
+         * Additional types for a global type. For ex: for an audio the type is LISTEN and the subtype can be one of PLAY,PAUSE,STOP,RESUME
+         */
         public Builder subType(String subType) {
             this.subType = subType;
             return this;
         }
 
+        /**
+         * Resource (button, screen, page, etc) id on which the interaction happened - use system identifiers when reporting device events
+         */
         public Builder id(String id) {
             this.id = id;
             return this;
         }
 
+        /**
+         * Expected interaction type if different from the child's response
+         */
         public Builder exType(String subType) {
             this.subType = subType;
             return this;
         }
 
+        /**
+         *
+         */
         public Builder resourceId(String resourceId) {
             this.id = resourceId;
             return this;
         }
 
+        /**
+         * Array of values, e.g. for timestamp of audio interactions
+         */
         public Builder values(String key, String value) {
             Map<String, Object> valueMap = new HashMap<>();
             valueMap.put(key, value);
@@ -100,6 +121,9 @@ public class GEInteract extends Telemetry {
             return this;
         }
 
+        /**
+         * Array of values, e.g. for timestamp of audio interactions
+         */
         public Builder values(List<Map<String, Object>> mapList) {
             this.values.addAll(mapList);
             return this;
@@ -110,11 +134,17 @@ public class GEInteract extends Telemetry {
             return this;
         }
 
+        /**
+         * Unique external resource identifier if any (for recorded voice, image, etc.)
+         */
         public Builder uri(String uri) {
             this.uri = uri;
             return this;
         }
 
+        /**
+         * List of {@link CorrelationData}
+         */
         public Builder correlationData(List<CorrelationData> correlationData) {
             this.correlationData = new ArrayList<>();
             if (!CollectionUtil.isNullOrEmpty(correlationData)) {
@@ -124,6 +154,9 @@ public class GEInteract extends Telemetry {
             return this;
         }
 
+        /**
+         * Positional attributes. For ex: Drag and Drop has two positional attributes. One where the drag has started and the drop point
+         */
         public Builder positions(String x, String y, String z) {
             Map<String, String> posMap = new HashMap<>();
             posMap.put("x", x);
@@ -133,11 +166,17 @@ public class GEInteract extends Telemetry {
             return this;
         }
 
+        /**
+         * Game data {@link GameData}
+         */
         public Builder gameData(GameData gameData) {
             this.gameData = gameData;
             return this;
         }
 
+        /**
+         * ETags {@link ETags}
+         */
         public Builder eTags(ETags eTags) {
             this.eTags = eTags;
             return this;

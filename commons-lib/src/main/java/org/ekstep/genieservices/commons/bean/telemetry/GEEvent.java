@@ -26,16 +26,25 @@ public class GEEvent extends Telemetry {
             this.eid = eid;
         }
 
+        /**
+         * Game data
+         */
         public Builder gameData(GameData gameData) {
             this.gameData = gameData;
             return this;
         }
 
+        /**
+         * ETags {@link ETags}
+         */
         public Builder eTags(ETags eTags) {
             this.eTags = eTags;
             return this;
         }
 
+        /**
+         * Event Known Structure for the respective telemetry.
+         */
         public Builder eks(Map<String, Object> eks) {
             this.eks = eks;
             return this;

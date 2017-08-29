@@ -3,9 +3,12 @@ package org.ekstep.genieservices.commons.bean.telemetry;
 import java.util.List;
 
 /**
- * Created on 7/13/2017.
+ * "etags": {
+ * "app": [""], // Genie tags
+ * "partner": [""], // Partner tags
+ * "dims": [""] // dimension tags passed by respective channels
+ * }
  *
- * @author anil
  */
 public class ETags {
 
