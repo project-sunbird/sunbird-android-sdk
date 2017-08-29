@@ -34,6 +34,7 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
     public void setup() throws IOException {
         super.setup();
         GenieServiceDBHelper.clearTelemetryTableEntry();
+        GenieServiceDBHelper.clearPartnerDBEntry();
     }
 
     /**

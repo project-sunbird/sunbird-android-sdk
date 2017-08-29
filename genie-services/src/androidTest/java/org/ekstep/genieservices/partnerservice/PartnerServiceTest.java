@@ -8,6 +8,7 @@ import org.ekstep.genieservices.telemetry.model.EventModel;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +24,13 @@ public class PartnerServiceTest extends GenieServiceTestBase {
             " * TDX77o/eVTUjcErLLYKBQ6qb8t/jCCuRNexIexRBldk4gC9STyuVWN8x2xkSildf\n" +
             " * Nch3KUTvwgJx1n2y/03tIHkimOxEONCg3rWPdiWx7nLdW4TuHbwZTZmMdhLjM4lI\n" +
             " * OSyoyYpX/JmDnxjq4QIDAQAB";
+
+
+    @Override
+    public void setup() throws IOException {
+        super.setup();
+        GenieServiceDBHelper.clearPartnerDBEntry();
+    }
 
     /**
      * Scenario : To check the entire partner flow.
