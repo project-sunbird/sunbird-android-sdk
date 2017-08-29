@@ -77,7 +77,11 @@ public class ContentImportErrorHandlingTest extends GenieServiceTestBase {
         GenieResponse<List<ContentImportResponse>> response = activity.importEcar(ecarImportRequest.build());
 
         Assert.assertTrue(response.getStatus());
-        Assert.assertEquals("DRAFT_CONTENT_EXPIRED", response.getResult().get(0).getStatus().toString());
+        List<ContentImportResponse> contentImportResponseList = response.getResult();
+        Assert.assertEquals(1, contentImportResponseList.size());
+        ContentImportResponse contentImportResponse = contentImportResponseList.get(0);
+        Assert.assertEquals("org.ekstep.coloursofnaturehindi", contentImportResponse.getIdentifier());
+        Assert.assertEquals("CONTENT_EXPIRED", contentImportResponse.getStatus().toString());
     }
 
     @Test
@@ -101,11 +105,15 @@ public class ContentImportErrorHandlingTest extends GenieServiceTestBase {
                 .fromFilePath(FILEPATH).toFolder(activity.getExternalFilesDir(null).toString());
 
         GenieResponse<List<ContentImportResponse>> response = activity.importEcar(contentImportRequest.build());
-        Assert.assertTrue("true", response.getStatus());
+        Assert.assertTrue(response.getStatus());
 
         GenieResponse<List<ContentImportResponse>> genieResponse = activity.importEcar(contentImportRequest.build());
-        Assert.assertFalse("false", genieResponse.getStatus());
-        Assert.assertEquals("The ECAR file is imported already!!!", genieResponse.getErrorMessages().get(0));
+        Assert.assertTrue(genieResponse.getStatus());
+        List<ContentImportResponse> contentImportResponseList = genieResponse.getResult();
+        Assert.assertEquals(1, contentImportResponseList.size());
+        ContentImportResponse contentImportResponse = contentImportResponseList.get(0);
+        Assert.assertEquals("do_30013486", contentImportResponse.getIdentifier());
+        Assert.assertEquals("ALREADY_EXIST", contentImportResponse.getStatus().toString());
     }
 
     @Test
