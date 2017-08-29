@@ -26,11 +26,17 @@ public class ContentFeedbackFilterCriteria {
         private String uid;
         private String contentId;
 
+        /**
+         * User id for which you want to filter the feedback of a content.
+         */
         public Builder byUser(String uid) {
             this.uid = uid;
             return this;
         }
 
+        /**
+         * Content id for which you want to filter the feedback of a content.
+         */
         public Builder forContent(String contentId) {
             this.contentId = contentId;
             return this;

@@ -53,21 +53,35 @@ public class RelatedContentRequest {
             this.limit = DEFAULT_LIMIT;
         }
 
+        /**
+         * Content id for which you want the related content.
+         */
         public Builder forContent(String contentId) {
             this.contentId = contentId;
             return this;
         }
 
+        /**
+         * User id for whom you want the related content.
+         */
         public Builder byUser(String uid) {
             this.uid = uid;
             return this;
         }
 
+        /**
+         * Language id of the related content.
+         *
+         * ex: Hindi - hi, Kannada - kn & etc
+         */
         public Builder byLanguage(String language) {
             this.language = language;
             return this;
         }
 
+        /**
+         * Related contents results limit.
+         */
         public Builder limit(long limit) {
             this.limit = limit;
             return this;

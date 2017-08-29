@@ -149,16 +149,25 @@ public class ContentSearchCriteria implements Serializable {
             this.limit = DEFAULT_LIMIT;
         }
 
+        /**
+         * Query string.
+         */
         public SearchBuilder query(String query) {
             this.query = query;
             return this;
         }
 
+        /**
+         * Search results limit.
+         */
         public SearchBuilder limit(long limit) {
             this.limit = limit;
             return this;
         }
 
+        /**
+         * List of sort criteria {@link ContentSortCriteria}.
+         */
         public SearchBuilder sort(List<ContentSortCriteria> sortCriteria) {
             this.sortCriteria = sortCriteria;
             return this;
@@ -169,21 +178,33 @@ public class ContentSearchCriteria implements Serializable {
             return this;
         }
 
+        /**
+         * Age of the user.
+         */
         public SearchBuilder age(int age) {
             this.age = age;
             return this;
         }
 
+        /**
+         * Grade of the user.
+         */
         public SearchBuilder grade(int standard) {
             this.grade = standard;
             return this;
         }
 
+        /**
+         * Medium of the user.
+         */
         public SearchBuilder medium(String medium) {
             this.medium = medium;
             return this;
         }
 
+        /**
+         * Board of the user.
+         */
         public SearchBuilder board(String board) {
             this.board = board;
             return this;

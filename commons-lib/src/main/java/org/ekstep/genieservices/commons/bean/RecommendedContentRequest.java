@@ -39,11 +39,19 @@ public class RecommendedContentRequest {
             this.limit = DEFAULT_LIMIT;
         }
 
+        /**
+         * Language id of the recommended content.
+         *
+         * ex: Hindi - hi, Kannada - kn & etc
+         */
         public Builder byLanguage(String language) {
             this.language = language;
             return this;
         }
 
+        /**
+         * Recommended contents results limit.
+         */
         public Builder limit(long limit) {
             this.limit = limit;
             return this;

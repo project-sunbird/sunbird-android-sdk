@@ -3,8 +3,7 @@ package org.ekstep.genieservices.commons.bean;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
 /**
- * This class accepts contentId and isChildContent while building it, and is used when deleting a content and also deleting its child contents if needed.
- *
+ * This class accepts contentId and isChildContent while building it, and is used when deleting a content and set if it is a child content.
  */
 public class ContentDeleteRequest {
 
@@ -28,6 +27,9 @@ public class ContentDeleteRequest {
         private String contentId;
         private boolean isChildContent;
 
+        /**
+         * Content id which you want to delete
+         */
         public Builder contentId(String contentId) {
             if (StringUtil.isNullOrEmpty(contentId)) {
                 throw new IllegalArgumentException("Illegal contentId");
@@ -36,6 +38,9 @@ public class ContentDeleteRequest {
             return this;
         }
 
+        /**
+         * Call it only if the deleting content is a child content
+         */
         public Builder isChildContent() {
             this.isChildContent = true;
             return this;

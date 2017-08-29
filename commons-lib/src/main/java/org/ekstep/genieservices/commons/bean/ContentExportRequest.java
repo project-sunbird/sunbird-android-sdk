@@ -36,6 +36,9 @@ public class ContentExportRequest {
             return this;
         }
 
+        /**
+         * Absolute path of the destination folder.
+         */
         public Builder toFolder(String destinationFolder) {
             this.destinationFolder = destinationFolder;
             return this;

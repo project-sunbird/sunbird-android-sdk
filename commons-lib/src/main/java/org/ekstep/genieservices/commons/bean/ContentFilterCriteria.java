@@ -68,20 +68,23 @@ public class ContentFilterCriteria {
         }
 
         /**
-         * Pass true if want feedback, provided by given uid else false.
+         * Call it if you want feedback, provided by given uid.
          */
         public Builder withFeedback() {
             this.attachFeedback = true;
             return this;
         }
 
+        /**
+         * Array of audience. i.e. "Learner", "Instructor".
+         */
         public Builder audience(String[] audience) {
             this.audience = audience;
             return this;
         }
 
         /**
-         * Pass true if want content access by given uid else false.
+         * Call it if you want content access by given uid.
          */
         public Builder withContentAccess() {
             this.attachContentAccess = true;

@@ -5,7 +5,7 @@ import org.ekstep.genieservices.commons.bean.enums.SortOrder;
 import java.io.Serializable;
 
 /**
- * Sort criteria
+ * Sort criteria which uses sort attribute as String from [relevance, name, popularity, lastPublishedOn] and sort order will be ascending or descending.
  */
 public class ContentSortCriteria implements Serializable {
 

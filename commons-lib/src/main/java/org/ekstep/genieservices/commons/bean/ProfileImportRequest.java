@@ -22,7 +22,7 @@ public class ProfileImportRequest {
         private String sourceFilePath;
 
         /**
-         * Profile file path which needs to import
+         * Absolute path of profile file which needs to imported.
          */
         public Builder fromFilePath(String filePath) {
             if (StringUtil.isNullOrEmpty(filePath)) {

@@ -63,7 +63,7 @@ public class EcarImportRequest {
         }
 
         /**
-         * Destination folder where content will import.
+         * Absolute path of destination folder where content will import.
          */
         public Builder toFolder(String toFolder) {
             if (toFolder == null) {

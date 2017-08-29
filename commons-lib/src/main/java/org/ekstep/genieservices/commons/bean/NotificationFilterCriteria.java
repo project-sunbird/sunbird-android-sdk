@@ -20,6 +20,9 @@ public class NotificationFilterCriteria {
     public static class Builder {
         private NotificationStatus notificationStatus;
 
+        /**
+         * Notification status {@link NotificationStatus}.
+         */
         public Builder notificationStatus(NotificationStatus notificationStatus) {
             this.notificationStatus = notificationStatus;
             return this;

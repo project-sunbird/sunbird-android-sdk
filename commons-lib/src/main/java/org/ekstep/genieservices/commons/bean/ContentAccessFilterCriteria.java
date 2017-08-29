@@ -25,11 +25,17 @@ public class ContentAccessFilterCriteria {
         private String contentId;
         private String uid;
 
+        /**
+         * Content id for which you want to filter the content access
+         */
         public Builder forContent(String contentId) {
             this.contentId = contentId;
             return this;
         }
 
+        /**
+         * User id for which you want to filter the content access
+         */
         public Builder byUser(String uid) {
             this.uid = uid;
             return this;

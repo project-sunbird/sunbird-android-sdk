@@ -99,6 +99,9 @@ public class ContentListingCriteria {
         private String[] channel;
         private String[] facets;
 
+        /**
+         * Listing Id of the required content listing.
+         */
         public Builder listingId(String contentListingId) {
             if (StringUtil.isNullOrEmpty(contentListingId)) {
                 throw new IllegalArgumentException("listingId required.");
@@ -107,51 +110,83 @@ public class ContentListingCriteria {
             return this;
         }
 
+        /**
+         * User id of the required content listing.
+         */
         public Builder forUser(String uid) {
             this.uid = uid;
             return this;
         }
 
+        /**
+         * Language id of the required content listing.
+         *
+         * ex - Hindi - hi, Kannada - kn etc
+         */
         public Builder forLanguage(String language) {
             this.language = language;
             return this;
         }
 
+        /**
+         * Subject of the required content listing.
+         */
         public Builder subject(String subject) {
             this.subject = subject;
             return this;
         }
 
+        /**
+         * Age of the User for required content listing.
+         */
         public Builder age(int age) {
             this.age = age;
             return this;
         }
 
+        /**
+         * Grade of the User for required content listing.
+         */
         public Builder grade(int standard) {
             this.grade = standard;
             return this;
         }
 
+        /**
+         * Medium of the User for required content listing.
+         */
         public Builder medium(String medium) {
             this.medium = medium;
             return this;
         }
 
+        /**
+         * Board of the User for required content listing.
+         */
         public Builder board(String board) {
             this.board = board;
             return this;
         }
 
+        /**
+         * Device Id for required content listing.
+         */
         public Builder deviceId(String did) {
             this.did = did;
             return this;
         }
 
+        /**
+         * Array of audience. i.e. "Learner", "Instructor".
+         */
         public Builder audience(String[] audience) {
             this.audience = audience;
             return this;
         }
 
+        /**
+         * Array of channels. i.e, "APSSDC", "GPF"
+         */
         public Builder channel(String[] channel) {
             this.channel = channel;
             return this;

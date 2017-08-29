@@ -36,16 +36,25 @@ public class SummaryRequest {
         public Builder() {
         }
 
+        /**
+         * Content id for which you want the summary.
+         */
         public Builder contentId(String contentId) {
             this.contentId = contentId;
             return this;
         }
 
+        /**
+         * User id for whom you want the summary.
+         */
         public Builder uid(String uid) {
             this.uid = uid;
             return this;
         }
 
+        /**
+         * Hierarchy data of the content of which you want the summary.
+         */
         public Builder hierarchyData(String hierarchyData) {
             this.hierarchyData = hierarchyData;
             return this;

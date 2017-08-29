@@ -36,6 +36,9 @@ public class ProfileExportRequest {
             return this;
         }
 
+        /**
+         * Absolute path of destination folder where content will import.
+         */
         public Builder toFolder(String destinationFolder) {
             this.destinationFolder = destinationFolder;
             return this;
