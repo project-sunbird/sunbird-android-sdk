@@ -7,6 +7,7 @@ import junit.framework.Assert;
 
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -19,6 +20,7 @@ public class LanguageServiceTest extends GenieServiceTestBase {
     private final static String TAG = LanguageServiceTest.class.getSimpleName();
 
     @Test
+    @Ignore
     public void _1getLanguageTraversalRule() {
         GenieResponse<String> genieResponse = activity.getLanguageTraversalRule("en");
         Assert.assertTrue(genieResponse.getStatus());
@@ -27,6 +29,7 @@ public class LanguageServiceTest extends GenieServiceTestBase {
     }
 
     @Test
+    @Ignore
     public void _2getLanguageTraversalRule() {
         GenieResponse<String> genieResponse = activity.getLanguageTraversalRule("se");
         Assert.assertTrue(genieResponse.getStatus());
@@ -35,6 +38,7 @@ public class LanguageServiceTest extends GenieServiceTestBase {
     }
 
     @Test
+    @Ignore
     public void _3getLanguageTraversalRule() {
         //TODO : check what is the requestData to be passed to getLanguageSearch().
         GenieResponse<String> genieResponse = activity.getLanguageTraversalRule(null);
@@ -45,6 +49,7 @@ public class LanguageServiceTest extends GenieServiceTestBase {
 
     // what should be the search string.
     @Test
+    @Ignore
     public void _1getLanguageSearch() {
         GenieResponse<String> genieResponse = activity.getLanguageSearch("en");
 
@@ -53,6 +58,7 @@ public class LanguageServiceTest extends GenieServiceTestBase {
     }
 
     @Test
+    @Ignore
     public void _2getLanguageSearch() {
         GenieResponse<String> genieResponse = activity.getLanguageSearch(null);
         Assert.assertFalse(genieResponse.getStatus());
@@ -63,6 +69,7 @@ public class LanguageServiceTest extends GenieServiceTestBase {
     }
 
     @Test
+    @Ignore
     public void _3getLanguageSearch() {
         GenieResponse<String> genieResponse = activity.getLanguageSearch("");
 
