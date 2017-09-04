@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class Telemetry {
 
-    private static final String TELEMETRY_VERSION = "2.1";
+    private static final String TELEMETRY_VERSION = "2.2";
 
     /**
      * unique event ID.
@@ -32,7 +32,7 @@ public class Telemetry {
     private long ets;
 
     /**
-     * version of the event data structure, currently "2.1".
+     * version of the event data structure, currently "2.2".
      */
     private String ver;
 

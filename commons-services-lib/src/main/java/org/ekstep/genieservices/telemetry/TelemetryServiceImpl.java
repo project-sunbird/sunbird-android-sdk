@@ -140,11 +140,11 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         String version = readVersion(event);
         if (version.equals("1.0")) {
             updateTs(event, DateUtil.getCurrentTimestamp());
-        } else if (version.equals("2.0") || version.equals("2.1")) {
+        } else if (version.equals("2.0") || version.equals("2.1") || version.equals("2.2")) {
             updateEts(event, DateUtil.getEpochTime());
         }
 
-        if (version.equals("2.1")) {
+        if (version.equals("2.1") || version.equals("2.2")) {
             // Patch the channel
             addChannel(event);
 
