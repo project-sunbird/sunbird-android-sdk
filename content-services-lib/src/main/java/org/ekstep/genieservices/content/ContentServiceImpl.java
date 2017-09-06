@@ -38,6 +38,7 @@ import org.ekstep.genieservices.commons.bean.enums.ContentImportStatus;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -726,7 +727,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
     @Override
     public GenieResponse<ContentExportResponse> exportContent(ContentExportRequest contentExportRequest) {
-        if (contentExportRequest.getContentIds() == null && contentExportRequest.getContentIds().isEmpty()) {
+        if (CollectionUtil.isNullOrEmpty(contentExportRequest.getContentIds())) {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, ServiceConstants.ErrorMessage.NO_CONTENT_TO_EXPORT, TAG);
         }
 

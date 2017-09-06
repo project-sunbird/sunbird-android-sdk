@@ -1035,28 +1035,24 @@ public class ContentHandler {
             if (masterDataResponse.getStatus()) {
                 MasterData masterData = masterDataResponse.getResult();
 
-                if (masterData.getValues() != null) {
-                    for (MasterDataValues masterDataValues : masterData.getValues()) {
-                        if (propertyValue.equals(masterDataValues.getTelemetry())) {
-                            Map<String, Object> searchMap = masterDataValues.getSearch();
-                            if (searchMap != null && searchMap.containsKey("filters")) {
-                                Map filtersMap = (Map) searchMap.get("filters");
-                                if (filtersMap != null) {
-                                    Iterator it = filtersMap.entrySet().iterator();
-                                    while (it.hasNext()) {
-                                        Set values = new HashSet();
-                                        Map.Entry entry = (Map.Entry) it.next();
-                                        List filterMapValue = (List) filterMap.get(entry.getKey());
-                                        if (filterMapValue != null) {
-                                            values.addAll(filterMapValue);
-                                        }
-                                        values.addAll((List) filtersMap.get(entry.getKey()));
-                                        filterMap.put(entry.getKey().toString(), new ArrayList<>(values));
-                                    }
+                for (MasterDataValues masterDataValues : masterData.getValues()) {
+                    if (propertyValue.equals(masterDataValues.getTelemetry())) {
+                        Map<String, Object> searchMap = masterDataValues.getSearch();
+                        Map filtersMap = (Map) searchMap.get("filters");
+                        if (filtersMap != null) {
+                            Iterator it = filtersMap.entrySet().iterator();
+                            while (it.hasNext()) {
+                                Set values = new HashSet();
+                                Map.Entry entry = (Map.Entry) it.next();
+                                List filterMapValue = (List) filterMap.get(entry.getKey());
+                                if (filterMapValue != null) {
+                                    values.addAll(filterMapValue);
                                 }
+                                values.addAll((List) filtersMap.get(entry.getKey()));
+                                filterMap.put(entry.getKey().toString(), new ArrayList<>(values));
                             }
-                            break;
                         }
+                        break;
                     }
                 }
             }
