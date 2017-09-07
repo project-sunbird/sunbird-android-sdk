@@ -8,7 +8,7 @@
 
     <!--Location-->
     <!--Allows an app to access precise location.-->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!--<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />-->
     <!--Allows an app to access approximate location. The API returns a location with an accuracy approximately equivalent to a city block.-->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
