@@ -1,7 +1,7 @@
 package org.ekstep.genieservices.config.network;
 
-import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.network.BaseAPI;
 
 import java.util.Locale;
@@ -21,7 +21,7 @@ public class TermsAPI extends BaseAPI {
     public TermsAPI(AppContext appContext) {
         super(appContext,
                 String.format(Locale.US, "%s/%s",
-                        appContext.getParams().getString(ServiceConstants.Params.TERMS_BASE_URL),
+                        appContext.getParams().getString(IParams.Key.TERMS_BASE_URL),
                         ENDPOINT),
                 TAG);
     }

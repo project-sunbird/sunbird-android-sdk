@@ -1,7 +1,7 @@
 package org.ekstep.genieservices.auth.network;
 
-import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.network.BaseAPI;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -26,9 +26,9 @@ public class AuthAPI extends BaseAPI {
 
     public AuthAPI(AppContext appContext, String mobileDeviceConsumerKey, String mobileAppConsumerBearerToken) {
         super(appContext,
-                String.format(Locale.US, "%s/consumer/%s/%s", appContext.getParams().getString(ServiceConstants.Params.APIGATEWAY_BASE_URL),
-                        appContext.getParams().getString(ServiceConstants.Params.MOBILE_APP_CONSUMER), SERVICE_ENDPOINTS)
-                    , TAG);
+                String.format(Locale.US, "%s/consumer/%s/%s", appContext.getParams().getString(IParams.Key.APIGATEWAY_BASE_URL),
+                        appContext.getParams().getString(IParams.Key.MOBILE_APP_CONSUMER), SERVICE_ENDPOINTS)
+                , TAG);
         this.mobileDeviceConsumerKey = mobileDeviceConsumerKey;
         this.mobileAppConsumerBearerToken = mobileAppConsumerBearerToken;
     }

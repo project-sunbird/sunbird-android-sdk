@@ -1,7 +1,7 @@
 package org.ekstep.genieservices.content.network;
 
-import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.network.BaseAPI;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -26,7 +26,7 @@ public class ContentListingAPI extends BaseAPI {
 
     public ContentListingAPI(AppContext appContext, String pageIdentifier, Map<String, Object> requestMap) {
         super(appContext,
-                String.format(Locale.US, "%s/pageApi/assemble/%s", appContext.getParams().getString(ServiceConstants.Params.CONTENT_LISTING_BASE_URL), pageIdentifier),
+                String.format(Locale.US, "%s/pageApi/assemble/%s", appContext.getParams().getString(IParams.Key.CONTENT_LISTING_BASE_URL), pageIdentifier),
                 TAG);
 
         this.pageIdentifier = pageIdentifier;

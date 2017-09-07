@@ -6,6 +6,7 @@ import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.TelemetryExportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
@@ -234,7 +235,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
     }
 
     private void addChannel(Map<String, Object> event) {
-        event.put("channel", mAppContext.getParams().getString(ServiceConstants.Params.CHANNEL_ID));
+        event.put("channel", mAppContext.getParams().getString(IParams.Key.CHANNEL_ID));
     }
 
     private void addProducerData(Map<String, Object> event) {
@@ -246,12 +247,12 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
 
         if (!pdata.containsKey("id") ||
                 (pdata.containsKey("id") && StringUtil.isNullOrEmpty(String.valueOf(pdata.containsKey("id"))))) {
-            pdata.put("id", mAppContext.getParams().getString(ServiceConstants.Params.PRODUCER_ID));
+            pdata.put("id", mAppContext.getParams().getString(IParams.Key.PRODUCER_ID));
         }
 
         if (!pdata.containsKey("ver") ||
                 (pdata.containsKey("ver") && StringUtil.isNullOrEmpty(String.valueOf(pdata.containsKey("ver"))))) {
-            pdata.put("ver", mAppContext.getParams().getString(ServiceConstants.Params.VERSION_NAME));
+            pdata.put("ver", mAppContext.getParams().getString(IParams.Key.VERSION_NAME));
         }
     }
 
@@ -261,8 +262,8 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
             gdata = (Map<String, Object>) event.get("gdata");
         } else {
             gdata = new HashMap<>();
-            gdata.put("id", mAppContext.getParams().getString(ServiceConstants.Params.APPLICATION_ID));
-            gdata.put("ver", mAppContext.getParams().getString(ServiceConstants.Params.VERSION_NAME));
+            gdata.put("id", mAppContext.getParams().getString(IParams.Key.APPLICATION_ID));
+            gdata.put("ver", mAppContext.getParams().getString(IParams.Key.VERSION_NAME));
 
             event.put("gdata", gdata);
         }

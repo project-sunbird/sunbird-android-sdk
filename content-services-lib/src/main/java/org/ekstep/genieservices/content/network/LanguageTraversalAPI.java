@@ -1,7 +1,7 @@
 package org.ekstep.genieservices.content.network;
 
-import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.network.BaseAPI;
 
 import java.util.Locale;
@@ -20,7 +20,7 @@ public class LanguageTraversalAPI extends BaseAPI {
 
     public LanguageTraversalAPI(AppContext appContext, String languageId) {
         super(appContext,
-                String.format(Locale.US, "%s/%s/%s", appContext.getParams().getString(ServiceConstants.Params.LANGUAGE_PLATFORM_BASE_URL), ENDPOINT, languageId),
+                String.format(Locale.US, "%s/%s/%s", appContext.getParams().getString(IParams.Key.LANGUAGE_PLATFORM_BASE_URL), ENDPOINT, languageId),
                 TAG);
     }
 

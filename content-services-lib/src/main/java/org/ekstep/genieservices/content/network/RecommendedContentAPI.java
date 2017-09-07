@@ -1,7 +1,7 @@
 package org.ekstep.genieservices.content.network;
 
-import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.network.BaseAPI;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -28,7 +28,7 @@ public class RecommendedContentAPI extends BaseAPI {
 
     public RecommendedContentAPI(AppContext appContext, Map<String, Object> requestMap) {
         super(appContext,
-                String.format(Locale.US, "%s/%s", appContext.getParams().getString(ServiceConstants.Params.CONTENT_BASE_URL), ENDPOINT),
+                String.format(Locale.US, "%s/%s", appContext.getParams().getString(IParams.Key.CONTENT_BASE_URL), ENDPOINT),
                 TAG);
 
         this.requestMap = requestMap;

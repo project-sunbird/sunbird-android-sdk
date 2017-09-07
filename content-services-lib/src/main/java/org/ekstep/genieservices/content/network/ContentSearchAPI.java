@@ -1,7 +1,7 @@
 package org.ekstep.genieservices.content.network;
 
-import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.network.BaseAPI;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
@@ -25,7 +25,7 @@ public class ContentSearchAPI extends BaseAPI {
     public ContentSearchAPI(AppContext appContext, Map<String, Object> requestMap) {
         super(appContext,
                 String.format(Locale.US, "%s/%s",
-                        appContext.getParams().getString(ServiceConstants.Params.SEARCH_BASE_URL),
+                        appContext.getParams().getString(IParams.Key.SEARCH_BASE_URL),
                         ENDPOINT),
                 TAG);
 

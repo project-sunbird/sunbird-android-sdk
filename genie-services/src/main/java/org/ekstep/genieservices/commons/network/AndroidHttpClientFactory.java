@@ -1,7 +1,7 @@
 package org.ekstep.genieservices.commons.network;
 
-import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AndroidAppContext;
+import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.network.auth.DefaultAuthenticator;
 
 import java.util.concurrent.TimeUnit;
@@ -19,8 +19,8 @@ public class AndroidHttpClientFactory implements IHttpClientFactory {
     public AndroidHttpClientFactory(AndroidAppContext appContext) {
         this.mAppContext = appContext;
 
-        int readTimeout = appContext.getParams().getInt(ServiceConstants.Params.NETWORK_READ_TIMEOUT);
-        int connectTimeout = appContext.getParams().getInt(ServiceConstants.Params.NETWORK_CONNECT_TIMEOUT);
+        int readTimeout = appContext.getParams().getInt(IParams.Key.NETWORK_READ_TIMEOUT);
+        int connectTimeout = appContext.getParams().getInt(IParams.Key.NETWORK_CONNECT_TIMEOUT);
 
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder.readTimeout(readTimeout, TimeUnit.SECONDS);

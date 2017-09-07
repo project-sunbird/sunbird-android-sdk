@@ -6,8 +6,8 @@ import com.google.gson.reflect.TypeToken;
 import org.ekstep.genieservices.IConfigService;
 import org.ekstep.genieservices.IContentFeedbackService;
 import org.ekstep.genieservices.IUserService;
-import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
@@ -685,8 +685,8 @@ public class ContentHandler {
      * @return true if compatible else false.
      */
     public static boolean isCompatible(AppContext appContext, Double compatibilityLevel) {
-        return (compatibilityLevel >= appContext.getParams().getInt(ServiceConstants.Params.MIN_COMPATIBILITY_LEVEL))
-                && (compatibilityLevel <= appContext.getParams().getInt(ServiceConstants.Params.MAX_COMPATIBILITY_LEVEL));
+        return (compatibilityLevel >= appContext.getParams().getInt(IParams.Key.MIN_COMPATIBILITY_LEVEL))
+                && (compatibilityLevel <= appContext.getParams().getInt(IParams.Key.MAX_COMPATIBILITY_LEVEL));
     }
 
     public static boolean isImportFileExist(ContentModel oldContentModel, Map newContentData) {
@@ -1011,8 +1011,8 @@ public class ContentHandler {
 
     private static Map<String, Integer> getCompatibilityLevelFilter(AppContext appContext) {
         Map<String, Integer> compatibilityLevelMap = new HashMap<>();
-        compatibilityLevelMap.put("min", appContext.getParams().getInt(ServiceConstants.Params.MIN_COMPATIBILITY_LEVEL));
-        compatibilityLevelMap.put("max", appContext.getParams().getInt(ServiceConstants.Params.MAX_COMPATIBILITY_LEVEL));
+        compatibilityLevelMap.put("min", appContext.getParams().getInt(IParams.Key.MIN_COMPATIBILITY_LEVEL));
+        compatibilityLevelMap.put("max", appContext.getParams().getInt(IParams.Key.MAX_COMPATIBILITY_LEVEL));
         return compatibilityLevelMap;
     }
 
