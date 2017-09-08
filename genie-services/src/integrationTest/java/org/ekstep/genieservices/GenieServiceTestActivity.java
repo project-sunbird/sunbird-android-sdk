@@ -8,6 +8,8 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
+import org.ekstep.genieservices.commons.bean.ContentAccess;
+import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentExportRequest;
@@ -23,6 +25,8 @@ import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
+import org.ekstep.genieservices.commons.bean.LearnerAssessmentDetails;
+import org.ekstep.genieservices.commons.bean.LearnerAssessmentSummary;
 import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.PartnerData;
 import org.ekstep.genieservices.commons.bean.Profile;
@@ -34,6 +38,7 @@ import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
+import org.ekstep.genieservices.commons.bean.SummaryRequest;
 import org.ekstep.genieservices.commons.bean.SyncStat;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
@@ -156,8 +161,13 @@ public class GenieServiceTestActivity extends Activity {
         GenieService.getAsyncService().getUserService().importProfile(profileImportRequest, responseHandler);
     }
 
-    public void exportProfile(final ProfileExportRequest profileExportRequest, IResponseHandler<ProfileExportResponse> responseHandler) {
-        GenieService.getAsyncService().getUserService().exportProfile(profileExportRequest, responseHandler);
+    public GenieResponse<ProfileImportResponse> importProfile(final ProfileImportRequest profileImportRequest) {
+        return mGenieService.getUserService().importProfile(profileImportRequest);
+    }
+
+
+    public GenieResponse<ProfileExportResponse> exportProfile(final ProfileExportRequest profileExportRequest) {
+        return mGenieService.getUserService().exportProfile(profileExportRequest);
     }
 
     public GenieResponse saveTelemetry(Telemetry event) {
@@ -334,6 +344,29 @@ public class GenieServiceTestActivity extends Activity {
         idle = false;
         GenieResponse<String> genieResponse = mGenieService.getLanguageService().getLanguageSearch(requestData);
         return genieResponse;
+    }
+
+    public GenieResponse addContentAccess(ContentAccess contentAccess) {
+        idle = false;
+        GenieResponse<Void> genieResponse = mGenieService.getUserService().addContentAccess(contentAccess);
+        return genieResponse;
+    }
+
+
+    public GenieResponse getAllContentAccess(ContentAccessFilterCriteria filterCriteria) {
+        idle = false;
+        GenieResponse<List<ContentAccess>> genieResponse = mGenieService.getUserService().getAllContentAccess(filterCriteria);
+        return genieResponse;
+    }
+
+    public GenieResponse<List<LearnerAssessmentSummary>> getSummary(SummaryRequest summaryRequest) {
+        idle = false;
+        return mGenieService.getSummarizerService().getSummary(summaryRequest);
+    }
+
+    public GenieResponse<List<LearnerAssessmentDetails>> getLearnerAssessmentDetails(SummaryRequest summaryRequest) {
+        idle = false;
+        return mGenieService.getSummarizerService().getLearnerAssessmentDetails(summaryRequest);
     }
 
     public void setIdle() {

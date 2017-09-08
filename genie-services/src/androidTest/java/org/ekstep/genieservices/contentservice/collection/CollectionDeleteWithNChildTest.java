@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.contentservice.collectiontest;
+package org.ekstep.genieservices.contentservice.collection;
 
 import android.os.Environment;
 import android.support.test.runner.AndroidJUnit4;
@@ -38,7 +38,7 @@ public class CollectionDeleteWithNChildTest extends GenieServiceTestBase {
         super.setup();
         activity = rule.getActivity();
         EcarCopyUtil.createFileFromAsset(activity.getApplicationContext(), COLLECTION_ASSET_PATH, DESTINATION);
-        GenieServiceDBHelper.clearEcarEntryFromDB();
+        GenieServiceDBHelper.clearContentEntryFromDB();
     }
 
     @After
