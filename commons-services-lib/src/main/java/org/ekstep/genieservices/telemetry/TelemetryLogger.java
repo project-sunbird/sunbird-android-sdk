@@ -3,6 +3,7 @@ package org.ekstep.genieservices.telemetry;
 import org.ekstep.genieservices.ITelemetryService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.telemetry.GEServiceAPICall;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
@@ -41,7 +42,7 @@ public class TelemetryLogger {
     }
 
     public static void logSuccess(AppContext appContext, GenieResponse response, String service, String method, Map<String, Object> params) {
-        appLoggingLevel = appContext.getParams().getInt(ServiceConstants.Params.LOG_LEVEL);
+        appLoggingLevel = appContext.getParams().getInt(IParams.Key.LOG_LEVEL);
         int parsedLogLevel = 3;
         if (params != null & params.get("logLevel") != null) {
             try {

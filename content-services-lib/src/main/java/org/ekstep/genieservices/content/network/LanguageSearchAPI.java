@@ -1,7 +1,7 @@
 package org.ekstep.genieservices.content.network;
 
-import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.network.BaseAPI;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
@@ -24,7 +24,7 @@ public class LanguageSearchAPI extends BaseAPI {
 
     public LanguageSearchAPI(AppContext appContext, String requestData) {
         super(appContext,
-                String.format(Locale.US, "%s/%s", appContext.getParams().getString(ServiceConstants.Params.LANGUAGE_PLATFORM_BASE_URL), ENDPOINT),
+                String.format(Locale.US, "%s/%s", appContext.getParams().getString(IParams.Key.LANGUAGE_PLATFORM_BASE_URL), ENDPOINT),
                 TAG);
 
         this.requestData = requestData;

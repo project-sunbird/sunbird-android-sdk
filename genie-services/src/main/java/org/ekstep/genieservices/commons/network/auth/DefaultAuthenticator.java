@@ -1,7 +1,7 @@
 package org.ekstep.genieservices.commons.network.auth;
 
-import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.network.IHttpAuthenticator;
 import org.ekstep.genieservices.commons.network.NetworkConstants;
 import org.ekstep.genieservices.commons.utils.StringUtil;
@@ -26,7 +26,7 @@ public class DefaultAuthenticator implements IHttpAuthenticator {
 
     @Override
     public Map<String, String> getAuthHeaders() {
-        String mobileAppKey = mAppContext.getParams().getString(ServiceConstants.Params.MOBILE_APP_KEY);
+        String mobileAppKey = mAppContext.getParams().getString(IParams.Key.MOBILE_APP_KEY);
         if (!StringUtil.isNullOrEmpty(mobileAppKey)) {
             return getApiGatewayHeaders();
         } else {
@@ -36,8 +36,8 @@ public class DefaultAuthenticator implements IHttpAuthenticator {
 
     private Map<String, String> getBasicAuthHeaders() {
         Map<String, String> authHeaders = new HashMap<>();
-        String user = mAppContext.getParams().getString(ServiceConstants.Params.API_USER);
-        String pass = mAppContext.getParams().getString(ServiceConstants.Params.API_PASS);
+        String user = mAppContext.getParams().getString(IParams.Key.API_USER);
+        String pass = mAppContext.getParams().getString(IParams.Key.API_PASS);
         String credentials = Credentials.basic(user, pass);
         authHeaders.put("Authorization", credentials);
         return authHeaders;

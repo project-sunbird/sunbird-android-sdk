@@ -1,7 +1,7 @@
 package org.ekstep.genieservices.content.network;
 
-import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.network.BaseAPI;
 
 import java.util.Locale;
@@ -21,7 +21,7 @@ public class ContentDetailsAPI extends BaseAPI {
     public ContentDetailsAPI(AppContext appContext, String contentId) {
         super(appContext,
                 String.format(Locale.US, "%s/%s/%s",
-                        appContext.getParams().getString(ServiceConstants.Params.CONTENT_BASE_URL), SERVICE_ENDPOINTS,
+                        appContext.getParams().getString(IParams.Key.CONTENT_BASE_URL), SERVICE_ENDPOINTS,
                         contentId),
                 TAG);
     }

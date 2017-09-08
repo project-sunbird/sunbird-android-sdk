@@ -41,26 +41,26 @@ public class BuildParams implements IParams {
             throw new IllegalArgumentException("packageName is mandatory, can not be null or empty.");
         }
 
-        put(ServiceConstants.Params.VERSION_NAME, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.VERSION_NAME));
-        put(ServiceConstants.Params.APPLICATION_ID, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.APPLICATION_ID));
-        put(ServiceConstants.Params.PRODUCER_ID, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.PRODUCER_ID));
-        put(ServiceConstants.Params.CHANNEL_ID, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.CHANNEL_ID));
-        put(ServiceConstants.Params.APP_QUALIFIER, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.APP_QUALIFIER));
+        put(Key.VERSION_NAME, BuildConfigUtil.getBuildConfigValue(packageName, Key.VERSION_NAME));
+        put(Key.APPLICATION_ID, BuildConfigUtil.getBuildConfigValue(packageName, Key.APPLICATION_ID));
+        put(Key.PRODUCER_ID, BuildConfigUtil.getBuildConfigValue(packageName, Key.PRODUCER_ID));
+        put(Key.CHANNEL_ID, BuildConfigUtil.getBuildConfigValue(packageName, Key.CHANNEL_ID));
+        put(Key.APP_QUALIFIER, BuildConfigUtil.getBuildConfigValue(packageName, Key.APP_QUALIFIER));
         put(ServiceConstants.Params.PLAYER_CONFIG, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.PLAYER_CONFIG));
-        put(ServiceConstants.Params.TELEMETRY_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.TELEMETRY_BASE_URL));
-        put(ServiceConstants.Params.LANGUAGE_PLATFORM_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.LANGUAGE_PLATFORM_BASE_URL));
-        put(ServiceConstants.Params.TERMS_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.TERMS_BASE_URL));
-        put(ServiceConstants.Params.CONFIG_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.CONFIG_BASE_URL));
-        put(ServiceConstants.Params.SEARCH_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.SEARCH_BASE_URL));
-        put(ServiceConstants.Params.CONTENT_LISTING_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.CONTENT_LISTING_BASE_URL));
-        put(ServiceConstants.Params.CONTENT_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.CONTENT_BASE_URL));
-        put(ServiceConstants.Params.APIGATEWAY_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.APIGATEWAY_BASE_URL));
-        put(ServiceConstants.Params.API_USER, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.API_USER));
-        put(ServiceConstants.Params.API_PASS, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.API_PASS));
-        put(ServiceConstants.Params.MOBILE_APP_SECRET, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.MOBILE_APP_SECRET));
-        put(ServiceConstants.Params.MOBILE_APP_KEY, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.MOBILE_APP_KEY));
-        put(ServiceConstants.Params.MOBILE_APP_CONSUMER, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.MOBILE_APP_CONSUMER));
-        put(ServiceConstants.Params.LOG_LEVEL, LogLevel.getLogLevel(BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.LOG_LEVEL)).getLevel());
+        put(Key.TELEMETRY_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, Key.TELEMETRY_BASE_URL));
+        put(Key.LANGUAGE_PLATFORM_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, Key.LANGUAGE_PLATFORM_BASE_URL));
+        put(Key.TERMS_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, Key.TERMS_BASE_URL));
+        put(Key.CONFIG_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, Key.CONFIG_BASE_URL));
+        put(Key.SEARCH_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, Key.SEARCH_BASE_URL));
+        put(Key.CONTENT_LISTING_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, Key.CONTENT_LISTING_BASE_URL));
+        put(Key.CONTENT_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, Key.CONTENT_BASE_URL));
+        put(Key.APIGATEWAY_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, Key.APIGATEWAY_BASE_URL));
+        put(Key.API_USER, BuildConfigUtil.getBuildConfigValue(packageName, Key.API_USER));
+        put(Key.API_PASS, BuildConfigUtil.getBuildConfigValue(packageName, Key.API_PASS));
+        put(Key.MOBILE_APP_SECRET, BuildConfigUtil.getBuildConfigValue(packageName, Key.MOBILE_APP_SECRET));
+        put(Key.MOBILE_APP_KEY, BuildConfigUtil.getBuildConfigValue(packageName, Key.MOBILE_APP_KEY));
+        put(Key.MOBILE_APP_CONSUMER, BuildConfigUtil.getBuildConfigValue(packageName, Key.MOBILE_APP_CONSUMER));
+        put(Key.LOG_LEVEL, LogLevel.getLogLevel(BuildConfigUtil.getBuildConfigValue(packageName, Key.LOG_LEVEL)).getLevel());
 
         initCompatibilityLevel(packageName);
 
@@ -71,13 +71,13 @@ public class BuildParams implements IParams {
             Class<?> classInstance = ReflectionUtil.getClass(profileConfigClass);
             if (classInstance != null) {
                 IProfileConfig profileConfiguration = (IProfileConfig) ReflectionUtil.getInstance(classInstance);
-                put(ServiceConstants.Params.PROFILE_PATH, profileConfiguration.getProfilePath(context));
+                put(Key.PROFILE_PATH, profileConfiguration.getProfilePath(context));
             }
         }
     }
 
     private void initCompatibilityLevel(String packageName) {
-        Object min = BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.MIN_COMPATIBILITY_LEVEL);
+        Object min = BuildConfigUtil.getBuildConfigValue(packageName, Key.MIN_COMPATIBILITY_LEVEL);
         int minCompatibilityLevel = 0;
         if (min != null) {
             minCompatibilityLevel = (int) min;
@@ -86,7 +86,7 @@ public class BuildParams implements IParams {
             minCompatibilityLevel = CONTENT_MIN_COMPATIBILITY_LEVEL;
         }
 
-        Object max = BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.MAX_COMPATIBILITY_LEVEL);
+        Object max = BuildConfigUtil.getBuildConfigValue(packageName, Key.MAX_COMPATIBILITY_LEVEL);
         int maxCompatibilityLevel = 0;
         if (max != null) {
             maxCompatibilityLevel = (int) max;
@@ -99,12 +99,12 @@ public class BuildParams implements IParams {
             throw new IllegalStateException("MAX_COMPATIBILITY_LEVEL should not be less than MIN_COMPATIBILITY_LEVEL.");
         }
 
-        put(ServiceConstants.Params.MIN_COMPATIBILITY_LEVEL, minCompatibilityLevel);
-        put(ServiceConstants.Params.MAX_COMPATIBILITY_LEVEL, maxCompatibilityLevel);
+        put(Key.MIN_COMPATIBILITY_LEVEL, minCompatibilityLevel);
+        put(Key.MAX_COMPATIBILITY_LEVEL, maxCompatibilityLevel);
     }
 
     private void initNetworkParam(String packageName) {
-        Object connectTimeoutObj = BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.NETWORK_CONNECT_TIMEOUT);
+        Object connectTimeoutObj = BuildConfigUtil.getBuildConfigValue(packageName, Key.NETWORK_CONNECT_TIMEOUT);
         int connectTimeout = 0;
         if (connectTimeoutObj != null) {
             connectTimeout = (int) connectTimeoutObj;
@@ -113,7 +113,7 @@ public class BuildParams implements IParams {
             connectTimeout = NETWORK_CONNECT_TIMEOUT;
         }
 
-        Object readTimeoutObj = BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.NETWORK_READ_TIMEOUT);
+        Object readTimeoutObj = BuildConfigUtil.getBuildConfigValue(packageName, Key.NETWORK_READ_TIMEOUT);
         int readTimeout = 0;
         if (readTimeoutObj != null) {
             readTimeout = (int) readTimeoutObj;
@@ -122,8 +122,8 @@ public class BuildParams implements IParams {
             readTimeout = NETWORK_READ_TIMEOUT;
         }
 
-        put(ServiceConstants.Params.NETWORK_CONNECT_TIMEOUT, connectTimeout);
-        put(ServiceConstants.Params.NETWORK_READ_TIMEOUT, readTimeout);
+        put(Key.NETWORK_CONNECT_TIMEOUT, connectTimeout);
+        put(Key.NETWORK_READ_TIMEOUT, readTimeout);
     }
 
     @Override

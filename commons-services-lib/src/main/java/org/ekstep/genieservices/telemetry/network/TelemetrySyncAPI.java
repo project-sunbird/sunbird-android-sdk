@@ -1,7 +1,7 @@
 package org.ekstep.genieservices.telemetry.network;
 
-import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.network.BaseAPI;
 
 import java.util.HashMap;
@@ -22,7 +22,7 @@ public class TelemetrySyncAPI extends BaseAPI {
 
     public TelemetrySyncAPI(AppContext appContext, byte[] data) {
         super(appContext,
-                String.format(Locale.US, "%s/%s", appContext.getParams().getString(ServiceConstants.Params.TELEMETRY_BASE_URL), ENDPOINTS),
+                String.format(Locale.US, "%s/%s", appContext.getParams().getString(IParams.Key.TELEMETRY_BASE_URL), ENDPOINTS),
                 TAG);
         mData = data;
     }

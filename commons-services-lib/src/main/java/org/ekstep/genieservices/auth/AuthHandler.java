@@ -1,8 +1,8 @@
 package org.ekstep.genieservices.auth;
 
-import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.auth.network.AuthAPI;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.enums.JWTokenType;
 import org.ekstep.genieservices.commons.network.NetworkConstants;
@@ -24,8 +24,8 @@ public class AuthHandler {
     }
 
     private static String generateMobileDeviceConsumerBearerToken(AppContext appContext) {
-        String mobileAppConsumerKey = appContext.getParams().getString(ServiceConstants.Params.MOBILE_APP_KEY);
-        String mobileAppConsumerSecret = appContext.getParams().getString(ServiceConstants.Params.MOBILE_APP_SECRET);
+        String mobileAppConsumerKey = appContext.getParams().getString(IParams.Key.MOBILE_APP_KEY);
+        String mobileAppConsumerSecret = appContext.getParams().getString(IParams.Key.MOBILE_APP_SECRET);
         String mobileDeviceConsumerKey = appContext.getDeviceInfo().getDeviceID();
         String mobileDeviceConsumerSecret = getMobileDeviceConsumerSecret(appContext, mobileDeviceConsumerKey, mobileAppConsumerKey, mobileAppConsumerSecret);
         String mobileDeviceConsumerBearerToken = null;
