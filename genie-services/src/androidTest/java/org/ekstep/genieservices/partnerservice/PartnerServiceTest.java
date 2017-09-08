@@ -25,7 +25,6 @@ public class PartnerServiceTest extends GenieServiceTestBase {
             " * Nch3KUTvwgJx1n2y/03tIHkimOxEONCg3rWPdiWx7nLdW4TuHbwZTZmMdhLjM4lI\n" +
             " * OSyoyYpX/JmDnxjq4QIDAQAB";
 
-
     @Override
     public void setup() throws IOException {
         super.setup();
@@ -45,7 +44,7 @@ public class PartnerServiceTest extends GenieServiceTestBase {
      * Then : Check if telemetry event is logged in for every event.
      */
     @Test
-    public void shouldTestEntirePartnerFlow() {
+    public void _10shouldTestEntirePartnerFlow() {
 
         PartnerData partnerData = new PartnerData("org.ekstep.partner", "1.6", PARTNER_ID, PARTNER_DATA, PUBLIC_KEY);
 
@@ -75,5 +74,107 @@ public class PartnerServiceTest extends GenieServiceTestBase {
         Map eventMap = eventModelList.get(0).getEventMap();
         Assert.assertEquals(telemetryEvent, eventMap.get("eid"));
         Assert.assertEquals("2.1", eventMap.get("ver"));
+    }
+
+    /**
+     * Scenario: Validate register partner when the partner id is null in the partner data.
+     */
+    @Test
+    public void _11shouldValidateForRegisterPartnerForNullPartnerId() {
+
+        PartnerData partnerData = new PartnerData("org.ekstep.partner", "1.6", null, PARTNER_DATA, PUBLIC_KEY);
+        GenieResponse registerPartnerResponse = activity.registerPartner(partnerData);
+        Assert.assertFalse(registerPartnerResponse.getStatus());
+        Assert.assertEquals("MISSING_PARTNER_ID", registerPartnerResponse.getErrorMessages().get(0));
+    }
+
+    /**
+     * Scenario: Validate register partner when the public key is null in the partner data.
+     */
+    @Test
+    public void _12shouldValidateForRegisterPartnerForNullPublicKey() {
+        PartnerData partnerData = new PartnerData("org.ekstep.partner", "1.6", PARTNER_ID, PARTNER_DATA, null);
+        GenieResponse registerPartnerResponse = activity.registerPartner(partnerData);
+        Assert.assertFalse(registerPartnerResponse.getStatus());
+        Assert.assertEquals("MISSING_PUBLIC_KEY", registerPartnerResponse.getErrorMessages().get(0));
+    }
+
+    /**
+     * Scenario: Validation when registering partner twice with the same partner data.
+     */
+    @Test
+    public void _13shouldValidateForPartnerDataInRegistration() {
+
+        PartnerData partnerData = new PartnerData("org.ekstep.partner", "1.6", PARTNER_ID, PARTNER_DATA, PUBLIC_KEY);
+
+        GenieResponse registerPartnerResponse = activity.registerPartner(partnerData);
+        Assert.assertTrue(registerPartnerResponse.getStatus());
+
+        GenieResponse registerResponse = activity.registerPartner(partnerData);
+        Assert.assertTrue(registerResponse.getStatus());
+    }
+
+    /**
+     * Scenario: Trying to start the partner session without registering the partner.
+     */
+    @Test
+    public void _14shouldCheckStartPartnerSessionForUnregisteredPartner() {
+
+        PartnerData partnerData = new PartnerData("org.ekstep.partner", "1.6", PARTNER_ID, PARTNER_DATA, PUBLIC_KEY);
+
+        GenieResponse startPartnerSession = activity.startPartnerSession(partnerData);
+        Assert.assertFalse(startPartnerSession.getStatus());
+        Assert.assertEquals("UNREGISTERED_PARTNER", startPartnerSession.getError());
+        Assert.assertEquals("- Session start failed! Partner: org.sample", startPartnerSession.getErrorMessages().get(0));
+    }
+
+    /**
+     * Scenario: Trying to send partner data without registering the partner.
+     */
+    @Test
+    public void _15shouldCheckSendDataForUnregisteredPartner() {
+
+        PartnerData partnerData = new PartnerData("org.ekstep.partner", "1.6", PARTNER_ID, PARTNER_DATA, PUBLIC_KEY);
+
+        GenieResponse sendDataResponse = activity.sendData(partnerData);
+        Assert.assertFalse(sendDataResponse.getStatus());
+        Assert.assertEquals("UNREGISTERED_PARTNER", sendDataResponse.getError());
+        Assert.assertEquals("- Sending data failed! Partner: org.sample", sendDataResponse.getErrorMessages().get(0));
+    }
+
+    /**
+     * Scenario: Validate for start partner session when the partner is not registered.
+     */
+    @Test
+    public void _16shouldCheckStartPartnerSessionForUnregisteredPartner() {
+        PartnerData partnerData = new PartnerData("org.ekstep.partner", "1.6", PARTNER_ID, PARTNER_DATA, PUBLIC_KEY);
+
+        GenieResponse startPartnerSession = activity.startPartnerSession(partnerData);
+        Assert.assertFalse(startPartnerSession.getStatus());
+        Assert.assertEquals("UNREGISTERED_PARTNER", startPartnerSession.getError());
+        Assert.assertEquals("- Session start failed! Partner: org.sample", startPartnerSession.getErrorMessages().get(0));
+    }
+
+    /**
+     * Scenario: Validate for the terminate partner session when the partner is not registered.
+     */
+    @Test
+    public void _17shouldCheckTerminatePartnerSessionForUnregisteredPartner() {
+        PartnerData partnerData = new PartnerData("org.ekstep.partner", "1.6", PARTNER_ID, PARTNER_DATA, PUBLIC_KEY);
+
+        GenieResponse terminatePartnerSession = activity.terminatePartnerSession(partnerData);
+        Assert.assertFalse(terminatePartnerSession.getStatus());
+        Assert.assertEquals("UNREGISTERED_PARTNER", terminatePartnerSession.getError());
+        Assert.assertEquals("- Session termination failed! Partner: org.sample", terminatePartnerSession.getErrorMessages().get(0));
+    }
+
+    /**
+     * To check if the partner is registered for an unregistered partner.
+     */
+    @Test
+    public void _18shouldCheckIfPartnerIsRegistered() {
+        GenieResponse isRegisteredResponse = activity.isPartnerRegistered("org.test");
+        Assert.assertTrue(isRegisteredResponse.getStatus());
+        Assert.assertEquals(false, isRegisteredResponse.getResult());
     }
 }
