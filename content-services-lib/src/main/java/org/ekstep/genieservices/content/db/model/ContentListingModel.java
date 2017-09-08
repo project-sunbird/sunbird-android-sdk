@@ -53,12 +53,6 @@ public class ContentListingModel implements IWritable, IUpdatable, IReadable, IC
         this.audienceStr = listingCriteria.getAudience() != null ? StringUtil.join(",", getSortedList(listingCriteria.getAudience())) : "";
     }
 
-    private List<String> getSortedList(String input[]) {
-        List<String> list = Arrays.asList(input);
-        Collections.sort(list);
-        return list;
-    }
-
     private ContentListingModel(IDBSession dbSession, ContentListingCriteria listingCriteria, String json, long expiryTime) {
         this(dbSession, listingCriteria);
         this.mJson = json;
@@ -78,6 +72,12 @@ public class ContentListingModel implements IWritable, IUpdatable, IReadable, IC
         } else {
             return contentListingModel;
         }
+    }
+
+    private List<String> getSortedList(String input[]) {
+        List<String> list = Arrays.asList(input);
+        Collections.sort(list);
+        return list;
     }
 
     public void save() {
@@ -144,6 +144,7 @@ public class ContentListingModel implements IWritable, IUpdatable, IReadable, IC
     public ContentValues getFieldsToUpdate() {
         ContentValues contentValues = new ContentValues();
         contentValues.put(PageEntry.COLUMN_NAME_PAGE_JSON, mJson);
+        contentValues.put(PageEntry.COLUMN_EXPIRY_TIME, mExpiryTime);
         return contentValues;
     }
 
