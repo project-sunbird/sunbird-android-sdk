@@ -27,6 +27,7 @@ import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
+import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -522,7 +523,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
     @Override
     public GenieResponse<ProfileExportResponse> exportProfile(ProfileExportRequest profileExportRequest) {
-        if (profileExportRequest.getUserIds() == null || profileExportRequest.getUserIds().size() == 0) {
+        if (CollectionUtil.isNullOrEmpty(profileExportRequest.getUserIds())) {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "There are no profile to export.", TAG);
         }
 
