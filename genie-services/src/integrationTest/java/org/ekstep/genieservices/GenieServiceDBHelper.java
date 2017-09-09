@@ -19,6 +19,7 @@ import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.profile.db.model.ContentAccessModel;
 import org.ekstep.genieservices.profile.db.model.LearnerSummaryModel;
 import org.ekstep.genieservices.telemetry.model.EventModel;
+import org.ekstep.genieservices.telemetry.model.ProcessedEventModel;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -59,6 +60,34 @@ public class GenieServiceDBHelper {
         if (cursor != null && cursor.moveToFirst())
             do {
                 EventModel eventModel = EventModel.build(sGSDBHelper.mAppContext.getDBSession());
+                eventModel.readWithoutMoving(new SQLiteResultSet(cursor));
+                events.add(eventModel);
+            } while (cursor.moveToNext());
+        cursor.close();
+
+        return events;
+    }
+
+    public static List<EventModel> findAllEvents() {
+        Cursor cursor = GenieServiceDBHelper.getDatabase().rawQuery("SELECT * FROM telemetry", null);
+        List<EventModel> events = new ArrayList<>();
+        if (cursor != null && cursor.moveToFirst())
+            do {
+                EventModel eventModel = EventModel.build(sGSDBHelper.mAppContext.getDBSession());
+                eventModel.readWithoutMoving(new SQLiteResultSet(cursor));
+                events.add(eventModel);
+            } while (cursor.moveToNext());
+        cursor.close();
+
+        return events;
+    }
+
+    public static List<ProcessedEventModel> findProcessedEvents() {
+        Cursor cursor = GenieServiceDBHelper.getDatabase().rawQuery("SELECT * FROM processed_telemetry", null);
+        List<ProcessedEventModel> events = new ArrayList<>();
+        if (cursor != null && cursor.moveToFirst())
+            do {
+                ProcessedEventModel eventModel = ProcessedEventModel.build(sGSDBHelper.mAppContext.getDBSession());
                 eventModel.readWithoutMoving(new SQLiteResultSet(cursor));
                 events.add(eventModel);
             } while (cursor.moveToNext());

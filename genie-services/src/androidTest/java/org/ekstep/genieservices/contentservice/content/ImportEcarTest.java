@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,16 +36,14 @@ import java.util.List;
 @RunWith(AndroidJUnit4.class)
 public class ImportEcarTest extends GenieServiceTestBase {
 
+    private static final String VISIBILITY_DEFAULT = "default";
     private final String CONTENT_ID = "do_30013486";
     private final String CONTENT_ID_WITH_CHILD = "do_30019820";
     private final String UNSUPPORTED_CONTENT_PATH = "Download/unsupported.zip";
     private final String CONTENT_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Multiplication2.ecar";
     private final String CONTENT_WITH_CHILD_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Times_Tables_2_to_10.ecar";
-    private final String CONTENT_WITH_CHILD_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Times_Tables_2_to_10.ecar";
-    private static final String VISIBILITY_DEFAULT = "default";
     private final String COLLECTION_ASSET_PATH = "Download/Times_Tables_2_to_10.ecar";
     private final String CONTENT_ASSET_PATH = "Download/Multiplication2.ecar";
-
     @Before
     public void setup() throws IOException {
         super.setup();
@@ -195,6 +194,19 @@ public class ImportEcarTest extends GenieServiceTestBase {
 
         Assert.assertFalse(genieResponse.getStatus());
         Assert.assertEquals("Content import failed, file doesn't exist.", genieResponse.getErrorMessages().get(0));
+    }
+
+    @Test
+    public void _8ShouldReturnValidationErrorForInvalidEcar() {
+
+
+        EcarImportRequest.Builder contentImportRequest = new EcarImportRequest.Builder()
+                .fromFilePath(DESTINATION + File.separator + "unsupported.zip")
+                .toFolder(activity.getExternalFilesDir(null).toString());
+        GenieResponse<List<ContentImportResponse>> genieResponse = activity.importEcar(contentImportRequest.build());
+        Assert.assertFalse(genieResponse.getStatus());
+        Assert.assertEquals(ServiceConstants.ErrorCode.INVALID_FILE, genieResponse.getError());
+        Assert.assertEquals(ServiceConstants.ErrorMessage.UNSUPPORTED_FILE, genieResponse.getErrorMessages().get(0));
     }
 
 

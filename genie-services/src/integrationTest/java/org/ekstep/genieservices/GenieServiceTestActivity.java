@@ -40,6 +40,9 @@ import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.SummaryRequest;
 import org.ekstep.genieservices.commons.bean.SyncStat;
+import org.ekstep.genieservices.commons.bean.TelemetryExportRequest;
+import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
+import org.ekstep.genieservices.commons.bean.TelemetryImportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
@@ -188,17 +191,17 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
-//    public GenieResponse<Void> importTelemetry() {
-//        idle = false;
-//        GenieResponse genieResponse = mGenieService.getTelemetryService().importTelemetry();
-//        return genieResponse;
-//    }
-//
-//    public GenieResponse<Void> exportTelemetry() {
-//        idle = false;
-//        GenieResponse<Void> genieResponse = mGenieService.getTelemetryService().exportTelemetry();
-//        return genieResponse;
-//    }
+    public GenieResponse<Void> importTelemetry(TelemetryImportRequest telemetryImportRequest) {
+        idle = false;
+        GenieResponse<Void> genieResponse = mGenieService.getTelemetryService().importTelemetry(telemetryImportRequest);
+        return genieResponse;
+    }
+
+    public GenieResponse<TelemetryExportResponse> exportTelemetry(TelemetryExportRequest telemetryExportRequest) {
+        idle = false;
+        GenieResponse<TelemetryExportResponse> genieResponse = mGenieService.getTelemetryService().exportTelemetry(telemetryExportRequest);
+        return genieResponse;
+    }
 
     public GenieResponse isPartnerRegistered(String partnerID) {
         idle = false;
