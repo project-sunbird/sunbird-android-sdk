@@ -1681,10 +1681,7 @@ public class SampleApiResponse {
                 "  },\n" +
                 "  \"responseCode\": \"OK\",\n" +
                 "  \"result\": {\n" +
-                "    \"count\": 588,\n" +
-                "    \"content\": [\n" +
-                "     \n" +
-                "    ],\n" +
+                "   \n" +
                 "    \"facets\": [\n" +
                 "      {\n" +
                 "        \"values\": [\n" +
@@ -2761,5 +2758,1339 @@ public class SampleApiResponse {
                 "}";
     }
 
+
+    public static String getSampleEvent() {
+        return "{\n" +
+                "  \"cdata\": [\n" +
+                "    \n" +
+                "  ],\n" +
+                "  \"did\": \"85f9b35bd361605a41911948359e61b2a22f75c7\",\n" +
+                "  \"edata\": {\n" +
+                "    \"eks\": {\n" +
+                "      \"dspec\": {\n" +
+                "        \"camera\": \"16.10.bong\",\n" +
+                "        \"cap\": [\n" +
+                "          \n" +
+                "        ],\n" +
+                "        \"cpu\": \"abi: armeabi-v7a processor\\t: 0 \",\n" +
+                "        \"dlocname\": \"\",\n" +
+                "        \"dname\": \"\",\n" +
+                "        \"edisk\": 11.57,\n" +
+                "        \"id\": \"caf46b2f69333e63\",\n" +
+                "        \"idisk\": 0.0,\n" +
+                "        \"make\": \"Samsung SM-G900H\",\n" +
+                "        \"mdata\": {\n" +
+                "          \"id\": \"diNqKQV9Xdg:APA91bEhupodZ8ohXKIhnieDHhvISQcWLTUBHdOLzZmPgLgkXp52U_YBV-Jc4tSUgPT9iQU_-WOseZ9jDFmtuCCcxwNBiq3va1Rp8iVdj332QSB6BSKtkBCGHz8zVw9Bl_9wlal533gD\",\n" +
+                "          \"type\": \"fcm\"\n" +
+                "        },\n" +
+                "        \"mem\": -1.0,\n" +
+                "        \"os\": \"Android 6.0.1\",\n" +
+                "        \"scrn\": 5.21,\n" +
+                "        \"sims\": -1\n" +
+                "      },\n" +
+                "      \"loc\": \"\"\n" +
+                "    }\n" +
+                "  },\n" +
+                "  \"eid\": \"GE_GENIE_START\",\n" +
+                "  \"ets\": 1496300828767,\n" +
+                "  \"gdata\": {\n" +
+                "    \"id\": \"genie.android\",\n" +
+                "    \"ver\": \"6.2.localqa-debug.24\"\n" +
+                "  },\n" +
+                "  \"sid\": \"\",\n" +
+                "  \"tags\": [\n" +
+                "    \n" +
+                "  ],\n" +
+                "  \"ts\": \"2017-06-01T07:07:08+0000\",\n" +
+                "  \"uid\": \"bf228c46-f7fe-49e1-bb91-eb1b254bec7c\",\n" +
+                "  \"ver\": \"2.0\"\n" +
+                "}";
+    }
+
+    public static String getTermsAPIResponse() {
+        return "{\n" +
+                "  \"id\": \"ekstep.learning.terms.list\",\n" +
+                "  \"ver\": \"3.0\",\n" +
+                "  \"ts\": \"2017-08-02T10:19:39ZZ\",\n" +
+                "  \"params\": {\n" +
+                "    \"resmsgid\": \"b064bc17-9410-4892-b03d-650dc2bbd9e3\",\n" +
+                "    \"msgid\": null,\n" +
+                "    \"err\": null,\n" +
+                "    \"status\": \"successful\",\n" +
+                "    \"errmsg\": null\n" +
+                "  },\n" +
+                "  \"responseCode\": \"OK\",\n" +
+                "  \"result\": {\n" +
+                "    \"gradeLevel\": {\n" +
+                "      \"label\": \"Grade Level\",\n" +
+                "      \"value\": \"gradeLevel\",\n" +
+                "      \"language\": \"en\",\n" +
+                "      \"description\": \"Grade Level of the child\",\n" +
+                "      \"values\": [\n" +
+                "        {\n" +
+                "          \"label\": \"KG\",\n" +
+                "          \"value\": \"0\",\n" +
+                "          \"telemetry\": \"0\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"gradeLevel\": [\n" +
+                "                \"Kindergarten\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Grade 1\",\n" +
+                "          \"value\": \"1\",\n" +
+                "          \"telemetry\": \"1\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"gradeLevel\": [\n" +
+                "                \"Grade 1\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Grade 2\",\n" +
+                "          \"value\": \"2\",\n" +
+                "          \"telemetry\": \"2\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"gradeLevel\": [\n" +
+                "                \"Grade 2\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Grade 3\",\n" +
+                "          \"value\": \"3\",\n" +
+                "          \"telemetry\": \"3\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"gradeLevel\": [\n" +
+                "                \"Grade 3\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Grade 4\",\n" +
+                "          \"value\": \"4\",\n" +
+                "          \"telemetry\": \"4\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"gradeLevel\": [\n" +
+                "                \"Grade 4\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Grade 5\",\n" +
+                "          \"value\": \"5\",\n" +
+                "          \"telemetry\": \"5\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"gradeLevel\": [\n" +
+                "                \"Grade 5\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Grade 6\",\n" +
+                "          \"value\": \"6\",\n" +
+                "          \"telemetry\": \"6\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"gradeLevel\": [\n" +
+                "                \"Grade 6\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Grade 7\",\n" +
+                "          \"value\": \"7\",\n" +
+                "          \"telemetry\": \"7\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"gradeLevel\": [\n" +
+                "                \"Grade 7\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Grade 8\",\n" +
+                "          \"value\": \"8\",\n" +
+                "          \"telemetry\": \"8\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"gradeLevel\": [\n" +
+                "                \"Grade 8\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Grade 9\",\n" +
+                "          \"value\": \"9\",\n" +
+                "          \"telemetry\": \"9\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"gradeLevel\": [\n" +
+                "                \"Grade 9\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Grade 10\",\n" +
+                "          \"value\": \"10\",\n" +
+                "          \"telemetry\": \"10\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"gradeLevel\": [\n" +
+                "                \"Grade 10\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Grade 11\",\n" +
+                "          \"value\": \"11\",\n" +
+                "          \"telemetry\": \"11\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"gradeLevel\": [\n" +
+                "                \"Grade 11\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Grade 12\",\n" +
+                "          \"value\": \"12\",\n" +
+                "          \"telemetry\": \"12\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"gradeLevel\": [\n" +
+                "                \"Grade 12\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Others\",\n" +
+                "          \"value\": \"-1\",\n" +
+                "          \"telemetry\": \"-1\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "\n" +
+                "            }\n" +
+                "          }\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    },\n" +
+                "    \"audience\": {\n" +
+                "      \"label\": \"audience\",\n" +
+                "      \"value\": \"audience\",\n" +
+                "      \"language\": \"en\",\n" +
+                "      \"description\": \"Purpose of the content\",\n" +
+                "      \"values\": [\n" +
+                "        {\n" +
+                "          \"label\": \"Learner\",\n" +
+                "          \"value\": \"learner\",\n" +
+                "          \"telemetry\": \"learner\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"audience\": [\n" +
+                "                \"learner\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Instructor\",\n" +
+                "          \"value\": \"instructor\",\n" +
+                "          \"telemetry\": \"instructor\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"audience\": [\n" +
+                "                \"instructor\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    },\n" +
+                "    \"subject\": {\n" +
+                "      \"label\": \"Subject\",\n" +
+                "      \"value\": \"subject\",\n" +
+                "      \"language\": \"en\",\n" +
+                "      \"description\": \"Subject of the content\",\n" +
+                "      \"values\": [\n" +
+                "        {\n" +
+                "          \"label\": \"Maths\",\n" +
+                "          \"value\": \"Maths\",\n" +
+                "          \"telemetry\": \"Maths\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"subject\": [\n" +
+                "                \"MATHS\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"English\",\n" +
+                "          \"value\": \"English\",\n" +
+                "          \"telemetry\": \"English\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"subject\": [\n" +
+                "                \"English\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Hindi\",\n" +
+                "          \"value\": \"Hindi\",\n" +
+                "          \"telemetry\": \"Hindi\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"subject\": [\n" +
+                "                \"Hindi\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Assamese\",\n" +
+                "          \"value\": \"Assamese\",\n" +
+                "          \"telemetry\": \"Assamese\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"subject\": [\n" +
+                "                \"Assamese\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Bengali\",\n" +
+                "          \"value\": \"Bengali\",\n" +
+                "          \"telemetry\": \"Bengali\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"subject\": [\n" +
+                "                \"Bengali\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Gujarati\",\n" +
+                "          \"value\": \"Gujarati\",\n" +
+                "          \"telemetry\": \"Gujarati\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"subject\": [\n" +
+                "                \"Gujarati\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Kannada\",\n" +
+                "          \"value\": \"Kannada\",\n" +
+                "          \"telemetry\": \"Kannada\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"subject\": [\n" +
+                "                \"Kannada\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Malayalam\",\n" +
+                "          \"value\": \"Malayalam\",\n" +
+                "          \"telemetry\": \"Malayalam\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"subject\": [\n" +
+                "                \"Malayalam\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Marathi\",\n" +
+                "          \"value\": \"Marathi\",\n" +
+                "          \"telemetry\": \"Marathi\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"subject\": [\n" +
+                "                \"Marathi\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Nepali\",\n" +
+                "          \"value\": \"Nepali\",\n" +
+                "          \"telemetry\": \"Nepali\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"subject\": [\n" +
+                "                \"Nepali\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Oriya\",\n" +
+                "          \"value\": \"Oriya\",\n" +
+                "          \"telemetry\": \"Oriya\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"subject\": [\n" +
+                "                \"Oriya\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Punjabi\",\n" +
+                "          \"value\": \"Punjabi\",\n" +
+                "          \"telemetry\": \"Punjabi\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"subject\": [\n" +
+                "                \"Punjabi\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Tamil\",\n" +
+                "          \"value\": \"Tamil\",\n" +
+                "          \"telemetry\": \"Tamil\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"subject\": [\n" +
+                "                \"Tamil\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Telugu\",\n" +
+                "          \"value\": \"Telugu\",\n" +
+                "          \"telemetry\": \"Telugu\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"subject\": [\n" +
+                "                \"Telugu\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Urdu\",\n" +
+                "          \"value\": \"Urdu\",\n" +
+                "          \"telemetry\": \"Urdu\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"subject\": [\n" +
+                "                \"Urdu\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    },\n" +
+                "    \"channel\": {\n" +
+                "      \"label\": \"Channel\",\n" +
+                "      \"value\": \"channel\",\n" +
+                "      \"language\": \"en\",\n" +
+                "      \"description\": \"List of partner channels\",\n" +
+                "      \"values\": [\n" +
+                "        {\n" +
+                "          \"label\": \"APSSDC\",\n" +
+                "          \"value\": \"AP_1\",\n" +
+                "          \"telemetry\": \"AP_1\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"tags\": [\n" +
+                "                \"APSSDC\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"GPF\",\n" +
+                "          \"value\": \"GP_1\",\n" +
+                "          \"telemetry\": \"GP_1\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"tags\": [\n" +
+                "                \"GPF\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    },\n" +
+                "    \"medium\": {\n" +
+                "      \"label\": \"Medium\",\n" +
+                "      \"value\": \"medium\",\n" +
+                "      \"language\": \"en\",\n" +
+                "      \"description\": \"Medium of instruction\",\n" +
+                "      \"values\": [\n" +
+                "        {\n" +
+                "          \"label\": \"English\",\n" +
+                "          \"value\": \"English\",\n" +
+                "          \"telemetry\": \"English\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"medium\": [\n" +
+                "                \"English\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Hindi\",\n" +
+                "          \"value\": \"Hindi\",\n" +
+                "          \"telemetry\": \"Hindi\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"medium\": [\n" +
+                "                \"Hindi\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Assamese\",\n" +
+                "          \"value\": \"Assamese\",\n" +
+                "          \"telemetry\": \"Assamese\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"medium\": [\n" +
+                "                \"Assamese\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Bengali\",\n" +
+                "          \"value\": \"Bengali\",\n" +
+                "          \"telemetry\": \"Bengali\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"medium\": [\n" +
+                "                \"Bengali\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Gujarati\",\n" +
+                "          \"value\": \"Gujarati\",\n" +
+                "          \"telemetry\": \"Gujarati\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"medium\": [\n" +
+                "                \"Gujarati\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Kannada\",\n" +
+                "          \"value\": \"Kannada\",\n" +
+                "          \"telemetry\": \"Kannada\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"medium\": [\n" +
+                "                \"Kannada\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Malayalam\",\n" +
+                "          \"value\": \"Malayalam\",\n" +
+                "          \"telemetry\": \"Malayalam\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"subject\": [\n" +
+                "                \"Malayalam\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Marathi\",\n" +
+                "          \"value\": \"Marathi\",\n" +
+                "          \"telemetry\": \"Marathi\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"medium\": [\n" +
+                "                \"Marathi\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Nepali\",\n" +
+                "          \"value\": \"Nepali\",\n" +
+                "          \"telemetry\": \"Nepali\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"medium\": [\n" +
+                "                \"Nepali\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Oriya\",\n" +
+                "          \"value\": \"Oriya\",\n" +
+                "          \"telemetry\": \"Oriya\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"medium\": [\n" +
+                "                \"Oriya\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Punjabi\",\n" +
+                "          \"value\": \"Punjabi\",\n" +
+                "          \"telemetry\": \"Punjabi\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"medium\": [\n" +
+                "                \"Punjabi\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Tamil\",\n" +
+                "          \"value\": \"Tamil\",\n" +
+                "          \"telemetry\": \"Tamil\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"medium\": [\n" +
+                "                \"Tamil\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Telugu\",\n" +
+                "          \"value\": \"Telugu\",\n" +
+                "          \"telemetry\": \"Telugu\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"medium\": [\n" +
+                "                \"Telugu\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Urdu\",\n" +
+                "          \"value\": \"Urdu\",\n" +
+                "          \"telemetry\": \"Urdu\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"medium\": [\n" +
+                "                \"Urdu\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Other\",\n" +
+                "          \"value\": \"Other\",\n" +
+                "          \"telemetry\": \"\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "          }\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    },\n" +
+                "    \"ageGroup\": {\n" +
+                "      \"label\": \"Age Group\",\n" +
+                "      \"value\": \"ageGroup\",\n" +
+                "      \"language\": \"en\",\n" +
+                "      \"description\": \"Age Group of the child\",\n" +
+                "      \"values\": [\n" +
+                "        {\n" +
+                "          \"label\": \"<5 Years\",\n" +
+                "          \"value\": \"0\",\n" +
+                "          \"telemetry\": \"0\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"ageGroup\": [\n" +
+                "                \"<5\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"5 Years\",\n" +
+                "          \"value\": \"5\",\n" +
+                "          \"telemetry\": \"5\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"ageGroup\": [\n" +
+                "                \"5-6\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"6 Years\",\n" +
+                "          \"value\": \"6\",\n" +
+                "          \"telemetry\": \"6\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"ageGroup\": [\n" +
+                "                \"6-7\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"7-8 Years\",\n" +
+                "          \"value\": \"7\",\n" +
+                "          \"telemetry\": \"7\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"ageGroup\": [\n" +
+                "                \"7-8\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"8-10 Years\",\n" +
+                "          \"value\": \"8\",\n" +
+                "          \"telemetry\": \"8\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"ageGroup\": [\n" +
+                "                \"8-10\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \">10 Years\",\n" +
+                "          \"value\": \"10\",\n" +
+                "          \"telemetry\": \"10\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"ageGroup\": [\n" +
+                "                \">10\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Others\",\n" +
+                "          \"value\": \"-1\",\n" +
+                "          \"telemetry\": \"-1\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "\n" +
+                "            }\n" +
+                "          }\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    },\n" +
+                "    \"ttl\": 24,\n" +
+                "    \"board\": {\n" +
+                "      \"label\": \"Board\",\n" +
+                "      \"value\": \"board\",\n" +
+                "      \"language\": \"en\",\n" +
+                "      \"description\": \"Curriculum\",\n" +
+                "      \"values\": [\n" +
+                "        {\n" +
+                "          \"label\": \"NCERT\",\n" +
+                "          \"value\": \"NCERT\",\n" +
+                "          \"telemetry\": \"NCERT\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"board\": [\n" +
+                "                \"NCERT\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"CBSE\",\n" +
+                "          \"value\": \"CBSE\",\n" +
+                "          \"telemetry\": \"CBSE\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"board\": [\n" +
+                "                \"CBSE\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"ICSE\",\n" +
+                "          \"value\": \"ICSE\",\n" +
+                "          \"telemetry\": \"ICSE\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"board\": [\n" +
+                "                \"ICSE\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"MSCERT\",\n" +
+                "          \"value\": \"MSCERT\",\n" +
+                "          \"telemetry\": \"MSCERT\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"board\": [\n" +
+                "                \"MSCERT\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Other\",\n" +
+                "          \"value\": \"Other\",\n" +
+                "          \"telemetry\": \"\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "\n" +
+                "            }\n" +
+                "          }\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    },\n" +
+                "    \"age\": {\n" +
+                "      \"label\": \"Age\",\n" +
+                "      \"value\": \"age\",\n" +
+                "      \"language\": \"en\",\n" +
+                "      \"description\": \"Age list for user profiles\",\n" +
+                "      \"values\": [\n" +
+                "        {\n" +
+                "          \"label\": \"5 Years\",\n" +
+                "          \"value\": \"5\",\n" +
+                "          \"telemetry\": \"5\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"ageGroup\": [\n" +
+                "                \"<5\",\n" +
+                "                \"5-6\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"6 Years\",\n" +
+                "          \"value\": \"6\",\n" +
+                "          \"telemetry\": \"6\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"ageGroup\": [\n" +
+                "                \"5-6\",\n" +
+                "                \"6-7\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"7 Years\",\n" +
+                "          \"value\": \"7\",\n" +
+                "          \"telemetry\": \"7\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"ageGroup\": [\n" +
+                "                \"6-7\",\n" +
+                "                \"7-8\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"8 Years\",\n" +
+                "          \"value\": \"8\",\n" +
+                "          \"telemetry\": \"8\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"ageGroup\": [\n" +
+                "                \"7-8\",\n" +
+                "                \"8-10\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"9 Years\",\n" +
+                "          \"value\": \"9\",\n" +
+                "          \"telemetry\": \"9\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"ageGroup\": [\n" +
+                "                \"8-10\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"10 Years\",\n" +
+                "          \"value\": \"10\",\n" +
+                "          \"telemetry\": \"10\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"ageGroup\": [\n" +
+                "                \"8-10\",\n" +
+                "                \">10\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"11 Years\",\n" +
+                "          \"value\": \"11\",\n" +
+                "          \"telemetry\": \"11\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"ageGroup\": [\n" +
+                "                \">10\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"12 Years\",\n" +
+                "          \"value\": \"12\",\n" +
+                "          \"telemetry\": \"12\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"ageGroup\": [\n" +
+                "                \">10\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"13 Years\",\n" +
+                "          \"value\": \"13\",\n" +
+                "          \"telemetry\": \"13\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"ageGroup\": [\n" +
+                "                \">10\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"14 Years\",\n" +
+                "          \"value\": \"14\",\n" +
+                "          \"telemetry\": \"14\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"ageGroup\": [\n" +
+                "                \">10\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"15 Years\",\n" +
+                "          \"value\": \"15\",\n" +
+                "          \"telemetry\": \"15\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"ageGroup\": [\n" +
+                "                \">10\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"16 Years\",\n" +
+                "          \"value\": \"16\",\n" +
+                "          \"telemetry\": \"16\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"ageGroup\": [\n" +
+                "                \">10\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"17 Years\",\n" +
+                "          \"value\": \"17\",\n" +
+                "          \"telemetry\": \"17\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"ageGroup\": [\n" +
+                "                \">10\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"18 Years\",\n" +
+                "          \"value\": \"18\",\n" +
+                "          \"telemetry\": \"18\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "              \"ageGroup\": [\n" +
+                "                \">10\"\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"label\": \"Other\",\n" +
+                "          \"value\": \"-1\",\n" +
+                "          \"telemetry\": \"-1\",\n" +
+                "          \"description\": \"\",\n" +
+                "          \"search\": {\n" +
+                "            \"filters\": {\n" +
+                "\n" +
+                "            }\n" +
+                "          }\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+    }
+
+    public static String getResourceBundleAPIResponse() {
+        return "{\n" +
+                "  \"id\": \"ekstep.ekstep.config.resourebundles.list\",\n" +
+                "  \"ver\": \"1.0\",\n" +
+                "  \"ts\": \"2016-06-29T11:04:35ZZ\",\n" +
+                "  \"params\": {\n" +
+                "    \"resmsgid\": \"4e2e1635-487f-4105-9279-572a30fd7d75\",\n" +
+                "    \"msgid\": null,\n" +
+                "    \"err\": null,\n" +
+                "    \"status\": \"successful\",\n" +
+                "    \"errmsg\": null\n" +
+                "  },\n" +
+                "  \"responseCode\": \"OK\",\n" +
+                "  \"result\": {\n" +
+                "    \"resourcebundles\": {\n" +
+                "      \"ta\": {\n" +
+                "        \"name\": \"Name\",\n" +
+                "        \"code\": \"Code\",\n" +
+                "        \"os\": \"Os\",\n" +
+                "        \"All\": \"All\",\n" +
+                "        \"Android\": \"Android\",\n" +
+                "        \"iOS\": \"iOS\",\n" +
+                "        \"Windows\": \"Windows\",\n" +
+                "        \"minOsVersion\": \"Min Supported OS Version\",\n" +
+                "        \"minGenieVersion\": \"Min Supported Genie Version\"\n" +
+                "      },\n" +
+                "      \"ka\": {\n" +
+                "        \"name\": \"Name\",\n" +
+                "        \"code\": \"Code\",\n" +
+                "        \"os\": \"Os\",\n" +
+                "        \"All\": \"All\",\n" +
+                "        \"Android\": \"Android\",\n" +
+                "        \"iOS\": \"iOS\",\n" +
+                "        \"Windows\": \"Windows\",\n" +
+                "        \"minOsVersion\": \"Min Supported OS Version\",\n" +
+                "        \"minGenieVersion\": \"Min Supported Genie Version\"\n" +
+                "      },\n" +
+                "      \"te\": {\n" +
+                "        \"name\": \"Name\",\n" +
+                "        \"code\": \"Code\",\n" +
+                "        \"os\": \"Os\",\n" +
+                "        \"All\": \"All\",\n" +
+                "        \"Android\": \"Android\",\n" +
+                "        \"iOS\": \"iOS\",\n" +
+                "        \"Windows\": \"Windows\",\n" +
+                "        \"minOsVersion\": \"Min Supported OS Version\",\n" +
+                "        \"minGenieVersion\": \"Min Supported Genie Version\"\n" +
+                "      },\n" +
+                "      \"en\": {\n" +
+                "        \"name\": \"Name\",\n" +
+                "        \"code\": \"Code\",\n" +
+                "        \"os\": \"Os\",\n" +
+                "        \"All\": \"All\",\n" +
+                "        \"Android\": \"Android\",\n" +
+                "        \"iOS\": \"iOS\",\n" +
+                "        \"Windows\": \"Windows\",\n" +
+                "        \"minOsVersion\": \"Min Supported OS Version\",\n" +
+                "        \"minGenieVersion\": \"Min Supported Genie Version\"\n" +
+                "      },\n" +
+                "      \"hi\": {\n" +
+                "        \"name\": \"Name\",\n" +
+                "        \"code\": \"Code\",\n" +
+                "        \"os\": \"Os\",\n" +
+                "        \"All\": \"All\",\n" +
+                "        \"Android\": \"Android\",\n" +
+                "        \"iOS\": \"iOS\",\n" +
+                "        \"Windows\": \"Windows\",\n" +
+                "        \"minOsVersion\": \"Min Supported OS Version\",\n" +
+                "        \"minGenieVersion\": \"Min Supported Genie Version\"\n" +
+                "      }\n" +
+                "    },\n" +
+                "    \"ttl\": 24.0\n" +
+                "  }\n" +
+                "}";
+    }
+
+
+    public static String getOrdinalsAPIResponse() {
+        return "{\n" +
+                "  \"id\": \"ekstep.ekstep.config.ordinals.list\",\n" +
+                "  \"ver\": \"1.0\",\n" +
+                "  \"ts\": \"2016-07-07T06:47:33ZZ\",\n" +
+                "  \"params\": {\n" +
+                "    \"resmsgid\": \"1c6be95b-7bdb-4d07-908b-08d45d18d8f9\",\n" +
+                "    \"msgid\": null,\n" +
+                "    \"err\": null,\n" +
+                "    \"status\": \"successful\",\n" +
+                "    \"errmsg\": null\n" +
+                "  },\n" +
+                "  \"responseCode\": \"OK\",\n" +
+                "  \"result\": {\n" +
+                "    \"ordinals\": {\n" +
+                "      \"os\": [\n" +
+                "        \"All\",\n" +
+                "        \"Android\",\n" +
+                "        \"iOS\",\n" +
+                "        \"Windows\"\n" +
+                "      ],\n" +
+                "      \"visibility\": [\n" +
+                "        \"Default\",\n" +
+                "        \"Parent\"\n" +
+                "      ],\n" +
+                "      \"mimeType\": [\n" +
+                "        \"application/vnd.ekstep.ecml-archive\",\n" +
+                "        \"application/vnd.ekstep.html-archive\"\n" +
+                "      ],\n" +
+                "      \"mediaType\": [\n" +
+                "        \"content\",\n" +
+                "        \"collection\"\n" +
+                "      ],\n" +
+                "      \"idealScreenSize\": [\n" +
+                "        \"small\",\n" +
+                "        \"normal\",\n" +
+                "        \"large\",\n" +
+                "        \"xlarge\",\n" +
+                "        \"other\"\n" +
+                "      ],\n" +
+                "      \"idealScreenDensity\": [\n" +
+                "        \"ldpi\",\n" +
+                "        \"mdpi\",\n" +
+                "        \"hdpi\",\n" +
+                "        \"xhdpi\",\n" +
+                "        \"xxhdpi\",\n" +
+                "        \"xxxhdpi\"\n" +
+                "      ],\n" +
+                "      \"resources\": [\n" +
+                "        \"Speaker\",\n" +
+                "        \"Touch\",\n" +
+                "        \"Microphone\",\n" +
+                "        \"GPS\",\n" +
+                "        \"Motion Sensor\",\n" +
+                "        \"Compass\"\n" +
+                "      ],\n" +
+                "      \"license\": [\n" +
+                "        \"Against DRM license\",\n" +
+                "        \"Creative Commons Attribution (CC BY)\",\n" +
+                "        \"Creative Commons Attribution-ShareAlike (CC BY-SA)\",\n" +
+                "        \"Creative Commons Zero (CC0)\",\n" +
+                "        \"Free Art License\",\n" +
+                "        \"Open Audio License\",\n" +
+                "        \"Open Game License\",\n" +
+                "        \"Other\"\n" +
+                "      ],\n" +
+                "      \"language\": [\n" +
+                "        \"English\",\n" +
+                "        \"Hindi\",\n" +
+                "        \"Assamese\",\n" +
+                "        \n" +
+                "      ],\n" +
+                "      \"ageGroup\": [\n" +
+                "        \"<5\",\n" +
+                "        \"5-6\",\n" +
+                "        \"6-7\",\n" +
+                "        \"7-8\",\n" +
+                "        \"8-10\",\n" +
+                "        \">10\",\n" +
+                "        \"Other\"\n" +
+                "      ],\n" +
+                "      \"gradeLevel\": [\n" +
+                "        \"Kindergarten\",\n" +
+                "        \"Grade 1\",\n" +
+                "        \"Grade 2\",\n" +
+                "        \"Grade 3\",\n" +
+                "        \"Grade 4\",\n" +
+                "        \"Grade 5\",\n" +
+                "        \"Other\"\n" +
+                "      ],\n" +
+                "      \"interactivityLevel\": [\n" +
+                "        \"High\",\n" +
+                "        \"Medium\",\n" +
+                "        \"Low\"\n" +
+                "      ],\n" +
+                "      \"curriculum\": [\n" +
+                "        \"NCERT\",\n" +
+                "        \"CBSE\",\n" +
+                "        \"ICSE\",\n" +
+                "        \"State Curriculum\",\n" +
+                "        \"Other\"\n" +
+                "      ],\n" +
+                "      \"contentType\": [\n" +
+                "        \"Story\",\n" +
+                "        \"Worksheet\",\n" +
+                "        \"Game\",\n" +
+                "        \"Simulation\",\n" +
+                "        \"Puzzle\",\n" +
+                "        \"Diagnostic\",\n" +
+                "        \"Collection\",\n" +
+                "        \"Asset\",\n" +
+                "        \"Template\"\n" +
+                "      ],\n" +
+                "      \"templateType\": [\n" +
+                "        \"story\",\n" +
+                "        \"worksheet\",\n" +
+                "        \"mcq\",\n" +
+                "        \"ftb\",\n" +
+                "        \"mtf\",\n" +
+                "        \"recognition\",\n" +
+                "        \"activity\",\n" +
+                "        \"widget\",\n" +
+                "        \"other\"\n" +
+                "      ],\n" +
+                "      \"genre\": [\n" +
+                "        \"Picture Books\",\n" +
+                "        \"Chapter Books\",\n" +
+                "        \"Flash Cards\",\n" +
+                "        \"Serial Books\",\n" +
+                "        \"Alphabet Books\",\n" +
+                "        \"Folktales\",\n" +
+                "        \"Fiction\",\n" +
+                "        \"Non-Fiction\",\n" +
+                "        \"Poems/Rhymes\",\n" +
+                "        \"Plays\",\n" +
+                "        \"Comics\",\n" +
+                "        \"Words\"\n" +
+                "      ]\n" +
+                "    },\n" +
+                "    \"ttl\": 24.0\n" +
+                "  }\n" +
+                "}";
+    }
+
+    public static String telemetrySyncResponse() {
+        return "{\n" +
+                "  \"id\": \"ekstep.telemetry\",\n" +
+                "  \"ver\": \"1.0\",\n" +
+                "  \"ts\": \"2016-03-28T15:25:49+05:30\",\n" +
+                "  \"params\": {\n" +
+                "    \"resmsgid\": \"ff3f6feee246c13d44558623c3b426d4aefb9343\",\n" +
+                "    \"msgid\": \"3BE38CAFADC951C3E87D2BE0FDD06144507BB8912\",\n" +
+                "    \"status\": \"" + "successful" + "\",\n" +
+                "    \"err\": \"\",\n" +
+                "    \"errmsg\": \"\"\n" +
+                "  }\n" +
+                "}";
+    }
 
 }

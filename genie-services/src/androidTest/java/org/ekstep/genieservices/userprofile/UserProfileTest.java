@@ -168,7 +168,7 @@ public class UserProfileTest extends GenieServiceTestBase {
     @Test
     public void _22ShouldReturnInvalidUserErrorForInvalidUserId() {
 
-        GenieResponse genieResponse = activity.setCurrentUser("sampleuid");
+        GenieResponse genieResponse = activity.setCurrentUser("sampleuid-111");
         Assert.assertNotNull(genieResponse);
         Assert.assertFalse(genieResponse.getStatus());
         Assert.assertEquals(ServiceConstants.ErrorCode.INVALID_USER, genieResponse.getError());

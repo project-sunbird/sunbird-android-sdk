@@ -28,12 +28,15 @@ public class GenieServiceTestBase {
     public static final int DEFAULT_TIMEOUT_IN_SECONDS = 30;
     public static final int MASTER_POLICY_TIMEOUT_IN_MINS = 1;
     public static final int IDLING_RESOURCE_TIMEOUT_IN_MINS = 1;
-    protected static final String DESTINATION = Environment.getExternalStorageDirectory().toString() + "/Download";
+    protected static final String DESTINATION = Environment.getExternalStorageDirectory().toString() + "/GenieSdkTestDump";
+    protected static final String CHILD_C2_ID = "do_30013486";
+    protected static final String CHILD_C3_ID = "do_30013497";
     public final PermissionsRule permissionsRule = new PermissionsRule(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE});
     @Rule
     public ActivityTestRule<GenieServiceTestActivity> rule = new ActivityTestRule<GenieServiceTestActivity>
             (GenieServiceTestActivity.class);
     protected GenieServiceTestActivity activity;
+    protected MockServer mMockServer;
     private GenieServiceIdlingResource idlingResource;
 
     @Before
@@ -75,6 +78,32 @@ public class GenieServiceTestBase {
                     }
                 });
     }
+
+    /**
+     * Starts the mock server.
+     */
+    protected void startMockServer() {
+        try {
+            mMockServer = new MockServer();
+            mMockServer.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Stops the mock server.
+     */
+    protected void shutDownMockServer() {
+        try {
+            if (mMockServer != null) {
+                mMockServer.shutDown();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
     /**
