@@ -195,9 +195,12 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
 
     @Override
     public String updateBy() {
-        return String.format(Locale.US, "%s = '%s' and %s = '%s' and %s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_UID, this.uid,
-                LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID, this.contentId,
-                LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA, this.hierarchyData == null ? "" : this.hierarchyData);
+        String isQid = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_QID, qid);
+        String isUid = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_UID, uid);
+        String isContentId = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID, contentId);
+        String isHData = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA, hierarchyData == null ? "" : hierarchyData);
+
+        return String.format(Locale.US, "where %s AND %s AND %s AND %s", isUid, isContentId, isHData, isQid);
     }
 
     @Override
