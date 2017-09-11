@@ -144,7 +144,6 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
             learnerAssessmentDetails.setMaxScore(cursor.getDouble(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_MAX_SCORE)));
         }
 
-
         return learnerAssessmentDetails;
     }
 
@@ -196,9 +195,9 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
 
     @Override
     public String updateBy() {
-        return String.format(Locale.US, "%s = %s and %s = %s and %s = %s", LearnerAssessmentsEntry.COLUMN_NAME_UID, this.uid,
+        return String.format(Locale.US, "%s = '%s' and %s = '%s' and %s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_UID, this.uid,
                 LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID, this.contentId,
-                LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA, this.hierarchyData);
+                LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA, this.hierarchyData == null ? "" : this.hierarchyData);
     }
 
     @Override
@@ -214,7 +213,6 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
     @Override
     public String filterForRead() {
         return filter;
-
     }
 
     @Override
@@ -239,7 +237,4 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
         return mAssessmentList;
     }
 
-    public Long getInsertedId() {
-        return this.id;
-    }
 }
