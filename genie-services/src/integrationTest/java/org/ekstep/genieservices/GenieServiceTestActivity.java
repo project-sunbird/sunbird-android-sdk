@@ -28,6 +28,8 @@ import org.ekstep.genieservices.commons.bean.HierarchyInfo;
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentDetails;
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentSummary;
 import org.ekstep.genieservices.commons.bean.MasterData;
+import org.ekstep.genieservices.commons.bean.Notification;
+import org.ekstep.genieservices.commons.bean.NotificationFilterCriteria;
 import org.ekstep.genieservices.commons.bean.PartnerData;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportRequest;
@@ -40,6 +42,7 @@ import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.SummaryRequest;
 import org.ekstep.genieservices.commons.bean.SyncStat;
+import org.ekstep.genieservices.commons.bean.Tag;
 import org.ekstep.genieservices.commons.bean.TelemetryExportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
 import org.ekstep.genieservices.commons.bean.TelemetryImportRequest;
@@ -370,6 +373,54 @@ public class GenieServiceTestActivity extends Activity {
     public GenieResponse<List<LearnerAssessmentDetails>> getLearnerAssessmentDetails(SummaryRequest summaryRequest) {
         idle = false;
         return mGenieService.getSummarizerService().getLearnerAssessmentDetails(summaryRequest);
+    }
+
+    public GenieResponse setTag(Tag tag) {
+        idle = false;
+        GenieResponse<Void> genieResponse = mGenieService.getTagService().setTag(tag);
+        return genieResponse;
+    }
+
+    public GenieResponse<List<Tag>> getTag() {
+        idle = false;
+        GenieResponse<List<Tag>> genieResponse = mGenieService.getTagService().getTags();
+        return genieResponse;
+    }
+
+    public GenieResponse<Void> deleteTag(String name) {
+        idle = false;
+        GenieResponse<Void> genieResponse = mGenieService.getTagService().deleteTag(name);
+        return genieResponse;
+    }
+
+    public GenieResponse<Void> updateTag(Tag tag) {
+        idle = false;
+        GenieResponse<Void> genieResponse = mGenieService.getTagService().updateTag(tag);
+        return genieResponse;
+    }
+
+    public GenieResponse<Void> addNotification(Notification notification) {
+        idle = false;
+        GenieResponse<Void> genieResponse = mGenieService.getNotificationService().addNotification(notification);
+        return genieResponse;
+    }
+
+    public GenieResponse<Notification> updateNotification(Notification notification) {
+        idle = false;
+        GenieResponse<Notification> genieResponse = mGenieService.getNotificationService().updateNotification(notification);
+        return genieResponse;
+    }
+
+    public GenieResponse<Void> deleteNotification(int msgId) {
+        idle = false;
+        GenieResponse<Void> genieResponse = mGenieService.getNotificationService().deleteNotification(msgId);
+        return genieResponse;
+    }
+
+    public GenieResponse<List<Notification>> getAllNotifications(NotificationFilterCriteria filterCriteria) {
+        idle = false;
+        GenieResponse<List<Notification>> genieResponse = mGenieService.getNotificationService().getAllNotifications(filterCriteria);
+        return genieResponse;
     }
 
     public void setIdle() {

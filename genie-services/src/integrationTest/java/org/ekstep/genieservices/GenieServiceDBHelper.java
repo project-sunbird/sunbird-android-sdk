@@ -336,4 +336,24 @@ public class GenieServiceDBHelper {
             e.printStackTrace();
         }
     }
+
+    public static void clearTagTableDBEntry() {
+        try {
+            int count = getDatabase().delete("telemetry_tags", "1", null);
+            Log.v("Count:::::", "" + count);
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+            Log.v(TAG, "Unable to delete tags DB entry");
+        }
+    }
+
+    public static void clearNotificationTableDBEntry() {
+        try {
+            int count = getDatabase().delete("notifications", "1", null);
+            Log.v("Count:::::", "" + count);
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+            Log.v(TAG, "Unable to delete notifications DB entry");
+        }
+    }
 }

@@ -11,6 +11,7 @@ import org.ekstep.genieservices.commons.bean.NotificationFilterCriteria;
 import org.ekstep.genieservices.notification.db.model.NotificationModel;
 import org.ekstep.genieservices.notification.db.model.NotificationsModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class NotificationServiceImpl extends BaseService implements INotificationService {
@@ -22,9 +23,10 @@ public class NotificationServiceImpl extends BaseService implements INotificatio
 
     @Override
     public GenieResponse<Void> addNotification(Notification notification) {
-        try {
+
+        if (notification != null) {
             NotificationModel notificationModel = NotificationHandler.convertNotificationMapToModel(mAppContext.getDBSession(), notification);
-            NotificationModel oldNotification = NotificationModel.find(mAppContext.getDBSession(), notification.getMsgid());
+            NotificationModel oldNotification = NotificationModel.findById(mAppContext.getDBSession(), notification.getMsgid());
 
             if (oldNotification != null) {
                 notificationModel.update();
@@ -33,55 +35,43 @@ public class NotificationServiceImpl extends BaseService implements INotificatio
             }
 
             return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.ADD_FAILED,
-                    ServiceConstants.ErrorMessage.FAILED_TO_ADD_UPDATE_NOTIFICATION, TAG);
         }
+        return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.ADD_FAILED, ServiceConstants.ErrorMessage.FAILED_TO_ADD_UPDATE_NOTIFICATION, TAG);
     }
 
     @Override
     public GenieResponse<Notification> updateNotification(Notification notification) {
         // -1 to update all the notifications
-        double msgId = notification.getMsgid();
-        try {
-            NotificationsModel notificationsUpdate = NotificationsModel.build(mAppContext.getDBSession(), NotificationHandler.getFilterConditionToUpdate(msgId));
-            notificationsUpdate.update();
-            return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-        } catch (Exception e) {
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.UPDATE_FAILED, ServiceConstants.ErrorMessage.FAILED_TO_UPDATE_THE_NOTIFICATION, TAG);
-        }
+        NotificationsModel notificationsUpdate = NotificationsModel.build(mAppContext.getDBSession(), NotificationHandler.getFilterConditionToUpdate(notification.getMsgid()));
+        notificationsUpdate.update();
+        return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
     }
 
     @Override
     public GenieResponse<Void> deleteNotification(int msgId) {
-        try {
-            NotificationModel notification = NotificationModel.build(mAppContext.getDBSession(), msgId);
-            mAppContext.getDBSession().clean(notification);
-
+        NotificationModel notification = NotificationModel.findById(mAppContext.getDBSession(), msgId);
+        if (notification != null) {
+            notification.delete();
             return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-        } catch (Exception e) {
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.DELETE_FAILED, ServiceConstants.ErrorMessage.FAILED_TO_DELETE_NOTIFICATION, TAG);
         }
+        return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.DELETE_FAILED, ServiceConstants.ErrorMessage.FAILED_TO_DELETE_NOTIFICATION, TAG);
+
     }
 
     @Override
     public GenieResponse<List<Notification>> getAllNotifications(NotificationFilterCriteria criteria) {
-        try {
-            NotificationsModel notifications = NotificationsModel.build(mAppContext.getDBSession(), NotificationHandler.getFilterCondition(criteria));
 
-            //Deletes all expired notifications
-            mAppContext.getDBSession().clean(notifications);
-            //Reads all valid notifications
-            mAppContext.getDBSession().read(notifications);
-
-            GenieResponse successResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-            List<Notification> notificationBeans = notifications.getNotificationBeans();
-//
-            successResponse.setResult(notificationBeans);
-            return successResponse;
-        } catch (Exception e) {
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_NOTIFICATIONS_FOUND, ServiceConstants.ErrorMessage.ERROR_WHILE_GETTING_NOTIFICATIONS, TAG);
+        NotificationsModel notificationModel = NotificationsModel.build(mAppContext.getDBSession(), NotificationHandler.getFilterCondition(criteria));
+        GenieResponse<List<Notification>> successResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        //Deletes all expired notifications
+        notificationModel.delete();
+        //Reads all valid notifications
+        NotificationsModel notifications = NotificationsModel.find(mAppContext.getDBSession(), NotificationHandler.getFilterCondition(criteria));
+        if (notifications == null) {
+            successResponse.setResult(new ArrayList<Notification>());
+        } else {
+            successResponse.setResult(notifications.getNotificationBeans());
         }
+        return successResponse;
     }
 }

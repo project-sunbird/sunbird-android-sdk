@@ -22,21 +22,17 @@ import java.util.Locale;
  */
 public class NotificationModel implements IWritable, IUpdatable, IReadable, ICleanable {
 
+    private static final String KEY_ISREAD = "isRead";
     private IDBSession mDBSession;
-
     private Long id = -1L;
-
     private double mMsgId;
     private long mExpiryTime;
     private String mDisplayTime;
     private Date receivedAt;
     private String mNotificationJson;
     private int isRead = 0;
-
     private long displayTimeinMillis;
     private long receivedAtTime;
-
-    private static final String KEY_ISREAD = "isRead";
 
     private NotificationModel() {
     }
@@ -73,15 +69,12 @@ public class NotificationModel implements IWritable, IUpdatable, IReadable, ICle
         return notificationModel;
     }
 
-    public static NotificationModel find(IDBSession dbSession, double msgId) {
+    public static NotificationModel findById(IDBSession dbSession, double msgId) {
         NotificationModel notification = new NotificationModel(dbSession, msgId);
         dbSession.read(notification);
 
-        if (notification.id == -1L) {
-            return null;
-        } else {
-            return notification;
-        }
+        return notification.id == -1L ? null : notification;
+
     }
 
     public Void save() {
@@ -131,7 +124,6 @@ public class NotificationModel implements IWritable, IUpdatable, IReadable, ICle
 
     @Override
     public ContentValues getFieldsToUpdate() {
-        // return null;
         ContentValues contentValues = new ContentValues();
         contentValues.put(NotificationEntry.COLUMN_NAME_MESSAGE_ID, mMsgId);
         contentValues.put(NotificationEntry.COLUMN_NAME_EXPIRY_TIME, mExpiryTime);
@@ -209,6 +201,11 @@ public class NotificationModel implements IWritable, IUpdatable, IReadable, ICle
     @Override
     public void beforeWrite(AppContext context) {
 
+    }
+
+    public Void delete() {
+        mDBSession.clean(this);
+        return null;
     }
 
     public String getNotificationJson() {
