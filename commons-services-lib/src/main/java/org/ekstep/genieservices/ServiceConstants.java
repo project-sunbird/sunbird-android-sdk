@@ -124,6 +124,9 @@ public interface ServiceConstants {
 
         // Authentication
         String TOKEN_GENERATION_FAILED = "TOKEN_GENERATION_FAILED";
+
+        // KeyValueStore
+        String KEY_NOT_FOUND = "KEY_NOT_FOUND";
     }
 
     interface ErrorMessage {
@@ -178,5 +181,8 @@ public interface ServiceConstants {
 
         //Authentication
         String FAILED_TO_GENERATE_TOKEN = "Failed to generate the bearer token";
+
+        //KeyStore Value
+        String UNABLE_TO_FIND_KEY = "Unable to find key";
     }
 }

@@ -1,6 +1,7 @@
 package org.ekstep.genieservices.commons.bean;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class accepts,
@@ -17,12 +18,14 @@ public class ContentImportRequest {
     private String destinationFolder;
     private List<String> contentIds;
     private List<CorrelationData> correlationData;
+    private Map<String, Object> attributes;
 
-    private ContentImportRequest(boolean isChildContent, String destinationFolder, List<String> contentIds, List<CorrelationData> correlationData) {
+    private ContentImportRequest(boolean isChildContent, String destinationFolder, List<String> contentIds, List<CorrelationData> correlationData, Map<String, Object> attributes) {
         this.isChildContent = isChildContent;
         this.destinationFolder = destinationFolder;
         this.contentIds = contentIds;
         this.correlationData = correlationData;
+        this.attributes = attributes;
     }
 
     public boolean isChildContent() {
@@ -41,11 +44,16 @@ public class ContentImportRequest {
         return correlationData;
     }
 
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
+
     public static class Builder {
         private boolean isChildContent;
         private String destinationFolder;
         private List<String> contentIds;
         private List<CorrelationData> correlationData;
+        private Map<String, Object> attributes;
 
         /**
          * Method to indicate that the file being imported is a child content
@@ -82,6 +90,14 @@ public class ContentImportRequest {
             return this;
         }
 
+        /**
+         * Free form data for content.
+         */
+        public Builder attributes(Map<String, Object> attributes) {
+            this.attributes = attributes;
+            return this;
+        }
+
         public ContentImportRequest build() {
             if (destinationFolder == null) {
                 throw new IllegalStateException("To folder required.");
@@ -91,7 +107,7 @@ public class ContentImportRequest {
                 throw new IllegalStateException("ContentIds required.");
             }
 
-            return new ContentImportRequest(isChildContent, destinationFolder, contentIds, correlationData);
+            return new ContentImportRequest(isChildContent, destinationFolder, contentIds, correlationData, attributes);
         }
     }
 }

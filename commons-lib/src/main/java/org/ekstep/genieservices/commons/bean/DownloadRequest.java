@@ -2,6 +2,7 @@ package org.ekstep.genieservices.commons.bean;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class accepts downloadId,identifier,downloadUrl,name,mimeType,destinationFolder,createdAt,isChildContent,processorClass and {@link List<CorrelationData>} whem requesting for a download to begin.
@@ -18,6 +19,7 @@ public class DownloadRequest implements Serializable {
     private String processorClass;
     private String filename;
     private String downloadedFilePath;
+    private Map<String, Object> attributes;
 
     public DownloadRequest(String identifier, String downloadUrl, String mimeType, String destinationFolder, boolean isChildContent) {
         this.identifier = identifier;
@@ -85,6 +87,14 @@ public class DownloadRequest implements Serializable {
 
     public void setDownloadedFilePath(String downloadedFilePath) {
         this.downloadedFilePath = downloadedFilePath;
+    }
+
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(Map<String, Object> attributes) {
+        this.attributes = attributes;
     }
 
     @Override

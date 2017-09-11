@@ -13,6 +13,7 @@ import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
+import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
@@ -224,5 +225,7 @@ public interface IContentService {
      * @return {@link GenieResponse<ContentExportResponse>}
      */
     GenieResponse<ContentExportResponse> exportContent(ContentExportRequest contentExportRequest);
+
+    GenieResponse<List<DownloadRequest>> getAllDownloads();
 
 }
