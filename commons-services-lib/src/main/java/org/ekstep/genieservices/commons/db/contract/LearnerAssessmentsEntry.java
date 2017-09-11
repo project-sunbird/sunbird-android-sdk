@@ -40,8 +40,7 @@ public abstract class LearnerAssessmentsEntry implements BaseColumns {
                 COLUMN_NAME_TIMESTAMP + DbConstants.INT_TYPE + DbConstants.COMMA_SEP +
                 COLUMN_NAME_Q_DESC + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
                 COLUMN_NAME_Q_TITLE + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
-                COLUMN_NAME_HIERARCHY_DATA + DbConstants.TEXT_TYPE + "  DEFAULT '' " + DbConstants.COMMA_SEP +
-                " UNIQUE (" + COLUMN_NAME_UID + DbConstants.COMMA_SEP + COLUMN_NAME_CONTENT_ID + DbConstants.COMMA_SEP + COLUMN_NAME_QID + DbConstants.COMMA_SEP + COLUMN_NAME_HIERARCHY_DATA + ") ON CONFLICT REPLACE" +
+                COLUMN_NAME_HIERARCHY_DATA + DbConstants.TEXT_TYPE + "  DEFAULT '' " +
                 " )";
     }
 
