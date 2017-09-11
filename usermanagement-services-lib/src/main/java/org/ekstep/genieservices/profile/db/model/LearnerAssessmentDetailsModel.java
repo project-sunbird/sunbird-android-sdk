@@ -200,7 +200,7 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
         String isContentId = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID, contentId);
         String isHData = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA, hierarchyData == null ? "" : hierarchyData);
 
-        return String.format(Locale.US, "where %s AND %s AND %s AND %s", isUid, isContentId, isHData, isQid);
+        return String.format(Locale.US, "%s AND %s AND %s AND %s", isUid, isContentId, isHData, isQid);
     }
 
     @Override
