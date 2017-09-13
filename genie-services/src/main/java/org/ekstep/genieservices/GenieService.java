@@ -86,8 +86,11 @@ public class GenieService {
         return sService;
     }
 
-    public static Void changeParams() {
-        sService.mAppContext.changeParams();
+    /**
+     * Change or update the params in runtime.
+     */
+    public static Void applyParams() {
+        sService.mAppContext.applyParams();
         return null;
     }
 

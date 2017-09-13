@@ -73,10 +73,14 @@ public class BuildParams implements IParams {
 
         initProfilePath(context, packageName);
 
+        // Initialize runtime params
         initParams(packageName);
     }
 
-    public void changeParams() {
+    /**
+     * Change or update the params in runtime.
+     */
+    public void applyParams() {
         if (mParams == null) {
             Logger.e(TAG, "Implement IParams and define in build.config");
             throw new IllegalStateException("Implement IParams and define in build.config");

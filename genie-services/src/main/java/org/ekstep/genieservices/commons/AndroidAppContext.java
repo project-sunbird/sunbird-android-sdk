@@ -60,8 +60,8 @@ public class AndroidAppContext extends AppContext<Context> {
     }
 
     @Override
-    public Void changeParams() {
-        ((BuildParams) this.mParams).changeParams();
+    public Void applyParams() {
+        ((BuildParams) this.mParams).applyParams();
         return null;
     }
 
