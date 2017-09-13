@@ -7,6 +7,28 @@ package org.ekstep.genieservices.commons;
  */
 public interface IParams {
 
+    /**
+     * Adds a value to the set.
+     *
+     * @param key   the name of the value to put
+     * @param value the data for the value to put
+     */
+    void put(String key, Object value);
+
+    String getString(String key);
+
+    long getLong(String key);
+
+    int getInt(String key);
+
+    boolean getBoolean(String key);
+
+    boolean contains(String key);
+
+    void remove(String key);
+
+    void clear();
+
     interface Key {
         String APPLICATION_ID = "APPLICATION_ID";
         String VERSION_NAME = "VERSION_NAME";
@@ -33,26 +55,4 @@ public interface IParams {
         String NETWORK_CONNECT_TIMEOUT = "NETWORK_CONNECT_TIMEOUT";
         String NETWORK_READ_TIMEOUT = "NETWORK_READ_TIMEOUT";
     }
-
-    /**
-     * Adds a value to the set.
-     *
-     * @param key   the name of the value to put
-     * @param value the data for the value to put
-     */
-    void put(String key, Object value);
-
-    String getString(String key);
-
-    long getLong(String key);
-
-    int getInt(String key);
-
-    boolean getBoolean(String key);
-
-    boolean contains(String key);
-
-    void remove(String key);
-
-    void clear();
 }

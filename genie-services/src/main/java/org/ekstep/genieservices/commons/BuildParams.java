@@ -82,7 +82,63 @@ public class BuildParams implements IParams {
             throw new IllegalStateException("Implement IParams and define in build.config");
         }
 
-        // TODO: 9/12/2017
+        if (!StringUtil.isNullOrEmpty(mParams.getString(Key.VERSION_NAME))) {
+            put(Key.VERSION_NAME, mParams.getString(Key.VERSION_NAME));
+        }
+        if (!StringUtil.isNullOrEmpty(mParams.getString(Key.APPLICATION_ID))) {
+            put(Key.APPLICATION_ID, mParams.getString(Key.APPLICATION_ID));
+        }
+        if (!StringUtil.isNullOrEmpty(mParams.getString(Key.PRODUCER_ID))) {
+            put(Key.PRODUCER_ID, mParams.getString(Key.PRODUCER_ID));
+        }
+        if (!StringUtil.isNullOrEmpty(mParams.getString(Key.CHANNEL_ID))) {
+            put(Key.CHANNEL_ID, mParams.getString(Key.CHANNEL_ID));
+        }
+        if (!StringUtil.isNullOrEmpty(mParams.getString(Key.APP_QUALIFIER))) {
+            put(Key.APP_QUALIFIER, mParams.getString(Key.APP_QUALIFIER));
+        }
+        if (!StringUtil.isNullOrEmpty(mParams.getString(Key.TELEMETRY_BASE_URL))) {
+            put(Key.TELEMETRY_BASE_URL, mParams.getString(Key.TELEMETRY_BASE_URL));
+        }
+        if (!StringUtil.isNullOrEmpty(mParams.getString(Key.LANGUAGE_PLATFORM_BASE_URL))) {
+            put(Key.LANGUAGE_PLATFORM_BASE_URL, mParams.getString(Key.LANGUAGE_PLATFORM_BASE_URL));
+        }
+        if (!StringUtil.isNullOrEmpty(mParams.getString(Key.TERMS_BASE_URL))) {
+            put(Key.TERMS_BASE_URL, mParams.getString(Key.TERMS_BASE_URL));
+        }
+        if (!StringUtil.isNullOrEmpty(mParams.getString(Key.CONFIG_BASE_URL))) {
+            put(Key.CONFIG_BASE_URL, mParams.getString(Key.CONFIG_BASE_URL));
+        }
+        if (!StringUtil.isNullOrEmpty(mParams.getString(Key.SEARCH_BASE_URL))) {
+            put(Key.SEARCH_BASE_URL, mParams.getString(Key.SEARCH_BASE_URL));
+        }
+        if (!StringUtil.isNullOrEmpty(mParams.getString(Key.CONTENT_LISTING_BASE_URL))) {
+            put(Key.CONTENT_LISTING_BASE_URL, mParams.getString(Key.CONTENT_LISTING_BASE_URL));
+        }
+        if (!StringUtil.isNullOrEmpty(mParams.getString(Key.CONTENT_BASE_URL))) {
+            put(Key.CONTENT_BASE_URL, mParams.getString(Key.CONTENT_BASE_URL));
+        }
+        if (!StringUtil.isNullOrEmpty(mParams.getString(Key.APIGATEWAY_BASE_URL))) {
+            put(Key.APIGATEWAY_BASE_URL, mParams.getString(Key.APIGATEWAY_BASE_URL));
+        }
+        if (!StringUtil.isNullOrEmpty(mParams.getString(Key.API_USER))) {
+            put(Key.API_USER, mParams.getString(Key.API_USER));
+        }
+        if (!StringUtil.isNullOrEmpty(mParams.getString(Key.API_PASS))) {
+            put(Key.API_PASS, mParams.getString(Key.API_PASS));
+        }
+        if (!StringUtil.isNullOrEmpty(mParams.getString(Key.MOBILE_APP_SECRET))) {
+            put(Key.MOBILE_APP_SECRET, mParams.getString(Key.MOBILE_APP_SECRET));
+        }
+        if (!StringUtil.isNullOrEmpty(mParams.getString(Key.MOBILE_APP_KEY))) {
+            put(Key.MOBILE_APP_KEY, mParams.getString(Key.MOBILE_APP_KEY));
+        }
+        if (!StringUtil.isNullOrEmpty(mParams.getString(Key.MOBILE_APP_CONSUMER))) {
+            put(Key.MOBILE_APP_CONSUMER, mParams.getString(Key.MOBILE_APP_CONSUMER));
+        }
+        if (!StringUtil.isNullOrEmpty(mParams.getString(Key.LOG_LEVEL))) {
+            put(Key.LOG_LEVEL, LogLevel.getLogLevel(mParams.getString(Key.LOG_LEVEL)).getLevel());
+        }
     }
 
     private void initParams(String packageName) {
