@@ -4,6 +4,7 @@ import android.content.Context;
 
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.enums.LogLevel;
+import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.ReflectionUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.utils.BuildConfigUtil;
@@ -17,6 +18,8 @@ import java.util.HashMap;
  */
 public class BuildParams implements IParams {
 
+    private static final String TAG = BuildParams.class.getSimpleName();
+
     private static final int CONTENT_MIN_COMPATIBILITY_LEVEL = 1;
     private static final int CONTENT_MAX_COMPATIBILITY_LEVEL = 3;
     private static final int NETWORK_READ_TIMEOUT = 10;
@@ -26,6 +29,8 @@ public class BuildParams implements IParams {
      * Holds the actual values
      */
     private HashMap<String, Object> mValues;
+
+    private IParams mParams;
 
     /**
      * Creates an empty set of values using the default initial size
@@ -66,12 +71,26 @@ public class BuildParams implements IParams {
 
         initNetworkParam(packageName);
 
-        String profileConfigClass = BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.PROFILE_CONFIG);
-        if (profileConfigClass != null) {
-            Class<?> classInstance = ReflectionUtil.getClass(profileConfigClass);
+        initProfilePath(context, packageName);
+
+        initParams(packageName);
+    }
+
+    public void changeParams() {
+        if (mParams == null) {
+            Logger.e(TAG, "Implement IParams and define in build.config");
+            throw new IllegalStateException("Implement IParams and define in build.config");
+        }
+
+        // TODO: 9/12/2017
+    }
+
+    private void initParams(String packageName) {
+        String paramsConfigClass = BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.PARAMS);
+        if (paramsConfigClass != null) {
+            Class<?> classInstance = ReflectionUtil.getClass(paramsConfigClass);
             if (classInstance != null) {
-                IProfileConfig profileConfiguration = (IProfileConfig) ReflectionUtil.getInstance(classInstance);
-                put(Key.PROFILE_PATH, profileConfiguration.getProfilePath(context));
+                this.mParams = (IParams) ReflectionUtil.getInstance(classInstance);
             }
         }
     }
@@ -124,6 +143,17 @@ public class BuildParams implements IParams {
 
         put(Key.NETWORK_CONNECT_TIMEOUT, connectTimeout);
         put(Key.NETWORK_READ_TIMEOUT, readTimeout);
+    }
+
+    private void initProfilePath(Context context, String packageName) {
+        String profileConfigClass = BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.PROFILE_CONFIG);
+        if (profileConfigClass != null) {
+            Class<?> classInstance = ReflectionUtil.getClass(profileConfigClass);
+            if (classInstance != null) {
+                IProfileConfig profileConfiguration = (IProfileConfig) ReflectionUtil.getInstance(classInstance);
+                put(Key.PROFILE_PATH, profileConfiguration.getProfilePath(context));
+            }
+        }
     }
 
     @Override

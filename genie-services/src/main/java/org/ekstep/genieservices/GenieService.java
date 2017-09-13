@@ -86,6 +86,11 @@ public class GenieService {
         return sService;
     }
 
+    public static Void changeParams() {
+        sService.mAppContext.changeParams();
+        return null;
+    }
+
     /**
      * This api gets the {@link ConfigServiceImpl}, when accessed in the below way
      * <p>
