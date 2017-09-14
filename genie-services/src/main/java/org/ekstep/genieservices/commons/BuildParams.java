@@ -9,6 +9,7 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.utils.BuildConfigUtil;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created on 27/4/17.
@@ -16,8 +17,6 @@ import java.util.HashMap;
  * @author swayangjit
  */
 public class BuildParams implements IParams {
-
-    private static final String TAG = BuildParams.class.getSimpleName();
 
     private static final int CONTENT_MIN_COMPATIBILITY_LEVEL = 1;
     private static final int CONTENT_MAX_COMPATIBILITY_LEVEL = 3;
@@ -29,7 +28,7 @@ public class BuildParams implements IParams {
     /**
      * Holds the actual values
      */
-    private HashMap<String, Object> mValues;
+    private Map<String, Object> mValues;
 
     /**
      * Creates an empty set of values using the default initial size
@@ -47,25 +46,25 @@ public class BuildParams implements IParams {
             throw new IllegalArgumentException("packageName is mandatory, can not be null or empty.");
         }
 
-        put(Key.VERSION_NAME, BuildConfigUtil.getBuildConfigValue(packageName, Key.VERSION_NAME));
-        put(Key.APPLICATION_ID, BuildConfigUtil.getBuildConfigValue(packageName, Key.APPLICATION_ID));
-        put(Key.PRODUCER_ID, BuildConfigUtil.getBuildConfigValue(packageName, Key.PRODUCER_ID));
-        put(Key.CHANNEL_ID, BuildConfigUtil.getBuildConfigValue(packageName, Key.CHANNEL_ID));
-        put(Key.APP_QUALIFIER, BuildConfigUtil.getBuildConfigValue(packageName, Key.APP_QUALIFIER));
-        put(ServiceConstants.Params.PLAYER_CONFIG, BuildConfigUtil.getBuildConfigValue(packageName, ServiceConstants.Params.PLAYER_CONFIG));
-        put(Key.TELEMETRY_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, Key.TELEMETRY_BASE_URL));
-        put(Key.LANGUAGE_PLATFORM_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, Key.LANGUAGE_PLATFORM_BASE_URL));
-        put(Key.TERMS_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, Key.TERMS_BASE_URL));
-        put(Key.CONFIG_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, Key.CONFIG_BASE_URL));
-        put(Key.SEARCH_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, Key.SEARCH_BASE_URL));
-        put(Key.CONTENT_LISTING_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, Key.CONTENT_LISTING_BASE_URL));
-        put(Key.CONTENT_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, Key.CONTENT_BASE_URL));
-        put(Key.APIGATEWAY_BASE_URL, BuildConfigUtil.getBuildConfigValue(packageName, Key.APIGATEWAY_BASE_URL));
-        put(Key.API_USER, BuildConfigUtil.getBuildConfigValue(packageName, Key.API_USER));
-        put(Key.API_PASS, BuildConfigUtil.getBuildConfigValue(packageName, Key.API_PASS));
-        put(Key.MOBILE_APP_SECRET, BuildConfigUtil.getBuildConfigValue(packageName, Key.MOBILE_APP_SECRET));
-        put(Key.MOBILE_APP_KEY, BuildConfigUtil.getBuildConfigValue(packageName, Key.MOBILE_APP_KEY));
-        put(Key.MOBILE_APP_CONSUMER, BuildConfigUtil.getBuildConfigValue(packageName, Key.MOBILE_APP_CONSUMER));
+        setParam(Key.VERSION_NAME);
+        setParam(Key.APPLICATION_ID);
+        setParam(Key.PRODUCER_ID);
+        setParam(Key.CHANNEL_ID);
+        setParam(Key.APP_QUALIFIER);
+        setParam(Key.TELEMETRY_BASE_URL);
+        setParam(Key.LANGUAGE_PLATFORM_BASE_URL);
+        setParam(Key.TERMS_BASE_URL);
+        setParam(Key.CONFIG_BASE_URL);
+        setParam(Key.SEARCH_BASE_URL);
+        setParam(Key.CONTENT_LISTING_BASE_URL);
+        setParam(Key.CONTENT_BASE_URL);
+        setParam(Key.APIGATEWAY_BASE_URL);
+        setParam(Key.API_USER);
+        setParam(Key.API_PASS);
+        setParam(Key.MOBILE_APP_SECRET);
+        setParam(Key.MOBILE_APP_KEY);
+        setParam(Key.MOBILE_APP_CONSUMER);
+        setParam(ServiceConstants.Params.PLAYER_CONFIG);
         put(Key.LOG_LEVEL, LogLevel.getLogLevel(BuildConfigUtil.getBuildConfigValue(packageName, Key.LOG_LEVEL)).getLevel());
 
         initCompatibilityLevel(packageName);
@@ -73,6 +72,19 @@ public class BuildParams implements IParams {
         initNetworkParam(packageName);
 
         initProfilePath(context, packageName);
+    }
+
+    private void setParam(String key) {
+        put(key, BuildConfigUtil.getBuildConfigValue(mPackageName, key));
+    }
+
+    private void setParam(IParams params, String key) {
+        if (!StringUtil.isNullOrEmpty(params.getString(key))) {
+            put(key, params.getString(key));
+        } else {
+            // Set default
+            setParam(key);
+        }
     }
 
     /**
@@ -87,62 +99,29 @@ public class BuildParams implements IParams {
             return;
         }
 
-        if (!StringUtil.isNullOrEmpty(params.getString(Key.VERSION_NAME))) {
-            put(Key.VERSION_NAME, params.getString(Key.VERSION_NAME));
-        }
-        if (!StringUtil.isNullOrEmpty(params.getString(Key.APPLICATION_ID))) {
-            put(Key.APPLICATION_ID, params.getString(Key.APPLICATION_ID));
-        }
-        if (!StringUtil.isNullOrEmpty(params.getString(Key.PRODUCER_ID))) {
-            put(Key.PRODUCER_ID, params.getString(Key.PRODUCER_ID));
-        }
-        if (!StringUtil.isNullOrEmpty(params.getString(Key.CHANNEL_ID))) {
-            put(Key.CHANNEL_ID, params.getString(Key.CHANNEL_ID));
-        }
-        if (!StringUtil.isNullOrEmpty(params.getString(Key.APP_QUALIFIER))) {
-            put(Key.APP_QUALIFIER, params.getString(Key.APP_QUALIFIER));
-        }
-        if (!StringUtil.isNullOrEmpty(params.getString(Key.TELEMETRY_BASE_URL))) {
-            put(Key.TELEMETRY_BASE_URL, params.getString(Key.TELEMETRY_BASE_URL));
-        }
-        if (!StringUtil.isNullOrEmpty(params.getString(Key.LANGUAGE_PLATFORM_BASE_URL))) {
-            put(Key.LANGUAGE_PLATFORM_BASE_URL, params.getString(Key.LANGUAGE_PLATFORM_BASE_URL));
-        }
-        if (!StringUtil.isNullOrEmpty(params.getString(Key.TERMS_BASE_URL))) {
-            put(Key.TERMS_BASE_URL, params.getString(Key.TERMS_BASE_URL));
-        }
-        if (!StringUtil.isNullOrEmpty(params.getString(Key.CONFIG_BASE_URL))) {
-            put(Key.CONFIG_BASE_URL, params.getString(Key.CONFIG_BASE_URL));
-        }
-        if (!StringUtil.isNullOrEmpty(params.getString(Key.SEARCH_BASE_URL))) {
-            put(Key.SEARCH_BASE_URL, params.getString(Key.SEARCH_BASE_URL));
-        }
-        if (!StringUtil.isNullOrEmpty(params.getString(Key.CONTENT_LISTING_BASE_URL))) {
-            put(Key.CONTENT_LISTING_BASE_URL, params.getString(Key.CONTENT_LISTING_BASE_URL));
-        }
-        if (!StringUtil.isNullOrEmpty(params.getString(Key.CONTENT_BASE_URL))) {
-            put(Key.CONTENT_BASE_URL, params.getString(Key.CONTENT_BASE_URL));
-        }
-        if (!StringUtil.isNullOrEmpty(params.getString(Key.APIGATEWAY_BASE_URL))) {
-            put(Key.APIGATEWAY_BASE_URL, params.getString(Key.APIGATEWAY_BASE_URL));
-        }
-        if (!StringUtil.isNullOrEmpty(params.getString(Key.API_USER))) {
-            put(Key.API_USER, params.getString(Key.API_USER));
-        }
-        if (!StringUtil.isNullOrEmpty(params.getString(Key.API_PASS))) {
-            put(Key.API_PASS, params.getString(Key.API_PASS));
-        }
-        if (!StringUtil.isNullOrEmpty(params.getString(Key.MOBILE_APP_SECRET))) {
-            put(Key.MOBILE_APP_SECRET, params.getString(Key.MOBILE_APP_SECRET));
-        }
-        if (!StringUtil.isNullOrEmpty(params.getString(Key.MOBILE_APP_KEY))) {
-            put(Key.MOBILE_APP_KEY, params.getString(Key.MOBILE_APP_KEY));
-        }
-        if (!StringUtil.isNullOrEmpty(params.getString(Key.MOBILE_APP_CONSUMER))) {
-            put(Key.MOBILE_APP_CONSUMER, params.getString(Key.MOBILE_APP_CONSUMER));
-        }
+        setParam(params, Key.VERSION_NAME);
+        setParam(params, Key.APPLICATION_ID);
+        setParam(params, Key.PRODUCER_ID);
+        setParam(params, Key.CHANNEL_ID);
+        setParam(params, Key.APP_QUALIFIER);
+        setParam(params, Key.TELEMETRY_BASE_URL);
+        setParam(params, Key.LANGUAGE_PLATFORM_BASE_URL);
+        setParam(params, Key.TERMS_BASE_URL);
+        setParam(params, Key.CONFIG_BASE_URL);
+        setParam(params, Key.SEARCH_BASE_URL);
+        setParam(params, Key.CONTENT_LISTING_BASE_URL);
+        setParam(params, Key.CONTENT_BASE_URL);
+        setParam(params, Key.APIGATEWAY_BASE_URL);
+        setParam(params, Key.API_USER);
+        setParam(params, Key.API_PASS);
+        setParam(params, Key.MOBILE_APP_SECRET);
+        setParam(params, Key.MOBILE_APP_KEY);
+        setParam(params, Key.MOBILE_APP_CONSUMER);
+
         if (!StringUtil.isNullOrEmpty(params.getString(Key.LOG_LEVEL))) {
             put(Key.LOG_LEVEL, LogLevel.getLogLevel(params.getString(Key.LOG_LEVEL)).getLevel());
+        } else { // Set default.
+            put(Key.LOG_LEVEL, LogLevel.getLogLevel(BuildConfigUtil.getBuildConfigValue(mPackageName, Key.LOG_LEVEL)).getLevel());
         }
     }
 

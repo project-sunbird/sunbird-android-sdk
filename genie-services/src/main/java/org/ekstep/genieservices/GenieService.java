@@ -70,6 +70,13 @@ public class GenieService {
         return sAsyncService;
     }
 
+    /**
+     * Initialize the SDK.
+     *
+     * @param context     {@link Context}
+     * @param packageName package name of the integrating application which is defined in Manifest.xml
+     * @return instance of {@link GenieService}.
+     */
     public static GenieService init(Context context, String packageName) {
         if (sService == null) {
             AppContext<Context> appContext = AndroidAppContext.buildAppContext(context, packageName);
@@ -87,7 +94,7 @@ public class GenieService {
     }
 
     /**
-     * Change or update the params in runtime.
+     * After the GenieService initialization in client app wants to change or update the params in runtime then call this method with updated params.
      *
      * @param params {@link IParams}
      */
