@@ -20,6 +20,7 @@ public class ContentSearchCriteria implements Serializable {
     private int grade;
     private String medium;
     private String board;
+    private String createdBy;
     private String[] audience;
     private String[] channel;
     private String[] contentStatusArray;
@@ -31,7 +32,7 @@ public class ContentSearchCriteria implements Serializable {
     // 1 - indicates search, 2 - filter
     private SearchType searchType;
 
-    private ContentSearchCriteria(String query, long limit, String mode, int age, int grade, String medium, String board,
+    private ContentSearchCriteria(String query, long limit, String mode, int age, int grade, String medium, String board, String createdBy,
                                   String[] audience, String[] channel, String[] contentStatusArray, String[] facets, String[] contentTypes,
                                   List<ContentSortCriteria> sortCriteria, SearchType searchType) {
         this.query = query;
@@ -41,6 +42,7 @@ public class ContentSearchCriteria implements Serializable {
         this.grade = grade;
         this.medium = medium;
         this.board = board;
+        this.createdBy = createdBy;
         this.audience = audience;
         this.channel = channel;
         this.contentStatusArray = contentStatusArray;
@@ -82,6 +84,10 @@ public class ContentSearchCriteria implements Serializable {
 
     public String getBoard() {
         return board;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
     }
 
     public String[] getAudience() {
@@ -137,6 +143,7 @@ public class ContentSearchCriteria implements Serializable {
         private int grade;
         private String medium;
         private String board;
+        private String createdBy;
         private String[] audience;
         private String[] channel;
         private String[] contentStatusArray;
@@ -211,6 +218,14 @@ public class ContentSearchCriteria implements Serializable {
         }
 
         /**
+         * Created by.
+         */
+        public SearchBuilder createdBy(String createdBy) {
+            this.createdBy = createdBy;
+            return this;
+        }
+
+        /**
          * Array of audience. i.e. "Learner", "Instructor".
          */
         public SearchBuilder audience(String[] audience) {
@@ -260,7 +275,7 @@ public class ContentSearchCriteria implements Serializable {
                 this.contentTypes = new String[]{"Story", "Worksheet", "Collection", "Game", "TextBook"};
             }
 
-            return new ContentSearchCriteria(query, limit, mode, age, grade, medium, board,
+            return new ContentSearchCriteria(query, limit, mode, age, grade, medium, board, createdBy,
                     audience, channel, contentStatusArray, facets, contentTypes, sortCriteria, SearchType.SEARCH);
         }
     }

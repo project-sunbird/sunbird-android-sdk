@@ -31,7 +31,6 @@ import java.util.Map;
  */
 public class SummarizerServiceImpl extends BaseService implements ISummarizerService {
 
-
     private static final String TAG = SummarizerServiceImpl.class.getSimpleName();
 
     public SummarizerServiceImpl(AppContext appContext) {
@@ -43,7 +42,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         LearnerAssessmentSummaryModel learnerAssessmentSummaryModel = null;
         GenieResponse<List<LearnerAssessmentSummary>> response;
         String methodName = "getSummary@LearnerAssessmentsServiceImpl";
-        HashMap params = new HashMap();
+        Map<String, Object> params = new HashMap<>();
         params.put("logLevel", "2");
 
         if (summaryRequest.getUid() != null) {
@@ -67,7 +66,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
     public GenieResponse<List<LearnerAssessmentDetails>> getLearnerAssessmentDetails(SummaryRequest summaryRequest) {
         GenieResponse<List<LearnerAssessmentDetails>> response;
         String methodName = "getLearnerAssessmentDetails@LearnerAssessmentsServiceImpl";
-        HashMap params = new HashMap();
+        Map<String, Object> params = new HashMap<>();
         params.put("logLevel", "2");
 
         String filter = getFilterForLearnerAssessmentDetails(null, summaryRequest.getUid(), summaryRequest.getContentId(), summaryRequest.getHierarchyData());
@@ -103,7 +102,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
     public GenieResponse<Void> saveLearnerAssessmentDetails(Telemetry telemetry) {
         GenieResponse<Void> response;
         String methodName = "saveLearnerAssessmentDetails@LearnerAssessmentsServiceImpl";
-        HashMap params = new HashMap();
+        Map<String, Object> params = new HashMap<>();
         params.put("logLevel", "2");
         LearnerAssessmentDetails learnerAssessmentDetails = mapTelemtryToLearnerAssessmentData(telemetry);
         LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.build(mAppContext.getDBSession(), learnerAssessmentDetails);
@@ -125,7 +124,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
     public GenieResponse<Void> saveLearnerContentSummaryDetails(Telemetry telemetry) {
         GenieResponse<Void> response;
         String methodName = "saveLearnerContentSummaryDetails@LearnerAssessmentsServiceImpl";
-        HashMap params = new HashMap();
+        Map<String, Object> params = new HashMap<>();
         params.put("logLevel", "2");
         LearnerContentSummaryDetails learnerContentSummaryDetails = mapTelemtryToLearnerContentSummaryDeatils(telemetry);
         LearnerSummaryModel learnerSummaryModel;
@@ -214,6 +213,5 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         }
         return learnerAssessmentDetails;
     }
-
 
 }

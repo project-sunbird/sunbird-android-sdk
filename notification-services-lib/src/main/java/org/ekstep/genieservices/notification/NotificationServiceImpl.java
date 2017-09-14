@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NotificationServiceImpl extends BaseService implements INotificationService {
+
     private static final String TAG = NotificationServiceImpl.class.getSimpleName();
 
     public NotificationServiceImpl(AppContext appContext) {
@@ -23,7 +24,6 @@ public class NotificationServiceImpl extends BaseService implements INotificatio
 
     @Override
     public GenieResponse<Void> addNotification(Notification notification) {
-
         if (notification != null) {
             NotificationModel notificationModel = NotificationHandler.convertNotificationMapToModel(mAppContext.getDBSession(), notification);
             NotificationModel oldNotification = NotificationModel.findById(mAppContext.getDBSession(), notification.getMsgid());
@@ -54,13 +54,12 @@ public class NotificationServiceImpl extends BaseService implements INotificatio
             notification.delete();
             return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         }
-        return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.DELETE_FAILED, ServiceConstants.ErrorMessage.FAILED_TO_DELETE_NOTIFICATION, TAG);
 
+        return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.DELETE_FAILED, ServiceConstants.ErrorMessage.FAILED_TO_DELETE_NOTIFICATION, TAG);
     }
 
     @Override
     public GenieResponse<List<Notification>> getAllNotifications(NotificationFilterCriteria criteria) {
-
         NotificationsModel notificationModel = NotificationsModel.build(mAppContext.getDBSession(), NotificationHandler.getFilterCondition(criteria));
         GenieResponse<List<Notification>> successResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         //Deletes all expired notifications
@@ -72,6 +71,7 @@ public class NotificationServiceImpl extends BaseService implements INotificatio
         } else {
             successResponse.setResult(notifications.getNotificationBeans());
         }
+
         return successResponse;
     }
 }

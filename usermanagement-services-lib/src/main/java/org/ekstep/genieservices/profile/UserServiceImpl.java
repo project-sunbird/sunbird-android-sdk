@@ -81,7 +81,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     @Override
     public GenieResponse<Profile> createUserProfile(Profile profile) {
         String methodName = "createUserProfile@UserServiceImpl";
-        HashMap<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("logLevel", "2");
 
         GenieResponse<Profile> response;
@@ -135,7 +135,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     @Override
     public GenieResponse<List<Profile>> getAllUserProfile() {
         String methodName = "getAllUserProfile@UserServiceImpl";
-        HashMap<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("logLevel", "1");
 
         GenieResponse<List<Profile>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
@@ -163,7 +163,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     @Override
     public GenieResponse<Profile> updateUserProfile(Profile profile) {
         String methodName = "updateUserProfile@UserServiceImpl";
-        HashMap<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("logLevel", "2");
 
         GenieResponse<Profile> response;
@@ -202,7 +202,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     @Override
     public GenieResponse<Void> deleteUser(String uid) {
         String methodName = "deleteUser@UserServiceImpl";
-        HashMap<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("uid", uid);
         params.put("logLevel", "2");
 
@@ -262,7 +262,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     @Override
     public GenieResponse<String> setAnonymousUser() {
         String methodName = "setAnonymousUser@UserServiceImpl";
-        HashMap<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("logLevel", "1");
 
         String uid = getAnonymousUser().getResult().getUid();
@@ -303,7 +303,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     @Override
     public GenieResponse<Void> setCurrentUser(String uid) {
         String methodName = "setCurrentUser@UserServiceImpl";
-        HashMap<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("uid", uid);
         params.put("logLevel", "2");
 
@@ -346,7 +346,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     @Override
     public GenieResponse<Profile> getCurrentUser() {
         String methodName = "getCurrentUser@UserServiceImpl";
-        HashMap<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("logLevel", "1");
 
         UserSessionModel userSessionModel = UserSessionModel.findUserSession(mAppContext);
@@ -374,7 +374,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     @Override
     public GenieResponse<UserSession> getCurrentUserSession() {
         String methodName = "getCurrentUserSession@UserServiceImpl";
-        HashMap<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("logLevel", "1");
 
         UserSessionModel userSessionModel = UserSessionModel.findUserSession(mAppContext);
@@ -405,7 +405,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     @Override
     public GenieResponse<List<ContentAccess>> getAllContentAccess(ContentAccessFilterCriteria criteria) {
         String methodName = "getAllContentAccess@UserServiceImpl";
-        HashMap<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("logLevel", "1");
 
         String contentFilter = null;
@@ -462,7 +462,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     public GenieResponse<Void> addContentAccess(ContentAccess contentAccess) {
         String methodName = "setLearnerState@UserServiceImpl";
         String contentLearnerState = (contentAccess.getContentLearnerState() == null) ? null : GsonUtil.toJson(contentAccess.getContentLearnerState().getLearnerState());
-        HashMap<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("contentIdentifier", contentAccess.getContentId());
         params.put("learnerState", contentLearnerState);
         params.put("logLevel", "2");
