@@ -21,6 +21,7 @@ import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
+import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
@@ -28,6 +29,7 @@ import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
+import org.ekstep.genieservices.commons.bean.enums.DownloadAction;
 
 import java.util.List;
 
@@ -379,6 +381,49 @@ public class ContentService {
             @Override
             public GenieResponse<ContentExportResponse> perform() {
                 return contentService.exportContent(contentExportRequest);
+            }
+        });
+    }
+
+
+    /**
+     * This api is used to get all current downloads.
+     *
+     * @param responseHandler - {@link IResponseHandler<List<DownloadRequest>>}
+     */
+    public void getAllDownloads(IResponseHandler<List<DownloadRequest>> responseHandler) {
+        new AsyncHandler<List<DownloadRequest>>(responseHandler).execute(new IPerformable<List<DownloadRequest>>() {
+            @Override
+            public GenieResponse<List<DownloadRequest>> perform() {
+                return contentService.getAllDownloads();
+            }
+        });
+    }
+
+    /**
+     * This api is used to set action in download queue
+     *
+     * @param responseHandler - {@link IResponseHandler<Void>}
+     */
+    public void setDownloadAction(final DownloadAction downloadAction, IResponseHandler<Void> responseHandler) {
+        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return contentService.setDownloadAction(downloadAction);
+            }
+        });
+    }
+
+    /**
+     * This api is used to get status of the downloadQueue
+     *
+     * @param responseHandler - {@link IResponseHandler<List<DownloadRequest>>}
+     */
+    public void getDownloadState(IResponseHandler<DownloadAction> responseHandler) {
+        new AsyncHandler<DownloadAction>(responseHandler).execute(new IPerformable<DownloadAction>() {
+            @Override
+            public GenieResponse<DownloadAction> perform() {
+                return contentService.getDownloadState();
             }
         });
     }

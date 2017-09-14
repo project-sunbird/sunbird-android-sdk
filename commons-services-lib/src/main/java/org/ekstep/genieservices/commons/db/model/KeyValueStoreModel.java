@@ -4,8 +4,10 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.BaseColumns;
 import org.ekstep.genieservices.commons.db.contract.KeyValueStoreEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
+import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
+import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 
@@ -15,7 +17,7 @@ import java.util.Locale;
  * Created by swayangjit on 10/9/17.
  */
 
-public class KeyValueStoreModel implements IWritable, IReadable {
+public class KeyValueStoreModel implements IWritable, IReadable, IUpdatable, ICleanable {
 
     private Long id = -1L;
     private IDBSession mDBSession;
@@ -52,7 +54,7 @@ public class KeyValueStoreModel implements IWritable, IReadable {
     public ContentValues getContentValues() {
         ContentValues contentValues = new ContentValues();
         contentValues.put(KeyValueStoreEntry.COLUMN_NAME_KEY, mKey);
-        contentValues.put(KeyValueStoreEntry.COLUMN_NAME_VALUE, mValue.getBytes());
+        contentValues.put(KeyValueStoreEntry.COLUMN_NAME_VALUE, mValue);
         return contentValues;
     }
 
@@ -70,8 +72,31 @@ public class KeyValueStoreModel implements IWritable, IReadable {
     }
 
     @Override
+    public ContentValues getFieldsToUpdate() {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(KeyValueStoreEntry.COLUMN_NAME_KEY, mKey);
+        contentValues.put(KeyValueStoreEntry.COLUMN_NAME_VALUE, mValue);
+        return contentValues;
+    }
+
+    @Override
     public String getTableName() {
         return KeyValueStoreEntry.TABLE_NAME;
+    }
+
+    @Override
+    public void clean() {
+        id = -1L;
+    }
+
+    @Override
+    public String selectionToClean() {
+        return String.format(Locale.US, "WHERE %s = '%s';", KeyValueStoreEntry.COLUMN_NAME_KEY, mKey);
+    }
+
+    @Override
+    public String updateBy() {
+        return String.format(Locale.US, "%s = '%s'", KeyValueStoreEntry.COLUMN_NAME_KEY, mKey);
     }
 
     @Override
@@ -103,11 +128,18 @@ public class KeyValueStoreModel implements IWritable, IReadable {
         mDBSession.create(this);
     }
 
+    public void update() {
+        mDBSession.update(this);
+    }
+
+    public void delete() {
+        mDBSession.clean(this);
+    }
+
     private void readWithoutMoving(IResultSet resultSet) {
         id = resultSet.getLong(resultSet.getColumnIndex(BaseColumns._ID));
         mKey = resultSet.getString(resultSet.getColumnIndex(KeyValueStoreEntry.COLUMN_NAME_KEY));
-        byte[] bytes = resultSet.getBlob(resultSet.getColumnIndex(KeyValueStoreEntry.COLUMN_NAME_VALUE));
-        mValue = new String(bytes);
+        mValue = resultSet.getString(resultSet.getColumnIndex(KeyValueStoreEntry.COLUMN_NAME_VALUE));
     }
 
     public String getKey() {

@@ -21,6 +21,7 @@ import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
+import org.ekstep.genieservices.commons.bean.enums.DownloadAction;
 
 import java.util.List;
 
@@ -227,5 +228,9 @@ public interface IContentService {
     GenieResponse<ContentExportResponse> exportContent(ContentExportRequest contentExportRequest);
 
     GenieResponse<List<DownloadRequest>> getAllDownloads();
+
+    GenieResponse<Void> setDownloadAction(DownloadAction action);
+
+    GenieResponse<DownloadAction> getDownloadState();
 
 }

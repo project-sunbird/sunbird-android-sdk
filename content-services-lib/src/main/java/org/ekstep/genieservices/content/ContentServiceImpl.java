@@ -35,9 +35,11 @@ import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.enums.ContentImportStatus;
+import org.ekstep.genieservices.commons.bean.enums.DownloadAction;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.commons.db.model.KeyValueStoreModel;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
@@ -72,6 +74,7 @@ import org.ekstep.genieservices.telemetry.TelemetryLogger;
 import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -763,19 +766,19 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     public GenieResponse<List<DownloadRequest>> getAllDownloads() {
 
         String methodName = "getAllDownloads@ContentServiceImpl";
-//        KeyValueStoreModel keyValueStoreModel = KeyValueStoreModel.findByKey(mAppContext.getDBSession(), DOWNLOAD_QUEUE);
+        KeyValueStoreModel keyValueStoreModel = KeyValueStoreModel.findByKey(mAppContext.getDBSession(), DOWNLOAD_QUEUE);
         GenieResponse<List<DownloadRequest>> response;
-//        if (keyValueStoreModel == null) {
-//            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.KEY_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_KEY, TAG);
-//            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, (Map) new HashMap<>(), ServiceConstants.ErrorMessage.UNABLE_TO_FIND_KEY);
-//            return response;
-//        }
-//        String value = keyValueStoreModel.getValue();
-//        List<DownloadRequest> requestList = new ArrayList<>();
-//        DownloadRequest[] downloadRequests = GsonUtil.fromJson(value, DownloadRequest[].class);
-//        requestList.addAll(Arrays.asList(downloadRequests));
+        if (keyValueStoreModel == null) {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.KEY_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_KEY, TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, (Map) new HashMap<>(), ServiceConstants.ErrorMessage.UNABLE_TO_FIND_KEY);
+            return response;
+        }
+        String value = keyValueStoreModel.getValue();
+        List<DownloadRequest> requestList = new ArrayList<>();
+        DownloadRequest[] downloadRequests = GsonUtil.fromJson(value, DownloadRequest[].class);
+        requestList.addAll(Arrays.asList(downloadRequests));
 
-        Type type = new TypeToken<List<ContentData>>() {
+        Type type = new TypeToken<List<DownloadRequest>>() {
         }.getType();
         List<DownloadRequest> downloadReqList = GsonUtil.getGson().fromJson(sampleResponse(), type);
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
@@ -783,6 +786,26 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, (Map) new HashMap<>());
         return response;
     }
+
+    @Override
+    public GenieResponse<Void> setDownloadAction(DownloadAction action) {
+        String methodName = "setDownloadAction@ContentServiceImpl";
+        mAppContext.getKeyValueStore().putInt(ServiceConstants.PreferenceKey.KEY_DOWNLOAD_STATUS, action.getValue());
+        GenieResponse<Void> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, (Map) new HashMap<>());
+        return response;
+
+    }
+
+    @Override
+    public GenieResponse<DownloadAction> getDownloadState() {
+        String methodName = "getDownloadState@ContentServiceImpl";
+        GenieResponse<DownloadAction> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        response.setResult(mAppContext.getKeyValueStore().getInt(ServiceConstants.PreferenceKey.KEY_DOWNLOAD_STATUS, 0) == 0 ? DownloadAction.RESUME : DownloadAction.PAUSE);
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, (Map) new HashMap<>());
+        return response;
+    }
+
 
     private String sampleResponse() {
         return "[\n" +
@@ -808,7 +831,20 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 "      \"name\": \"Content2\"\n" +
                 "    }\n" +
                 "  },\n" +
+                "  \n" +
                 "  {\n" +
+                "    \"downloadId\": 4,\n" +
+                "    \"identifier\": \"do_12345671\",\n" +
+                "    \"downloadUrl\": \"sampleurl\",\n" +
+                "    \"mimeType\": \"application/ecar\",\n" +
+                "    \"destinationFolder\": \"\",\n" +
+                "    \"isChildContent\": true,\n" +
+                "    \"attributes\": {\n" +
+                "      \"identifier\": \"do_12345678\",\n" +
+                "      \"name\": \"Content4\"\n" +
+                "    }\n" +
+                "  },\n" +
+                "{\n" +
                 "    \"downloadId\": 3,\n" +
                 "    \"identifier\": \"do_123456\",\n" +
                 "    \"downloadUrl\": \"sampleurl\",\n" +
@@ -820,35 +856,26 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 "    }\n" +
                 "  },\n" +
                 "  {\n" +
-                "    \"downloadId\": 4,\n" +
-                "    \"identifier\": \"do_1234567\",\n" +
-                "    \"downloadUrl\": \"sampleurl\",\n" +
-                "    \"mimeType\": \"application/ecar\",\n" +
-                "    \"destinationFolder\": \"\",\n" +
-                "    \"isChildContent\": true,\n" +
-                "    \"attributes\": {\n" +
-                "      \"name\": \"Content4\"\n" +
-                "    }\n" +
-                "  },\n" +
-                "  {\n" +
                 "    \"downloadId\": 5,\n" +
-                "    \"identifier\": \"do_1234567\",\n" +
+                "    \"identifier\": \"do_12345672\",\n" +
                 "    \"downloadUrl\": \"sampleurl\",\n" +
                 "    \"mimeType\": \"application/ecar\",\n" +
                 "    \"destinationFolder\": \"\",\n" +
                 "    \"isChildContent\": true,\n" +
                 "    \"attributes\": {\n" +
+                "      \"identifier\": \"do_12345678\",\n" +
                 "      \"name\": \"Content4\"\n" +
                 "    }\n" +
                 "  },\n" +
                 "  {\n" +
                 "    \"downloadId\": 6,\n" +
-                "    \"identifier\": \"do_1234567\",\n" +
+                "    \"identifier\": \"do_12345673\",\n" +
                 "    \"downloadUrl\": \"sampleurl\",\n" +
                 "    \"mimeType\": \"application/ecar\",\n" +
                 "    \"destinationFolder\": \"\",\n" +
                 "    \"isChildContent\": true,\n" +
                 "    \"attributes\": {\n" +
+                "      \"identifier\": \"do_12345678\",\n" +
                 "      \"name\": \"Content4\"\n" +
                 "    }\n" +
                 "  }\n" +

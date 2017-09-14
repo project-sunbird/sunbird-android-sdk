@@ -14,7 +14,7 @@ public abstract class KeyValueStoreEntry implements BaseColumns {
         return "CREATE TABLE " + TABLE_NAME + " (" +
                 _ID + " INTEGER PRIMARY KEY," +
                 COLUMN_NAME_KEY + DbConstants.TEXT_TYPE + ", " +
-                COLUMN_NAME_VALUE + DbConstants.BLOB_TYPE +
+                COLUMN_NAME_VALUE + DbConstants.TEXT_TYPE +
                 " )";
     }
 

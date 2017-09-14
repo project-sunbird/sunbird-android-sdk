@@ -60,6 +60,9 @@ public interface ServiceConstants {
         String KEY_ACTIVE_PARTNER_ID = "partner.activeid";
         String SHARED_PREF_SESSION_KEY = "partnersessionid";
         String SHARED_PREF_PARTNER_SET_EPOCH = "partnerSET";
+
+        //Download
+        String KEY_DOWNLOAD_STATUS = "download_status";
     }
 
     interface Partner {
