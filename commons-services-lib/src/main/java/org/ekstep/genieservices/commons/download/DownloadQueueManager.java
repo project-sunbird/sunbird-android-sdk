@@ -145,6 +145,7 @@ public class DownloadQueueManager {
         List<DownloadRequest> requestList = getAllRequests();
         Set<DownloadRequest> downloadRequestSet = new LinkedHashSet<>(requestList);
         downloadRequestSet.add(request);
+        mDownloadRequestList = new ArrayList<>(downloadRequestSet);
         saveToKeyValueStore(downloadRequestSet);
     }
 
