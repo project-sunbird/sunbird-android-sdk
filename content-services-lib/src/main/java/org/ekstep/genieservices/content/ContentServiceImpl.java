@@ -658,7 +658,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             }
 
             if (contentDataList != null) {
-                DownloadRequest[] downloadRequests = new DownloadRequest[contentDataList.size()];
+                List<DownloadRequest> downloadRequestList = new ArrayList<>();
                 for (int i = 0; i < contentDataList.size(); i++) {
                     Map<String, Object> dataMap = contentDataList.get(i);
                     String contentId = ContentHandler.readIdentifier(dataMap);
@@ -667,18 +667,23 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
                     if (!StringUtil.isNullOrEmpty(downloadUrl) && ServiceConstants.FileExtension.CONTENT.equalsIgnoreCase(FileUtil.getFileExtension(downloadUrl))) {
                         status = ContentImportStatus.ENQUEUED_FOR_DOWNLOAD;
+
                         DownloadRequest downloadRequest = new DownloadRequest(contentId, downloadUrl, ContentConstants.MimeType.ECAR, importRequest.getDestinationFolder(), importRequest.isChildContent());
                         downloadRequest.setFilename(contentId + "." + ServiceConstants.FileExtension.CONTENT);
                         downloadRequest.setCorrelationData(importRequest.getCorrelationData());
                         downloadRequest.setProcessorClass("org.ekstep.genieservices.commons.download.ContentImportService");
-                        downloadRequests[i] = downloadRequest;
+
+                        downloadRequestList.add(downloadRequest);
                     }
 
                     contentIds.remove(contentId);
                     contentImportResponseList.add(new ContentImportResponse(contentId, status));
                 }
 
-                downloadService.enqueue(downloadRequests);
+                if (downloadRequestList.size() > 0) {
+                    DownloadRequest[] downloadRequestArray = (DownloadRequest[]) downloadRequestList.toArray();
+                    downloadService.enqueue(downloadRequestArray);
+                }
             }
         }
 
