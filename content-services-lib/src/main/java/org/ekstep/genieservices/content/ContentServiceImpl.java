@@ -24,6 +24,7 @@ import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
+import org.ekstep.genieservices.commons.bean.ContentMoveRequest;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
@@ -759,6 +760,11 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 .then(new AddGeTransferContentExportEvent());
 
         return cleanTempLoc.execute(mAppContext, exportContentContext);
+    }
+
+    @Override
+    public GenieResponse<Void> moveContent(ContentMoveRequest contentMoveRequest) {
+        return null;
     }
 
 }

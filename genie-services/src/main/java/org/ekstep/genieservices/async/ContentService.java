@@ -19,6 +19,7 @@ import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
+import org.ekstep.genieservices.commons.bean.ContentMoveRequest;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
@@ -379,6 +380,28 @@ public class ContentService {
             @Override
             public GenieResponse<ContentExportResponse> perform() {
                 return contentService.exportContent(contentExportRequest);
+            }
+        });
+    }
+
+    /**
+     * This api is used to move all the downloaded content from source to destination folder.
+     * <p>
+     * <p>
+     * On successful moving the content, the response will return status as TRUE, with response set in result
+     * <p>
+     * <p>
+     * On failing to move the content, the response will be with return status as FALSE and with the following error
+     * <p>MOVE_FAILED
+     *
+     * @param contentMoveRequest - {@link ContentMoveRequest}
+     * @param responseHandler    - {@link IResponseHandler<Void>}
+     */
+    public void moveContent(final ContentMoveRequest contentMoveRequest, IResponseHandler<Void> responseHandler) {
+        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return contentService.moveContent(contentMoveRequest);
             }
         });
     }
