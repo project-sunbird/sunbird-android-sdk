@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -190,6 +192,44 @@ public class FileUtil {
             return externalFilesDir.getUsableSpace();
         }
         return 0;
+    }
+
+    public static boolean isFreeSpaceAvailable(long deviceAvailableFreeSpace, long fileSpace, long bufferSize) {
+        long BUFFER_SIZE = 1024 * 10;
+        if (bufferSize > 0) {
+            BUFFER_SIZE = bufferSize;
+        }
+        return deviceAvailableFreeSpace > 0 && deviceAvailableFreeSpace > (fileSpace + BUFFER_SIZE);
+    }
+
+    public static long getFileSize(final File file) {
+        if (file == null || !file.exists()) {
+            return 0;
+        }
+        if (!file.isDirectory()) {
+            return file.length();
+        }
+
+        final List<File> dirs = new LinkedList<>();
+        dirs.add(file);
+        long result = 0;
+        while (!dirs.isEmpty()) {
+            final File dir = dirs.remove(0);
+            if (!dir.exists()) {
+                continue;
+            }
+            final File[] listFiles = dir.listFiles();
+            if (listFiles == null || listFiles.length == 0) {
+                continue;
+            }
+            for (final File child : listFiles) {
+                result += child.length();
+                if (child.isDirectory()) {
+                    dirs.add(child);
+                }
+            }
+        }
+        return result;
     }
 
     public static String getExportTelemetryFilePath(File externalFilesDir) {
