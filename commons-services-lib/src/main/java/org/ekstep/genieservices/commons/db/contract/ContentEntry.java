@@ -21,6 +21,7 @@ public abstract class ContentEntry implements BaseColumns {
     public static final String COLUMN_NAME_CONTENT_TYPE = "content_type";   // Content type could be story, worksheet, game, collection, textbook.
     public static final String COLUMN_NAME_AUDIENCE = "audience";   // learner or instructor
     public static final String COLUMN_NAME_UID = "uid";   // list of comma separated uid
+    public static final String COLUMN_NAME_SIZE_ON_DEVICE = "size_on_device";   // list of comma separated uid
 
     public static final String getCreateEntry() {
         return "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
@@ -34,7 +35,8 @@ public abstract class ContentEntry implements BaseColumns {
                 COLUMN_NAME_VISIBILITY + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
                 COLUMN_NAME_SERVER_LAST_UPDATED_ON + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
                 COLUMN_NAME_LOCAL_LAST_UPDATED_ON + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
-                COLUMN_NAME_MANIFEST_VERSION + DbConstants.TEXT_TYPE +
+                COLUMN_NAME_MANIFEST_VERSION + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
+                COLUMN_NAME_SIZE_ON_DEVICE + DbConstants.INT_TYPE +
                 " )";
     }
 
@@ -60,6 +62,10 @@ public abstract class ContentEntry implements BaseColumns {
 
     public static final String getDeleteEntry() {
         return "DROP TABLE IF EXISTS " + TABLE_NAME;
+    }
+
+    public static String getAlterEntryForContentSize() {
+        return "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_NAME_SIZE_ON_DEVICE + DbConstants.INT_TYPE + " NOT NULL DEFAULT 0;";
     }
 
 }

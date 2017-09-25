@@ -285,6 +285,10 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         return path;
     }
 
+    public void setPath(String path) {
+        this.path = path;
+    }
+
     public String getVisibility() {
         return visibility;
     }
