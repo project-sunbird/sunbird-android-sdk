@@ -35,8 +35,7 @@ public abstract class ContentEntry implements BaseColumns {
                 COLUMN_NAME_VISIBILITY + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
                 COLUMN_NAME_SERVER_LAST_UPDATED_ON + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
                 COLUMN_NAME_LOCAL_LAST_UPDATED_ON + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
-                COLUMN_NAME_MANIFEST_VERSION + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
-                COLUMN_NAME_SIZE_ON_DEVICE + DbConstants.INT_TYPE +
+                COLUMN_NAME_MANIFEST_VERSION + DbConstants.TEXT_TYPE +
                 " )";
     }
 
