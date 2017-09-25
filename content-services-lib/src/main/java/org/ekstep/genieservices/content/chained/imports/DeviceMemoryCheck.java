@@ -20,6 +20,7 @@ import java.util.List;
  * @author anil
  */
 public class DeviceMemoryCheck implements IChainable<List<ContentImportResponse>, ImportContentContext> {
+
     private static final String TAG = DeviceMemoryCheck.class.getSimpleName();
 
     private IChainable<List<ContentImportResponse>, ImportContentContext> nextLink;
@@ -30,7 +31,7 @@ public class DeviceMemoryCheck implements IChainable<List<ContentImportResponse>
         File ecarFile = new File(importContext.getEcarFilePath());
         long ecarFileSpace = ecarFile.length();
         long bufferSize = calculateBufferSize(ecarFileSpace);
-        if (deviceUsableSpace < (ecarFileSpace + bufferSize)) {
+        if (FileUtil.isFreeSpaceAvailable(deviceUsableSpace, ecarFileSpace, bufferSize)) {
             Logger.e(TAG, "Import failed. Device memory full!!!");
             return GenieResponseBuilder.getErrorResponse(ContentConstants.IMPORT_FAILED_DEVICE_MEMORY_FULL, "Import failed. Device memory full.", TAG);
         }
@@ -51,7 +52,7 @@ public class DeviceMemoryCheck implements IChainable<List<ContentImportResponse>
     private long calculateBufferSize(long ecarFileSize) {
         long bufferSize = 0;
         if (ecarFileSize > 0) {
-            bufferSize = ecarFileSize / 5;
+            bufferSize = ecarFileSize / 4;
         }
         return bufferSize;
     }

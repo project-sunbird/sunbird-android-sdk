@@ -39,11 +39,10 @@ public class DeviceMemoryCheck implements IChainable<ContentExportResponse, Expo
                         fileSize = fileSize + new BigDecimal((Double) item.get("size")).longValue();
                     } catch (Exception e) {
                         Logger.e(TAG, e.getMessage());
-                        continue;
                     }
                 }
 
-                if (!isFreeSpaceAvailable(deviceUsableSpace, fileSize)) {
+                if (!FileUtil.isFreeSpaceAvailable(deviceUsableSpace, fileSize, 0)) {
                     return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "Device memory full.", TAG);
                 }
             } catch (Exception e) {
@@ -62,15 +61,6 @@ public class DeviceMemoryCheck implements IChainable<ContentExportResponse, Expo
     public IChainable<ContentExportResponse, ExportContentContext> then(IChainable<ContentExportResponse, ExportContentContext> link) {
         nextLink = link;
         return link;
-    }
-
-    private boolean isFreeSpaceAvailable(long deviceUsableSpace, long fileSpace) {
-        long BUFFER_SIZE = 0;
-        if (deviceUsableSpace > 0 && deviceUsableSpace < (fileSpace + BUFFER_SIZE)) {
-            Logger.e(TAG, "Device memory full!");
-            return false;
-        }
-        return true;
     }
 
 }

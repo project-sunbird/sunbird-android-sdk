@@ -1,5 +1,7 @@
 package org.ekstep.genieservices.commons.bean;
 
+import org.ekstep.genieservices.commons.utils.StringUtil;
+
 import java.util.List;
 
 /**
@@ -59,8 +61,8 @@ public class ContentImportRequest {
          * Destination folder where content will import.
          */
         public Builder toFolder(String toFolder) {
-            if (toFolder == null) {
-                throw new IllegalArgumentException("Illegal toFolder");
+            if (StringUtil.isNullOrEmpty(toFolder)) {
+                throw new IllegalArgumentException("Illegal toFolder, should not be null or empty.");
             }
             this.destinationFolder = toFolder;
             return this;
@@ -83,7 +85,7 @@ public class ContentImportRequest {
         }
 
         public ContentImportRequest build() {
-            if (destinationFolder == null) {
+            if (StringUtil.isNullOrEmpty(destinationFolder)) {
                 throw new IllegalStateException("To folder required.");
             }
 
