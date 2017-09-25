@@ -208,9 +208,11 @@ public class ExtractPayloads implements IChainable<List<ContentImportResponse>, 
                 path = oldContentPath;
             }
 
+            long sizeOnDevice = FileUtil.getFileSize(new File(path));
+
             ContentHandler.addOrUpdateViralityMetadata(item, appContext.getDeviceInfo().getDeviceID());
             ContentModel newContentModel = ContentModel.build(appContext.getDBSession(), identifier, importContext.getManifestVersion(), GsonUtil.toJson(item),
-                    mimeType, contentType, visibility, path, refCount, contentState, audience);
+                    mimeType, contentType, visibility, path, refCount, contentState, audience, sizeOnDevice);
 
             if (oldContentModel == null) {
                 newContentModel.save();

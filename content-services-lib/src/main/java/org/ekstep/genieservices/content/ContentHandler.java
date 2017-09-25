@@ -416,6 +416,7 @@ public class ContentHandler {
         content.setContentType(contentModel.getContentType());
         content.setAvailableLocally(isAvailableLocally(contentModel.getContentState()));
         content.setReferenceCount(contentModel.getRefCount());
+        content.setSizeOnDevice(contentModel.getSizeOnDevice());
 
         long contentCreationTime = 0;
         String localLastUpdatedTime = contentModel.getLocalLastUpdatedTime();

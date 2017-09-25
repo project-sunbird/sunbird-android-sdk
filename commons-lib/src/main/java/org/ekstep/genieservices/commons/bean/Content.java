@@ -21,6 +21,7 @@ public class Content implements Serializable {
     private List<ContentAccess> contentAccess;
     private List<Content> children;
     private List<HierarchyInfo> hierarchyInfo;
+    private long sizeOnDevice;
 
     public String getIdentifier() {
         return identifier;
@@ -126,4 +127,11 @@ public class Content implements Serializable {
         this.hierarchyInfo = hierarchyInfo;
     }
 
+    public long getSizeOnDevice() {
+        return sizeOnDevice;
+    }
+
+    public void setSizeOnDevice(long sizeOnDevice) {
+        this.sizeOnDevice = sizeOnDevice;
+    }
 }

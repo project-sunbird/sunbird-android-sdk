@@ -39,7 +39,7 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
     private String localLastUpdatedTime;
     private String serverLastUpdatedOn;
     private String audience;
-    private int contentSizeOnDevice;
+    private long sizeOnDevice;
 
     private ContentModel(IDBSession dbSession) {
         this.mDBSession = dbSession;
@@ -66,12 +66,12 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
 
     private ContentModel(IDBSession dbSession, String identifier, String manifestVersion, String localData,
                          String mimeType, String contentType, String visibility, String path,
-                         int refCount, int contentState, String audience, int contentSizeOnDevice) {
+                         int refCount, int contentState, String audience, long sizeOnDevice) {
         this(dbSession, identifier, null, null, manifestVersion, localData, mimeType, contentType, visibility, audience);
         this.path = path;
         this.refCount = refCount;
         this.contentState = contentState;
-        this.contentSizeOnDevice = contentSizeOnDevice;
+        this.sizeOnDevice = sizeOnDevice;
     }
 
     public static ContentModel find(IDBSession dbSession, Object identifier) {
@@ -98,9 +98,9 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
 
     public static ContentModel build(IDBSession dbSession, String identifier, String manifestVersion, String localData,
                                      String mimeType, String contentType, String visibility, String path,
-                                     int refCount, int contentState, String audience, int contentSizeOnDevice) {
+                                     int refCount, int contentState, String audience, long sizeOnDevice) {
         ContentModel contentModel = new ContentModel(dbSession, identifier, manifestVersion, localData,
-                mimeType, contentType, visibility, path, refCount, contentState, audience, contentSizeOnDevice);
+                mimeType, contentType, visibility, path, refCount, contentState, audience, sizeOnDevice);
 
         return contentModel;
     }
@@ -133,7 +133,7 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         with(contentValues, ContentEntry.COLUMN_NAME_CONTENT_STATE, contentState);
         with(contentValues, ContentEntry.COLUMN_NAME_AUDIENCE, audience);
 //        with(contentValues, ContentEntry.COLUMN_NAME_INDEX, null);
-        with(contentValues, ContentEntry.COLUMN_NAME_SIZE_ON_DEVICE, contentSizeOnDevice);
+        with(contentValues, ContentEntry.COLUMN_NAME_SIZE_ON_DEVICE, sizeOnDevice);
 
         return contentValues;
     }
@@ -169,7 +169,7 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         with(contentValues, ContentEntry.COLUMN_NAME_CONTENT_STATE, contentState);
         with(contentValues, ContentEntry.COLUMN_NAME_AUDIENCE, audience);
 //        with(contentValues, ContentEntry.COLUMN_NAME_INDEX, null);
-        with(contentValues, ContentEntry.COLUMN_NAME_SIZE_ON_DEVICE, contentSizeOnDevice);
+        with(contentValues, ContentEntry.COLUMN_NAME_SIZE_ON_DEVICE, sizeOnDevice);
         return contentValues;
     }
 
@@ -231,7 +231,7 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         contentType = resultSet.getString(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_CONTENT_TYPE));
         localLastUpdatedTime = resultSet.getString(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_LOCAL_LAST_UPDATED_ON));
         audience = resultSet.getString(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_AUDIENCE));
-        contentSizeOnDevice = resultSet.getInt(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_SIZE_ON_DEVICE));
+        sizeOnDevice = resultSet.getLong(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_SIZE_ON_DEVICE));
     }
 
     private void with(ContentValues contentValues, String key, String value) {
@@ -241,6 +241,10 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
     }
 
     private void with(ContentValues contentValues, String key, int value) {
+        contentValues.put(key, value);
+    }
+
+    private void with(ContentValues contentValues, String key, long value) {
         contentValues.put(key, value);
     }
 
@@ -378,4 +382,7 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         return result;
     }
 
+    public long getSizeOnDevice() {
+        return sizeOnDevice;
+    }
 }
