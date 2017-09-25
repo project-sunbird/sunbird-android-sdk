@@ -1,5 +1,9 @@
 package org.ekstep.genieservices.commons.bean;
 
+import org.ekstep.genieservices.commons.utils.StringUtil;
+
+import java.util.List;
+
 /**
  * Created on 9/18/2017.
  *
@@ -7,10 +11,17 @@ package org.ekstep.genieservices.commons.bean;
  */
 public class ContentMoveRequest {
 
+    private List<String> contentIds;
     private String destinationFolder;
+//    private Step Duplicate/merge/
 
-    public ContentMoveRequest(String destinationFolder) {
+    public ContentMoveRequest(List<String> contentIds, String destinationFolder) {
+        this.contentIds = contentIds;
         this.destinationFolder = destinationFolder;
+    }
+
+    public List<String> getContentIds() {
+        return contentIds;
     }
 
     public String getDestinationFolder() {
@@ -18,13 +29,22 @@ public class ContentMoveRequest {
     }
 
     public static class Builder {
+        private List<String> contentIds;
         private String destinationFolder;
+
+        /**
+         * List of content identifier which needs to move. If not set than by default will move all contents.
+         */
+        public Builder contentIds(List<String> contentIds) {
+            this.contentIds = contentIds;
+            return this;
+        }
 
         /**
          * Destination folder where content will import.
          */
         public Builder toFolder(String toFolder) {
-            if (toFolder == null) {
+            if (StringUtil.isNullOrEmpty(toFolder)) {
                 throw new IllegalArgumentException("Illegal toFolder");
             }
             this.destinationFolder = toFolder;
@@ -32,11 +52,11 @@ public class ContentMoveRequest {
         }
 
         public ContentMoveRequest build() {
-            if (destinationFolder == null) {
+            if (StringUtil.isNullOrEmpty(destinationFolder)) {
                 throw new IllegalStateException("To folder required.");
             }
 
-            return new ContentMoveRequest(destinationFolder);
+            return new ContentMoveRequest(contentIds, destinationFolder);
         }
     }
 }

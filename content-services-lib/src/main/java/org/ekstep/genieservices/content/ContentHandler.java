@@ -1532,4 +1532,14 @@ public class ContentHandler {
         return fileName;
     }
 
+    public static long getSizeOnDevice(List<String> contentIds) {
+        // TODO: 9/25/2017 - Write the query to read the summation of size on device.
+        if (CollectionUtil.isNullOrEmpty(contentIds)) {
+            // Get size of all content stored in DB.
+        } else {
+            // Get the size of given identifier.
+        }
+        return 0;
+    }
+
 }

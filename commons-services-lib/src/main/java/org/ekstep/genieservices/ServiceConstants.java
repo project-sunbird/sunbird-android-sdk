@@ -102,6 +102,7 @@ public interface ServiceConstants {
         String INVALID_USER = "INVALID_USER";
         String EXPORT_FAILED = "EXPORT_FAILED";
         String IMPORT_FAILED = "IMPORT_FAILED";
+        String MOVE_FAILED = "MOVE_FAILED";
 
         //Partner
         String UNREGISTERED_PARTNER = "UNREGISTERED_PARTNER";
@@ -178,5 +179,7 @@ public interface ServiceConstants {
 
         //Authentication
         String FAILED_TO_GENERATE_TOKEN = "Failed to generate the bearer token";
+
+        String NOT_WRITABLE = "Destination folder is not writable.";
     }
 }
