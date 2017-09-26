@@ -68,6 +68,7 @@ import org.ekstep.genieservices.content.chained.move.DeleteSourceFolder;
 import org.ekstep.genieservices.content.chained.move.DuplicateContentCheck;
 import org.ekstep.genieservices.content.chained.move.StoreDestinationContentInDB;
 import org.ekstep.genieservices.content.chained.move.UpdateSourceContentPathInDB;
+import org.ekstep.genieservices.content.chained.move.ValidateDestinationContent;
 import org.ekstep.genieservices.content.chained.move.ValidateDestinationFolder;
 import org.ekstep.genieservices.content.db.model.ContentListingModel;
 import org.ekstep.genieservices.content.db.model.ContentModel;
@@ -777,6 +778,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         ValidateDestinationFolder validateDestinationFolder = new ValidateDestinationFolder();
         validateDestinationFolder.then(new org.ekstep.genieservices.content.chained.move.DeviceMemoryCheck())
+                .then(new ValidateDestinationContent())
                 .then(new DuplicateContentCheck())
                 .then(new CopyContentFromSourceToDestination())
                 .then(new DeleteSourceFolder())

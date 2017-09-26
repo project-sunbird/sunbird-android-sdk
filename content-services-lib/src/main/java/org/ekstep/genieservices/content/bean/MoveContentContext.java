@@ -3,6 +3,7 @@ package org.ekstep.genieservices.content.bean;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,6 +14,7 @@ import java.util.List;
 public class MoveContentContext {
 
     private List<String> contentIds;
+    private List<String> validContentIdsInDestination;
     private File destinationFolder;
     private File contentRootFolder;
     private List<ContentModel> contentsInSource;
@@ -20,11 +22,17 @@ public class MoveContentContext {
 
     public MoveContentContext(List<String> contentIds, File destinationFolder) {
         this.contentIds = contentIds;
+        this.validContentIdsInDestination = new ArrayList<>();
         this.destinationFolder = destinationFolder;
+        this.contentsInDestination = new ArrayList<>();
     }
 
     public List<String> getContentIds() {
         return contentIds;
+    }
+
+    public List<String> getValidContentIdsInDestination() {
+        return validContentIdsInDestination;
     }
 
     public File getDestinationFolder() {
@@ -51,7 +59,4 @@ public class MoveContentContext {
         return contentsInDestination;
     }
 
-    public void setContentsInDestination(List<ContentModel> contentsInDestination) {
-        this.contentsInDestination = contentsInDestination;
-    }
 }
