@@ -3,10 +3,12 @@ package org.ekstep.genieservices.commons.db.migration.impl;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.contract.ContentEntry;
 import org.ekstep.genieservices.commons.db.migration.Migration;
+import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.db.model.ContentsModel;
 
 import java.io.File;
+import java.util.Locale;
 
 public class _10_StorageManagementMigration extends Migration {
 
@@ -43,15 +45,22 @@ public class _10_StorageManagementMigration extends Migration {
                         //Rename the folder
                         if (renameOldFolder(path, stringBuilder.toString())) {
 
-                            // TODO: 25/9/17 Check how can the multiple rows can be updated at one shot
                             //set the path
-                            contentModel.setPath(stringBuilder.toString());
-
-                            //update the content path
-                            contentModel.update();
+                            path = stringBuilder.toString();
                         }
                     }
                 }
+
+                //update the size of the content here
+                long size = FileUtil.getFileSize(new File(path));
+
+
+                //update both the path and the size
+                String.format(Locale.US, "UPDATE %s SET %s = '%s', %s = '%s'  where %s = '%s';",
+                        ContentEntry.TABLE_NAME,
+                        ContentEntry.COLUMN_NAME_PATH, path,
+                        ContentEntry.COLUMN_NAME_SIZE_ON_DEVICE, size,
+                        ContentEntry.COLUMN_NAME_IDENTIFIER, contentModel.getIdentifier());
             }
         }
     }
