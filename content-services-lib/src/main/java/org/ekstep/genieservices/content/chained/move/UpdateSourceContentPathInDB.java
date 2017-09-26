@@ -11,7 +11,7 @@ import org.ekstep.genieservices.content.db.model.ContentModel;
  *
  * @author anil
  */
-public class UpdatePathInDB implements IChainable<Void, MoveContentContext> {
+public class UpdateSourceContentPathInDB implements IChainable<Void, MoveContentContext> {
 
     private IChainable<Void, MoveContentContext> nextLink;
 

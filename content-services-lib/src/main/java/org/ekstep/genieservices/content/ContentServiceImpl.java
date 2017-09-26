@@ -66,7 +66,8 @@ import org.ekstep.genieservices.content.chained.imports.ValidateEcar;
 import org.ekstep.genieservices.content.chained.move.CopyContentFromSourceToDestination;
 import org.ekstep.genieservices.content.chained.move.DeleteSourceFolder;
 import org.ekstep.genieservices.content.chained.move.DuplicateContentCheck;
-import org.ekstep.genieservices.content.chained.move.UpdatePathInDB;
+import org.ekstep.genieservices.content.chained.move.StoreDestinationContentInDB;
+import org.ekstep.genieservices.content.chained.move.UpdateSourceContentPathInDB;
 import org.ekstep.genieservices.content.chained.move.ValidateDestinationFolder;
 import org.ekstep.genieservices.content.db.model.ContentListingModel;
 import org.ekstep.genieservices.content.db.model.ContentModel;
@@ -779,7 +780,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 .then(new DuplicateContentCheck())
                 .then(new CopyContentFromSourceToDestination())
                 .then(new DeleteSourceFolder())
-                .then(new UpdatePathInDB());
+                .then(new UpdateSourceContentPathInDB())
+                .then(new StoreDestinationContentInDB());
 
         // Check destination folder is writable or not. file.canWrite(); file.isDirectory(); - Done
         // DeviceMemoryCheck - Done
