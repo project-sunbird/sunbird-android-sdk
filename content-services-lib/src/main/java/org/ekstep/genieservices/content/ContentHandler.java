@@ -681,8 +681,12 @@ public class ContentHandler {
     }
 
     private static List<ContentModel> findAllContent(IDBSession dbSession) {
+        String contentStateFilter = String.format(Locale.US, "%s != '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.SEEN_BUT_NOT_AVAILABLE);
+
+        String filter = String.format(Locale.US, " where %s", contentStateFilter);
+
         List<ContentModel> contentModelListInDB = null;
-        ContentsModel contentsModel = ContentsModel.find(dbSession, "");
+        ContentsModel contentsModel = ContentsModel.find(dbSession, filter);
         if (contentsModel != null) {
             contentModelListInDB = contentsModel.getContentModelList();
         }
