@@ -54,13 +54,14 @@ public class _10_StorageManagementMigration extends Migration {
                 //update the size of the content here
                 long size = FileUtil.getFileSize(new File(path));
 
-
                 //update both the path and the size
-                String.format(Locale.US, "UPDATE %s SET %s = '%s', %s = '%s'  where %s = '%s';",
+                String updateQuery = String.format(Locale.US, "UPDATE %s SET %s = '%s', %s = '%s'  where %s = '%s';",
                         ContentEntry.TABLE_NAME,
                         ContentEntry.COLUMN_NAME_PATH, path,
                         ContentEntry.COLUMN_NAME_SIZE_ON_DEVICE, size,
                         ContentEntry.COLUMN_NAME_IDENTIFIER, contentModel.getIdentifier());
+
+                appContext.getDBSession().execute(updateQuery);
             }
         }
     }
