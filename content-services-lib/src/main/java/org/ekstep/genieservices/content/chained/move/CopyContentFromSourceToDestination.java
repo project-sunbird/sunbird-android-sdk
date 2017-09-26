@@ -8,31 +8,28 @@ import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
-import org.ekstep.genieservices.content.ContentHandler;
 import org.ekstep.genieservices.content.bean.MoveContentContext;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Created on 9/25/2017.
  *
  * @author anil
  */
-public class MoveContent implements IChainable<Void, MoveContentContext> {
+public class CopyContentFromSourceToDestination implements IChainable<Void, MoveContentContext> {
 
-    private static final String TAG = MoveContent.class.getSimpleName();
+    private static final String TAG = CopyContentFromSourceToDestination.class.getSimpleName();
 
     private IChainable<Void, MoveContentContext> nextLink;
 
     @Override
     public GenieResponse<Void> execute(AppContext appContext, MoveContentContext moveContentContext) {
-        List<ContentModel> contentModelToMove = ContentHandler.getContentModelToMove(appContext.getDBSession(), moveContentContext.getContentIds());
 
-        if (!CollectionUtil.isNullOrEmpty(contentModelToMove)) {
-            for (ContentModel contentModel : contentModelToMove) {
+        if (!CollectionUtil.isNullOrEmpty(moveContentContext.getContentsInSource())) {
+            for (ContentModel contentModel : moveContentContext.getContentsInSource()) {
                 File source = new File(contentModel.getPath());
                 try {
                     FileUtil.copyFolder(source, moveContentContext.getContentRootFolder());

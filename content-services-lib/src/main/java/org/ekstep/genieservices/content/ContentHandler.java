@@ -1557,7 +1557,7 @@ public class ContentHandler {
         return 0;
     }
 
-    public static List<ContentModel> getContentModelToMove(IDBSession dbSession, List<String> contentIds) {
+    public static List<ContentModel> getAllContentModelToMove(IDBSession dbSession, List<String> contentIds) {
         if (CollectionUtil.isNullOrEmpty(contentIds)) {
             return findAllContent(dbSession);
         } else {

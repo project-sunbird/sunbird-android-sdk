@@ -1,5 +1,7 @@
 package org.ekstep.genieservices.content.bean;
 
+import org.ekstep.genieservices.content.db.model.ContentModel;
+
 import java.io.File;
 import java.util.List;
 
@@ -13,6 +15,8 @@ public class MoveContentContext {
     private List<String> contentIds;
     private File destinationFolder;
     private File contentRootFolder;
+    private List<ContentModel> contentsInSource;
+    private List<ContentModel> contentsInDestination;
 
     public MoveContentContext(List<String> contentIds, File destinationFolder) {
         this.contentIds = contentIds;
@@ -33,5 +37,21 @@ public class MoveContentContext {
 
     public void setContentRootFolder(File contentRootFolder) {
         this.contentRootFolder = contentRootFolder;
+    }
+
+    public List<ContentModel> getContentsInSource() {
+        return contentsInSource;
+    }
+
+    public void setContentsInSource(List<ContentModel> contentsInSource) {
+        this.contentsInSource = contentsInSource;
+    }
+
+    public List<ContentModel> getContentsInDestination() {
+        return contentsInDestination;
+    }
+
+    public void setContentsInDestination(List<ContentModel> contentsInDestination) {
+        this.contentsInDestination = contentsInDestination;
     }
 }
