@@ -181,5 +181,6 @@ public interface ServiceConstants {
         String FAILED_TO_GENERATE_TOKEN = "Failed to generate the bearer token";
 
         String NOT_WRITABLE = "Destination folder is not writable.";
+        String NO_CONTENT_TO_MOVE = "Nothing to move.";
     }
 }

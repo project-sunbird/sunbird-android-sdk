@@ -5,7 +5,10 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.content.bean.MoveContentContext;
+
+import java.io.File;
 
 /**
  * Created on 9/25/2017.
@@ -21,6 +24,16 @@ public class ValidateDestinationFolder implements IChainable<Void, MoveContentCo
     @Override
     public GenieResponse<Void> execute(AppContext appContext, MoveContentContext moveContentContext) {
         if (moveContentContext.getDestinationFolder().isDirectory() && moveContentContext.getDestinationFolder().canWrite()) {
+            File contentRootFolder;
+            if (!moveContentContext.getDestinationFolder().getPath().endsWith(FileUtil.CONTENT_FOLDER)) {
+                // Make content folder if not exists in destination folder.
+                contentRootFolder = FileUtil.getContentRootDir(moveContentContext.getDestinationFolder());
+            } else {
+                contentRootFolder = moveContentContext.getDestinationFolder();
+            }
+
+            moveContentContext.setContentRootFolder(contentRootFolder);
+
             return nextLink.execute(appContext, moveContentContext);
         } else {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.MOVE_FAILED, ServiceConstants.ErrorMessage.NOT_WRITABLE, TAG);

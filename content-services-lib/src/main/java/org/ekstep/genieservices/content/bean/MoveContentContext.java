@@ -12,6 +12,7 @@ public class MoveContentContext {
 
     private List<String> contentIds;
     private File destinationFolder;
+    private File contentRootFolder;
 
     public MoveContentContext(List<String> contentIds, File destinationFolder) {
         this.contentIds = contentIds;
@@ -24,5 +25,13 @@ public class MoveContentContext {
 
     public File getDestinationFolder() {
         return destinationFolder;
+    }
+
+    public File getContentRootFolder() {
+        return contentRootFolder;
+    }
+
+    public void setContentRootFolder(File contentRootFolder) {
+        this.contentRootFolder = contentRootFolder;
     }
 }

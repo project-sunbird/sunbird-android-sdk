@@ -21,6 +21,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class FileUtil {
 
+    public static final String CONTENT_FOLDER = "/content";
+
     public static String readFileFromClasspath(String filename) {
         String result = "";
         try {
@@ -106,32 +108,72 @@ public class FileUtil {
     }
 
     public static void cp(File src, File dst) throws IOException {
-        InputStream in = new FileInputStream(src);
-        OutputStream out = new FileOutputStream(dst);
+        InputStream in = null;
+        OutputStream out = null;
+        try {
+            in = new FileInputStream(src);
+            out = new FileOutputStream(dst);
 
-        // Transfer bytes from in to out
-        byte[] buffer = new byte[1024];
-        int length;
-        while ((length = in.read(buffer)) > 0) {
-            out.write(buffer, 0, length);
+            // Transfer bytes from in to out
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = in.read(buffer)) > 0) {
+                out.write(buffer, 0, length);
+            }
+        } finally {
+            if (in != null) {
+                in.close();
+            }
+            if (out != null) {
+                out.flush();
+                out.close();
+            }
         }
-        in.close();
-        out.close();
     }
 
     public static void cp(String src, String dst) throws IOException {
-        InputStream in = new FileInputStream(src);
-        OutputStream out = new FileOutputStream(dst);
+        InputStream in = null;
+        OutputStream out = null;
+        try {
+            in = new FileInputStream(src);
+            out = new FileOutputStream(dst);
 
-        // Transfer bytes from in to out
-        byte[] buffer = new byte[1024];
-        int length;
-        while ((length = in.read(buffer)) > 0) {
-            out.write(buffer, 0, length);
+            // Transfer bytes from in to out
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = in.read(buffer)) > 0) {
+                out.write(buffer, 0, length);
+            }
+        } finally {
+            if (in != null) {
+                in.close();
+            }
+            if (out != null) {
+                out.flush();
+                out.close();
+            }
         }
-        in.close();
-        out.flush();
-        out.close();
+    }
+
+    public static void copyFolder(File source, File destination) throws IOException {
+        if (source.isDirectory()) {
+            if (!destination.exists()) {
+                destination.mkdirs();
+            }
+
+            String files[] = source.list();
+
+            if (files != null) {
+                for (String file : files) {
+                    File srcFile = new File(source, file);
+                    File destFile = new File(destination, file);
+
+                    copyFolder(srcFile, destFile);
+                }
+            }
+        } else {
+            cp(source, destination);
+        }
     }
 
     public static File getTmpDir(File externalFilesDir) {
@@ -139,7 +181,7 @@ public class FileUtil {
     }
 
     public static File getContentRootDir(File externalFilesDir) {
-        return new File(externalFilesDir.getPath() + "/content");
+        return new File(externalFilesDir.getPath() + CONTENT_FOLDER);
     }
 
     public static String getTmpDirFilePath(File externalFilesDir) {

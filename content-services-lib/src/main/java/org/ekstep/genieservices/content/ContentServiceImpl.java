@@ -63,6 +63,9 @@ import org.ekstep.genieservices.content.chained.imports.EcarCleanUp;
 import org.ekstep.genieservices.content.chained.imports.ExtractEcar;
 import org.ekstep.genieservices.content.chained.imports.ExtractPayloads;
 import org.ekstep.genieservices.content.chained.imports.ValidateEcar;
+import org.ekstep.genieservices.content.chained.move.DuplicateContentCheck;
+import org.ekstep.genieservices.content.chained.move.MoveContent;
+import org.ekstep.genieservices.content.chained.move.UpdatePathInDB;
 import org.ekstep.genieservices.content.chained.move.ValidateDestinationFolder;
 import org.ekstep.genieservices.content.db.model.ContentListingModel;
 import org.ekstep.genieservices.content.db.model.ContentModel;
@@ -769,14 +772,19 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         File destinationFolder = new File(contentMoveRequest.getDestinationFolder());
 
         MoveContentContext moveContentContext = new MoveContentContext(contentMoveRequest.getContentIds(), destinationFolder);
-        ValidateDestinationFolder validateDestinationFolder = new ValidateDestinationFolder();
-        validateDestinationFolder.then(new org.ekstep.genieservices.content.chained.move.DeviceMemoryCheck());
 
-        // Check destination folder is writable or not. file.canWrite(); file.isDirectory();
-        // DeviceMemoryCheck
-        // popup is shown mentioning the discrepancy (and listing all the items that are added/missing)
+        ValidateDestinationFolder validateDestinationFolder = new ValidateDestinationFolder();
+        validateDestinationFolder.then(new org.ekstep.genieservices.content.chained.move.DeviceMemoryCheck())
+                .then(new DuplicateContentCheck())
+                .then(new MoveContent())
+                .then(new UpdatePathInDB());
+
+        // Check destination folder is writable or not. file.canWrite(); file.isDirectory(); - Done
+        // DeviceMemoryCheck - Done
+        //TODO: Separate method to shown the discrepancy (and listing all the items that are added/missing)
         // Check duplicate content in source and destination folder
         // MoveContent from source to destination and Update path in DB
+        // Update DB to update path with new updated destination path
         // Read the content from destination folder if any and make entry in DB
         // Delete source folder, only after it’s successfully copied and imported on the destination.
         // Add GE_INTERACT

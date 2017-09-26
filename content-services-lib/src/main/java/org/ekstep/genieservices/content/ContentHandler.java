@@ -680,6 +680,16 @@ public class ContentHandler {
         return contentModelListInDB;
     }
 
+    private static List<ContentModel> findAllContent(IDBSession dbSession) {
+        List<ContentModel> contentModelListInDB = null;
+        ContentsModel contentsModel = ContentsModel.find(dbSession, "");
+        if (contentsModel != null) {
+            contentModelListInDB = contentsModel.getContentModelList();
+        }
+
+        return contentModelListInDB;
+    }
+
     /**
      * Is compatible to current version of Genie.
      *
@@ -917,7 +927,7 @@ public class ContentHandler {
         return requestMap;
     }
 
-    private static void addSortCriteria(Map requestMap, ContentSearchCriteria criteria) {
+    private static void addSortCriteria(Map<String, Object> requestMap, ContentSearchCriteria criteria) {
         Map<String, String> sortMap = new HashMap<>();
         List<ContentSortCriteria> sortCriterias = criteria.getSortCriteria();
         if (sortCriterias != null && sortCriterias.size() > 0) {
@@ -1541,6 +1551,14 @@ public class ContentHandler {
             // Get the size of given identifier.
         }
         return 0;
+    }
+
+    public static List<ContentModel> getContentModelToMove(IDBSession dbSession, List<String> contentIds) {
+        if (CollectionUtil.isNullOrEmpty(contentIds)) {
+            return findAllContent(dbSession);
+        } else {
+            return findAllContentsWithIdentifiers(dbSession, contentIds);
+        }
     }
 
 }
