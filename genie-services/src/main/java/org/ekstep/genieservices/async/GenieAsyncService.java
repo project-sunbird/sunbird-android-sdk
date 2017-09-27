@@ -8,8 +8,9 @@ public class GenieAsyncService {
     private static GenieService sService;
 
     private ConfigService mConfigService;
-    private SyncService mSyncService;
     private TelemetryService mTelemetryService;
+    private SyncService mSyncService;
+    private PartnerService mPartnerService;
     private UserService mUserService;
     private ContentService mContentService;
     private TagService mTagService;
@@ -32,11 +33,11 @@ public class GenieAsyncService {
         return mConfigService;
     }
 
-    public UserService getUserService() {
-        if (mUserService == null) {
-            mUserService = new UserService(sService);
+    public TelemetryService getTelemetryService() {
+        if (mTelemetryService == null) {
+            mTelemetryService = new TelemetryService(sService);
         }
-        return mUserService;
+        return mTelemetryService;
     }
 
     public SyncService getSyncService() {
@@ -46,11 +47,18 @@ public class GenieAsyncService {
         return mSyncService;
     }
 
-    public TelemetryService getTelemetryService() {
-        if (mTelemetryService == null) {
-            mTelemetryService = new TelemetryService(sService);
+    public PartnerService getPartnerService() {
+        if (mPartnerService == null) {
+            mPartnerService = new PartnerService(sService);
         }
-        return mTelemetryService;
+        return mPartnerService;
+    }
+
+    public UserService getUserService() {
+        if (mUserService == null) {
+            mUserService = new UserService(sService);
+        }
+        return mUserService;
     }
 
     public TagService getTagService() {
