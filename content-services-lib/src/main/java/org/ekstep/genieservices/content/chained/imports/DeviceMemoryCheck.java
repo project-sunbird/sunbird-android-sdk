@@ -31,7 +31,7 @@ public class DeviceMemoryCheck implements IChainable<List<ContentImportResponse>
         File ecarFile = new File(importContext.getEcarFilePath());
         long ecarFileSpace = ecarFile.length();
         long bufferSize = calculateBufferSize(ecarFileSpace);
-        if (FileUtil.isFreeSpaceAvailable(deviceUsableSpace, ecarFileSpace, bufferSize)) {
+        if (!FileUtil.isFreeSpaceAvailable(deviceUsableSpace, ecarFileSpace, bufferSize)) {
             Logger.e(TAG, "Import failed. Device memory full!!!");
             return GenieResponseBuilder.getErrorResponse(ContentConstants.IMPORT_FAILED_DEVICE_MEMORY_FULL, "Import failed. Device memory full.", TAG);
         }

@@ -8,9 +8,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -301,6 +303,18 @@ public class FileUtil {
             ex.printStackTrace();
         }
         return json;
+    }
+
+    public static void writeManifest(File manifestPath, Map<String, Object> manifestMap) throws IOException {
+        File manifestFile = new File(manifestPath, "manifest.json");
+        FileOutputStream fileOutputStream = new FileOutputStream(manifestFile);
+        OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
+
+        String json = GsonUtil.toJson(manifestMap);
+
+        outputStreamWriter.write(json);
+        outputStreamWriter.close();
+        fileOutputStream.close();
     }
 
 }

@@ -58,6 +58,7 @@ import org.ekstep.genieservices.content.chained.export.DeleteTemporaryEcar;
 import org.ekstep.genieservices.content.chained.export.EcarBundle;
 import org.ekstep.genieservices.content.chained.export.WriteManifest;
 import org.ekstep.genieservices.content.chained.imports.AddGeTransferContentImportEvent;
+import org.ekstep.genieservices.content.chained.imports.CreateContentImportManifest;
 import org.ekstep.genieservices.content.chained.imports.DeviceMemoryCheck;
 import org.ekstep.genieservices.content.chained.imports.EcarCleanUp;
 import org.ekstep.genieservices.content.chained.imports.ExtractEcar;
@@ -601,6 +602,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             deviceMemoryCheck.then(new ExtractEcar(tmpLocation))
                     .then(new ValidateEcar(tmpLocation))
                     .then(new ExtractPayloads(tmpLocation))
+                    .then(new CreateContentImportManifest())
                     .then(new EcarCleanUp(tmpLocation))
                     .then(new AddGeTransferContentImportEvent());
             response = deviceMemoryCheck.execute(mAppContext, importContentContext);

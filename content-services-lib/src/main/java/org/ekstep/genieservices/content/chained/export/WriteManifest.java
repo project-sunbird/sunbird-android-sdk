@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.Map;
 
 /**
  * Created on 6/19/2017.
@@ -35,15 +36,7 @@ public class WriteManifest implements IChainable<ContentExportResponse, ExportCo
         }
 
         try {
-            File manifestFile = new File(exportContext.getTmpLocation(), "manifest.json");
-            FileOutputStream fileOutputStream = new FileOutputStream(manifestFile);
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
-
-            String json = GsonUtil.toJson(exportContext.getManifest());
-
-            outputStreamWriter.write(json);
-            outputStreamWriter.close();
-            fileOutputStream.close();
+            FileUtil.writeManifest(exportContext.getTmpLocation(), exportContext.getManifest());
         } catch (IOException e) {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, e.getMessage(), TAG);
         }
