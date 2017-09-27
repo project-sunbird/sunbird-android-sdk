@@ -690,7 +690,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 }
 
                 if (downloadRequestList.size() > 0) {
-                    DownloadRequest[] downloadRequestArray = (DownloadRequest[]) downloadRequestList.toArray();
+                    DownloadRequest[] downloadRequestArray = downloadRequestList.toArray(new DownloadRequest[downloadRequestList.size()]);
                     downloadService.enqueue(downloadRequestArray);
                 }
             }
