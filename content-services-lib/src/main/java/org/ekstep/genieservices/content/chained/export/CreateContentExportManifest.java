@@ -28,13 +28,6 @@ public class CreateContentExportManifest implements IChainable<ContentExportResp
     private static final String TAG = CreateContentExportManifest.class.getSimpleName();
 
     private IChainable<ContentExportResponse, ExportContentContext> nextLink;
-    private List<ContentModel> contentModelsToExport;
-    private List<Map<String, Object>> items;
-
-    public CreateContentExportManifest(List<ContentModel> contentModelsToExport) {
-        this.contentModelsToExport = contentModelsToExport;
-        this.items = new ArrayList<>();
-    }
 
     @Override
     public GenieResponse<ContentExportResponse> execute(AppContext appContext, ExportContentContext exportContext) {
@@ -43,7 +36,7 @@ public class CreateContentExportManifest implements IChainable<ContentExportResp
         List<String> childIdentifiers = new ArrayList<>();
         List<String> allContents = new ArrayList<>();
 
-        for (ContentModel contentModel : contentModelsToExport) {
+        for (ContentModel contentModel : exportContext.getContentModelsToExport()) {
             // item local data
             item = GsonUtil.fromJson(contentModel.getLocalData(), Map.class);
 
@@ -69,15 +62,13 @@ public class CreateContentExportManifest implements IChainable<ContentExportResp
             if (childIdentifiers.contains(contentIdentifier)) {
                 contentData.put(ContentHandler.KEY_VISIBILITY, ContentConstants.Visibility.PARENT);
             }
-            items.add(contentData);
+            exportContext.getItems().add(contentData);
         }
-
-        exportContext.setItems(items);
 
         HashMap<String, Object> archive = new HashMap<>();
         archive.put("ttl", ContentConstants.TTL);
-        archive.put("count", this.items.size());
-        archive.put("items", this.items);
+        archive.put("count", exportContext.getItems().size());
+        archive.put("items", exportContext.getItems());
 
         // Initialize manifest
         exportContext.getManifest().put("id", ContentConstants.EKSTEP_CONTENT_ARCHIVE);

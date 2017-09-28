@@ -756,15 +756,15 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         Map<String, Object> metadata = new HashMap<>();
         metadata.put(ServiceConstants.CONTENT_ITEMS_COUNT_KEY, contentModelsToExport.size());
 
-        ExportContentContext exportContentContext = new ExportContentContext(metadata, destinationFolder, ecarFile);
+        ExportContentContext exportContentContext = new ExportContentContext(metadata, destinationFolder, ecarFile, contentModelsToExport);
 
         CleanTempLoc cleanTempLoc = new CleanTempLoc();
         cleanTempLoc.then(new CreateTempLoc())
-                .then(new CreateContentExportManifest(contentModelsToExport))
+                .then(new CreateContentExportManifest())
                 .then(new WriteManifest())
-                .then(new CompressContent(contentModelsToExport))
+                .then(new CompressContent())
                 .then(new org.ekstep.genieservices.content.chained.export.DeviceMemoryCheck())
-                .then(new CopyAsset(contentModelsToExport))
+                .then(new CopyAsset())
                 .then(new EcarBundle())
                 .then(new DeleteTemporaryEcar())
                 .then(new AddGeTransferContentExportEvent());

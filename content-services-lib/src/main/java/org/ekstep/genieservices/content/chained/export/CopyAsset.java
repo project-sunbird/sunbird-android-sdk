@@ -14,8 +14,6 @@ import org.ekstep.genieservices.content.db.model.ContentModel;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,55 +26,33 @@ public class CopyAsset implements IChainable<ContentExportResponse, ExportConten
     private static final String TAG = CopyAsset.class.getSimpleName();
 
     private IChainable<ContentExportResponse, ExportContentContext> nextLink;
-    private List<ContentModel> contentModelsToExport;
-
-    public CopyAsset(List<ContentModel> contentModelsToExport) {
-        this.contentModelsToExport = contentModelsToExport;
-    }
 
     @Override
     public GenieResponse<ContentExportResponse> execute(AppContext appContext, ExportContentContext exportContext) {
+        try {
+            int i = 0;
+            for (ContentModel contentModel : exportContext.getContentModelsToExport()) {
+                Map item = exportContext.getItems().get(i);
 
-        List<String> assets;
-        int i = 0;
-
-        for (ContentModel contentModel : contentModelsToExport) {
-            assets = new ArrayList<>();
-            Map item = exportContext.getItems().get(i);
-
-            String appIcon = ContentHandler.readAppIcon(item);
-            if (!StringUtil.isNullOrEmpty(appIcon)) {
-                assets.add(appIcon);
-            }
-
-            String posterImage = ContentHandler.readPosterImage(item);
-            if (!StringUtil.isNullOrEmpty(posterImage)) {
-                assets.add(posterImage);
-            }
-
-            String grayScaleAppIcon = ContentHandler.readGrayScaleAppIcon(item);
-            if (!StringUtil.isNullOrEmpty(grayScaleAppIcon)) {
-                assets.add(grayScaleAppIcon);
-            }
-
-            for (String asset : assets) {
-                if (!StringUtil.isNullOrEmpty(asset)) {
-                    File source = new File(contentModel.getPath(), asset);
-
-                    if (source.exists()) {
-                        File dest = new File(exportContext.getTmpLocation(), asset);
-                        dest.getParentFile().mkdirs();
-
-                        try {
-                            FileUtil.cp(source, dest);
-                        } catch (IOException e) {
-                            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, e.getMessage(), TAG);
-                        }
-                    }
+                String appIcon = ContentHandler.readAppIcon(item);
+                if (!StringUtil.isNullOrEmpty(appIcon)) {
+                    copyAsset(contentModel.getPath(), exportContext.getTmpLocation(), appIcon);
                 }
-            }
 
-            i++;
+                String posterImage = ContentHandler.readPosterImage(item);
+                if (!StringUtil.isNullOrEmpty(posterImage)) {
+                    copyAsset(contentModel.getPath(), exportContext.getTmpLocation(), posterImage);
+                }
+
+                String grayScaleAppIcon = ContentHandler.readGrayScaleAppIcon(item);
+                if (!StringUtil.isNullOrEmpty(grayScaleAppIcon)) {
+                    copyAsset(contentModel.getPath(), exportContext.getTmpLocation(), grayScaleAppIcon);
+                }
+
+                i++;
+            }
+        } catch (IOException e) {
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, e.getMessage(), TAG);
         }
 
         if (nextLink != null) {
@@ -90,5 +66,16 @@ public class CopyAsset implements IChainable<ContentExportResponse, ExportConten
     public IChainable<ContentExportResponse, ExportContentContext> then(IChainable<ContentExportResponse, ExportContentContext> link) {
         nextLink = link;
         return link;
+    }
+
+    private void copyAsset(String sourcePath, File destinationPath, String appIcon) throws IOException {
+        File source = new File(sourcePath, appIcon);
+
+        if (source.exists()) {
+            File dest = new File(destinationPath, appIcon);
+            dest.getParentFile().mkdirs();
+
+            FileUtil.cp(source, dest);
+        }
     }
 }

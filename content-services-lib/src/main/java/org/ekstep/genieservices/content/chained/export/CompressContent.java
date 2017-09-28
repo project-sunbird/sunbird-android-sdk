@@ -28,11 +28,6 @@ public class CompressContent implements IChainable<ContentExportResponse, Export
     private static final String TAG = CompressContent.class.getSimpleName();
 
     private IChainable<ContentExportResponse, ExportContentContext> nextLink;
-    private List<ContentModel> contentModelsToExport;
-
-    public CompressContent(List<ContentModel> contentModelsToExport) {
-        this.contentModelsToExport = contentModelsToExport;
-    }
 
     @Override
     public GenieResponse<ContentExportResponse> execute(AppContext appContext, ExportContentContext exportContext) {
@@ -52,7 +47,7 @@ public class CompressContent implements IChainable<ContentExportResponse, Export
 
         int iteration = 0;
 
-        for (ContentModel contentModel : contentModelsToExport) {
+        for (ContentModel contentModel : exportContext.getContentModelsToExport()) {
             Map contentData = GsonUtil.fromJson(contentModel.getLocalData(), Map.class);
 
             if (!ContentHandler.isAvailableLocally(contentModel.getContentState())
