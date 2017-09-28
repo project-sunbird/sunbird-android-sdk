@@ -5,8 +5,8 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
-import org.ekstep.genieservices.content.ContentHandler;
 import org.ekstep.genieservices.content.bean.MoveContentContext;
 
 /**
@@ -23,7 +23,13 @@ public class DeviceMemoryCheck implements IChainable<Void, MoveContentContext> {
     @Override
     public GenieResponse<Void> execute(AppContext appContext, MoveContentContext moveContentContext) {
         long deviceUsableSpace = FileUtil.getFreeUsableSpace(moveContentContext.getDestinationFolder());
-        long spaceRequired = ContentHandler.getSizeOnDevice(moveContentContext.getContentIds());
+        // TODO: 9/25/2017 - Write the query to read the summation of size on device.
+        long spaceRequired = 0;
+        if (CollectionUtil.isNullOrEmpty(moveContentContext.getContentIds())) {
+            // Get size of all content stored in DB.
+        } else {
+            // Get the size of given identifier.
+        }
 
         if (!FileUtil.isFreeSpaceAvailable(deviceUsableSpace, spaceRequired, 0)) {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.MOVE_FAILED,

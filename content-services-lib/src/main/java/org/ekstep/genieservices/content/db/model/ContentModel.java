@@ -1,6 +1,7 @@
 package org.ekstep.genieservices.content.db.model;
 
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.contract.ContentEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
@@ -39,7 +40,8 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
     private String localLastUpdatedTime;
     private String serverLastUpdatedOn;
     private String audience;
-    private long sizeOnDevice;
+    private Long sizeOnDevice;
+    private Long lastUsedTime;
 
     private ContentModel(IDBSession dbSession) {
         this.mDBSession = dbSession;
@@ -232,6 +234,10 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         localLastUpdatedTime = resultSet.getString(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_LOCAL_LAST_UPDATED_ON));
         audience = resultSet.getString(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_AUDIENCE));
         sizeOnDevice = resultSet.getLong(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_SIZE_ON_DEVICE));
+
+        if (resultSet.getColumnIndex(ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP) != -1) {
+            lastUsedTime = resultSet.getLong(resultSet.getColumnIndex(ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP));
+        }
     }
 
     private void with(ContentValues contentValues, String key, String value) {
@@ -330,6 +336,14 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         return localLastUpdatedTime;
     }
 
+    public Long getSizeOnDevice() {
+        return sizeOnDevice;
+    }
+
+    public Long getLastUsedTime() {
+        return lastUsedTime;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -382,7 +396,4 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         return result;
     }
 
-    public long getSizeOnDevice() {
-        return sizeOnDevice;
-    }
 }

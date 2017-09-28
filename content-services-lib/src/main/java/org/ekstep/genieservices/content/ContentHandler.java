@@ -417,6 +417,7 @@ public class ContentHandler {
         content.setAvailableLocally(isAvailableLocally(contentModel.getContentState()));
         content.setReferenceCount(contentModel.getRefCount());
         content.setSizeOnDevice(contentModel.getSizeOnDevice());
+        content.setLastUsedTime(contentModel.getLastUsedTime());
 
         long contentCreationTime = 0;
         String localLastUpdatedTime = contentModel.getLocalLastUpdatedTime();
@@ -535,8 +536,11 @@ public class ContentHandler {
 
         String query;
         if (uid != null) {
-            query = String.format(Locale.US, "SELECT c.* FROM  %s c LEFT JOIN %s ca ON c.%s = ca.%s AND ca.%s = '%s' %s %s;",
-                    ContentEntry.TABLE_NAME, ContentAccessEntry.TABLE_NAME, ContentEntry.COLUMN_NAME_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_UID, uid,
+            query = String.format(Locale.US, "SELECT c.*, ca.%s FROM  %s c LEFT JOIN %s ca ON c.%s = ca.%s AND ca.%s = '%s' %s %s;",
+                    ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP,
+                    ContentEntry.TABLE_NAME, ContentAccessEntry.TABLE_NAME,
+                    ContentEntry.COLUMN_NAME_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER,
+                    ContentAccessEntry.COLUMN_NAME_UID, uid,
                     filter, orderBy);
         } else {
             query = String.format(Locale.US, "SELECT c.* FROM  %s c %s;",
@@ -1545,16 +1549,6 @@ public class ContentHandler {
         }
 
         return fileName;
-    }
-
-    public static long getSizeOnDevice(List<String> contentIds) {
-        // TODO: 9/25/2017 - Write the query to read the summation of size on device.
-        if (CollectionUtil.isNullOrEmpty(contentIds)) {
-            // Get size of all content stored in DB.
-        } else {
-            // Get the size of given identifier.
-        }
-        return 0;
     }
 
 }
