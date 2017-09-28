@@ -15,7 +15,6 @@ import org.ekstep.genieservices.content.db.model.ContentModel;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,21 +30,18 @@ public class CompressContent implements IChainable<ContentExportResponse, Export
 
     @Override
     public GenieResponse<ContentExportResponse> execute(AppContext appContext, ExportContentContext exportContext) {
-        int progressPercent = 0;
-
-        List<Map<String, Object>> items = exportContext.getItems();
         File path;
         File payload;
         String artifactUrl;
 
+        int progressPercent = 0;
+        int iteration = 0;
         int jump;
-        if (items.size() > 0) {
-            jump = 90 / items.size();
+        if (exportContext.getItems().size() > 0) {
+            jump = 90 / exportContext.getItems().size();
         } else {
             jump = 90;
         }
-
-        int iteration = 0;
 
         for (ContentModel contentModel : exportContext.getContentModelsToExport()) {
             Map contentData = GsonUtil.fromJson(contentModel.getLocalData(), Map.class);
@@ -75,7 +71,6 @@ public class CompressContent implements IChainable<ContentExportResponse, Export
                 progressPercent = iteration * jump;
             }
         }
-
         progressPercent = 90;
 
         if (nextLink != null) {
