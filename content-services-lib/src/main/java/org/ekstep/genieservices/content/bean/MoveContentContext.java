@@ -24,6 +24,7 @@ public class MoveContentContext {
         this.contentIds = contentIds;
         this.validContentIdsInDestination = new ArrayList<>();
         this.destinationFolder = destinationFolder;
+        this.contentsInSource = new ArrayList<>();
         this.contentsInDestination = new ArrayList<>();
     }
 
@@ -49,10 +50,6 @@ public class MoveContentContext {
 
     public List<ContentModel> getContentsInSource() {
         return contentsInSource;
-    }
-
-    public void setContentsInSource(List<ContentModel> contentsInSource) {
-        this.contentsInSource = contentsInSource;
     }
 
     public List<ContentModel> getContentsInDestination() {

@@ -680,7 +680,7 @@ public class ContentHandler {
         return contentModelListInDB;
     }
 
-    private static List<ContentModel> findAllContent(IDBSession dbSession) {
+    public static List<ContentModel> findAllContent(IDBSession dbSession) {
         String contentStateFilter = String.format(Locale.US, "%s != '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.SEEN_BUT_NOT_AVAILABLE);
 
         String filter = String.format(Locale.US, " where %s", contentStateFilter);
@@ -1555,14 +1555,6 @@ public class ContentHandler {
             // Get the size of given identifier.
         }
         return 0;
-    }
-
-    public static List<ContentModel> getAllContentModelToMove(IDBSession dbSession, List<String> contentIds) {
-        if (CollectionUtil.isNullOrEmpty(contentIds)) {
-            return findAllContent(dbSession);
-        } else {
-            return findAllContentsWithIdentifiers(dbSession, contentIds);
-        }
     }
 
 }

@@ -32,7 +32,8 @@ public class CopyContentFromSourceToDestination implements IChainable<Void, Move
             for (ContentModel contentModel : moveContentContext.getContentsInSource()) {
                 File source = new File(contentModel.getPath());
                 try {
-                    FileUtil.copyFolder(source, moveContentContext.getContentRootFolder());
+                    File contentDestination = new File(moveContentContext.getContentRootFolder(), contentModel.getIdentifier());
+                    FileUtil.copyFolder(source, contentDestination);
                 } catch (IOException e) {
                     Logger.e(TAG, "Move failed", e);
                     return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.MOVE_FAILED, e.getMessage(), TAG);

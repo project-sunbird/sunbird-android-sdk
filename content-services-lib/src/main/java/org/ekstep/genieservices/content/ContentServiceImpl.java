@@ -787,15 +787,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 .then(new UpdateSourceContentPathInDB())
                 .then(new StoreDestinationContentInDB());
 
-        // Check destination folder is writable or not. file.canWrite(); file.isDirectory(); - Done
-        // DeviceMemoryCheck - Done
         //TODO: Separate method to shown the discrepancy (and listing all the items that are added/missing)
-        // Check duplicate content in source and destination folder
-        // CopyContent from source to destination
-        // Update DB to update path with new updated destination path
-        // Read the content from destination folder if any and make entry in DB
-        // Delete source folder, only after it’s successfully copied and imported on the destination.
-        // Add GE_INTERACT
         return validateDestinationFolder.execute(mAppContext, moveContentContext);
     }
 

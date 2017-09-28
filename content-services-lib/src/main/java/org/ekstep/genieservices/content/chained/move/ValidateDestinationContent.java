@@ -40,14 +40,14 @@ public class ValidateDestinationContent implements IChainable<Void, MoveContentC
                         continue;
                     }
 
-                    LinkedTreeMap map = GsonUtil.fromJson(manifestJson, LinkedTreeMap.class);
+                    LinkedTreeMap manifestMap = GsonUtil.fromJson(manifestJson, LinkedTreeMap.class);
 
-                    String manifestVersion = (String) map.get("ver");
+                    String manifestVersion = (String) manifestMap.get("ver");
                     if (manifestVersion.equals("1.0")) {
                         continue;
                     }
 
-                    LinkedTreeMap archive = (LinkedTreeMap) map.get("archive");
+                    LinkedTreeMap archive = (LinkedTreeMap) manifestMap.get("archive");
                     List<Map<String, Object>> items = null;
                     if (archive.containsKey("items")) {
                         items = (List<Map<String, Object>>) archive.get("items");

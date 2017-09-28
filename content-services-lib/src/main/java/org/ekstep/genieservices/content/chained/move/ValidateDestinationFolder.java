@@ -25,11 +25,11 @@ public class ValidateDestinationFolder implements IChainable<Void, MoveContentCo
     public GenieResponse<Void> execute(AppContext appContext, MoveContentContext moveContentContext) {
         if (moveContentContext.getDestinationFolder().isDirectory() && moveContentContext.getDestinationFolder().canWrite()) {
             File contentRootFolder;
-            if (!moveContentContext.getDestinationFolder().getPath().endsWith(FileUtil.CONTENT_FOLDER)) {
+            if (moveContentContext.getDestinationFolder().getPath().endsWith(FileUtil.CONTENT_FOLDER)) {
+                contentRootFolder = moveContentContext.getDestinationFolder();
+            } else {
                 // Make content folder if not exists in destination folder.
                 contentRootFolder = FileUtil.getContentRootDir(moveContentContext.getDestinationFolder());
-            } else {
-                contentRootFolder = moveContentContext.getDestinationFolder();
             }
 
             moveContentContext.setContentRootFolder(contentRootFolder);
