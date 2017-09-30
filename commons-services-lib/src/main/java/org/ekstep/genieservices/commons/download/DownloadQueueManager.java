@@ -37,8 +37,9 @@ public class DownloadQueueManager {
         this.mKeyValueStore = keyValueStore;
     }
 
-    public DownloadQueueManager(IDBSession dbSession) {
+    public DownloadQueueManager(IKeyValueStore keyValueStore, IDBSession dbSession) {
         this.mDbSession = dbSession;
+        this.mKeyValueStore = keyValueStore;
     }
 
     private List<DownloadRequest> getAllRequests() {

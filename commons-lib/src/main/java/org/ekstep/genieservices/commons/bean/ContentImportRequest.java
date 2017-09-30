@@ -1,113 +1,55 @@
 package org.ekstep.genieservices.commons.bean;
 
-import java.util.List;
+import org.ekstep.genieservices.commons.utils.StringUtil;
+
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * This class accepts,
- * - isChildContent - if the child contents are required while importing
- * - destinationFolder - where the contents are to be stored
- * - contentIds - list of contentIds to be imported
- * - correlationData - list of correlationData
- * - status - list of status i.e. "Live", "Draft"
- * - contentType - List of contentType. "Story", "Worksheet", "Collection", "Game", "TextBook", "Course", "LessonPlan".
+ *  * - contentImportMap
  */
 public class ContentImportRequest {
 
-    private boolean isChildContent;
-    private String destinationFolder;
-    private List<String> contentIds;
-    private List<CorrelationData> correlationData;
-    private Map<String, Object> attributes;
+    private Map<String, Object> contentImportMap;
 
-    private ContentImportRequest(boolean isChildContent, String destinationFolder, List<String> contentIds, List<CorrelationData> correlationData, Map<String, Object> attributes) {
-        this.isChildContent = isChildContent;
-        this.destinationFolder = destinationFolder;
-        this.contentIds = contentIds;
-        this.correlationData = correlationData;
-        this.attributes = attributes;
+    private ContentImportRequest(Map<String, Object> contentImportMap) {
+        this.contentImportMap = contentImportMap;
     }
 
-    public boolean isChildContent() {
-        return isChildContent;
-    }
-
-    public String getDestinationFolder() {
-        return destinationFolder;
-    }
-
-    public List<String> getContentIds() {
-        return contentIds;
-    }
-
-    public List<CorrelationData> getCorrelationData() {
-        return correlationData;
-    }
-
-    public Map<String, Object> getAttributes() {
-        return attributes;
+    public Map<String, Object> getContentImportMap() {
+        return contentImportMap;
     }
 
     public static class Builder {
-        private boolean isChildContent;
-        private String destinationFolder;
-        private List<String> contentIds;
-        private List<CorrelationData> correlationData;
-        private Map<String, Object> attributes;
+        private Map<String, Object> contentImportMap;
 
-        /**
-         * Method to indicate that the file being imported is a child content
-         */
-        public Builder childContent() {
-            this.isChildContent = true;
-            return this;
+        public Builder() {
+            this.contentImportMap = new HashMap<>();
         }
 
         /**
-         * Destination folder where content will import.
+         * Method to add ContentImport object
          */
-        public Builder toFolder(String toFolder) {
-            if (toFolder == null) {
-                throw new IllegalArgumentException("Illegal toFolder");
+        public Builder add(ContentImport contentImport) {
+            if (contentImport == null) {
+                throw new IllegalStateException("ContentImport cant be null");
             }
-            this.destinationFolder = toFolder;
-            return this;
-        }
 
-        /**
-         * List of content identifier which needs to import.
-         */
-        public Builder contentIds(List<String> contentIds) {
-            this.contentIds = contentIds;
-            return this;
-        }
+            if (StringUtil.isNullOrEmpty(contentImport.getContentId())) {
+                throw new IllegalStateException("Identifier required.");
+            }
 
-        /**
-         * CorrelationData of content.
-         */
-        public Builder correlationData(List<CorrelationData> correlationData) {
-            this.correlationData = correlationData;
-            return this;
-        }
+            if (StringUtil.isNullOrEmpty(contentImport.getDestinationFolder())) {
+                throw new IllegalStateException("To folder required.");
+            }
 
-        /**
-         * Free form data for content.
-         */
-        public Builder attributes(Map<String, Object> attributes) {
-            this.attributes = attributes;
+            this.contentImportMap.put(contentImport.getContentId(), contentImport);
             return this;
         }
 
         public ContentImportRequest build() {
-            if (destinationFolder == null) {
-                throw new IllegalStateException("To folder required.");
-            }
-
-            if (contentIds == null || contentIds.size() == 0) {
-                throw new IllegalStateException("ContentIds required.");
-            }
-
-            return new ContentImportRequest(isChildContent, destinationFolder, contentIds, correlationData, attributes);
+            return new ContentImportRequest(this.contentImportMap);
         }
     }
 }

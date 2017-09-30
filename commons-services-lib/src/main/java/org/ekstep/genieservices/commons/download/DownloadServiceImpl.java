@@ -36,7 +36,7 @@ public class DownloadServiceImpl implements IDownloadService {
     private ScheduledExecutorService mExecutor;
 
     public DownloadServiceImpl(AppContext appContext) {
-        this.mDownloadQueueManager = new DownloadQueueManager(appContext.getDBSession());
+        this.mDownloadQueueManager = new DownloadQueueManager(appContext.getKeyValueStore(), appContext.getDBSession());
         this.mDownloadManager = appContext.getDownloadManager();
     }
 

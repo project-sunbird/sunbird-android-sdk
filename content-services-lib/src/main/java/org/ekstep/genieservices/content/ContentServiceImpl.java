@@ -20,6 +20,7 @@ import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentExportRequest;
 import org.ekstep.genieservices.commons.bean.ContentExportResponse;
 import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
+import org.ekstep.genieservices.commons.bean.ContentImport;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.ContentListing;
@@ -74,10 +75,10 @@ import org.ekstep.genieservices.telemetry.TelemetryLogger;
 import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 /**
@@ -647,9 +648,10 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         GenieResponse<List<ContentImportResponse>> response;
         List<ContentImportResponse> contentImportResponseList = new ArrayList<>();
-        List<String> contentIds = importRequest.getContentIds();
+        Map<String, Object> contentImportMap = importRequest.getContentImportMap();
+        Set<String> contentIds = contentImportMap.keySet();
 
-        ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, ContentHandler.getSearchRequest(mAppContext, importRequest));
+        ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, ContentHandler.getSearchRequest(mAppContext, contentIds));
         GenieResponse apiResponse = contentSearchAPI.post();
         if (apiResponse.getStatus()) {
             String body = apiResponse.getResult().toString();
@@ -672,11 +674,11 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
                     if (!StringUtil.isNullOrEmpty(downloadUrl) && ServiceConstants.FileExtension.CONTENT.equalsIgnoreCase(FileUtil.getFileExtension(downloadUrl))) {
                         status = ContentImportStatus.ENQUEUED_FOR_DOWNLOAD;
-                        DownloadRequest downloadRequest = new DownloadRequest(contentId, downloadUrl, ContentConstants.MimeType.ECAR, importRequest.getDestinationFolder(), importRequest.isChildContent());
+                        ContentImport contentImport = (ContentImport) contentImportMap.get(contentId);
+                        DownloadRequest downloadRequest = new DownloadRequest(contentId, downloadUrl, ContentConstants.MimeType.ECAR, contentImport.getDestinationFolder(), contentImport.isChildContent());
                         downloadRequest.setFilename(contentId + "." + ServiceConstants.FileExtension.CONTENT);
-                        downloadRequest.setCorrelationData(importRequest.getCorrelationData());
+                        downloadRequest.setCorrelationData(contentImport.getCorrelationData());
                         downloadRequest.setProcessorClass("org.ekstep.genieservices.commons.download.ContentImportService");
-                        downloadRequest.setAttributes(importRequest.getAttributes());
                         downloadRequests[i] = downloadRequest;
                     }
 
@@ -774,13 +776,13 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             return response;
         }
         String value = keyValueStoreModel.getValue();
-        List<DownloadRequest> requestList = new ArrayList<>();
-        DownloadRequest[] downloadRequests = GsonUtil.fromJson(value, DownloadRequest[].class);
-        requestList.addAll(Arrays.asList(downloadRequests));
+//        List<DownloadRequest> requestList = new ArrayList<>();
+//        DownloadRequest[] downloadRequests = GsonUtil.fromJson(value, DownloadRequest[].class);
+//        requestList.addAll(Arrays.asList(downloadRequests));
 
         Type type = new TypeToken<List<DownloadRequest>>() {
         }.getType();
-        List<DownloadRequest> downloadReqList = GsonUtil.getGson().fromJson(sampleResponse(), type);
+        List<DownloadRequest> downloadReqList = GsonUtil.getGson().fromJson(value, type);
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(downloadReqList);
         TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, (Map) new HashMap<>());
@@ -804,82 +806,6 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         response.setResult(mAppContext.getKeyValueStore().getInt(ServiceConstants.PreferenceKey.KEY_DOWNLOAD_STATUS, 0) == 0 ? DownloadAction.RESUME : DownloadAction.PAUSE);
         TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, (Map) new HashMap<>());
         return response;
-    }
-
-
-    private String sampleResponse() {
-        return "[\n" +
-                "  {\n" +
-                "    \"downloadId\": 1,\n" +
-                "    \"identifier\": \"do_1234\",\n" +
-                "    \"downloadUrl\": \"sampleurl\",\n" +
-                "    \"mimeType\": \"application/ecar\",\n" +
-                "    \"destinationFolder\": \"\",\n" +
-                "    \"isChildContent\": false,\n" +
-                "    \"attributes\": {\n" +
-                "      \"name\": \"Content1\"\n" +
-                "    }\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"downloadId\": 2,\n" +
-                "    \"identifier\": \"do_12345\",\n" +
-                "    \"downloadUrl\": \"sampleurl\",\n" +
-                "    \"mimeType\": \"application/ecar\",\n" +
-                "    \"destinationFolder\": \"\",\n" +
-                "    \"isChildContent\": false,\n" +
-                "    \"attributes\": {\n" +
-                "      \"name\": \"Content2\"\n" +
-                "    }\n" +
-                "  },\n" +
-                "  \n" +
-                "  {\n" +
-                "    \"downloadId\": 4,\n" +
-                "    \"identifier\": \"do_12345671\",\n" +
-                "    \"downloadUrl\": \"sampleurl\",\n" +
-                "    \"mimeType\": \"application/ecar\",\n" +
-                "    \"destinationFolder\": \"\",\n" +
-                "    \"isChildContent\": true,\n" +
-                "    \"attributes\": {\n" +
-                "      \"identifier\": \"do_12345678\",\n" +
-                "      \"name\": \"Content4\"\n" +
-                "    }\n" +
-                "  },\n" +
-                "{\n" +
-                "    \"downloadId\": 3,\n" +
-                "    \"identifier\": \"do_123456\",\n" +
-                "    \"downloadUrl\": \"sampleurl\",\n" +
-                "    \"mimeType\": \"application/ecar\",\n" +
-                "    \"destinationFolder\": \"\",\n" +
-                "    \"isChildContent\": false,\n" +
-                "    \"attributes\": {\n" +
-                "      \"name\": \"Content3\"\n" +
-                "    }\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"downloadId\": 5,\n" +
-                "    \"identifier\": \"do_12345672\",\n" +
-                "    \"downloadUrl\": \"sampleurl\",\n" +
-                "    \"mimeType\": \"application/ecar\",\n" +
-                "    \"destinationFolder\": \"\",\n" +
-                "    \"isChildContent\": true,\n" +
-                "    \"attributes\": {\n" +
-                "      \"identifier\": \"do_12345678\",\n" +
-                "      \"name\": \"Content4\"\n" +
-                "    }\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"downloadId\": 6,\n" +
-                "    \"identifier\": \"do_12345673\",\n" +
-                "    \"downloadUrl\": \"sampleurl\",\n" +
-                "    \"mimeType\": \"application/ecar\",\n" +
-                "    \"destinationFolder\": \"\",\n" +
-                "    \"isChildContent\": true,\n" +
-                "    \"attributes\": {\n" +
-                "      \"identifier\": \"do_12345678\",\n" +
-                "      \"name\": \"Content4\"\n" +
-                "    }\n" +
-                "  }\n" +
-                "]";
     }
 
 }
