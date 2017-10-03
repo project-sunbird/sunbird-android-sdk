@@ -15,6 +15,7 @@ import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentMoveRequest;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
+import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
@@ -22,6 +23,7 @@ import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
+import org.ekstep.genieservices.commons.bean.enums.DownloadAction;
 
 import java.util.List;
 
@@ -201,6 +203,19 @@ public interface IContentService {
      */
     GenieResponse<ContentImportResponse> getImportStatus(String contentId);
 
+
+    /**
+     * This api is used to get the status of contents
+     * <p>
+     * <p>
+     * Response will always be status set TRUE, with {@link ContentImportResponse} set in result.
+     *
+     * @param contentIdList Content idList.
+     * @return {@link GenieResponse<ContentImportResponse>}
+     */
+    GenieResponse<List<ContentImportResponse>> getImportStatus(List<String> contentIdList);
+
+
     /**
      * This api is used to cancel the on-going download
      * <p>
@@ -226,6 +241,12 @@ public interface IContentService {
      * @return {@link GenieResponse<ContentExportResponse>}
      */
     GenieResponse<ContentExportResponse> exportContent(ContentExportRequest contentExportRequest);
+
+    GenieResponse<List<DownloadRequest>> getAllDownloads();
+
+    GenieResponse<Void> setDownloadAction(DownloadAction action);
+
+    GenieResponse<DownloadAction> getDownloadState();
 
     /**
      * This api is used to move all the downloaded content from source to destination folder.

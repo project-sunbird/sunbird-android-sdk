@@ -22,6 +22,7 @@ import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentExportRequest;
 import org.ekstep.genieservices.commons.bean.ContentExportResponse;
 import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
+import org.ekstep.genieservices.commons.bean.ContentImport;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.ContentListing;
@@ -39,9 +40,11 @@ import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.enums.ContentDeleteStatus;
 import org.ekstep.genieservices.commons.bean.enums.ContentImportStatus;
+import org.ekstep.genieservices.commons.bean.enums.DownloadAction;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
@@ -88,6 +91,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 /**
@@ -651,6 +655,37 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
+    public GenieResponse<List<ContentImportResponse>> getImportStatus(List<String> contentIdList) {
+        String methodName = "getImportStatus@ContentServiceImpl";
+        Map<String, Object> params = new HashMap<>();
+        params.put("identifierList", GsonUtil.toJson(contentIdList));
+        params.put("logLevel", "2");
+
+        List<ContentImportResponse> contentImportResponseList = new ArrayList<>();
+        for (String contentId : contentIdList) {
+            DownloadRequest request = downloadService.getDownloadRequest(contentId);
+            ContentImportStatus status = ContentImportStatus.NOT_FOUND;
+            if (request != null) {
+                status = request.getDownloadId() == -1 ? ContentImportStatus.ENQUEUED_FOR_DOWNLOAD : ContentImportStatus.DOWNLOAD_STARTED;
+            } else {
+                ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), contentId);
+                if (contentModel != null) {
+                    status = ContentImportStatus.IMPORT_COMPLETED;
+                }
+            }
+
+            ContentImportResponse contentImportResponse = new ContentImportResponse(contentId, status);
+            contentImportResponseList.add(contentImportResponse);
+        }
+
+
+        GenieResponse<List<ContentImportResponse>> response = GenieResponseBuilder.getSuccessResponse("");
+        response.setResult(contentImportResponseList);
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        return response;
+    }
+
+    @Override
     public GenieResponse<List<ContentImportResponse>> importContent(ContentImportRequest importRequest) {
         String methodName = "importContent@ContentServiceImpl";
         Map<String, Object> params = new HashMap<>();
@@ -659,9 +694,10 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         GenieResponse<List<ContentImportResponse>> response;
         List<ContentImportResponse> contentImportResponseList = new ArrayList<>();
-        List<String> contentIds = importRequest.getContentIds();
+        Map<String, Object> contentImportMap = importRequest.getContentImportMap();
+        Set<String> contentIds = contentImportMap.keySet();
 
-        ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, ContentHandler.getSearchRequest(mAppContext, importRequest));
+        ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, ContentHandler.getSearchRequest(mAppContext, contentIds));
         GenieResponse apiResponse = contentSearchAPI.post();
         if (apiResponse.getStatus()) {
             String body = apiResponse.getResult().toString();
@@ -684,10 +720,10 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
                     if (!StringUtil.isNullOrEmpty(downloadUrl) && ServiceConstants.FileExtension.CONTENT.equalsIgnoreCase(FileUtil.getFileExtension(downloadUrl))) {
                         status = ContentImportStatus.ENQUEUED_FOR_DOWNLOAD;
-
-                        DownloadRequest downloadRequest = new DownloadRequest(contentId, downloadUrl, ContentConstants.MimeType.ECAR, importRequest.getDestinationFolder(), importRequest.isChildContent());
+                        ContentImport contentImport = (ContentImport) contentImportMap.get(contentId);
+                        DownloadRequest downloadRequest = new DownloadRequest(contentId, downloadUrl, ContentConstants.MimeType.ECAR, contentImport.getDestinationFolder(), contentImport.isChildContent());
                         downloadRequest.setFilename(contentId + "." + ServiceConstants.FileExtension.CONTENT);
-                        downloadRequest.setCorrelationData(importRequest.getCorrelationData());
+                        downloadRequest.setCorrelationData(contentImport.getCorrelationData());
                         downloadRequest.setProcessorClass("org.ekstep.genieservices.commons.download.ContentImportService");
 
                         downloadRequestList.add(downloadRequest);
@@ -776,6 +812,50 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 .then(new AddGeTransferContentExportEvent());
 
         return cleanTempLoc.execute(mAppContext, exportContentContext);
+    }
+
+    @Override
+    public GenieResponse<List<DownloadRequest>> getAllDownloads() {
+
+        String methodName = "getAllDownloads@ContentServiceImpl";
+        NoSqlModel noSqlModel = NoSqlModel.findByKey(mAppContext.getDBSession(), ServiceConstants.DOWNLOAD_QUEUE);
+        GenieResponse<List<DownloadRequest>> response;
+        if (noSqlModel == null) {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.KEY_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_KEY, TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, (Map) new HashMap<>(), ServiceConstants.ErrorMessage.UNABLE_TO_FIND_KEY);
+            return response;
+        }
+        String value = noSqlModel.getValue();
+//        List<DownloadRequest> requestList = new ArrayList<>();
+//        DownloadRequest[] downloadRequests = GsonUtil.fromJson(value, DownloadRequest[].class);
+//        requestList.addAll(Arrays.asList(downloadRequests));
+
+        Type type = new TypeToken<List<DownloadRequest>>() {
+        }.getType();
+        List<DownloadRequest> downloadReqList = GsonUtil.getGson().fromJson(value, type);
+        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        response.setResult(downloadReqList);
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, (Map) new HashMap<>());
+        return response;
+    }
+
+    @Override
+    public GenieResponse<Void> setDownloadAction(DownloadAction action) {
+        String methodName = "setDownloadAction@ContentServiceImpl";
+        mAppContext.getKeyValueStore().putInt(ServiceConstants.PreferenceKey.KEY_DOWNLOAD_STATUS, action.getValue());
+        GenieResponse<Void> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, (Map) new HashMap<>());
+        return response;
+
+    }
+
+    @Override
+    public GenieResponse<DownloadAction> getDownloadState() {
+        String methodName = "getDownloadState@ContentServiceImpl";
+        GenieResponse<DownloadAction> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        response.setResult(mAppContext.getKeyValueStore().getInt(ServiceConstants.PreferenceKey.KEY_DOWNLOAD_STATUS, 0) == 0 ? DownloadAction.RESUME : DownloadAction.PAUSE);
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, (Map) new HashMap<>());
+        return response;
     }
 
     @Override

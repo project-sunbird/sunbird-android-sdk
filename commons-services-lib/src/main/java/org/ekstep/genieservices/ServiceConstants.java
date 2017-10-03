@@ -11,6 +11,8 @@ public interface ServiceConstants {
     String FAILED_RESPONSE = "failed";
     String VALIDATION_ERROR = "VALIDATION_ERROR";
 
+    String DOWNLOAD_QUEUE = "download_queue";
+
     /* Key Constants for all the key value store */
     String KEY_USER_SESSION = "session";
 
@@ -58,6 +60,9 @@ public interface ServiceConstants {
         String KEY_ACTIVE_PARTNER_ID = "partner.activeid";
         String SHARED_PREF_SESSION_KEY = "partnersessionid";
         String SHARED_PREF_PARTNER_SET_EPOCH = "partnerSET";
+
+        //Download
+        String KEY_DOWNLOAD_STATUS = "download_status";
     }
 
     interface Partner {
@@ -115,6 +120,9 @@ public interface ServiceConstants {
 
         // Authentication
         String TOKEN_GENERATION_FAILED = "TOKEN_GENERATION_FAILED";
+
+        // KeyValueStore
+        String KEY_NOT_FOUND = "KEY_NOT_FOUND";
     }
 
     interface ErrorMessage {
@@ -159,6 +167,9 @@ public interface ServiceConstants {
 
         //Authentication
         String FAILED_TO_GENERATE_TOKEN = "Failed to generate the bearer token";
+
+        //KeyStore Value
+        String UNABLE_TO_FIND_KEY = "Unable to find key";
 
         String NOT_WRITABLE = "Destination folder is not writable.";
         String NO_CONTENT_TO_MOVE = "Nothing to move.";
