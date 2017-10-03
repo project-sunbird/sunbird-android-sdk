@@ -105,7 +105,7 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
         }
 
         if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_Q_INDEX) != -1) {
-            learnerAssessmentDetails.setQindex(cursor.getDouble(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID)));
+            learnerAssessmentDetails.setQindex(cursor.getDouble(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_Q_INDEX)));
         }
 
         if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_CORRECT) != -1) {
@@ -143,7 +143,6 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
         if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_MAX_SCORE) != -1) {
             learnerAssessmentDetails.setMaxScore(cursor.getDouble(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_MAX_SCORE)));
         }
-
 
         return learnerAssessmentDetails;
     }
@@ -196,9 +195,12 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
 
     @Override
     public String updateBy() {
-        return String.format(Locale.US, "%s = %s and %s = %s and %s = %s", LearnerAssessmentsEntry.COLUMN_NAME_UID, this.uid,
-                LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID, this.contentId,
-                LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA, this.hierarchyData);
+        String isQid = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_QID, qid);
+        String isUid = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_UID, uid);
+        String isContentId = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID, contentId);
+        String isHData = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA, hierarchyData == null ? "" : hierarchyData);
+
+        return String.format(Locale.US, "%s AND %s AND %s AND %s", isUid, isContentId, isHData, isQid);
     }
 
     @Override
@@ -214,7 +216,6 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
     @Override
     public String filterForRead() {
         return filter;
-
     }
 
     @Override
@@ -239,7 +240,4 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
         return mAssessmentList;
     }
 
-    public Long getInsertedId() {
-        return this.id;
-    }
 }

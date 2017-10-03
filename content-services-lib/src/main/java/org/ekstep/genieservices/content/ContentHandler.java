@@ -193,7 +193,7 @@ public class ContentHandler {
     }
 
     public static String readAudience(Map contentData) {
-        ArrayList<String> audienceList = null;
+        List<String> audienceList = null;
         if (contentData.containsKey(AUDIENCE_KEY)) {
             Object o = contentData.get(AUDIENCE_KEY);
             if (o instanceof String) {
@@ -893,7 +893,7 @@ public class ContentHandler {
         filterMap.put("identifier", contentIds);
         filterMap.put("objectType", Collections.singletonList("Content"));
 
-        HashMap<String, Object> requestMap = new HashMap<>();
+        Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("filters", filterMap);
         requestMap.put("fields", Arrays.asList(KEY_DOWNLOAD_URL, KEY_VARIANTS, KEY_MIME_TYPE));
 
@@ -901,7 +901,7 @@ public class ContentHandler {
     }
 
     public static Map<String, Object> getSearchContentRequest(AppContext appContext, IConfigService configService, ContentSearchCriteria criteria) {
-        HashMap<String, Object> requestMap = new HashMap<>();
+        Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("query", criteria.getQuery());
         requestMap.put("limit", criteria.getLimit());
         requestMap.put("mode", criteria.getMode());
@@ -934,22 +934,31 @@ public class ContentHandler {
         filterMap.put("objectType", Collections.singletonList("Content"));
         filterMap.put("contentType", Arrays.asList(criteria.getContentTypes()));
 
+        // Add createdBy filter
+        if (!StringUtil.isNullOrEmpty(criteria.getCreatedBy())) {
+            filterMap.put("createdBy", criteria.getCreatedBy());
+        }
+
         //Add filters for criteria attributes
         // Add subject filter
-        if (criteria.getAge() > 0)
+        if (criteria.getAge() > 0) {
             applyListingFilter(configService, MasterDataType.AGEGROUP, String.valueOf(criteria.getAge()), filterMap);
-
-        // Add board filter
-        if (!StringUtil.isNullOrEmpty(criteria.getBoard()))
-            applyListingFilter(configService, MasterDataType.BOARD, criteria.getBoard(), filterMap);
-
-        // Add medium filter
-        if (!StringUtil.isNullOrEmpty(criteria.getMedium()))
-            applyListingFilter(configService, MasterDataType.MEDIUM, criteria.getMedium(), filterMap);
+        }
 
         // Add standard filter
-        if (criteria.getGrade() > 0)
+        if (criteria.getGrade() > 0) {
             applyListingFilter(configService, MasterDataType.GRADELEVEL, String.valueOf(criteria.getGrade()), filterMap);
+        }
+
+        // Add medium filter
+        if (!StringUtil.isNullOrEmpty(criteria.getMedium())) {
+            applyListingFilter(configService, MasterDataType.MEDIUM, criteria.getMedium(), filterMap);
+        }
+
+        // Add board filter
+        if (!StringUtil.isNullOrEmpty(criteria.getBoard())) {
+            applyListingFilter(configService, MasterDataType.BOARD, criteria.getBoard(), filterMap);
+        }
 
         String[] audienceArr = criteria.getAudience();
         if (audienceArr != null && audienceArr.length > 0) {
@@ -1023,7 +1032,7 @@ public class ContentHandler {
 
     private static void applyListingFilter(IConfigService configService, MasterDataType masterDataType, String propertyValue, Map<String, Object> filterMap) {
         if (configService != null && propertyValue != null) {
-            String property = masterDataType.getValue();
+//            String property = masterDataType.getValue();
 
             if (masterDataType == MasterDataType.AGEGROUP) {
                 masterDataType = MasterDataType.AGE;
@@ -1161,19 +1170,19 @@ public class ContentHandler {
         return -1;
     }
 
-    public static HashMap<String, Object> getRecommendedContentRequest(RecommendedContentRequest request, String did) {
-        HashMap<String, Object> contextMap = new HashMap<>();
+    public static Map<String, Object> getRecommendedContentRequest(RecommendedContentRequest request, String did) {
+        Map<String, Object> contextMap = new HashMap<>();
         contextMap.put("did", did);
         contextMap.put("dlang", request.getLanguage());
 
-        HashMap<String, Object> requestMap = new HashMap<>();
+        Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("context", contextMap);
         requestMap.put("limit", request.getLimit());
 
         return requestMap;
     }
 
-    public static HashMap<String, Object> getRelatedContentRequest(RelatedContentRequest request, String did) {
+    public static Map<String, Object> getRelatedContentRequest(RelatedContentRequest request, String did) {
         String dlang = "";
         String uid = "";
         if (!StringUtil.isNullOrEmpty(request.getUid())) {
@@ -1183,13 +1192,13 @@ public class ContentHandler {
             dlang = request.getLanguage();
         }
 
-        HashMap<String, Object> contextMap = new HashMap<>();
+        Map<String, Object> contextMap = new HashMap<>();
         contextMap.put("contentid", request.getContentId());
         contextMap.put("uid", uid);
         contextMap.put("dlang", dlang);
         contextMap.put("did", did);
 
-        HashMap<String, Object> requestMap = new HashMap<>();
+        Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("context", contextMap);
         requestMap.put("limit", request.getLimit());
 
@@ -1218,7 +1227,7 @@ public class ContentHandler {
     }
 
     private static Map<String, Object> getContentListingRequest(AppContext appContext, IConfigService configService, ContentListingCriteria contentListingCriteria, String did) {
-        HashMap<String, Object> contextMap = new HashMap<>();
+        Map<String, Object> contextMap = new HashMap<>();
 
         if (!StringUtil.isNullOrEmpty(contentListingCriteria.getUid())) {
             contextMap.put("uid", contentListingCriteria.getUid());
@@ -1265,7 +1274,7 @@ public class ContentHandler {
             }
         }
 
-        HashMap<String, Object> requestMap = new HashMap<>();
+        Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("context", contextMap);
         requestMap.put("filters", filterMap);
 
@@ -1352,7 +1361,7 @@ public class ContentHandler {
                 if (searchMap.containsKey("filters")) {
                     Map filtersMap = (Map) searchMap.get("filters");
                     if (filtersMap.containsKey("contentType")) {
-                        ArrayList<String> contentType = (ArrayList<String>) filtersMap.get("contentType");
+                        List<String> contentType = (ArrayList<String>) filtersMap.get("contentType");
                         builder.contentTypes(contentType.toArray(new String[contentType.size()]));
                     }
 
@@ -1360,7 +1369,7 @@ public class ContentHandler {
                 }
 
                 if (searchMap.containsKey("facets")) {
-                    ArrayList<String> facets = (ArrayList<String>) searchMap.get("facets");
+                    List<String> facets = (ArrayList<String>) searchMap.get("facets");
                     builder.facets(facets.toArray(new String[facets.size()]));
                 }
 

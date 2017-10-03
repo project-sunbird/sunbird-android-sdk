@@ -8,6 +8,8 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
+import org.ekstep.genieservices.commons.bean.ContentAccess;
+import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentExportRequest;
@@ -23,7 +25,11 @@ import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
+import org.ekstep.genieservices.commons.bean.LearnerAssessmentDetails;
+import org.ekstep.genieservices.commons.bean.LearnerAssessmentSummary;
 import org.ekstep.genieservices.commons.bean.MasterData;
+import org.ekstep.genieservices.commons.bean.Notification;
+import org.ekstep.genieservices.commons.bean.NotificationFilterCriteria;
 import org.ekstep.genieservices.commons.bean.PartnerData;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportRequest;
@@ -34,7 +40,12 @@ import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
+import org.ekstep.genieservices.commons.bean.SummaryRequest;
 import org.ekstep.genieservices.commons.bean.SyncStat;
+import org.ekstep.genieservices.commons.bean.Tag;
+import org.ekstep.genieservices.commons.bean.TelemetryExportRequest;
+import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
+import org.ekstep.genieservices.commons.bean.TelemetryImportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
@@ -156,8 +167,13 @@ public class GenieServiceTestActivity extends Activity {
         GenieService.getAsyncService().getUserService().importProfile(profileImportRequest, responseHandler);
     }
 
-    public void exportProfile(final ProfileExportRequest profileExportRequest, IResponseHandler<ProfileExportResponse> responseHandler) {
-        GenieService.getAsyncService().getUserService().exportProfile(profileExportRequest, responseHandler);
+    public GenieResponse<ProfileImportResponse> importProfile(final ProfileImportRequest profileImportRequest) {
+        return mGenieService.getUserService().importProfile(profileImportRequest);
+    }
+
+
+    public GenieResponse<ProfileExportResponse> exportProfile(final ProfileExportRequest profileExportRequest) {
+        return mGenieService.getUserService().exportProfile(profileExportRequest);
     }
 
     public GenieResponse saveTelemetry(Telemetry event) {
@@ -178,17 +194,17 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
-//    public GenieResponse<Void> importTelemetry() {
-//        idle = false;
-//        GenieResponse genieResponse = mGenieService.getTelemetryService().importTelemetry();
-//        return genieResponse;
-//    }
-//
-//    public GenieResponse<Void> exportTelemetry() {
-//        idle = false;
-//        GenieResponse<Void> genieResponse = mGenieService.getTelemetryService().exportTelemetry();
-//        return genieResponse;
-//    }
+    public GenieResponse<Void> importTelemetry(TelemetryImportRequest telemetryImportRequest) {
+        idle = false;
+        GenieResponse<Void> genieResponse = mGenieService.getTelemetryService().importTelemetry(telemetryImportRequest);
+        return genieResponse;
+    }
+
+    public GenieResponse<TelemetryExportResponse> exportTelemetry(TelemetryExportRequest telemetryExportRequest) {
+        idle = false;
+        GenieResponse<TelemetryExportResponse> genieResponse = mGenieService.getTelemetryService().exportTelemetry(telemetryExportRequest);
+        return genieResponse;
+    }
 
     public GenieResponse isPartnerRegistered(String partnerID) {
         idle = false;
@@ -333,6 +349,77 @@ public class GenieServiceTestActivity extends Activity {
     public GenieResponse getLanguageSearch(String requestData) {
         idle = false;
         GenieResponse<String> genieResponse = mGenieService.getLanguageService().getLanguageSearch(requestData);
+        return genieResponse;
+    }
+
+    public GenieResponse addContentAccess(ContentAccess contentAccess) {
+        idle = false;
+        GenieResponse<Void> genieResponse = mGenieService.getUserService().addContentAccess(contentAccess);
+        return genieResponse;
+    }
+
+
+    public GenieResponse getAllContentAccess(ContentAccessFilterCriteria filterCriteria) {
+        idle = false;
+        GenieResponse<List<ContentAccess>> genieResponse = mGenieService.getUserService().getAllContentAccess(filterCriteria);
+        return genieResponse;
+    }
+
+    public GenieResponse<List<LearnerAssessmentSummary>> getSummary(SummaryRequest summaryRequest) {
+        idle = false;
+        return mGenieService.getSummarizerService().getSummary(summaryRequest);
+    }
+
+    public GenieResponse<List<LearnerAssessmentDetails>> getLearnerAssessmentDetails(SummaryRequest summaryRequest) {
+        idle = false;
+        return mGenieService.getSummarizerService().getLearnerAssessmentDetails(summaryRequest);
+    }
+
+    public GenieResponse setTag(Tag tag) {
+        idle = false;
+        GenieResponse<Void> genieResponse = mGenieService.getTagService().setTag(tag);
+        return genieResponse;
+    }
+
+    public GenieResponse<List<Tag>> getTag() {
+        idle = false;
+        GenieResponse<List<Tag>> genieResponse = mGenieService.getTagService().getTags();
+        return genieResponse;
+    }
+
+    public GenieResponse<Void> deleteTag(String name) {
+        idle = false;
+        GenieResponse<Void> genieResponse = mGenieService.getTagService().deleteTag(name);
+        return genieResponse;
+    }
+
+    public GenieResponse<Void> updateTag(Tag tag) {
+        idle = false;
+        GenieResponse<Void> genieResponse = mGenieService.getTagService().updateTag(tag);
+        return genieResponse;
+    }
+
+    public GenieResponse<Void> addNotification(Notification notification) {
+        idle = false;
+        GenieResponse<Void> genieResponse = mGenieService.getNotificationService().addNotification(notification);
+        return genieResponse;
+    }
+
+    public GenieResponse<Notification> updateNotification(Notification notification) {
+        idle = false;
+        GenieResponse<Notification> genieResponse = mGenieService.getNotificationService().updateNotification(notification);
+        return genieResponse;
+    }
+
+    public GenieResponse<Void> deleteNotification(int msgId) {
+        idle = false;
+        GenieResponse<Void> genieResponse = mGenieService.getNotificationService().deleteNotification(msgId);
+        return genieResponse;
+    }
+
+    public GenieResponse<List<Notification>> getAllNotifications(NotificationFilterCriteria filterCriteria) {
+        idle = false;
+        GenieResponse<List<Notification>> genieResponse = mGenieService.getNotificationService().getAllNotifications(filterCriteria);
         return genieResponse;
     }
 

@@ -60,6 +60,12 @@ public class AndroidAppContext extends AppContext<Context> {
     }
 
     @Override
+    public Void applyParams(IParams params) {
+        ((BuildParams) this.mParams).setParams(params);
+        return null;
+    }
+
+    @Override
     public ILocationInfo getLocationInfo() {
         return mLocationInfo;
     }

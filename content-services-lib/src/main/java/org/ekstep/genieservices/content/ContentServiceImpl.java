@@ -108,7 +108,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     @Override
     public GenieResponse<Content> getContentDetails(ContentDetailsRequest contentDetailsRequest) {
         String methodName = "getContentDetails@ContentServiceImpl";
-        HashMap<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(contentDetailsRequest));
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
 
@@ -150,7 +150,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     @Override
     public GenieResponse<List<Content>> getAllLocalContent(ContentFilterCriteria criteria) {
         String methodName = "getAllLocalContent@ContentServiceImpl";
-        HashMap<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("criteria", GsonUtil.toJson(criteria));
 
         GenieResponse<List<Content>> response;
@@ -179,7 +179,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     @Override
     public GenieResponse<Content> getChildContents(ChildContentRequest childContentRequest) {
         String methodName = "getChildContents@ContentServiceImpl";
-        HashMap<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(childContentRequest));
 
         GenieResponse<Content> response;
@@ -237,7 +237,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
     @Override
     public GenieResponse<Void> deleteContent(ContentDeleteRequest deleteRequest) {
-        HashMap<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(deleteRequest));
         String methodName = "deleteContent@ContentServiceImpl";
 
@@ -270,7 +270,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
     @Override
     public GenieResponse<ContentListing> getContentListing(ContentListingCriteria contentListingCriteria) {
-        HashMap<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("criteria", GsonUtil.toJson(contentListingCriteria));
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
         String methodName = "getContentListing@ContentServiceImpl";
@@ -307,7 +307,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
     @Override
     public GenieResponse<ContentSearchResult> searchContent(ContentSearchCriteria contentSearchCriteria) {
-        HashMap<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(contentSearchCriteria));
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
         String methodName = "searchContent@ContentServiceImpl";
@@ -371,7 +371,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
     @Override
     public GenieResponse<RecommendedContentResult> getRecommendedContent(RecommendedContentRequest request) {
-        HashMap<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(request));
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
         String methodName = "getRecommendedContents@ContentServiceImpl";
@@ -419,7 +419,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
     @Override
     public GenieResponse<RelatedContentResult> getRelatedContent(RelatedContentRequest request) {
-        HashMap<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(request));
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
         String methodName = "getRelatedContent@ContentServiceImpl";
@@ -467,9 +467,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
     @Override
     public GenieResponse<Content> nextContent(List<HierarchyInfo> hierarchyInfo, String currentContentIdentifier) {
-
         String methodName = "nextContent@ContentServiceImpl";
-        HashMap<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("contentIdentifiers", GsonUtil.toJson(hierarchyInfo));
         params.put("logLevel", "2");
 
@@ -568,7 +567,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     @Override
     public GenieResponse<List<ContentImportResponse>> importEcar(EcarImportRequest importRequest) {
         String methodName = "importEcar@ContentServiceImpl";
-        HashMap<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("importContent", importRequest.getSourceFilePath());
         params.put("isChildContent", importRequest.isChildContent());
         params.put("logLevel", "2");
@@ -617,7 +616,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     @Override
     public GenieResponse<ContentImportResponse> getImportStatus(String contentId) {
         String methodName = "getImportStatus@ContentServiceImpl";
-        HashMap<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("identifier", contentId);
         params.put("logLevel", "2");
 
@@ -673,7 +672,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     @Override
     public GenieResponse<List<ContentImportResponse>> importContent(ContentImportRequest importRequest) {
         String methodName = "importContent@ContentServiceImpl";
-        HashMap<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(importRequest));
         params.put("logLevel", "2");
 
@@ -696,7 +695,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             }
 
             if (contentDataList != null) {
-                DownloadRequest[] downloadRequests = new DownloadRequest[contentDataList.size()];
+                List<DownloadRequest> downloadRequestList = new ArrayList<>();
                 for (int i = 0; i < contentDataList.size(); i++) {
                     Map<String, Object> dataMap = contentDataList.get(i);
                     String contentId = ContentHandler.readIdentifier(dataMap);
@@ -710,14 +709,18 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                         downloadRequest.setFilename(contentId + "." + ServiceConstants.FileExtension.CONTENT);
                         downloadRequest.setCorrelationData(contentImport.getCorrelationData());
                         downloadRequest.setProcessorClass("org.ekstep.genieservices.commons.download.ContentImportService");
-                        downloadRequests[i] = downloadRequest;
+
+                        downloadRequestList.add(downloadRequest);
                     }
 
                     contentIds.remove(contentId);
                     contentImportResponseList.add(new ContentImportResponse(contentId, status));
                 }
 
-                downloadService.enqueue(downloadRequests);
+                if (downloadRequestList.size() > 0) {
+                    DownloadRequest[] downloadRequestArray = downloadRequestList.toArray(new DownloadRequest[downloadRequestList.size()]);
+                    downloadService.enqueue(downloadRequestArray);
+                }
             }
         }
 
@@ -735,7 +738,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     @Override
     public GenieResponse<Void> cancelDownload(String contentId) {
         String methodName = "cancelDownload@ContentServiceImpl";
-        HashMap<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("identifier", contentId);
         params.put("logLevel", "2");
         downloadService.cancel(contentId);

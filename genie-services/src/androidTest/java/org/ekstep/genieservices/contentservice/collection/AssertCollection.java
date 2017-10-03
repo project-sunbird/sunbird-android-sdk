@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.contentservice.collectiontest;
+package org.ekstep.genieservices.contentservice.collection;
 
 import junit.framework.Assert;
 

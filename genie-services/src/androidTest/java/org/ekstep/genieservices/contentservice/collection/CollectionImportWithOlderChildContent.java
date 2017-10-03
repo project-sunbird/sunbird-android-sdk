@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.contentservice.collectiontest;
+package org.ekstep.genieservices.contentservice.collection;
 
 import android.os.Environment;
 import android.support.test.runner.AndroidJUnit4;
@@ -41,7 +41,7 @@ public class CollectionImportWithOlderChildContent extends GenieServiceTestBase 
         activity = rule.getActivity();
         EcarCopyUtil.createFileFromAsset(activity.getApplicationContext(),COLLECTION_ASSET_PATH, DESTINATION);
         EcarCopyUtil.createFileFromAsset(activity.getApplicationContext(),CHILD_CONTENT_ASSET_PATH, DESTINATION);
-        GenieServiceDBHelper.clearEcarEntryFromDB();
+        GenieServiceDBHelper.clearContentEntryFromDB();
     }
 
     @After
@@ -58,7 +58,7 @@ public class CollectionImportWithOlderChildContent extends GenieServiceTestBase 
     @Test
     public void test1ShouldCheckImportAndVisibility() {
 
-        GenieServiceDBHelper.clearEcarEntryFromDB();
+        GenieServiceDBHelper.clearContentEntryFromDB();
 
         shouldImportChildContentEcar();
 

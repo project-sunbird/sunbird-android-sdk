@@ -7,33 +7,6 @@ package org.ekstep.genieservices.commons;
  */
 public interface IParams {
 
-    interface Key {
-        String APPLICATION_ID = "APPLICATION_ID";
-        String VERSION_NAME = "VERSION_NAME";
-        String PRODUCER_ID = "PRODUCER_ID";
-        String CHANNEL_ID = "CHANNEL_ID";
-        String APP_QUALIFIER = "QUALIFIER";
-        String TELEMETRY_BASE_URL = "TELEMETRY_BASE_URL";
-        String LANGUAGE_PLATFORM_BASE_URL = "LANGUAGE_PLATFORM_BASE_URL";
-        String TERMS_BASE_URL = "TERMS_BASE_URL";
-        String CONFIG_BASE_URL = "CONFIG_BASE_URL";
-        String SEARCH_BASE_URL = "SEARCH_BASE_URL";
-        String CONTENT_LISTING_BASE_URL = "CONTENT_LISTING_BASE_URL";
-        String CONTENT_BASE_URL = "CONTENT_BASE_URL";
-        String APIGATEWAY_BASE_URL = "APIGATEWAY_BASE_URL";
-        String API_PASS = "API_PASS";
-        String API_USER = "API_USER";
-        String MOBILE_APP_SECRET = "MOBILE_APP_SECRET";
-        String MOBILE_APP_KEY = "MOBILE_APP_KEY";
-        String MOBILE_APP_CONSUMER = "MOBILE_APP_CONSUMER";
-        String LOG_LEVEL = "LOG_LEVEL";
-        String MIN_COMPATIBILITY_LEVEL = "MIN_COMPATIBILITY_LEVEL";
-        String MAX_COMPATIBILITY_LEVEL = "MAX_COMPATIBILITY_LEVEL";
-        String PROFILE_PATH = "PROFILE_PATH";
-        String NETWORK_CONNECT_TIMEOUT = "NETWORK_CONNECT_TIMEOUT";
-        String NETWORK_READ_TIMEOUT = "NETWORK_READ_TIMEOUT";
-    }
-
     /**
      * Adds a value to the set.
      *
@@ -55,4 +28,31 @@ public interface IParams {
     void remove(String key);
 
     void clear();
+
+    interface Key {
+        String APPLICATION_ID = "APPLICATION_ID";
+        String VERSION_NAME = "VERSION_NAME";
+        String PRODUCER_ID = "PRODUCER_ID";
+        String CHANNEL_ID = "CHANNEL_ID";
+        String APP_QUALIFIER = "APP_QUALIFIER";
+        String TELEMETRY_BASE_URL = "TELEMETRY_BASE_URL";
+        String LANGUAGE_PLATFORM_BASE_URL = "LANGUAGE_PLATFORM_BASE_URL";
+        String TERMS_BASE_URL = "TERMS_BASE_URL";
+        String CONFIG_BASE_URL = "CONFIG_BASE_URL";
+        String SEARCH_BASE_URL = "SEARCH_BASE_URL";
+        String CONTENT_LISTING_BASE_URL = "CONTENT_LISTING_BASE_URL";
+        String CONTENT_BASE_URL = "CONTENT_BASE_URL";
+        String APIGATEWAY_BASE_URL = "APIGATEWAY_BASE_URL";
+        String API_PASS = "API_PASS";
+        String API_USER = "API_USER";
+        String MOBILE_APP_SECRET = "MOBILE_APP_SECRET";
+        String MOBILE_APP_KEY = "MOBILE_APP_KEY";
+        String MOBILE_APP_CONSUMER = "MOBILE_APP_CONSUMER";
+        String LOG_LEVEL = "LOG_LEVEL";
+        String MIN_COMPATIBILITY_LEVEL = "MIN_COMPATIBILITY_LEVEL";
+        String MAX_COMPATIBILITY_LEVEL = "MAX_COMPATIBILITY_LEVEL";
+        String PROFILE_PATH = "PROFILE_PATH";
+        String NETWORK_CONNECT_TIMEOUT = "NETWORK_CONNECT_TIMEOUT";
+        String NETWORK_READ_TIMEOUT = "NETWORK_READ_TIMEOUT";
+    }
 }

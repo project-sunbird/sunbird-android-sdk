@@ -29,13 +29,13 @@ android {
 
         }
         integrationTest {
-            buildConfigField 'String', 'TELEMETRY_BASE_URL', '"https://qa.ekstep.in/api/data/v3"'
+            buildConfigField 'String', 'TELEMETRY_BASE_URL', '"http://localhost:33456"'
             buildConfigField 'String', 'LANGUAGE_PLATFORM_BASE_URL', '"https://qa.ekstep.in/api/language/v3"'
-            buildConfigField 'String', 'TERMS_BASE_URL', '"https://qa.ekstep.in/api/domain/v3"'
-            buildConfigField 'String', 'CONFIG_BASE_URL', '"https://qa.ekstep.in/api/meta/v3"'
-            buildConfigField 'String', 'SEARCH_BASE_URL', '"https://qa.ekstep.in/api/composite/v3"'
-            buildConfigField 'String', 'CONTENT_LISTING_BASE_URL', '"https://qa.ekstep.in/api/data/v3"'
-            buildConfigField 'String', 'CONTENT_BASE_URL', '"https://qa.ekstep.in/api/content/v3"'
+            buildConfigField 'String', 'TERMS_BASE_URL', '"http://localhost:33456"'
+            buildConfigField 'String', 'CONFIG_BASE_URL', '"http://localhost:33456"'
+            buildConfigField 'String', 'SEARCH_BASE_URL', '"http://localhost:33456"'
+            buildConfigField 'String', 'CONTENT_LISTING_BASE_URL', '"http://localhost:33456"'
+            buildConfigField 'String', 'CONTENT_BASE_URL', '"http://localhost:33456"'
             buildConfigField 'String', 'APIGATEWAY_BASE_URL', '"https://qa.ekstep.in/api/api-manager/v1"'
             buildConfigField 'String', 'PRODUCER_ID', '"genie"'
             buildConfigField 'String', 'CHANNEL_ID', '"in.ekstep"'
@@ -81,6 +81,7 @@ dependencies {
     compile "com.squareup.okhttp3:okhttp:$rootProject.ext.okhttpVersion"
 
     androidTestCompile 'com.jayway.awaitility:awaitility:1.7.0'
+    androidTestCompile 'com.squareup.okhttp3:mockwebserver:3.8.1'
     androidTestCompile('com.android.support.test.espresso:espresso-core:3.0.0', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })

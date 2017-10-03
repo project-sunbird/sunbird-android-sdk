@@ -1,18 +1,24 @@
 package org.ekstep.genieservices.telemetryservice;
 
-import android.util.Log;
-
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
+import org.ekstep.genieservices.SampleApiResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.PartnerData;
 import org.ekstep.genieservices.commons.bean.SyncStat;
+import org.ekstep.genieservices.commons.bean.TelemetryExportRequest;
+import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
+import org.ekstep.genieservices.commons.bean.TelemetryImportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
+import org.ekstep.genieservices.commons.db.contract.TelemetryProcessedEntry;
 import org.ekstep.genieservices.telemetry.model.EventModel;
 import org.junit.Assert;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +26,7 @@ import java.util.Map;
 /**
  * Created by Sneha on 5/16/2017.
  */
-
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TelemetryServiceTest extends GenieServiceTestBase {
     private static final String TAG = TelemetryServiceTest.class.getSimpleName();
     private static final String PARTNER_ID = "org.sample";
@@ -36,6 +42,41 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
         GenieServiceDBHelper.clearTelemetryTableEntry();
         GenieServiceDBHelper.clearPartnerDBEntry();
     }
+
+    @Test
+    public void _1shouldExportTelemetryToGSAFileSuccessfully() {
+        //This is event is generated to ensure all GE_SESSION_START and all events will be generated first
+        activity.saveTelemetry(SampleApiResponse.getSampleEvent());
+
+        GenieServiceDBHelper.clearTelemetryTableEntry();
+        for (int i = 0; i <= 4; i++) {
+            activity.saveTelemetry(SampleApiResponse.getSampleEvent());
+        }
+
+        Assert.assertEquals(5, GenieServiceDBHelper.findAllEvents().size());
+
+        TelemetryExportRequest request = new TelemetryExportRequest.Builder().toFolder(activity.getExternalFilesDir(null).toString()).build();
+        GenieResponse<TelemetryExportResponse> response = activity.exportTelemetry(request);
+        Assert.assertTrue(response.getStatus());
+        Assert.assertNotNull(response.getResult());
+        Assert.assertEquals(activity.getExternalFilesDir(null).toString() + File.separator + "tmp" + File.separator + "transfer.gsa", response.getResult().getExportedFilePath());
+    }
+
+    @Test
+    public void _2shouldImportGSAFileSuccessfully() {
+        for (int i = 0; i <= 4; i++) {
+            activity.saveTelemetry(SampleApiResponse.getSampleEvent());
+        }
+
+        TelemetryExportRequest request = new TelemetryExportRequest.Builder().toFolder(activity.getExternalFilesDir(null).toString()).build();
+        activity.exportTelemetry(request);
+        GenieServiceDBHelper.clearTelemetryTableEntry();
+        GenieServiceDBHelper.clearTable(TelemetryProcessedEntry.TABLE_NAME);
+        TelemetryImportRequest importRequest = new TelemetryImportRequest.Builder().fromFilePath(activity.getExternalFilesDir(null).toString() + File.separator + "tmp" + File.separator + "transfer.gsa").build();
+        activity.importTelemetry(importRequest);
+        Assert.assertEquals(1, GenieServiceDBHelper.findProcessedEvents().size());
+    }
+
 
     /**
      * To check for the TelemetryEvent data.
@@ -89,7 +130,7 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
      * Then : Check if the telemetry event is saved.
      */
     @Test
-    public void shouldSaveTelemetryData() {
+    public void _3shouldSaveTelemetryData() {
 
         PartnerData partnerData = new PartnerData("org.ekstep.partner", "1.6", PARTNER_ID, PARTNER_DATA, PUBLIC_KEY);
 
@@ -108,7 +149,7 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
      * Then :Check if the telemetry event is saved.
      */
     @Test
-    public void shouldSaveTelemetryDataAsString() {
+    public void _4shouldSaveTelemetryDataAsString() {
 
         GenieServiceDBHelper.clearTelemetryTableEntry();
 
@@ -164,7 +205,7 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
     }
 
     @Test
-    public void shoulCheckUnsyncedTelemetryData() {
+    public void _5shoulCheckUnsyncedTelemetryData() {
 
         GenieServiceDBHelper.clearTelemetryTableEntry();
 
@@ -183,9 +224,13 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
 
     private void shouldCheckSyncedTelemetryData(GenieResponse<TelemetryStat> telemetryStatGenieResponse) {
 
+        startMockServer();
+        mMockServer.mockHttpResponse(SampleApiResponse.telemetrySyncResponse(), 200);
+        mMockServer.mockHttpResponse(SampleApiResponse.telemetrySyncResponse(), 200);
+        mMockServer.mockHttpResponse(SampleApiResponse.telemetrySyncResponse(), 200);
         GenieResponse<SyncStat> syncStatGenieResponse = activity.sync();
 
-        Assert.assertTrue("true", syncStatGenieResponse.getStatus());
+        Assert.assertTrue(syncStatGenieResponse.getStatus());
         Assert.assertNotNull(syncStatGenieResponse.getResult().getSyncedEventCount());
         Assert.assertNotEquals(0, syncStatGenieResponse.getResult().getSyncedEventCount());
         Assert.assertNotEquals(0, syncStatGenieResponse.getResult().getSyncTime());
@@ -193,5 +238,8 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
         //TODO : check getUnSyncedEventCount and getSyncedEventCount are different.
         Assert.assertEquals(telemetryStatGenieResponse.getResult().getUnSyncedEventCount() + 1,
                 syncStatGenieResponse.getResult().getSyncedEventCount());
+        shutDownMockServer();
     }
+
+
 }

@@ -127,6 +127,7 @@ public class NotificationsModel implements IReadable, IUpdatable, ICleanable {
                 notificationModel.setReadStatus(1);
             }
             Notification notification = new Notification();
+            notification.setMsgid((int) notificationModel.getNotificationMessageId());
             notification.setNotificationJson(notificationModel.getNotificationJson());
             notifications.add(notification);
         }

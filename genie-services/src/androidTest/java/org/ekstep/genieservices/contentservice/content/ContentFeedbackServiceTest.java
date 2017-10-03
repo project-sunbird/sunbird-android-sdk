@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.contentfeedback;
+package org.ekstep.genieservices.contentservice.content;
 
 import android.os.Environment;
 import android.support.test.runner.AndroidJUnit4;
@@ -8,6 +8,7 @@ import junit.framework.Assert;
 import org.ekstep.genieservices.EcarCopyUtil;
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
+import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
@@ -17,8 +18,10 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,6 +29,7 @@ import java.util.List;
 /**
  * Created by Sneha on 6/2/2017.
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(AndroidJUnit4.class)
 public class ContentFeedbackServiceTest extends GenieServiceTestBase {
     private static final String TAG = ContentFeedbackServiceTest.class.getSimpleName();
@@ -38,8 +42,7 @@ public class ContentFeedbackServiceTest extends GenieServiceTestBase {
     public void setup() throws IOException {
         super.setup();
         activity = rule.getActivity();
-        EcarCopyUtil.createFileFromAsset(activity.getApplicationContext(), CONTENT_ASSET_PATH, DESTINATION);
-        GenieServiceDBHelper.clearEcarEntryFromDB();
+        GenieServiceDBHelper.clearContentEntryFromDB();
     }
 
     @After
@@ -48,9 +51,14 @@ public class ContentFeedbackServiceTest extends GenieServiceTestBase {
     }
 
     @Test
-    public void shouldSendFeedbackForEcar() {
+    public void _0ShouldCopyNeccesoryEcar() {
+        EcarCopyUtil.createFileFromAsset(activity.getApplicationContext(), CONTENT_ASSET_PATH, DESTINATION);
+    }
 
-        GenieServiceDBHelper.clearEcarEntryFromDB();
+    @Test
+    public void _1ShouldSendFeedbackForEcar() {
+
+        GenieServiceDBHelper.clearContentEntryFromDB();
 
         //create profile
         String uid = createAndSetProfileForGetFeedback();
@@ -79,6 +87,55 @@ public class ContentFeedbackServiceTest extends GenieServiceTestBase {
         //assert get feedback data
         shouldAssertGetFeedbackData(sendFeedbackData, getFeedbackData);
     }
+
+    @Test
+    public void _2ShouldGettheFeedbackforagivenUid() {
+
+        GenieServiceDBHelper.clearContentEntryFromDB();
+
+        //create profile
+        String uid = createAndSetProfileForGetFeedback();
+
+        //import content
+        importContent();
+
+        //send feedback
+        ContentFeedback sendFeedbackData = new ContentFeedback();
+        sendFeedbackData.setComments("Great content");
+        sendFeedbackData.setContentId(CONTENT_ID);
+        sendFeedbackData.setRating(3);
+        GenieResponse genieResponseSendFeedback = activity.sendFeedback(sendFeedbackData);
+        Assert.assertTrue(genieResponseSendFeedback.getStatus());
+
+    }
+
+    @Test
+    public void _3ShouldUpdatetheFeedbackforGivenUid() {
+
+        //send feedback
+        ContentFeedbackFilterCriteria.Builder feedbackCriteria = new ContentFeedbackFilterCriteria.Builder()
+                .byUser("sampleuid");
+        GenieResponse genieResponseSendFeedback = activity.getFeedback(feedbackCriteria.build());
+        Assert.assertTrue(genieResponseSendFeedback.getStatus());
+
+
+    }
+
+    @Test
+    public void _4ShouldThrowValidationErrorfirEmptyContentId() {
+
+        //send feedback
+        ContentFeedback sendFeedbackData = new ContentFeedback();
+        sendFeedbackData.setComments("Great content Updated");
+        sendFeedbackData.setRating(3);
+        GenieResponse genieResponseSendFeedback = activity.sendFeedback(sendFeedbackData);
+        Assert.assertFalse(genieResponseSendFeedback.getStatus());
+        Assert.assertEquals(ServiceConstants.ErrorCode.VALIDATION_ERROR, genieResponseSendFeedback.getError());
+        Assert.assertEquals(ServiceConstants.ErrorMessage.MANDATORY_FIELD_CONTENT_IDENTIFIER, genieResponseSendFeedback.getErrorMessages().get(0));
+
+
+    }
+
 
     private void shouldAssertGetFeedbackData(ContentFeedback contentFeedback, ContentFeedback getFeedback) {
         Assert.assertEquals(contentFeedback.getContentId(), getFeedback.getContentId());
@@ -114,6 +171,7 @@ public class ContentFeedbackServiceTest extends GenieServiceTestBase {
 
         GenieServiceDBHelper.clearProfileTable();
         Profile profile = new Profile("Happy1", "@drawable/ic_avatar2", "en");
+        profile.setUid("sampleuid");
         profile.setAge(4);
         profile.setDay(12);
         profile.setMonth(11);
