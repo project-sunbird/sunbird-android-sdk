@@ -11,6 +11,7 @@ import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.enums.ContentImportStatus;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
+import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
@@ -35,7 +36,7 @@ public class DownloadServiceImpl implements IDownloadService {
     private ScheduledExecutorService mExecutor;
 
     public DownloadServiceImpl(AppContext appContext) {
-        this.mDownloadQueueManager = new DownloadQueueManager(appContext.getKeyValueStore());
+        this.mDownloadQueueManager = new DownloadQueueManager(appContext.getKeyValueStore(), appContext.getDBSession());
         this.mDownloadManager = appContext.getDownloadManager();
     }
 
@@ -51,7 +52,10 @@ public class DownloadServiceImpl implements IDownloadService {
 
     @Override
     public void resumeDownloads() {
-        resume();
+        if (mDownloadQueueManager.shouldResume()) {
+            resume();
+        }
+
     }
 
     @Override
@@ -131,7 +135,7 @@ public class DownloadServiceImpl implements IDownloadService {
      */
     private synchronized void resume() {
         List<String> currentDownloads = mDownloadQueueManager.getCurrentDownloads();
-        if (currentDownloads.size() == 0) {
+        if (CollectionUtil.isNullOrEmpty(currentDownloads)) {
             DownloadRequest request = mDownloadQueueManager.popDownloadRequest();
             if (request != null) {
                 TelemetryLogger.log(buildGEInteractEvent(InteractionType.TOUCH, ServiceConstants.Telemetry.CONTENT_DOWNLOAD_INITIATE, request.getCorrelationData(), request.getIdentifier()));

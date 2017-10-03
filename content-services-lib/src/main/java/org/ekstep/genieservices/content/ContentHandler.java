@@ -15,7 +15,6 @@ import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
 import org.ekstep.genieservices.commons.bean.ContentFeedbackFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
-import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingSection;
@@ -888,10 +887,10 @@ public class ContentHandler {
         return contentModelListInDB;
     }
 
-    public static Map<String, Object> getSearchRequest(AppContext appContext, ContentImportRequest importRequest) {
+    public static Map<String, Object> getSearchRequest(AppContext appContext, Set<String> contentIds) {
         Map<String, Object> filterMap = new HashMap<>();
         filterMap.put("compatibilityLevel", getCompatibilityLevelFilter(appContext));
-        filterMap.put("identifier", importRequest.getContentIds());
+        filterMap.put("identifier", contentIds);
         filterMap.put("objectType", Collections.singletonList("Content"));
 
         Map<String, Object> requestMap = new HashMap<>();

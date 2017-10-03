@@ -23,6 +23,7 @@ public abstract class Migrations {
         migrations.add(new _07_UIBrandingMigration());
         migrations.add(new _08_PartnerFilterMigration());
         migrations.add(new _09_SdkMigration());
+        migrations.add(new _010_CreateKeyValueStoreMigration());
 
         Collections.sort(migrations);
 
