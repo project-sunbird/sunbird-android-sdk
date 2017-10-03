@@ -24,7 +24,6 @@ public abstract class Migrations {
         migrations.add(new _08_PartnerFilterMigration());
         migrations.add(new _09_SdkMigration());
         migrations.add(new _10_StorageManagementMigration());
-        migrations.add(new _010_CreateKeyValueStoreMigration());
 
         Collections.sort(migrations);
 

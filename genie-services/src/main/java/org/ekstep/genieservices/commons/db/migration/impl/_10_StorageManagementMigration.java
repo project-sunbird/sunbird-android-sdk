@@ -2,6 +2,7 @@ package org.ekstep.genieservices.commons.db.migration.impl;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.contract.ContentEntry;
+import org.ekstep.genieservices.commons.db.contract.NoSqlEntry;
 import org.ekstep.genieservices.commons.db.migration.Migration;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.content.db.model.ContentModel;
@@ -22,6 +23,9 @@ public class _10_StorageManagementMigration extends Migration {
 
     @Override
     public void apply(AppContext appContext) {
+        // Create nosql Table
+        appContext.getDBSession().execute(NoSqlEntry.getCreateEntry());
+
         // Create size col in content table
         appContext.getDBSession().execute(ContentEntry.getAlterEntryForContentSize());
 
