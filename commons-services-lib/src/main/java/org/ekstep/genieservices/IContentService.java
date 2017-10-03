@@ -3,6 +3,7 @@ package org.ekstep.genieservices;
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
+import org.ekstep.genieservices.commons.bean.ContentDeleteResponse;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentExportRequest;
 import org.ekstep.genieservices.commons.bean.ContentExportResponse;
@@ -82,9 +83,9 @@ public interface IContentService {
      * <p>NO_DATA_FOUND
      *
      * @param contentDeleteRequest - {@link ContentDeleteRequest}
-     * @return - {@link GenieResponse<Void>}
+     * @return - {@link GenieResponse<List<ContentDeleteResponse>>}
      */
-    GenieResponse<Void> deleteContent(ContentDeleteRequest contentDeleteRequest);
+    GenieResponse<List<ContentDeleteResponse>> deleteContent(ContentDeleteRequest contentDeleteRequest);
 
     /**
      * This api is used get the complete content listing with criteria mentioned in {@link ContentListingCriteria}

@@ -15,7 +15,9 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentData;
+import org.ekstep.genieservices.commons.bean.ContentDelete;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
+import org.ekstep.genieservices.commons.bean.ContentDeleteResponse;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentExportRequest;
 import org.ekstep.genieservices.commons.bean.ContentExportResponse;
@@ -35,6 +37,7 @@ import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
+import org.ekstep.genieservices.commons.bean.enums.ContentDeleteStatus;
 import org.ekstep.genieservices.commons.bean.enums.ContentImportStatus;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
@@ -241,34 +244,37 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<Void> deleteContent(ContentDeleteRequest deleteRequest) {
+    public GenieResponse<List<ContentDeleteResponse>> deleteContent(ContentDeleteRequest deleteRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(deleteRequest));
         String methodName = "deleteContent@ContentServiceImpl";
 
-        GenieResponse<Void> response;
-        ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), deleteRequest.getContentId());
+        List<ContentDeleteResponse> contentDeleteResponseList = new ArrayList<>();
+        for (ContentDelete contentDelete : deleteRequest.getContentDeleteList()) {
+            ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), contentDelete.getContentId());
 
-        if (contentModel == null) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, ServiceConstants.ErrorMessage.CONTENT_NOT_FOUND_TO_DELETE + deleteRequest.getContentId(), TAG);
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.NO_CONTENT_LISTING_DATA);
-            return response;
+            if (contentModel == null) {
+                contentDeleteResponseList.add(new ContentDeleteResponse(contentDelete.getContentId(), ContentDeleteStatus.NOT_FOUND));
+            } else {
+                contentDeleteResponseList.add(new ContentDeleteResponse(contentDelete.getContentId(), ContentDeleteStatus.DELETED_SUCCESSFULLY));
+
+                //delete or update pre-requisites
+                if (ContentHandler.hasPreRequisites(contentModel.getLocalData())) {
+                    ContentHandler.deleteAllPreRequisites(mAppContext, contentModel, contentDelete.isChildContent());
+                }
+
+                //delete or update child items
+                if (ContentHandler.hasChildren(contentModel.getLocalData())) {
+                    ContentHandler.deleteAllChild(mAppContext, contentModel, contentDelete.isChildContent());
+                }
+
+                //delete or update root item
+                ContentHandler.deleteOrUpdateContent(contentModel, false, contentDelete.isChildContent());
+            }
         }
 
-        //delete or update pre-requisites
-        if (ContentHandler.hasPreRequisites(contentModel.getLocalData())) {
-            ContentHandler.deleteAllPreRequisites(mAppContext, contentModel, deleteRequest.isChildContent());
-        }
-
-        //delete or update child items
-        if (ContentHandler.hasChildren(contentModel.getLocalData())) {
-            ContentHandler.deleteAllChild(mAppContext, contentModel, deleteRequest.isChildContent());
-        }
-
-        //delete or update root item
-        ContentHandler.deleteOrUpdateContent(contentModel, false, deleteRequest.isChildContent());
-
-        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        GenieResponse<List<ContentDeleteResponse>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        response.setResult(contentDeleteResponseList);
         TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;
     }

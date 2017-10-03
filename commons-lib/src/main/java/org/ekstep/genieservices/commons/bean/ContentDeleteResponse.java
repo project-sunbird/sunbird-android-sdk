@@ -1,28 +1,33 @@
 package org.ekstep.genieservices.commons.bean;
 
-import org.ekstep.genieservices.commons.bean.enums.ContentImportStatus;
+import org.ekstep.genieservices.commons.bean.enums.ContentDeleteStatus;
 
 /**
  * This class holds the identifier, status of content.
  * <p>
- * Status - {@link ContentImportStatus}
+ * Status - {@link ContentDeleteStatus}
+ * <p>
+ * Created on 10/3/2017.
+ *
+ * @author anil
  */
-public class ContentImportResponse {
+
+public class ContentDeleteResponse {
 
     private String identifier;
-    private ContentImportStatus status;
+    private ContentDeleteStatus status;
 
-    public ContentImportResponse(String identifier, ContentImportStatus status) {
+    public ContentDeleteResponse(String identifier, ContentDeleteStatus status) {
         this.identifier = identifier;
         this.status = status;
     }
 
-    public ContentImportStatus getStatus() {
-        return status;
-    }
-
     public String getIdentifier() {
         return identifier;
+    }
+
+    public ContentDeleteStatus getStatus() {
+        return status;
     }
 
     @Override
@@ -33,7 +38,7 @@ public class ContentImportResponse {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ContentImportResponse that = (ContentImportResponse) o;
+        ContentDeleteResponse that = (ContentDeleteResponse) o;
         return identifier != null ? identifier.equals(that.identifier) : that.identifier == null;
     }
 
@@ -41,5 +46,4 @@ public class ContentImportResponse {
     public int hashCode() {
         return identifier != null ? identifier.hashCode() : 0;
     }
-
 }

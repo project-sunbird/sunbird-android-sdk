@@ -1,57 +1,51 @@
 package org.ekstep.genieservices.commons.bean;
 
+import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class accepts contentId and isChildContent while building it, and is used when deleting a content and set if it is a child content.
  */
 public class ContentDeleteRequest {
 
-    private String contentId;
-    private boolean isChildContent;
+    private List<ContentDelete> contentDeleteList;
 
-    private ContentDeleteRequest(String contentId, boolean isChildContent) {
-        this.contentId = contentId;
-        this.isChildContent = isChildContent;
+    private ContentDeleteRequest(List<ContentDelete> contentDeleteList) {
+        this.contentDeleteList = contentDeleteList;
     }
 
-    public String getContentId() {
-        return contentId;
-    }
-
-    public boolean isChildContent() {
-        return isChildContent;
+    public List<ContentDelete> getContentDeleteList() {
+        return contentDeleteList;
     }
 
     public static class Builder {
-        private String contentId;
-        private boolean isChildContent;
+        private List<ContentDelete> contentDeleteList;
 
-        /**
-         * Content id which you want to delete
-         */
-        public Builder contentId(String contentId) {
-            if (StringUtil.isNullOrEmpty(contentId)) {
-                throw new IllegalArgumentException("Illegal contentId");
-            }
-            this.contentId = contentId;
-            return this;
+        public Builder() {
+            this.contentDeleteList = new ArrayList<>();
         }
 
-        /**
-         * Call it only if the deleting content is a child content
-         */
-        public Builder isChildContent() {
-            this.isChildContent = true;
+        public Builder add(ContentDelete contentDelete) {
+            if (contentDelete == null) {
+                throw new IllegalArgumentException("contentDelete can not be null.");
+            }
+            if (StringUtil.isNullOrEmpty(contentDelete.getContentId())) {
+                throw new IllegalArgumentException("Illegal contentId");
+            }
+
+            this.contentDeleteList.add(contentDelete);
             return this;
         }
 
         public ContentDeleteRequest build() {
-            if (StringUtil.isNullOrEmpty(contentId)) {
-                throw new IllegalStateException("contentId required.");
+            if (CollectionUtil.isNullOrEmpty(contentDeleteList)) {
+                throw new IllegalStateException("Add at least one content to delete.");
             }
 
-            return new ContentDeleteRequest(contentId, isChildContent);
+            return new ContentDeleteRequest(contentDeleteList);
         }
     }
 }

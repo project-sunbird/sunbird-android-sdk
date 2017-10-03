@@ -9,6 +9,7 @@ import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
+import org.ekstep.genieservices.commons.bean.ContentDeleteResponse;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentExportRequest;
 import org.ekstep.genieservices.commons.bean.ContentExportResponse;
@@ -120,10 +121,10 @@ public class ContentService {
      * @param contentDeleteRequest - {@link ContentDeleteRequest}
      * @param responseHandler      - {@link IResponseHandler<Void>}
      */
-    public void deleteContent(final ContentDeleteRequest contentDeleteRequest, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+    public void deleteContent(final ContentDeleteRequest contentDeleteRequest, IResponseHandler<List<ContentDeleteResponse>> responseHandler) {
+        new AsyncHandler<List<ContentDeleteResponse>>(responseHandler).execute(new IPerformable<List<ContentDeleteResponse>>() {
             @Override
-            public GenieResponse<Void> perform() {
+            public GenieResponse<List<ContentDeleteResponse>> perform() {
                 return contentService.deleteContent(contentDeleteRequest);
             }
         });
