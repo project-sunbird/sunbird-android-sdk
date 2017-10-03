@@ -89,7 +89,7 @@ import java.util.Stack;
 public class ContentServiceImpl extends BaseService implements IContentService {
 
     private static final String TAG = ContentServiceImpl.class.getSimpleName();
-    private static final String DOWNLOAD_QUEUE = "download_queue";
+
 
     private IUserService userService;
     private IContentFeedbackService contentFeedbackService;
@@ -802,7 +802,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     public GenieResponse<List<DownloadRequest>> getAllDownloads() {
 
         String methodName = "getAllDownloads@ContentServiceImpl";
-        NoSqlModel noSqlModel = NoSqlModel.findByKey(mAppContext.getDBSession(), DOWNLOAD_QUEUE);
+        NoSqlModel noSqlModel = NoSqlModel.findByKey(mAppContext.getDBSession(), ServiceConstants.DOWNLOAD_QUEUE);
         GenieResponse<List<DownloadRequest>> response;
         if (noSqlModel == null) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.KEY_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_KEY, TAG);

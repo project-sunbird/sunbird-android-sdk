@@ -24,9 +24,6 @@ public class NoSqlModel implements IWritable, IReadable, IUpdatable, ICleanable 
     private String mKey;
     private String mValue;
 
-    private NoSqlModel(IDBSession dbSession) {
-        this.mDBSession = dbSession;
-    }
 
     private NoSqlModel(IDBSession dbSession, String key) {
         this.mDBSession = dbSession;

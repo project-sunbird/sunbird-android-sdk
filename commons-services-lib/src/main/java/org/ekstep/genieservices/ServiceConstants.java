@@ -12,6 +12,8 @@ public interface ServiceConstants {
     String ERROR_DELETING_A_USER = "Error when deleting user profile";
     String VALIDATION_ERROR = "VALIDATION_ERROR";
 
+    String DOWNLOAD_QUEUE = "download_queue";
+
     /* Key Constants for all the key value store */
     String KEY_USER_SESSION = "session";
 

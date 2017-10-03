@@ -33,15 +33,15 @@ public class ContentImportRequest {
          */
         public Builder add(ContentImport contentImport) {
             if (contentImport == null) {
-                throw new IllegalStateException("ContentImport cant be null");
+                throw new IllegalArgumentException("ContentImport cant be null");
             }
 
             if (StringUtil.isNullOrEmpty(contentImport.getContentId())) {
-                throw new IllegalStateException("Identifier required.");
+                throw new IllegalArgumentException("Identifier required.");
             }
 
             if (StringUtil.isNullOrEmpty(contentImport.getDestinationFolder())) {
-                throw new IllegalStateException("To folder required.");
+                throw new IllegalArgumentException("To folder required.");
             }
 
             this.contentImportMap.put(contentImport.getContentId(), contentImport);
@@ -49,6 +49,9 @@ public class ContentImportRequest {
         }
 
         public ContentImportRequest build() {
+            if (this.contentImportMap.isEmpty()) {
+                throw new IllegalStateException("Add atleast one content to import");
+            }
             return new ContentImportRequest(this.contentImportMap);
         }
     }

@@ -25,17 +25,12 @@ import java.util.Set;
  */
 public class DownloadQueueManager {
 
-    private static final String DOWNLOAD_QUEUE = "download_queue";
     private static final String CURRENT_DOWNLOAD = "current_download";
 
     private IKeyValueStore mKeyValueStore;
     private IDBSession mDbSession;
     private List<DownloadRequest> mDownloadRequestList;
     private List<String> mCurrentDownloads;
-
-    public DownloadQueueManager(IKeyValueStore keyValueStore) {
-        this.mKeyValueStore = keyValueStore;
-    }
 
     public DownloadQueueManager(IKeyValueStore keyValueStore, IDBSession dbSession) {
         this.mDbSession = dbSession;
@@ -45,7 +40,7 @@ public class DownloadQueueManager {
     private List<DownloadRequest> getAllRequests() {
         if (CollectionUtil.isNullOrEmpty(mDownloadRequestList)) {
             mDownloadRequestList = new ArrayList<>();
-            NoSqlModel noSqlModel = NoSqlModel.findByKey(mDbSession, DOWNLOAD_QUEUE);
+            NoSqlModel noSqlModel = NoSqlModel.findByKey(mDbSession, ServiceConstants.DOWNLOAD_QUEUE);
             if (noSqlModel != null) {
                 String jsonDownloadRequest = noSqlModel.getValue();
                 if (!StringUtil.isNullOrEmpty(jsonDownloadRequest)) {
@@ -94,7 +89,7 @@ public class DownloadQueueManager {
         int index = downloadRequestList.indexOf(downloadRequest);
         if (index != -1) {
             downloadRequestList.set(index, downloadRequest);
-            saveToKeyValueStore(downloadRequestList);
+            save(downloadRequestList);
         }
     }
 
@@ -104,7 +99,7 @@ public class DownloadQueueManager {
             DownloadRequest downloadingRequest = contentList.get(i);
             if (downloadingRequest.getDownloadId() == downloadId) {
                 contentList.remove(i);
-                saveToKeyValueStore(contentList);
+                save(contentList);
             }
         }
     }
@@ -115,22 +110,22 @@ public class DownloadQueueManager {
             DownloadRequest downloadingRequest = contentList.get(i);
             if (identifier.equals(downloadingRequest.getIdentifier())) {
                 contentList.remove(i);
-                saveToKeyValueStore(contentList);
+                save(contentList);
             }
         }
     }
 
 
-    public void saveToKeyValueStore(Object requestList) {
+    public void save(Object requestList) {
         Collection collection = (Collection) requestList;
         String jsonContents = GsonUtil.getGson().toJson(requestList);
 
         if (CollectionUtil.isNullOrEmpty(collection)) {
-            NoSqlModel noSqlModel = NoSqlModel.build(mDbSession, DOWNLOAD_QUEUE, jsonContents);
+            NoSqlModel noSqlModel = NoSqlModel.build(mDbSession, ServiceConstants.DOWNLOAD_QUEUE, jsonContents);
             noSqlModel.delete();
         } else {
-            NoSqlModel noSqlModel = NoSqlModel.build(mDbSession, DOWNLOAD_QUEUE, jsonContents);
-            NoSqlModel noSqlModelInDb = NoSqlModel.findByKey(mDbSession, DOWNLOAD_QUEUE);
+            NoSqlModel noSqlModel = NoSqlModel.build(mDbSession, ServiceConstants.DOWNLOAD_QUEUE, jsonContents);
+            NoSqlModel noSqlModelInDb = NoSqlModel.findByKey(mDbSession, ServiceConstants.DOWNLOAD_QUEUE);
             if (noSqlModelInDb == null) {
                 noSqlModel.save();
             } else {
@@ -147,7 +142,7 @@ public class DownloadQueueManager {
         Set<DownloadRequest> downloadRequestSet = new LinkedHashSet<>(requestList);
         downloadRequestSet.add(request);
         mDownloadRequestList = new ArrayList<>(downloadRequestSet);
-        saveToKeyValueStore(downloadRequestSet);
+        save(downloadRequestSet);
     }
 
     public List<String> getCurrentDownloads() {
@@ -202,6 +197,6 @@ public class DownloadQueueManager {
     }
 
     public boolean shouldResume() {
-        return mKeyValueStore.getInt(ServiceConstants.PreferenceKey.KEY_DOWNLOAD_STATUS, 0) == 0 ? true : false;
+        return mKeyValueStore.getInt(ServiceConstants.PreferenceKey.KEY_DOWNLOAD_STATUS, 0) == 0;
     }
 }
