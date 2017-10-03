@@ -40,7 +40,7 @@ import org.ekstep.genieservices.commons.bean.enums.DownloadAction;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
 import org.ekstep.genieservices.commons.chained.IChainable;
-import org.ekstep.genieservices.commons.db.model.KeyValueStoreModel;
+import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
@@ -640,6 +640,37 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
+    public GenieResponse<List<ContentImportResponse>> getImportStatus(List<String> contentIdList) {
+        String methodName = "getImportStatus@ContentServiceImpl";
+        Map<String, Object> params = new HashMap<>();
+        params.put("identifierList", GsonUtil.toJson(contentIdList));
+        params.put("logLevel", "2");
+
+        List<ContentImportResponse> contentImportResponseList = new ArrayList<>();
+        for (String contentId : contentIdList) {
+            DownloadRequest request = downloadService.getDownloadRequest(contentId);
+            ContentImportStatus status = ContentImportStatus.NOT_FOUND;
+            if (request != null) {
+                status = request.getDownloadId() == -1 ? ContentImportStatus.ENQUEUED_FOR_DOWNLOAD : ContentImportStatus.DOWNLOAD_STARTED;
+            } else {
+                ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), contentId);
+                if (contentModel != null) {
+                    status = ContentImportStatus.IMPORT_COMPLETED;
+                }
+            }
+
+            ContentImportResponse contentImportResponse = new ContentImportResponse(contentId, status);
+            contentImportResponseList.add(contentImportResponse);
+        }
+
+
+        GenieResponse<List<ContentImportResponse>> response = GenieResponseBuilder.getSuccessResponse("");
+        response.setResult(contentImportResponseList);
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        return response;
+    }
+
+    @Override
     public GenieResponse<List<ContentImportResponse>> importContent(ContentImportRequest importRequest) {
         String methodName = "importContent@ContentServiceImpl";
         HashMap<String, Object> params = new HashMap<>();
@@ -768,14 +799,14 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     public GenieResponse<List<DownloadRequest>> getAllDownloads() {
 
         String methodName = "getAllDownloads@ContentServiceImpl";
-        KeyValueStoreModel keyValueStoreModel = KeyValueStoreModel.findByKey(mAppContext.getDBSession(), DOWNLOAD_QUEUE);
+        NoSqlModel noSqlModel = NoSqlModel.findByKey(mAppContext.getDBSession(), DOWNLOAD_QUEUE);
         GenieResponse<List<DownloadRequest>> response;
-        if (keyValueStoreModel == null) {
+        if (noSqlModel == null) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.KEY_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_KEY, TAG);
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, (Map) new HashMap<>(), ServiceConstants.ErrorMessage.UNABLE_TO_FIND_KEY);
             return response;
         }
-        String value = keyValueStoreModel.getValue();
+        String value = noSqlModel.getValue();
 //        List<DownloadRequest> requestList = new ArrayList<>();
 //        DownloadRequest[] downloadRequests = GsonUtil.fromJson(value, DownloadRequest[].class);
 //        requestList.addAll(Arrays.asList(downloadRequests));

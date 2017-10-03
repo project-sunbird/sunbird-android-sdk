@@ -201,6 +201,19 @@ public interface IContentService {
      */
     GenieResponse<ContentImportResponse> getImportStatus(String contentId);
 
+
+    /**
+     * This api is used to get the status of contents
+     * <p>
+     * <p>
+     * Response will always be status set TRUE, with {@link ContentImportResponse} set in result.
+     *
+     * @param contentIdList Content idList.
+     * @return {@link GenieResponse<ContentImportResponse>}
+     */
+    GenieResponse<List<ContentImportResponse>> getImportStatus(List<String> contentIdList);
+
+
     /**
      * This api is used to cancel the on-going download
      * <p>

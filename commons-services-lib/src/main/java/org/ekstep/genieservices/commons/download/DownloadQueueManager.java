@@ -5,7 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
-import org.ekstep.genieservices.commons.db.model.KeyValueStoreModel;
+import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -45,9 +45,9 @@ public class DownloadQueueManager {
     private List<DownloadRequest> getAllRequests() {
         if (CollectionUtil.isNullOrEmpty(mDownloadRequestList)) {
             mDownloadRequestList = new ArrayList<>();
-            KeyValueStoreModel keyStoreModel = KeyValueStoreModel.findByKey(mDbSession, DOWNLOAD_QUEUE);
-            if (keyStoreModel != null) {
-                String jsonDownloadRequest = keyStoreModel.getValue();
+            NoSqlModel noSqlModel = NoSqlModel.findByKey(mDbSession, DOWNLOAD_QUEUE);
+            if (noSqlModel != null) {
+                String jsonDownloadRequest = noSqlModel.getValue();
                 if (!StringUtil.isNullOrEmpty(jsonDownloadRequest)) {
                     Type type = new TypeToken<List<DownloadRequest>>() {
                     }.getType();
@@ -126,15 +126,15 @@ public class DownloadQueueManager {
         String jsonContents = GsonUtil.getGson().toJson(requestList);
 
         if (CollectionUtil.isNullOrEmpty(collection)) {
-            KeyValueStoreModel keyStoreModel = KeyValueStoreModel.build(mDbSession, DOWNLOAD_QUEUE, jsonContents);
-            keyStoreModel.delete();
+            NoSqlModel noSqlModel = NoSqlModel.build(mDbSession, DOWNLOAD_QUEUE, jsonContents);
+            noSqlModel.delete();
         } else {
-            KeyValueStoreModel keyStoreModel = KeyValueStoreModel.build(mDbSession, DOWNLOAD_QUEUE, jsonContents);
-            KeyValueStoreModel keyStoreModelinDb = KeyValueStoreModel.findByKey(mDbSession, DOWNLOAD_QUEUE);
-            if (keyStoreModelinDb == null) {
-                keyStoreModel.save();
+            NoSqlModel noSqlModel = NoSqlModel.build(mDbSession, DOWNLOAD_QUEUE, jsonContents);
+            NoSqlModel noSqlModelInDb = NoSqlModel.findByKey(mDbSession, DOWNLOAD_QUEUE);
+            if (noSqlModelInDb == null) {
+                noSqlModel.save();
             } else {
-                keyStoreModel.update();
+                noSqlModel.update();
             }
         }
 
@@ -153,9 +153,9 @@ public class DownloadQueueManager {
     public List<String> getCurrentDownloads() {
         if (CollectionUtil.isNullOrEmpty(mCurrentDownloads)) {
             mCurrentDownloads = new ArrayList<>();
-            KeyValueStoreModel keyStoreModel = KeyValueStoreModel.findByKey(mDbSession, CURRENT_DOWNLOAD);
-            if (keyStoreModel != null) {
-                String jsonCurrentDownloads = keyStoreModel.getValue();
+            NoSqlModel noSqlModel = NoSqlModel.findByKey(mDbSession, CURRENT_DOWNLOAD);
+            if (noSqlModel != null) {
+                String jsonCurrentDownloads = noSqlModel.getValue();
                 if (!StringUtil.isNullOrEmpty(jsonCurrentDownloads)) {
                     Type type = new TypeToken<List<String>>() {
                     }.getType();
@@ -187,15 +187,15 @@ public class DownloadQueueManager {
     private void saveCurrentDownloads(List<String> identifiers) {
         String currentDownloads = GsonUtil.getGson().toJson(identifiers);
         if (CollectionUtil.isNullOrEmpty(identifiers)) {
-            KeyValueStoreModel keyStoreModel = KeyValueStoreModel.build(mDbSession, CURRENT_DOWNLOAD, currentDownloads);
-            keyStoreModel.delete();
+            NoSqlModel noSqlModel = NoSqlModel.build(mDbSession, CURRENT_DOWNLOAD, currentDownloads);
+            noSqlModel.delete();
         } else {
-            KeyValueStoreModel keyStoreModelinDb = KeyValueStoreModel.findByKey(mDbSession, CURRENT_DOWNLOAD);
-            KeyValueStoreModel keyStoreModel = KeyValueStoreModel.build(mDbSession, CURRENT_DOWNLOAD, currentDownloads);
-            if (keyStoreModelinDb == null) {
-                keyStoreModel.save();
+            NoSqlModel noSqlModelinDb = NoSqlModel.findByKey(mDbSession, CURRENT_DOWNLOAD);
+            NoSqlModel noSqlModel = NoSqlModel.build(mDbSession, CURRENT_DOWNLOAD, currentDownloads);
+            if (noSqlModelinDb == null) {
+                noSqlModel.save();
             } else {
-                keyStoreModel.update();
+                noSqlModel.update();
             }
         }
 

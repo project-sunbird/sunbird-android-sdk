@@ -1,7 +1,7 @@
 package org.ekstep.genieservices.commons.db.migration.impl;
 
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.db.contract.KeyValueStoreEntry;
+import org.ekstep.genieservices.commons.db.contract.NoSqlEntry;
 import org.ekstep.genieservices.commons.db.migration.Migration;
 
 /**
@@ -19,6 +19,6 @@ public class _010_CreateKeyValueStoreMigration extends Migration {
 
     @Override
     public void apply(AppContext appContext) {
-        appContext.getDBSession().execute(KeyValueStoreEntry.getCreateEntry());
+        appContext.getDBSession().execute(NoSqlEntry.getCreateEntry());
     }
 }

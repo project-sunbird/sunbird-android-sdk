@@ -346,6 +346,24 @@ public class ContentService {
     }
 
     /**
+     * This api is used to get the status of list of contentids
+     * <p>
+     * <p>
+     * Response will always be status set TRUE, with {@link ContentImportResponse} set in result.
+     *
+     * @param contentIdList       Content ids.
+     * @param responseHandler - {@link IResponseHandler<List<ContentImportResponse>>}
+     */
+    public void getImportStatus(final List<String> contentIdList, IResponseHandler<List<ContentImportResponse>> responseHandler) {
+        new AsyncHandler<List<ContentImportResponse>>(responseHandler).execute(new IPerformable<List<ContentImportResponse>>() {
+            @Override
+            public GenieResponse<List<ContentImportResponse>> perform() {
+                return contentService.getImportStatus(contentIdList);
+            }
+        });
+    }
+
+    /**
      * This api is used to cancel the on-going download
      * <p>
      * <p>

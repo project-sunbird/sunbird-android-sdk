@@ -2,7 +2,7 @@ package org.ekstep.genieservices.commons.db.model;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.BaseColumns;
-import org.ekstep.genieservices.commons.db.contract.KeyValueStoreEntry;
+import org.ekstep.genieservices.commons.db.contract.NoSqlEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
@@ -17,44 +17,44 @@ import java.util.Locale;
  * Created by swayangjit on 10/9/17.
  */
 
-public class KeyValueStoreModel implements IWritable, IReadable, IUpdatable, ICleanable {
+public class NoSqlModel implements IWritable, IReadable, IUpdatable, ICleanable {
 
     private Long id = -1L;
     private IDBSession mDBSession;
     private String mKey;
     private String mValue;
 
-    private KeyValueStoreModel(IDBSession dbSession) {
+    private NoSqlModel(IDBSession dbSession) {
         this.mDBSession = dbSession;
     }
 
-    private KeyValueStoreModel(IDBSession dbSession, String key) {
+    private NoSqlModel(IDBSession dbSession, String key) {
         this.mDBSession = dbSession;
         this.mKey = key;
     }
 
-    private KeyValueStoreModel(IDBSession dbSession, String key, String value) {
+    private NoSqlModel(IDBSession dbSession, String key, String value) {
         this.mDBSession = dbSession;
         this.mKey = key;
         this.mValue = value;
     }
 
-    public static KeyValueStoreModel build(IDBSession dbSession, String key, String value) {
-        return new KeyValueStoreModel(dbSession, key, value);
+    public static NoSqlModel build(IDBSession dbSession, String key, String value) {
+        return new NoSqlModel(dbSession, key, value);
     }
 
-    public static KeyValueStoreModel findByKey(IDBSession dbSession, String key) {
-        KeyValueStoreModel keyStoreModel = new KeyValueStoreModel(dbSession, key);
-        dbSession.read(keyStoreModel);
-        return keyStoreModel.getValue() == null ? null : keyStoreModel;
+    public static NoSqlModel findByKey(IDBSession dbSession, String key) {
+        NoSqlModel noSqlModel = new NoSqlModel(dbSession, key);
+        dbSession.read(noSqlModel);
+        return noSqlModel.getValue() == null ? null : noSqlModel;
 
     }
 
     @Override
     public ContentValues getContentValues() {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(KeyValueStoreEntry.COLUMN_NAME_KEY, mKey);
-        contentValues.put(KeyValueStoreEntry.COLUMN_NAME_VALUE, mValue);
+        contentValues.put(NoSqlEntry.COLUMN_NAME_KEY, mKey);
+        contentValues.put(NoSqlEntry.COLUMN_NAME_VALUE, mValue);
         return contentValues;
     }
 
@@ -74,14 +74,14 @@ public class KeyValueStoreModel implements IWritable, IReadable, IUpdatable, ICl
     @Override
     public ContentValues getFieldsToUpdate() {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(KeyValueStoreEntry.COLUMN_NAME_KEY, mKey);
-        contentValues.put(KeyValueStoreEntry.COLUMN_NAME_VALUE, mValue);
+        contentValues.put(NoSqlEntry.COLUMN_NAME_KEY, mKey);
+        contentValues.put(NoSqlEntry.COLUMN_NAME_VALUE, mValue);
         return contentValues;
     }
 
     @Override
     public String getTableName() {
-        return KeyValueStoreEntry.TABLE_NAME;
+        return NoSqlEntry.TABLE_NAME;
     }
 
     @Override
@@ -91,12 +91,12 @@ public class KeyValueStoreModel implements IWritable, IReadable, IUpdatable, ICl
 
     @Override
     public String selectionToClean() {
-        return String.format(Locale.US, "WHERE %s = '%s';", KeyValueStoreEntry.COLUMN_NAME_KEY, mKey);
+        return String.format(Locale.US, "WHERE %s = '%s';", NoSqlEntry.COLUMN_NAME_KEY, mKey);
     }
 
     @Override
     public String updateBy() {
-        return String.format(Locale.US, "%s = '%s'", KeyValueStoreEntry.COLUMN_NAME_KEY, mKey);
+        return String.format(Locale.US, "%s = '%s'", NoSqlEntry.COLUMN_NAME_KEY, mKey);
     }
 
     @Override
@@ -106,7 +106,7 @@ public class KeyValueStoreModel implements IWritable, IReadable, IUpdatable, ICl
 
     @Override
     public String filterForRead() {
-        return String.format(Locale.US, "where %s = '%s'", KeyValueStoreEntry.COLUMN_NAME_KEY, mKey);
+        return String.format(Locale.US, "where %s = '%s'", NoSqlEntry.COLUMN_NAME_KEY, mKey);
     }
 
     @Override
@@ -138,8 +138,8 @@ public class KeyValueStoreModel implements IWritable, IReadable, IUpdatable, ICl
 
     private void readWithoutMoving(IResultSet resultSet) {
         id = resultSet.getLong(resultSet.getColumnIndex(BaseColumns._ID));
-        mKey = resultSet.getString(resultSet.getColumnIndex(KeyValueStoreEntry.COLUMN_NAME_KEY));
-        mValue = resultSet.getString(resultSet.getColumnIndex(KeyValueStoreEntry.COLUMN_NAME_VALUE));
+        mKey = resultSet.getString(resultSet.getColumnIndex(NoSqlEntry.COLUMN_NAME_KEY));
+        mValue = resultSet.getString(resultSet.getColumnIndex(NoSqlEntry.COLUMN_NAME_VALUE));
     }
 
     public String getKey() {
