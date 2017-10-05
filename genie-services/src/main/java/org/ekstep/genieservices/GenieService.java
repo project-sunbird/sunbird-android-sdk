@@ -81,7 +81,7 @@ public class GenieService {
         if (sService == null) {
             AppContext<Context> appContext = AndroidAppContext.buildAppContext(context, packageName);
             Logger.init(new AndroidLogger());
-            ContentPlayer.init(appContext.getParams().getString(IParams.Key.APP_QUALIFIER), appContext.getParams().getString(ServiceConstants.Params.PLAYER_CONFIG));
+            ContentPlayer.init(appContext.getParams().getString(IParams.Key.APPLICATION_ID), appContext.getParams().getString(ServiceConstants.Params.PLAYER_CONFIG));
             TelemetryLogger.init(new TelemetryServiceImpl(appContext, new UserServiceImpl(appContext)));
             //initializing event bus for Telemetry
             SummaryListener.init(appContext);

@@ -5,8 +5,6 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
 
-import com.google.gson.reflect.TypeToken;
-
 import org.ekstep.genieproviders.BaseContentProvider;
 import org.ekstep.genieproviders.util.Constants;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
@@ -15,7 +13,6 @@ import org.ekstep.genieservices.commons.bean.LearnerAssessmentDetails;
 import org.ekstep.genieservices.commons.bean.SummaryRequest;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,17 +36,15 @@ public abstract class AbstractSummarizerProvider extends BaseContentProvider {
         if (selection != null) {
             cursor = getMatrixCursor();
 
-            Type type = new TypeToken<Map>() {
-            }.getType();
-            Map data = GsonUtil.getGson().fromJson(selection, type);
-
-            Map hierarchyData = (Map) data.get("hierarchyData");
+            Map data = GsonUtil.getGson().fromJson(selection, Map.class);
 
             String currentContentIdentifier = data.get("currentContentIdentifier").toString();
             String userId = data.get("userId").toString();
             SummaryRequest.Builder summaryRequestBuilder = new SummaryRequest.Builder();
             summaryRequestBuilder.contentId(currentContentIdentifier);
             summaryRequestBuilder.uid(userId);
+
+            Map hierarchyData = (Map) data.get("hierarchyData");
             String hierarchyDataString = null;
             if (hierarchyData != null) {
                 hierarchyDataString = hierarchyData.get("id") != null ? hierarchyData.get("id").toString() : null;
@@ -78,12 +73,10 @@ public abstract class AbstractSummarizerProvider extends BaseContentProvider {
                 cursor.addRow(new String[]{GsonUtil.toJson(successResponse)});
 
                 return cursor;
-            } else {
-                getErrorResponse(cursor);
             }
         }
 
-        return null;
+        return getErrorResponse(cursor);
     }
 
     protected Cursor getErrorResponse(MatrixCursor cursor) {
@@ -116,8 +109,4 @@ public abstract class AbstractSummarizerProvider extends BaseContentProvider {
         return 0;
     }
 
-    private String getCompletePath() {
-        String SUMMARIZER_PATH = "summarizer";
-        return String.format("%s.%s", getPackageName(), SUMMARIZER_PATH);
-    }
 }

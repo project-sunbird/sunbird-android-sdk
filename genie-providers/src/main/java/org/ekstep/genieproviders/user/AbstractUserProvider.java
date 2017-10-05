@@ -23,6 +23,7 @@ import java.util.List;
  */
 
 public abstract class AbstractUserProvider extends BaseContentProvider {
+
     private final String TAG = AbstractUserProvider.class.getSimpleName();
 
     @Override
@@ -55,8 +56,6 @@ public abstract class AbstractUserProvider extends BaseContentProvider {
             if (response != null && response.getStatus() && response.getResult() != null) {
                 return Uri.parse(response.getResult().getUid());
             }
-
-            return null;
         }
         return null;
     }
@@ -65,16 +64,15 @@ public abstract class AbstractUserProvider extends BaseContentProvider {
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         if (selectionArgs[0].isEmpty()) {
             Logger.i(TAG, "Deleting profile - Selection Id is empty");
-            return 0;
         } else {
             Logger.i(TAG, "Deleting profile - Selection Id - " + selectionArgs[0]);
             GenieResponse response = getService().getUserService().deleteUser(selectionArgs[0]);
             if (response.getStatus()) {
                 return 1;
             }
-
-            return 0;
         }
+
+        return 0;
     }
 
     @Override
@@ -85,11 +83,9 @@ public abstract class AbstractUserProvider extends BaseContentProvider {
             if (response != null && response.getStatus()) {
                 return 1;
             }
-
-            return 0;
-        } else {
-            return 0;
         }
+
+        return 0;
     }
 
     private String getCompletePath() {

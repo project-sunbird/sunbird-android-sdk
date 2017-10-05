@@ -28,7 +28,6 @@ public abstract class AbstractContentProvider extends BaseContentProvider {
         return null;
     }
 
-
     @Override
     public String getType(Uri uri) {
         return String.format("vnd.android.cursor.item/%s.provider.content", getPackageName());

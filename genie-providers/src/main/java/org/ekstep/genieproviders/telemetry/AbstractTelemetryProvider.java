@@ -22,7 +22,6 @@ public abstract class AbstractTelemetryProvider extends BaseContentProvider {
         return true;
     }
 
-
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
         return null;
@@ -53,8 +52,4 @@ public abstract class AbstractTelemetryProvider extends BaseContentProvider {
         return 0;
     }
 
-    private String getCompletePath() {
-        String TELEMETRY_PATH = "telemetry";
-        return String.format("%s.%s", getPackageName(), TELEMETRY_PATH);
-    }
 }
