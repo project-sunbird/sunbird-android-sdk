@@ -15,7 +15,6 @@ import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentMoveRequest;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
-import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
@@ -242,10 +241,24 @@ public interface IContentService {
      */
     GenieResponse<ContentExportResponse> exportContent(ContentExportRequest contentExportRequest);
 
-    GenieResponse<List<DownloadRequest>> getAllDownloads();
-
+    /**
+     * This api is used to pause / resume the  download queue.
+     * <p>
+     * <p>
+     * On successful setting the status, the response will return status as TRUE, with response set in result
+     * <p>
+     * <p>
+     * On failing tosetting the status, the response will be with return status as FALSE
+     */
     GenieResponse<Void> setDownloadAction(DownloadAction action);
 
+    /**
+     * This api is used get Download queue state.
+     * <p>
+     * <p>
+     * Response will always be status set TRUE, with {@link DownloadAction} set in result.
+     * <p>
+     */
     GenieResponse<DownloadAction> getDownloadState();
 
     /**

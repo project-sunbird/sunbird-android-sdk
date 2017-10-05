@@ -44,7 +44,6 @@ import org.ekstep.genieservices.commons.bean.enums.DownloadAction;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
 import org.ekstep.genieservices.commons.chained.IChainable;
-import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
@@ -815,38 +814,14 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<List<DownloadRequest>> getAllDownloads() {
-        Map<String, Object> params = new HashMap<>();
-        params.put("logLevel", "2");
-
-        String methodName = "getAllDownloads@ContentServiceImpl";
-        NoSqlModel noSqlModel = NoSqlModel.findByKey(mAppContext.getDBSession(), ServiceConstants.DOWNLOAD_QUEUE);
-        GenieResponse<List<DownloadRequest>> response;
-        if (noSqlModel == null) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.KEY_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_KEY, TAG);
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_KEY);
-            return response;
-        }
-        String value = noSqlModel.getValue();
-//        List<DownloadRequest> requestList = new ArrayList<>();
-//        DownloadRequest[] downloadRequests = GsonUtil.fromJson(value, DownloadRequest[].class);
-//        requestList.addAll(Arrays.asList(downloadRequests));
-
-        Type type = new TypeToken<List<DownloadRequest>>() {
-        }.getType();
-        List<DownloadRequest> downloadReqList = GsonUtil.getGson().fromJson(value, type);
-        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-        response.setResult(downloadReqList);
-        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
-        return response;
-    }
-
-    @Override
     public GenieResponse<Void> setDownloadAction(DownloadAction action) {
         Map<String, Object> params = new HashMap<>();
         params.put("logLevel", "2");
         String methodName = "setDownloadAction@ContentServiceImpl";
         mAppContext.getKeyValueStore().putInt(ServiceConstants.PreferenceKey.KEY_DOWNLOAD_STATUS, action.getValue());
+        if (action.getValue() == 1) {
+            downloadService.resumeDownloads();
+        }
         GenieResponse<Void> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;
