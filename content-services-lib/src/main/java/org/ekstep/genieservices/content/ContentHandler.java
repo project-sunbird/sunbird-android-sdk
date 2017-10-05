@@ -501,23 +501,17 @@ public class ContentHandler {
         return contentState == ContentConstants.State.ARTIFACT_AVAILABLE;
     }
 
-    private static String[] getDefaultContentTypes() {
-        return new String[]{"Story", "Worksheet", "Collection", "Game", "TextBook"};
-    }
-
     public static List<ContentModel> getAllLocalContent(IDBSession dbSession, ContentFilterCriteria criteria) {
-        String uid = null;
-        String[] contentTypes;
-        if (criteria != null) {
-            uid = criteria.getUid();
-            contentTypes = criteria.getContentTypes();
-        } else {
-            contentTypes = getDefaultContentTypes();
+        if (criteria == null) {
+            criteria = new ContentFilterCriteria.Builder().build();
         }
+
+        String uid = criteria.getUid();
+        String[] contentTypes = criteria.getContentTypes();
         String contentTypesStr = StringUtil.join("','", contentTypes);
 
         StringBuilder audienceFilterBuilder = new StringBuilder();
-        if (criteria != null && criteria.getAudience() != null && criteria.getAudience().length > 0) {
+        if (criteria.getAudience() != null && criteria.getAudience().length > 0) {
             for (String audience : criteria.getAudience()) {
                 audienceFilterBuilder.append(audienceFilterBuilder.length() > 0 ? " or " : "");
                 audienceFilterBuilder.append(String.format(Locale.US, "c.%s like '%%%s%%'", ContentEntry.COLUMN_NAME_AUDIENCE, audience));
@@ -531,7 +525,37 @@ public class ContentHandler {
                 ? String.format(Locale.US, "WHERE (%s AND %s AND %s)", contentVisibilityFilter, artifactAvailabilityFilter, contentTypeFilter)
                 : String.format(Locale.US, "WHERE (%s AND %s AND %s AND (%s))", contentVisibilityFilter, artifactAvailabilityFilter, contentTypeFilter, audienceFilterBuilder.toString());
 
-        String orderBy = String.format(Locale.US, "ORDER BY ca.%s desc, c.%s desc, c.%s desc", ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP, ContentEntry.COLUMN_NAME_LOCAL_LAST_UPDATED_ON, ContentEntry.COLUMN_NAME_SERVER_LAST_UPDATED_ON);
+        StringBuilder orderBy = new StringBuilder();
+        int i = 0;
+        for (ContentSortCriteria sortCriteria : criteria.getSortCriteria()) {
+            if (sortCriteria != null) {
+                if ("lastUsedOn".equals(sortCriteria.getSortAttribute()) && uid != null) {
+                    if (i > 0) {
+                        orderBy.append(",");
+                    } else {
+                        orderBy.append("ORDER BY");
+                    }
+                    orderBy.append(String.format(Locale.US, " ca.%s %s", ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP, sortCriteria.getSortOrder().getValue()));
+                    i++;
+                } else if ("localLastUpdatedOn".equals(sortCriteria.getSortAttribute())) {
+                    if (i > 0) {
+                        orderBy.append(",");
+                    } else {
+                        orderBy.append("ORDER BY");
+                    }
+                    orderBy.append(String.format(Locale.US, " c.%s %s", ContentEntry.COLUMN_NAME_LOCAL_LAST_UPDATED_ON, sortCriteria.getSortOrder().getValue()));
+                    i++;
+                } else if ("sizeOnDevice".equals(sortCriteria.getSortAttribute())) {
+                    if (i > 0) {
+                        orderBy.append(",");
+                    } else {
+                        orderBy.append("ORDER BY");
+                    }
+                    orderBy.append(String.format(Locale.US, " c.%s %s", ContentEntry.COLUMN_NAME_SIZE_ON_DEVICE, sortCriteria.getSortOrder().getValue()));
+                    i++;
+                }
+            }
+        }
 
         String query;
         if (uid != null) {
@@ -540,10 +564,11 @@ public class ContentHandler {
                     ContentEntry.TABLE_NAME, ContentAccessEntry.TABLE_NAME,
                     ContentEntry.COLUMN_NAME_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER,
                     ContentAccessEntry.COLUMN_NAME_UID, uid,
-                    filter, orderBy);
+                    filter, orderBy.toString());
         } else {
-            query = String.format(Locale.US, "SELECT c.* FROM  %s c %s;",
-                    ContentEntry.TABLE_NAME, filter);
+            query = String.format(Locale.US, "SELECT c.* FROM  %s c %s %s;",
+                    ContentEntry.TABLE_NAME,
+                    filter, orderBy.toString());
         }
 
         List<ContentModel> contentModelListInDB;

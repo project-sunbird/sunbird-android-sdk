@@ -1,6 +1,11 @@
 package org.ekstep.genieservices.commons.bean;
 
+import org.ekstep.genieservices.commons.bean.enums.SortOrder;
+import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This class holds the uid, types of content required and attachFeedback, attachContentAccess flags if the feedback and content access are required.
@@ -12,13 +17,15 @@ public class ContentFilterCriteria {
     private String[] audience;
     private boolean attachFeedback;
     private boolean attachContentAccess;
+    private Set<ContentSortCriteria> sortCriteria;
 
-    private ContentFilterCriteria(String uid, String[] contentTypes, String[] audience, boolean attachFeedback, boolean attachContentAccess) {
+    private ContentFilterCriteria(String uid, String[] contentTypes, String[] audience, boolean attachFeedback, boolean attachContentAccess, Set<ContentSortCriteria> sortCriteria) {
         this.uid = uid;
         this.contentTypes = contentTypes;
         this.audience = audience;
         this.attachFeedback = attachFeedback;
         this.attachContentAccess = attachContentAccess;
+        this.sortCriteria = sortCriteria;
     }
 
     public String getUid() {
@@ -41,6 +48,10 @@ public class ContentFilterCriteria {
         return attachContentAccess;
     }
 
+    public Set<ContentSortCriteria> getSortCriteria() {
+        return sortCriteria;
+    }
+
     @Override
     public String toString() {
         return GsonUtil.toJson(this);
@@ -52,6 +63,7 @@ public class ContentFilterCriteria {
         private String[] audience;
         private boolean attachFeedback;
         private boolean attachContentAccess;
+        private Set<ContentSortCriteria> sortCriteria;
 
         /**
          * User id to get the content in order to access by that user.
@@ -91,11 +103,24 @@ public class ContentFilterCriteria {
             return this;
         }
 
+        /**
+         * List of sort criteria {@link ContentSortCriteria}.
+         */
+        public Builder sort(Set<ContentSortCriteria> sortCriteria) {
+            this.sortCriteria = sortCriteria;
+            return this;
+        }
+
         public ContentFilterCriteria build() {
             if (contentTypes == null || contentTypes.length == 0) {
                 contentTypes = new String[]{"Story", "Worksheet", "Collection", "Game", "TextBook"};
             }
-            return new ContentFilterCriteria(uid, contentTypes, audience, attachFeedback, attachContentAccess);
+            if (CollectionUtil.isNullOrEmpty(sortCriteria)) {
+                sortCriteria = new HashSet<>();
+                sortCriteria.add(new ContentSortCriteria("lastUsedOn", SortOrder.DESC));
+                sortCriteria.add(new ContentSortCriteria("localLastUpdatedOn", SortOrder.DESC));
+            }
+            return new ContentFilterCriteria(uid, contentTypes, audience, attachFeedback, attachContentAccess, sortCriteria);
         }
     }
 }

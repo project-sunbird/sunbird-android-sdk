@@ -5,7 +5,7 @@ import org.ekstep.genieservices.commons.bean.enums.SortOrder;
 import java.io.Serializable;
 
 /**
- * Sort criteria which uses sort attribute as String from [relevance, name, popularity, lastPublishedOn] and sort order will be ascending or descending.
+ * Sort criteria which uses sort attribute as String from [relevance, name, popularity, lastPublishedOn, sizeOnDevice, lastUsedOn, localLastUpdatedOn] and sort order will be ascending or descending.
  */
 public class ContentSortCriteria implements Serializable {
 
@@ -31,5 +31,20 @@ public class ContentSortCriteria implements Serializable {
 
     public void setSortOrder(SortOrder sortOrder) {
         this.sortOrder = sortOrder;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ContentSortCriteria)) return false;
+
+        ContentSortCriteria that = (ContentSortCriteria) o;
+
+        return sortAttribute != null ? sortAttribute.equals(that.sortAttribute) : that.sortAttribute == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return sortAttribute != null ? sortAttribute.hashCode() : 0;
     }
 }
