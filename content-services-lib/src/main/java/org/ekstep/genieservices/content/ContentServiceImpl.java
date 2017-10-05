@@ -816,13 +816,15 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
     @Override
     public GenieResponse<List<DownloadRequest>> getAllDownloads() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("logLevel", "2");
 
         String methodName = "getAllDownloads@ContentServiceImpl";
         NoSqlModel noSqlModel = NoSqlModel.findByKey(mAppContext.getDBSession(), ServiceConstants.DOWNLOAD_QUEUE);
         GenieResponse<List<DownloadRequest>> response;
         if (noSqlModel == null) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.KEY_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_KEY, TAG);
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, (Map) new HashMap<>(), ServiceConstants.ErrorMessage.UNABLE_TO_FIND_KEY);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_KEY);
             return response;
         }
         String value = noSqlModel.getValue();
@@ -835,26 +837,30 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         List<DownloadRequest> downloadReqList = GsonUtil.getGson().fromJson(value, type);
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(downloadReqList);
-        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, (Map) new HashMap<>());
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;
     }
 
     @Override
     public GenieResponse<Void> setDownloadAction(DownloadAction action) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("logLevel", "2");
         String methodName = "setDownloadAction@ContentServiceImpl";
         mAppContext.getKeyValueStore().putInt(ServiceConstants.PreferenceKey.KEY_DOWNLOAD_STATUS, action.getValue());
         GenieResponse<Void> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, (Map) new HashMap<>());
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;
 
     }
 
     @Override
     public GenieResponse<DownloadAction> getDownloadState() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("logLevel", "2");
         String methodName = "getDownloadState@ContentServiceImpl";
         GenieResponse<DownloadAction> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(mAppContext.getKeyValueStore().getInt(ServiceConstants.PreferenceKey.KEY_DOWNLOAD_STATUS, 0) == 0 ? DownloadAction.RESUME : DownloadAction.PAUSE);
-        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, (Map) new HashMap<>());
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;
     }
 
