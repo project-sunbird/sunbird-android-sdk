@@ -407,20 +407,6 @@ public class ContentService {
 
 
     /**
-     * This api is used to get all current downloads.
-     *
-     * @param responseHandler - {@link IResponseHandler<List<DownloadRequest>>}
-     */
-    public void getAllDownloads(IResponseHandler<List<DownloadRequest>> responseHandler) {
-        new AsyncHandler<List<DownloadRequest>>(responseHandler).execute(new IPerformable<List<DownloadRequest>>() {
-            @Override
-            public GenieResponse<List<DownloadRequest>> perform() {
-                return contentService.getAllDownloads();
-            }
-        });
-    }
-
-    /**
      * This api is used to set action in download queue
      *
      * @param responseHandler - {@link IResponseHandler<Void>}
