@@ -5,11 +5,15 @@ import org.ekstep.genieservices.commons.db.contract.ContentEntry;
 import org.ekstep.genieservices.commons.db.contract.NoSqlEntry;
 import org.ekstep.genieservices.commons.db.migration.Migration;
 import org.ekstep.genieservices.commons.utils.FileUtil;
+import org.ekstep.genieservices.content.ContentHandler;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.db.model.ContentsModel;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class _10_StorageManagementMigration extends Migration {
 
@@ -66,6 +70,12 @@ public class _10_StorageManagementMigration extends Migration {
                         ContentEntry.COLUMN_NAME_IDENTIFIER, contentModel.getIdentifier());
 
                 appContext.getDBSession().execute(updateQuery);
+
+                //create the manifest for this content
+                List<ContentModel> contentModelList = new ArrayList<>();
+                contentModelList.add(contentModel);
+
+                ContentHandler.createAndWriteManifest(appContext, contentModelList);
             }
         }
     }

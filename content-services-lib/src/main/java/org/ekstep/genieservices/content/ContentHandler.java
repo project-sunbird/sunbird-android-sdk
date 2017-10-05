@@ -48,6 +48,7 @@ import org.ekstep.genieservices.content.network.ContentDetailsAPI;
 import org.ekstep.genieservices.content.network.ContentListingAPI;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1574,5 +1575,93 @@ public class ContentHandler {
 
         return fileName;
     }
+
+    // TODO: 5/10/17 Re-iterating of the queue should be optimised
+    public static void createAndWriteManifest(AppContext appContext, List<ContentModel> contentModelList) {
+        for (ContentModel contentModel : contentModelList) {
+            Queue<ContentModel> queue = new LinkedList<>();
+
+            queue.add(contentModel);
+
+            ContentModel node;
+
+            List<ContentModel> contentWithAllChildren = new ArrayList<>();
+            contentWithAllChildren.add(contentModel);
+
+            while (!queue.isEmpty()) {
+                node = queue.remove();
+
+                if (hasChildren(node.getLocalData())) {
+                    List<String> childContentsIdentifiers = getChildContentsIdentifiers(node.getLocalData());
+                    List<ContentModel> contentModelListInDB = findAllContentsWithIdentifiers(appContext.getDBSession(), childContentsIdentifiers);
+                    if (contentModelListInDB != null) {
+                        queue.addAll(contentModelListInDB);
+                        contentWithAllChildren.addAll(contentModelListInDB);
+                    }
+                }
+            }
+
+            Map<String, Object> manifest = createManifest(appContext, contentWithAllChildren);
+
+            try {
+                FileUtil.writeManifest(new File(contentModel.getPath()), manifest);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // TODO: 5/10/17 This method needs to be reused in CreateContentExportManifest class
+    private static Map<String, Object> createManifest(AppContext appContext, List<ContentModel> contentWithAllChildren) {
+        List<Map<String, Object>> items = new ArrayList<>();
+        Map<String, Map<String, Object>> contentIndex = new HashMap<>();
+        List<String> childIdentifiers = new ArrayList<>();
+        List<String> allContents = new ArrayList<>();
+        Map<String, Object> item;
+
+
+        for (ContentModel c : contentWithAllChildren) {
+            // item local data
+            item = GsonUtil.fromJson(c.getLocalData(), Map.class);
+
+            // index item
+            contentIndex.put(c.getIdentifier(), item);
+            ContentHandler.addViralityMetadataIfMissing(item, appContext.getDeviceInfo().getDeviceID());
+
+            // get item's children only to mark children with visibility as Parent
+            if (ContentHandler.hasChildren(item)) {
+                // store children identifiers
+                childIdentifiers.addAll(ContentHandler.getChildContentsIdentifiers(item));
+            }
+            if (ContentHandler.hasPreRequisites(item)) {
+                // store children identifiers
+                childIdentifiers.addAll(ContentHandler.getPreRequisitesIdentifiers(item));
+            }
+
+            allContents.add(c.getIdentifier());
+        }
+
+        for (String contentIdentifier : allContents) {
+            Map<String, Object> contentData = contentIndex.get(contentIdentifier);
+            if (childIdentifiers.contains(contentIdentifier)) {
+                contentData.put(ContentHandler.KEY_VISIBILITY, ContentConstants.Visibility.PARENT);
+            }
+            items.add(contentData);
+        }
+
+        HashMap<String, Object> archive = new HashMap<>();
+        archive.put("ttl", ContentConstants.TTL);
+        archive.put("count", items.size());
+        archive.put("items", items);
+
+        // Initialize manifest
+        Map<String, Object> manifest = new HashMap<>();
+        manifest.put("id", ContentConstants.EKSTEP_CONTENT_ARCHIVE);
+        manifest.put("ver", ContentConstants.SUPPORTED_MANIFEST_VERSION);
+        manifest.put("ts", DateUtil.getFormattedDateWithTimeZone(DateUtil.TIME_ZONE_GMT));
+        manifest.put("archive", archive);
+        return manifest;
+    }
+
 
 }

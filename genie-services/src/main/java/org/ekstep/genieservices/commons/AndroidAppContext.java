@@ -38,11 +38,11 @@ public class AndroidAppContext extends AppContext<Context> {
     public static AppContext<Context> buildAppContext(Context context, String appPackage) {
         AndroidAppContext appContext = new AndroidAppContext(context);
         appContext.setParams(new BuildParams(context, appPackage));
+        appContext.setDeviceInfo(new DeviceInfo(context));
         appContext.setDBSession(ServiceDbHelper.getGSDBSession(appContext));
         appContext.setConnectionInfo(new AndroidNetworkConnectivity(appContext));
         appContext.setHttpClientFactory(new AndroidHttpClientFactory(appContext));
         appContext.setKeyValueStore(new PreferenceWrapper(context, SHARED_PREFERENCE_NAME));
-        appContext.setDeviceInfo(new DeviceInfo(context));
         // Initialize this after KeyValueStore initialization.
         appContext.setLocationInfo(new LocationInfo(appContext));
         appContext.setDownloadManager(new AndroidDownloadManager(context));
