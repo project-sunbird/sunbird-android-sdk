@@ -4,8 +4,8 @@ import org.ekstep.genieservices.commons.bean.enums.SortOrder;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class holds the uid, types of content required and attachFeedback, attachContentAccess flags if the feedback and content access are required.
@@ -17,9 +17,9 @@ public class ContentFilterCriteria {
     private String[] audience;
     private boolean attachFeedback;
     private boolean attachContentAccess;
-    private Set<ContentSortCriteria> sortCriteria;
+    private List<ContentSortCriteria> sortCriteria;
 
-    private ContentFilterCriteria(String uid, String[] contentTypes, String[] audience, boolean attachFeedback, boolean attachContentAccess, Set<ContentSortCriteria> sortCriteria) {
+    private ContentFilterCriteria(String uid, String[] contentTypes, String[] audience, boolean attachFeedback, boolean attachContentAccess, List<ContentSortCriteria> sortCriteria) {
         this.uid = uid;
         this.contentTypes = contentTypes;
         this.audience = audience;
@@ -48,7 +48,7 @@ public class ContentFilterCriteria {
         return attachContentAccess;
     }
 
-    public Set<ContentSortCriteria> getSortCriteria() {
+    public List<ContentSortCriteria> getSortCriteria() {
         return sortCriteria;
     }
 
@@ -63,7 +63,7 @@ public class ContentFilterCriteria {
         private String[] audience;
         private boolean attachFeedback;
         private boolean attachContentAccess;
-        private Set<ContentSortCriteria> sortCriteria;
+        private List<ContentSortCriteria> sortCriteria;
 
         /**
          * User id to get the content in order to access by that user.
@@ -106,7 +106,7 @@ public class ContentFilterCriteria {
         /**
          * List of sort criteria {@link ContentSortCriteria}.
          */
-        public Builder sort(Set<ContentSortCriteria> sortCriteria) {
+        public Builder sort(List<ContentSortCriteria> sortCriteria) {
             this.sortCriteria = sortCriteria;
             return this;
         }
@@ -116,7 +116,7 @@ public class ContentFilterCriteria {
                 contentTypes = new String[]{"Story", "Worksheet", "Collection", "Game", "TextBook"};
             }
             if (CollectionUtil.isNullOrEmpty(sortCriteria)) {
-                sortCriteria = new HashSet<>();
+                sortCriteria = new ArrayList<>();
                 sortCriteria.add(new ContentSortCriteria("lastUsedOn", SortOrder.DESC));
                 sortCriteria.add(new ContentSortCriteria("localLastUpdatedOn", SortOrder.DESC));
             }
