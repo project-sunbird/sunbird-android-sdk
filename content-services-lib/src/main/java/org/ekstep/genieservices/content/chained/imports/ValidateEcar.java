@@ -88,10 +88,10 @@ public class ValidateEcar implements IChainable<List<ContentImportResponse>, Imp
 
             // To check whether the file is already imported or not
             if (!StringUtil.isNullOrEmpty(oldContentPath)     // Check if path of old content is not empty.
-//                    && ContentConstants.Visibility.DEFAULT.equals(visibility) // Check if visibility is default for new content.
-                    && isDuplicateCheckRequired(isDraftContent, ContentHandler.readPkgVersion(item))     // Check if its draft and pkgVersion is 0.
-                    && ContentHandler.isImportFileExist(oldContentModel, item)) {   // Check whether the file is already imported or not.
-
+                    && ContentConstants.Visibility.DEFAULT.equals(visibility) // If visibility is Parent then this content must go through ExtractPayloads
+                    && !isDuplicateCheckRequired(isDraftContent, ContentHandler.readPkgVersion(item))     // Check if its draft and pkgVersion is 0.
+                    && ContentHandler.isImportFileExist(oldContentModel, item)   // Check whether the file is already imported or not.
+                    ) {
                 skipContent(importContext, identifier, visibility, ContentImportStatus.ALREADY_EXIST);
                 continue;
             }
@@ -126,7 +126,7 @@ public class ValidateEcar implements IChainable<List<ContentImportResponse>, Imp
      * If status is DRAFT and pkgVersion == 0 then don't do the duplicate check..
      */
     private boolean isDuplicateCheckRequired(boolean isDraftContent, Double pkgVersion) {
-        return !(isDraftContent && pkgVersion == 0);
+        return (isDraftContent && pkgVersion == 0);
     }
 
     private GenieResponse<List<ContentImportResponse>> getErrorResponse(String error, String errorMessage) {

@@ -745,7 +745,7 @@ public class ContentHandler {
             String oldVisibility = oldContentModel.getVisibility();
             String newVisibility = readVisibility(newContentData);
 
-            if (oldIdentifier.equalsIgnoreCase(newIdentifier) && oldVisibility.equalsIgnoreCase(newVisibility)) {
+            if (oldIdentifier.equals(newIdentifier) && oldVisibility.equals(newVisibility)) {
                 isExist = readPkgVersion(oldContentModel.getLocalData()) >= readPkgVersion(newContentData);
             }
         } catch (Exception e) {
