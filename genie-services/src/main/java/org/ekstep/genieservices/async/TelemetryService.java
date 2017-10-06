@@ -1,7 +1,5 @@
 package org.ekstep.genieservices.async;
 
-import android.os.AsyncTask;
-
 import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.ITelemetryService;
 import org.ekstep.genieservices.commons.IResponseHandler;
