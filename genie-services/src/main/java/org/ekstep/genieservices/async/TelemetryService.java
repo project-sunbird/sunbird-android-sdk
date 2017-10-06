@@ -35,12 +35,12 @@ public class TelemetryService {
      * @param responseHandler - {@link IResponseHandler<Void>}
      */
     public void saveTelemetry(final String eventString, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
                 return telemetryService.saveTelemetry(eventString);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -55,12 +55,12 @@ public class TelemetryService {
      * @param responseHandler - {@link IResponseHandler<Void>}
      */
     public void saveTelemetry(final Telemetry event, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new IPerformable<Void>() {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
                 return telemetryService.saveTelemetry(event);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -71,12 +71,12 @@ public class TelemetryService {
      * @param responseHandler - {@link IResponseHandler<TelemetryStat>}
      */
     public void getTelemetryStat(IResponseHandler<TelemetryStat> responseHandler) {
-        new AsyncHandler<TelemetryStat>(responseHandler).execute(new IPerformable<TelemetryStat>() {
+        ThreadPool.getInstance().execute(new IPerformable<TelemetryStat>() {
             @Override
             public GenieResponse<TelemetryStat> perform() {
                 return telemetryService.getTelemetryStat();
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -91,12 +91,12 @@ public class TelemetryService {
      * @param responseHandler        - {@link IResponseHandler<Void>}
      */
     public void importTelemetry(final TelemetryImportRequest telemetryImportRequest, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
                 return telemetryService.importTelemetry(telemetryImportRequest);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -111,12 +111,12 @@ public class TelemetryService {
      * @param responseHandler        - {@link IResponseHandler<TelemetryExportResponse>}
      */
     public void exportTelemetry(final TelemetryExportRequest telemetryExportRequest, IResponseHandler<TelemetryExportResponse> responseHandler) {
-        new AsyncHandler<TelemetryExportResponse>(responseHandler).execute(new IPerformable<TelemetryExportResponse>() {
+        ThreadPool.getInstance().execute(new IPerformable<TelemetryExportResponse>() {
             @Override
             public GenieResponse<TelemetryExportResponse> perform() {
                 return telemetryService.exportTelemetry(telemetryExportRequest);
             }
-        });
+        }, responseHandler);
     }
 
 }
