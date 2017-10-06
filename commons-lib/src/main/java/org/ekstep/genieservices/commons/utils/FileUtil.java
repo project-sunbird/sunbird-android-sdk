@@ -313,7 +313,9 @@ public class FileUtil {
         String json = GsonUtil.toJson(manifestMap);
 
         outputStreamWriter.write(json);
+        outputStreamWriter.flush();
         outputStreamWriter.close();
+        fileOutputStream.flush();
         fileOutputStream.close();
     }
 
