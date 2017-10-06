@@ -28,12 +28,12 @@ public class AuthService {
      * @param responseHandler - {@link IResponseHandler<String>}
      */
     public void getMobileDeviceBearerToken(IResponseHandler<String> responseHandler) {
-        new AsyncHandler<String>(responseHandler).execute(new IPerformable<String>() {
+        ThreadPool.getInstance().execute(new IPerformable<String>() {
             @Override
             public GenieResponse<String> perform() {
                 return authService.getMobileDeviceBearerToken();
             }
-        });
+        }, responseHandler);
     }
 
 }

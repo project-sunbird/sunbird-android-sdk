@@ -31,12 +31,12 @@ public class TagService {
      * @param responseHandler - {@link IResponseHandler<Void>}
      */
     public void setTag(final Tag tag, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
                 return tagService.setTag(tag);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -47,12 +47,12 @@ public class TagService {
      * @param responseHandler - {@link IResponseHandler<List<Tag>>}
      */
     public void getTags(IResponseHandler<List<Tag>> responseHandler) {
-        new AsyncHandler<List<Tag>>(responseHandler).execute(new IPerformable<List<Tag>>() {
+        ThreadPool.getInstance().execute(new IPerformable<List<Tag>>() {
             @Override
             public GenieResponse<List<Tag>> perform() {
                 return tagService.getTags();
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -67,12 +67,12 @@ public class TagService {
      * @param responseHandler - {@link IResponseHandler<Void>}
      */
     public void deleteTag(final String name, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
                 return tagService.deleteTag(name);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -87,12 +87,12 @@ public class TagService {
      * @param responseHandler - {@link IResponseHandler<Void>}
      */
     public void updateTag(final Tag tag, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
                 return tagService.updateTag(tag);
             }
-        });
+        }, responseHandler);
     }
 
 }

@@ -35,12 +35,12 @@ public class ConfigService {
      * @param responseHandler - {@link IResponseHandler<List<MasterData>>}
      */
     public void getAllMasterData(IResponseHandler<List<MasterData>> responseHandler) {
-        new AsyncHandler<List<MasterData>>(responseHandler).execute(new IPerformable<List<MasterData>>() {
+        ThreadPool.getInstance().execute(new IPerformable<List<MasterData>>() {
             @Override
             public GenieResponse<List<MasterData>> perform() {
                 return configService.getAllMasterData();
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -58,12 +58,12 @@ public class ConfigService {
      * @param responseHandler - {@link IResponseHandler<MasterData>}
      */
     public void getMasterData(final MasterDataType type, IResponseHandler<MasterData> responseHandler) {
-        new AsyncHandler<MasterData>(responseHandler).execute(new IPerformable<MasterData>() {
+        ThreadPool.getInstance().execute(new IPerformable<MasterData>() {
             @Override
             public GenieResponse<MasterData> perform() {
                 return configService.getMasterData(type);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -81,12 +81,12 @@ public class ConfigService {
      * @param responseHandler - {@link IResponseHandler<Map<String, Object>>}
      */
     public void getResourceBundle(final String languageIdentifier, IResponseHandler<Map<String, Object>> responseHandler) {
-        new AsyncHandler<Map<String, Object>>(responseHandler).execute(new IPerformable<Map<String, Object>>() {
+        ThreadPool.getInstance().execute(new IPerformable<Map<String, Object>>() {
             @Override
             public GenieResponse<Map<String, Object>> perform() {
                 return configService.getResourceBundle(languageIdentifier);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -102,11 +102,11 @@ public class ConfigService {
      * @param responseHandler - {@link IResponseHandler<Map<String, Object>>}
      */
     public void getOrdinals(IResponseHandler<Map<String, Object>> responseHandler) {
-        new AsyncHandler<Map<String, Object>>(responseHandler).execute(new IPerformable<Map<String, Object>>() {
+        ThreadPool.getInstance().execute(new IPerformable<Map<String, Object>>() {
             @Override
             public GenieResponse<Map<String, Object>> perform() {
                 return configService.getOrdinals();
             }
-        });
+        }, responseHandler);
     }
 }

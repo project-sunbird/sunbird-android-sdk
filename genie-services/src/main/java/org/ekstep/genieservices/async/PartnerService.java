@@ -32,12 +32,12 @@ public class PartnerService {
      * @param responseHandler
      */
     public void registerPartner(final PartnerData partnerData, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
                 return partnerService.registerPartner(partnerData);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -50,12 +50,12 @@ public class PartnerService {
      * @param responseHandler
      */
     public void isRegistered(final String partnerID, IResponseHandler<Boolean> responseHandler) {
-        new AsyncHandler<Boolean>(responseHandler).execute(new IPerformable<Boolean>() {
+        ThreadPool.getInstance().execute(new IPerformable<Boolean>() {
             @Override
             public GenieResponse<Boolean> perform() {
                 return partnerService.isRegistered(partnerID);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -71,12 +71,12 @@ public class PartnerService {
      * @param responseHandler
      */
     public void startPartnerSession(final PartnerData partnerData, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
                 return partnerService.startPartnerSession(partnerData);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -92,12 +92,12 @@ public class PartnerService {
      * @param responseHandler
      */
     public void terminatePartnerSession(final PartnerData partnerData, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
                 return partnerService.terminatePartnerSession(partnerData);
             }
-        });
+        }, responseHandler);
     }
 
     /**
@@ -113,12 +113,12 @@ public class PartnerService {
      * @param responseHandler
      */
     public void sendData(final PartnerData partnerData, IResponseHandler<String> responseHandler) {
-        new AsyncHandler<String>(responseHandler).execute(new IPerformable<String>() {
+        ThreadPool.getInstance().execute(new IPerformable<String>() {
             @Override
             public GenieResponse<String> perform() {
                 return partnerService.sendData(partnerData);
             }
-        });
+        }, responseHandler);
     }
 
 }
