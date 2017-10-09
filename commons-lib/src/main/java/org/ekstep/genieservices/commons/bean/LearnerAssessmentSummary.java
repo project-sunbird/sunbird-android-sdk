@@ -12,6 +12,7 @@ public class LearnerAssessmentSummary implements Serializable {
     private int noOfQuestions;
     private int correctAnswers;
     private Double totalTimespent;
+    private String hierarchyData;
 
     public String getUid() {
         return uid;
@@ -51,5 +52,13 @@ public class LearnerAssessmentSummary implements Serializable {
 
     public void setTotalTimespent(Double totalTimespent) {
         this.totalTimespent = totalTimespent;
+    }
+
+    public String getHierarchyData() {
+        return hierarchyData;
+    }
+
+    public void setHierarchyData(String hierarchyData) {
+        this.hierarchyData = hierarchyData;
     }
 }

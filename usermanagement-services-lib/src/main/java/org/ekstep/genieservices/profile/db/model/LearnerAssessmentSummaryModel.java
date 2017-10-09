@@ -22,6 +22,7 @@ public class LearnerAssessmentSummaryModel implements IReadable {
     private Integer noOfQuestions;
     private Integer correctAnswers;
     private Double totalTimespent;
+    private String hierarchyData;
     private List<LearnerAssessmentSummary> assessmentMap;
 
     private LearnerAssessmentSummaryModel(IDBSession dbSession) {
@@ -43,11 +44,11 @@ public class LearnerAssessmentSummaryModel implements IReadable {
     }
 
     private static String getChildProgressQuery(String uid) {
-        return "select uid, content_id, count(qid), sum(correct), sum(time_spent) from " + LearnerAssessmentsEntry.TABLE_NAME + " where uid = '" + uid + "' group by content_id ";
+        return "select uid, content_id, count(qid), sum(correct), sum(time_spent), h_data from " + LearnerAssessmentsEntry.TABLE_NAME + " where uid = '" + uid + "' group by content_id ";
     }
 
     private static String getContentProgressQuery(String contentId) {
-        return "select uid, content_id, count(qid), sum(correct), sum(time_spent) from " + LearnerAssessmentsEntry.TABLE_NAME + " where content_id = '" + contentId + "' group by uid";
+        return "select uid, content_id, count(qid), sum(correct), sum(time_spent), h_data from " + LearnerAssessmentsEntry.TABLE_NAME + " where content_id = '" + contentId + "' group by uid";
     }
 
     @Override
@@ -77,6 +78,10 @@ public class LearnerAssessmentSummaryModel implements IReadable {
 
         this.totalTimespent = cursor.getDouble(4);
         learnerAssessmentSummary.setTotalTimespent(this.totalTimespent);
+
+        this.hierarchyData = cursor.getString(5);
+        learnerAssessmentSummary.setHierarchyData(this.hierarchyData);
+
 
         return learnerAssessmentSummary;
     }
