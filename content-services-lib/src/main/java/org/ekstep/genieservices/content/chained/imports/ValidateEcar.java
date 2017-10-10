@@ -68,7 +68,6 @@ public class ValidateEcar implements IChainable<List<ContentImportResponse>, Imp
         for (Map<String, Object> item : items) {
             String identifier = ContentHandler.readIdentifier(item);
             String visibility = ContentHandler.readVisibility(item);
-            boolean isDraftContent = ContentHandler.isDraftContent(ContentHandler.readStatus(item));
 
             // If compatibility level is not in range then do not copy artifact
             if (ContentConstants.Visibility.DEFAULT.equals(visibility)
@@ -77,6 +76,7 @@ public class ValidateEcar implements IChainable<List<ContentImportResponse>, Imp
                 continue;
             }
 
+            boolean isDraftContent = ContentHandler.isDraftContent(ContentHandler.readStatus(item));
             //Draft content expiry .To prevent import of draft content if the expires date is lesser than from the current date.
             if (isDraftContent && ContentHandler.isExpired(ContentHandler.readExpiryDate(item))) {
                 skipContent(importContext, identifier, visibility, ContentImportStatus.CONTENT_EXPIRED);
@@ -89,7 +89,7 @@ public class ValidateEcar implements IChainable<List<ContentImportResponse>, Imp
             // To check whether the file is already imported or not
             if (!StringUtil.isNullOrEmpty(oldContentPath)     // Check if path of old content is not empty.
                     && ContentConstants.Visibility.DEFAULT.equals(visibility) // If visibility is Parent then this content must go through ExtractPayloads
-                    && !isDuplicateCheckRequired(isDraftContent, ContentHandler.readPkgVersion(item))     // Check if its draft and pkgVersion is 0.
+                    && !ContentHandler.isDuplicateCheckRequired(isDraftContent, ContentHandler.readPkgVersion(item))     // Check if its draft and pkgVersion is 0.
                     && ContentHandler.isImportFileExist(oldContentModel, item)   // Check whether the file is already imported or not.
                     ) {
                 skipContent(importContext, identifier, visibility, ContentImportStatus.ALREADY_EXIST);
@@ -120,13 +120,6 @@ public class ValidateEcar implements IChainable<List<ContentImportResponse>, Imp
             importContext.getContentImportResponseList().add(new ContentImportResponse(identifier, contentImportStatus));
         }
         importContext.getSkippedItemsIdentifier().add(identifier);
-    }
-
-    /**
-     * If status is DRAFT and pkgVersion == 0 then don't do the duplicate check..
-     */
-    private boolean isDuplicateCheckRequired(boolean isDraftContent, Double pkgVersion) {
-        return (isDraftContent && pkgVersion == 0);
     }
 
     private GenieResponse<List<ContentImportResponse>> getErrorResponse(String error, String errorMessage) {

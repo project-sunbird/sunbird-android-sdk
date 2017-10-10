@@ -20,7 +20,7 @@ public class ContentSearchCriteria implements Serializable {
     private int grade;
     private String medium;
     private String board;
-    private String createdBy;
+    private String[] createdBy;
     private String[] audience;
     private String[] channel;
     private String[] contentStatusArray;
@@ -32,7 +32,7 @@ public class ContentSearchCriteria implements Serializable {
     // 1 - indicates search, 2 - filter
     private SearchType searchType;
 
-    private ContentSearchCriteria(String query, long limit, String mode, int age, int grade, String medium, String board, String createdBy,
+    private ContentSearchCriteria(String query, long limit, String mode, int age, int grade, String medium, String board, String[] createdBy,
                                   String[] audience, String[] channel, String[] contentStatusArray, String[] facets, String[] contentTypes,
                                   List<ContentSortCriteria> sortCriteria, SearchType searchType) {
         this.query = query;
@@ -86,7 +86,7 @@ public class ContentSearchCriteria implements Serializable {
         return board;
     }
 
-    public String getCreatedBy() {
+    public String[] getCreatedBy() {
         return createdBy;
     }
 
@@ -143,7 +143,7 @@ public class ContentSearchCriteria implements Serializable {
         private int grade;
         private String medium;
         private String board;
-        private String createdBy;
+        private String[] createdBy;
         private String[] audience;
         private String[] channel;
         private String[] contentStatusArray;
@@ -220,7 +220,7 @@ public class ContentSearchCriteria implements Serializable {
         /**
          * Created by.
          */
-        public SearchBuilder createdBy(String createdBy) {
+        public SearchBuilder createdBy(String[] createdBy) {
             this.createdBy = createdBy;
             return this;
         }

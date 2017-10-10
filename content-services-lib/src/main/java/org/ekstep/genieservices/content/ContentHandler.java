@@ -756,6 +756,13 @@ public class ContentHandler {
     }
 
     /**
+     * If status is DRAFT and pkgVersion == 0 then don't do the duplicate check..
+     */
+    public static boolean isDuplicateCheckRequired(boolean isDraftContent, Double pkgVersion) {
+        return isDraftContent && pkgVersion == 0;
+    }
+
+    /**
      * To Check whether the content is exist or not.
      *
      * @param oldContent    Old ContentModel
@@ -980,8 +987,8 @@ public class ContentHandler {
         filterMap.put("contentType", Arrays.asList(criteria.getContentTypes()));
 
         // Add createdBy filter
-        if (!StringUtil.isNullOrEmpty(criteria.getCreatedBy())) {
-            filterMap.put("createdBy", criteria.getCreatedBy());
+        if (!CollectionUtil.hasEmptyData(criteria.getCreatedBy())) {
+            filterMap.put("createdBy", Arrays.asList(criteria.getCreatedBy()));
         }
 
         //Add filters for criteria attributes
