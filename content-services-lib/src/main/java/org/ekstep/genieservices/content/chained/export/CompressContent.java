@@ -47,7 +47,7 @@ public class CompressContent implements IChainable<ContentExportResponse, Export
             Map contentData = GsonUtil.fromJson(contentModel.getLocalData(), Map.class);
 
             if (!ContentHandler.isAvailableLocally(contentModel.getContentState())
-                    && ContentHandler.isOnlineContent(contentData)) {
+                    || ContentHandler.isOnlineContent(contentData)) {
                 continue;
             }
 
