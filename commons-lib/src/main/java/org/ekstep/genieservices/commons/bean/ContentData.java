@@ -30,6 +30,7 @@ public class ContentData implements Serializable {
     private List<String> gradeLevel;
     private String osId;
     private String contentType;
+    private String resourceType;
     private String artifactMimeType;
     private String versionKey;
     private String contentEncoding;
@@ -123,6 +124,10 @@ public class ContentData implements Serializable {
 
     public String getContentType() {
         return contentType;
+    }
+
+    public String getResourceType() {
+        return resourceType;
     }
 
     public String getArtifactMimeType() {

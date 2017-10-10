@@ -255,7 +255,7 @@ public class ContentSearchCriteria implements Serializable {
         }
 
         /**
-         * Array of contentTypes. i.e. "Story", "Worksheet", "Game", "Collection", "TextBook", "Course", "LessonPlan".
+         * Array of contentTypes. i.e. "Story", "Worksheet", "Game", "Collection", "TextBook", "Resource", "Course", "LessonPlan".
          */
         public SearchBuilder contentTypes(String[] contentTypes) {
             this.contentTypes = contentTypes;
@@ -272,7 +272,7 @@ public class ContentSearchCriteria implements Serializable {
             }
 
             if (contentTypes == null || contentTypes.length == 0) {
-                this.contentTypes = new String[]{"Story", "Worksheet", "Collection", "Game", "TextBook"};
+                this.contentTypes = new String[]{"Story", "Worksheet", "Game", "Collection", "TextBook", "Resource"};
             }
 
             return new ContentSearchCriteria(query, limit, mode, age, grade, medium, board, createdBy,
@@ -316,7 +316,7 @@ public class ContentSearchCriteria implements Serializable {
         }
 
         /**
-         * Array of contentTypes. i.e. "Story", "Worksheet", "Game", "Collection", "TextBook", "Course", "LessonPlan".
+         * Array of contentTypes. i.e. "Story", "Worksheet", "Game", "Collection", "TextBook", "Resource", "Course", "LessonPlan".
          */
         public FilterBuilder contentTypes(String[] contentTypes) {
             this.contentTypes = contentTypes;
@@ -349,7 +349,7 @@ public class ContentSearchCriteria implements Serializable {
             }
 
             if (contentTypes == null || contentTypes.length == 0) {
-                this.contentTypes = new String[]{"Story", "Worksheet", "Collection", "Game", "TextBook"};
+                this.contentTypes = new String[]{"Story", "Worksheet", "Game", "Collection", "TextBook", "Resource"};
             }
 
             return new ContentSearchCriteria(query, limit, mode, facets, contentTypes, facetFilters, impliedFilters, sortCriteria, SearchType.FILTER);

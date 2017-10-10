@@ -113,7 +113,7 @@ public class ContentFilterCriteria {
 
         public ContentFilterCriteria build() {
             if (contentTypes == null || contentTypes.length == 0) {
-                contentTypes = new String[]{"Story", "Worksheet", "Collection", "Game", "TextBook"};
+                contentTypes = new String[]{"Story", "Worksheet", "Game", "Collection", "TextBook", "Resource"};
             }
             if (CollectionUtil.isNullOrEmpty(sortCriteria)) {
                 sortCriteria = new ArrayList<>();

@@ -171,6 +171,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
 
         if (telemetry.getCdata() != null) {
             for (CorrelationData eachCdataValue : telemetry.getCdata()) {
+                // TODO: 10/10/2017 - Relook following check, it should be mymeType check instead of specific contentType check
                 if (eachCdataValue.getType().equalsIgnoreCase("Collection") || eachCdataValue.getType().equalsIgnoreCase("TextBook")) {
                     learnerContentSummaryDetails.setHierarchyData(eachCdataValue.getId());
                     break;
@@ -205,6 +206,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
 
         if (telemetry.getCdata() != null) {
             for (CorrelationData eachCdataValue : telemetry.getCdata()) {
+                // TODO: 10/10/2017 - Relook following check, it should be mymeType check instead of specific contentType check
                 if (eachCdataValue.getType().equalsIgnoreCase("Collection") || eachCdataValue.getType().equalsIgnoreCase("TextBook")) {
                     learnerAssessmentDetails.setHierarchyData(eachCdataValue.getId());
                     break;
