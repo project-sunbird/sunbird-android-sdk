@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import org.ekstep.genieservices.IConfigService;
 import org.ekstep.genieservices.IContentFeedbackService;
 import org.ekstep.genieservices.IUserService;
+import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.bean.Content;
@@ -601,7 +602,7 @@ public class ContentHandler {
         return contentModelListInDB;
     }
 
-    public static void deleteOrUpdateContent(ContentModel contentModel, boolean isChildItems, boolean isChildContent) {
+    public static void deleteOrUpdateContent(AppContext appContext, ContentModel contentModel, boolean isChildItems, boolean isChildContent) {
         int refCount = contentModel.getRefCount();
         int contentState;
         String visibility = contentModel.getVisibility();
@@ -651,6 +652,15 @@ public class ContentHandler {
         if (contentModel.getPath() != null) {
             if (contentState == ContentConstants.State.ONLY_SPINE) {
                 FileUtil.rm(new File(contentModel.getPath()), contentModel.getIdentifier());
+
+                String contentRootPath = StringUtil.getFirstPartOfThePathNameOnLastDelimiter(contentModel.getPath());
+
+                //store the folder's last modified time
+                File contentRootFolder = FileUtil.getContentRootDir(new File(contentRootPath));
+
+                if (FileUtil.doesFileExists(contentRootFolder.getPath())) {
+                    appContext.getKeyValueStore().putLong(ServiceConstants.PreferenceKey.KEY_LAST_MODIFIED, contentRootFolder.lastModified());
+                }
             }
 
             contentModel.setVisibility(visibility);
@@ -668,7 +678,7 @@ public class ContentHandler {
 
         if (contentModelListInDB != null) {
             for (ContentModel c : contentModelListInDB) {
-                deleteOrUpdateContent(c, true, isChildContent);
+                deleteOrUpdateContent(appContext, c, true, isChildContent);
             }
         }
     }
@@ -692,7 +702,7 @@ public class ContentHandler {
 
             // Deleting only child content
             if (!contentModel.getIdentifier().equalsIgnoreCase(node.getIdentifier())) {
-                deleteOrUpdateContent(node, true, isChildContent);
+                deleteOrUpdateContent(appContext, node, true, isChildContent);
             }
         }
     }
@@ -710,7 +720,7 @@ public class ContentHandler {
     }
 
     public static List<ContentModel> findAllContent(IDBSession dbSession) {
-        String contentStateFilter = String.format(Locale.US, "%s != '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.SEEN_BUT_NOT_AVAILABLE);
+        String contentStateFilter = String.format(Locale.US, "%s > '0'", ContentEntry.COLUMN_NAME_REF_COUNT);
 
         String filter = String.format(Locale.US, " where %s", contentStateFilter);
 

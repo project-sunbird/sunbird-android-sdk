@@ -5,6 +5,7 @@ import org.ekstep.genieservices.commons.db.contract.ContentEntry;
 import org.ekstep.genieservices.commons.db.contract.NoSqlEntry;
 import org.ekstep.genieservices.commons.db.migration.Migration;
 import org.ekstep.genieservices.commons.utils.FileUtil;
+import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.ContentHandler;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.db.model.ContentsModel;
@@ -13,7 +14,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 public class _10_StorageManagementMigration extends Migration {
 
@@ -43,7 +43,7 @@ public class _10_StorageManagementMigration extends Migration {
                 String path = contentModel.getPath();
 
                 if (!path.endsWith(contentModel.getIdentifier())) {
-                    String contentRootPath = getFirstPartOfThePathName(path);
+                    String contentRootPath = StringUtil.getFirstPartOfThePathNameOnLastDelimiter(path);
 
                     if (contentRootPath != null) {
                         StringBuilder stringBuilder = new StringBuilder(contentRootPath);
@@ -86,21 +86,4 @@ public class _10_StorageManagementMigration extends Migration {
 
         return oldPath.renameTo(newPath);
     }
-
-    /**
-     * This method gets you the first part of the string that is divided after last index of "/"
-     *
-     * @param contentFolderName
-     * @return
-     */
-    private String getFirstPartOfThePathName(String contentFolderName) {
-        int lastIndexOfDelimiter = contentFolderName.lastIndexOf("/");
-
-        if (lastIndexOfDelimiter > 0 && lastIndexOfDelimiter < contentFolderName.length()) {
-            return contentFolderName.substring(0, lastIndexOfDelimiter);
-        }
-
-        return null;
-    }
-
 }

@@ -56,4 +56,20 @@ public class StringUtil {
         }
         return sb.toString();
     }
+
+    /**
+     * This method gets you the first part of the string that is divided after last index of "/"
+     *
+     * @param contentFolderName
+     * @return
+     */
+    public static String getFirstPartOfThePathNameOnLastDelimiter(String contentFolderName) {
+        int lastIndexOfDelimiter = contentFolderName.lastIndexOf("/");
+
+        if (lastIndexOfDelimiter > 0 && lastIndexOfDelimiter < contentFolderName.length()) {
+            return contentFolderName.substring(0, lastIndexOfDelimiter);
+        }
+
+        return null;
+    }
 }

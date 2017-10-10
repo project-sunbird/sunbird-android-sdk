@@ -63,6 +63,9 @@ public interface ServiceConstants {
 
         //Download
         String KEY_DOWNLOAD_STATUS = "download_status";
+
+        //Scan Storage
+        String KEY_LAST_MODIFIED = "last_modified";
     }
 
     interface Partner {

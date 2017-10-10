@@ -12,6 +12,7 @@ import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.ScanStorageRequest;
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentData;
@@ -38,10 +39,12 @@ import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
+import org.ekstep.genieservices.commons.bean.ScanStorageResponse;
 import org.ekstep.genieservices.commons.bean.enums.ContentDeleteStatus;
 import org.ekstep.genieservices.commons.bean.enums.ContentImportStatus;
 import org.ekstep.genieservices.commons.bean.enums.DownloadAction;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
+import org.ekstep.genieservices.commons.bean.enums.ScanStorageStatus;
 import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
@@ -87,7 +90,9 @@ import org.ekstep.genieservices.telemetry.TelemetryLogger;
 import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -272,7 +277,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 }
 
                 //delete or update root item
-                ContentHandler.deleteOrUpdateContent(contentModel, false, contentDelete.isChildContent());
+                ContentHandler.deleteOrUpdateContent(mAppContext, contentModel, false, contentDelete.isChildContent());
+
             }
         }
 
@@ -622,6 +628,13 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
 
                 EventBus.postEvent(new ContentImportResponse(identifier, ContentImportStatus.IMPORT_COMPLETED));
+
+                //store the folder's last modified time
+                File contentRootFolder = FileUtil.getContentRootDir(new File(importContentContext.getDestinationFolder()));
+
+                if (FileUtil.doesFileExists(contentRootFolder.getPath())) {
+                    mAppContext.getKeyValueStore().putLong(ServiceConstants.PreferenceKey.KEY_LAST_MODIFIED, contentRootFolder.lastModified());
+                }
             }
 
             return response;
@@ -858,4 +871,84 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         return validateDestinationFolder.execute(mAppContext, moveContentContext);
     }
 
+    @Override
+    public GenieResponse<List<ScanStorageResponse>> scanStorage(ScanStorageRequest scanStorageRequest) {
+        List<ScanStorageResponse> scannedIdentifiersList = new ArrayList<>();
+        List<String> deletedContents = null;
+        List<String> addedContents = null;
+
+        //get the last modified time from preference
+        long storedLastModifiedTime = mAppContext.getKeyValueStore().getLong(ServiceConstants.PreferenceKey.KEY_LAST_MODIFIED, 0);
+
+        //check if folder exists
+        if (FileUtil.doesFileExists(scanStorageRequest.getStorageFilePath())) {
+            File storageFolder = FileUtil.getContentRootDir(new File(scanStorageRequest.getStorageFilePath()));
+
+            //get last modified time of the folder
+            long folderLastModifiedTime = storageFolder.lastModified();
+
+            if (storedLastModifiedTime != folderLastModifiedTime) {
+                List<String> foldersList = new ArrayList<>();
+
+                //get all the identifiers from the folder
+                String[] folders = storageFolder.list();
+
+                if (folders != null && folders.length > 0) {
+                    foldersList = Arrays.asList(folders);
+                }
+
+                //get all the identifiers from the db
+                List<ContentModel> contentModelList = ContentHandler.findAllContent(mAppContext.getDBSession());
+
+                //fetch all identifiers fron the content model list
+                List<String> contentIdentifiers = new ArrayList<>();
+                if (contentModelList != null && contentModelList.size() > 0) {
+                    for (ContentModel contentModel : contentModelList) {
+                        contentIdentifiers.add(contentModel.getIdentifier());
+                    }
+                }
+
+                if (foldersList.size() > 0 && contentIdentifiers.size() > 0 && !foldersList.containsAll(contentIdentifiers)) {
+                    //deleted contents - if the identifier is present in db-list and not in folder-list
+                    deletedContents = getDeletedContents(foldersList, contentIdentifiers);
+
+                    //newly added contents - if the identifier is present in folder-list and not in the db-list
+                    addedContents = getNewlyAddedContents(foldersList, contentIdentifiers);
+                }
+            }
+        }
+
+        if (deletedContents != null && deletedContents.size() > 0) {
+            for (String deletedContent : deletedContents) {
+                scannedIdentifiersList.add(new ScanStorageResponse(deletedContent, ScanStorageStatus.DELETED));
+            }
+        }
+
+        if (addedContents != null && addedContents.size() > 0) {
+            for (String addedContent : addedContents) {
+                scannedIdentifiersList.add(new ScanStorageResponse(addedContent, ScanStorageStatus.ADDED));
+            }
+        }
+
+        GenieResponse<List<ScanStorageResponse>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        response.setResult(scannedIdentifiersList);
+
+        return response;
+    }
+
+    private ArrayList<String> getNewlyAddedContents(List<String> foldersList, List<String> contentIdentifiers) {
+        Set<String> dbContents = new HashSet<>(contentIdentifiers);
+        Set<String> folderContents = new HashSet<>(foldersList);
+        folderContents.removeAll(dbContents);
+
+        return new ArrayList<>(folderContents);
+    }
+
+    private ArrayList<String> getDeletedContents(List<String> foldersList, List<String> contentIdentifiers) {
+        Set<String> dbContents = new HashSet<>(contentIdentifiers);
+        Set<String> folderContents = new HashSet<>(foldersList);
+        dbContents.removeAll(folderContents);
+
+        return new ArrayList<>(dbContents);
+    }
 }

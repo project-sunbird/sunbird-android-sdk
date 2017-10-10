@@ -4,6 +4,7 @@ import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.IContentFeedbackService;
 import org.ekstep.genieservices.IContentService;
 import org.ekstep.genieservices.commons.IResponseHandler;
+import org.ekstep.genieservices.commons.ScanStorageRequest;
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
@@ -29,6 +30,7 @@ import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
+import org.ekstep.genieservices.commons.bean.ScanStorageResponse;
 import org.ekstep.genieservices.commons.bean.enums.DownloadAction;
 
 import java.util.List;
@@ -457,5 +459,25 @@ public class ContentService {
             }
         });
     }
+
+    /**
+     * This api is used to get the last modified time of the folder in the path passed to the api and then cross check it against
+     * the stored last modified, and if their is a difference, then show the differences.
+     * <p>
+     * <p>
+     * Response will be the list of {@link ScanStorageResponse} which contains added, deleted and updated contents
+     *
+     * @param scanStorageRequest
+     * @param responseHandler
+     */
+    public void scanStorage(final ScanStorageRequest scanStorageRequest, IResponseHandler<List<ScanStorageResponse>> responseHandler) {
+        new AsyncHandler<List<ScanStorageResponse>>(responseHandler).execute(new IPerformable<List<ScanStorageResponse>>() {
+            @Override
+            public GenieResponse<List<ScanStorageResponse>> perform() {
+                return contentService.scanStorage(scanStorageRequest);
+            }
+        });
+    }
+
 
 }
