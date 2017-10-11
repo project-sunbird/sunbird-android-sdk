@@ -12,7 +12,6 @@ import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
-import org.ekstep.genieservices.commons.ScanStorageRequest;
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentData;
@@ -39,6 +38,7 @@ import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
+import org.ekstep.genieservices.commons.bean.ScanStorageRequest;
 import org.ekstep.genieservices.commons.bean.ScanStorageResponse;
 import org.ekstep.genieservices.commons.bean.enums.ContentDeleteStatus;
 import org.ekstep.genieservices.commons.bean.enums.ContentImportStatus;
@@ -873,6 +873,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
     @Override
     public GenieResponse<List<ScanStorageResponse>> scanStorage(ScanStorageRequest scanStorageRequest) {
+        File storageFolder = null;
         List<ScanStorageResponse> scannedIdentifiersList = new ArrayList<>();
         List<String> deletedContents = null;
         List<String> addedContents = null;
@@ -882,7 +883,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         //check if folder exists
         if (FileUtil.doesFileExists(scanStorageRequest.getStorageFilePath())) {
-            File storageFolder = FileUtil.getContentRootDir(new File(scanStorageRequest.getStorageFilePath()));
+            storageFolder = FileUtil.getContentRootDir(new File(scanStorageRequest.getStorageFilePath()));
 
             //get last modified time of the folder
             long folderLastModifiedTime = storageFolder.lastModified();
@@ -930,13 +931,84 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             }
         }
 
+        if (scannedIdentifiersList.size() > 0) {
+            performActionOnContents(scannedIdentifiersList);
+
+            if (storageFolder != null) {
+                mAppContext.getKeyValueStore().putLong(ServiceConstants.PreferenceKey.KEY_LAST_MODIFIED, storageFolder.lastModified());
+            }
+        }
+
         GenieResponse<List<ScanStorageResponse>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(scannedIdentifiersList);
 
         return response;
     }
 
-    private ArrayList<String> getNewlyAddedContents(List<String> foldersList, List<String> contentIdentifiers) {
+    /**
+     * This method performs necessary action on that particular content based on the scan status of the content.
+     *
+     * @param scannedIdentifiersList
+     */
+    private void performActionOnContents(List<ScanStorageResponse> scannedIdentifiersList) {
+        List<String> deletedIdsList = new ArrayList<>();
+        List<String> addedIdsList = new ArrayList<>();
+        List<String> updateIdsList = new ArrayList<>();
+
+        if (scannedIdentifiersList != null && scannedIdentifiersList.size() > 0) {
+            for (ScanStorageResponse scannedContent : scannedIdentifiersList) {
+                if (scannedContent.getStatus().equals(ScanStorageStatus.DELETED)) {
+                    deletedIdsList.add(scannedContent.getIdentifier());
+                } else if (scannedContent.getStatus().equals(ScanStorageStatus.ADDED)) {
+                    addedIdsList.add(scannedContent.getIdentifier());
+                } else if (scannedContent.getStatus().equals(ScanStorageStatus.UPDATED)) {
+                    updateIdsList.add(scannedContent.getIdentifier());
+                }
+            }
+        }
+
+        if (deletedIdsList.size() > 0) {
+            deleteContentsFromDb(deletedIdsList);
+        }
+
+    }
+
+    /**
+     * This method deletes all the contents that were manually deleted from the memory and reflects the same in the db
+     *
+     * @param deletedIdsList
+     */
+    private void deleteContentsFromDb(List<String> deletedIdsList) {
+        List<ContentModel> deletedIdsContentModels = new ArrayList<>();
+
+        if (deletedIdsList != null && deletedIdsList.size() > 0) {
+            deletedIdsContentModels = ContentHandler.findAllContentsWithIdentifiers(mAppContext.getDBSession(), deletedIdsList);
+
+            if (deletedIdsContentModels.size() > 0) {
+                for (ContentModel contentModel : deletedIdsContentModels) {
+                    //update the content state to spine
+                    if (ContentConstants.MimeType.COLLECTION.equals(contentModel.getMimeType()) && contentModel.getRefCount() > 1) {
+                        contentModel.addOrUpdateContentState(ContentConstants.State.ARTIFACT_AVAILABLE);
+                    } else {
+                        contentModel.addOrUpdateContentState(ContentConstants.State.ONLY_SPINE);
+                    }
+
+                    //check the ref-count and update the value
+                    if (contentModel.getVisibility().equalsIgnoreCase(ContentConstants.Visibility.DEFAULT) &&
+                            contentModel.getRefCount() > 0) {
+                        contentModel.addOrUpdateRefCount(contentModel.getRefCount() - 1);
+                    }
+
+                    contentModel.setVisibility(ContentConstants.Visibility.PARENT);
+
+                    contentModel.update();
+                }
+            }
+
+        }
+    }
+
+    private List<String> getNewlyAddedContents(List<String> foldersList, List<String> contentIdentifiers) {
         Set<String> dbContents = new HashSet<>(contentIdentifiers);
         Set<String> folderContents = new HashSet<>(foldersList);
         folderContents.removeAll(dbContents);
@@ -944,7 +1016,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         return new ArrayList<>(folderContents);
     }
 
-    private ArrayList<String> getDeletedContents(List<String> foldersList, List<String> contentIdentifiers) {
+    private List<String> getDeletedContents(List<String> foldersList, List<String> contentIdentifiers) {
         Set<String> dbContents = new HashSet<>(contentIdentifiers);
         Set<String> folderContents = new HashSet<>(foldersList);
         dbContents.removeAll(folderContents);

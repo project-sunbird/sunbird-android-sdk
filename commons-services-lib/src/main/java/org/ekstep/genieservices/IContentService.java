@@ -1,6 +1,6 @@
 package org.ekstep.genieservices;
 
-import org.ekstep.genieservices.commons.ScanStorageRequest;
+import org.ekstep.genieservices.commons.bean.ScanStorageRequest;
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
@@ -25,7 +25,6 @@ import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.ScanStorageResponse;
 import org.ekstep.genieservices.commons.bean.enums.DownloadAction;
-import org.ekstep.genieservices.commons.bean.enums.ScanStorageStatus;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.commons;
+package org.ekstep.genieservices.commons.bean;
 
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
@@ -11,7 +11,7 @@ public class ScanStorageRequest {
 
     private String storageFilePath;
 
-    public ScanStorageRequest(String storageFilePath) {
+    private ScanStorageRequest(String storageFilePath) {
         this.storageFilePath = storageFilePath;
     }
 

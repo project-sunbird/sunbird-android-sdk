@@ -656,10 +656,12 @@ public class ContentHandler {
                 String contentRootPath = StringUtil.getFirstPartOfThePathNameOnLastDelimiter(contentModel.getPath());
 
                 //store the folder's last modified time
-                File contentRootFolder = FileUtil.getContentRootDir(new File(contentRootPath));
+                if(!StringUtil.isNullOrEmpty(contentRootPath)) {
+                    File contentRootFolder = new File(contentRootPath);
 
-                if (FileUtil.doesFileExists(contentRootFolder.getPath())) {
-                    appContext.getKeyValueStore().putLong(ServiceConstants.PreferenceKey.KEY_LAST_MODIFIED, contentRootFolder.lastModified());
+                    if (FileUtil.doesFileExists(contentRootFolder.getPath())) {
+                        appContext.getKeyValueStore().putLong(ServiceConstants.PreferenceKey.KEY_LAST_MODIFIED, contentRootFolder.lastModified());
+                    }
                 }
             }
 
