@@ -832,7 +832,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         params.put("logLevel", "2");
         String methodName = "setDownloadAction@ContentServiceImpl";
         mAppContext.getKeyValueStore().putInt(ServiceConstants.PreferenceKey.KEY_DOWNLOAD_STATUS, action.getValue());
-        if (action.getValue() == 1) {
+        if (action.getValue() == 0) {
             downloadService.resumeDownloads();
         }
         GenieResponse<Void> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
