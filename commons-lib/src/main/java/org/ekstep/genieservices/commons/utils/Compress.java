@@ -56,12 +56,12 @@ public class Compress {
         if (fileList != null) {
             for (File file : fileList) {
                 //skip manifest.json file from exploded sdcard content
-                if (!CollectionUtil.isNullOrEmpty(skippDirectoriesName)) {
-                    skippDirectoriesName.contains(file.getName());
+                if (!CollectionUtil.isNullOrEmpty(skippDirectoriesName)
+                        && skippDirectoriesName.contains(file.getName())) {
                     continue;
                 }
-                if (!CollectionUtil.isNullOrEmpty(skippFilesName)) {
-                    skippFilesName.contains(file.getName());
+                if (!CollectionUtil.isNullOrEmpty(skippFilesName)
+                        && skippFilesName.contains(file.getName())) {
                     continue;
                 }
 
