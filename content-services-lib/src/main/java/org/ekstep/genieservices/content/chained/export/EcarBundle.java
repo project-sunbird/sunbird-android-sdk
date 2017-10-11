@@ -30,7 +30,7 @@ public class EcarBundle implements IChainable<ContentExportResponse, ExportConte
         File destination = exportContext.getEcarFile();
 
         try {
-            Compress.zip(source, destination);
+            Compress.zip(source, destination, null, null);
             exportContext.getMetadata().put(ServiceConstants.FILE_SIZE, destination.length());
         } catch (IOException e) {
             e.printStackTrace();

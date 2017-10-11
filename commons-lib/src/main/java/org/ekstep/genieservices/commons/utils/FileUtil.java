@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 public class FileUtil {
 
     public static final String CONTENT_FOLDER = "/content";
+    public static final String MANIFEST_FILE_NAME = "manifest.json";
 
     public static String readFileFromClasspath(String filename) {
         String result = "";
@@ -292,7 +293,7 @@ public class FileUtil {
     public static String readManifest(File tmpLocation) {
         String json = null;
         try {
-            File manifest = new File(tmpLocation.getPath(), "/manifest.json");
+            File manifest = new File(tmpLocation.getPath(), "/" + MANIFEST_FILE_NAME);
             InputStream is = new FileInputStream(manifest);
             int size = is.available();
             byte[] buffer = new byte[size];
@@ -306,7 +307,7 @@ public class FileUtil {
     }
 
     public static void writeManifest(File manifestPath, Map<String, Object> manifestMap) throws IOException {
-        File manifestFile = new File(manifestPath, "manifest.json");
+        File manifestFile = new File(manifestPath, MANIFEST_FILE_NAME);
         FileOutputStream fileOutputStream = new FileOutputStream(manifestFile);
         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
 

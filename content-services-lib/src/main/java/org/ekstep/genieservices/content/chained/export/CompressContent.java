@@ -7,6 +7,7 @@ import org.ekstep.genieservices.commons.bean.ContentExportResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.Compress;
+import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.ContentHandler;
@@ -15,6 +16,8 @@ import org.ekstep.genieservices.content.db.model.ContentModel;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -61,7 +64,13 @@ public class CompressContent implements IChainable<ContentExportResponse, Export
                     if (artifactUrl.contains("." + ServiceConstants.FileExtension.APK)) {
                         Compress.zipAPK(path, exportContext.getTmpLocation(), artifactUrl);
                     } else {
-                        Compress.zip(path, payload);
+                        List<String> skippDirectoriesName = new ArrayList<>();
+                        skippDirectoriesName.add(contentModel.getIdentifier());
+
+                        List<String> skippFilesName = new ArrayList<>();
+                        skippFilesName.add(FileUtil.MANIFEST_FILE_NAME);
+
+                        Compress.zip(path, payload, skippDirectoriesName, skippFilesName);
                     }
                 } catch (IOException e) {
                     return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, e.getMessage(), TAG);

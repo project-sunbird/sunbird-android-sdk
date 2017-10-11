@@ -1,13 +1,12 @@
 package org.ekstep.genieservices.commons.utils;
 
-import org.ekstep.genieservices.commons.CommonConstants;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -20,7 +19,7 @@ public class Compress {
 
     private static final int BUFFER = 2048;
 
-    public static boolean zip(File sourceFolder, File zipFile) throws IOException {
+    public static boolean zip(File sourceFolder, File zipFile, List<String> skippDirectoriesName, List<String> skippFilesName) throws IOException {
         BufferedInputStream origin;
 
         zipFile.getParentFile().mkdirs();
@@ -30,7 +29,7 @@ public class Compress {
         ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest));
 
         if (sourceFolder.isDirectory()) {
-            zipSubFolder(out, sourceFolder, sourceFolder.getParent().length());
+            zipSubFolder(out, sourceFolder, sourceFolder.getParent().length(), skippDirectoriesName, skippFilesName);
         } else {
             byte data[] = new byte[BUFFER];
 
@@ -50,21 +49,24 @@ public class Compress {
         return true;
     }
 
-    private static void zipSubFolder(ZipOutputStream out, File sourceFolder, int basePathLength) throws IOException {
+    private static void zipSubFolder(ZipOutputStream out, File sourceFolder, int basePathLength, List<String> skippDirectoriesName, List<String> skippFilesName) throws IOException {
         File[] fileList = sourceFolder.listFiles();
         BufferedInputStream origin;
 
         if (fileList != null) {
             for (File file : fileList) {
                 //skip manifest.json file from exploded sdcard content
-                if (file.getName().equalsIgnoreCase("manifest.json")) {
-                    if (file.getAbsolutePath().contains(CommonConstants.GENIE_EXTRACTED_ECAR_FOLDER_PATH)) {
-                        continue;
-                    }
+                if (!CollectionUtil.isNullOrEmpty(skippDirectoriesName)) {
+                    skippDirectoriesName.contains(file.getName());
+                    continue;
+                }
+                if (!CollectionUtil.isNullOrEmpty(skippFilesName)) {
+                    skippFilesName.contains(file.getName());
+                    continue;
                 }
 
                 if (file.isDirectory()) {
-                    zipSubFolder(out, file, basePathLength);
+                    zipSubFolder(out, file, basePathLength, skippDirectoriesName, skippFilesName);
                 } else {
                     byte data[] = new byte[BUFFER];
 
@@ -112,14 +114,6 @@ public class Compress {
         File[] fileList = sourceFolder.listFiles();
         if (fileList != null) {
             for (File file : fileList) {
-
-                //skip manifest.json file from exploded sdcard content
-                if (file.getName().equalsIgnoreCase("manifest.json")) {
-                    if (file.getAbsolutePath().contains(CommonConstants.GENIE_EXTRACTED_ECAR_FOLDER_PATH)) {
-                        continue;
-                    }
-                }
-
                 if (file.isDirectory()) {
                     if (file.getName().equalsIgnoreCase(fileIdentifier)) {
                         copyFileAssets(file, payloadFolder, "");
