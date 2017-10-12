@@ -874,9 +874,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     @Override
     public GenieResponse<List<ScanStorageResponse>> scanStorage(ScanStorageRequest scanStorageRequest) {
         File storageFolder = null;
-        List<ScanStorageResponse> scannedIdentifiersList = new ArrayList<>();
-        List<String> deletedContents = null;
-        List<String> addedContents = null;
+        List<ScanStorageResponse> addedOrDeletedIdentifiersList = new ArrayList<>();
+        List<String> deletedContentIdentifiers = null;
+        List<String> addedContentIdentifiers = null;
 
         //get the last modified time from preference
         long storedLastModifiedTime = mAppContext.getKeyValueStore().getLong(ServiceConstants.PreferenceKey.KEY_LAST_MODIFIED, 0);
@@ -899,40 +899,46 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 }
 
                 //get all the identifiers from the db
-                List<ContentModel> contentModelList = ContentHandler.findAllContent(mAppContext.getDBSession());
+                List<ContentModel> dbContentModelList = ContentHandler.findAllContent(mAppContext.getDBSession());
 
-                //fetch all identifiers fron the content model list
-                List<String> contentIdentifiers = new ArrayList<>();
-                if (contentModelList != null && contentModelList.size() > 0) {
-                    for (ContentModel contentModel : contentModelList) {
-                        contentIdentifiers.add(contentModel.getIdentifier());
+                //fetch all identifiers from the content model list
+                List<String> dbContentIdentifiers = new ArrayList<>();
+                if (dbContentModelList != null && dbContentModelList.size() > 0) {
+                    for (ContentModel contentModel : dbContentModelList) {
+                        dbContentIdentifiers.add(contentModel.getIdentifier());
                     }
                 }
 
-                if (foldersList.size() > 0 && contentIdentifiers.size() > 0 && !foldersList.containsAll(contentIdentifiers)) {
+                if (foldersList.size() > 0 && dbContentIdentifiers.size() > 0) {
                     //deleted contents - if the identifier is present in db-list and not in folder-list
-                    deletedContents = getDeletedContents(foldersList, contentIdentifiers);
+                    deletedContentIdentifiers = getDeletedContents(foldersList, dbContentIdentifiers);
 
                     //newly added contents - if the identifier is present in folder-list and not in the db-list
-                    addedContents = getNewlyAddedContents(foldersList, contentIdentifiers);
+                    addedContentIdentifiers = getNewlyAddedContents(foldersList, dbContentIdentifiers);
                 }
             }
         }
 
-        if (deletedContents != null && deletedContents.size() > 0) {
-            for (String deletedContent : deletedContents) {
-                scannedIdentifiersList.add(new ScanStorageResponse(deletedContent, ScanStorageStatus.DELETED));
+        if (deletedContentIdentifiers != null && deletedContentIdentifiers.size() > 0) {
+            for (String deletedContent : deletedContentIdentifiers) {
+                addedOrDeletedIdentifiersList.add(new ScanStorageResponse(deletedContent, ScanStorageStatus.DELETED));
             }
         }
 
-        if (addedContents != null && addedContents.size() > 0) {
-            for (String addedContent : addedContents) {
-                scannedIdentifiersList.add(new ScanStorageResponse(addedContent, ScanStorageStatus.ADDED));
+
+        if (addedContentIdentifiers != null && addedContentIdentifiers.size() > 0) {
+            // Validate manifest identifiers
+            List<String> validContentIdentifiers = ContentHandler.getValidIdentifiersFromPath(mAppContext, storageFolder, addedContentIdentifiers);
+
+            if (!CollectionUtil.isNullOrEmpty(validContentIdentifiers)) {
+                for (String addedContent : validContentIdentifiers) {
+                    addedOrDeletedIdentifiersList.add(new ScanStorageResponse(addedContent, ScanStorageStatus.ADDED));
+                }
             }
         }
 
-        if (scannedIdentifiersList.size() > 0) {
-            performActionOnContents(scannedIdentifiersList);
+        if (addedOrDeletedIdentifiersList.size() > 0) {
+            performActionOnContents(addedOrDeletedIdentifiersList, storageFolder);
 
             if (storageFolder != null) {
                 mAppContext.getKeyValueStore().putLong(ServiceConstants.PreferenceKey.KEY_LAST_MODIFIED, storageFolder.lastModified());
@@ -940,7 +946,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         }
 
         GenieResponse<List<ScanStorageResponse>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-        response.setResult(scannedIdentifiersList);
+        response.setResult(addedOrDeletedIdentifiersList);
 
         return response;
     }
@@ -949,65 +955,31 @@ public class ContentServiceImpl extends BaseService implements IContentService {
      * This method performs necessary action on that particular content based on the scan status of the content.
      *
      * @param scannedIdentifiersList
+     * @param storageFolder
      */
-    private void performActionOnContents(List<ScanStorageResponse> scannedIdentifiersList) {
-        List<String> deletedIdsList = new ArrayList<>();
-        List<String> addedIdsList = new ArrayList<>();
-        List<String> updateIdsList = new ArrayList<>();
+    private void performActionOnContents(List<ScanStorageResponse> scannedIdentifiersList, File storageFolder) {
 
         if (scannedIdentifiersList != null && scannedIdentifiersList.size() > 0) {
             for (ScanStorageResponse scannedContent : scannedIdentifiersList) {
                 if (scannedContent.getStatus().equals(ScanStorageStatus.DELETED)) {
-                    deletedIdsList.add(scannedContent.getIdentifier());
+                    ContentHandler.deleteContentsFromDb(mAppContext.getDBSession(), scannedContent.getIdentifier());
                 } else if (scannedContent.getStatus().equals(ScanStorageStatus.ADDED)) {
-                    addedIdsList.add(scannedContent.getIdentifier());
+                    ContentHandler.addContentToDb(mAppContext, scannedContent.getIdentifier(), storageFolder);
                 } else if (scannedContent.getStatus().equals(ScanStorageStatus.UPDATED)) {
-                    updateIdsList.add(scannedContent.getIdentifier());
+                    // TODO: 12/10/17 Yet to be done - In progress
+//                    updateIdsList.add(scannedContent.getIdentifier());
                 }
             }
         }
-
-        if (deletedIdsList.size() > 0) {
-            deleteContentsFromDb(deletedIdsList);
-        }
-
     }
 
     /**
-     * This method deletes all the contents that were manually deleted from the memory and reflects the same in the db
+     * This method gives all the identifiers of the contents that are newly added manually, by looking at the identifiers from the db
      *
-     * @param deletedIdsList
+     * @param foldersList
+     * @param contentIdentifiers
+     * @return
      */
-    private void deleteContentsFromDb(List<String> deletedIdsList) {
-        List<ContentModel> deletedIdsContentModels = new ArrayList<>();
-
-        if (deletedIdsList != null && deletedIdsList.size() > 0) {
-            deletedIdsContentModels = ContentHandler.findAllContentsWithIdentifiers(mAppContext.getDBSession(), deletedIdsList);
-
-            if (deletedIdsContentModels.size() > 0) {
-                for (ContentModel contentModel : deletedIdsContentModels) {
-                    //update the content state to spine
-                    if (ContentConstants.MimeType.COLLECTION.equals(contentModel.getMimeType()) && contentModel.getRefCount() > 1) {
-                        contentModel.addOrUpdateContentState(ContentConstants.State.ARTIFACT_AVAILABLE);
-                    } else {
-                        contentModel.addOrUpdateContentState(ContentConstants.State.ONLY_SPINE);
-                    }
-
-                    //check the ref-count and update the value
-                    if (contentModel.getVisibility().equalsIgnoreCase(ContentConstants.Visibility.DEFAULT) &&
-                            contentModel.getRefCount() > 0) {
-                        contentModel.addOrUpdateRefCount(contentModel.getRefCount() - 1);
-                    }
-
-                    contentModel.setVisibility(ContentConstants.Visibility.PARENT);
-
-                    contentModel.update();
-                }
-            }
-
-        }
-    }
-
     private List<String> getNewlyAddedContents(List<String> foldersList, List<String> contentIdentifiers) {
         Set<String> dbContents = new HashSet<>(contentIdentifiers);
         Set<String> folderContents = new HashSet<>(foldersList);
@@ -1016,6 +988,13 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         return new ArrayList<>(folderContents);
     }
 
+    /**
+     * This method gives all the identifiers of the contents that are deleted manually, by looking at the identifiers from the db
+     *
+     * @param foldersList
+     * @param contentIdentifiers
+     * @return
+     */
     private List<String> getDeletedContents(List<String> foldersList, List<String> contentIdentifiers) {
         Set<String> dbContents = new HashSet<>(contentIdentifiers);
         Set<String> folderContents = new HashSet<>(foldersList);

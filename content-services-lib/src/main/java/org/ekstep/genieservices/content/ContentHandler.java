@@ -656,7 +656,7 @@ public class ContentHandler {
                 String contentRootPath = StringUtil.getFirstPartOfThePathNameOnLastDelimiter(contentModel.getPath());
 
                 //store the folder's last modified time
-                if(!StringUtil.isNullOrEmpty(contentRootPath)) {
+                if (!StringUtil.isNullOrEmpty(contentRootPath)) {
                     File contentRootFolder = new File(contentRootPath);
 
                     if (FileUtil.doesFileExists(contentRootFolder.getPath())) {
@@ -1682,5 +1682,229 @@ public class ContentHandler {
         return manifest;
     }
 
+    /**
+     * This method deletes all the contents that were manually deleted from the memory and reflects the same in the db
+     *
+     * @param dbSession
+     * @param deletedIdentifier
+     */
+    public static void deleteContentsFromDb(IDBSession dbSession, String deletedIdentifier) {
+        List<ContentModel> deletedIdsContentModels = new ArrayList<>();
+        List<String> deletedIdentifierList = new ArrayList<>();
+        deletedIdentifierList.add(deletedIdentifier);
+
+        if (deletedIdentifierList.size() > 0) {
+            deletedIdsContentModels.addAll(ContentHandler.findAllContentsWithIdentifiers(dbSession, deletedIdentifierList));
+
+            if (deletedIdsContentModels.size() > 0) {
+                for (ContentModel contentModel : deletedIdsContentModels) {
+                    //update the content state to spine
+                    if (ContentConstants.MimeType.COLLECTION.equals(contentModel.getMimeType()) && contentModel.getRefCount() > 1) {
+                        contentModel.addOrUpdateContentState(ContentConstants.State.ARTIFACT_AVAILABLE);
+                    } else {
+                        contentModel.addOrUpdateContentState(ContentConstants.State.ONLY_SPINE);
+                    }
+
+                    //check the ref-count and update the value
+                    if (contentModel.getVisibility().equalsIgnoreCase(ContentConstants.Visibility.DEFAULT) &&
+                            contentModel.getRefCount() > 0) {
+                        contentModel.addOrUpdateRefCount(contentModel.getRefCount() - 1);
+                    }
+
+                    contentModel.setVisibility(ContentConstants.Visibility.PARENT);
+
+                    contentModel.update();
+                }
+            }
+
+        }
+    }
+
+    /**
+     * This method returns only the valid identifiers, present in a particular folder by checking if the manifest of that content is valid
+     * @param appContext
+     * @param storageFolder
+     * @param addedContentIdentifiers
+     * @return
+     */
+    public static List<String> getValidIdentifiersFromPath(AppContext appContext, File storageFolder, List<String> addedContentIdentifiers) {
+        List<String> validIdentifiers = new ArrayList<>();
+
+        // Read content in destination folder.
+        for (String file : addedContentIdentifiers) {
+            File destFile = new File(storageFolder, file);
+            if (destFile.isDirectory()) {
+                String manifestJson = FileUtil.readManifest(destFile);
+                if (manifestJson == null) {
+                    continue;
+                }
+
+                LinkedTreeMap manifestMap = GsonUtil.fromJson(manifestJson, LinkedTreeMap.class);
+
+                String manifestVersion = (String) manifestMap.get("ver");
+                if (manifestVersion.equals("1.0")) {
+                    continue;
+                }
+
+                LinkedTreeMap archive = (LinkedTreeMap) manifestMap.get("archive");
+                List<Map<String, Object>> items = null;
+                if (archive.containsKey("items")) {
+                    items = (List<Map<String, Object>>) archive.get("items");
+                }
+
+                if (items == null || items.isEmpty()) {
+                    continue;
+                }
+
+                Logger.d(TAG, items.toString());
+
+                for (Map<String, Object> item : items) {
+                    String visibility = ContentHandler.readVisibility(item);
+
+                    // If compatibility level is not in range then do not copy artifact
+                    if (ContentConstants.Visibility.PARENT.equals(visibility)
+                            || !ContentHandler.isCompatible(appContext, ContentHandler.readCompatibilityLevel(item))) {
+                        continue;
+                    }
+
+                    boolean isDraftContent = ContentHandler.isDraftContent(ContentHandler.readStatus(item));
+                    //Draft content expiry .To prevent import of draft content if the expires date is lesser than from the current date.
+                    if (isDraftContent && ContentHandler.isExpired(ContentHandler.readExpiryDate(item))) {
+                        continue;
+                    }
+
+                    validIdentifiers.add(file);
+                }
+            }
+        }
+
+        return validIdentifiers;
+    }
+
+
+    /**
+     * This method adds the necessary information of the content to db, when the content is added manually.
+     *
+     * @param appContext
+     * @param identifier
+     * @param storageFolder
+     */
+    public static void addContentToDb(AppContext appContext, String identifier, File storageFolder) {
+        String mimeType, contentType, visibility, audience, path;
+        Double compatibilityLevel, pkgVersion;
+        int refCount;
+        int contentState = ContentConstants.State.ONLY_SPINE;
+        String oldContentPath;
+        String artifactUrl;
+        ContentModel oldContentModel;
+
+//        read the manifest for that identifier and read the items from the same manifest and pass it to below loop
+        File destFile = new File(storageFolder, identifier);
+
+        if (destFile.isDirectory()) {
+            String manifestJson = FileUtil.readManifest(destFile);
+
+            LinkedTreeMap manifestMap = GsonUtil.fromJson(manifestJson, LinkedTreeMap.class);
+
+            LinkedTreeMap archive = (LinkedTreeMap) manifestMap.get("archive");
+            List<Map<String, Object>> items = (List<Map<String, Object>>) archive.get("items");
+
+            String manifestVersion = (String) manifestMap.get("ver");
+
+            for (Map<String, Object> item : items) {
+                mimeType = ContentHandler.readMimeType(item);
+                contentType = ContentHandler.readContentType(item);
+                visibility = ContentHandler.readVisibility(item);
+                audience = ContentHandler.readAudience(item);
+                compatibilityLevel = ContentHandler.readCompatibilityLevel(item);
+                pkgVersion = ContentHandler.readPkgVersion(item);
+                artifactUrl = ContentHandler.readArtifactUrl(item);
+
+                oldContentModel = ContentModel.find(appContext.getDBSession(), identifier);
+                oldContentPath = oldContentModel == null ? null : oldContentModel.getPath();
+                boolean isContentExist = ContentHandler.isContentExist(oldContentModel, identifier, pkgVersion);
+
+                //Apk files
+                if ((!StringUtil.isNullOrEmpty(mimeType) && mimeType.equalsIgnoreCase(ContentConstants.MimeType.APK)) ||
+                        (!StringUtil.isNullOrEmpty(artifactUrl) && artifactUrl.contains("." + ServiceConstants.FileExtension.APK))) {
+                    contentState = ContentConstants.State.ONLY_SPINE;
+                } else {
+                    //If the content is exist then copy the old content data and add it into new content.
+                    if (isContentExist && !(ContentConstants.ContentStatus.DRAFT.equalsIgnoreCase(ContentHandler.readStatus(item)))) {
+                        if (oldContentModel.getVisibility().equalsIgnoreCase(ContentConstants.Visibility.DEFAULT)) {
+                            Map<String, Object> oldContentLocalDataMap = GsonUtil.fromJson(oldContentModel.getLocalData(), Map.class);
+
+                            item.clear();
+                            item.putAll(oldContentLocalDataMap);
+                        }
+                    } else {
+                        isContentExist = false;
+
+                        // If compatibility level is not in range then do not copy artifact
+                        if (ContentHandler.isCompatible(appContext, compatibilityLevel)) {
+                            // Add or update the content_state
+                            if (ContentConstants.MimeType.COLLECTION.equals(mimeType)) {
+                                contentState = ContentConstants.State.ARTIFACT_AVAILABLE;
+                            } else {
+                                // TODO: 11/10/17 how will you check if the content is spine or not
+                                contentState = ContentConstants.State.ARTIFACT_AVAILABLE;
+                            }
+                        }
+                    }
+                }
+
+                //add or update the reference count for the content
+                if (oldContentModel != null) {
+                    refCount = oldContentModel.getRefCount();
+
+//                if (!importContext.isChildContent()) {    // If import started from child content then do not update the refCount.
+                    // if the content has a 'Default' visibility and update the same content then don't increase the reference count...
+                    if (!(ContentConstants.Visibility.DEFAULT.equals(oldContentModel.getVisibility()) && ContentConstants.Visibility.DEFAULT.equalsIgnoreCase(visibility))) {
+                        refCount = refCount + 1;
+                    }
+//                }
+                } else {
+                    refCount = 1;
+                }
+
+                // Set content visibility
+                if ("Library".equalsIgnoreCase(ContentHandler.readObjectType(item))) {
+                    visibility = ContentConstants.Visibility.PARENT;
+                } else if (oldContentModel != null) {
+                    if (!ContentConstants.Visibility.PARENT.equals(oldContentModel.getVisibility())) {  // If not started from child content then do not shrink visibility.
+                        visibility = oldContentModel.getVisibility();
+                    }
+                }
+
+                // Add or update the content_state. contentState should not update the spine_only when importing the spine content after importing content with artifacts.
+                if (oldContentModel != null && oldContentModel.getContentState() > contentState) {
+                    contentState = oldContentModel.getContentState();
+                }
+
+                //updated the content path if the content is already exists.
+                if (!isContentExist) {
+                    path = destFile.getPath();
+                } else {
+                    path = oldContentPath;
+                }
+
+                long sizeOnDevice = 0;
+                if (!StringUtil.isNullOrEmpty(path)) {
+                    sizeOnDevice = FileUtil.getFileSize(new File(path));
+                }
+
+                ContentHandler.addOrUpdateViralityMetadata(item, appContext.getDeviceInfo().getDeviceID());
+                ContentModel newContentModel = ContentModel.build(appContext.getDBSession(), identifier, manifestVersion, GsonUtil.toJson(item),
+                        mimeType, contentType, visibility, path, refCount, contentState, audience, sizeOnDevice);
+
+                if (oldContentModel == null) {
+                    newContentModel.save();
+                } else {
+                    newContentModel.update();
+                }
+            }
+        }
+
+    }
 
 }
