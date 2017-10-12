@@ -5,6 +5,8 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.ImportContentProgress;
+import org.ekstep.genieservices.commons.bean.MoveContentProgress;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.Decompress;
@@ -16,6 +18,7 @@ import org.ekstep.genieservices.content.ContentConstants;
 import org.ekstep.genieservices.content.ContentHandler;
 import org.ekstep.genieservices.content.bean.ImportContentContext;
 import org.ekstep.genieservices.content.db.model.ContentModel;
+import org.ekstep.genieservices.eventbus.EventBus;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,6 +54,11 @@ public class ExtractPayloads implements IChainable<List<ContentImportResponse>, 
         File payload;
         File payloadDestination = null;
         ContentModel oldContentModel;
+
+        //this count is for maintaining how many contents are imported so far
+        int currentCount = 0;
+        //post event before starting with how many imports are to be done totally
+        EventBus.postEvent(new ImportContentProgress(currentCount, importContext.getItems().size()));
 
         for (Map<String, Object> item : importContext.getItems()) {
             identifier = ContentHandler.readIdentifier(item);
@@ -227,6 +235,10 @@ public class ExtractPayloads implements IChainable<List<ContentImportResponse>, 
                 }
             }
             importContext.getIdentifiers().add(identifier);
+
+            //increase the current count
+            currentCount++;
+            EventBus.postEvent(new ImportContentProgress(currentCount, importContext.getItems().size()));
         }
 
         if (nextLink != null) {
