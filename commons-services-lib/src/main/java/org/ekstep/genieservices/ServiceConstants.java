@@ -177,4 +177,9 @@ public interface ServiceConstants {
         String NOT_WRITABLE = "Destination folder is not writable.";
         String NO_CONTENT_TO_MOVE = "Nothing to move.";
     }
+
+    interface SuccessMessage {
+        String SCAN_SUCCESS_NO_CHANGES = "Scan success no changes available";
+        String SCAN_SUCCESS_WITH_CHANGES = "Scan success and changes available";
+    }
 }

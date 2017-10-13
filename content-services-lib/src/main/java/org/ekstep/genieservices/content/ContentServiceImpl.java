@@ -40,6 +40,7 @@ import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.ScanStorageRequest;
 import org.ekstep.genieservices.commons.bean.ScanStorageResponse;
+import org.ekstep.genieservices.commons.bean.StorageScanStatus;
 import org.ekstep.genieservices.commons.bean.enums.ContentDeleteStatus;
 import org.ekstep.genieservices.commons.bean.enums.ContentImportStatus;
 import org.ekstep.genieservices.commons.bean.enums.DownloadAction;
@@ -877,6 +878,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         List<ScanStorageResponse> addedOrDeletedIdentifiersList = new ArrayList<>();
         List<String> deletedContentIdentifiers = null;
         List<String> addedContentIdentifiers = null;
+        GenieResponse<List<ScanStorageResponse>> response;
 
         //get the last modified time from preference
         long storedLastModifiedTime = mAppContext.getKeyValueStore().getLong(ServiceConstants.PreferenceKey.KEY_LAST_MODIFIED, 0);
@@ -916,39 +918,41 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                     //newly added contents - if the identifier is present in folder-list and not in the db-list
                     addedContentIdentifiers = getNewlyAddedContents(foldersList, dbContentIdentifiers);
                 }
-            }
-        }
 
-        if (deletedContentIdentifiers != null && deletedContentIdentifiers.size() > 0) {
-            for (String deletedContent : deletedContentIdentifiers) {
-                addedOrDeletedIdentifiersList.add(new ScanStorageResponse(deletedContent, ScanStorageStatus.DELETED));
-            }
-        }
-
-
-        if (addedContentIdentifiers != null && addedContentIdentifiers.size() > 0) {
-            // Validate manifest identifiers
-            List<String> validContentIdentifiers = ContentHandler.getValidIdentifiersFromPath(mAppContext, storageFolder, addedContentIdentifiers);
-
-            if (!CollectionUtil.isNullOrEmpty(validContentIdentifiers)) {
-                for (String addedContent : validContentIdentifiers) {
-                    addedOrDeletedIdentifiersList.add(new ScanStorageResponse(addedContent, ScanStorageStatus.ADDED));
+                if (deletedContentIdentifiers != null && deletedContentIdentifiers.size() > 0) {
+                    for (String deletedContent : deletedContentIdentifiers) {
+                        addedOrDeletedIdentifiersList.add(new ScanStorageResponse(deletedContent, ScanStorageStatus.DELETED));
+                    }
                 }
+
+
+                if (addedContentIdentifiers != null && addedContentIdentifiers.size() > 0) {
+                    // Validate manifest identifiers
+                    List<String> validContentIdentifiers = ContentHandler.getValidIdentifiersFromPath(mAppContext, storageFolder, addedContentIdentifiers);
+
+                    if (!CollectionUtil.isNullOrEmpty(validContentIdentifiers)) {
+                        for (String addedContent : validContentIdentifiers) {
+                            addedOrDeletedIdentifiersList.add(new ScanStorageResponse(addedContent, ScanStorageStatus.ADDED));
+                        }
+                    }
+                }
+
+                if (addedOrDeletedIdentifiersList.size() > 0) {
+                    performActionOnContents(addedOrDeletedIdentifiersList, storageFolder);
+
+                    if (storageFolder != null) {
+                        mAppContext.getKeyValueStore().putLong(ServiceConstants.PreferenceKey.KEY_LAST_MODIFIED, storageFolder.lastModified());
+                    }
+                }
+
+                response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SuccessMessage.SCAN_SUCCESS_WITH_CHANGES);
+                response.setResult(addedOrDeletedIdentifiersList);
+
+                EventBus.postEvent(new StorageScanStatus(true));
             }
         }
 
-        if (addedOrDeletedIdentifiersList.size() > 0) {
-            performActionOnContents(addedOrDeletedIdentifiersList, storageFolder);
-
-            if (storageFolder != null) {
-                mAppContext.getKeyValueStore().putLong(ServiceConstants.PreferenceKey.KEY_LAST_MODIFIED, storageFolder.lastModified());
-            }
-        }
-
-        GenieResponse<List<ScanStorageResponse>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-        response.setResult(addedOrDeletedIdentifiersList);
-
-        return response;
+        return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SuccessMessage.SCAN_SUCCESS_NO_CHANGES);
     }
 
     /**
