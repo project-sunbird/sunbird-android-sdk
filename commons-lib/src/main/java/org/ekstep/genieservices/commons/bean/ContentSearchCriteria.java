@@ -272,7 +272,7 @@ public class ContentSearchCriteria implements Serializable {
             }
 
             if (contentTypes == null || contentTypes.length == 0) {
-                this.contentTypes = new String[]{"Story", "Worksheet", "Game", "Collection", "TextBook", "Resource"};
+                this.contentTypes = new String[]{"Story", "Worksheet", "Game", "Collection", "TextBook"};
             }
 
             return new ContentSearchCriteria(query, limit, mode, age, grade, medium, board, createdBy,
