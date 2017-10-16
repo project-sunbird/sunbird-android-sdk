@@ -877,7 +877,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         List<ScanStorageResponse> addedOrDeletedIdentifiersList = new ArrayList<>();
         List<String> deletedContentIdentifiers = null;
         List<String> addedContentIdentifiers = null;
-        GenieResponse<List<ScanStorageResponse>> response;
+        GenieResponse<List<ScanStorageResponse>> response = null;
 
         //get the last modified time from preference
         long storedLastModifiedTime = mAppContext.getKeyValueStore().getLong(ServiceConstants.PreferenceKey.KEY_LAST_MODIFIED, 0);
@@ -947,9 +947,11 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SuccessMessage.SCAN_SUCCESS_WITH_CHANGES);
                 response.setResult(addedOrDeletedIdentifiersList);
             }
+        } else {
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SuccessMessage.SCAN_SUCCESS_NO_CHANGES);
         }
 
-        return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SuccessMessage.SCAN_SUCCESS_NO_CHANGES);
+        return response;
     }
 
     /**
