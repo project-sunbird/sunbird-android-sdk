@@ -40,7 +40,6 @@ import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.ScanStorageRequest;
 import org.ekstep.genieservices.commons.bean.ScanStorageResponse;
-import org.ekstep.genieservices.commons.bean.StorageScanStatus;
 import org.ekstep.genieservices.commons.bean.enums.ContentDeleteStatus;
 import org.ekstep.genieservices.commons.bean.enums.ContentImportStatus;
 import org.ekstep.genieservices.commons.bean.enums.DownloadAction;
@@ -947,8 +946,6 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
                 response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SuccessMessage.SCAN_SUCCESS_WITH_CHANGES);
                 response.setResult(addedOrDeletedIdentifiersList);
-
-                EventBus.postEvent(new StorageScanStatus(true));
             }
         }
 
