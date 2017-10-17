@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
 android {
-    defaultPublishConfig "productionRelease"
+//    defaultPublishConfig "productionRelease"
     publishNonDefault true
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -13,11 +13,17 @@ android {
         versionCode rootProject.ext.versionCode
         versionName rootProject.ext.versionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
+
+    dexOptions {
+        incremental true
+        javaMaxHeapSize "4g"
+    }
+
     buildTypes {
         debug {
             testCoverageEnabled true
+            multiDexEnabled true
         }
         release {
             minifyEnabled false
@@ -80,7 +86,12 @@ dependencies {
     compile "com.google.android.gms:play-services-location:$rootProject.ext.playServiceVersion"
     compile "com.squareup.okhttp3:okhttp:$rootProject.ext.okhttpVersion"
 
+    //Debug dependencies
+    debugCompile 'com.facebook.stetho:stetho:1.5.0'
+    debugCompile 'com.facebook.stetho:stetho-okhttp3:1.5.0'
+
     androidTestCompile 'com.jayway.awaitility:awaitility:1.7.0'
+    integrationTestCompile 'com.android.support:multidex:1.0.1'
     androidTestCompile 'com.squareup.okhttp3:mockwebserver:3.8.1'
     androidTestCompile('com.android.support.test.espresso:espresso-core:3.0.0', {
         exclude group: 'com.android.support', module: 'support-annotations'

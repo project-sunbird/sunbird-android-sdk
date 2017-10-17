@@ -31,7 +31,7 @@ import java.util.List;
 
 public class GenieServiceDBHelper {
     private final static String TAG = GenieServiceDBHelper.class.getSimpleName();
-    public static String GS_DB = "/data/data/org.ekstep.genieservices1/databases/GenieServices.db";
+    public static String GS_DB = "/data/data/org.ekstep.genieservices.test/databases/GenieServices.db";
     private static SQLiteDatabase sSqliteDatabase = null;
     private static GenieServiceDBHelper sGSDBHelper;
     private AppContext mAppContext;
@@ -271,8 +271,8 @@ public class GenieServiceDBHelper {
     }
 
     public static void updateTtlinContentListingTable(ContentListingCriteria criteria) {
-        ContentListingModel model = ContentListingModel.build(sGSDBHelper.mAppContext.getDBSession(), criteria, SampleApiResponse.getContentListingAPIResponse(), DateUtil.getEpochTime() - (2 * DateUtil.MILLISECONDS_IN_AN_HOUR));
-        model.update();
+//        ContentListingModel model = ContentListingModel.build(sGSDBHelper.mAppContext.getDBSession(), criteria, SampleApiResponse.getContentListingAPIResponse(), DateUtil.getEpochTime() - (2 * DateUtil.MILLISECONDS_IN_AN_HOUR));
+//        model.update();
     }
 
 

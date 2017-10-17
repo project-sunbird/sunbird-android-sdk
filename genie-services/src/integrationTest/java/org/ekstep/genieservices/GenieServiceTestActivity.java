@@ -20,6 +20,7 @@ import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
+import org.ekstep.genieservices.commons.bean.ContentMoveRequest;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
@@ -420,6 +421,12 @@ public class GenieServiceTestActivity extends Activity {
     public GenieResponse<List<Notification>> getAllNotifications(NotificationFilterCriteria filterCriteria) {
         idle = false;
         GenieResponse<List<Notification>> genieResponse = mGenieService.getNotificationService().getAllNotifications(filterCriteria);
+        return genieResponse;
+    }
+
+    public GenieResponse<Void> moveContent(ContentMoveRequest.Builder contentMoveRequest){
+        idle = false;
+        GenieResponse<Void> genieResponse  = mGenieService.getContentService().moveContent(contentMoveRequest.build());
         return genieResponse;
     }
 
