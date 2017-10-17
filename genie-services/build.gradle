@@ -87,8 +87,8 @@ dependencies {
     compile "com.squareup.okhttp3:okhttp:$rootProject.ext.okhttpVersion"
 
     //Debug dependencies
-    debugCompile 'com.facebook.stetho:stetho:1.5.0'
-    debugCompile 'com.facebook.stetho:stetho-okhttp3:1.5.0'
+    integrationTestCompile 'com.facebook.stetho:stetho:1.5.0'
+    integrationTestCompile 'com.facebook.stetho:stetho-okhttp3:1.5.0'
 
     androidTestCompile 'com.jayway.awaitility:awaitility:1.7.0'
     integrationTestCompile 'com.android.support:multidex:1.0.1'
