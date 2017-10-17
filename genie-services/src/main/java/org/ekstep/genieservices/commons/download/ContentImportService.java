@@ -8,8 +8,11 @@ import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.IContentService;
 import org.ekstep.genieservices.IDownloadService;
 import org.ekstep.genieservices.ServiceConstants;
+import org.ekstep.genieservices.async.IPerformable;
+import org.ekstep.genieservices.async.ThreadPool;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
+import org.ekstep.genieservices.commons.bean.GenieResponse;
 
 /**
  * Created on 13/6/17.
@@ -20,22 +23,30 @@ public class ContentImportService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        DownloadRequest downloadRequest = (DownloadRequest) intent.getSerializableExtra(ServiceConstants.BundleKey.BUNDLE_KEY_DOWNLOAD_REQUEST);
+        final DownloadRequest downloadRequest = (DownloadRequest) intent.getSerializableExtra(ServiceConstants.BundleKey.BUNDLE_KEY_DOWNLOAD_REQUEST);
 
-        EcarImportRequest.Builder ecarImportRequest = new EcarImportRequest.Builder();
+        final EcarImportRequest.Builder ecarImportRequest = new EcarImportRequest.Builder();
         ecarImportRequest.fromFilePath(downloadRequest.getDownloadedFilePath())
                 .toFolder(downloadRequest.getDestinationFolder());
         if (downloadRequest.isChildContent()) {
             ecarImportRequest.isChildContent();
         }
 
-        IContentService contentService = GenieService.getService().getContentService();
-        contentService.importEcar(ecarImportRequest.build());
+        ThreadPool.getInstance().execute(new IPerformable() {
+            @Override
+            public GenieResponse perform() {
+                IContentService contentService = GenieService.getService().getContentService();
+                contentService.importEcar(ecarImportRequest.build());
 
-        IDownloadService downloadService = GenieService.getService().getDownloadService();
-        downloadService.removeDownloadedFile(downloadRequest.getDownloadId());
+                IDownloadService downloadService = GenieService.getService().getDownloadService();
+                downloadService.removeDownloadedFile(downloadRequest.getDownloadId());
 
-        stopSelf();
+                stopSelf();
+                return null;
+            }
+        }, null);
+
+
         return Service.START_REDELIVER_INTENT;
     }
 

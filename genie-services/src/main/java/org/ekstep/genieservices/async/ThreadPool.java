@@ -6,8 +6,6 @@ import android.os.Message;
 
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.utils.GsonUtil;
-import org.ekstep.genieservices.commons.utils.Logger;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -33,7 +31,7 @@ public final class ThreadPool {
     }
 
     public static final ThreadPool getInstance() {
-        if(instance == null) {
+        if (instance == null) {
             lock.lock();
             try {
                 if (instance == null)
@@ -52,17 +50,17 @@ public final class ThreadPool {
             @Override
             public void run() {
                 final GenieResponse response = performable.perform();
-                if (Logger.isDebugEnabled()) {
-                    Logger.d("GenieAsyncResponse", GsonUtil.toJson(response));
-                }
-                Handler handler = new MainThreadHandler(){
+                Handler handler = new MainThreadHandler() {
                     @Override
                     public void handleMessage(Message msg) {
-                        if (response.getStatus()) {
-                            responseHandler.onSuccess(response);
-                        } else {
-                            responseHandler.onError(response);
+                        if (response != null) {
+                            if (response.getStatus()) {
+                                responseHandler.onSuccess(response);
+                            } else {
+                                responseHandler.onError(response);
+                            }
                         }
+
                     }
                 };
                 Message message = handler.obtainMessage(RESULT_MESG);
@@ -80,7 +78,6 @@ public final class ThreadPool {
         }
 
     }
-
 
 
 }
