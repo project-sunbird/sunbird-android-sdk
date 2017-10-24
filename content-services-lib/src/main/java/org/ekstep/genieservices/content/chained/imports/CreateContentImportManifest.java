@@ -6,6 +6,7 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.content.ContentHandler;
 import org.ekstep.genieservices.content.bean.ImportContentContext;
 import org.ekstep.genieservices.content.db.model.ContentModel;
@@ -27,7 +28,9 @@ public class CreateContentImportManifest implements IChainable<List<ContentImpor
     public GenieResponse<List<ContentImportResponse>> execute(AppContext appContext, ImportContentContext importContentContext) {
         List<ContentModel> contentModelList = ContentHandler.findAllContentsWithIdentifiers(appContext.getDBSession(), importContentContext.getIdentifiers());
 
-        ContentHandler.createAndWriteManifest(appContext, contentModelList);
+        if (!CollectionUtil.isNullOrEmpty(contentModelList)) {
+            ContentHandler.createAndWriteManifest(appContext, contentModelList);
+        }
 
         if (nextLink != null) {
             return nextLink.execute(appContext, importContentContext);
