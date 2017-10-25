@@ -340,6 +340,10 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         return sizeOnDevice;
     }
 
+    public void setSizeOnDevice(Long sizeOnDevice) {
+        this.sizeOnDevice = sizeOnDevice;
+    }
+
     public Long getLastUsedTime() {
         return lastUsedTime;
     }

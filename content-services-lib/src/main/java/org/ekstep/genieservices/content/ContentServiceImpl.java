@@ -71,6 +71,7 @@ import org.ekstep.genieservices.content.chained.imports.DeviceMemoryCheck;
 import org.ekstep.genieservices.content.chained.imports.EcarCleanUp;
 import org.ekstep.genieservices.content.chained.imports.ExtractEcar;
 import org.ekstep.genieservices.content.chained.imports.ExtractPayloads;
+import org.ekstep.genieservices.content.chained.imports.UpdateSizeOnDevice;
 import org.ekstep.genieservices.content.chained.imports.ValidateEcar;
 import org.ekstep.genieservices.content.chained.move.CopyContentFromSourceToDestination;
 import org.ekstep.genieservices.content.chained.move.DeleteSourceFolder;
@@ -278,9 +279,16 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
                 //delete or update root item
                 ContentHandler.deleteOrUpdateContent(mAppContext, contentModel, false, contentDelete.isChildContent());
-
             }
         }
+
+        // Update size on device value in DB after content deletion.
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ContentHandler.updateSizeOnDevice(mAppContext);
+            }
+        }).start();
 
         GenieResponse<List<ContentDeleteResponse>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(contentDeleteResponseList);
@@ -619,6 +627,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                     .then(new ExtractPayloads(tmpLocation))
                     .then(new CreateContentImportManifest())
                     .then(new EcarCleanUp(tmpLocation))
+                    .then(new UpdateSizeOnDevice())
                     .then(new AddGeTransferContentImportEvent());
             response = deviceMemoryCheck.execute(mAppContext, importContentContext);
 
@@ -867,24 +876,22 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 .then(new UpdateSourceContentPathInDB())
                 .then(new StoreDestinationContentInDB());
 
-        //TODO: Separate method to shown the discrepancy (and listing all the items that are added/missing)
         return validateDestinationFolder.execute(mAppContext, moveContentContext);
     }
 
     @Override
     public GenieResponse<List<ScanStorageResponse>> scanStorage(ScanStorageRequest scanStorageRequest) {
-        File storageFolder = null;
-        List<ScanStorageResponse> addedOrDeletedIdentifiersList = new ArrayList<>();
-        List<String> deletedContentIdentifiers = null;
-        List<String> addedContentIdentifiers = null;
-        GenieResponse<List<ScanStorageResponse>> response = null;
+        GenieResponse<List<ScanStorageResponse>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SuccessMessage.SCAN_SUCCESS_NO_CHANGES);
 
         //get the last modified time from preference
         long storedLastModifiedTime = mAppContext.getKeyValueStore().getLong(ServiceConstants.PreferenceKey.KEY_LAST_MODIFIED, 0);
 
         //check if folder exists
         if (FileUtil.doesFileExists(scanStorageRequest.getStorageFilePath())) {
-            storageFolder = FileUtil.getContentRootDir(new File(scanStorageRequest.getStorageFilePath()));
+            List<String> deletedContentIdentifiers = null;
+            List<String> addedContentIdentifiers = null;
+            List<ScanStorageResponse> addedOrDeletedIdentifiersList = new ArrayList<>();
+            File storageFolder = FileUtil.getContentRootDir(new File(scanStorageRequest.getStorageFilePath()));
 
             //get last modified time of the folder
             long folderLastModifiedTime = storageFolder.lastModified();
@@ -904,7 +911,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
                 //fetch all identifiers from the content model list
                 List<String> dbContentIdentifiers = new ArrayList<>();
-                if (dbContentModelList != null && dbContentModelList.size() > 0) {
+                if (!CollectionUtil.isNullOrEmpty(dbContentModelList)) {
                     for (ContentModel contentModel : dbContentModelList) {
                         dbContentIdentifiers.add(contentModel.getIdentifier());
                     }
@@ -918,14 +925,13 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                     addedContentIdentifiers = getNewlyAddedContents(foldersList, dbContentIdentifiers);
                 }
 
-                if (deletedContentIdentifiers != null && deletedContentIdentifiers.size() > 0) {
+                if (!CollectionUtil.isNullOrEmpty(deletedContentIdentifiers)) {
                     for (String deletedContent : deletedContentIdentifiers) {
                         addedOrDeletedIdentifiersList.add(new ScanStorageResponse(deletedContent, ScanStorageStatus.DELETED));
                     }
                 }
 
-
-                if (addedContentIdentifiers != null && addedContentIdentifiers.size() > 0) {
+                if (!CollectionUtil.isNullOrEmpty(addedContentIdentifiers)) {
                     // Validate manifest identifiers
                     List<String> validContentIdentifiers = ContentHandler.getValidIdentifiersFromPath(mAppContext, storageFolder, addedContentIdentifiers);
 
@@ -947,8 +953,6 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SuccessMessage.SCAN_SUCCESS_WITH_CHANGES);
                 response.setResult(addedOrDeletedIdentifiersList);
             }
-        } else {
-            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SuccessMessage.SCAN_SUCCESS_NO_CHANGES);
         }
 
         return response;
@@ -961,8 +965,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
      * @param storageFolder
      */
     private void performActionOnContents(List<ScanStorageResponse> scannedIdentifiersList, File storageFolder) {
-
-        if (scannedIdentifiersList != null && scannedIdentifiersList.size() > 0) {
+        if (!CollectionUtil.isNullOrEmpty(scannedIdentifiersList)) {
             for (ScanStorageResponse scannedContent : scannedIdentifiersList) {
                 if (scannedContent.getStatus().equals(ScanStorageStatus.DELETED)) {
                     ContentHandler.deleteContentsFromDb(mAppContext.getDBSession(), scannedContent.getIdentifier());

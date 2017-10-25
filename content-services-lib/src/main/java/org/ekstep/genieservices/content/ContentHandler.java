@@ -164,7 +164,7 @@ public class ContentHandler {
     }
 
     public static boolean isOnlineContent(Map contentData) {
-        String contentDisposition = ContentHandler.readContentDisposition(contentData);
+        String contentDisposition = readContentDisposition(contentData);
 
         return !StringUtil.isNullOrEmpty(contentDisposition) && ContentConstants.ContentDisposition.ONLINE.equals(contentDisposition);
     }
@@ -1645,16 +1645,16 @@ public class ContentHandler {
 
             // index item
             contentIndex.put(c.getIdentifier(), item);
-            ContentHandler.addViralityMetadataIfMissing(item, appContext.getDeviceInfo().getDeviceID());
+            addViralityMetadataIfMissing(item, appContext.getDeviceInfo().getDeviceID());
 
             // get item's children only to mark children with visibility as Parent
-            if (ContentHandler.hasChildren(item)) {
+            if (hasChildren(item)) {
                 // store children identifiers
-                childIdentifiers.addAll(ContentHandler.getChildContentsIdentifiers(item));
+                childIdentifiers.addAll(getChildContentsIdentifiers(item));
             }
-            if (ContentHandler.hasPreRequisites(item)) {
+            if (hasPreRequisites(item)) {
                 // store children identifiers
-                childIdentifiers.addAll(ContentHandler.getPreRequisitesIdentifiers(item));
+                childIdentifiers.addAll(getPreRequisitesIdentifiers(item));
             }
 
             allContents.add(c.getIdentifier());
@@ -1663,7 +1663,7 @@ public class ContentHandler {
         for (String contentIdentifier : allContents) {
             Map<String, Object> contentData = contentIndex.get(contentIdentifier);
             if (childIdentifiers.contains(contentIdentifier)) {
-                contentData.put(ContentHandler.KEY_VISIBILITY, ContentConstants.Visibility.PARENT);
+                contentData.put(KEY_VISIBILITY, ContentConstants.Visibility.PARENT);
             }
             items.add(contentData);
         }
@@ -1694,7 +1694,7 @@ public class ContentHandler {
         deletedIdentifierList.add(deletedIdentifier);
 
         if (deletedIdentifierList.size() > 0) {
-            deletedIdsContentModels.addAll(ContentHandler.findAllContentsWithIdentifiers(dbSession, deletedIdentifierList));
+            deletedIdsContentModels.addAll(findAllContentsWithIdentifiers(dbSession, deletedIdentifierList));
 
             if (deletedIdsContentModels.size() > 0) {
                 for (ContentModel contentModel : deletedIdsContentModels) {
@@ -1722,6 +1722,7 @@ public class ContentHandler {
 
     /**
      * This method returns only the valid identifiers, present in a particular folder by checking if the manifest of that content is valid
+     *
      * @param appContext
      * @param storageFolder
      * @param addedContentIdentifiers
@@ -1759,17 +1760,17 @@ public class ContentHandler {
                 Logger.d(TAG, items.toString());
 
                 for (Map<String, Object> item : items) {
-                    String visibility = ContentHandler.readVisibility(item);
+                    String visibility = readVisibility(item);
 
                     // If compatibility level is not in range then do not copy artifact
                     if (ContentConstants.Visibility.PARENT.equals(visibility)
-                            || !ContentHandler.isCompatible(appContext, ContentHandler.readCompatibilityLevel(item))) {
+                            || !isCompatible(appContext, readCompatibilityLevel(item))) {
                         continue;
                     }
 
-                    boolean isDraftContent = ContentHandler.isDraftContent(ContentHandler.readStatus(item));
+                    boolean isDraftContent = isDraftContent(readStatus(item));
                     //Draft content expiry .To prevent import of draft content if the expires date is lesser than from the current date.
-                    if (isDraftContent && ContentHandler.isExpired(ContentHandler.readExpiryDate(item))) {
+                    if (isDraftContent && isExpired(readExpiryDate(item))) {
                         continue;
                     }
 
@@ -1812,17 +1813,17 @@ public class ContentHandler {
             String manifestVersion = (String) manifestMap.get("ver");
 
             for (Map<String, Object> item : items) {
-                mimeType = ContentHandler.readMimeType(item);
-                contentType = ContentHandler.readContentType(item);
-                visibility = ContentHandler.readVisibility(item);
-                audience = ContentHandler.readAudience(item);
-                compatibilityLevel = ContentHandler.readCompatibilityLevel(item);
-                pkgVersion = ContentHandler.readPkgVersion(item);
-                artifactUrl = ContentHandler.readArtifactUrl(item);
+                mimeType = readMimeType(item);
+                contentType = readContentType(item);
+                visibility = readVisibility(item);
+                audience = readAudience(item);
+                compatibilityLevel = readCompatibilityLevel(item);
+                pkgVersion = readPkgVersion(item);
+                artifactUrl = readArtifactUrl(item);
 
                 oldContentModel = ContentModel.find(appContext.getDBSession(), identifier);
                 oldContentPath = oldContentModel == null ? null : oldContentModel.getPath();
-                boolean isContentExist = ContentHandler.isContentExist(oldContentModel, identifier, pkgVersion);
+                boolean isContentExist = isContentExist(oldContentModel, identifier, pkgVersion);
 
                 //Apk files
                 if ((!StringUtil.isNullOrEmpty(mimeType) && mimeType.equalsIgnoreCase(ContentConstants.MimeType.APK)) ||
@@ -1830,7 +1831,7 @@ public class ContentHandler {
                     contentState = ContentConstants.State.ONLY_SPINE;
                 } else {
                     //If the content is exist then copy the old content data and add it into new content.
-                    if (isContentExist && !(ContentConstants.ContentStatus.DRAFT.equalsIgnoreCase(ContentHandler.readStatus(item)))) {
+                    if (isContentExist && !(ContentConstants.ContentStatus.DRAFT.equalsIgnoreCase(readStatus(item)))) {
                         if (oldContentModel.getVisibility().equalsIgnoreCase(ContentConstants.Visibility.DEFAULT)) {
                             Map<String, Object> oldContentLocalDataMap = GsonUtil.fromJson(oldContentModel.getLocalData(), Map.class);
 
@@ -1841,7 +1842,7 @@ public class ContentHandler {
                         isContentExist = false;
 
                         // If compatibility level is not in range then do not copy artifact
-                        if (ContentHandler.isCompatible(appContext, compatibilityLevel)) {
+                        if (isCompatible(appContext, compatibilityLevel)) {
                             // Add or update the content_state
                             if (ContentConstants.MimeType.COLLECTION.equals(mimeType)) {
                                 contentState = ContentConstants.State.ARTIFACT_AVAILABLE;
@@ -1868,7 +1869,7 @@ public class ContentHandler {
                 }
 
                 // Set content visibility
-                if ("Library".equalsIgnoreCase(ContentHandler.readObjectType(item))) {
+                if ("Library".equalsIgnoreCase(readObjectType(item))) {
                     visibility = ContentConstants.Visibility.PARENT;
                 } else if (oldContentModel != null) {
                     if (!ContentConstants.Visibility.PARENT.equals(oldContentModel.getVisibility())) {  // If not started from child content then do not shrink visibility.
@@ -1893,7 +1894,7 @@ public class ContentHandler {
                     sizeOnDevice = FileUtil.getFileSize(new File(path));
                 }
 
-                ContentHandler.addOrUpdateViralityMetadata(item, appContext.getDeviceInfo().getDeviceID());
+                addOrUpdateViralityMetadata(item, appContext.getDeviceInfo().getDeviceID());
                 ContentModel newContentModel = ContentModel.build(appContext.getDBSession(), identifier, manifestVersion, GsonUtil.toJson(item),
                         mimeType, contentType, visibility, path, refCount, contentState, audience, sizeOnDevice);
 
@@ -1904,7 +1905,42 @@ public class ContentHandler {
                 }
             }
         }
+    }
 
+    public static void updateSizeOnDevice(AppContext appContext) {
+        List<ContentModel> dbContentModelList = findAllContent(appContext.getDBSession());
+        if (!CollectionUtil.isNullOrEmpty(dbContentModelList)) {
+            for (ContentModel contentModel : dbContentModelList) {
+                if (hasChildren(contentModel.getLocalData())) {
+                    long sizeOnDevice = 0;
+                    Queue<ContentModel> queue = new LinkedList<>();
+
+                    queue.add(contentModel);
+
+                    ContentModel node;
+                    while (!queue.isEmpty()) {
+                        node = queue.remove();
+
+                        if (hasChildren(node.getLocalData())) {
+                            List<String> childContentsIdentifiers = getChildContentsIdentifiers(node.getLocalData());
+                            List<ContentModel> contentModelListInDB = findAllContentsWithIdentifiers(appContext.getDBSession(), childContentsIdentifiers);
+                            if (contentModelListInDB != null) {
+                                queue.addAll(contentModelListInDB);
+                            }
+                        }
+
+                        if (ContentConstants.MimeType.COLLECTION.equals(node.getMimeType())) {
+                            sizeOnDevice = sizeOnDevice + FileUtil.getFileSize(new File(node.getPath()));
+                        } else {
+                            sizeOnDevice = sizeOnDevice + node.getSizeOnDevice();
+                        }
+                    }
+
+                    contentModel.setSizeOnDevice(sizeOnDevice);
+                    contentModel.update();
+                }
+            }
+        }
     }
 
 }
