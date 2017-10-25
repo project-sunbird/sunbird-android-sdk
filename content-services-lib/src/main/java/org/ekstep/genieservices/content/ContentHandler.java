@@ -669,6 +669,7 @@ public class ContentHandler {
             // Update the refCount
             contentModel.addOrUpdateRefCount(refCount);
             contentModel.addOrUpdateContentState(contentState);
+            contentModel.setSizeOnDevice(FileUtil.getFileSize(new File(contentModel.getPath())));
 
             contentModel.update();
         }
