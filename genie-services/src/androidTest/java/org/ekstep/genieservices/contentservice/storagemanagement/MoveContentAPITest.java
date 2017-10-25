@@ -5,12 +5,14 @@ import android.support.test.runner.AndroidJUnit4;
 import android.support.v4.content.ContextCompat;
 
 import org.ekstep.genieservices.EcarCopyUtil;
+import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.ContentMoveRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.utils.FileUtil;
+import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -33,6 +35,7 @@ import java.util.List;
 public class MoveContentAPITest extends GenieServiceTestBase {
 
     private static final String VISIBILITY_DEFAULT = "default";
+    private static final String COLLECTION_ASSET_PATH = "Download/Times_Tables_2_to_10.ecar";
     private final String CONTENT_ID = "do_30013486";
     private final String CONTENT_FILEPATH = "Download/Multiplication2.ecar";
 
@@ -54,7 +57,7 @@ public class MoveContentAPITest extends GenieServiceTestBase {
 
 
     @Test
-    public void _1importContentEcar() {
+    public void _11importContentEcar() {
         EcarImportRequest.Builder ecarImportRequest = new EcarImportRequest.Builder().fromFilePath(DESTINATION + "/Multiplication2.ecar").toFolder(activity.getExternalFilesDir(null).toString());
         GenieResponse<List<ContentImportResponse>> response = activity.importEcar(ecarImportRequest.build());
     }
@@ -68,7 +71,7 @@ public class MoveContentAPITest extends GenieServiceTestBase {
      * d. Check if the content_id folder does not exist in the Internal Memory
      */
     @Test
-    public void _2moveContentFromInternalToExternalStorage() {
+    public void _22moveContentFromInternalToExternalStorage() {
         moveContentFromInternalToExternalStorage();
     }
 
@@ -86,7 +89,36 @@ public class MoveContentAPITest extends GenieServiceTestBase {
 
             Assert.assertFalse(FileUtil.doesFileExists(folderPathInInternalMemory));
             Assert.assertTrue(FileUtil.doesFileExists(folderPathInSdCard));
+
+            ContentModel contentModel = GenieServiceDBHelper.getContentPathInDB(CONTENT_ID);
+            Assert.assertEquals(folderPathInSdCard, contentModel.getPath());
         }
+    }
+
+    /**
+     * Scenario: Move downloaded content to default storage.
+     * Given: When user sets the external storage as default storage,
+     * then the contents that are downloaded later should move to external storage.
+     * When: User sets the external storage as default.
+     * Then: The downloaded contents get stored to the external storage.
+     */
+    @Test
+    public void _33checkDownloadedContentMovesToDefaultStorage() {
+
+        String folderPathInSdCard = getExternalSdcardPath(activity) + "/content/" + CONTENT_ID;
+        String folderPathInInternalMemory = activity.getExternalFilesDir(null).toString() + "/content/" + CONTENT_ID;
+
+        //import content
+        EcarCopyUtil.createFileFromAsset(activity, COLLECTION_ASSET_PATH, DESTINATION);
+        EcarImportRequest.Builder ecarImportRequest = new EcarImportRequest.Builder()
+                .fromFilePath(DESTINATION + "/Multiplication2.ecar")
+                .toFolder(getExternalSdcardPath(activity));
+        GenieResponse<List<ContentImportResponse>> response = activity.importEcar(ecarImportRequest.build());
+
+        //check if it's getting stored in external storage.
+        Assert.assertTrue(response.getStatus());
+        Assert.assertTrue(FileUtil.doesFileExists(folderPathInSdCard));
+        Assert.assertFalse(FileUtil.doesFileExists(folderPathInInternalMemory));
     }
 
     /**
@@ -98,7 +130,7 @@ public class MoveContentAPITest extends GenieServiceTestBase {
      * d. Check if the content_id folder does not exist in the Internal Memory
      */
     @Test
-    public void _3moveContentFromExternalToInternalStorage() {
+    public void _44moveContentFromExternalToInternalStorage() {
         String internalStorageFilePath = activity.getExternalFilesDir(null).toString();
 
         ContentMoveRequest.Builder contentMoveRequest = new ContentMoveRequest.Builder();
@@ -112,19 +144,22 @@ public class MoveContentAPITest extends GenieServiceTestBase {
 
             Assert.assertFalse(FileUtil.doesFileExists(folderPathInSdCard));
             Assert.assertTrue(FileUtil.doesFileExists(folderPathInInternalMemory));
+
+            ContentModel contentModel = GenieServiceDBHelper.getContentPathInDB(CONTENT_ID);
+            Assert.assertEquals(folderPathInInternalMemory, contentModel.getPath());
         }
     }
 
     /**
      * Test 3 - Copy same content present in External storage, from Internal storage
-     *
+     * <p>
      * a. Copy same content to the CONTENT folder in the internal storage.
      * b. using move api copy the content to the CONTENT folder of the external storage, which already has the same content
      * c. Check if the content_id folder exists in the SD Card
      * d. Check if the content_id folder does not exist in the Internal Memory
      */
     @Test
-    public void _4moveAlreadyExistingContentFromInternalToExternal() {
+    public void _55moveAlreadyExistingContentFromInternalToExternal() {
         String contentPathInInternalMemory = activity.getExternalFilesDir(null).toString() + "/content/" + CONTENT_ID;
         String contentPathInExternalMemory = getExternalSdcardPath(activity) + "/content/" + CONTENT_ID;
 

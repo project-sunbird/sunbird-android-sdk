@@ -13,8 +13,6 @@ import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
 import org.ekstep.genieservices.commons.db.contract.ProfileEntry;
 import org.ekstep.genieservices.commons.db.core.impl.SQLiteResultSet;
-import org.ekstep.genieservices.commons.utils.DateUtil;
-import org.ekstep.genieservices.content.db.model.ContentListingModel;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.profile.db.model.ContentAccessModel;
 import org.ekstep.genieservices.profile.db.model.LearnerSummaryModel;
@@ -80,6 +78,19 @@ public class GenieServiceDBHelper {
         cursor.close();
 
         return events;
+    }
+
+    public static ContentModel getContentPathInDB(String identifier) {
+        String query = "SELECT * FROM content where identifier='" + identifier + "'";
+        Cursor cursor = GenieServiceDBHelper.getDatabase().rawQuery(query, null);
+        ContentModel contentModel = ContentModel.build(sGSDBHelper.mAppContext.getDBSession());
+        if (cursor != null && cursor.moveToFirst())
+            do {
+                contentModel.readWithoutMoving(new SQLiteResultSet(cursor));
+            } while (cursor.moveToNext());
+        cursor.close();
+
+        return contentModel;
     }
 
     public static List<ProcessedEventModel> findProcessedEvents() {
