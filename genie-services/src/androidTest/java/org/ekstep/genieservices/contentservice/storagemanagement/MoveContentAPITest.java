@@ -13,11 +13,14 @@ import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.content.db.model.ContentModel;
+import org.ekstep.genieservices.utils.DeviceSpec;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 
@@ -36,6 +39,8 @@ public class MoveContentAPITest extends GenieServiceTestBase {
 
     private static final String VISIBILITY_DEFAULT = "default";
     private static final String COLLECTION_ASSET_PATH = "Download/Times_Tables_2_to_10.ecar";
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
     private final String CONTENT_ID = "do_30013486";
     private final String CONTENT_FILEPATH = "Download/Multiplication2.ecar";
 
@@ -51,13 +56,13 @@ public class MoveContentAPITest extends GenieServiceTestBase {
     }
 
     @Test
-    public void _0ShouldCopyNecessaryFiles() {
+    public void _11_ShouldCopyNecessaryFiles() {
         EcarCopyUtil.createFileFromAsset(activity, CONTENT_FILEPATH, DESTINATION);
     }
 
 
     @Test
-    public void _11importContentEcar() {
+    public void _22_importContentEcar() {
         EcarImportRequest.Builder ecarImportRequest = new EcarImportRequest.Builder().fromFilePath(DESTINATION + "/Multiplication2.ecar").toFolder(activity.getExternalFilesDir(null).toString());
         GenieResponse<List<ContentImportResponse>> response = activity.importEcar(ecarImportRequest.build());
     }
@@ -71,7 +76,7 @@ public class MoveContentAPITest extends GenieServiceTestBase {
      * d. Check if the content_id folder does not exist in the Internal Memory
      */
     @Test
-    public void _22moveContentFromInternalToExternalStorage() {
+    public void _33_moveContentFromInternalToExternalStorage() {
         moveContentFromInternalToExternalStorage();
     }
 
@@ -103,7 +108,7 @@ public class MoveContentAPITest extends GenieServiceTestBase {
      * Then: The downloaded contents get stored to the external storage.
      */
     @Test
-    public void _33checkDownloadedContentMovesToDefaultStorage() {
+    public void _44_checkDownloadedContentMovesToDefaultStorage() {
 
         String folderPathInSdCard = getExternalSdcardPath(activity) + "/content/" + CONTENT_ID;
         String folderPathInInternalMemory = activity.getExternalFilesDir(null).toString() + "/content/" + CONTENT_ID;
@@ -130,7 +135,11 @@ public class MoveContentAPITest extends GenieServiceTestBase {
      * d. Check if the content_id folder does not exist in the Internal Memory
      */
     @Test
-    public void _44moveContentFromExternalToInternalStorage() {
+    public void _55_moveContentFromExternalToInternalStorage() {
+        moveContentFromExternalToInternalStorage();
+    }
+
+    public void moveContentFromExternalToInternalStorage() {
         String internalStorageFilePath = activity.getExternalFilesDir(null).toString();
 
         ContentMoveRequest.Builder contentMoveRequest = new ContentMoveRequest.Builder();
@@ -159,7 +168,7 @@ public class MoveContentAPITest extends GenieServiceTestBase {
      * d. Check if the content_id folder does not exist in the Internal Memory
      */
     @Test
-    public void _55moveAlreadyExistingContentFromInternalToExternal() {
+    public void _66_moveAlreadyExistingContentFromInternalToExternal() {
         String contentPathInInternalMemory = activity.getExternalFilesDir(null).toString() + "/content/" + CONTENT_ID;
         String contentPathInExternalMemory = getExternalSdcardPath(activity) + "/content/" + CONTENT_ID;
 
@@ -184,4 +193,70 @@ public class MoveContentAPITest extends GenieServiceTestBase {
         return null;
     }
 
+    /**
+     * Scenario: When device external memory is low and we try to move the file to external storage, File IOException is thrown.
+     * Given: When device is external memory is low.
+     * When: We try to move file to device storage.
+     * Then: IOException is thrown
+     *
+     * @throws IOException - No space left on device
+     */
+    @Test
+    public void _77_checkForLowExternalMemory() throws IOException {
+
+        File contentPathInMemory = new File(getExternalSdcardPath(activity) + "/content/" + CONTENT_ID);
+        String dummyFilepath = getExternalSdcardPath(activity) + "/content2/";
+
+        int i = 0;
+
+        long usedSpace = DeviceSpec.getTotalExternalMemorySize() - DeviceSpec.getAvailableExternalMemorySize();
+        long availableSpace = DeviceSpec.getAvailableExternalMemorySize();
+
+        while (availableSpace != 0) {
+            i++;
+            File copyOfContent = new File(dummyFilepath + i);
+            FileUtil.copyFolder(contentPathInMemory, copyOfContent);
+            exception.expect(IOException.class);
+
+            if (usedSpace == availableSpace) {
+                exception.expect(IOException.class);
+                break;
+            }
+        }
+    }
+
+    /**
+     * Scenario: When device internal memory is low and we try to move the file to internal storage, File IOException is thrown.
+     * Given: When device is internal memory is low.
+     * When: We try to move file to device storage.
+     * Then: IOException is thrown
+     *
+     * @throws IOException - No space left on device
+     */
+    @Test
+    public void _99_checkForLowInternalMemory() throws IOException {
+
+        moveContentFromExternalToInternalStorage();
+
+        String contentPathInInternalMemory = activity.getExternalFilesDir(null).toString() + "/content/" + CONTENT_ID;
+        String dummyPath = activity.getExternalFilesDir(null).toString() + "/content2/";
+
+        int i = 0;
+
+        long usedSpace = DeviceSpec.getTotalInternalMemorySize() - DeviceSpec.getAvailableInternalMemorySize();
+        long availableSpace = DeviceSpec.getAvailableInternalMemorySize();
+
+        while (availableSpace != 0) {
+            i++;
+            File copyOfContent = new File(dummyPath + i);
+
+            FileUtil.copyFolder(new File(contentPathInInternalMemory), copyOfContent);
+            exception.expect(IOException.class);
+
+            if (usedSpace == availableSpace) {
+                exception.expect(IOException.class);
+                break;
+            }
+        }
+    }
 }
