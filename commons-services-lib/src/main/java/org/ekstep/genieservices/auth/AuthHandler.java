@@ -26,7 +26,7 @@ public class AuthHandler {
     private static String generateMobileDeviceConsumerBearerToken(AppContext appContext) {
         String mobileAppConsumerKey = appContext.getParams().getString(IParams.Key.MOBILE_APP_KEY);
         String mobileAppConsumerSecret = appContext.getParams().getString(IParams.Key.MOBILE_APP_SECRET);
-        String mobileDeviceConsumerKey = appContext.getDeviceInfo().getDeviceID();
+        String mobileDeviceConsumerKey = appContext.getParams().getString(IParams.Key.CHANNEL_ID) + "-" + appContext.getDeviceInfo().getDeviceID();
         String mobileDeviceConsumerSecret = getMobileDeviceConsumerSecret(appContext, mobileDeviceConsumerKey, mobileAppConsumerKey, mobileAppConsumerSecret);
         String mobileDeviceConsumerBearerToken = null;
         if (mobileDeviceConsumerSecret != null) {
