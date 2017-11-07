@@ -31,6 +31,7 @@ public class ContentData implements Serializable {
     private String osId;
     private String contentType;
     private String resourceType;
+    private String mimeType;
     private String artifactMimeType;
     private String versionKey;
     private String contentEncoding;
@@ -130,6 +131,10 @@ public class ContentData implements Serializable {
         return resourceType;
     }
 
+    public String getMimeType() {
+        return mimeType;
+    }
+
     public String getArtifactMimeType() {
         return artifactMimeType;
     }
@@ -183,6 +188,8 @@ public class ContentData implements Serializable {
                 ", gradeLevel=" + gradeLevel +
                 ", osId='" + osId + '\'' +
                 ", contentType='" + contentType + '\'' +
+                ", resourceType='" + resourceType + '\'' +
+                ", mimeType='" + mimeType + '\'' +
                 ", artifactMimeType='" + artifactMimeType + '\'' +
                 ", versionKey='" + versionKey + '\'' +
                 ", contentEncoding='" + contentEncoding + '\'' +
