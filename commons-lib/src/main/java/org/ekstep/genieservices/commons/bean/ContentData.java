@@ -36,6 +36,7 @@ public class ContentData implements Serializable {
     private String versionKey;
     private String contentEncoding;
     private String contentDisposition;
+    private String contentTypesCount;
     private List<ContentVariant> contentVariantList;
     private List<String> screenshots;
 
@@ -151,6 +152,10 @@ public class ContentData implements Serializable {
         return contentDisposition;
     }
 
+    public String getContentTypesCount() {
+        return contentTypesCount;
+    }
+
     public List<ContentVariant> getVariants() {
         return contentVariantList;
     }
@@ -194,6 +199,7 @@ public class ContentData implements Serializable {
                 ", versionKey='" + versionKey + '\'' +
                 ", contentEncoding='" + contentEncoding + '\'' +
                 ", contentDisposition='" + contentDisposition + '\'' +
+                ", contentTypesCount='" + contentTypesCount + '\'' +
                 ", contentVariantList=" + contentVariantList +
                 ", screenshots=" + screenshots +
                 '}';
