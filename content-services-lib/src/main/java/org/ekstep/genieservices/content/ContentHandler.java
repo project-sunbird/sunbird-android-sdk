@@ -1483,7 +1483,7 @@ public class ContentHandler {
 
         if (ContentConstants.MimeType.COLLECTION.equals(readMimeType(dataMap))) {
             Map variantMap = readVariant(dataMap);
-            if (variantMap.get("spine") != null) {
+            if (variantMap != null && variantMap.get("spine") != null) {
                 Map spineData = (Map) variantMap.get("spine");
                 if (spineData != null) {
                     downloadUrl = spineData.get("ecarUrl").toString();
