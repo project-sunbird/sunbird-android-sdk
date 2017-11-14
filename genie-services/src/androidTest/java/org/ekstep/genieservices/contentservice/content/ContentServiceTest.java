@@ -1,15 +1,16 @@
 package org.ekstep.genieservices.contentservice.content;
 
-import android.os.Environment;
 import android.support.test.runner.AndroidJUnit4;
 
 import junit.framework.Assert;
 
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
-import org.ekstep.genieservices.SampleApiResponse;
+import org.ekstep.genieservices.SampleResponse;
 import org.ekstep.genieservices.commons.bean.Content;
+import org.ekstep.genieservices.commons.bean.ContentDelete;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
+import org.ekstep.genieservices.commons.bean.ContentDeleteResponse;
 import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
@@ -41,8 +42,8 @@ public class ContentServiceTest extends GenieServiceTestBase {
     private static final String VISIBILITY_DEFAULT = "default";
     private final String CONTENT_ID = "do_30013486";
     private final String CONTENT_ID_WITH_CHILD = "do_30019820";
-    private final String CONTENT_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Multiplication2.ecar";
-    private final String CONTENT_WITH_CHILD_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Times_Tables_2_to_10.ecar";
+    private final String CONTENT_FILEPATH = DESTINATION + "/Multiplication2.ecar";
+    private final String CONTENT_WITH_CHILD_FILEPATH = DESTINATION + "/Times_Tables_2_to_10.ecar";
 
     @Before
     public void setup() throws IOException {
@@ -97,7 +98,7 @@ public class ContentServiceTest extends GenieServiceTestBase {
 
         startMockServer();
 
-        mMockServer.mockHttpResponse(SampleApiResponse.getRecommendedContent(), 200);
+        mMockServer.mockHttpResponse(SampleResponse.getRecommendedContent(), 200);
 
         RecommendedContentRequest.Builder contentRequest = new RecommendedContentRequest.Builder().byLanguage("en");
 
@@ -113,7 +114,7 @@ public class ContentServiceTest extends GenieServiceTestBase {
 
         startMockServer();
 
-        mMockServer.mockHttpResponse(SampleApiResponse.getRecommendedContent(), 400);
+        mMockServer.mockHttpResponse(SampleResponse.getRecommendedContent(), 400);
 
         RecommendedContentRequest.Builder contentRequest = new RecommendedContentRequest.Builder().byLanguage("en");
 
@@ -128,7 +129,7 @@ public class ContentServiceTest extends GenieServiceTestBase {
 
         startMockServer();
 
-        mMockServer.mockHttpResponse(SampleApiResponse.getRecommendedContent(), 200);
+        mMockServer.mockHttpResponse(SampleResponse.getRecommendedContent(), 200);
 
         RelatedContentRequest.Builder contentRequest = new RelatedContentRequest.Builder().forContent(CONTENT_ID);
 
@@ -143,7 +144,7 @@ public class ContentServiceTest extends GenieServiceTestBase {
 
         startMockServer();
 
-        mMockServer.mockHttpResponse(SampleApiResponse.getRecommendedContent(), 400);
+        mMockServer.mockHttpResponse(SampleResponse.getRecommendedContent(), 400);
 
         RelatedContentRequest.Builder contentRequest = new RelatedContentRequest.Builder().forContent(CONTENT_ID);
 
@@ -161,7 +162,7 @@ public class ContentServiceTest extends GenieServiceTestBase {
         GenieResponse<List<ContentImportResponse>> response = activity.importEcar(importRequest.build());
         Assert.assertTrue("true", response.getStatus());
 
-        ContentDeleteRequest.Builder detailsRequest = new ContentDeleteRequest.Builder().contentId(CONTENT_ID);
+        ContentDeleteRequest.Builder detailsRequest = new ContentDeleteRequest.Builder().add(new ContentDelete(CONTENT_ID, false));
 
         GenieResponse genieResponse = activity.deleteContent(detailsRequest.build());
         Assert.assertTrue(genieResponse.getStatus());
@@ -180,12 +181,11 @@ public class ContentServiceTest extends GenieServiceTestBase {
         GenieResponse<List<ContentImportResponse>> response = activity.importEcar(importRequest.build());
         Assert.assertTrue(response.getStatus());
 
-        ContentDeleteRequest.Builder detailsRequest = new ContentDeleteRequest.Builder().contentId(CONTENT_ID_WITH_CHILD);
+        ContentDeleteRequest.Builder detailsRequest = new ContentDeleteRequest.Builder().add(new ContentDelete(CONTENT_ID_WITH_CHILD, false));
 
-        GenieResponse genieResponse = activity.deleteContent(detailsRequest.build());
-        Assert.assertFalse(genieResponse.getStatus());
-        Assert.assertEquals("NO_DATA_FOUND", genieResponse.getError());
-        Assert.assertEquals("No content found to delete for identifier = do_30019820", genieResponse.getErrorMessages().get(0));
+        GenieResponse<List<ContentDeleteResponse>> genieResponse = activity.deleteContent(detailsRequest.build());
+        Assert.assertTrue(genieResponse.getStatus());
+        Assert.assertEquals(-1, genieResponse.getResult().get(0).getStatus().getValue());
     }
 
 

@@ -9,6 +9,7 @@ import org.ekstep.genieservices.EcarCopyUtil;
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.ServiceConstants;
+import org.ekstep.genieservices.commons.bean.ContentDelete;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -54,7 +55,7 @@ public class CollectionDeleteWithNChildTest extends GenieServiceTestBase {
         EcarImportRequest.Builder importRequest = new EcarImportRequest.Builder().fromFilePath(COLLECTION_FILE_PATH).toFolder(activity.getExternalFilesDir(null).toString());
 
         GenieResponse response = activity.importEcar(importRequest.build());
-        Assert.assertTrue("true", response.getStatus());
+        Assert.assertTrue(response.getStatus());
         Assert.assertEquals(ServiceConstants.FileExtension.CONTENT, ext);
 
         GenieServiceDBHelper.findEcarDBEntry(CONTENT_ID);
@@ -70,10 +71,10 @@ public class CollectionDeleteWithNChildTest extends GenieServiceTestBase {
         AssertCollection.verifyContentEntryAndVisibility(AssertCollection.CHILD_C9_ID, VISIBILITY_PARENT);
         AssertCollection.verifyContentEntryAndVisibility(AssertCollection.CHILD_C10_ID, VISIBILITY_PARENT);
 
-        ContentDeleteRequest.Builder contentDelete = new ContentDeleteRequest.Builder().contentId(CONTENT_ID);
+        ContentDeleteRequest.Builder contentDelete = new ContentDeleteRequest.Builder().add(new ContentDelete(CONTENT_ID, false));
 
         GenieResponse genieResponse = activity.deleteContent(contentDelete.build());
-        Assert.assertTrue("true", genieResponse.getStatus());
+        Assert.assertTrue(genieResponse.getStatus());
         AssertCollection.verifyContentIsDeleted(CONTENT_ID, activity, COLLECTION_FILE_PATH);
 
     }

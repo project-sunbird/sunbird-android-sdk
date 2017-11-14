@@ -1,6 +1,5 @@
 package org.ekstep.genieservices.contentservice.content;
 
-import android.os.Environment;
 import android.support.test.runner.AndroidJUnit4;
 
 import junit.framework.Assert;
@@ -9,6 +8,7 @@ import org.ekstep.genieservices.EcarCopyUtil;
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.commons.bean.Content;
+import org.ekstep.genieservices.commons.bean.ContentDelete;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
@@ -29,8 +29,8 @@ import java.util.List;
 @RunWith(AndroidJUnit4.class)
 public class ContentUpdateAndReferenceCountCheck extends GenieServiceTestBase {
 
-    private static final String COLLECTION_FILE_PATH = Environment.getExternalStorageDirectory().toString() + "/Download/Times_Tables_2_to_10.ecar";
-    private static final String CHILD_CONTENT_FILE_PATH = Environment.getExternalStorageDirectory().toString() + "/Download/Multiplication4.ecar";
+    private static final String COLLECTION_FILE_PATH = DESTINATION + "/Times_Tables_2_to_10.ecar";
+    private static final String CHILD_CONTENT_FILE_PATH = DESTINATION + "/Multiplication4.ecar";
 
     private static final String COLLECTION_ASSET_PATH = "Download/Times_Tables_2_to_10.ecar";
     private static final String CHILD_CONTENT_ASSET_PATH = "Download/Multiplication4.ecar";
@@ -83,7 +83,7 @@ public class ContentUpdateAndReferenceCountCheck extends GenieServiceTestBase {
         Assert.assertEquals(2, contentDetailsResponse.getResult().getReferenceCount());
 
         //delete content
-        ContentDeleteRequest.Builder deleteRequest = new ContentDeleteRequest.Builder().contentId(AssertCollection.CHILD_C4_ID).isChildContent();
+        ContentDeleteRequest.Builder deleteRequest = new ContentDeleteRequest.Builder().add(new ContentDelete(AssertCollection.CHILD_C4_ID, true));
         GenieResponse deleteResponse = activity.deleteContent(deleteRequest.build());
         Assert.assertTrue(deleteResponse.getStatus());
 

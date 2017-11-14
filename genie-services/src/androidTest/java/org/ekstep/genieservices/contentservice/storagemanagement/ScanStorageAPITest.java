@@ -146,12 +146,12 @@ public class ScanStorageAPITest extends GenieServiceTestBase {
 
     /**
      * Test 2 - Add an extra invalid content to the CONTENT folder manually (Default visibility)
-     *
+     * <p>
      * a. Add any invalid default visibility content to the CONTENT folder in the internal storage, to the already existing contents.
      * b. Using scanStorage api, to check if any content is added or not
      * c. If added, check if the content which was manually added is added to the db
      * d. Check if the recently added content is got in the get all local contents api
-     *
+     * <p>
      * Result - Should not be added to the db and must not be listed in the list of local contents
      */
     @Test

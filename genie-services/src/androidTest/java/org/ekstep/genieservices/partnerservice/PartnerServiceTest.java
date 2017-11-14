@@ -73,7 +73,7 @@ public class PartnerServiceTest extends GenieServiceTestBase {
         List<EventModel> eventModelList = GenieServiceDBHelper.findEventById(telemetryEvent);
         Map eventMap = eventModelList.get(0).getEventMap();
         Assert.assertEquals(telemetryEvent, eventMap.get("eid"));
-        Assert.assertEquals("2.1", eventMap.get("ver"));
+        Assert.assertEquals("2.2", eventMap.get("ver"));
     }
 
     /**

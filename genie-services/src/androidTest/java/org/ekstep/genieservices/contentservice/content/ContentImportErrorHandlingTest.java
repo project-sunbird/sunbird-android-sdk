@@ -1,6 +1,5 @@
 package org.ekstep.genieservices.contentservice.content;
 
-import android.os.Environment;
 import android.support.test.runner.AndroidJUnit4;
 
 import junit.framework.Assert;
@@ -32,10 +31,10 @@ public class ContentImportErrorHandlingTest extends GenieServiceTestBase {
     private static final String EXPIRED_CONTENT_ASSET_PATH = "Download/lesson_expired.ecar";
     private static final String OUTDATED_CONTENT_ASSET_PATH = "Download/hawa_v1.0.ecar";
 
-    private static final String ECAR_NO_MANIFEST_PATH = Environment.getExternalStorageDirectory().toString() + "/Download/hawa_no_manifest.ecar";
-    private final String FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Multiplication2.ecar";
-    private final String EXPIRED_CONTENT_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/lesson_expired.ecar";
-    private final String OUTDATED_CONTENT_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/hawa_v1.0.ecar";
+    private static final String ECAR_NO_MANIFEST_PATH = DESTINATION + "/hawa_no_manifest.ecar";
+    private final String FILEPATH = DESTINATION + "/Multiplication2.ecar";
+    private final String EXPIRED_CONTENT_FILEPATH = DESTINATION + "/lesson_expired.ecar";
+    private final String OUTDATED_CONTENT_FILEPATH = DESTINATION + "/hawa_v1.0.ecar";
 
     @Before
     public void setup() throws IOException {

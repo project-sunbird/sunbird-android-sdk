@@ -1,0 +1,93 @@
+apply plugin: 'jacoco'
+
+jacoco {
+//    https://github.com/dampcake/Robolectric-JaCoCo-Sample
+//    https://wiki.jenkins-ci.org/display/JENKINS/JaCoCo+Plugin
+    // https://bintray.com/bintray/jcenter/org.jacoco:org.jacoco.core
+
+//    toolVersion = "0.7.7.201606060606"
+    toolVersion = "0.7.6.201602180812"
+//    toolVersion = "0.7.5.201505241946"
+//    toolVersion = "0.7.4.201502262128"
+}
+
+android {
+    testOptions {
+        unitTests.all {
+            jacoco {
+                includeNoLocationClasses = true
+            }
+        }
+    }
+}
+
+def coverageSourceDirs = [
+        '/genie-sdk-test/src/main/java'
+]
+
+project.afterEvaluate {
+    task jacocoTestReport(type: JacocoReport, dependsOn: "connectedDebugAndroidTest") {
+        group = "Reporting"
+        description = "Generate Jacoco coverage reports after running tests."
+
+        classDirectories = fileTree(
+                dir: 'genie-sdk-test/build/intermediates/classes/debug',
+                excludes: ['**/R.class',
+                           '**/R$*.class',
+                           '**/*$ViewInjector*.*',
+                           '**/BuildConfig.*',
+                           '**/Manifest*.*',
+                           '**/async/*.*',
+                           '**/utils/*.*',
+                           '**/commons/exception/*.*',
+                           '**/content/LanguageServiceImpl.*',
+                           '**/auth/*.*',
+                           '**/auth/network/*.*',
+                           '**/commons/db/contract/*.*',
+                           '**/eventbus/*.*','**/commons/**','**/content/network/LanguageSearchAPI.*','**/content/network/LanguageTraversalAPI.*',
+                           '**/MyApplication.*','**/MainActivity.*','**/BaseService.*','**/GenieService.*','**/GenieSdkEventListener.*'
+                            ]
+        )
+
+//    additionalSourceDirs = files(coverageSourceDirs)
+        sourceDirectories = files(coverageSourceDirs)
+        executionData = fileTree(dir: project.projectDir, includes:['**/*.exec', '**/*.ec'])
+
+
+        reports {
+            xml.enabled = true
+            html.enabled = true
+        }
+    }
+}
+
+//project.afterEvaluate {
+//
+//    android.applicationVariants.all { variant ->
+//        def name = variant.name
+//        def testTaskName = "test${name.capitalize()}UnitTest"
+//
+//        tasks.create(name: "${testTaskName}Coverage", type: JacocoReport, dependsOn: "$testTaskName") {
+//            group = "Reporting"
+//            description = "Generate Jacoco coverage reports for the ${name.capitalize()} build."
+//
+//            classDirectories = fileTree(
+//                    dir: "${project.buildDir}/intermediates/classes/${name}",
+//                    excludes: ['**/R.class',
+//                               '**/R$*.class',
+//                               '**/*$ViewInjector*.*',
+//                               '**/*$ViewBinder*.*',
+//                               '**/BuildConfig.*',
+//                               '**/Manifest*.*']
+//            )
+//
+//            sourceDirectories = files(['src/main/java'].plus(android.sourceSets[name].java.srcDirs))
+//            executionData = files("${project.buildDir}/jacoco/${testTaskName}.exec")
+//
+//            reports {
+//                xml.enabled = true
+//                html.enabled = true
+//            }
+//        }
+//    }
+//}

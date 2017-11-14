@@ -7,7 +7,7 @@ import junit.framework.Assert;
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.MockServer;
-import org.ekstep.genieservices.SampleApiResponse;
+import org.ekstep.genieservices.SampleResponse;
 import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -45,7 +45,7 @@ public class ContentListingAPITest extends GenieServiceTestBase {
     public void _1ShouldReturnFalseStatusFor404Error() {
         startMockServer();
 
-        mMockServer.mockHttpResponse(SampleApiResponse.getContentListingAPIResponse(), 400);
+        mMockServer.mockHttpResponse(SampleResponse.getContentListingAPIResponse(), 400);
 
         String PARTNER_HOME_IDENTIFIER = "org.ekstep.genie.content";
         ContentListingCriteria.Builder contentListingCriteria = new ContentListingCriteria.Builder();
@@ -62,7 +62,7 @@ public class ContentListingAPITest extends GenieServiceTestBase {
 
         startMockServer();
 
-        mMockServer.mockHttpResponse(SampleApiResponse.getContentListingAPIResponse(), 200);
+        mMockServer.mockHttpResponse(SampleResponse.getContentListingAPIResponse(), 200);
 
         GenieServiceDBHelper.clearTable(PageEntry.TABLE_NAME);
 
@@ -103,7 +103,7 @@ public class ContentListingAPITest extends GenieServiceTestBase {
     public void _4ShouldInvokeServerAPIIfTtlExpired() throws InterruptedException {
 
         startMockServer();
-        mMockServer.mockHttpResponse(SampleApiResponse.getContentListingAPIResponse(), 200);
+        mMockServer.mockHttpResponse(SampleResponse.getContentListingAPIResponse(), 200);
 
         String PARTNER_HOME_IDENTIFIER = "org.ekstep.genie.content.partnerhome";
         ContentListingCriteria.Builder contentListingCriteria = new ContentListingCriteria.Builder();

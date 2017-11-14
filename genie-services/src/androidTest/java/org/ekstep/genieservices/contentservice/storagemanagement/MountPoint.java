@@ -4,7 +4,7 @@ public class MountPoint {
     private final String mountPath;
     private final String storageState;
     private final StorageType storageType;
-    
+
     public MountPoint(
             String mountPath,
             String storageState,
@@ -14,7 +14,6 @@ public class MountPoint {
         this.storageType = storageType;
     }
 
-   
 
     public String getMountPath() {
         return mountPath;
@@ -27,7 +26,7 @@ public class MountPoint {
     public StorageType getStorageType() {
         return storageType;
     }
-    
+
     public enum StorageType {
         /**
          * Internal storage.
@@ -44,7 +43,6 @@ public class MountPoint {
          */
         USB
     }
-	
-	
+
 
 }
