@@ -15,6 +15,11 @@ public class ProducerData {
     private String id;
 
     /**
+     * In case the component is distributed, then which instance of that component
+     */
+    private String pid;
+
+    /**
      * version of the App
      */
     private String ver;
@@ -22,6 +27,7 @@ public class ProducerData {
     public ProducerData(String id, String ver) {
         this.id = id;
         this.ver = ver;
+        this.pid = "";
     }
 
     public String getId() {
