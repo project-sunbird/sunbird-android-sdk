@@ -74,12 +74,14 @@ public class Log extends TelemetryV3 {
         /**
          * Additional params in the log message
          */
-        public Builder addParam(Map<String, Object> param) {
-            if (paramList != null) {
+        public Builder addParam(String key, Object value) {
+            if (paramList == null) {
                 paramList = new ArrayList<>();
             }
-            if (param != null) {
-                this.paramList.add(param);
+            if (key != null && value != null) {
+                Map<String, Object> map = new HashMap<>();
+                map.put(key, value);
+                this.paramList.add(map);
             }
 
             return this;

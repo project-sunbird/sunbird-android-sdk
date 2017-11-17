@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class TelemetryV3 {
 
-    private static final String TELEMETRY_VERSION = "3";
+    private static final String TELEMETRY_VERSION = "3.0";
 
     /**
      * unique event ID.

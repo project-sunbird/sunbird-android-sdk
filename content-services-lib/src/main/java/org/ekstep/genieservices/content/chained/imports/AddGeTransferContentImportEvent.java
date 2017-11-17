@@ -5,7 +5,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.telemetry.GETransfer;
+import org.ekstep.genieservices.commons.bean.telemetry.Share;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.ContentHandler;
@@ -38,24 +38,18 @@ public class AddGeTransferContentImportEvent implements IChainable<List<ContentI
 
     private void logGETransferEvent(ImportContentContext importContext) {
         Map<String, Object> metadata = importContext.getMetadata();
-
-        GETransfer.Builder geTransfer = new GETransfer.Builder();
-        geTransfer.directionImport()
-                .count(importContext.getItems().size())     // ((List) metadata.get(ServiceConstants.CONTENT_ITEMS_KEY)).size()
-                .size((Long) metadata.get(ServiceConstants.FILE_SIZE));
-
-        String fileType = (String) metadata.get(ServiceConstants.FILE_TYPE);
-        if (StringUtil.isNullOrEmpty(fileType)) {
-            geTransfer.dataTypeContent();
-        } else {
-            geTransfer.dataTypeExplodedContent();
-        }
+        Share.Builder share = new Share.Builder();
+        share.directionImport().dataTypeFile();
 
         for (Map item : importContext.getItems()) {
-            geTransfer.addContent(ContentHandler.readOriginFromContentMap(item), ContentHandler.readIdentifier(item), ContentHandler.readPkgVersion(item), ContentHandler.readTransferCountFromContentMap(item));
+            String fileType = (String) metadata.get(ServiceConstants.FILE_TYPE);
+            String type = StringUtil.isNullOrEmpty(fileType) ? share.itemTypeContent() : share.itemTypeExplodedContent();
+            share.addItem(type, ContentHandler.readOriginFromContentMap(item), ContentHandler.readIdentifier(item), ContentHandler.readPkgVersion(item),
+                    ContentHandler.readTransferCountFromContentMap(item),
+                    ContentHandler.readSizeFromContentMap(item));
         }
 
-        TelemetryLogger.log(geTransfer.build());
+        TelemetryLogger.log(share.build());
     }
 
 }

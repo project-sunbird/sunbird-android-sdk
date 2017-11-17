@@ -14,6 +14,7 @@ import org.ekstep.genieservices.commons.bean.TelemetryImportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
+import org.ekstep.genieservices.commons.bean.telemetry.TelemetryV3;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
 import org.ekstep.genieservices.commons.exception.InvalidDataException;
@@ -88,6 +89,11 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
     }
 
     @Override
+    public GenieResponse<Void> saveTelemetry(TelemetryV3 event) {
+        return saveTelemetry(event.toString());
+    }
+
+    @Override
     public GenieResponse<TelemetryStat> getTelemetryStat() {
         String methodName = "getTelemetryStat@TelemetryServiceImpl";
         HashMap params = new HashMap();
@@ -127,6 +133,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         }
 
         decorateEvent(event);
+        System.out.println("Event:::" + " " + eventType + " " + GsonUtil.toJson(event));
 
         EventModel eventModel = EventModel.build(mAppContext.getDBSession(), event, eventType);
         eventModel.save();
@@ -252,7 +259,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
             pdata.put("id", mAppContext.getParams().getString(IParams.Key.PRODUCER_ID));
         }
 
-        String id = (String) pdata.get("id");
+        String id = (String) pdata.get("pid");
         if (!isValidId(id)) {
             pdata.put("pid", GENIE_SERVICE_GID);
         }
@@ -343,7 +350,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         }
 
         if (CollectionUtil.isKeyNotAvailable(actorMap, "type")) {
-            actorMap.put("id", "User");
+            actorMap.put("type", "User");
         }
     }
 

@@ -1,6 +1,7 @@
 package org.ekstep.genieservices.commons.bean.telemetry;
 
 import org.ekstep.genieservices.commons.bean.CorrelationData;
+import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
@@ -52,19 +53,22 @@ public class Interact extends TelemetryV3 {
         private List<Map<String, String>> pos = new ArrayList<>();
         private List<Map<String, Object>> values = new ArrayList<>();
         private List<CorrelationData> correlationData;
+        private String objId;
+        private String objType;
+        private String objVer;
 
         /**
          * Type of interaction TOUCH,DRAG,DROP,PINCH,ZOOM,SHAKE,ROTATE,SPEAK,LISTEN,WRITE,DRAW,START,ENDCHOOSE,ACTIVATE,SHOW,HIDE,SCROLL,HEARTBEAT,OTHER
          */
-        public Builder type(String type) {
-            this.type = type;
+        public Builder interActionType(InteractionType type) {
+            this.type = type.getValue();
             return this;
         }
 
         /**
          * Additional types for a global type. For ex: for an audio the type is LISTEN and thesubtype can be one of PLAY,PAUSE,STOP,RESUME,END
          */
-        public Builder subtype(String subType) {
+        public Builder subType(String subType) {
             this.subType = subType;
             return this;
         }
@@ -110,11 +114,35 @@ public class Interact extends TelemetryV3 {
             return this;
         }
 
+        /**
+         * Id of the object. For ex: content id incase of content
+         */
+        public Builder objectId(String objId) {
+            this.objId = objId;
+            return this;
+        }
+
+        /**
+         * Type of the object. For ex: "Content", "Community", "User" etc.
+         */
+        public Builder objectType(String objType) {
+            this.objType = objType;
+            return this;
+        }
+
+        /**
+         * version of the object
+         */
+        public Builder objectVersion(String objVer) {
+            this.objVer = objVer;
+            return this;
+        }
+
 
         public Interact build() {
             Interact event = new Interact(type, subType, id, pageId, pos, values);
-            Map<String, Object> context = new HashMap<>();
             event.setCoRrelationdata(correlationData);
+            event.setObject(objId != null ? objId : "", objType != null ? objType : "", objVer != null ? objVer : "");
             return event;
         }
     }

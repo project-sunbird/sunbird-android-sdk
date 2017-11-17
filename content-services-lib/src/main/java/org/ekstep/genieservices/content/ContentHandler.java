@@ -103,6 +103,7 @@ public class ContentHandler {
     private static final String KEY_VIRALITY_METADATA = "virality";
     private static final String KEY_TRANSFER_COUNT = "transferCount";
     private static final String KEY_ORIGIN = "origin";
+    private static final String KEY_SIZE = "size";
 
     private static final int DEFAULT_PACKAGE_VERSION = -1;
     private static final int INITIAL_VALUE_FOR_TRANSFER_COUNT = 0;
@@ -830,6 +831,10 @@ public class ContentHandler {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    public static String readSizeFromContentMap(Map contentData) {
+        return contentData.get(KEY_SIZE) != null ? String.valueOf(contentData.get(KEY_SIZE)) : "";
     }
 
     public static void addOrUpdateViralityMetadata(Map<String, Object> localDataMap, String origin) {

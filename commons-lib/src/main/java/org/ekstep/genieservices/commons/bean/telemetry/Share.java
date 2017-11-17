@@ -14,18 +14,16 @@ public class Share extends TelemetryV3 {
     private static final String EID = "SHARE";
 
 
-    private Share(String direction, String dataType, int count, long size, List<Map<String, Object>> contents) {
+    private Share(String direction, String dataType, List<Map<String, Object>> contents) {
         super(EID);
-        setEData(createEData(direction, dataType, count, size, contents));
+        setEData(createEData(direction, dataType, contents));
     }
 
-    private Map<String, Object> createEData(String direction, String dataType, int count, long size, List<Map<String, Object>> contents) {
+    private Map<String, Object> createEData(String direction, String dataType, List<Map<String, Object>> contents) {
         Map<String, Object> map = new HashMap<>();
-        map.put("direction", direction);
-        map.put("datatype", dataType);
-        map.put("count", count);
-        map.put("size", size);
-        map.put("contents", contents);
+        map.put("dir", direction);
+        map.put("type", dataType);
+        map.put("items", contents);
         return map;
     }
 
@@ -56,15 +54,21 @@ public class Share extends TelemetryV3 {
             return this;
         }
 
-
-        public Share.Builder count(int count) {
-            this.count = count;
-            return this;
+        public String itemTypeContent() {
+            return this.dataType = "CONTENT";
         }
 
-        public Share.Builder size(long size) {
-            this.size = size;
-            return this;
+        public String itemTypeExplodedContent() {
+            return this.dataType = "EXPLODEDCONTENT";
+        }
+
+        public String itemTypeTelemetry() {
+            return this.dataType = "TELEMETRY";
+        }
+
+
+        public String itemTypeProfile() {
+            return this.dataType = "PROFILE";
         }
 
         /**
@@ -74,23 +78,24 @@ public class Share extends TelemetryV3 {
             Map<String, Object> itemMap = new HashMap<>();
             itemMap.put("origin", origin);
             itemMap.put("id", identifier);
-            if ("Content".equalsIgnoreCase(type)) {
-                itemMap.put("type", "Content");
+            if ("Content".equalsIgnoreCase(type) || "EXPLODEDCONTENT".equals(type)) {
+                itemMap.put("type", type);
                 itemMap.put("ver", pkgVersion);
+                //Add Params
+                List<Map<String, Object>> paramsList = new ArrayList<>();
+                Map<String, Object> paramsMap = new HashMap<>();
+                paramsMap.put("transfers", transferCount);
+                paramsMap.put("size", size);
+                paramsList.add(paramsMap);
+
+                itemMap.put("params", paramsList);
             } else if ("Profile".equalsIgnoreCase(type)) {
                 itemMap.put("type", "Profile");
             } else if ("Telemetry".equalsIgnoreCase(type)) {
                 itemMap.put("type", "Telemetry");
             }
 
-            //Add Params
-            List<Map<String, Object>> paramsList = new ArrayList<>();
-            Map<String, Object> paramsMap = new HashMap<>();
-            paramsMap.put("transfers", transferCount);
-            paramsMap.put("size", size);
-            paramsList.add(paramsMap);
 
-            itemMap.put("params", paramsList);
 
             //Add Origin
             Map<String, Object> originMap = new HashMap<>();
@@ -104,7 +109,7 @@ public class Share extends TelemetryV3 {
         }
 
         public Share build() {
-            return new Share(direction, dataType, count, size, contents);
+            return new Share(direction, dataType, contents);
         }
     }
 }

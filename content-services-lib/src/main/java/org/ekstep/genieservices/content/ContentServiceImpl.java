@@ -45,7 +45,7 @@ import org.ekstep.genieservices.commons.bean.enums.ContentImportStatus;
 import org.ekstep.genieservices.commons.bean.enums.DownloadAction;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.enums.ScanStorageStatus;
-import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
+import org.ekstep.genieservices.commons.bean.telemetry.Interact;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
@@ -785,22 +785,24 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     private void buildInitiateEvent() {
-        GEInteract geInteract = new GEInteract.Builder().
-                stageId(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID).
+        Interact interact = new Interact.Builder().
+                pageid(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID).
                 subType(ServiceConstants.Telemetry.CONTENT_IMPORT_INITIATED_SUB_TYPE).
                 interActionType(InteractionType.TOUCH).
+                objectType("Content").
                 build();
-        TelemetryLogger.log(geInteract);
+        TelemetryLogger.log(interact);
     }
 
     private void buildSuccessEvent(String identifier) {
-        GEInteract geInteract = new GEInteract.Builder().
-                stageId(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID).
+        Interact interact = new Interact.Builder().
+                pageid(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID).
                 subType(ServiceConstants.Telemetry.CONTENT_IMPORT_SUCCESS_SUB_TYPE).
                 interActionType(InteractionType.OTHER).
-                id(identifier).
+                objectId(identifier).
+                objectType("Content").
                 build();
-        TelemetryLogger.log(geInteract);
+        TelemetryLogger.log(interact);
     }
 
     @Override

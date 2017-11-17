@@ -5,14 +5,13 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
-import org.ekstep.genieservices.commons.bean.telemetry.GETransfer;
+import org.ekstep.genieservices.commons.bean.telemetry.Share;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.importexport.bean.ExportTelemetryContext;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 import org.ekstep.genieservices.telemetry.model.ImportedMetadataListModel;
 import org.ekstep.genieservices.telemetry.model.ImportedMetadataModel;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,21 +56,15 @@ public class AddGeTransferTelemetryExportEvent implements IChainable<TelemetryEx
     }
 
     private void logGETransferEvent(ExportTelemetryContext exportContext, List<ImportedMetadataModel> importedMetadataModelList) {
-        int aggregateCount = 0;
-        GETransfer.Builder geTransfer = new GETransfer.Builder();
-        geTransfer.directionExport()
-                .dataTypeTelemetry()
-                .size(new File(exportContext.getDestinationDBFilePath()).length());
+
+        Share.Builder share = new Share.Builder();
+        share.directionExport().dataTypeFile();
 
         for (ImportedMetadataModel importedMetadataModel : importedMetadataModelList) {
-            aggregateCount += importedMetadataModel.getCount();
-
-            geTransfer.addContent(importedMetadataModel.getDeviceId(), importedMetadataModel.getImportedId(), importedMetadataModel.getCount());
+            share.addItem(share.itemTypeTelemetry(), importedMetadataModel.getDeviceId(), importedMetadataModel.getImportedId(),
+                    0.0, 0, "");
         }
-        aggregateCount += Integer.valueOf(exportContext.getMetadata().get(ServiceConstants.EVENTS_COUNT).toString());
 
-        geTransfer.count(aggregateCount);
-
-        TelemetryLogger.log(geTransfer.build());
+        TelemetryLogger.log(share.build());
     }
 }

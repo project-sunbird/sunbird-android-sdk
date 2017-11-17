@@ -5,7 +5,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentExportResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.telemetry.GETransfer;
+import org.ekstep.genieservices.commons.bean.telemetry.Share;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.content.ContentHandler;
 import org.ekstep.genieservices.content.bean.ExportContentContext;
@@ -38,19 +38,16 @@ public class AddGeTransferContentExportEvent implements IChainable<ContentExport
     }
 
     private void logGETransferEvent(ExportContentContext exportContext) {
-        Map<String, Object> metadata = exportContext.getMetadata();
-
-        GETransfer.Builder geTransfer = new GETransfer.Builder();
-        geTransfer.directionExport()
-                .dataTypeContent()
-                .count((Integer) metadata.get(ServiceConstants.CONTENT_ITEMS_COUNT_KEY))
-                .size((Long) metadata.get(ServiceConstants.FILE_SIZE));
+        Share.Builder share = new Share.Builder();
+        share.directionExport().dataTypeFile();
 
         for (Map item : exportContext.getItems()) {
-            geTransfer.addContent(ContentHandler.readOriginFromContentMap(item), ContentHandler.readIdentifier(item), ContentHandler.readPkgVersion(item), ContentHandler.readTransferCountFromContentMap(item));
+            share.addItem(share.itemTypeContent(), ContentHandler.readOriginFromContentMap(item), ContentHandler.readIdentifier(item), ContentHandler.readPkgVersion(item),
+                    ContentHandler.readTransferCountFromContentMap(item),
+                    ContentHandler.readSizeFromContentMap(item));
         }
 
-        TelemetryLogger.log(geTransfer.build());
+        TelemetryLogger.log(share.build());
     }
 
 }
