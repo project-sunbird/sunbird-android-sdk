@@ -26,4 +26,16 @@ public class TelemetryObject {
         this.type = type;
         this.version = version;
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getVersion() {
+        return version;
+    }
 }

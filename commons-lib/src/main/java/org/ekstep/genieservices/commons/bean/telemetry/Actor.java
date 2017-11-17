@@ -15,4 +15,12 @@ public class Actor {
         this.id = id;
         this.type = type;
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getType() {
+        return type;
+    }
 }

@@ -69,6 +69,14 @@ public class TelemetryV3 {
         return this.ver;
     }
 
+    public long getEts() {
+        return ets;
+    }
+
+    public Map<String, Object> getEdata() {
+        return edata;
+    }
+
     public void setEData(Map<String, Object> edata) {
         this.edata = edata;
     }
@@ -83,6 +91,18 @@ public class TelemetryV3 {
 
     public void setTags(Tags tags) {
         this.tags = tags;
+    }
+
+    public Actor getActor() {
+        return actor;
+    }
+
+    public Context getContext() {
+        return context;
+    }
+
+    public TelemetryObject getObject() {
+        return object;
     }
 
     @Override

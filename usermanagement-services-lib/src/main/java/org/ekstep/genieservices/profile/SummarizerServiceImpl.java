@@ -11,9 +11,8 @@ import org.ekstep.genieservices.commons.bean.LearnerAssessmentDetails;
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentSummary;
 import org.ekstep.genieservices.commons.bean.LearnerContentSummaryDetails;
 import org.ekstep.genieservices.commons.bean.SummaryRequest;
-import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
+import org.ekstep.genieservices.commons.bean.telemetry.TelemetryV3;
 import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
-import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.profile.db.model.LearnerAssessmentDetailsModel;
@@ -99,7 +98,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
 
 
     @Override
-    public GenieResponse<Void> saveLearnerAssessmentDetails(Telemetry telemetry) {
+    public GenieResponse<Void> saveLearnerAssessmentDetails(TelemetryV3 telemetry) {
         GenieResponse<Void> response;
         String methodName = "saveLearnerAssessmentDetails@LearnerAssessmentsServiceImpl";
         Map<String, Object> params = new HashMap<>();
@@ -121,7 +120,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
     }
 
     @Override
-    public GenieResponse<Void> saveLearnerContentSummaryDetails(Telemetry telemetry) {
+    public GenieResponse<Void> saveLearnerContentSummaryDetails(TelemetryV3 telemetry) {
         GenieResponse<Void> response;
         String methodName = "saveLearnerContentSummaryDetails@LearnerAssessmentsServiceImpl";
         Map<String, Object> params = new HashMap<>();
@@ -157,20 +156,18 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         return null;
     }
 
-    private LearnerContentSummaryDetails mapTelemtryToLearnerContentSummaryDeatils(Telemetry telemetry) {
+    private LearnerContentSummaryDetails mapTelemtryToLearnerContentSummaryDeatils(TelemetryV3 telemetry) {
         LearnerContentSummaryDetails learnerContentSummaryDetails = new LearnerContentSummaryDetails();
-        learnerContentSummaryDetails.setUid(telemetry.getUid());
-        learnerContentSummaryDetails.setContentId(telemetry.getGdata().getId());
-        Map<String, Object> eks = (Map<String, Object>) telemetry.getEData().get("eks");
-        learnerContentSummaryDetails.setTimespent((Double) eks.get("length"));
-        if ("2.0".equalsIgnoreCase(telemetry.getVer())) {
-            learnerContentSummaryDetails.setTimestamp((Long) telemetry.getEts());
-        } else {
-            learnerContentSummaryDetails.setTimestamp(DateUtil.dateToEpoch(telemetry.getTs()));
-        }
+        learnerContentSummaryDetails.setUid(telemetry.getActor().getId());
+        learnerContentSummaryDetails.setContentId(telemetry.getObject().getId());
+        Map<String, Object> eData = telemetry.getEdata();
+        learnerContentSummaryDetails.setTimespent((Double) eData.get("duration"));
 
-        if (telemetry.getCdata() != null) {
-            for (CorrelationData eachCdataValue : telemetry.getCdata()) {
+        learnerContentSummaryDetails.setTimestamp((Long) telemetry.getEts());
+
+        List<CorrelationData> cData = telemetry.getContext().getCdata();
+        if (cData != null) {
+            for (CorrelationData eachCdataValue : cData) {
                 // TODO: 10/10/2017 - Relook following check, it should be mymeType check instead of specific contentType check
                 if (eachCdataValue.getType().equalsIgnoreCase("Collection") || eachCdataValue.getType().equalsIgnoreCase("TextBook")) {
                     learnerContentSummaryDetails.setHierarchyData(eachCdataValue.getId());
@@ -182,30 +179,29 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         return learnerContentSummaryDetails;
     }
 
-    private LearnerAssessmentDetails mapTelemtryToLearnerAssessmentData(Telemetry telemetry) {
+    private LearnerAssessmentDetails mapTelemtryToLearnerAssessmentData(TelemetryV3 telemetry) {
         LearnerAssessmentDetails learnerAssessmentDetails = new LearnerAssessmentDetails();
-        learnerAssessmentDetails.setUid(telemetry.getUid());
-        learnerAssessmentDetails.setContentId(telemetry.getGdata().getId());
-        Map<String, Object> eks = (Map<String, Object>) telemetry.getEData().get("eks");
-        learnerAssessmentDetails.setQid((String) eks.get("qid"));
-        learnerAssessmentDetails.setQindex((Double) eks.get("qindex"));
-        String pass = (String) eks.get("pass");
+        learnerAssessmentDetails.setUid(telemetry.getActor().getId());
+        learnerAssessmentDetails.setContentId(telemetry.getObject().getId());
+        Map<String, Object> eData = telemetry.getEdata();
+        Map<String, Object> question = (Map<String, Object>) eData.get("item");
+        learnerAssessmentDetails.setQid((String) question.get("id"));
+        learnerAssessmentDetails.setQindex((Double) eData.get("index"));
+        String pass = (String) eData.get("pass");
         learnerAssessmentDetails.setCorrect(("Yes".equalsIgnoreCase(pass) ? 1 : 0));
-        learnerAssessmentDetails.setScore((Double) eks.get("score"));
-        learnerAssessmentDetails.setTimespent((Double) eks.get("length"));
+        learnerAssessmentDetails.setScore((Double) eData.get("score"));
+        learnerAssessmentDetails.setTimespent((Double) eData.get("duration"));
         if ("2.0".equalsIgnoreCase(telemetry.getVer())) {
             learnerAssessmentDetails.setTimestamp((Long) telemetry.getEts());
-            learnerAssessmentDetails.setRes(GsonUtil.toJson(eks.get("resvalues")));
-        } else {
-            learnerAssessmentDetails.setTimestamp(DateUtil.dateToEpoch(telemetry.getTs()));
-            learnerAssessmentDetails.setRes(GsonUtil.toJson(eks.get("res")));
+            learnerAssessmentDetails.setRes(GsonUtil.toJson(eData.get("resvalues")));
         }
-        learnerAssessmentDetails.setQdesc((String) eks.get("qdesc"));
-        learnerAssessmentDetails.setQtitle((String) eks.get("qtitle"));
-        learnerAssessmentDetails.setMaxScore((Double) eks.get("maxscore"));
+        learnerAssessmentDetails.setQdesc((String) question.get("desc"));
+        learnerAssessmentDetails.setQtitle((String) question.get("title"));
+        learnerAssessmentDetails.setMaxScore((Double) question.get("maxscore"));
 
-        if (telemetry.getCdata() != null) {
-            for (CorrelationData eachCdataValue : telemetry.getCdata()) {
+        List<CorrelationData> cData = telemetry.getContext().getCdata();
+        if (cData != null) {
+            for (CorrelationData eachCdataValue : cData) {
                 // TODO: 10/10/2017 - Relook following check, it should be mymeType check instead of specific contentType check
                 if (eachCdataValue.getType().equalsIgnoreCase("Collection") || eachCdataValue.getType().equalsIgnoreCase("TextBook")) {
                     learnerAssessmentDetails.setHierarchyData(eachCdataValue.getId());

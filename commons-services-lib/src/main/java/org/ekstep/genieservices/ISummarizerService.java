@@ -4,7 +4,7 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentDetails;
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentSummary;
 import org.ekstep.genieservices.commons.bean.SummaryRequest;
-import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
+import org.ekstep.genieservices.commons.bean.telemetry.TelemetryV3;
 
 import java.util.List;
 
@@ -49,9 +49,9 @@ public interface ISummarizerService {
      */
     GenieResponse<List<LearnerAssessmentDetails>> getLearnerAssessmentDetails(SummaryRequest summaryRequest);
 
-    GenieResponse<Void> saveLearnerAssessmentDetails(Telemetry telemetry);
+    GenieResponse<Void> saveLearnerAssessmentDetails(TelemetryV3 telemetry);
 
-    GenieResponse<Void> saveLearnerContentSummaryDetails(Telemetry telemetry);
+    GenieResponse<Void> saveLearnerContentSummaryDetails(TelemetryV3 telemetry);
 
 
 }

@@ -25,6 +25,30 @@ public class Context {
         this.sid = "";
     }
 
+    public String getChannel() {
+        return channel;
+    }
+
+    public ProducerData getPdata() {
+        return pdata;
+    }
+
+    public String getEnv() {
+        return env;
+    }
+
+    public String getSid() {
+        return sid;
+    }
+
+    public String getDid() {
+        return did;
+    }
+
+    public List<CorrelationData> getCdata() {
+        return cdata;
+    }
+
     public void setCdata(List<CorrelationData> cdata) {
         this.cdata = cdata;
     }
