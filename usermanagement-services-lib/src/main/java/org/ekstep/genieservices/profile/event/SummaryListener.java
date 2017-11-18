@@ -1,7 +1,7 @@
 package org.ekstep.genieservices.profile.event;
 
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.bean.telemetry.TelemetryV3;
+import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.eventbus.EventBus;
 import org.greenrobot.eventbus.NoSubscriberEvent;
@@ -40,7 +40,7 @@ public class SummaryListener {
     }
 
     @Subscribe
-    public void onTelemetryEvent(TelemetryV3 telemetryEvent) throws InterruptedException {
+    public void onTelemetryEvent(Telemetry telemetryEvent) throws InterruptedException {
         SummaryHandler.handleTelemetryEvent(telemetryEvent, this.appContext);
     }
 

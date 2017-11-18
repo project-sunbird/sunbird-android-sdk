@@ -12,7 +12,7 @@ import java.util.Map;
  * Created by swayangjit on 15/11/17.
  */
 
-public class Log extends TelemetryV3 {
+public class Log extends Telemetry {
 
     private static final String EID = "LOG";
 
@@ -37,6 +37,7 @@ public class Log extends TelemetryV3 {
         private String level;
         private String message;
         private String pageid;
+        private String actorType;
         private List<Map<String, Object>> paramList;
 
         /**
@@ -87,9 +88,18 @@ public class Log extends TelemetryV3 {
             return this;
         }
 
+        /**
+         * Type of actor who created the event
+         */
+        public Builder actorType(String actorType) {
+            this.actorType = actorType;
+            return this;
+        }
+
 
         public Log build() {
             Log event = new Log(type, level, message, pageid, paramList);
+            event.setActor(new Actor("", actorType));
             return event;
         }
     }

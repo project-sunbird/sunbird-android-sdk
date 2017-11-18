@@ -14,7 +14,7 @@ import java.util.Map;
  * Created by swayangjit on 15/11/17.
  */
 
-public class Impression extends TelemetryV3 {
+public class Impression extends Telemetry {
 
     private static final String EID = "IMPRESSION";
 

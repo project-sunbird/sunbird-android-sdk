@@ -9,11 +9,11 @@ import java.util.Map;
  * Created by swayangjit on 15/11/17.
  */
 
-public class ExData extends TelemetryV3 {
+public class ExData extends Telemetry {
 
     private static final String EID = "EXDATA";
 
-    private ExData(String type, String data) {
+    public ExData(String type, String data) {
         super(EID);
         setEData(createEData(type, data));
     }

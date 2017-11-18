@@ -6,7 +6,6 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
-import org.ekstep.genieservices.commons.bean.telemetry.GECreateProfile;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
@@ -14,7 +13,6 @@ import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.importexport.bean.ImportProfileContext;
 import org.ekstep.genieservices.profile.db.model.UserProfileModel;
 import org.ekstep.genieservices.profile.db.model.UserProfilesModel;
-import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 /**
  * Created on 6/8/2017.
@@ -48,7 +46,6 @@ public class TransportProfiles implements IChainable<ProfileImportResponse, Impo
 //                    final GECreateUser geCreateUser = new GECreateUser(gameData, profile.getUid(), appContext.getLocationInfo().getLocation());
 
                     final UserProfileModel profileModel = UserProfileModel.build(appContext.getDBSession(), profile);
-                    final GECreateProfile geCreateProfile = new GECreateProfile(profile, appContext.getLocationInfo().getLocation());
                     appContext.getDBSession().executeInTransaction(new IDBTransaction() {
                         @Override
                         public Void perform(IDBSession dbSession) {
@@ -56,7 +53,6 @@ public class TransportProfiles implements IChainable<ProfileImportResponse, Impo
 //                            TelemetryLogger.log(geCreateUser);
 
                             profileModel.save();
-                            TelemetryLogger.log(geCreateProfile);
                             return null;
                         }
                     });

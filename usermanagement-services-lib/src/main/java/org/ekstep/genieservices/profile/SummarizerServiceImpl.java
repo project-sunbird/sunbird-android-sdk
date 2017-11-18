@@ -11,7 +11,7 @@ import org.ekstep.genieservices.commons.bean.LearnerAssessmentDetails;
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentSummary;
 import org.ekstep.genieservices.commons.bean.LearnerContentSummaryDetails;
 import org.ekstep.genieservices.commons.bean.SummaryRequest;
-import org.ekstep.genieservices.commons.bean.telemetry.TelemetryV3;
+import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
@@ -98,7 +98,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
 
 
     @Override
-    public GenieResponse<Void> saveLearnerAssessmentDetails(TelemetryV3 telemetry) {
+    public GenieResponse<Void> saveLearnerAssessmentDetails(Telemetry telemetry) {
         GenieResponse<Void> response;
         String methodName = "saveLearnerAssessmentDetails@LearnerAssessmentsServiceImpl";
         Map<String, Object> params = new HashMap<>();
@@ -120,7 +120,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
     }
 
     @Override
-    public GenieResponse<Void> saveLearnerContentSummaryDetails(TelemetryV3 telemetry) {
+    public GenieResponse<Void> saveLearnerContentSummaryDetails(Telemetry telemetry) {
         GenieResponse<Void> response;
         String methodName = "saveLearnerContentSummaryDetails@LearnerAssessmentsServiceImpl";
         Map<String, Object> params = new HashMap<>();
@@ -156,7 +156,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         return null;
     }
 
-    private LearnerContentSummaryDetails mapTelemtryToLearnerContentSummaryDeatils(TelemetryV3 telemetry) {
+    private LearnerContentSummaryDetails mapTelemtryToLearnerContentSummaryDeatils(Telemetry telemetry) {
         LearnerContentSummaryDetails learnerContentSummaryDetails = new LearnerContentSummaryDetails();
         learnerContentSummaryDetails.setUid(telemetry.getActor().getId());
         learnerContentSummaryDetails.setContentId(telemetry.getObject().getId());
@@ -179,7 +179,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         return learnerContentSummaryDetails;
     }
 
-    private LearnerAssessmentDetails mapTelemtryToLearnerAssessmentData(TelemetryV3 telemetry) {
+    private LearnerAssessmentDetails mapTelemtryToLearnerAssessmentData(Telemetry telemetry) {
         LearnerAssessmentDetails learnerAssessmentDetails = new LearnerAssessmentDetails();
         learnerAssessmentDetails.setUid(telemetry.getActor().getId());
         learnerAssessmentDetails.setContentId(telemetry.getObject().getId());

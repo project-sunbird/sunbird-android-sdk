@@ -9,7 +9,7 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
 import org.ekstep.genieservices.commons.bean.ContentFeedbackFilterCriteria;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.telemetry.GEFeedback;
+import org.ekstep.genieservices.commons.bean.telemetry.Feedback;
 import org.ekstep.genieservices.commons.db.contract.ContentFeedbackEntry;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.bean.enums.GEFeedbackContextType;
@@ -59,11 +59,11 @@ public class ContentFeedbackServiceImpl extends BaseService implements IContentF
         return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
     }
 
-    private void saveContentFeedbackEvent(ContentFeedback feedback) {
-        GEFeedback geFeedback = new GEFeedback("RATING", feedback.getContentId(), feedback.getRating(), feedback.getComments(),
-                GEFeedbackContextType.CONTENT.getValue(), feedback.getStageId());
+    private void saveContentFeedbackEvent(ContentFeedback contentFeedback) {
+        Feedback feedback = new Feedback(contentFeedback.getRating(), contentFeedback.getComments(), contentFeedback.getContentId(),
+                GEFeedbackContextType.CONTENT.getValue(), contentFeedback.getContentVersion());
 
-        TelemetryLogger.log(geFeedback);
+        TelemetryLogger.log(feedback);
     }
 
     @Override

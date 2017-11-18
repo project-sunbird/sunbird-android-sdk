@@ -15,7 +15,7 @@ import java.util.Map;
  * Created by user on 15/11/17.
  */
 
-public class Interact extends TelemetryV3 {
+public class Interact extends Telemetry {
 
     private static final String EID = "INTERACT";
 

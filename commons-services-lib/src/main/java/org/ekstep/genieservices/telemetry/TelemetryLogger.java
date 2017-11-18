@@ -5,10 +5,8 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.telemetry.GEServiceAPICall;
 import org.ekstep.genieservices.commons.bean.telemetry.Log;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
-import org.ekstep.genieservices.commons.bean.telemetry.TelemetryV3;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 
 import java.util.HashMap;
@@ -81,22 +79,11 @@ public class TelemetryLogger {
         save(telemetry);
     }
 
-    public static void log(TelemetryV3 telemetry) {
-        save(telemetry);
-    }
-
-    public static TelemetryV3 create(AppContext appContext, GenieResponse response, String service, String method, Map<String, Object> params, HashMap result) {
-        GEServiceAPICall.Builder eventBuilder = new GEServiceAPICall.Builder();
-//        return eventBuilder.service(service)
-//                .method(method)
-//                .mode(getNetworkMode(appContext.getConnectionInfo()))
-//                .request(params)
-//                .response(response)
-//                .result(result)
-//                .build();
+    public static Telemetry create(AppContext appContext, GenieResponse response, String service, String method, Map<String, Object> params, HashMap result) {
 
         Log log = new Log.Builder().type("api_call")
                 .level("trace")
+                .actorType(ServiceConstants.Telemetry.ACTOR_TYPE_SYSTEM)
                 .addParam("method", method)
                 .addParam("mode", getNetworkMode(appContext.getConnectionInfo()))
                 .addParam("request", params)
@@ -108,12 +95,6 @@ public class TelemetryLogger {
     }
 
     private static void save(Telemetry event) {
-        //This could throw a NPE if the telemetry service is not injected via the init method.
-        // Have purposefully kept it this way so that the caller knows that init has not happened during testing.
-        sTelemetryLogger.mTelemetryService.saveTelemetry(event);
-    }
-
-    private static void save(TelemetryV3 event) {
         //This could throw a NPE if the telemetry service is not injected via the init method.
         // Have purposefully kept it this way so that the caller knows that init has not happened during testing.
         sTelemetryLogger.mTelemetryService.saveTelemetry(event);

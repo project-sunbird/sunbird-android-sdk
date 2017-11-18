@@ -9,11 +9,11 @@ import java.util.Map;
  * Created by swayangjit on 15/11/17.
  */
 
-public class Error extends TelemetryV3 {
+public class Error extends Telemetry {
 
     private static final String EID = "ERROR";
 
-    private Error(String err, String stackTrace, String pageId) {
+    public Error(String err, String stackTrace, String pageId) {
         super(EID);
         setEData(createEData(err, stackTrace, pageId));
     }

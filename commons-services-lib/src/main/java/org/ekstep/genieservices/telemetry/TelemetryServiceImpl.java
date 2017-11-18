@@ -14,7 +14,6 @@ import org.ekstep.genieservices.commons.bean.TelemetryImportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
-import org.ekstep.genieservices.commons.bean.telemetry.TelemetryV3;
 import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
 import org.ekstep.genieservices.commons.exception.InvalidDataException;
@@ -88,10 +87,6 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         return saveTelemetry(event.toString());
     }
 
-    @Override
-    public GenieResponse<Void> saveTelemetry(TelemetryV3 event) {
-        return saveTelemetry(event.toString());
-    }
 
     @Override
     public GenieResponse<TelemetryStat> getTelemetryStat() {
@@ -350,7 +345,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         }
 
         if (CollectionUtil.isKeyNotAvailable(actorMap, "type")) {
-            actorMap.put("type", "User");
+            actorMap.put("type", ServiceConstants.Telemetry.ACTOR_TYPE_USER);
         }
     }
 

@@ -17,16 +17,16 @@ public class End extends Telemetry {
 
     private static final String EID = "END";
 
-    private End(String type, String mode, String duration, String pageid, List<Map<String, Object>> summaryList) {
+    private End(String type, String mode, int duration, String pageid, List<Map<String, Object>> summaryList) {
         super(EID);
         createEData(type, mode, duration, pageid, summaryList);
     }
 
-    protected Map<String, Object> createEData(String type, String mode, String duration, String pageid, List<Map<String, Object>> summaryList) {
+    protected Map<String, Object> createEData(String type, String mode, int duration, String pageid, List<Map<String, Object>> summaryList) {
         Map<String, Object> eData = new HashMap<>();
         eData.put("type", !StringUtil.isNullOrEmpty(type) ? type : "");
         eData.put("mode", !StringUtil.isNullOrEmpty(mode) ? mode : "");
-        eData.put("duration", !StringUtil.isNullOrEmpty(duration) ? duration : "");
+        eData.put("duration", duration);
         eData.put("pageid", !StringUtil.isNullOrEmpty(pageid) ? pageid : "");
         eData.put("summary", !CollectionUtil.isNullOrEmpty(summaryList) ? summaryList : new ArrayList<>());
         return eData;
@@ -41,7 +41,7 @@ public class End extends Telemetry {
 
         private String type;
         private String mode;
-        private String duration;
+        private int duration;
         private String pageid;
         private List<Map<String, Object>> summaryList = null;
 
@@ -64,7 +64,7 @@ public class End extends Telemetry {
         /**
          * Total duration from start to end in seconds
          */
-        public Builder duration(String duration) {
+        public Builder duration(int duration) {
             this.duration = duration;
             return this;
         }

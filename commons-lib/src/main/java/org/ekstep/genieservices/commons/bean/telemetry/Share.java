@@ -9,7 +9,7 @@ import java.util.Map;
  * Created by swayangjit on 15/11/17.
  */
 
-public class Share extends TelemetryV3 {
+public class Share extends Telemetry {
 
     private static final String EID = "SHARE";
 

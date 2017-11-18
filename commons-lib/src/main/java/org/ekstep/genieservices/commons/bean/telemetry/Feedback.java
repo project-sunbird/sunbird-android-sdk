@@ -7,13 +7,14 @@ import java.util.Map;
  * Created by swayangjit on 15/11/17.
  */
 
-public class Feedback extends TelemetryV3 {
+public class Feedback extends Telemetry {
 
     private static final String EID = "FEEDBACK";
 
-    public Feedback(float rating, String comments) {
+    public Feedback(float rating, String comments, String id, String version, String type) {
         super(EID);
         setEData(createData(rating, comments));
+        setObject(id, version, type);
     }
 
     private Map<String, Object> createData(float rating, String comments) {

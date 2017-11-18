@@ -16,13 +16,9 @@ import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.enums.ContentAccessStatus;
-import org.ekstep.genieservices.commons.bean.telemetry.GECreateProfile;
-import org.ekstep.genieservices.commons.bean.telemetry.GECreateUser;
-import org.ekstep.genieservices.commons.bean.telemetry.GEDeleteProfile;
-import org.ekstep.genieservices.commons.bean.telemetry.GEError;
-import org.ekstep.genieservices.commons.bean.telemetry.GESessionEnd;
-import org.ekstep.genieservices.commons.bean.telemetry.GESessionStart;
-import org.ekstep.genieservices.commons.bean.telemetry.GEUpdateProfile;
+import org.ekstep.genieservices.commons.bean.telemetry.End;
+import org.ekstep.genieservices.commons.bean.telemetry.Error;
+import org.ekstep.genieservices.commons.bean.telemetry.Start;
 import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
@@ -113,16 +109,12 @@ public class UserServiceImpl extends BaseService implements IUserService {
         }
         final UserModel userModel = UserModel.build(dbSession, uid);
 
-        final GECreateUser geCreateUser = new GECreateUser(uid, mAppContext.getLocationInfo().getLocation());
         final UserProfileModel profileModel = UserProfileModel.build(dbSession, profile);
-        final GECreateProfile geCreateProfile = new GECreateProfile(profile, mAppContext.getLocationInfo().getLocation());
         dbSession.executeInTransaction(new IDBTransaction() {
             @Override
             public Void perform(IDBSession dbSession) {
                 userModel.save();
-                TelemetryLogger.log(geCreateUser);
                 profileModel.save();
-                TelemetryLogger.log(geCreateProfile);
                 return null;
             }
         });
@@ -151,7 +143,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     }
 
     private void logGEError(GenieResponse response, String id) {
-        GEError geError = new GEError(response.getError(), id, "", response.getErrorMessages().toString());
+        Error geError = new Error(response.getError(), response.getErrorMessages().toString(), id);
         TelemetryLogger.log(geError);
     }
 
@@ -184,8 +176,6 @@ public class UserServiceImpl extends BaseService implements IUserService {
         // TODO: 6/6/2017 - check if profile exists or not before updating.
         userProfileModel.update();
 
-        GEUpdateProfile geUpdateProfile = new GEUpdateProfile(profile, mAppContext.getDeviceInfo().getDeviceID());
-        TelemetryLogger.log(geUpdateProfile);
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Profile.class);
         response.setResult(profile);
@@ -226,7 +216,6 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
             Profile profile = new Profile("", "", "");
             profile.setUid(uid);
-            final GEDeleteProfile geDeleteProfile = new GEDeleteProfile(profile);
             mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
                 @Override
                 public Void perform(IDBSession dbSession) {
@@ -236,7 +225,6 @@ public class UserServiceImpl extends BaseService implements IUserService {
                     userProfileModel.delete();
 
                     userModel.delete();
-                    TelemetryLogger.log(geDeleteProfile);
 
                     return null;
                 }
@@ -280,8 +268,6 @@ public class UserServiceImpl extends BaseService implements IUserService {
         String uid = getAnonymousUserId();
         if (uid == null) {
             uid = createAnonymousUser();
-            GECreateUser geCreateUser = new GECreateUser(uid, mAppContext.getLocationInfo().getLocation());
-            TelemetryLogger.log(geCreateUser);
         }
         Profile profile = new Profile(uid);
         GenieResponse<Profile> response = GenieResponseBuilder.getSuccessResponse("", Profile.class);
@@ -322,8 +308,11 @@ public class UserServiceImpl extends BaseService implements IUserService {
         if (session == null) {
             sessionCreationRequired = true;
         } else if (!session.getUserSessionBean().getUid().equals(uid)) {
-            GESessionEnd geSessionEnd = new GESessionEnd(session.getUserSessionBean(), mAppContext.getDeviceInfo().getDeviceID());
-            TelemetryLogger.log(geSessionEnd);
+            End end = new End.Builder()
+                    .type(ServiceConstants.Telemetry.SESSION)
+                    .duration(DateUtil.elapsedTimeTillNow(session.getUserSessionBean().getCreatedTime()))
+                    .build();
+            TelemetryLogger.log(end);
             session.endSession();
             sessionCreationRequired = true;
         }
@@ -331,8 +320,11 @@ public class UserServiceImpl extends BaseService implements IUserService {
         if (sessionCreationRequired) {
             UserSessionModel userSessionModel = UserSessionModel.buildUserSession(mAppContext, uid);
             userSessionModel.startSession();
-            GESessionStart geSessionStart = new GESessionStart(userSessionModel.getUserSessionBean(), mAppContext.getLocationInfo().getLocation(), mAppContext.getDeviceInfo().getDeviceID());
-            TelemetryLogger.log(geSessionStart);
+            Start start = new Start.Builder().
+                    type(ServiceConstants.Telemetry.SESSION)
+                    .loc(mAppContext.getLocationInfo().getLocation())
+                    .build();
+            TelemetryLogger.log(start);
         }
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
@@ -397,8 +389,6 @@ public class UserServiceImpl extends BaseService implements IUserService {
         if (uid == null) {
             uid = createAnonymousUser();
             setCurrentUser(uid);
-            GECreateUser geCreateUser = new GECreateUser(uid, mAppContext.getLocationInfo().getLocation());
-            TelemetryLogger.log(geCreateUser);
         }
     }
 
