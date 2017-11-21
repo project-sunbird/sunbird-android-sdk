@@ -17,12 +17,12 @@ public class End extends Telemetry {
 
     private static final String EID = "END";
 
-    private End(String type, String mode, int duration, String pageid, List<Map<String, Object>> summaryList) {
+    private End(String type, String mode, long duration, String pageid, List<Map<String, Object>> summaryList) {
         super(EID);
         createEData(type, mode, duration, pageid, summaryList);
     }
 
-    protected Map<String, Object> createEData(String type, String mode, int duration, String pageid, List<Map<String, Object>> summaryList) {
+    protected Map<String, Object> createEData(String type, String mode, long duration, String pageid, List<Map<String, Object>> summaryList) {
         Map<String, Object> eData = new HashMap<>();
         eData.put("type", !StringUtil.isNullOrEmpty(type) ? type : "");
         eData.put("mode", !StringUtil.isNullOrEmpty(mode) ? mode : "");
@@ -41,7 +41,7 @@ public class End extends Telemetry {
 
         private String type;
         private String mode;
-        private int duration;
+        private long duration;
         private String pageid;
         private List<Map<String, Object>> summaryList = null;
 
@@ -64,7 +64,7 @@ public class End extends Telemetry {
         /**
          * Total duration from start to end in seconds
          */
-        public Builder duration(int duration) {
+        public Builder duration(long duration) {
             this.duration = duration;
             return this;
         }

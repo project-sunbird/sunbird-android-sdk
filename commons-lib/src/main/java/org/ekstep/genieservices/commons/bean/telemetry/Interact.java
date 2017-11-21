@@ -103,6 +103,14 @@ public class Interact extends Telemetry {
         }
 
         /**
+         * Extra attributes for an interaction
+         */
+        public Builder values(List<Map<String, Object>> values) {
+            this.values = values;
+            return this;
+        }
+
+        /**
          * Positional attributes. For ex: Drag and Drop has two positional attributes. One where the drag has started and the drop point
          */
         public Builder positions(String x, String y, String z) {
