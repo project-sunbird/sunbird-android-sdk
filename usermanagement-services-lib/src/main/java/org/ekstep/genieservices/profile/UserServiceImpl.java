@@ -16,6 +16,7 @@ import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.enums.ContentAccessStatus;
+import org.ekstep.genieservices.commons.bean.telemetry.Audit;
 import org.ekstep.genieservices.commons.bean.telemetry.End;
 import org.ekstep.genieservices.commons.bean.telemetry.Error;
 import org.ekstep.genieservices.commons.bean.telemetry.Start;
@@ -114,7 +115,9 @@ public class UserServiceImpl extends BaseService implements IUserService {
             @Override
             public Void perform(IDBSession dbSession) {
                 userModel.save();
+                logUserAuditEvent(userModel.getUid());
                 profileModel.save();
+                logProfileAuditEvent(profileModel.getProfile());
                 return null;
             }
         });
@@ -122,6 +125,27 @@ public class UserServiceImpl extends BaseService implements IUserService {
         GenieResponse<Profile> successResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         successResponse.setResult(GsonUtil.fromJson(profileModel.getProfile().toString(), Profile.class));
         return successResponse;
+    }
+
+
+    private void logUserAuditEvent(String uid) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("action", "User-Created");
+        map.put("uid", uid);
+        map.put("loc", mAppContext.getLocationInfo().getLocation());
+
+        Audit audit = new Audit(null, GsonUtil.toJson(map), null, ServiceConstants.Telemetry.ACTOR_TYPE_SYSTEM);
+        TelemetryLogger.log(audit);
+    }
+
+    private void logProfileAuditEvent(Profile profile) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("action", "Profile-Created");
+        map.put("profile", GsonUtil.toJson(profile));
+        map.put("loc", mAppContext.getLocationInfo().getLocation());
+
+        Audit audit = new Audit(null, GsonUtil.toJson(map), null, ServiceConstants.Telemetry.ACTOR_TYPE_SYSTEM);
+        TelemetryLogger.log(audit);
     }
 
     @Override
@@ -268,6 +292,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         String uid = getAnonymousUserId();
         if (uid == null) {
             uid = createAnonymousUser();
+            logUserAuditEvent(uid);
         }
         Profile profile = new Profile(uid);
         GenieResponse<Profile> response = GenieResponseBuilder.getSuccessResponse("", Profile.class);
@@ -388,6 +413,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         String uid = getAnonymousUserId();
         if (uid == null) {
             uid = createAnonymousUser();
+            logUserAuditEvent(uid);
             setCurrentUser(uid);
         }
     }

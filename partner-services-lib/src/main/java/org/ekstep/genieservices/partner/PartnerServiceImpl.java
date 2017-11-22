@@ -7,10 +7,12 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.PartnerData;
+import org.ekstep.genieservices.commons.bean.telemetry.Audit;
 import org.ekstep.genieservices.commons.bean.telemetry.ExData;
 import org.ekstep.genieservices.commons.exception.EncryptionException;
 import org.ekstep.genieservices.commons.utils.Base64Util;
 import org.ekstep.genieservices.commons.utils.CryptoUtil;
+import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.partner.db.model.PartnerModel;
@@ -70,6 +72,14 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
                 partnerModel = PartnerModel.build(appContext.getDBSession(), partnerData.getPartnerID(), partnerData.getPublicKey(), getPublicKeyId(partnerData));
                 partnerModel.save();
 
+                Map<String, Object> map = new HashMap<>();
+                map.put("partnerid", partnerData.getPartnerID());
+                map.put("publickey", partnerData.getPublicKey());
+                map.put("did", mAppContext.getDeviceInfo().getDeviceID());
+
+                Audit audit = new Audit(null, GsonUtil.toJson(map), null, ServiceConstants.Telemetry.ACTOR_TYPE_SYSTEM);
+                TelemetryLogger.log(audit);
+
                 response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
                 TelemetryLogger.logSuccess(mAppContext, response, TAG, "registerPartner@PartnerServiceImpl", new HashMap<String, Object>());
                 return response;
@@ -122,10 +132,31 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
         if (partnerModel != null) {
             PartnerSessionModel partnerSessionModel = PartnerSessionModel.find(appContext);
             if (partnerSessionModel != null) {
+
+                Map<String, Object> map = new HashMap<>();
+                map.put("action", "Partner-Session-Terminated");
+                map.put("partnerid", partnerSessionModel.getPartnerID());
+                map.put("did", mAppContext.getDeviceInfo().getDeviceID());
+                map.put("duration", DateUtil.getEpochDiff(partnerSessionModel.getEpochTime()));
+                map.put("partnersessionid", partnerSessionModel.getPartnerSessionId());
+
+                Audit audit = new Audit(null, GsonUtil.toJson(map), null, ServiceConstants.Telemetry.ACTOR_TYPE_SYSTEM);
+                TelemetryLogger.log(audit);
+
                 partnerSessionModel.clear();
             }
             partnerSessionModel = PartnerSessionModel.build(appContext, partnerData.getPartnerID());
             partnerSessionModel.save();
+
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("action", "Partner-Session-Started");
+            map.put("partnerid", partnerSessionModel.getPartnerID());
+            map.put("did", mAppContext.getDeviceInfo().getDeviceID());
+            map.put("partnersessionid", partnerSessionModel.getPartnerSessionId());
+
+            Audit audit = new Audit(null, GsonUtil.toJson(map), null, ServiceConstants.Telemetry.ACTOR_TYPE_SYSTEM);
+            TelemetryLogger.log(audit);
 
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
@@ -153,6 +184,16 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
         if (partnerModel != null && partnerSessionModel != null && partnerID.equals(partnerSessionModel.getPartnerID())) {
             partnerSessionModel.clear();
 
+            Map<String, Object> map = new HashMap<>();
+            map.put("action", "Partner-Session-Terminated");
+            map.put("partnerid", partnerSessionModel.getPartnerID());
+            map.put("did", mAppContext.getDeviceInfo().getDeviceID());
+            map.put("duration", DateUtil.getEpochDiff(partnerSessionModel.getEpochTime()));
+            map.put("partnersessionid", partnerSessionModel.getPartnerSessionId());
+
+            Audit audit = new Audit(null, GsonUtil.toJson(map), null, ServiceConstants.Telemetry.ACTOR_TYPE_SYSTEM);
+            TelemetryLogger.log(audit);
+
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
             return response;
@@ -178,7 +219,14 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
         if (partnerModel != null) {
             try {
                 Map<String, String> data = processData(partnerData);
-                ExData exData = new ExData("partnerdata", data.get("encrypted_data"));
+
+                Map<String, String> eventMap = new HashMap<>();
+                eventMap.put("partnerid", partnerModel.getPartnerID());
+                eventMap.put("publickeyid", partnerModel.getPublicKeyId());
+                eventMap.put("data", data.get("encrypted_data"));
+                eventMap.put("key", data.get("encrypted_key"));
+                eventMap.put("iv", data.get("iv"));
+                ExData exData = new ExData("partnerdata", GsonUtil.toJson(eventMap));
                 TelemetryLogger.log(exData);
 
                 response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, String.class);
@@ -199,6 +247,7 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
             return response;
         }
     }
+
 
     private Map<String, String> processData(PartnerData partnerData) throws EncryptionException {
         Map<String, String> data = new HashMap<>();

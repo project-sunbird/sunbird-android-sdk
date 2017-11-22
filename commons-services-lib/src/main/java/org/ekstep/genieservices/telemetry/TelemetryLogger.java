@@ -84,6 +84,7 @@ public class TelemetryLogger {
         Log log = new Log.Builder().type("api_call")
                 .level("trace")
                 .actorType(ServiceConstants.Telemetry.ACTOR_TYPE_SYSTEM)
+                .addParam("service", service)
                 .addParam("method", method)
                 .addParam("mode", getNetworkMode(appContext.getConnectionInfo()))
                 .addParam("request", params)
