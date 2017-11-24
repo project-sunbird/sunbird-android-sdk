@@ -1,5 +1,6 @@
 package org.ekstep.genieservices.commons.bean;
 
+import org.ekstep.genieservices.commons.bean.enums.ExistingContentAction;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.util.List;
@@ -13,11 +14,12 @@ public class ContentMoveRequest {
 
     private List<String> contentIds;
     private String destinationFolder;
-//    private Step Duplicate/merge/
+    private ExistingContentAction existingContentAction;
 
-    public ContentMoveRequest(List<String> contentIds, String destinationFolder) {
+    public ContentMoveRequest(List<String> contentIds, String destinationFolder, ExistingContentAction existingContentAction) {
         this.contentIds = contentIds;
         this.destinationFolder = destinationFolder;
+        this.existingContentAction = existingContentAction;
     }
 
     public List<String> getContentIds() {
@@ -28,9 +30,14 @@ public class ContentMoveRequest {
         return destinationFolder;
     }
 
+    public ExistingContentAction getExistingContentAction() {
+        return existingContentAction;
+    }
+
     public static class Builder {
         private List<String> contentIds;
         private String destinationFolder;
+        private ExistingContentAction existingContentAction;
 
         /**
          * List of content identifier which needs to move. If not set than by default will move all contents.
@@ -51,12 +58,20 @@ public class ContentMoveRequest {
             return this;
         }
 
+        /**
+         * Action to be taken when the destination folder contains same contents as the contents trying to move.
+         */
+        public Builder actionForDuplicateContentFound(ExistingContentAction existingContentAction) {
+            this.existingContentAction = existingContentAction;
+            return this;
+        }
+
         public ContentMoveRequest build() {
             if (StringUtil.isNullOrEmpty(destinationFolder)) {
                 throw new IllegalStateException("To folder required.");
             }
 
-            return new ContentMoveRequest(contentIds, destinationFolder);
+            return new ContentMoveRequest(contentIds, destinationFolder, existingContentAction);
         }
     }
 }

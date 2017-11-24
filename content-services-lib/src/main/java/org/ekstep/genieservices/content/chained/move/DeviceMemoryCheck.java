@@ -4,24 +4,27 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.MoveContentErrorResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.content.bean.MoveContentContext;
+
+import java.util.List;
 
 /**
  * Created on 9/18/2017.
  *
  * @author anil
  */
-public class DeviceMemoryCheck implements IChainable<Void, MoveContentContext> {
+public class DeviceMemoryCheck implements IChainable<List<MoveContentErrorResponse>, MoveContentContext> {
 
     private static final String TAG = DeviceMemoryCheck.class.getSimpleName();
 
-    private IChainable<Void, MoveContentContext> nextLink;
+    private IChainable<List<MoveContentErrorResponse>, MoveContentContext> nextLink;
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, MoveContentContext moveContentContext) {
+    public GenieResponse<List<MoveContentErrorResponse>> execute(AppContext appContext, MoveContentContext moveContentContext) {
         long deviceUsableSpace = FileUtil.getFreeUsableSpace(moveContentContext.getDestinationFolder());
         // TODO: 9/25/2017 - Write the query to read the summation of size on device.
         long spaceRequired = 0;
@@ -41,7 +44,7 @@ public class DeviceMemoryCheck implements IChainable<Void, MoveContentContext> {
     }
 
     @Override
-    public IChainable<Void, MoveContentContext> then(IChainable<Void, MoveContentContext> link) {
+    public IChainable<List<MoveContentErrorResponse>, MoveContentContext> then(IChainable<List<MoveContentErrorResponse>, MoveContentContext> link) {
         nextLink = link;
         return link;
     }

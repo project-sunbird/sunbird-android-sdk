@@ -34,6 +34,7 @@ import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
+import org.ekstep.genieservices.commons.bean.MoveContentErrorResponse;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
@@ -862,10 +863,10 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<Void> moveContent(ContentMoveRequest contentMoveRequest) {
+    public GenieResponse<List<MoveContentErrorResponse>> moveContent(ContentMoveRequest contentMoveRequest) {
         File destinationFolder = new File(contentMoveRequest.getDestinationFolder());
 
-        MoveContentContext moveContentContext = new MoveContentContext(contentMoveRequest.getContentIds(), destinationFolder);
+        MoveContentContext moveContentContext = new MoveContentContext(contentMoveRequest.getContentIds(), destinationFolder, contentMoveRequest.getExistingContentAction());
 
         ValidateDestinationFolder validateDestinationFolder = new ValidateDestinationFolder();
         validateDestinationFolder.then(new org.ekstep.genieservices.content.chained.move.DeviceMemoryCheck())

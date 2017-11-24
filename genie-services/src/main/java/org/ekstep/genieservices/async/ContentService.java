@@ -4,6 +4,7 @@ import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.IContentFeedbackService;
 import org.ekstep.genieservices.IContentService;
 import org.ekstep.genieservices.commons.IResponseHandler;
+import org.ekstep.genieservices.commons.bean.MoveContentErrorResponse;
 import org.ekstep.genieservices.commons.bean.ScanStorageRequest;
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
@@ -451,10 +452,10 @@ public class ContentService {
      * @param contentMoveRequest - {@link ContentMoveRequest}
      * @param responseHandler    - {@link IResponseHandler<Void>}
      */
-    public void moveContent(final ContentMoveRequest contentMoveRequest, IResponseHandler<Void> responseHandler) {
-        new AsyncHandler<Void>(responseHandler).execute(new IPerformable<Void>() {
+    public void moveContent(final ContentMoveRequest contentMoveRequest, IResponseHandler<List<MoveContentErrorResponse>> responseHandler) {
+        new AsyncHandler<List<MoveContentErrorResponse>>(responseHandler).execute(new IPerformable<List<MoveContentErrorResponse>>() {
             @Override
-            public GenieResponse<Void> perform() {
+            public GenieResponse<List<MoveContentErrorResponse>> perform() {
                 return contentService.moveContent(contentMoveRequest);
             }
         });

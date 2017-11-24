@@ -4,25 +4,27 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.MoveContentErrorResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.content.bean.MoveContentContext;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * Created on 9/25/2017.
  *
  * @author anil
  */
-public class ValidateDestinationFolder implements IChainable<Void, MoveContentContext> {
+public class ValidateDestinationFolder implements IChainable<List<MoveContentErrorResponse>, MoveContentContext> {
 
     private static final String TAG = ValidateDestinationFolder.class.getSimpleName();
 
-    private IChainable<Void, MoveContentContext> nextLink;
+    private IChainable<List<MoveContentErrorResponse>, MoveContentContext> nextLink;
 
     @Override
-    public GenieResponse<Void> execute(AppContext appContext, MoveContentContext moveContentContext) {
+    public GenieResponse<List<MoveContentErrorResponse>> execute(AppContext appContext, MoveContentContext moveContentContext) {
         if (moveContentContext.getDestinationFolder().isDirectory() && moveContentContext.getDestinationFolder().canWrite()) {
             File contentRootFolder;
             if (moveContentContext.getDestinationFolder().getPath().endsWith(FileUtil.CONTENT_FOLDER)) {
@@ -41,7 +43,7 @@ public class ValidateDestinationFolder implements IChainable<Void, MoveContentCo
     }
 
     @Override
-    public IChainable<Void, MoveContentContext> then(IChainable<Void, MoveContentContext> link) {
+    public IChainable<List<MoveContentErrorResponse>, MoveContentContext> then(IChainable<List<MoveContentErrorResponse>, MoveContentContext> link) {
         nextLink = link;
         return link;
     }

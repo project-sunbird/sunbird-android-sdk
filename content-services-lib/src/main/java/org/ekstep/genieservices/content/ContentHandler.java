@@ -286,7 +286,7 @@ public class ContentHandler {
         return (String) serverData.get(KEY_LAST_UPDATED_ON);
     }
 
-    private static Double readPkgVersion(String localData) {
+    public static Double readPkgVersion(String localData) {
         return readPkgVersion(GsonUtil.fromJson(localData, Map.class));
     }
 
