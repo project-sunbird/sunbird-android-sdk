@@ -1,6 +1,7 @@
 package org.ekstep.genieservices.commons.bean.telemetry;
 
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.util.ArrayList;
@@ -29,6 +30,11 @@ public class Log extends Telemetry {
         eData.put("pageid", !StringUtil.isNullOrEmpty(pageid) ? pageid : "");
         eData.put("params", !CollectionUtil.isNullOrEmpty(paramsList) ? paramsList : new ArrayList<>());
         return eData;
+    }
+
+    @Override
+    public String toString() {
+        return GsonUtil.toJson(this);
     }
 
     public static class Builder {

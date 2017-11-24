@@ -1,5 +1,6 @@
 package org.ekstep.genieservices.commons.bean.telemetry;
 
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class Audit extends Telemetry {
     public Audit(List<String> props, String state, String prevstate, String actorType) {
         super(EID);
         setEData(createEData(props, state, prevstate));
+        setActor(new Actor("", actorType));
     }
 
     protected Map<String, Object> createEData(List<String> props, String state, String prevstate) {
@@ -27,5 +29,10 @@ public class Audit extends Telemetry {
         eData.put("state", !StringUtil.isNullOrEmpty(state) ? state : "");
         eData.put("prevstate", !StringUtil.isNullOrEmpty(prevstate) ? prevstate : "");
         return eData;
+    }
+
+    @Override
+    public String toString() {
+        return GsonUtil.toJson(this);
     }
 }

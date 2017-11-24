@@ -1,5 +1,7 @@
 package org.ekstep.genieservices.commons.bean.telemetry;
 
+import org.ekstep.genieservices.commons.utils.GsonUtil;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,5 +24,10 @@ public class Feedback extends Telemetry {
         eData.put("rating", rating);
         eData.put("comments", comments);
         return eData;
+    }
+
+    @Override
+    public String toString() {
+        return GsonUtil.toJson(this);
     }
 }

@@ -1,5 +1,6 @@
 package org.ekstep.genieservices.commons.bean.telemetry;
 
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.util.HashMap;
@@ -23,5 +24,10 @@ public class ExData extends Telemetry {
         eData.put("type", !StringUtil.isNullOrEmpty(type) ? type : "");
         eData.put("data", !StringUtil.isNullOrEmpty(data) ? data : "");
         return eData;
+    }
+
+    @Override
+    public String toString() {
+        return GsonUtil.toJson(this);
     }
 }

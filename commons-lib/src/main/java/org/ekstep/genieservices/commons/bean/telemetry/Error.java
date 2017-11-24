@@ -1,5 +1,6 @@
 package org.ekstep.genieservices.commons.bean.telemetry;
 
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.util.HashMap;
@@ -25,6 +26,11 @@ public class Error extends Telemetry {
         eks.put("stacktrace", stackTrace);
         eks.put("pageid", !StringUtil.isNullOrEmpty(pageId) ? pageId : "");
         return eks;
+    }
+
+    @Override
+    public String toString() {
+        return GsonUtil.toJson(this);
     }
 
 }
