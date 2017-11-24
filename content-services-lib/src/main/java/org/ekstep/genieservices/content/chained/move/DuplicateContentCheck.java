@@ -67,8 +67,6 @@ public class DuplicateContentCheck implements IChainable<List<MoveContentErrorRe
                         moveContentErrorResponseList.add(moveContentErrorResponse);
                     } else {
                         //both versions are same, do nothing
-                        moveContentErrorResponse = new MoveContentErrorResponse(duplicateContentModel.getIdentifier(), MoveContentStatus.SAME_VERSION);
-                        moveContentErrorResponseList.add(moveContentErrorResponse);
                     }
                 }
 
