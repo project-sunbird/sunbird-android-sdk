@@ -1,6 +1,6 @@
 package org.ekstep.genieservices;
 
-import org.ekstep.genieservices.commons.bean.MoveContentErrorResponse;
+import org.ekstep.genieservices.commons.bean.MoveContentResponse;
 import org.ekstep.genieservices.commons.bean.ScanStorageRequest;
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
@@ -276,7 +276,7 @@ public interface IContentService {
      *
      * @param contentMoveRequest - {@link ContentMoveRequest}
      */
-    GenieResponse<List<MoveContentErrorResponse>> moveContent(ContentMoveRequest contentMoveRequest);
+    GenieResponse<List<MoveContentResponse>> moveContent(ContentMoveRequest contentMoveRequest);
 
     /**
      * This api is used to get the last modified time of the folder in the path passed to the api and then cross check it against

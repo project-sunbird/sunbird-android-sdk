@@ -424,9 +424,9 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
-    public GenieResponse<Void> moveContent(ContentMoveRequest.Builder contentMoveRequest){
+    public GenieResponse<List<MoveContentErrorResponse>> moveContent(ContentMoveRequest.Builder contentMoveRequest){
         idle = false;
-        GenieResponse<Void> genieResponse  = mGenieService.getContentService().moveContent(contentMoveRequest.build());
+        GenieResponse<MoveContentErrorResponse> genieResponse  = mGenieService.getContentService().moveContent(contentMoveRequest.build());
         return genieResponse;
     }
 

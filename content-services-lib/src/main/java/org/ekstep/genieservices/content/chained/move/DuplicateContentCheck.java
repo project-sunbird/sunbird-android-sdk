@@ -5,7 +5,7 @@ import com.google.gson.internal.LinkedTreeMap;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.MoveContentErrorResponse;
+import org.ekstep.genieservices.commons.bean.MoveContentResponse;
 import org.ekstep.genieservices.commons.bean.enums.ExistingContentAction;
 import org.ekstep.genieservices.commons.bean.enums.MoveContentStatus;
 import org.ekstep.genieservices.commons.chained.IChainable;
@@ -27,14 +27,14 @@ import java.util.Map;
  *
  * @author anil
  */
-public class DuplicateContentCheck implements IChainable<List<MoveContentErrorResponse>, MoveContentContext> {
+public class DuplicateContentCheck implements IChainable<List<MoveContentResponse>, MoveContentContext> {
 
     private static final String TAG = DuplicateContentCheck.class.getSimpleName();
 
-    private IChainable<List<MoveContentErrorResponse>, MoveContentContext> nextLink;
+    private IChainable<List<MoveContentResponse>, MoveContentContext> nextLink;
 
     @Override
-    public GenieResponse<List<MoveContentErrorResponse>> execute(AppContext appContext, MoveContentContext moveContentContext) {
+    public GenieResponse<List<MoveContentResponse>> execute(AppContext appContext, MoveContentContext moveContentContext) {
         List<ContentModel> contentsInSource;
         if (CollectionUtil.isNullOrEmpty(moveContentContext.getContentIds())) {
             contentsInSource = ContentHandler.findAllContent(appContext.getDBSession());
@@ -49,10 +49,10 @@ public class DuplicateContentCheck implements IChainable<List<MoveContentErrorRe
             //check if any of the action has been already set, if set then follow accordingly
             ExistingContentAction existingContentAction = moveContentContext.getExistingContentAction();
             if (existingContentAction == null) {
-                List<MoveContentErrorResponse> moveContentErrorResponseList = new ArrayList<>();
+                List<MoveContentResponse> moveContentErrorResponseList = new ArrayList<>();
 
                 for (ContentModel duplicateContentModel : duplicateContentsInSource) {
-                    MoveContentErrorResponse moveContentErrorResponse;
+                    MoveContentResponse moveContentErrorResponse;
 
                     //get content model from file
                     Double destPkgVersion = getPkgVersionFromFile(moveContentContext, duplicateContentModel.getIdentifier());
@@ -60,10 +60,10 @@ public class DuplicateContentCheck implements IChainable<List<MoveContentErrorRe
                     Double srcPkgVersion = ContentHandler.readPkgVersion(duplicateContentModel.getLocalData());
 
                     if (destPkgVersion > srcPkgVersion) {
-                        moveContentErrorResponse = new MoveContentErrorResponse(duplicateContentModel.getIdentifier(), MoveContentStatus.HIGHER_VERSION_IN_DESTINATION);
+                        moveContentErrorResponse = new MoveContentResponse(duplicateContentModel.getIdentifier(), MoveContentStatus.HIGHER_VERSION_IN_DESTINATION);
                         moveContentErrorResponseList.add(moveContentErrorResponse);
                     } else if (destPkgVersion > srcPkgVersion) {
-                        moveContentErrorResponse = new MoveContentErrorResponse(duplicateContentModel.getIdentifier(), MoveContentStatus.LOWER_VERSION_IN_DESTINATION);
+                        moveContentErrorResponse = new MoveContentResponse(duplicateContentModel.getIdentifier(), MoveContentStatus.LOWER_VERSION_IN_DESTINATION);
                         moveContentErrorResponseList.add(moveContentErrorResponse);
                     } else {
                         //both versions are same, do nothing
@@ -71,7 +71,7 @@ public class DuplicateContentCheck implements IChainable<List<MoveContentErrorRe
                 }
 
                 if (moveContentErrorResponseList.size() > 0) {
-                    GenieResponse<List<MoveContentErrorResponse>> errorResponse = GenieResponseBuilder.getErrorResponse(ContentConstants.DUPLICATE_CONTENT, "Duplicate contents found", "DuplicateContentCheck");
+                    GenieResponse<List<MoveContentResponse>> errorResponse = GenieResponseBuilder.getErrorResponse(ContentConstants.DUPLICATE_CONTENT, "Duplicate contents found", "DuplicateContentCheck");
                     errorResponse.setResult(moveContentErrorResponseList);
                     return errorResponse;
                 }
@@ -82,7 +82,7 @@ public class DuplicateContentCheck implements IChainable<List<MoveContentErrorRe
     }
 
     @Override
-    public IChainable<List<MoveContentErrorResponse>, MoveContentContext> then(IChainable<List<MoveContentErrorResponse>, MoveContentContext> link) {
+    public IChainable<List<MoveContentResponse>, MoveContentContext> then(IChainable<List<MoveContentResponse>, MoveContentContext> link) {
         nextLink = link;
         return link;
     }

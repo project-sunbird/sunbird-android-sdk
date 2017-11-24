@@ -4,7 +4,7 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.MoveContentErrorResponse;
+import org.ekstep.genieservices.commons.bean.MoveContentResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.content.bean.MoveContentContext;
@@ -17,14 +17,14 @@ import java.util.List;
  *
  * @author anil
  */
-public class ValidateDestinationFolder implements IChainable<List<MoveContentErrorResponse>, MoveContentContext> {
+public class ValidateDestinationFolder implements IChainable<List<MoveContentResponse>, MoveContentContext> {
 
     private static final String TAG = ValidateDestinationFolder.class.getSimpleName();
 
-    private IChainable<List<MoveContentErrorResponse>, MoveContentContext> nextLink;
+    private IChainable<List<MoveContentResponse>, MoveContentContext> nextLink;
 
     @Override
-    public GenieResponse<List<MoveContentErrorResponse>> execute(AppContext appContext, MoveContentContext moveContentContext) {
+    public GenieResponse<List<MoveContentResponse>> execute(AppContext appContext, MoveContentContext moveContentContext) {
         if (moveContentContext.getDestinationFolder().isDirectory() && moveContentContext.getDestinationFolder().canWrite()) {
             File contentRootFolder;
             if (moveContentContext.getDestinationFolder().getPath().endsWith(FileUtil.CONTENT_FOLDER)) {
@@ -43,7 +43,7 @@ public class ValidateDestinationFolder implements IChainable<List<MoveContentErr
     }
 
     @Override
-    public IChainable<List<MoveContentErrorResponse>, MoveContentContext> then(IChainable<List<MoveContentErrorResponse>, MoveContentContext> link) {
+    public IChainable<List<MoveContentResponse>, MoveContentContext> then(IChainable<List<MoveContentResponse>, MoveContentContext> link) {
         nextLink = link;
         return link;
     }

@@ -1,7 +1,6 @@
 package org.ekstep.genieservices.commons.bean;
 
 import org.ekstep.genieservices.commons.bean.enums.MoveContentStatus;
-import org.ekstep.genieservices.commons.bean.enums.ScanStorageStatus;
 
 import java.io.Serializable;
 
@@ -12,12 +11,12 @@ import java.io.Serializable;
  * shriharsh
  */
 
-public class MoveContentErrorResponse implements Serializable {
+public class MoveContentResponse implements Serializable {
 
     private String identifier;
     private MoveContentStatus status;
 
-    public MoveContentErrorResponse(String identifier, MoveContentStatus status) {
+    public MoveContentResponse(String identifier, MoveContentStatus status) {
         this.identifier = identifier;
         this.status = status;
     }
@@ -38,7 +37,7 @@ public class MoveContentErrorResponse implements Serializable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        MoveContentErrorResponse that = (MoveContentErrorResponse) o;
+        MoveContentResponse that = (MoveContentResponse) o;
         return identifier != null ? identifier.equals(that.identifier) : that.identifier == null;
     }
 
