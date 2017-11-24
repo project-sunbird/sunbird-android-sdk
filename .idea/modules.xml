@@ -9,6 +9,7 @@
       <module fileurl="file://$PROJECT_DIR$/content-services-lib/content-services-lib.iml" filepath="$PROJECT_DIR$/content-services-lib/content-services-lib.iml" />
       <module fileurl="file://$PROJECT_DIR$/genie-integration/genie-integration.iml" filepath="$PROJECT_DIR$/genie-integration/genie-integration.iml" />
       <module fileurl="file://$PROJECT_DIR$/genie-providers/genie-providers.iml" filepath="$PROJECT_DIR$/genie-providers/genie-providers.iml" />
+      <module fileurl="file://$PROJECT_DIR$/genie-sdk-test/genie-sdk-test.iml" filepath="$PROJECT_DIR$/genie-sdk-test/genie-sdk-test.iml" />
       <module fileurl="file://$PROJECT_DIR$/genie-services/genie-services.iml" filepath="$PROJECT_DIR$/genie-services/genie-services.iml" />
       <module fileurl="file://$PROJECT_DIR$/notification-services-lib/notification-services-lib.iml" filepath="$PROJECT_DIR$/notification-services-lib/notification-services-lib.iml" />
       <module fileurl="file://$PROJECT_DIR$/partner-services-lib/partner-services-lib.iml" filepath="$PROJECT_DIR$/partner-services-lib/partner-services-lib.iml" />
