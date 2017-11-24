@@ -6,8 +6,7 @@ package org.ekstep.genieservices.commons.bean.enums;
  */
 
 public enum MoveContentStatus {
-
-    SAME_VERSION(0), HIGHER_VERSION_IN_DESTINATION(1), LOWER_VERSION_IN_DESTINATION(2);
+    HIGHER_VERSION_IN_DESTINATION(1), LOWER_VERSION_IN_DESTINATION(2);
 
     private int value;
 
