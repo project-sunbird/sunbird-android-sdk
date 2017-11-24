@@ -117,7 +117,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
                 userModel.save();
                 logUserAuditEvent(userModel.getUid());
                 profileModel.save();
-                logProfileAuditEvent(profileModel.getProfile());
+                logProfileAuditEvent(profileModel.getProfile(), null);
                 return null;
             }
         });
@@ -138,13 +138,13 @@ public class UserServiceImpl extends BaseService implements IUserService {
         TelemetryLogger.log(audit);
     }
 
-    private void logProfileAuditEvent(Profile profile) {
+    private void logProfileAuditEvent(Profile profile, Profile oldProfile) {
         Map<String, Object> map = new HashMap<>();
         map.put("action", "Profile-Created");
         map.put("profile", GsonUtil.toJson(profile));
         map.put("loc", mAppContext.getLocationInfo().getLocation());
 
-        Audit audit = new Audit(null, GsonUtil.toJson(map), null, ServiceConstants.Telemetry.ACTOR_TYPE_SYSTEM);
+        Audit audit = new Audit(null, GsonUtil.toJson(map), oldProfile != null ? GsonUtil.toJson(oldProfile) : null, ServiceConstants.Telemetry.ACTOR_TYPE_SYSTEM);
         TelemetryLogger.log(audit);
     }
 
@@ -196,16 +196,25 @@ public class UserServiceImpl extends BaseService implements IUserService {
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_UPDATE_PROFILE);
             return response;
         }
-        UserProfileModel userProfileModel = UserProfileModel.build(mAppContext.getDBSession(), profile);
-        // TODO: 6/6/2017 - check if profile exists or not before updating.
-        userProfileModel.update();
 
+        UserProfileModel userProfileDbModel = UserProfileModel.find(mAppContext.getDBSession(), profile.getUid());
+        if (userProfileDbModel != null) {
+            UserProfileModel userProfileModel = UserProfileModel.build(mAppContext.getDBSession(), profile);
+            userProfileModel.update();
 
-        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Profile.class);
-        response.setResult(profile);
+            logProfileAuditEvent(userProfileDbModel.getProfile(), profile);
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Profile.class);
+            response.setResult(profile);
 
-        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
-        return response;
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+            return response;
+        } else {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROFILE_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_PROFILE, TAG, Profile.class);
+            logGEError(response, "updateUserProfile");
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_UPDATE_PROFILE);
+            return response;
+        }
+
     }
 
     /**
