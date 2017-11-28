@@ -105,7 +105,6 @@ public class GenieServiceTestBase {
     }
 
 
-
     /**
      * Method to create a new user profile and return it.
      *

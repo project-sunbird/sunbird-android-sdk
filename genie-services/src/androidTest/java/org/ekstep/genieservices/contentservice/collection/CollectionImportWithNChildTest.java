@@ -1,6 +1,5 @@
 package org.ekstep.genieservices.contentservice.collection;
 
-import android.os.Environment;
 import android.support.test.runner.AndroidJUnit4;
 
 import junit.framework.Assert;
@@ -40,8 +39,8 @@ public class CollectionImportWithNChildTest extends GenieServiceTestBase {
     private static final String EMPTY_COLLECTION_ASSET_PATH = "Download/Empty_Collection.ecar";
     final String CONTENT_ID = "do_20045823";
     final String CONTENT_ID_WITH_CHILD = "do_30019820";
-    private final String CONTENT_WITH_CHILD_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Times_Tables_2_to_10.ecar";
-    private final String EMPTY_COLLECTION_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Empty_Collection.ecar";
+    private final String CONTENT_WITH_CHILD_FILEPATH = DESTINATION + "/Times_Tables_2_to_10.ecar";
+    private final String EMPTY_COLLECTION_FILEPATH = DESTINATION + "/Empty_Collection.ecar";
 
     @Before
     public void setup() throws IOException {

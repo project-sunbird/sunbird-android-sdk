@@ -440,6 +440,18 @@ public class ContentHandler {
         return content;
     }
 
+    /**
+     * Content with artifact without zip i.e. pfd, mp4
+     *
+     * @param contentDisposition
+     * @param contentEncoding
+     * @return
+     */
+    public static boolean isInlineIdentity(String contentDisposition, String contentEncoding) {
+        return !StringUtil.isNullOrEmpty(contentDisposition) && !StringUtil.isNullOrEmpty(contentEncoding)
+                && ContentConstants.ContentDisposition.INLINE.equals(contentDisposition) && ContentConstants.ContentEncoding.IDENTITY.equals(contentEncoding);
+    }
+
     public static String getCurrentUserId(IUserService userService) {
         if (userService != null) {
             UserSession userSession = userService.getCurrentUserSession().getResult();

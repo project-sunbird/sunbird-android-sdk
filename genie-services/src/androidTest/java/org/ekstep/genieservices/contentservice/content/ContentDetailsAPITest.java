@@ -1,6 +1,5 @@
 package org.ekstep.genieservices.contentservice.content;
 
-import android.os.Environment;
 import android.support.test.runner.AndroidJUnit4;
 
 import junit.framework.Assert;
@@ -9,7 +8,7 @@ import org.ekstep.genieservices.EcarCopyUtil;
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
 import org.ekstep.genieservices.MockServer;
-import org.ekstep.genieservices.SampleApiResponse;
+import org.ekstep.genieservices.SampleResponse;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
@@ -33,7 +32,7 @@ import java.util.List;
 @RunWith(AndroidJUnit4.class)
 public class ContentDetailsAPITest extends GenieServiceTestBase {
 
-    private final String CONTENT_FILE_PATH = Environment.getExternalStorageDirectory().toString() + "/Download/Multiplication2.ecar";
+    private final String CONTENT_FILE_PATH = DESTINATION + "/Multiplication2.ecar";
     private final String CONTENT_ASSET_PATH = "Download/Multiplication2.ecar";
     private final String CONTENT_ID = "do_30013486";
 
@@ -87,7 +86,7 @@ public class ContentDetailsAPITest extends GenieServiceTestBase {
     public void _2ShouldInvokeServerAPIForContentDetails() {
         GenieServiceDBHelper.clearContentEntryFromDB();
         startMockServer();
-        mMockServer.mockHttpResponse(SampleApiResponse.getContentDetailsResponse(), 200);
+        mMockServer.mockHttpResponse(SampleResponse.getContentDetailsResponse(), 200);
         ContentDetailsRequest.Builder contentDetailsRequest = new ContentDetailsRequest.Builder().forContent(CONTENT_ID).withContentAccess().withFeedback();
         GenieResponse<Content> genieResponseDetails = activity.getContentDetails(contentDetailsRequest.build());
         mMockServer.assertRequestCount(1);
@@ -116,7 +115,7 @@ public class ContentDetailsAPITest extends GenieServiceTestBase {
     @Test
     public void _4ShouldInvokeServerAPIIfAttributeisSet() throws InterruptedException {
         startMockServer();
-        mMockServer.mockHttpResponse(SampleApiResponse.getContentDetailsResponse(), 200);
+        mMockServer.mockHttpResponse(SampleResponse.getContentDetailsResponse(), 200);
         EcarImportRequest.Builder ecarImportReuqest = new EcarImportRequest.Builder().fromFilePath(CONTENT_FILE_PATH).toFolder(activity.getExternalFilesDir(null).toString());
         activity.importEcar(ecarImportReuqest.build());
         ContentDetailsRequest.Builder contentDetailsRequest = new ContentDetailsRequest.Builder().forContent(CONTENT_ID).refreshContentDetailsFromServer();
@@ -130,7 +129,7 @@ public class ContentDetailsAPITest extends GenieServiceTestBase {
     @Test
     public void _5ShouldGiveNoDataFoundError() throws InterruptedException {
         startMockServer();
-        mMockServer.mockHttpResponse(SampleApiResponse.getContentDetailsResponse(), 400);
+        mMockServer.mockHttpResponse(SampleResponse.getContentDetailsResponse(), 400);
         ContentDetailsRequest.Builder contentDetailsRequest = new ContentDetailsRequest.Builder().forContent(CONTENT_ID).refreshContentDetailsFromServer();
         GenieResponse<Content> genieResponseDetails = activity.getContentDetails(contentDetailsRequest.build());
         Assert.assertFalse(genieResponseDetails.getStatus());

@@ -6,7 +6,7 @@ import junit.framework.Assert;
 
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
-import org.ekstep.genieservices.SampleApiResponse;
+import org.ekstep.genieservices.SampleResponse;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -44,7 +44,7 @@ public class ContentSearchAPITest extends GenieServiceTestBase {
     @Test
     public void _1ShouldInvokeContentSearchAPISuccessfully() {
         startMockServer();
-        mMockServer.mockHttpResponse(SampleApiResponse.getSerachAPIResult(), 200);
+        mMockServer.mockHttpResponse(SampleResponse.getSerachAPIResult(), 200);
         ContentSearchCriteria.SearchBuilder contentSearchCriteria = new ContentSearchCriteria.SearchBuilder().query("worksheet").limit(10);
         GenieResponse<ContentSearchResult> response = activity.searchContent(contentSearchCriteria.build());
         Assert.assertTrue(response.getStatus());
@@ -58,7 +58,7 @@ public class ContentSearchAPITest extends GenieServiceTestBase {
     @Test
     public void _2ShouldReturnSuccessResponseIfNoResultAvailable() {
         startMockServer();
-        mMockServer.mockHttpResponse(SampleApiResponse.getEmptySerachAPIResult(), 200);
+        mMockServer.mockHttpResponse(SampleResponse.getEmptySerachAPIResult(), 200);
         ContentSearchCriteria.SearchBuilder contentSearchCriteria = new ContentSearchCriteria.SearchBuilder().query("worksheet").limit(10);
         GenieResponse<ContentSearchResult> response = activity.searchContent(contentSearchCriteria.build());
         Assert.assertTrue(response.getStatus());
@@ -70,7 +70,7 @@ public class ContentSearchAPITest extends GenieServiceTestBase {
     @Test
     public void _3ShouldReturnFailureResponseFor404Error() {
         startMockServer();
-        mMockServer.mockHttpResponse(SampleApiResponse.getEmptySerachAPIResult(), 400);
+        mMockServer.mockHttpResponse(SampleResponse.getEmptySerachAPIResult(), 400);
         ContentSearchCriteria.SearchBuilder contentSearchCriteria = new ContentSearchCriteria.SearchBuilder().query("worksheet").limit(10);
         GenieResponse<ContentSearchResult> response = activity.searchContent(contentSearchCriteria.build());
         Assert.assertFalse(response.getStatus());

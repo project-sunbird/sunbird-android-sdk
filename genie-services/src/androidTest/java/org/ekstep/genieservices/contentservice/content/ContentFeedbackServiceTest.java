@@ -1,6 +1,5 @@
 package org.ekstep.genieservices.contentservice.content;
 
-import android.os.Environment;
 import android.support.test.runner.AndroidJUnit4;
 
 import junit.framework.Assert;
@@ -32,9 +31,8 @@ import java.util.List;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(AndroidJUnit4.class)
 public class ContentFeedbackServiceTest extends GenieServiceTestBase {
-    private static final String TAG = ContentFeedbackServiceTest.class.getSimpleName();
     final String CONTENT_ID = "do_30013486";
-    private final String CONTENT_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Multiplication2.ecar";
+    private final String CONTENT_FILEPATH = DESTINATION + "/Multiplication2.ecar";
 
     private final String CONTENT_ASSET_PATH = "Download/Multiplication2.ecar";
 

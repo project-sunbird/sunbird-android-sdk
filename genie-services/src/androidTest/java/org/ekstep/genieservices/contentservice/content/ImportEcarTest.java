@@ -8,8 +8,9 @@ import junit.framework.Assert;
 import org.ekstep.genieservices.EcarCopyUtil;
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
-import org.ekstep.genieservices.SampleApiResponse;
+import org.ekstep.genieservices.SampleResponse;
 import org.ekstep.genieservices.ServiceConstants;
+import org.ekstep.genieservices.commons.bean.ContentImport;
 import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
@@ -40,10 +41,11 @@ public class ImportEcarTest extends GenieServiceTestBase {
     private final String CONTENT_ID = "do_30013486";
     private final String CONTENT_ID_WITH_CHILD = "do_30019820";
     private final String UNSUPPORTED_CONTENT_PATH = "Download/unsupported.zip";
-    private final String CONTENT_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Multiplication2.ecar";
-    private final String CONTENT_WITH_CHILD_FILEPATH = Environment.getExternalStorageDirectory().toString() + "/Download/Times_Tables_2_to_10.ecar";
+    private final String CONTENT_FILEPATH = DESTINATION + "/Multiplication2.ecar";
+    private final String CONTENT_WITH_CHILD_FILEPATH = DESTINATION + "/Times_Tables_2_to_10.ecar";
     private final String COLLECTION_ASSET_PATH = "Download/Times_Tables_2_to_10.ecar";
     private final String CONTENT_ASSET_PATH = "Download/Multiplication2.ecar";
+
     @Before
     public void setup() throws IOException {
         super.setup();
@@ -61,6 +63,7 @@ public class ImportEcarTest extends GenieServiceTestBase {
         EcarCopyUtil.createFileFromAsset(activity, UNSUPPORTED_CONTENT_PATH, DESTINATION);
         EcarCopyUtil.createFileFromAsset(activity, COLLECTION_ASSET_PATH, DESTINATION);
         EcarCopyUtil.createFileFromAsset(activity, CONTENT_ASSET_PATH, DESTINATION);
+        EcarCopyUtil.createFileFromAsset(activity, UNSUPPORTED_CONTENT_PATH, DESTINATION);
     }
 
 
@@ -69,9 +72,8 @@ public class ImportEcarTest extends GenieServiceTestBase {
         List<String> contentIdList = new ArrayList<>();
         contentIdList.add(CONTENT_ID_WITH_CHILD);
         startMockServer();
-        mMockServer.mockHttpResponse(SampleApiResponse.getSearchResultForDownload(), 200);
-        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder()
-                .toFolder(activity.getExternalFilesDir(null).toString()).contentIds(contentIdList);
+        mMockServer.mockHttpResponse(SampleResponse.getSearchResultForDownload(), 200);
+        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder().add(new ContentImport(CONTENT_ID_WITH_CHILD, activity.getExternalFilesDir(null).toString()));
         GenieResponse<List<ContentImportResponse>> genieResponse = activity.importContent(contentImportRequest.build());
         Assert.assertTrue("true", genieResponse.getStatus());
         shutDownMockServer();
@@ -82,10 +84,9 @@ public class ImportEcarTest extends GenieServiceTestBase {
         GenieServiceDBHelper.clearContentEntryFromDB();
         List<String> contentIdList = new ArrayList<>();
         contentIdList.add(CONTENT_ID_WITH_CHILD);
-        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder()
-                .toFolder(activity.getExternalFilesDir(null).toString()).contentIds(contentIdList);
+        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder().add(new ContentImport(CONTENT_ID_WITH_CHILD, activity.getExternalFilesDir(null).toString()));
         startMockServer();
-        mMockServer.mockHttpResponse(SampleApiResponse.getSearchResultForDownload(), 200);
+        mMockServer.mockHttpResponse(SampleResponse.getSearchResultForDownload(), 200);
         GenieResponse<List<ContentImportResponse>> genieResponse = activity.importContent(contentImportRequest.build());
         Assert.assertTrue("true", genieResponse.getStatus());
         GenieResponse<ContentImportResponse> contentImportStatus = activity.getImportStatus(CONTENT_ID_WITH_CHILD);
@@ -101,8 +102,7 @@ public class ImportEcarTest extends GenieServiceTestBase {
         GenieServiceDBHelper.clearContentEntryFromDB();
         List<String> contentIdList = new ArrayList<>();
         contentIdList.add(CONTENT_ID);
-        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder()
-                .toFolder(activity.getExternalFilesDir(null).toString()).contentIds(contentIdList);
+        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder().add(new ContentImport(CONTENT_ID, activity.getExternalFilesDir(null).toString()));
         GenieResponse<List<ContentImportResponse>> genieResponse = activity.importContent(contentImportRequest.build());
         Assert.assertTrue("true", genieResponse.getStatus());
         final GenieResponse<ContentImportResponse> contentImportStatus = activity.getImportStatus(CONTENT_ID);
@@ -125,8 +125,7 @@ public class ImportEcarTest extends GenieServiceTestBase {
         GenieServiceDBHelper.clearContentEntryFromDB();
         List<String> contentIdList = new ArrayList<>();
         contentIdList.add(CONTENT_ID_WITH_CHILD);
-        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder()
-                .toFolder(activity.getExternalFilesDir(null).toString()).contentIds(contentIdList);
+        ContentImportRequest.Builder contentImportRequest = new ContentImportRequest.Builder().add(new ContentImport(CONTENT_ID_WITH_CHILD, activity.getExternalFilesDir(null).toString()));
         GenieResponse<List<ContentImportResponse>> genieResponse = activity.importContent(contentImportRequest.build());
         Assert.assertTrue("true", genieResponse.getStatus());
         GenieResponse<Void> downloadCancelResponse = activity.cancelDownload(CONTENT_ID_WITH_CHILD);

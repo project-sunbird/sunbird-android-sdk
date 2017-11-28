@@ -6,7 +6,7 @@ import junit.framework.Assert;
 
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
-import org.ekstep.genieservices.SampleApiResponse;
+import org.ekstep.genieservices.SampleResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Notification;
 import org.ekstep.genieservices.commons.bean.NotificationFilterCriteria;
@@ -42,7 +42,7 @@ public class NotificationServiceTest extends GenieServiceTestBase {
     @Test
     public void _11shouldAddNotification() {
 
-        String notificationJson = SampleApiResponse.getNotification();
+        String notificationJson = SampleResponse.getNotification();
         Notification notification = GsonUtil.fromJson(notificationJson, Notification.class);
 
         GenieResponse<Void> genieResponse = activity.addNotification(notification);
@@ -50,7 +50,19 @@ public class NotificationServiceTest extends GenieServiceTestBase {
     }
 
     @Test
-    public void _12shouldValidateAddNotificationForNull() {
+    public void _12shouldUpdateThenotificationIfSameNotificationisAdded() {
+
+        String notificationJson = SampleResponse.getNotification();
+        Notification notification = GsonUtil.fromJson(notificationJson, Notification.class);
+
+        GenieResponse<Void> genieResponse = activity.addNotification(notification);
+        Assert.assertTrue(genieResponse.getStatus());
+        GenieResponse<Void> genieResponse1 = activity.addNotification(notification);
+        Assert.assertTrue(genieResponse1.getStatus());
+    }
+
+    @Test
+    public void _13shouldValidateAddNotificationForNull() {
         GenieResponse<Void> genieResponse = activity.addNotification(null);
         Assert.assertFalse(genieResponse.getStatus());
         Assert.assertEquals("Failed to add/update  notification", genieResponse.getErrorMessages().get(0));
@@ -59,13 +71,13 @@ public class NotificationServiceTest extends GenieServiceTestBase {
     @Test
     public void _22shouldUpdateNotification() {
 
-        String notificationJson = SampleApiResponse.getNotification();
+        String notificationJson = SampleResponse.getNotification();
         Notification notification = GsonUtil.fromJson(notificationJson, Notification.class);
 
         GenieResponse<Void> genieResponse = activity.addNotification(notification);
         Assert.assertTrue(genieResponse.getStatus());
 
-        String updatedNotificationJson = SampleApiResponse.getUpdatedNotification();
+        String updatedNotificationJson = SampleResponse.getUpdatedNotification();
         Notification notification2 = GsonUtil.fromJson(updatedNotificationJson, Notification.class);
 
         GenieResponse<Notification> updateResponse = activity.updateNotification(notification2);
@@ -74,9 +86,26 @@ public class NotificationServiceTest extends GenieServiceTestBase {
     }
 
     @Test
+    public void _23shouldUpdateAllNotification() {
+
+        String notificationJson = SampleResponse.getNotification();
+        Notification notification = GsonUtil.fromJson(notificationJson, Notification.class);
+
+        GenieResponse<Void> genieResponse = activity.addNotification(notification);
+        Assert.assertTrue(genieResponse.getStatus());
+
+        String updatedNotificationJson = SampleResponse.getUpdatedNotification();
+        Notification notification2 = GsonUtil.fromJson(updatedNotificationJson, Notification.class);
+        notification2.setMsgid(-1);
+        GenieResponse<Notification> updateResponse = activity.updateNotification(notification2);
+        Assert.assertTrue(updateResponse.getStatus());
+
+    }
+
+    @Test
     public void _33shouldDeleteNotification() {
 
-        String notificationJson = SampleApiResponse.getNotification();
+        String notificationJson = SampleResponse.getNotification();
         Notification notification = GsonUtil.fromJson(notificationJson, Notification.class);
 
         //add notification
@@ -91,7 +120,7 @@ public class NotificationServiceTest extends GenieServiceTestBase {
 
     @Test
     public void _34shouldValidateDeleteNotification() {
-        String notificationJson = SampleApiResponse.getNotification();
+        String notificationJson = SampleResponse.getNotification();
         Notification notification = GsonUtil.fromJson(notificationJson, Notification.class);
 
         //add notification
@@ -106,7 +135,7 @@ public class NotificationServiceTest extends GenieServiceTestBase {
 
     @Test
     public void _44shouldGetAllNotifications() {
-        String notificationJson = SampleApiResponse.getNotification();
+        String notificationJson = SampleResponse.getNotification();
         Notification notification = GsonUtil.fromJson(notificationJson, Notification.class);
 
         //add notification
@@ -121,5 +150,40 @@ public class NotificationServiceTest extends GenieServiceTestBase {
         Assert.assertTrue(getAllResponse.getStatus());
 
         Assert.assertEquals(1, getAllResponse.getResult().get(0).getMsgid());
+    }
+
+    @Test
+    public void _45shouldGetZeroNotificationsIfNoNotificationsAvailable() {
+
+        NotificationFilterCriteria.Builder filterCriteria = new NotificationFilterCriteria.Builder()
+                .notificationStatus(NotificationStatus.ALL);
+
+//        get all notification
+        GenieResponse<List<Notification>> getAllResponse = activity.getAllNotifications(filterCriteria.build());
+        Assert.assertTrue(getAllResponse.getStatus());
+
+        Assert.assertEquals(0, getAllResponse.getResult().size());
+    }
+
+    @Test
+    public void _45shouldGetNotificationsDependingUponStatus() {
+
+        NotificationFilterCriteria.Builder filterCriteria = new NotificationFilterCriteria.Builder()
+                .notificationStatus(NotificationStatus.READ);
+
+//        get all notification
+        GenieResponse<List<Notification>> getAllResponse = activity.getAllNotifications(filterCriteria.build());
+        Assert.assertTrue(getAllResponse.getStatus());
+
+        Assert.assertEquals(0, getAllResponse.getResult().size());
+
+        NotificationFilterCriteria.Builder filterCriteria1 = new NotificationFilterCriteria.Builder()
+                .notificationStatus(NotificationStatus.UNREAD);
+
+//        get all notification
+        GenieResponse<List<Notification>> getAllResponse1 = activity.getAllNotifications(filterCriteria1.build());
+        Assert.assertTrue(getAllResponse1.getStatus());
+
+        Assert.assertEquals(0, getAllResponse1.getResult().size());
     }
 }

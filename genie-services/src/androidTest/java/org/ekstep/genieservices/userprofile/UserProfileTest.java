@@ -14,6 +14,7 @@ import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.enums.ContentAccessStatus;
+import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.contract.UserEntry;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.profile.db.model.ContentAccessModel;
@@ -40,10 +41,10 @@ import java.util.UUID;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UserProfileTest extends GenieServiceTestBase {
 
-    private static final String ONE_PROFILE_EPAR = "epar/" + "OneProfile.epar";
+    private static final String ONE_PROFILE_EPAR = "epar/" + "PROFILE_ONE.epar";
     private static final String TWO_PROFILE_EPAR = "epar/" + "TWOProfile.epar";
     private static final String COLLECTION_ASSET_PATH = "Download/Times_Tables_2_to_10.ecar";
-    private final String ONE_PROFILE_FILE_PATH = DESTINATION + File.separator + "OneProfile.epar";
+    private final String ONE_PROFILE_FILE_PATH = DESTINATION + File.separator + "PROFILE_ONE.epar";
     private final String PROFILE_ID = "76c33e90-5b82-4739-af56-78580bb0f91a";
 
     @Before
@@ -693,12 +694,15 @@ public class UserProfileTest extends GenieServiceTestBase {
         ContentAccessModel contentAccessModel = GenieServiceDBHelper.findContentAccessInDB(CHILD_C2_ID);
 
         Assert.assertNotNull(contentAccessModel);
-        Assert.assertEquals(ContentAccessStatus.NOT_PLAYED.getValue(), contentAccessModel.getStatus());
+        Assert.assertEquals(ContentAccessStatus.PLAYED.getValue(), contentAccessModel.getStatus());
 
     }
 
     @Test
     public void _93ShouldGetAllContentAccessInfo() {
+
+        GenieServiceDBHelper.clearTable(ContentAccessEntry.TABLE_NAME);
+
         String uid = "sampleuid1";
         Profile profile = new Profile("profile1", "@drawable/icavatar", "en");
         profile.setUid(uid);
@@ -716,7 +720,7 @@ public class UserProfileTest extends GenieServiceTestBase {
 
         ContentAccessFilterCriteria criteria = new ContentAccessFilterCriteria.Builder().forContent(CHILD_C2_ID).build();
         GenieResponse<List<ContentAccess>> contentAccessList = activity.getAllContentAccess(criteria);
-        Assert.assertEquals(2, contentAccessList.getResult().size());
+        Assert.assertEquals(1, contentAccessList.getResult().size());
 
         ContentAccessFilterCriteria criteria1 = new ContentAccessFilterCriteria.Builder().forContent(CHILD_C3_ID).build();
         GenieResponse<List<ContentAccess>> contentAccessList1 = activity.getAllContentAccess(criteria1);

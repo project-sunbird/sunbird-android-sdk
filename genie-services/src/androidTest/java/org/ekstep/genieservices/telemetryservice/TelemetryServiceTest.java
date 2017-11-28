@@ -2,7 +2,7 @@ package org.ekstep.genieservices.telemetryservice;
 
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.GenieServiceTestBase;
-import org.ekstep.genieservices.SampleApiResponse;
+import org.ekstep.genieservices.SampleResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.PartnerData;
 import org.ekstep.genieservices.commons.bean.SyncStat;
@@ -46,11 +46,11 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
     @Test
     public void _1shouldExportTelemetryToGSAFileSuccessfully() {
         //This is event is generated to ensure all GE_SESSION_START and all events will be generated first
-        activity.saveTelemetry(SampleApiResponse.getSampleEvent());
+        activity.saveTelemetry(SampleResponse.getSampleEvent());
 
         GenieServiceDBHelper.clearTelemetryTableEntry();
         for (int i = 0; i <= 4; i++) {
-            activity.saveTelemetry(SampleApiResponse.getSampleEvent());
+            activity.saveTelemetry(SampleResponse.getSampleEvent());
         }
 
         Assert.assertEquals(5, GenieServiceDBHelper.findAllEvents().size());
@@ -65,7 +65,7 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
     @Test
     public void _2shouldImportGSAFileSuccessfully() {
         for (int i = 0; i <= 4; i++) {
-            activity.saveTelemetry(SampleApiResponse.getSampleEvent());
+            activity.saveTelemetry(SampleResponse.getSampleEvent());
         }
 
         TelemetryExportRequest request = new TelemetryExportRequest.Builder().toFolder(activity.getExternalFilesDir(null).toString()).build();
@@ -91,7 +91,7 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
         Map<String, Object> etags = (Map<String, Object>) eventMap.get("etags");
 
         Assert.assertEquals(telemetryEvent, eventMap.get("eid"));
-        Assert.assertEquals("2.1", eventMap.get("ver"));
+        Assert.assertEquals("2.2", eventMap.get("ver"));
         Assert.assertNotNull(eventMap.get("sid"));
         Assert.assertNotNull(eventMap.get("did"));
         Assert.assertEquals(PARTNER_ID, eks.get("partnerid"));
@@ -225,9 +225,9 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
     private void shouldCheckSyncedTelemetryData(GenieResponse<TelemetryStat> telemetryStatGenieResponse) {
 
         startMockServer();
-        mMockServer.mockHttpResponse(SampleApiResponse.telemetrySyncResponse(), 200);
-        mMockServer.mockHttpResponse(SampleApiResponse.telemetrySyncResponse(), 200);
-        mMockServer.mockHttpResponse(SampleApiResponse.telemetrySyncResponse(), 200);
+        mMockServer.mockHttpResponse(SampleResponse.telemetrySyncResponse(), 200);
+        mMockServer.mockHttpResponse(SampleResponse.telemetrySyncResponse(), 200);
+        mMockServer.mockHttpResponse(SampleResponse.telemetrySyncResponse(), 200);
         GenieResponse<SyncStat> syncStatGenieResponse = activity.sync();
 
         Assert.assertTrue(syncStatGenieResponse.getStatus());
