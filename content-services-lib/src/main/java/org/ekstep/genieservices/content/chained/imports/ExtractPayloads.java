@@ -6,7 +6,6 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContentProgress;
-import org.ekstep.genieservices.commons.bean.MoveContentProgress;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.Decompress;
@@ -147,7 +146,7 @@ public class ExtractPayloads implements IChainable<List<ContentImportResponse>, 
                                     || (ContentConstants.ContentDisposition.INLINE.equals(contentDisposition) && ContentConstants.ContentEncoding.GZIP.equals(contentEncoding))) { // Content with zip artifact
                                 payload = new File(tmpLocation.getPath(), "/" + artifactUrl);
                                 unzipSuccess = Decompress.unzip(payload, payloadDestination);
-                            } else if (ContentConstants.ContentDisposition.INLINE.equals(contentDisposition) && ContentConstants.ContentEncoding.IDENTITY.equals(contentEncoding)) {    // Content with artifact without zip i.e. pfd, mp4
+                            } else if (ContentHandler.isInlineIdentity(contentDisposition, contentEncoding)) {    // Content with artifact without zip i.e. pfd, mp4
                                 try {
                                     copyAssets(tmpLocation.getPath(), artifactUrl, payloadDestination);
                                     unzipSuccess = true;
