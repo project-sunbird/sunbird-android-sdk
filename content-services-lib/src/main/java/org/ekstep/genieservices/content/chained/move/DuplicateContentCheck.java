@@ -49,10 +49,10 @@ public class DuplicateContentCheck implements IChainable<List<MoveContentRespons
             //check if any of the action has been already set, if set then follow accordingly
             ExistingContentAction existingContentAction = moveContentContext.getExistingContentAction();
             if (existingContentAction == null) {
-                List<MoveContentResponse> moveContentErrorResponseList = new ArrayList<>();
+                List<MoveContentResponse> moveContentResponseList = new ArrayList<>();
 
                 for (ContentModel duplicateContentModel : duplicateContentsInSource) {
-                    MoveContentResponse moveContentErrorResponse;
+                    MoveContentResponse moveContentResponse;
 
                     //get content model from file
                     Double destPkgVersion = getPkgVersionFromFile(moveContentContext, duplicateContentModel.getIdentifier());
@@ -60,19 +60,19 @@ public class DuplicateContentCheck implements IChainable<List<MoveContentRespons
                     Double srcPkgVersion = ContentHandler.readPkgVersion(duplicateContentModel.getLocalData());
 
                     if (destPkgVersion > srcPkgVersion) {
-                        moveContentErrorResponse = new MoveContentResponse(duplicateContentModel.getIdentifier(), MoveContentStatus.HIGHER_VERSION_IN_DESTINATION);
-                        moveContentErrorResponseList.add(moveContentErrorResponse);
-                    } else if (destPkgVersion > srcPkgVersion) {
-                        moveContentErrorResponse = new MoveContentResponse(duplicateContentModel.getIdentifier(), MoveContentStatus.LOWER_VERSION_IN_DESTINATION);
-                        moveContentErrorResponseList.add(moveContentErrorResponse);
+                        moveContentResponse = new MoveContentResponse(duplicateContentModel.getIdentifier(), MoveContentStatus.HIGHER_VERSION_IN_DESTINATION);
+                        moveContentResponseList.add(moveContentResponse);
+                    } else if (destPkgVersion < srcPkgVersion) {
+                        moveContentResponse = new MoveContentResponse(duplicateContentModel.getIdentifier(), MoveContentStatus.LOWER_VERSION_IN_DESTINATION);
+                        moveContentResponseList.add(moveContentResponse);
                     } else {
                         //both versions are same, do nothing
                     }
                 }
 
-                if (moveContentErrorResponseList.size() > 0) {
+                if (moveContentResponseList.size() > 0) {
                     GenieResponse<List<MoveContentResponse>> errorResponse = GenieResponseBuilder.getErrorResponse(ContentConstants.DUPLICATE_CONTENT, "Duplicate contents found", "DuplicateContentCheck");
-                    errorResponse.setResult(moveContentErrorResponseList);
+                    errorResponse.setResult(moveContentResponseList);
                     return errorResponse;
                 }
             }

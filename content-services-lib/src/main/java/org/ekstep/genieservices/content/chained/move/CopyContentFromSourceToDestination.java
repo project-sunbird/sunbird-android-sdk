@@ -4,8 +4,8 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.MoveContentResponse;
 import org.ekstep.genieservices.commons.bean.MoveContentProgress;
+import org.ekstep.genieservices.commons.bean.MoveContentResponse;
 import org.ekstep.genieservices.commons.bean.enums.ExistingContentAction;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
@@ -38,11 +38,13 @@ public class CopyContentFromSourceToDestination implements IChainable<List<MoveC
             EventBus.postEvent(new MoveContentProgress(currentCount, moveContentContext.getContentsInSource().size()));
 
             ExistingContentAction existingContentAction = moveContentContext.getExistingContentAction();
+            List<String> validContentIdsInDestination = moveContentContext.getValidContentIdsInDestination();
 
             for (ContentModel contentModelInSource : moveContentContext.getContentsInSource()) {
                 File source = new File(contentModelInSource.getPath());
                 try {
-                    if (moveContentContext.getValidContentIdsInDestination().contains(contentModelInSource.getIdentifier())) {
+                    if (validContentIdsInDestination != null && existingContentAction != null && validContentIdsInDestination.size() > 0
+                            && validContentIdsInDestination.contains(contentModelInSource.getIdentifier())) {
                         File contentDestination = new File(moveContentContext.getContentRootFolder(), contentModelInSource.getIdentifier());
 
                         switch (existingContentAction) {
@@ -60,6 +62,7 @@ public class CopyContentFromSourceToDestination implements IChainable<List<MoveC
                                 break;
                             case IGNORE:
                             case KEEP_DESTINATION:
+                            default:
                                 if (moveContentContext.getValidContentIdsInDestination().contains(contentModelInSource.getIdentifier())) {
                                     currentCount++;
                                 } else {
@@ -68,6 +71,10 @@ public class CopyContentFromSourceToDestination implements IChainable<List<MoveC
                                 }
                                 break;
                         }
+                    } else {
+                        File contentDestination = new File(moveContentContext.getContentRootFolder(), contentModelInSource.getIdentifier());
+                        FileUtil.copyFolder(source, contentDestination);
+                        currentCount++;
                     }
                     EventBus.postEvent(new MoveContentProgress(currentCount, moveContentContext.getContentsInSource().size()));
                 } catch (IOException e) {
