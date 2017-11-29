@@ -20,6 +20,7 @@ public class StoreDestinationContentInDB implements IChainable<List<MoveContentR
 
     @Override
     public GenieResponse<List<MoveContentResponse>> execute(AppContext appContext, MoveContentContext moveContentContext) {
+        // TODO: 29/11/17 Extract the content model from the folder which are different from duplicate contents and are not in DB
         for (ContentModel contentModel : moveContentContext.getContentsInDestination()) {
             contentModel.update();
         }

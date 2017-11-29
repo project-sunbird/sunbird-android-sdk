@@ -7,6 +7,7 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MoveContentProgress;
 import org.ekstep.genieservices.commons.bean.MoveContentResponse;
 import org.ekstep.genieservices.commons.bean.enums.ExistingContentAction;
+import org.ekstep.genieservices.commons.bean.enums.MoveContentStatus;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
@@ -43,8 +44,8 @@ public class CopyContentFromSourceToDestination implements IChainable<List<MoveC
             for (ContentModel contentModelInSource : moveContentContext.getContentsInSource()) {
                 try {
                     if (duplicateContents != null && duplicateContents.size() > 0) {
-                        for (MoveContentResponse contentResponse : duplicateContents) {
-                            if (contentResponse.getIdentifier().equalsIgnoreCase(contentModelInSource.getIdentifier())) {
+                        for (MoveContentResponse duplicateContent : duplicateContents) {
+                            if (duplicateContent.getIdentifier().equalsIgnoreCase(contentModelInSource.getIdentifier())) {
                                 //this means by default we keep contents in the destination
                                 if (existingContentAction == null) {
                                     currentCount++;
@@ -59,9 +60,13 @@ public class CopyContentFromSourceToDestination implements IChainable<List<MoveC
                                             //Rename the destination folder to identifier_temp
                                             //Delete of these temp folders will happen only on successful completion of copying the files
                                             //Else rollback of temp folders will happen when cancel is initiated
-                                            //FileUtil.copyFolder(source, contentDestination);
-                                            // TODO: 29/11/17 Check if the destination file has to be removed
-                                            currentCount++;
+                                            if (duplicateContent.getStatus() == MoveContentStatus.SAME_VERSION_IN_BOTH){
+                                                currentCount++;
+                                            }else {
+                                                renameDestinationDuplicateFolder(moveContentContext, duplicateContent.getIdentifier());
+                                                copyFolder(moveContentContext, contentModelInSource);
+                                                currentCount++;
+                                            }
                                             break;
                                         case IGNORE:
                                         case KEEP_DESTINATION:
@@ -71,16 +76,12 @@ public class CopyContentFromSourceToDestination implements IChainable<List<MoveC
                                     }
                                 }
                             } else {
-                                File source = new File(contentModelInSource.getPath());
-                                File contentDestination = new File(moveContentContext.getContentRootFolder(), contentModelInSource.getIdentifier());
-                                FileUtil.copyFolder(source, contentDestination);
+                                copyFolder(moveContentContext, contentModelInSource);
                                 currentCount++;
                             }
                         }
                     } else {
-                        File source = new File(contentModelInSource.getPath());
-                        File contentDestination = new File(moveContentContext.getContentRootFolder(), contentModelInSource.getIdentifier());
-                        FileUtil.copyFolder(source, contentDestination);
+                        copyFolder(moveContentContext, contentModelInSource);
                         currentCount++;
                     }
                     EventBus.postEvent(new MoveContentProgress(currentCount, moveContentContext.getContentsInSource().size()));
@@ -94,6 +95,19 @@ public class CopyContentFromSourceToDestination implements IChainable<List<MoveC
         }
 
         return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.MOVE_FAILED, ServiceConstants.ErrorMessage.NO_CONTENT_TO_MOVE, TAG);
+    }
+
+    private void renameDestinationDuplicateFolder(MoveContentContext moveContentContext, String identifier) {
+        File oldFile = new File(moveContentContext.getContentRootFolder(), identifier);
+        File newFile = new File(moveContentContext.getContentRootFolder(), identifier+"_temp");
+
+        oldFile.renameTo(newFile);
+    }
+
+    private void copyFolder(MoveContentContext moveContentContext, ContentModel contentModelInSource) throws IOException {
+        File source = new File(contentModelInSource.getPath());
+        File contentDestination = new File(moveContentContext.getContentRootFolder(), contentModelInSource.getIdentifier());
+        FileUtil.copyFolder(source, contentDestination);
     }
 
     @Override

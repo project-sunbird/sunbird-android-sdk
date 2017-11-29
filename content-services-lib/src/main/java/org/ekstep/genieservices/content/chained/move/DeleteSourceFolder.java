@@ -4,6 +4,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MoveContentResponse;
 import org.ekstep.genieservices.commons.bean.enums.ExistingContentAction;
+import org.ekstep.genieservices.commons.bean.enums.MoveContentStatus;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.content.bean.MoveContentContext;
@@ -31,9 +32,17 @@ public class DeleteSourceFolder implements IChainable<List<MoveContentResponse>,
                 FileUtil.rm(new File(contentModel.getPath()));
             }else{
                 if (existingContentAction == ExistingContentAction.KEEP_SOURCE && moveContentContext.getDuplicateContents().size() > 0){
-                    for (MoveContentResponse contentResponse : moveContentContext.getDuplicateContents()){
-                        if (contentResponse.getIdentifier().equalsIgnoreCase(contentModel.getIdentifier())){
-                            // do not remove this folder, it is needed
+                    for (MoveContentResponse duplicateContent : moveContentContext.getDuplicateContents()){
+                        if (duplicateContent.getIdentifier().equalsIgnoreCase(contentModel.getIdentifier())){
+                            if (duplicateContent.getStatus() == MoveContentStatus.SAME_VERSION_IN_BOTH){
+                                FileUtil.rm(new File(contentModel.getPath()));
+                            }else{
+                                //Remove the renamed destination folder
+                                FileUtil.rm(getRenamedFolder(moveContentContext, duplicateContent.getIdentifier()));
+
+                                //Remove source folder as well
+                                FileUtil.rm(new File(contentModel.getPath()));
+                            }
                         }else {
                             FileUtil.rm(new File(contentModel.getPath()));
                         }
@@ -45,6 +54,10 @@ public class DeleteSourceFolder implements IChainable<List<MoveContentResponse>,
         }
 
         return nextLink.execute(appContext, moveContentContext);
+    }
+
+    private File getRenamedFolder(MoveContentContext moveContentContext, String identifier) {
+        return new File(moveContentContext.getContentRootFolder(), identifier+"_temp");
     }
 
     @Override

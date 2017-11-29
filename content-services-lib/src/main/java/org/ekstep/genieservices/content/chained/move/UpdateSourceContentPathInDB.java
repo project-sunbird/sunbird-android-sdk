@@ -23,25 +23,8 @@ public class UpdateSourceContentPathInDB implements IChainable<List<MoveContentR
 
     @Override
     public GenieResponse<List<MoveContentResponse>> execute(AppContext appContext, MoveContentContext moveContentContext) {
-
-        ExistingContentAction existingContentAction = moveContentContext.getExistingContentAction();
-
         for (ContentModel contentModel : moveContentContext.getContentsInSource()) {
-            if (existingContentAction == null) {
-                updatePath(moveContentContext, contentModel);
-            } else {
-                if (existingContentAction == ExistingContentAction.KEEP_SOURCE && moveContentContext.getDuplicateContents().size() > 0) {
-                    for (MoveContentResponse contentResponse : moveContentContext.getDuplicateContents()) {
-                        if (contentResponse.getIdentifier().equalsIgnoreCase(contentModel.getIdentifier())) {
-                            // do not update this folder path
-                        } else {
-                            updatePath(moveContentContext, contentModel);
-                        }
-                    }
-                } else {
-                    updatePath(moveContentContext, contentModel);
-                }
-            }
+            updatePath(moveContentContext, contentModel);
         }
 
         return nextLink.execute(appContext, moveContentContext);
