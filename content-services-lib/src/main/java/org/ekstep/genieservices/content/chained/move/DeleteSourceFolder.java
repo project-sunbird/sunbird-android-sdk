@@ -3,6 +3,7 @@ package org.ekstep.genieservices.content.chained.move;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MoveContentResponse;
+import org.ekstep.genieservices.commons.bean.enums.ExistingContentAction;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.content.bean.MoveContentContext;
@@ -23,8 +24,24 @@ public class DeleteSourceFolder implements IChainable<List<MoveContentResponse>,
     @Override
     public GenieResponse<List<MoveContentResponse>> execute(AppContext appContext, MoveContentContext moveContentContext) {
 
+        ExistingContentAction existingContentAction = moveContentContext.getExistingContentAction();
+
         for (ContentModel contentModel : moveContentContext.getContentsInSource()) {
-            FileUtil.rm(new File(contentModel.getPath()));
+            if (existingContentAction == null) {
+                FileUtil.rm(new File(contentModel.getPath()));
+            }else{
+                if (existingContentAction == ExistingContentAction.KEEP_SOURCE && moveContentContext.getDuplicateContents().size() > 0){
+                    for (MoveContentResponse contentResponse : moveContentContext.getDuplicateContents()){
+                        if (contentResponse.getIdentifier().equalsIgnoreCase(contentModel.getIdentifier())){
+                            // do not remove this folder, it is needed
+                        }else {
+                            FileUtil.rm(new File(contentModel.getPath()));
+                        }
+                    }
+                }else{
+                    FileUtil.rm(new File(contentModel.getPath()));
+                }
+            }
         }
 
         return nextLink.execute(appContext, moveContentContext);

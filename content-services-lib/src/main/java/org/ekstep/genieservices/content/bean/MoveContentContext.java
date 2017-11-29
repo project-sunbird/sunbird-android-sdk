@@ -1,5 +1,6 @@
 package org.ekstep.genieservices.content.bean;
 
+import org.ekstep.genieservices.commons.bean.MoveContentResponse;
 import org.ekstep.genieservices.commons.bean.enums.ExistingContentAction;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 
@@ -21,10 +22,12 @@ public class MoveContentContext {
     private List<ContentModel> contentsInSource;
     private List<ContentModel> contentsInDestination;
     private ExistingContentAction existingContentAction;
+    private List<MoveContentResponse> duplicateContents;
 
     public MoveContentContext(List<String> contentIds, File destinationFolder, ExistingContentAction existingContentAction) {
         this.contentIds = contentIds;
         this.validContentIdsInDestination = new ArrayList<>();
+        this.duplicateContents = new ArrayList<>();
         this.destinationFolder = destinationFolder;
         this.contentsInSource = new ArrayList<>();
         this.contentsInDestination = new ArrayList<>();
@@ -37,6 +40,10 @@ public class MoveContentContext {
 
     public List<String> getValidContentIdsInDestination() {
         return validContentIdsInDestination;
+    }
+
+    public List<MoveContentResponse> getDuplicateContents() {
+        return duplicateContents;
     }
 
     public File getDestinationFolder() {

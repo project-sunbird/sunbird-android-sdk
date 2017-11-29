@@ -38,40 +38,47 @@ public class CopyContentFromSourceToDestination implements IChainable<List<MoveC
             EventBus.postEvent(new MoveContentProgress(currentCount, moveContentContext.getContentsInSource().size()));
 
             ExistingContentAction existingContentAction = moveContentContext.getExistingContentAction();
-            List<String> validContentIdsInDestination = moveContentContext.getValidContentIdsInDestination();
+            List<MoveContentResponse> duplicateContents = moveContentContext.getDuplicateContents();
 
             for (ContentModel contentModelInSource : moveContentContext.getContentsInSource()) {
-                File source = new File(contentModelInSource.getPath());
                 try {
-                    if (validContentIdsInDestination != null && existingContentAction != null && validContentIdsInDestination.size() > 0
-                            && validContentIdsInDestination.contains(contentModelInSource.getIdentifier())) {
-                        File contentDestination = new File(moveContentContext.getContentRootFolder(), contentModelInSource.getIdentifier());
-
-                        switch (existingContentAction) {
-                            case KEEP_HIGHER_VERSION:
-                                break;
-                            case KEEP_LOWER_VERSION:
-                                break;
-                            case KEEP_SOURCE:
-                                // TODO: 24/11/17
-                                //Rename the destination folder to identifier_temp
-                                //Delete of these temp folders will happen only on successful completion of copying the files
-                                //Else rollback of temp folders will happen when cancel is initiated
-                                FileUtil.copyFolder(source, contentDestination);
-                                currentCount++;
-                                break;
-                            case IGNORE:
-                            case KEEP_DESTINATION:
-                            default:
-                                if (moveContentContext.getValidContentIdsInDestination().contains(contentModelInSource.getIdentifier())) {
+                    if (duplicateContents != null && duplicateContents.size() > 0) {
+                        for (MoveContentResponse contentResponse : duplicateContents) {
+                            if (contentResponse.getIdentifier().equalsIgnoreCase(contentModelInSource.getIdentifier())) {
+                                //this means by default we keep contents in the destination
+                                if (existingContentAction == null) {
                                     currentCount++;
                                 } else {
-                                    FileUtil.copyFolder(source, contentDestination);
-                                    currentCount++;
+                                    switch (existingContentAction) {
+                                        case KEEP_HIGHER_VERSION:
+                                            break;
+                                        case KEEP_LOWER_VERSION:
+                                            break;
+                                        case KEEP_SOURCE:
+                                            // TODO: 24/11/17
+                                            //Rename the destination folder to identifier_temp
+                                            //Delete of these temp folders will happen only on successful completion of copying the files
+                                            //Else rollback of temp folders will happen when cancel is initiated
+                                            //FileUtil.copyFolder(source, contentDestination);
+                                            // TODO: 29/11/17 Check if the destination file has to be removed
+                                            currentCount++;
+                                            break;
+                                        case IGNORE:
+                                        case KEEP_DESTINATION:
+                                        default:
+                                            currentCount++;
+                                            break;
+                                    }
                                 }
-                                break;
+                            } else {
+                                File source = new File(contentModelInSource.getPath());
+                                File contentDestination = new File(moveContentContext.getContentRootFolder(), contentModelInSource.getIdentifier());
+                                FileUtil.copyFolder(source, contentDestination);
+                                currentCount++;
+                            }
                         }
                     } else {
+                        File source = new File(contentModelInSource.getPath());
                         File contentDestination = new File(moveContentContext.getContentRootFolder(), contentModelInSource.getIdentifier());
                         FileUtil.copyFolder(source, contentDestination);
                         currentCount++;

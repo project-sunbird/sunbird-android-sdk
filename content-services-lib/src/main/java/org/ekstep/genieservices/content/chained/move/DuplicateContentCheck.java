@@ -48,33 +48,40 @@ public class DuplicateContentCheck implements IChainable<List<MoveContentRespons
         if (!CollectionUtil.isNullOrEmpty(duplicateContentsInSource)) {
             //check if any of the action has been already set, if set then follow accordingly
             ExistingContentAction existingContentAction = moveContentContext.getExistingContentAction();
-            if (existingContentAction == null) {
-                List<MoveContentResponse> moveContentResponseList = new ArrayList<>();
+            List<MoveContentResponse> moveContentDiffPkgList = new ArrayList<>();
+            List<MoveContentResponse> moveContentDupContentList = new ArrayList<>();
 
-                for (ContentModel duplicateContentModel : duplicateContentsInSource) {
-                    MoveContentResponse moveContentResponse;
+            for (ContentModel duplicateContentModel : duplicateContentsInSource) {
+                MoveContentResponse moveContentResponse;
 
-                    //get content model from file
-                    Double destPkgVersion = getPkgVersionFromFile(moveContentContext, duplicateContentModel.getIdentifier());
+                //get content model from file
+                Double destPkgVersion = getPkgVersionFromFile(moveContentContext, duplicateContentModel.getIdentifier());
 
-                    Double srcPkgVersion = ContentHandler.readPkgVersion(duplicateContentModel.getLocalData());
+                Double srcPkgVersion = ContentHandler.readPkgVersion(duplicateContentModel.getLocalData());
 
-                    if (destPkgVersion > srcPkgVersion) {
-                        moveContentResponse = new MoveContentResponse(duplicateContentModel.getIdentifier(), MoveContentStatus.HIGHER_VERSION_IN_DESTINATION);
-                        moveContentResponseList.add(moveContentResponse);
-                    } else if (destPkgVersion < srcPkgVersion) {
-                        moveContentResponse = new MoveContentResponse(duplicateContentModel.getIdentifier(), MoveContentStatus.LOWER_VERSION_IN_DESTINATION);
-                        moveContentResponseList.add(moveContentResponse);
-                    } else {
-                        //both versions are same, do nothing
-                    }
+                if (destPkgVersion > srcPkgVersion) {
+                    moveContentResponse = new MoveContentResponse(duplicateContentModel.getIdentifier(), MoveContentStatus.HIGHER_VERSION_IN_DESTINATION);
+                    moveContentDiffPkgList.add(moveContentResponse);
+                    moveContentDupContentList.add(moveContentResponse);
+                } else if (destPkgVersion < srcPkgVersion) {
+                    moveContentResponse = new MoveContentResponse(duplicateContentModel.getIdentifier(), MoveContentStatus.LOWER_VERSION_IN_DESTINATION);
+                    moveContentDiffPkgList.add(moveContentResponse);
+                    moveContentDupContentList.add(moveContentResponse);
+                } else {
+                    //both versions are same
+                    moveContentResponse = new MoveContentResponse(duplicateContentModel.getIdentifier(), MoveContentStatus.SAME_VERSION_IN_BOTH);
+                    moveContentDupContentList.add(moveContentResponse);
                 }
+            }
 
-                if (moveContentResponseList.size() > 0) {
-                    GenieResponse<List<MoveContentResponse>> errorResponse = GenieResponseBuilder.getErrorResponse(ContentConstants.DUPLICATE_CONTENT, "Duplicate contents found", "DuplicateContentCheck");
-                    errorResponse.setResult(moveContentResponseList);
-                    return errorResponse;
-                }
+            if (moveContentDupContentList.size() > 0) {
+                moveContentContext.getDuplicateContents().addAll(moveContentDupContentList);
+            }
+
+            if (existingContentAction == null && moveContentDiffPkgList.size() > 0) {
+                GenieResponse<List<MoveContentResponse>> errorResponse = GenieResponseBuilder.getErrorResponse(ContentConstants.DUPLICATE_CONTENT, "Duplicate contents found", "DuplicateContentCheck");
+                errorResponse.setResult(moveContentDiffPkgList);
+                return errorResponse;
             }
         }
 
