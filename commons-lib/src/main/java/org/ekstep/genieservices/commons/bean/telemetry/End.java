@@ -19,7 +19,7 @@ public class End extends Telemetry {
 
     private End(String type, String mode, long duration, String pageid, List<Map<String, Object>> summaryList) {
         super(EID);
-        createEData(type, mode, duration, pageid, summaryList);
+        setEData(createEData(type, mode, duration, pageid, summaryList));
     }
 
     protected Map<String, Object> createEData(String type, String mode, long duration, String pageid, List<Map<String, Object>> summaryList) {
