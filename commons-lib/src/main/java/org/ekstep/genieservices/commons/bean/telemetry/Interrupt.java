@@ -14,7 +14,7 @@ public class Interrupt extends Telemetry {
 
     private static final String EID = "INTERRUPT";
 
-    public Interrupt(String pageid, String type) {
+    public Interrupt(String type, String pageid) {
         super(EID);
         setEData(createEData(type, pageid));
     }
