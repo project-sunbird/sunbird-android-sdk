@@ -50,22 +50,22 @@ public class PartnerServiceTest extends GenieServiceTestBase {
 
         GenieResponse registerPartnerResponse = activity.registerPartner(partnerData);
         Assert.assertTrue(registerPartnerResponse.getStatus());
-        checkIfTelemetryEventIsLogged("GE_REGISTER_PARTNER");
+        checkIfTelemetryEventIsLogged("AUDIT");
 
         GenieResponse isRegisteredPartnerResponse = activity.isPartnerRegistered(PARTNER_ID);
         Assert.assertTrue(isRegisteredPartnerResponse.getStatus());
 
         GenieResponse startPartnerSession = activity.startPartnerSession(partnerData);
         Assert.assertTrue(startPartnerSession.getStatus());
-        checkIfTelemetryEventIsLogged("GE_START_PARTNER_SESSION");
+        checkIfTelemetryEventIsLogged("AUDIT");
 
         GenieResponse sendDataResponse = activity.sendData(partnerData);
         Assert.assertTrue(sendDataResponse.getStatus());
-        checkIfTelemetryEventIsLogged("GE_PARTNER_DATA");
+        checkIfTelemetryEventIsLogged("EXDATA");
 
         GenieResponse terminatePartnerSession = activity.terminatePartnerSession(partnerData);
         Assert.assertTrue(terminatePartnerSession.getStatus());
-        checkIfTelemetryEventIsLogged("GE_STOP_PARTNER_SESSION");
+        checkIfTelemetryEventIsLogged("AUDIT");
     }
 
     private void checkIfTelemetryEventIsLogged(String telemetryEvent) {
@@ -73,7 +73,7 @@ public class PartnerServiceTest extends GenieServiceTestBase {
         List<EventModel> eventModelList = GenieServiceDBHelper.findEventById(telemetryEvent);
         Map eventMap = eventModelList.get(0).getEventMap();
         Assert.assertEquals(telemetryEvent, eventMap.get("eid"));
-        Assert.assertEquals("2.2", eventMap.get("ver"));
+        Assert.assertEquals("3.0", eventMap.get("ver"));
     }
 
     /**
@@ -184,7 +184,7 @@ public class PartnerServiceTest extends GenieServiceTestBase {
 
         GenieResponse registerPartnerResponse = activity.registerPartner(partnerData);
         Assert.assertTrue(registerPartnerResponse.getStatus());
-        checkIfTelemetryEventIsLogged("GE_REGISTER_PARTNER");
+        checkIfTelemetryEventIsLogged("AUDIT");
 
         GenieResponse startPartnerSession = activity.startPartnerSession(partnerData);
         Assert.assertTrue(startPartnerSession.getStatus());
@@ -193,12 +193,12 @@ public class PartnerServiceTest extends GenieServiceTestBase {
 
         GenieResponse registerPartner = activity.registerPartner(partnerData2);
         Assert.assertTrue(registerPartner.getStatus());
-        checkIfTelemetryEventIsLogged("GE_REGISTER_PARTNER");
+        checkIfTelemetryEventIsLogged("AUDIT");
 
         GenieResponse startPartner = activity.startPartnerSession(partnerData2);
         Assert.assertTrue(startPartner.getStatus());
 
-        checkIfTelemetryEventIsLogged("GE_STOP_PARTNER_SESSION");
+        checkIfTelemetryEventIsLogged("AUDIT");
 
     }
 }

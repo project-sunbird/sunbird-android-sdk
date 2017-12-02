@@ -163,7 +163,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         Map<String, Object> eData = telemetry.getEdata();
         learnerContentSummaryDetails.setTimespent((Double) eData.get("duration"));
 
-        learnerContentSummaryDetails.setTimestamp((Long) telemetry.getEts());
+        learnerContentSummaryDetails.setTimestamp(telemetry.getEts());
 
         List<CorrelationData> cData = telemetry.getContext().getCdata();
         if (cData != null) {
@@ -191,10 +191,9 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         learnerAssessmentDetails.setCorrect(("Yes".equalsIgnoreCase(pass) ? 1 : 0));
         learnerAssessmentDetails.setScore((Double) eData.get("score"));
         learnerAssessmentDetails.setTimespent((Double) eData.get("duration"));
-        if ("2.0".equalsIgnoreCase(telemetry.getVer())) {
-            learnerAssessmentDetails.setTimestamp((Long) telemetry.getEts());
-            learnerAssessmentDetails.setRes(GsonUtil.toJson(eData.get("resvalues")));
-        }
+
+        learnerAssessmentDetails.setTimestamp((Long) telemetry.getEts());
+        learnerAssessmentDetails.setRes(GsonUtil.toJson(eData.get("resvalues")));
         learnerAssessmentDetails.setQdesc((String) question.get("desc"));
         learnerAssessmentDetails.setQtitle((String) question.get("title"));
         learnerAssessmentDetails.setMaxScore((Double) question.get("maxscore"));

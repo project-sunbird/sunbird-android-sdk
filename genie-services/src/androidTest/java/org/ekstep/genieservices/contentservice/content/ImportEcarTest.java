@@ -159,9 +159,9 @@ public class ImportEcarTest extends GenieServiceTestBase {
         GenieServiceDBHelper.findEcarDBEntry(CONTENT_ID);
         AssertCollection.verifyNoChildContentEntry(CONTENT_ID);
 
-        AssertImportTelemetryEvent.verifyGEInteractIsLoggedForContentImportInitiated("GE_INTERACT");
-        AssertImportTelemetryEvent.verifyGeTransferIsLoggedForContentImport("GE_TRANSFER");
-        AssertImportTelemetryEvent.verifyGEInteractIsLoggedForContentImportSuccess("GE_INTERACT");
+        AssertImportTelemetryEvent.verifyGEInteractIsLoggedForContentImportInitiated("INTERACT");
+        AssertImportTelemetryEvent.verifyGeTransferIsLoggedForContentImport("SHARE");
+        AssertImportTelemetryEvent.verifyGEInteractIsLoggedForContentImportSuccess("INTERACT");
     }
 
     @Test
@@ -175,9 +175,9 @@ public class ImportEcarTest extends GenieServiceTestBase {
         Assert.assertNull(genieResponse.getError());
         Assert.assertEquals(ServiceConstants.FileExtension.CONTENT, ext);
 
-        AssertImportTelemetryEvent.verifyGEInteractIsLoggedForContentImportInitiated("GE_INTERACT");
-        AssertImportTelemetryEvent.verifyGeTransferIsLoggedForContentImport("GE_TRANSFER");
-        AssertImportTelemetryEvent.verifyGEInteractIsLoggedForContentImportSuccess("GE_INTERACT");
+        AssertImportTelemetryEvent.verifyGEInteractIsLoggedForContentImportInitiated("INTERACT");
+        AssertImportTelemetryEvent.verifyGeTransferIsLoggedForContentImport("SHARE");
+        AssertImportTelemetryEvent.verifyGEInteractIsLoggedForContentImportSuccess("INTERACT");
 
         GenieServiceDBHelper.findEcarDBEntry(CONTENT_ID_WITH_CHILD);
         AssertCollection.verifyCollectionEntryAndVisibility(CONTENT_ID_WITH_CHILD, VISIBILITY_DEFAULT);

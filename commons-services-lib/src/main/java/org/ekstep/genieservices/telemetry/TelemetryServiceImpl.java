@@ -328,7 +328,9 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         Map<String, Object> context = (Map<String, Object>) event.get("context");
         context.put("channel", mAppContext.getParams().getString(IParams.Key.CHANNEL_ID));
         addProducerDataV3(context);
-        context.put("env", mAppContext.getParams().getString(IParams.Key.ENVIRONMENT));
+        if (!context.containsKey("env") || StringUtil.isNullOrEmpty(context.get("env").toString())) {
+            context.put("env", mAppContext.getParams().getString(IParams.Key.ENVIRONMENT));
+        }
         context.put("sid", isSessionValid(session) ? session.getSid() : "");
         context.put("did", mAppContext.getDeviceInfo().getDeviceID());
     }

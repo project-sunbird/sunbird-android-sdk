@@ -11,6 +11,7 @@ import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
 import org.ekstep.genieservices.commons.bean.TelemetryImportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.db.contract.TelemetryProcessedEntry;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.telemetry.model.EventModel;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
@@ -86,14 +87,15 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
         Map eventMap = eventModelList.get(0).getEventMap();
 
         Map<String, Object> edata = (Map<String, Object>) eventMap.get("edata");
-        Map<String, Object> eks = (Map<String, Object>) edata.get("eks");
-        Map<String, Object> etags = (Map<String, Object>) eventMap.get("etags");
+        Map<String, Object> context = (Map<String, Object>) eventMap.get("context");
+        Map<String, Object> etags = (Map<String, Object>) eventMap.get("tags");
 
         Assert.assertEquals(telemetryEvent, eventMap.get("eid"));
-        Assert.assertEquals("2.2", eventMap.get("ver"));
-        Assert.assertNotNull(eventMap.get("sid"));
-        Assert.assertNotNull(eventMap.get("did"));
-        Assert.assertEquals(PARTNER_ID, eks.get("partnerid"));
+        Assert.assertEquals("3.0", eventMap.get("ver"));
+        Assert.assertNotNull(context.get("sid"));
+        Assert.assertNotNull(context.get("did"));
+        Map data = GsonUtil.fromJson(edata.get("data").toString(), Map.class);
+        Assert.assertEquals(PARTNER_ID, data.get("partnerid"));
 
         List<Object> partnerDataList = ((List<Object>) etags.get("partner"));
         Assert.assertEquals(PARTNER_ID, partnerDataList.get(0));
@@ -115,11 +117,11 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
         GenieResponse sendDataResponse = activity.sendData(partnerData);
         Assert.assertTrue(sendDataResponse.getStatus());
 
-        checkIfTelemetryEventIsLogged("GE_PARTNER_DATA");
+        checkIfTelemetryEventIsLogged("EXDATA");
     }
 
     /**
-     * Scenario : To save Telemetry details passed to it as {@link Telemetry}
+     * Scenario : To save Telemetry details passed to it as {@link org.ekstep.genieservices.commons.bean.telemetry.Telemetry}
      * Given : Save telemetry details.
      * Step 1. Create a user profile and set as current user.
      * Step 2. Create a GameData Object.

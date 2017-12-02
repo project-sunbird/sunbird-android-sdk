@@ -148,6 +148,16 @@ public class UserServiceImpl extends BaseService implements IUserService {
         TelemetryLogger.log(audit);
     }
 
+    private void logProfileDeleteAuditEvent(Profile profile) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("action", "Profile-Deleted");
+        map.put("uid", profile.getUid());
+        map.put("duration", DateUtil.elapsedTimeTillNow(profile.getCreatedAt().getTime()));
+
+        Audit audit = new Audit(null, GsonUtil.toJson(map), null, ServiceConstants.Telemetry.ACTOR_TYPE_SYSTEM);
+        TelemetryLogger.log(audit);
+    }
+
     @Override
     public GenieResponse<List<Profile>> getAllUserProfile() {
         String methodName = "getAllUserProfile@UserServiceImpl";
@@ -249,6 +259,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
             Profile profile = new Profile("", "", "");
             profile.setUid(uid);
+            final Profile profileDB = userProfileModel.getProfile();
             mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
                 @Override
                 public Void perform(IDBSession dbSession) {
@@ -258,7 +269,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
                     userProfileModel.delete();
 
                     userModel.delete();
-
+                    logProfileDeleteAuditEvent(profileDB);
                     return null;
                 }
             });

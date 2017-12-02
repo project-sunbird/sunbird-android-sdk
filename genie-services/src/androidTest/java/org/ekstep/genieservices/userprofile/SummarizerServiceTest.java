@@ -40,7 +40,7 @@ public class SummarizerServiceTest extends GenieServiceTestBase {
     @Test
     public void _11ShouldPopulateLearnerSummaryDetailsTable() throws InterruptedException {
         activity.saveTelemetry(SampleResponse.getSampleOEEndEvent());
-        Thread.sleep(5000);
+        Thread.sleep(15000);
         Assert.assertEquals(1, GenieServiceDBHelper.findLearnerContentSummaryDetails(SUMMARIZED_CONTENTID).size());
 
     }
