@@ -964,10 +964,11 @@ public class ContentHandler {
         return contentModelListInDB;
     }
 
-    public static Map<String, Object> getSearchRequest(AppContext appContext, Set<String> contentIds) {
+    public static Map<String, Object> getSearchRequest(AppContext appContext, Set<String> contentIds, String[] status) {
         Map<String, Object> filterMap = new HashMap<>();
         filterMap.put("compatibilityLevel", getCompatibilityLevelFilter(appContext));
         filterMap.put("identifier", contentIds);
+        filterMap.put("status", Arrays.asList(status));
         filterMap.put("objectType", Collections.singletonList("Content"));
 
         Map<String, Object> requestMap = new HashMap<>();

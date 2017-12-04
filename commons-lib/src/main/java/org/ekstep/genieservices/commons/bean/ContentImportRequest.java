@@ -7,22 +7,29 @@ import java.util.Map;
 
 /**
  * This class accepts,
- *  * - contentImportMap
+ * * - contentImportMap
  */
 public class ContentImportRequest {
 
     private Map<String, Object> contentImportMap;
+    private String[] contentStatusArray;
 
-    private ContentImportRequest(Map<String, Object> contentImportMap) {
+    private ContentImportRequest(Map<String, Object> contentImportMap, String[] contentStatusArray) {
         this.contentImportMap = contentImportMap;
+        this.contentStatusArray = contentStatusArray;
     }
 
     public Map<String, Object> getContentImportMap() {
         return contentImportMap;
     }
 
+    public String[] getContentStatusArray() {
+        return contentStatusArray;
+    }
+
     public static class Builder {
         private Map<String, Object> contentImportMap;
+        private String[] contentStatusArray;
 
         public Builder() {
             this.contentImportMap = new HashMap<>();
@@ -48,11 +55,21 @@ public class ContentImportRequest {
             return this;
         }
 
+        public Builder allowUnlistedContent() {
+            this.contentStatusArray = new String[]{"Live", "Unlisted"};
+            return this;
+        }
+
         public ContentImportRequest build() {
             if (this.contentImportMap.isEmpty()) {
                 throw new IllegalStateException("Add atleast one content to import");
             }
-            return new ContentImportRequest(this.contentImportMap);
+
+            if (contentStatusArray == null || contentStatusArray.length == 0) {
+                this.contentStatusArray = new String[]{"Live"};
+            }
+
+            return new ContentImportRequest(contentImportMap, contentStatusArray);
         }
     }
 }
