@@ -1,7 +1,11 @@
 package org.ekstep.genieservices.commons.bean;
 
+import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.commons.utils.StringUtil;
+
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class holds all the data related to Content Data
@@ -25,6 +29,7 @@ public class ContentData implements Serializable {
     private String license;
     private String expires;
     private String downloadUrl;
+    private Object variants;
     private String artifactUrl;
     private List<String> language;
     private List<String> gradeLevel;
@@ -39,7 +44,6 @@ public class ContentData implements Serializable {
     private String contentTypesCount;
     private String lastPublishedOn;
     private String createdOn;
-    private List<ContentVariant> contentVariantList;
     private List<String> screenshots;
 
     public String getIdentifier() {
@@ -67,6 +71,18 @@ public class ContentData implements Serializable {
     }
 
     public String getSize() {
+        return size;
+    }
+
+    public String getSize(String variantName) {
+        if (!StringUtil.isNullOrEmpty(variantName)) {
+            Map variants = getVariants();
+            if (variants != null && variants.get(variantName) != null) {
+                Map variantMap = (Map) variants.get(variantName);
+                return variantMap.get("size").toString();
+            }
+        }
+
         return size;
     }
 
@@ -108,6 +124,18 @@ public class ContentData implements Serializable {
 
     public String getDownloadUrl() {
         return downloadUrl;
+    }
+
+    public Map<String, Object> getVariants() {
+        Map<String, Object> variantMap = null;
+        if (variants != null) {
+            if (variants instanceof Map) {
+                variantMap = (Map<String, Object>) variants;
+            } else {
+                variantMap = GsonUtil.fromJson(((String) variants).replace("\\", ""), Map.class);
+            }
+        }
+        return variantMap;
     }
 
     public String getArtifactUrl() {
@@ -166,14 +194,6 @@ public class ContentData implements Serializable {
         return createdOn;
     }
 
-    public List<ContentVariant> getVariants() {
-        return contentVariantList;
-    }
-
-    public void setVariants(List<ContentVariant> contentVariantList) {
-        this.contentVariantList = contentVariantList;
-    }
-
     public List<String> getScreenshots() {
         return screenshots;
     }
@@ -198,6 +218,7 @@ public class ContentData implements Serializable {
                 ", license='" + license + '\'' +
                 ", expires='" + expires + '\'' +
                 ", downloadUrl='" + downloadUrl + '\'' +
+                ", variants='" + variants + '\'' +
                 ", artifactUrl='" + artifactUrl + '\'' +
                 ", language=" + language +
                 ", gradeLevel=" + gradeLevel +
@@ -212,7 +233,6 @@ public class ContentData implements Serializable {
                 ", contentTypesCount='" + contentTypesCount + '\'' +
                 ", lastPublishedOn='" + lastPublishedOn + '\'' +
                 ", createdOn='" + createdOn + '\'' +
-                ", contentVariantList=" + contentVariantList +
                 ", screenshots=" + screenshots +
                 '}';
     }
