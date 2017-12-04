@@ -126,7 +126,7 @@ public class SampleResponse {
                 "      \"type\": \"Content\",\n" +
                 "      \"ver\": \"411\"\n" +
                 "    },\n" +
-                "    \"tags\": {},\n" +
+                "    \"tags\": [],\n" +
                 "    \"type\": \"events\",\n" +
                 "    \n" +
                 "    \"channel\": \"in.ekstep\"\n" +
@@ -178,9 +178,9 @@ public class SampleResponse {
                 "      \"type\": \"\"\n" +
                 "    }\n" +
                 "  },\n" +
-                "  \"tags\": {\n" +
+                "  \"tags\": [\n" +
                 "    \n" +
-                "  }\n" +
+                "  ]\n" +
                 "}";
     }
 
@@ -4170,6 +4170,56 @@ public class SampleResponse {
                 "  \"msg\": \"Congratulations on downloading Genie.\",\n" +
                 "  \"relativetime\": 1,\n" +
                 "  \"actionid\": 1\n" +
+                "}";
+    }
+
+    public static String getSampleStartEvent() {
+        return "{\n" +
+                "  \n" +
+                "    \"actor\": {\n" +
+                "      \"id\": \"790bd396-7cc2-406d-b27e-806f64fbc7de\",\n" +
+                "      \"type\": \"User\"\n" +
+                "    },\n" +
+                "    \"eid\": \"START\",\n" +
+                "    \"edata\": {\n" +
+                "      \"mode\": \"play\",\n" +
+                "      \"duration\": 0,\n" +
+                "      \"type\": \"player\",\n" +
+                "      \"pageid\": \"\"\n" +
+                "    },\n" +
+                "    \"ver\": \"3.0\",\n" +
+                "    \"ets\": 1512382835857,\n" +
+                "    \"context\": {\n" +
+                "      \"channel\": \"in.ekstep\",\n" +
+                "      \"env\": \"ContentPlayer\",\n" +
+                "      \"sid\": \"23e9b57f-0f2b-4d6c-9c6a-7c7197a3d21c\",\n" +
+                "      \"did\": \"1843b51374548982ecd555803f43d7f2e7dfed9c\",\n" +
+                "      \"pdata\": {\n" +
+                "        \"id\": \"in.ekstep\",\n" +
+                "        \"ver\": \"1.0\"\n" +
+                "      },\n" +
+                "      \"cdata\": [\n" +
+                "        {\n" +
+                "          \"type\": \"ContentSession\",\n" +
+                "          \"id\": \"8a0132846b98053a09cd666c5ffd00e7\"\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    },\n" +
+                "    \"mid\": \"START:4d3d82a5-f683-43df-a5bb-93117046a47d\",\n" +
+                "    \"object\": {\n" +
+                "      \"id\": \"do_30087399\",\n" +
+                "      \"type\": \"Content\",\n" +
+                "      \"ver\": \"10.0\",\n" +
+                "      \"subtype\": \"\",\n" +
+                "      \"parent\": {\n" +
+                "        \"id\": \"\",\n" +
+                "        \"type\": \"\"\n" +
+                "      }\n" +
+                "    },\n" +
+                "    \"tags\": []\n" +
+                "    \n" +
+                "  \n" +
+                "  \n" +
                 "}";
     }
 

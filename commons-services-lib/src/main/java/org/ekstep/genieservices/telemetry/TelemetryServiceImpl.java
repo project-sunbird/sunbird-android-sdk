@@ -162,15 +162,14 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
             patchContext(currentUserSession, event);
 
             // Patch tags if missing.
-            if (!event.containsKey("tags")) {
-                event.put("tags", new HashMap<>());
+            if (!event.containsKey("tags") || CollectionUtil.isNullOrEmpty((List<String>) event.get("tags"))) {
+                event.put("tags", new ArrayList<>());
             }
 
-            Map<String, Object> tags = (Map<String, Object>) event.get("tags");
+            List<String> tags = (List<String>) event.get("tags");
             // Patch the app tags.
-            patchProgramTags(tags);
-            // Patch the partner tags if missing.
-            patchPartnerTags(tags);
+            patchProgramTagsV3(tags);
+
 
         } else {
             if (version.equals("2.1") || version.equals("2.2")) {
@@ -282,6 +281,13 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         }
     }
 
+    private void patchProgramTagsV3(List<String> tags) {
+        Set<String> activeProgramTags = TelemetryTagCache.activeTags(mAppContext);
+        List<String> tagList = new ArrayList<>();
+        tagList.addAll(activeProgramTags);
+        tags.addAll(tagList);
+    }
+
     private void patchProgramTags(Map<String, Object> tags) {
         Set<String> activeProgramTags = TelemetryTagCache.activeTags(mAppContext);
         List<String> tagList = new ArrayList<>();
@@ -321,6 +327,36 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         }
     }
 
+
+    private void patchPartnerTagsV3(Map<String, Object> context) {
+        if (!context.containsKey("cdata")) {
+            context.put("cdata", new ArrayList<Map<String, String>>());
+        }
+        String partnerId = mAppContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.KEY_ACTIVE_PARTNER_ID, "");
+        if (!StringUtil.isNullOrEmpty(partnerId)) {
+            List<Map<String, String>> partnerTagList = (List<Map<String, String>>) context.get("cdata");
+
+            if (!containsPartnerId(partnerTagList, partnerId)) {
+                Map<String, String> cdata = new HashMap<>();
+                cdata.put("type", "partner");
+                cdata.put("id", partnerId);
+                partnerTagList.add(cdata);
+            }
+
+
+        }
+    }
+
+    private boolean containsPartnerId(List<Map<String, String>> partnerTagList, String partnerId) {
+        for (int i = 0; i < partnerTagList.size(); i++) {
+            Map<String, String> map = partnerTagList.get(i);
+            if (map.containsValue(partnerId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void patchContext(UserSession session, Map<String, Object> event) {
         if (!event.containsKey("context")) {
             event.put("context", new HashMap<>());
@@ -333,6 +369,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         }
         context.put("sid", isSessionValid(session) ? session.getSid() : "");
         context.put("did", mAppContext.getDeviceInfo().getDeviceID());
+        patchPartnerTagsV3(context);
     }
 
     private void addActor(Map<String, Object> event, String uid) {

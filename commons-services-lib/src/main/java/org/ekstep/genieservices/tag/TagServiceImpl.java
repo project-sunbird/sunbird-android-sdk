@@ -7,6 +7,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Tag;
+import org.ekstep.genieservices.commons.bean.telemetry.Audit;
 import org.ekstep.genieservices.commons.utils.CryptoUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
@@ -20,6 +21,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.ekstep.genieservices.tag.model.TagModel.find;
 
@@ -73,6 +75,16 @@ public class TagServiceImpl extends BaseService implements ITagService {
         return genieResponse;
     }
 
+    private void logCreateTagTelemetry(Tag tag, String hash) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("action", "Tag-Created");
+        map.put("taghash", hash);
+        map.put("tag", GsonUtil.toJson(tag));
+
+        Audit audit = new Audit(null, GsonUtil.toJson(map), null, ServiceConstants.Telemetry.ACTOR_TYPE_SYSTEM);
+        TelemetryLogger.log(audit);
+    }
+
     @Override
     public GenieResponse<List<Tag>> getTags() {
         String methodName = "getTags@TagService";
@@ -108,6 +120,7 @@ public class TagServiceImpl extends BaseService implements ITagService {
         if (existingTagModel != null) {
             existingTagModel.clear();
             genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+            logDeleteTagTelemetry(existingTagModel.tagHash());
             TelemetryLogger.logSuccess(mAppContext, genieResponse, TAG, methodName, params);
         } else {
             genieResponse = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.VALIDATION_ERROR, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_TAG, TAG);
@@ -115,6 +128,16 @@ public class TagServiceImpl extends BaseService implements ITagService {
         }
         return genieResponse;
     }
+
+    private void logDeleteTagTelemetry(String hash) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("action", "Tag-Deleted");
+        map.put("taghash", hash);
+
+        Audit audit = new Audit(null, GsonUtil.toJson(map), null, ServiceConstants.Telemetry.ACTOR_TYPE_SYSTEM);
+        TelemetryLogger.log(audit);
+    }
+
 
     @Override
     public GenieResponse<Void> updateTag(Tag tag) {
@@ -136,6 +159,7 @@ public class TagServiceImpl extends BaseService implements ITagService {
                 } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
                     //This will never occur as the algo and encoding are hardcoded.
                 }
+                String prevTagHash = tagModel.tagHash();
                 // TODO: 6/6/2017 - Needs to revisit update.
                 tagModel = TagModel.build(mAppContext.getDBSession(), tag.getName().trim(), tagHash,
                         tag.getDescription(),
@@ -144,6 +168,7 @@ public class TagServiceImpl extends BaseService implements ITagService {
                 tagModel.update();
                 TelemetryTagCache.clearCache(mAppContext);
                 genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+                logUpdateTagTelemetry(tag, tagModel.tagHash(), prevTagHash);
                 TelemetryLogger.logSuccess(mAppContext, genieResponse, TAG, methodName, params);
             }
         } else {
@@ -154,4 +179,14 @@ public class TagServiceImpl extends BaseService implements ITagService {
         return genieResponse;
     }
 
+    private void logUpdateTagTelemetry(Tag tag, String hash, String prevTagHash) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("action", "Tag-Updated");
+        map.put("taghash", hash);
+        map.put("prevtaghash", prevTagHash);
+        map.put("tag", GsonUtil.toJson(tag));
+
+        Audit audit = new Audit(null, GsonUtil.toJson(map), null, ServiceConstants.Telemetry.ACTOR_TYPE_SYSTEM);
+        TelemetryLogger.log(audit);
+    }
 }

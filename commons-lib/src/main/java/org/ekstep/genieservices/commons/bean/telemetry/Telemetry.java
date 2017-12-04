@@ -50,7 +50,7 @@ public class Telemetry {
 
     private Map<String, Object> edata;
 
-    private Tags tags;
+    private List<String> tags;
 
     public Telemetry(String eid) {
         this.eid = eid;
@@ -89,7 +89,7 @@ public class Telemetry {
         this.object = new TelemetryObject(id, type, ver);
     }
 
-    public void setTags(Tags tags) {
+    public void setTags(List<String> tags) {
         this.tags = tags;
     }
 

@@ -11,7 +11,6 @@ import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
 import org.ekstep.genieservices.commons.bean.TelemetryImportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.db.contract.TelemetryProcessedEntry;
-import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.telemetry.model.EventModel;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
@@ -88,17 +87,19 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
 
         Map<String, Object> edata = (Map<String, Object>) eventMap.get("edata");
         Map<String, Object> context = (Map<String, Object>) eventMap.get("context");
-        Map<String, Object> etags = (Map<String, Object>) eventMap.get("tags");
 
         Assert.assertEquals(telemetryEvent, eventMap.get("eid"));
         Assert.assertEquals("3.0", eventMap.get("ver"));
         Assert.assertNotNull(context.get("sid"));
         Assert.assertNotNull(context.get("did"));
-        Map data = GsonUtil.fromJson(edata.get("data").toString(), Map.class);
-        Assert.assertEquals(PARTNER_ID, data.get("partnerid"));
 
-        List<Object> partnerDataList = ((List<Object>) etags.get("partner"));
-        Assert.assertEquals(PARTNER_ID, partnerDataList.get(0));
+        List<Map<String, String>> partnerDataList = ((List<Map<String, String>>) context.get("cdata"));
+        if (partnerDataList.size() == 2) {
+            Assert.assertEquals(PARTNER_ID, partnerDataList.get(1).get("id"));
+        } else {
+            Assert.assertEquals(PARTNER_ID, partnerDataList.get(0).get("id"));
+        }
+
     }
 
     private void savePartnerData(PartnerData partnerData) {
@@ -154,54 +155,10 @@ public class TelemetryServiceTest extends GenieServiceTestBase {
 
         GenieServiceDBHelper.clearTelemetryTableEntry();
 
-        String eventStrng = "{\n" +
-                "  \"cdata\": [\n" +
-                "    \n" +
-                "  ],\n" +
-                "  \"did\": \"85f9b35bd361605a41911948359e61b2a22f75c7\",\n" +
-                "  \"edata\": {\n" +
-                "    \"eks\": {\n" +
-                "      \"dspec\": {\n" +
-                "        \"camera\": \"16.10.bong\",\n" +
-                "        \"cap\": [\n" +
-                "          \n" +
-                "        ],\n" +
-                "        \"cpu\": \"abi: armeabi-v7a processor\\t: 0 \",\n" +
-                "        \"dlocname\": \"\",\n" +
-                "        \"dname\": \"\",\n" +
-                "        \"edisk\": 11.57,\n" +
-                "        \"id\": \"caf46b2f69333e63\",\n" +
-                "        \"idisk\": 0.0,\n" +
-                "        \"make\": \"Samsung SM-G900H\",\n" +
-                "        \"mdata\": {\n" +
-                "          \"id\": \"diNqKQV9Xdg:APA91bEhupodZ8ohXKIhnieDHhvISQcWLTUBHdOLzZmPgLgkXp52U_YBV-Jc4tSUgPT9iQU_-WOseZ9jDFmtuCCcxwNBiq3va1Rp8iVdj332QSB6BSKtkBCGHz8zVw9Bl_9wlal533gD\",\n" +
-                "          \"type\": \"fcm\"\n" +
-                "        },\n" +
-                "        \"mem\": -1.0,\n" +
-                "        \"os\": \"Android 6.0.1\",\n" +
-                "        \"scrn\": 5.21,\n" +
-                "        \"sims\": -1\n" +
-                "      },\n" +
-                "      \"loc\": \"\"\n" +
-                "    }\n" +
-                "  },\n" +
-                "  \"eid\": \"GE_GENIE_START\",\n" +
-                "  \"ets\": 1496300828767,\n" +
-                "  \"gdata\": {\n" +
-                "    \"id\": \"genie.android\",\n" +
-                "    \"ver\": \"6.2.localqa-debug.24\"\n" +
-                "  },\n" +
-                "  \"sid\": \"\",\n" +
-                "  \"tags\": [\n" +
-                "    \n" +
-                "  ],\n" +
-                "  \"ts\": \"2017-06-01T07:07:08+0000\",\n" +
-                "  \"uid\": \"bf228c46-f7fe-49e1-bb91-eb1b254bec7c\",\n" +
-                "  \"ver\": \"2.0\"\n" +
-                "}";
 
-        GenieResponse genieResponse = activity.saveTelemetry(eventStrng);
+        GenieResponse genieResponse = activity.saveTelemetry(SampleResponse.getSampleStartEvent());
         Assert.assertTrue("true", genieResponse.getStatus());
+        checkIfTelemetryEventIsLogged("START");
 
     }
 
