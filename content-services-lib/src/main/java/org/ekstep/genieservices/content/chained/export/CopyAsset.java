@@ -32,21 +32,28 @@ public class CopyAsset implements IChainable<ContentExportResponse, ExportConten
         try {
             int i = 0;
             for (ContentModel contentModel : exportContext.getContentModelsToExport()) {
-                Map item = exportContext.getItems().get(i);
+                Map contentData = exportContext.getItems().get(i);
 
-                String appIcon = ContentHandler.readAppIcon(item);
+                String appIcon = ContentHandler.readAppIcon(contentData);
                 if (!StringUtil.isNullOrEmpty(appIcon)) {
                     copyAsset(contentModel.getPath(), exportContext.getTmpLocation(), appIcon);
                 }
 
-                String posterImage = ContentHandler.readPosterImage(item);
+                String posterImage = ContentHandler.readPosterImage(contentData);
                 if (!StringUtil.isNullOrEmpty(posterImage)) {
                     copyAsset(contentModel.getPath(), exportContext.getTmpLocation(), posterImage);
                 }
 
-                String grayScaleAppIcon = ContentHandler.readGrayScaleAppIcon(item);
+                String grayScaleAppIcon = ContentHandler.readGrayScaleAppIcon(contentData);
                 if (!StringUtil.isNullOrEmpty(grayScaleAppIcon)) {
                     copyAsset(contentModel.getPath(), exportContext.getTmpLocation(), grayScaleAppIcon);
+                }
+
+                if (ContentHandler.isInlineIdentity(ContentHandler.readContentDisposition(contentData), ContentHandler.readContentEncoding(contentData))) {
+                    String artifactUrl = ContentHandler.readArtifactUrl(contentData);
+                    if (!StringUtil.isNullOrEmpty(artifactUrl)) {
+                        copyAsset(contentModel.getPath(), exportContext.getTmpLocation(), artifactUrl);
+                    }
                 }
 
                 i++;

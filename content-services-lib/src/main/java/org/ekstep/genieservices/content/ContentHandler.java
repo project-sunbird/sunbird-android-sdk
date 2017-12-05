@@ -22,7 +22,6 @@ import org.ekstep.genieservices.commons.bean.ContentListingSection;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchFilter;
 import org.ekstep.genieservices.commons.bean.ContentSortCriteria;
-import org.ekstep.genieservices.commons.bean.ContentVariant;
 import org.ekstep.genieservices.commons.bean.FilterValue;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MasterData;
@@ -179,6 +178,19 @@ public class ContentHandler {
             return contentType;
         }
         return null;
+    }
+
+    private static Map readVariant(Map contentDataMap) {
+        Map variantData = null;
+        Object variants = contentDataMap.get(KEY_VARIANTS);
+        if (variants != null) {
+            if (variants instanceof Map) {
+                variantData = (Map) variants;
+            } else {
+                variantData = GsonUtil.fromJson(((String) variants).replace("\\", ""), Map.class);
+            }
+        }
+        return variantData;
     }
 
     private static String readName(Map contentData) {
@@ -401,12 +413,10 @@ public class ContentHandler {
         ContentData localData = null, serverData = null;
         if (contentModel.getLocalData() != null) {
             localData = GsonUtil.fromJson(contentModel.getLocalData(), ContentData.class);
-            localData.setVariants(getContentVariants(contentModel.getLocalData()));
             content.setContentData(localData);
         }
         if (contentModel.getServerData() != null) {
             serverData = GsonUtil.fromJson(contentModel.getServerData(), ContentData.class);
-            serverData.setVariants(getContentVariants(contentModel.getServerData()));
             if (localData == null) {
                 content.setContentData(serverData);
             }
@@ -431,32 +441,16 @@ public class ContentHandler {
         return content;
     }
 
-    private static List<ContentVariant> getContentVariants(String dataJson) {
-        List<ContentVariant> contentVariantList = new ArrayList<>();
-
-        Map<String, Object> dataMap = GsonUtil.fromJson(dataJson, Map.class);
-        ContentVariant spineContentVariant = getVariant(dataMap, "spine");
-        if (spineContentVariant != null) contentVariantList.add(spineContentVariant);
-        return contentVariantList;
-    }
-
-    private static ContentVariant getVariant(Map contentDataMap, String variantName) {
-        Object variants = contentDataMap.get(KEY_VARIANTS);
-        ContentVariant contentVariant = null;
-        if (variants != null) {
-            Map variantData;
-            if (variants instanceof Map) {
-                variantData = (Map) variants;
-            } else {
-                variantData = GsonUtil.fromJson(((String) variants).replace("\\", ""), Map.class);
-            }
-
-            if (variantData.get(variantName) != null) {
-                Map spineData = (Map) variantData.get(variantName);
-                contentVariant = new ContentVariant(variantName, spineData.get("ecarUrl").toString(), spineData.get("size").toString());
-            }
-        }
-        return contentVariant;
+    /**
+     * Content with artifact without zip i.e. pfd, mp4
+     *
+     * @param contentDisposition
+     * @param contentEncoding
+     * @return
+     */
+    public static boolean isInlineIdentity(String contentDisposition, String contentEncoding) {
+        return !StringUtil.isNullOrEmpty(contentDisposition) && !StringUtil.isNullOrEmpty(contentEncoding)
+                && ContentConstants.ContentDisposition.INLINE.equals(contentDisposition) && ContentConstants.ContentEncoding.IDENTITY.equals(contentEncoding);
     }
 
     public static String getCurrentUserId(IUserService userService) {
@@ -957,10 +951,11 @@ public class ContentHandler {
         return contentModelListInDB;
     }
 
-    public static Map<String, Object> getSearchRequest(AppContext appContext, Set<String> contentIds) {
+    public static Map<String, Object> getSearchRequest(AppContext appContext, Set<String> contentIds, String[] status) {
         Map<String, Object> filterMap = new HashMap<>();
         filterMap.put("compatibilityLevel", getCompatibilityLevelFilter(appContext));
         filterMap.put("identifier", contentIds);
+        filterMap.put("status", Arrays.asList(status));
         filterMap.put("objectType", Collections.singletonList("Content"));
 
         Map<String, Object> requestMap = new HashMap<>();
@@ -1505,9 +1500,12 @@ public class ContentHandler {
         String downloadUrl = null;
 
         if (ContentConstants.MimeType.COLLECTION.equals(readMimeType(dataMap))) {
-            ContentVariant spineContentVariant = getVariant(dataMap, "spine");
-            if (spineContentVariant != null) {
-                downloadUrl = spineContentVariant.getEcarUrl();
+            Map variantMap = readVariant(dataMap);
+            if (variantMap != null && variantMap.get("spine") != null) {
+                Map spineData = (Map) variantMap.get("spine");
+                if (spineData != null) {
+                    downloadUrl = spineData.get("ecarUrl").toString();
+                }
             }
         }
 

@@ -718,7 +718,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         Map<String, Object> contentImportMap = importRequest.getContentImportMap();
         Set<String> contentIds = contentImportMap.keySet();
 
-        ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, ContentHandler.getSearchRequest(mAppContext, contentIds));
+        ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, ContentHandler.getSearchRequest(mAppContext, contentIds, importRequest.getContentStatusArray()));
         GenieResponse apiResponse = contentSearchAPI.post();
         if (apiResponse.getStatus()) {
             String body = apiResponse.getResult().toString();
