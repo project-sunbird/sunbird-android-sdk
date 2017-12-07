@@ -7,21 +7,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by swayangjit on 24/11/17.
+ * Created on 24/11/17.
+ *
+ * @author swayangjit
  */
-
 public class Interrupt extends Telemetry {
 
     private static final String EID = "INTERRUPT";
 
-    public Interrupt(String type, String pageid) {
+    private Interrupt(String type, String pageId) {
         super(EID);
-        setEData(createEData(type, pageid));
+        setEData(createEData(type, pageId));
     }
 
     private Map<String, Object> createEData(String type, String pageId) {
         Map<String, Object> eData = new HashMap<>();
-        eData.put("type", !StringUtil.isNullOrEmpty(type) ? type : "");
+        eData.put("type", type);
         eData.put("pageid", !StringUtil.isNullOrEmpty(pageId) ? pageId : "");
         return eData;
     }
@@ -32,7 +33,6 @@ public class Interrupt extends Telemetry {
     }
 
     public static class Builder {
-
         private String type;
         private String pageId;
 
@@ -49,7 +49,6 @@ public class Interrupt extends Telemetry {
 
         /**
          * Page id where the interrupt has happened
-         *
          */
         public Builder pageId(String pageId) {
             this.pageId = pageId;
@@ -60,8 +59,8 @@ public class Interrupt extends Telemetry {
             if (StringUtil.isNullOrEmpty(type)) {
                 throw new IllegalStateException("type is required.");
             }
-            Interrupt event = new Interrupt(type, pageId);
-            return event;
+
+            return new Interrupt(type, pageId);
         }
     }
 }

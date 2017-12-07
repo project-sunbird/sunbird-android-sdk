@@ -12,16 +12,17 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by user on 15/11/17.
+ * Created on 15/11/17.
+ *
+ * @author anil
  */
-
 public class Interact extends Telemetry {
 
     private static final String EID = "INTERACT";
 
-    private Interact(String type, String subtype, String id, String pageid, List<Map<String, String>> positionList, List<Map<String, Object>> valueList) {
+    private Interact(String type, String subtype, String id, String pageId, List<Map<String, String>> positionList, List<Map<String, Object>> valueList) {
         super(EID);
-        setEData(createEData(type, subtype, id, pageid, positionList, valueList));
+        setEData(createEData(type, subtype, id, pageId, positionList, valueList));
     }
 
     protected Map<String, Object> createEData(String type, String subType, String id, String pageId, List<Map<String, String>> positionList, List<Map<String, Object>> valueList) {
@@ -61,9 +62,9 @@ public class Interact extends Telemetry {
         /**
          * Type of interaction TOUCH,DRAG,DROP,PINCH,ZOOM,SHAKE,ROTATE,SPEAK,LISTEN,WRITE,DRAW,START,ENDCHOOSE,ACTIVATE,SHOW,HIDE,SCROLL,HEARTBEAT,OTHER
          */
-        public Builder interActionType(InteractionType type) {
-            if (type != null) {
-                throw new IllegalArgumentException("type shouldn't be null or empty.");
+        public Builder interactionType(InteractionType type) {
+            if (type == null) {
+                throw new IllegalArgumentException("interactionType should not be null.");
             }
             this.type = type.getValue();
             return this;
@@ -88,7 +89,7 @@ public class Interact extends Telemetry {
         /**
          * Stage or page id on which the event happened
          */
-        public Builder pageid(String pageId) {
+        public Builder pageId(String pageId) {
             if (StringUtil.isNullOrEmpty(pageId)) {
                 throw new IllegalArgumentException("pageId shouldn't be null or empty.");
             }
@@ -170,6 +171,7 @@ public class Interact extends Telemetry {
             if (StringUtil.isNullOrEmpty(pageId)) {
                 throw new IllegalStateException("pageId is required.");
             }
+
             Interact event = new Interact(type, subType, id, pageId, pos, values);
             event.setCoRrelationdata(correlationData);
             event.setObject(objId != null ? objId : "", objType != null ? objType : "", objVer != null ? objVer : "", rollup);

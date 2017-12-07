@@ -63,7 +63,7 @@ public class ContentFeedbackServiceImpl extends BaseService implements IContentF
         feedback.rating(contentFeedback.getRating())
                 .comments(contentFeedback.getComments())
                 .objectId(contentFeedback.getContentId())
-                .objectType("Content")
+                .objectType(ServiceConstants.Telemetry.OBJECT_TYPE_CONTENT)
                 .objectVersion(contentFeedback.getContentVersion());
 
         TelemetryLogger.log(feedback.build());

@@ -785,23 +785,23 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     private void buildInitiateEvent() {
-        Interact interact = new Interact.Builder().
-                pageid(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID).
-                subType(ServiceConstants.Telemetry.CONTENT_IMPORT_INITIATED_SUB_TYPE).
-                interActionType(InteractionType.TOUCH).
-                objectType(ServiceConstants.Telemetry.OBJECT_TYPE_CONTENT).
-                build();
+        Interact interact = new Interact.Builder()
+                .pageId(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID)
+                .subType(ServiceConstants.Telemetry.CONTENT_IMPORT_INITIATED_SUB_TYPE)
+                .interactionType(InteractionType.TOUCH)
+                .objectType(ServiceConstants.Telemetry.OBJECT_TYPE_CONTENT)
+                .build();
         TelemetryLogger.log(interact);
     }
 
     private void buildSuccessEvent(String identifier) {
-        Interact interact = new Interact.Builder().
-                pageid(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID).
-                subType(ServiceConstants.Telemetry.CONTENT_IMPORT_SUCCESS_SUB_TYPE).
-                interActionType(InteractionType.OTHER).
-                objectId(identifier).
-                objectType(ServiceConstants.Telemetry.OBJECT_TYPE_CONTENT).
-                build();
+        Interact interact = new Interact.Builder()
+                .pageId(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID)
+                .subType(ServiceConstants.Telemetry.CONTENT_IMPORT_SUCCESS_SUB_TYPE)
+                .interactionType(InteractionType.OTHER)
+                .objectId(identifier)
+                .objectType(ServiceConstants.Telemetry.OBJECT_TYPE_CONTENT)
+                .build();
         TelemetryLogger.log(interact);
     }
 
