@@ -18,20 +18,20 @@ public class Impression extends Telemetry {
 
     private static final String EID = "IMPRESSION";
 
-    private Impression(String type, String subtype, String pageid, String uri, Visit visit) {
+    private Impression(String type, String subtype, String pageid, String uri, List<Visit> visits) {
         super(EID);
-        setEData(createEData(type, subtype, pageid, uri, visit));
+        setEData(createEData(type, subtype, pageid, uri, visits));
     }
 
-    protected Map<String, Object> createEData(String type, String subtype, String pageid, String uri, Visit visit) {
+    protected Map<String, Object> createEData(String type, String subtype, String pageid, String uri, List<Visit> visits) {
         Map<String, Object> eData = new HashMap<>();
         eData.put("type", type);
         eData.put("subtype", !StringUtil.isNullOrEmpty(subtype) ? subtype : "");
         eData.put("pageid", !StringUtil.isNullOrEmpty(pageid) ? pageid : "");
         eData.put("uri", !StringUtil.isNullOrEmpty(uri) ? uri : "");
-        List<Visit> visits = new ArrayList<>();
-        visits.add(visit);
-        eData.put("visits", visits);
+        if (!CollectionUtil.isNullOrEmpty(visits)) {
+            eData.put("visits", visits);
+        }
         return eData;
     }
 
@@ -46,12 +46,8 @@ public class Impression extends Telemetry {
         private String subType;
         private String pageid;
         private String uri;
-        private String objid;
-        private String objtype;
-        private String objVer;
-        private String section;
-        private int index;
         private List<CorrelationData> correlationData;
+        private List<Visit> visitList;
 
         /**
          * Impression type (list, detail, view, edit, workflow, search)
@@ -97,49 +93,23 @@ public class Impression extends Telemetry {
             return this;
         }
 
-        /**
-         * Unique id for the object visited
-         */
-        public Builder visitedTo(String objid) {
-            this.objid = objid;
-            return this;
-        }
 
         /**
-         * Type of the object visited
+         * Object Visits description
          */
-        public Builder visitedObjectType(String objtype) {
-            this.objtype = objtype;
-            return this;
-        }
-
-        /**
-         * Version of the object visited
-         */
-        public Builder visitedObjectVersion(String objVer) {
-            this.objVer = objVer;
-            return this;
-        }
-
-        /**
-         * Free flowing text
-         */
-        public Builder visitedSection(String section) {
-            this.section = section;
-            return this;
-        }
-
-        /**
-         * Index of the object within a given list
-         */
-        public Builder visitedObjectIndex(int index) {
-            this.index = index;
+        public Builder addVisits(Visit visit) {
+            if (visitList == null) {
+                visitList = new ArrayList<>();
+            }
+            if (visit != null) {
+                this.visitList.add(visit);
+            }
             return this;
         }
 
 
         public Impression build() {
-            Impression event = new Impression(type, subType, pageid, uri, new Visit(objid, objtype, objVer, section, index));
+            Impression event = new Impression(type, subType, pageid, uri, visitList);
             event.setCoRrelationdata(correlationData);
             return event;
         }
