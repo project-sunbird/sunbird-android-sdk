@@ -49,7 +49,7 @@ public class Interrupt extends Telemetry {
 
         /**
          * Page id where the interrupt has happened
-         * }
+         *
          */
         public Builder pageId(String pageId) {
             this.pageId = pageId;
