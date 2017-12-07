@@ -12,7 +12,6 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.telemetry.Feedback;
 import org.ekstep.genieservices.commons.db.contract.ContentFeedbackEntry;
 import org.ekstep.genieservices.commons.utils.StringUtil;
-import org.ekstep.genieservices.content.bean.enums.GEFeedbackContextType;
 import org.ekstep.genieservices.content.db.model.ContentFeedbackModel;
 import org.ekstep.genieservices.content.db.model.ContentFeedbacksModel;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
@@ -60,10 +59,14 @@ public class ContentFeedbackServiceImpl extends BaseService implements IContentF
     }
 
     private void saveContentFeedbackEvent(ContentFeedback contentFeedback) {
-        Feedback feedback = new Feedback(contentFeedback.getRating(), contentFeedback.getComments(), contentFeedback.getContentId(),
-                GEFeedbackContextType.CONTENT.getValue(), contentFeedback.getContentVersion());
+        Feedback.Builder feedback = new Feedback.Builder();
+        feedback.rating(contentFeedback.getRating())
+                .comments(contentFeedback.getComments())
+                .objectId(contentFeedback.getContentId())
+                .objectType("Content")
+                .objectVersion(contentFeedback.getContentVersion());
 
-        TelemetryLogger.log(feedback);
+        TelemetryLogger.log(feedback.build());
     }
 
     @Override
