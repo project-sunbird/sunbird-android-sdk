@@ -96,8 +96,6 @@ public interface ServiceConstants {
         String CONTENT_PLAYER = "ContentPlayer";
         String SESSION = "Session";
         String OBJECT_TYPE_CONTENT = "Content";
-        String ACTOR_TYPE_USER = "User";
-        String ACTOR_TYPE_SYSTEM = "System";
     }
 
     interface ErrorCode {

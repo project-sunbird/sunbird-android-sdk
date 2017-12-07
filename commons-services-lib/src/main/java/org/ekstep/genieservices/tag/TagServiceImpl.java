@@ -7,6 +7,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Tag;
+import org.ekstep.genieservices.commons.bean.telemetry.Actor;
 import org.ekstep.genieservices.commons.bean.telemetry.Audit;
 import org.ekstep.genieservices.commons.utils.CryptoUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -40,7 +41,7 @@ public class TagServiceImpl extends BaseService implements ITagService {
     @Override
     public GenieResponse<Void> setTag(Tag tag) {
         String methodName = "setTag@TagService";
-        HashMap params = new HashMap();
+        Map<String, Object> params = new HashMap<>();
         params.put("tag", GsonUtil.toJson(tag));
         params.put("logLevel", "2");
 
@@ -81,14 +82,14 @@ public class TagServiceImpl extends BaseService implements ITagService {
         map.put("taghash", hash);
         map.put("tag", GsonUtil.toJson(tag));
 
-        Audit audit = new Audit(null, GsonUtil.toJson(map), null, ServiceConstants.Telemetry.ACTOR_TYPE_SYSTEM);
+        Audit audit = new Audit(null, GsonUtil.toJson(map), null, Actor.TYPE_SYSTEM);
         TelemetryLogger.log(audit);
     }
 
     @Override
     public GenieResponse<List<Tag>> getTags() {
         String methodName = "getTags@TagService";
-        HashMap params = new HashMap();
+        Map<String, Object> params = new HashMap<>();
         params.put("logLevel", "2");
 
         GenieResponse<List<Tag>> genieResponse;
@@ -110,7 +111,7 @@ public class TagServiceImpl extends BaseService implements ITagService {
     public GenieResponse<Void> deleteTag(String name) {
 
         String methodName = "deleteTag@TagService";
-        HashMap params = new HashMap();
+        Map<String, Object> params = new HashMap<>();
         params.put("tagName", name);
         params.put("logLevel", "2");
 
@@ -134,7 +135,7 @@ public class TagServiceImpl extends BaseService implements ITagService {
         map.put("action", "Tag-Deleted");
         map.put("taghash", hash);
 
-        Audit audit = new Audit(null, GsonUtil.toJson(map), null, ServiceConstants.Telemetry.ACTOR_TYPE_SYSTEM);
+        Audit audit = new Audit(null, GsonUtil.toJson(map), null, Actor.TYPE_SYSTEM);
         TelemetryLogger.log(audit);
     }
 
@@ -142,7 +143,7 @@ public class TagServiceImpl extends BaseService implements ITagService {
     @Override
     public GenieResponse<Void> updateTag(Tag tag) {
         String methodName = "updateTag@TagService";
-        HashMap params = new HashMap();
+        Map<String, Object> params = new HashMap<>();
         params.put("tag", GsonUtil.toJson(tag));
         params.put("logLevel", "2");
 
@@ -186,7 +187,7 @@ public class TagServiceImpl extends BaseService implements ITagService {
         map.put("prevtaghash", prevTagHash);
         map.put("tag", GsonUtil.toJson(tag));
 
-        Audit audit = new Audit(null, GsonUtil.toJson(map), null, ServiceConstants.Telemetry.ACTOR_TYPE_SYSTEM);
+        Audit audit = new Audit(null, GsonUtil.toJson(map), null, Actor.TYPE_SYSTEM);
         TelemetryLogger.log(audit);
     }
 }

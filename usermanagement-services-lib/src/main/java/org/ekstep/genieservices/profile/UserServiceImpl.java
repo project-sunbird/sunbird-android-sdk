@@ -16,6 +16,7 @@ import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.enums.ContentAccessStatus;
+import org.ekstep.genieservices.commons.bean.telemetry.Actor;
 import org.ekstep.genieservices.commons.bean.telemetry.Audit;
 import org.ekstep.genieservices.commons.bean.telemetry.End;
 import org.ekstep.genieservices.commons.bean.telemetry.Error;
@@ -134,7 +135,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         map.put("uid", uid);
         map.put("loc", mAppContext.getLocationInfo().getLocation());
 
-        Audit audit = new Audit(null, GsonUtil.toJson(map), null, ServiceConstants.Telemetry.ACTOR_TYPE_SYSTEM);
+        Audit audit = new Audit(null, GsonUtil.toJson(map), null, Actor.TYPE_SYSTEM);
         TelemetryLogger.log(audit);
     }
 
@@ -144,7 +145,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         map.put("profile", GsonUtil.toJson(profile));
         map.put("loc", mAppContext.getLocationInfo().getLocation());
 
-        Audit audit = new Audit(null, GsonUtil.toJson(map), oldProfile != null ? GsonUtil.toJson(oldProfile) : null, ServiceConstants.Telemetry.ACTOR_TYPE_SYSTEM);
+        Audit audit = new Audit(null, GsonUtil.toJson(map), oldProfile != null ? GsonUtil.toJson(oldProfile) : null, Actor.TYPE_SYSTEM);
         TelemetryLogger.log(audit);
     }
 
@@ -154,7 +155,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         map.put("uid", profile.getUid());
         map.put("duration", DateUtil.elapsedTimeTillNow(profile.getCreatedAt().getTime()));
 
-        Audit audit = new Audit(null, GsonUtil.toJson(map), null, ServiceConstants.Telemetry.ACTOR_TYPE_SYSTEM);
+        Audit audit = new Audit(null, GsonUtil.toJson(map), null, Actor.TYPE_SYSTEM);
         TelemetryLogger.log(audit);
     }
 

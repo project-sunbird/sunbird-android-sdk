@@ -5,6 +5,7 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.telemetry.Actor;
 import org.ekstep.genieservices.commons.bean.telemetry.Log;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
@@ -83,7 +84,7 @@ public class TelemetryLogger {
 
         Log log = new Log.Builder().type("api_call")
                 .level("trace")
-                .actorType(ServiceConstants.Telemetry.ACTOR_TYPE_SYSTEM)
+                .actorType(Actor.TYPE_SYSTEM)
                 .addParam("service", service)
                 .addParam("method", method)
                 .addParam("mode", getNetworkMode(appContext.getConnectionInfo()))

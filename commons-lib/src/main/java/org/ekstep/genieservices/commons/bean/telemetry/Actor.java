@@ -9,14 +9,18 @@ package org.ekstep.genieservices.commons.bean.telemetry;
  * "type":  // Required. User, System etc.
  * }
  */
-
+// TODO: Need to revisit
 public class Actor {
+
+    public static final String TYPE_SYSTEM = "System";
+    public static final String TYPE_USER = "User";
 
     private String id;
     private String type;
-    public Actor() {
-    }
 
+    public Actor() {
+        this.type = TYPE_USER;
+    }
 
     public Actor(String type) {
         this.type = type;
@@ -26,7 +30,15 @@ public class Actor {
         return id;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getType() {
         return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

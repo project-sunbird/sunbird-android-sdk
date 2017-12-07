@@ -382,10 +382,6 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         if (CollectionUtil.isKeyNotAvailable(actorMap, "id")) {
             actorMap.put("id", uid);
         }
-
-        if (CollectionUtil.isKeyNotAvailable(actorMap, "type")) {
-            actorMap.put("type", ServiceConstants.Telemetry.ACTOR_TYPE_USER);
-        }
     }
 
     private void addGameDataIfMissing(Map<String, Object> event) {
