@@ -56,6 +56,7 @@ public class Interact extends Telemetry {
         private String objId;
         private String objType;
         private String objVer;
+        private Rollup rollup;
 
         /**
          * Type of interaction TOUCH,DRAG,DROP,PINCH,ZOOM,SHAKE,ROTATE,SPEAK,LISTEN,WRITE,DRAW,START,ENDCHOOSE,ACTIVATE,SHOW,HIDE,SCROLL,HEARTBEAT,OTHER
@@ -146,11 +147,19 @@ public class Interact extends Telemetry {
             return this;
         }
 
+        /**
+         * hierarcyLevel to be computed of the object. Only 4 levels are allowed.
+         */
+        public Builder hierarcyLevel(Rollup rollup) {
+            this.rollup = rollup;
+            return this;
+        }
+
 
         public Interact build() {
             Interact event = new Interact(type, subType, id, pageId, pos, values);
             event.setCoRrelationdata(correlationData);
-            event.setObject(objId != null ? objId : "", objType != null ? objType : "", objVer != null ? objVer : "");
+            event.setObject(objId != null ? objId : "", objType != null ? objType : "", objVer != null ? objVer : "", rollup);
             return event;
         }
     }

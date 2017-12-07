@@ -21,6 +21,11 @@ public class TelemetryObject {
      */
     private String version;
 
+    /**
+     * Rollups to be computed of the object. Only 4 levels are allowed
+     */
+    private Rollup rollup;
+
     public TelemetryObject(String id, String type, String version) {
         this.id = id;
         this.type = type;
@@ -37,5 +42,9 @@ public class TelemetryObject {
 
     public String getVersion() {
         return version;
+    }
+
+    public void setRollup(Rollup rollup) {
+        this.rollup = rollup;
     }
 }

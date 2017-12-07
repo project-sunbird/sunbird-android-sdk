@@ -85,8 +85,9 @@ public class Telemetry {
         this.context.setCdata(correlationData);
     }
 
-    public void setObject(String id, String type, String ver) {
+    public void setObject(String id, String type, String ver, Rollup rollup) {
         this.object = new TelemetryObject(id, type, ver);
+        this.object.setRollup(rollup);
     }
 
     public void setTags(List<String> tags) {
