@@ -81,10 +81,11 @@ public class TelemetryLogger {
     }
 
     public static Telemetry create(AppContext appContext, GenieResponse response, String service, String method, Map<String, Object> params, Map<String, Object> result) {
-
-        Log log = new Log.Builder().type("api_call")
+        Log log = new Log.Builder()
+                .type("api_call")
                 .level(Log.Level.TRACE)
                 .actorType(Actor.TYPE_SYSTEM)
+                .message(service + " " + method)
                 .addParam("service", service)
                 .addParam("method", method)
                 .addParam("mode", getNetworkMode(appContext.getConnectionInfo()))
