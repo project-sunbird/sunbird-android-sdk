@@ -50,7 +50,7 @@ public class End extends Telemetry {
          */
         public Builder type(String type) {
             if (StringUtil.isNullOrEmpty(type)) {
-                throw new IllegalArgumentException("Type shouldn't be null or empty.");
+                throw new IllegalArgumentException("type shouldn't be null or empty.");
             }
             this.type = type;
             return this;
@@ -95,7 +95,7 @@ public class End extends Telemetry {
 
         public End build() {
             if (StringUtil.isNullOrEmpty(type)) {
-                throw new IllegalStateException("Type is required.");
+                throw new IllegalStateException("type is required.");
             }
 
             return new End(type, mode, duration, pageid, summaryList);

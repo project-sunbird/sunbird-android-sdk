@@ -62,6 +62,9 @@ public class Interact extends Telemetry {
          * Type of interaction TOUCH,DRAG,DROP,PINCH,ZOOM,SHAKE,ROTATE,SPEAK,LISTEN,WRITE,DRAW,START,ENDCHOOSE,ACTIVATE,SHOW,HIDE,SCROLL,HEARTBEAT,OTHER
          */
         public Builder interActionType(InteractionType type) {
+            if (type != null) {
+                throw new IllegalArgumentException("type shouldn't be null or empty.");
+            }
             this.type = type.getValue();
             return this;
         }
@@ -86,6 +89,9 @@ public class Interact extends Telemetry {
          * Stage or page id on which the event happened
          */
         public Builder pageid(String pageId) {
+            if (StringUtil.isNullOrEmpty(pageId)) {
+                throw new IllegalArgumentException("pageId shouldn't be null or empty.");
+            }
             this.pageId = pageId;
             return this;
         }
@@ -157,6 +163,13 @@ public class Interact extends Telemetry {
 
 
         public Interact build() {
+            if (StringUtil.isNullOrEmpty(type)) {
+                throw new IllegalStateException("type is required.");
+            }
+
+            if (StringUtil.isNullOrEmpty(pageId)) {
+                throw new IllegalStateException("pageId is required.");
+            }
             Interact event = new Interact(type, subType, id, pageId, pos, values);
             event.setCoRrelationdata(correlationData);
             event.setObject(objId != null ? objId : "", objType != null ? objType : "", objVer != null ? objVer : "", rollup);

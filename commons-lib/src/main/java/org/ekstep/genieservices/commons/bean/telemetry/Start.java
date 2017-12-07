@@ -50,6 +50,10 @@ public class Start extends Telemetry {
          * Type of event generator
          */
         public Builder type(String type) {
+            if (StringUtil.isNullOrEmpty(type)) {
+                throw new IllegalArgumentException("type shouldn't be null or empty.");
+            }
+
             this.type = type;
             return this;
         }
@@ -95,6 +99,9 @@ public class Start extends Telemetry {
         }
 
         public Start build() {
+            if (StringUtil.isNullOrEmpty(type)) {
+                throw new IllegalStateException("type is required");
+            }
             Start event = new Start(type, dspec, loc, mode, duration, pageid);
             return event;
         }

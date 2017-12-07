@@ -54,6 +54,9 @@ public class Impression extends Telemetry {
          * Impression type (list, detail, view, edit, workflow, search)
          */
         public Builder type(String type) {
+            if (StringUtil.isNullOrEmpty(type)) {
+                throw new IllegalArgumentException("type shouldn't be null or empty.");
+            }
             this.type = type;
             return this;
         }
@@ -70,6 +73,9 @@ public class Impression extends Telemetry {
          * Unique page id
          */
         public Builder pageId(String pageid) {
+            if (StringUtil.isNullOrEmpty(pageid)) {
+                throw new IllegalArgumentException("pageid shouldn't be null or empty.");
+            }
             this.pageid = pageid;
             return this;
         }
@@ -108,6 +114,13 @@ public class Impression extends Telemetry {
         }
 
         public Impression build() {
+            if (StringUtil.isNullOrEmpty(type)) {
+                throw new IllegalStateException("type is required.");
+            }
+
+            if (StringUtil.isNullOrEmpty(pageid)) {
+                throw new IllegalStateException("pageid is required.");
+            }
             Impression event = new Impression(type, subType, pageid, uri, visitList);
             event.setCoRrelationdata(correlationData);
             return event;

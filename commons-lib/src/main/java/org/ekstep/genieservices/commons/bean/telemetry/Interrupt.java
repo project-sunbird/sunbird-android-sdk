@@ -40,6 +40,9 @@ public class Interrupt extends Telemetry {
          * Type of interrupt [m:background, m:resume]
          */
         public Builder type(String type) {
+            if (StringUtil.isNullOrEmpty(type)) {
+                throw new IllegalArgumentException("type shouldn't be null or empty.");
+            }
             this.type = type;
             return this;
         }
@@ -54,6 +57,9 @@ public class Interrupt extends Telemetry {
         }
 
         public Interrupt build() {
+            if (StringUtil.isNullOrEmpty(type)) {
+                throw new IllegalStateException("type is required.");
+            }
             Interrupt event = new Interrupt(type, pageId);
             return event;
         }
