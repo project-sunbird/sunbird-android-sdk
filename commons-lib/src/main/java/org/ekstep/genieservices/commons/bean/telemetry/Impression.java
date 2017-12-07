@@ -29,7 +29,9 @@ public class Impression extends Telemetry {
         eData.put("subtype", !StringUtil.isNullOrEmpty(subtype) ? subtype : "");
         eData.put("pageid", !StringUtil.isNullOrEmpty(pageid) ? pageid : "");
         eData.put("uri", !StringUtil.isNullOrEmpty(uri) ? uri : "");
-        eData.put("visits", visit);
+        List<Visit> visits = new ArrayList<>();
+        visits.add(visit);
+        eData.put("visits", visits);
         return eData;
     }
 

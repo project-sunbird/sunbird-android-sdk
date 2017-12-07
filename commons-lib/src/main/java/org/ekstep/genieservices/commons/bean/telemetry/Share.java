@@ -80,7 +80,7 @@ public class Share extends Telemetry {
             itemMap.put("id", identifier);
             if ("Content".equalsIgnoreCase(type) || "EXPLODEDCONTENT".equals(type)) {
                 itemMap.put("type", type);
-                itemMap.put("ver", pkgVersion);
+                itemMap.put("ver", String.valueOf(pkgVersion));
                 //Add Params
                 List<Map<String, Object>> paramsList = new ArrayList<>();
                 Map<String, Object> paramsMap = new HashMap<>();
