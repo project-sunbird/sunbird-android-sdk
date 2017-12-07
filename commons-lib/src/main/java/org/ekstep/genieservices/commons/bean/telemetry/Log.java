@@ -105,7 +105,7 @@ public class Log extends Telemetry {
 
         public Log build() {
             Log event = new Log(type, level, message, pageid, paramList);
-            event.setActor(new Actor("", actorType));
+            event.setActor(new Actor(actorType));
             return event;
         }
     }

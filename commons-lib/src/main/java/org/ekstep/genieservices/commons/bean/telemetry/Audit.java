@@ -20,7 +20,7 @@ public class Audit extends Telemetry {
     public Audit(List<String> props, String state, String prevstate, String actorType) {
         super(EID);
         setEData(createEData(props, state, prevstate));
-        setActor(new Actor("", actorType));
+        setActor(new Actor(actorType));
     }
 
     protected Map<String, Object> createEData(List<String> props, String state, String prevstate) {

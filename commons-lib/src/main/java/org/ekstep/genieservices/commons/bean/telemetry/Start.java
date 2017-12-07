@@ -14,18 +14,20 @@ public class Start extends Telemetry {
 
     private static final String EID = "START";
 
-    private Start(String type, DeviceSpecification dSpec, String loc, String mode, String duration, String pageid) {
+    private Start(String type, DeviceSpecification dSpec, String loc, String mode, long duration, String pageid) {
         super(EID);
         setEData(createEData(type, dSpec, loc, mode, duration, pageid));
     }
 
-    protected Map<String, Object> createEData(String type, DeviceSpecification dSpec, String loc, String mode, String duration, String pageid) {
+    protected Map<String, Object> createEData(String type, DeviceSpecification dSpec, String loc, String mode, long duration, String pageid) {
         Map<String, Object> eData = new HashMap<>();
         eData.put("type", !StringUtil.isNullOrEmpty(type) ? type : "");
         eData.put("dspec", dSpec != null ? dSpec : new DeviceSpecification());
         eData.put("loc", !StringUtil.isNullOrEmpty(loc) ? loc : "");
         eData.put("mode", !StringUtil.isNullOrEmpty(mode) ? mode : "");
-        eData.put("duration", !StringUtil.isNullOrEmpty(duration) ? duration : "");
+        if (duration > 0) {
+            eData.put("duration", duration);
+        }
         eData.put("pageid", !StringUtil.isNullOrEmpty(pageid) ? pageid : "");
         return eData;
     }
@@ -41,7 +43,7 @@ public class Start extends Telemetry {
         private DeviceSpecification dspec;
         private String loc;
         private String mode;
-        private String duration;
+        private long duration;
         private String pageid;
 
         /**
@@ -79,7 +81,7 @@ public class Start extends Telemetry {
         /**
          * Time taken to initialize/start.
          */
-        public Builder duration(String duration) {
+        public Builder duration(long duration) {
             this.duration = duration;
             return this;
         }

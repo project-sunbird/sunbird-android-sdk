@@ -24,7 +24,7 @@ public class End extends Telemetry {
 
     protected Map<String, Object> createEData(String type, String mode, long duration, String pageid, List<Map<String, Object>> summaryList) {
         Map<String, Object> eData = new HashMap<>();
-        eData.put("type", !StringUtil.isNullOrEmpty(type) ? type : "");
+        eData.put("type", type);
         eData.put("mode", !StringUtil.isNullOrEmpty(mode) ? mode : "");
         eData.put("duration", duration);
         eData.put("pageid", !StringUtil.isNullOrEmpty(pageid) ? pageid : "");
@@ -49,6 +49,9 @@ public class End extends Telemetry {
          * Type of event generator
          */
         public Builder type(String type) {
+            if (StringUtil.isNullOrEmpty(type)) {
+                throw new IllegalArgumentException("Type shouldn't be null or empty.");
+            }
             this.type = type;
             return this;
         }
@@ -91,8 +94,11 @@ public class End extends Telemetry {
         }
 
         public End build() {
-            End event = new End(type, mode, duration, pageid, summaryList);
-            return event;
+            if (StringUtil.isNullOrEmpty(type)) {
+                throw new IllegalStateException("Type is required.");
+            }
+
+            return new End(type, mode, duration, pageid, summaryList);
         }
     }
 }

@@ -17,13 +17,6 @@ public class Context {
     private String did;
     private List<CorrelationData> cdata;
 
-    public Context() {
-        this.channel = "";
-        this.env = "";
-        this.env = "";
-        this.did = "";
-        this.sid = "";
-    }
 
     public String getChannel() {
         return channel;

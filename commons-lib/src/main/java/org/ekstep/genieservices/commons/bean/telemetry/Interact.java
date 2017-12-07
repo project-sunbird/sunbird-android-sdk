@@ -33,7 +33,7 @@ public class Interact extends Telemetry {
 
         Map<String, Object> extra = new HashMap<>();
         extra.put("pos", !CollectionUtil.isNullOrEmpty(positionList) ? positionList : new ArrayList<>());
-        eData.put("values", !CollectionUtil.isNullOrEmpty(valueList) ? valueList : new ArrayList<>());
+        extra.put("values", !CollectionUtil.isNullOrEmpty(valueList) ? valueList : new ArrayList<>());
         eData.put("extra", extra);
 
         return eData;
