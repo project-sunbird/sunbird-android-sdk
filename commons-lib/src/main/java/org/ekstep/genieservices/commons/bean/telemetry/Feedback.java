@@ -16,7 +16,7 @@ public class Feedback extends Telemetry {
     public Feedback(float rating, String comments, String id, String version, String type) {
         super(EID);
         setEData(createData(rating, comments));
-        setObject(id, version, type);
+        setObject(id, version, type, null);
     }
 
     private Map<String, Object> createData(float rating, String comments) {
