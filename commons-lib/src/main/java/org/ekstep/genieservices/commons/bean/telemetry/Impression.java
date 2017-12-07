@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by swayangjit on 15/11/17.
+ * Created on 15/11/17.
+ *
+ * @author swayangjit
  */
 
 public class Impression extends Telemetry {
@@ -41,7 +43,6 @@ public class Impression extends Telemetry {
     }
 
     public static class Builder {
-
         private String type;
         private String subType;
         private String pageid;
@@ -93,11 +94,10 @@ public class Impression extends Telemetry {
             return this;
         }
 
-
         /**
          * Object Visits description
          */
-        public Builder addVisits(Visit visit) {
+        public Builder addVisit(Visit visit) {
             if (visitList == null) {
                 visitList = new ArrayList<>();
             }
@@ -106,7 +106,6 @@ public class Impression extends Telemetry {
             }
             return this;
         }
-
 
         public Impression build() {
             Impression event = new Impression(type, subType, pageid, uri, visitList);

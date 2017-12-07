@@ -10,9 +10,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by swayangjit on 15/11/17.
+ * Created on 15/11/17.
+ *
+ * @author swayangjit
  */
-
 public class Log extends Telemetry {
 
     private static final String EID = "LOG";
@@ -24,9 +25,9 @@ public class Log extends Telemetry {
 
     protected Map<String, Object> createEData(String type, String level, String message, String pageid, List<Map<String, Object>> paramsList) {
         Map<String, Object> eData = new HashMap<>();
-        eData.put("type", !StringUtil.isNullOrEmpty(type) ? type : "");
-        eData.put("level", !StringUtil.isNullOrEmpty(level) ? level : "");
-        eData.put("message", !StringUtil.isNullOrEmpty(message) ? level : "");
+        eData.put("type", type);
+        eData.put("level", level);
+        eData.put("message", message);
         eData.put("pageid", !StringUtil.isNullOrEmpty(pageid) ? pageid : "");
         eData.put("params", !CollectionUtil.isNullOrEmpty(paramsList) ? paramsList : new ArrayList<>());
         return eData;
@@ -37,8 +38,16 @@ public class Log extends Telemetry {
         return GsonUtil.toJson(this);
     }
 
-    public static class Builder {
+    public interface Level {
+        String TRACE = "TRACE";
+        String DEBUG = "DEBUG";
+        String INFO = "INFO";
+        String WARN = "WARN";
+        String ERROR = "ERROR";
+        String FATAL = "FATAL";
+    }
 
+    public static class Builder {
         private String type;
         private String level;
         private String message;
@@ -50,6 +59,10 @@ public class Log extends Telemetry {
          * Type of log (system, process, api_access, api_call, job, app_update etc)
          */
         public Builder type(String type) {
+            if (StringUtil.isNullOrEmpty(type)) {
+                throw new IllegalArgumentException("type should not be null or empty.");
+            }
+
             this.type = type;
             return this;
         }
@@ -58,6 +71,10 @@ public class Log extends Telemetry {
          * Level of the log. TRACE, DEBUG, INFO, WARN, ERROR, FATAL
          */
         public Builder level(String level) {
+            if (StringUtil.isNullOrEmpty(level)) {
+                throw new IllegalArgumentException("level should not be null or empty.");
+            }
+
             this.level = level;
             return this;
         }
@@ -66,6 +83,10 @@ public class Log extends Telemetry {
          * Log message
          */
         public Builder message(String message) {
+            if (StringUtil.isNullOrEmpty(message)) {
+                throw new IllegalArgumentException("message should not be null or empty.");
+            }
+
             this.message = message;
             return this;
         }
@@ -102,8 +123,19 @@ public class Log extends Telemetry {
             return this;
         }
 
-
         public Log build() {
+            if (StringUtil.isNullOrEmpty(type)) {
+                throw new IllegalStateException("type is required.");
+            }
+
+            if (StringUtil.isNullOrEmpty(level)) {
+                throw new IllegalStateException("level is required.");
+            }
+
+            if (StringUtil.isNullOrEmpty(message)) {
+                throw new IllegalStateException("message is required.");
+            }
+
             Log event = new Log(type, level, message, pageid, paramList);
             event.setActor(new Actor(actorType));
             return event;

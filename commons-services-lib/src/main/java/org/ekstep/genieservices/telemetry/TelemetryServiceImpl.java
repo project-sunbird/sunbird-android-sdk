@@ -67,7 +67,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
     @Override
     public GenieResponse<Void> saveTelemetry(String eventString) {
         String methodName = "saveTelemetry@TelemetryServiceImpl";
-        HashMap params = new HashMap();
+        Map<String, Object> params = new HashMap<>();
         params.put("Event", eventString);
         params.put("logLevel", "2");
 
@@ -77,7 +77,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
             return response;
         } catch (InvalidDataException e) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.VALIDATION_ERROR, ServiceConstants.ErrorMessage.UNABLE_TO_SAVE_EVENT, TAG, Void.class);
-            saveEvent(TelemetryLogger.create(mAppContext, response, TAG, methodName, params, new HashMap()).toString());
+            saveEvent(TelemetryLogger.create(mAppContext, response, TAG, methodName, params, new HashMap<String, Object>()).toString());
             return response;
         }
     }
@@ -91,7 +91,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
     @Override
     public GenieResponse<TelemetryStat> getTelemetryStat() {
         String methodName = "getTelemetryStat@TelemetryServiceImpl";
-        HashMap params = new HashMap();
+        Map<String, Object> params = new HashMap<>();
         params.put("logLevel", "2");
 
         String telemetryEventCountQuery = "select count(*) from telemetry";
@@ -116,7 +116,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         GenieResponse<TelemetryStat> genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         genieResponse.setResult(new TelemetryStat(unSyncedEventCount, lastSyncTime));
 
-        saveEvent(TelemetryLogger.create(mAppContext, genieResponse, TAG, methodName, params, new HashMap()).toString());
+        saveEvent(TelemetryLogger.create(mAppContext, genieResponse, TAG, methodName, params, new HashMap<String, Object>()).toString());
         return genieResponse;
     }
 
@@ -342,8 +342,6 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
                 cdata.put("id", partnerId);
                 partnerTagList.add(cdata);
             }
-
-
         }
     }
 

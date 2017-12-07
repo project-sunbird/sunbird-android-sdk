@@ -67,12 +67,12 @@ public class TelemetryLogger {
     }
 
     public static void logFailure(AppContext appContext, GenieResponse response, String service, String method, Map<String, Object> params, String message) {
-        HashMap<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         result.put("message", message);
         log(appContext, response, service, method, params, result);
     }
 
-    private static void log(AppContext appContext, GenieResponse response, String service, String method, Map<String, Object> params, HashMap result) {
+    private static void log(AppContext appContext, GenieResponse response, String service, String method, Map<String, Object> params, Map<String, Object> result) {
         save(create(appContext, response, service, method, params, result));
     }
 
@@ -80,10 +80,10 @@ public class TelemetryLogger {
         save(telemetry);
     }
 
-    public static Telemetry create(AppContext appContext, GenieResponse response, String service, String method, Map<String, Object> params, HashMap result) {
+    public static Telemetry create(AppContext appContext, GenieResponse response, String service, String method, Map<String, Object> params, Map<String, Object> result) {
 
         Log log = new Log.Builder().type("api_call")
-                .level("trace")
+                .level(Log.Level.TRACE)
                 .actorType(Actor.TYPE_SYSTEM)
                 .addParam("service", service)
                 .addParam("method", method)
@@ -92,8 +92,8 @@ public class TelemetryLogger {
                 .addParam("response", response)
                 .addParam("result", result)
                 .build();
-        return log;
 
+        return log;
     }
 
     private static void save(Telemetry event) {
