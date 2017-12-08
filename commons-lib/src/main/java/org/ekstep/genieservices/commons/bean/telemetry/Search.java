@@ -34,8 +34,7 @@ public class Search extends Telemetry {
 
         eData.put("correlationid", !StringUtil.isNullOrEmpty(correlationid) ? correlationid : "");
         eData.put("size", size);
-        eData.put("topn", new ArrayList<Map<String, Object>>() {
-        });
+        eData.put("topn", new ArrayList<Map<String, Object>>());
         return eData;
     }
 
