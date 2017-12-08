@@ -26,7 +26,7 @@ public class Start extends Telemetry {
         eData.put("loc", !StringUtil.isNullOrEmpty(loc) ? loc : "");
         eData.put("mode", !StringUtil.isNullOrEmpty(mode) ? mode : "");
         if (duration > 0) {
-            eData.put("duration", duration);
+            eData.put("duration", String.valueOf(duration));
         }
         eData.put("pageid", !StringUtil.isNullOrEmpty(pageid) ? pageid : "");
         return eData;

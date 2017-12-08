@@ -3,6 +3,7 @@ package org.ekstep.genieservices.commons.bean.telemetry;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +34,8 @@ public class Search extends Telemetry {
 
         eData.put("correlationid", !StringUtil.isNullOrEmpty(correlationid) ? correlationid : "");
         eData.put("size", size);
-
+        eData.put("topn", new ArrayList<Map<String, Object>>() {
+        });
         return eData;
     }
 
