@@ -135,8 +135,10 @@ public class UserServiceImpl extends BaseService implements IUserService {
         map.put("uid", uid);
         map.put("loc", mAppContext.getLocationInfo().getLocation());
 
-        Audit audit = new Audit(null, GsonUtil.toJson(map), null, Actor.TYPE_SYSTEM);
-        TelemetryLogger.log(audit);
+        Audit.Builder audit = new Audit.Builder();
+        audit.currentState(GsonUtil.toJson(map))
+                .actorType(Actor.TYPE_SYSTEM);
+        TelemetryLogger.log(audit.build());
     }
 
     private void logProfileAuditEvent(Profile profile, Profile oldProfile) {
@@ -145,8 +147,13 @@ public class UserServiceImpl extends BaseService implements IUserService {
         map.put("profile", GsonUtil.toJson(profile));
         map.put("loc", mAppContext.getLocationInfo().getLocation());
 
-        Audit audit = new Audit(null, GsonUtil.toJson(map), oldProfile != null ? GsonUtil.toJson(oldProfile) : null, Actor.TYPE_SYSTEM);
-        TelemetryLogger.log(audit);
+        Audit.Builder audit = new Audit.Builder();
+        audit.currentState(GsonUtil.toJson(map))
+                .actorType(Actor.TYPE_SYSTEM);
+        if (oldProfile != null) {
+            audit.previousState(GsonUtil.toJson(oldProfile));
+        }
+        TelemetryLogger.log(audit.build());
     }
 
     private void logProfileDeleteAuditEvent(Profile profile) {
@@ -155,8 +162,10 @@ public class UserServiceImpl extends BaseService implements IUserService {
         map.put("uid", profile.getUid());
         map.put("duration", DateUtil.elapsedTimeTillNow(profile.getCreatedAt().getTime()));
 
-        Audit audit = new Audit(null, GsonUtil.toJson(map), null, Actor.TYPE_SYSTEM);
-        TelemetryLogger.log(audit);
+        Audit.Builder audit = new Audit.Builder();
+        audit.currentState(GsonUtil.toJson(map))
+                .actorType(Actor.TYPE_SYSTEM);
+        TelemetryLogger.log(audit.build());
     }
 
     @Override

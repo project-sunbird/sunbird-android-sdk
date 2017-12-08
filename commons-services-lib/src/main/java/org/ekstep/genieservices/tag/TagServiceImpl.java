@@ -82,8 +82,10 @@ public class TagServiceImpl extends BaseService implements ITagService {
         map.put("taghash", hash);
         map.put("tag", GsonUtil.toJson(tag));
 
-        Audit audit = new Audit(null, GsonUtil.toJson(map), null, Actor.TYPE_SYSTEM);
-        TelemetryLogger.log(audit);
+        Audit.Builder audit = new Audit.Builder();
+        audit.currentState(GsonUtil.toJson(map))
+                .actorType(Actor.TYPE_SYSTEM);
+        TelemetryLogger.log(audit.build());
     }
 
     @Override
@@ -135,10 +137,11 @@ public class TagServiceImpl extends BaseService implements ITagService {
         map.put("action", "Tag-Deleted");
         map.put("taghash", hash);
 
-        Audit audit = new Audit(null, GsonUtil.toJson(map), null, Actor.TYPE_SYSTEM);
-        TelemetryLogger.log(audit);
+        Audit.Builder audit = new Audit.Builder();
+        audit.currentState(GsonUtil.toJson(map))
+                .actorType(Actor.TYPE_SYSTEM);
+        TelemetryLogger.log(audit.build());
     }
-
 
     @Override
     public GenieResponse<Void> updateTag(Tag tag) {
@@ -187,7 +190,9 @@ public class TagServiceImpl extends BaseService implements ITagService {
         map.put("prevtaghash", prevTagHash);
         map.put("tag", GsonUtil.toJson(tag));
 
-        Audit audit = new Audit(null, GsonUtil.toJson(map), null, Actor.TYPE_SYSTEM);
-        TelemetryLogger.log(audit);
+        Audit.Builder audit = new Audit.Builder();
+        audit.currentState(GsonUtil.toJson(map))
+                .actorType(Actor.TYPE_SYSTEM);
+        TelemetryLogger.log(audit.build());
     }
 }

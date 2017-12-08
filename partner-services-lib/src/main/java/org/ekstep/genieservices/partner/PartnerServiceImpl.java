@@ -78,8 +78,10 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
                 map.put("publickey", partnerData.getPublicKey());
                 map.put("did", mAppContext.getDeviceInfo().getDeviceID());
 
-                Audit audit = new Audit(null, GsonUtil.toJson(map), null, Actor.TYPE_SYSTEM);
-                TelemetryLogger.log(audit);
+                Audit.Builder audit = new Audit.Builder();
+                audit.currentState(GsonUtil.toJson(map))
+                        .actorType(Actor.TYPE_SYSTEM);
+                TelemetryLogger.log(audit.build());
 
                 response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
                 TelemetryLogger.logSuccess(mAppContext, response, TAG, "registerPartner@PartnerServiceImpl", new HashMap<String, Object>());
@@ -141,8 +143,10 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
                 map.put("duration", DateUtil.getEpochDiff(partnerSessionModel.getEpochTime()));
                 map.put("partnersessionid", partnerSessionModel.getPartnerSessionId());
 
-                Audit audit = new Audit(null, GsonUtil.toJson(map), null, Actor.TYPE_SYSTEM);
-                TelemetryLogger.log(audit);
+                Audit.Builder audit = new Audit.Builder();
+                audit.currentState(GsonUtil.toJson(map))
+                        .actorType(Actor.TYPE_SYSTEM);
+                TelemetryLogger.log(audit.build());
 
                 partnerSessionModel.clear();
             }
@@ -156,8 +160,10 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
             map.put("did", mAppContext.getDeviceInfo().getDeviceID());
             map.put("partnersessionid", partnerSessionModel.getPartnerSessionId());
 
-            Audit audit = new Audit(null, GsonUtil.toJson(map), null, Actor.TYPE_SYSTEM);
-            TelemetryLogger.log(audit);
+            Audit.Builder audit = new Audit.Builder();
+            audit.currentState(GsonUtil.toJson(map))
+                    .actorType(Actor.TYPE_SYSTEM);
+            TelemetryLogger.log(audit.build());
 
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
@@ -192,8 +198,10 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
             map.put("duration", DateUtil.getEpochDiff(partnerSessionModel.getEpochTime()));
             map.put("partnersessionid", partnerSessionModel.getPartnerSessionId());
 
-            Audit audit = new Audit(null, GsonUtil.toJson(map), null, Actor.TYPE_SYSTEM);
-            TelemetryLogger.log(audit);
+            Audit.Builder audit = new Audit.Builder();
+            audit.currentState(GsonUtil.toJson(map))
+                    .actorType(Actor.TYPE_SYSTEM);
+            TelemetryLogger.log(audit.build());
 
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
