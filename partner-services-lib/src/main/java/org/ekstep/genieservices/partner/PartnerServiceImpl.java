@@ -235,8 +235,11 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
                 eventMap.put("data", data.get("encrypted_data"));
                 eventMap.put("key", data.get("encrypted_key"));
                 eventMap.put("iv", data.get("iv"));
-                ExData exData = new ExData("partnerdata", GsonUtil.toJson(eventMap));
-                TelemetryLogger.log(exData);
+
+                ExData.Builder exData = new ExData.Builder()
+                        .type("partnerdata")
+                        .data(GsonUtil.toJson(eventMap));
+                TelemetryLogger.log(exData.build());
 
                 response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, String.class);
                 response.setResult(data.toString());
@@ -256,7 +259,6 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
             return response;
         }
     }
-
 
     private Map<String, String> processData(PartnerData partnerData) throws EncryptionException {
         Map<String, String> data = new HashMap<>();
