@@ -7,28 +7,38 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by swayangjit on 15/11/17.
+ * Created on 15/11/17.
+ *
+ * @author swayangjit
  */
-
 public class Start extends Telemetry {
 
     private static final String EID = "START";
 
-    private Start(String type, DeviceSpecification dSpec, String loc, String mode, long duration, String pageid) {
+    private Start(String type, DeviceSpecification dSpec, String loc, String mode, long duration, String pageId) {
         super(EID);
-        setEData(createEData(type, dSpec, loc, mode, duration, pageid));
+        setEData(createEData(type, dSpec, loc, mode, duration, pageId));
     }
 
-    protected Map<String, Object> createEData(String type, DeviceSpecification dSpec, String loc, String mode, long duration, String pageid) {
+    private Map<String, Object> createEData(String type, DeviceSpecification deviceSpecification, String loc, String mode, long duration, String pageId) {
         Map<String, Object> eData = new HashMap<>();
         eData.put("type", !StringUtil.isNullOrEmpty(type) ? type : "");
-        eData.put("dspec", dSpec != null ? dSpec : new DeviceSpecification());
-        eData.put("loc", !StringUtil.isNullOrEmpty(loc) ? loc : "");
-        eData.put("mode", !StringUtil.isNullOrEmpty(mode) ? mode : "");
-        if (duration > 0) {
-            eData.put("duration", String.valueOf(duration));
+
+        if (deviceSpecification != null) {
+            eData.put("dspec", deviceSpecification);
         }
-        eData.put("pageid", !StringUtil.isNullOrEmpty(pageid) ? pageid : "");
+        if (!StringUtil.isNullOrEmpty(loc)) {
+            eData.put("loc", loc);
+        }
+        if (!StringUtil.isNullOrEmpty(mode)) {
+            eData.put("mode", mode);
+        }
+        if (duration > 0) {
+            eData.put("duration", duration);
+        }
+        if (!StringUtil.isNullOrEmpty(pageId)) {
+            eData.put("pageid", pageId);
+        }
         return eData;
     }
 
@@ -40,11 +50,11 @@ public class Start extends Telemetry {
     public static class Builder {
 
         private String type;
-        private DeviceSpecification dspec;
+        private DeviceSpecification deviceSpecification;
         private String loc;
         private String mode;
         private long duration;
-        private String pageid;
+        private String pageId;
 
         /**
          * Type of event generator
@@ -61,8 +71,8 @@ public class Start extends Telemetry {
         /**
          * Device specification of device .
          */
-        public Builder deviceSpec(DeviceSpecification dspec) {
-            this.dspec = dspec;
+        public Builder deviceSpecification(DeviceSpecification deviceSpecification) {
+            this.deviceSpecification = deviceSpecification;
             return this;
         }
 
@@ -93,8 +103,8 @@ public class Start extends Telemetry {
         /**
          * Page/Stage id where the start has happened.
          */
-        public Builder pageid(String pageid) {
-            this.pageid = pageid;
+        public Builder pageId(String pageId) {
+            this.pageId = pageId;
             return this;
         }
 
@@ -102,8 +112,7 @@ public class Start extends Telemetry {
             if (StringUtil.isNullOrEmpty(type)) {
                 throw new IllegalStateException("type is required");
             }
-            Start event = new Start(type, dspec, loc, mode, duration, pageid);
-            return event;
+            return new Start(type, deviceSpecification, loc, mode, duration, pageId);
         }
     }
 }
