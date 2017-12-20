@@ -22,7 +22,7 @@ public class Audit extends Telemetry {
         setActor(new Actor(actorType));
     }
 
-    protected Map<String, Object> createEData(List<String> props, String currentState, String prevState) {
+    private Map<String, Object> createEData(List<String> props, String currentState, String prevState) {
         Map<String, Object> eData = new HashMap<>();
         eData.put("props", props);
         eData.put("state", currentState);

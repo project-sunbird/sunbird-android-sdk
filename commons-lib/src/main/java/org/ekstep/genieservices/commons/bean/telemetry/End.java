@@ -1,6 +1,5 @@
 package org.ekstep.genieservices.commons.bean.telemetry;
 
-import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
@@ -10,25 +9,26 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by swayangjit on 15/11/17.
+ * Created on 15/11/17.
+ *
+ * @author swayangjit
  */
-
 public class End extends Telemetry {
 
     private static final String EID = "END";
 
-    private End(String type, String mode, long duration, String pageid, List<Map<String, Object>> summaryList) {
+    private End(String type, String mode, long duration, String pageId, List<Map<String, Object>> summaryList) {
         super(EID);
-        setEData(createEData(type, mode, duration, pageid, summaryList));
+        setEData(createEData(type, mode, duration, pageId, summaryList));
     }
 
-    protected Map<String, Object> createEData(String type, String mode, long duration, String pageid, List<Map<String, Object>> summaryList) {
+    private Map<String, Object> createEData(String type, String mode, long duration, String pageId, List<Map<String, Object>> summaryList) {
         Map<String, Object> eData = new HashMap<>();
         eData.put("type", type);
-        eData.put("mode", !StringUtil.isNullOrEmpty(mode) ? mode : "");
+        eData.put("mode", mode);
         eData.put("duration", duration);
-        eData.put("pageid", !StringUtil.isNullOrEmpty(pageid) ? pageid : "");
-        eData.put("summary", !CollectionUtil.isNullOrEmpty(summaryList) ? summaryList : new ArrayList<>());
+        eData.put("pageid", pageId);
+        eData.put("summary", summaryList);
         return eData;
     }
 
@@ -42,7 +42,7 @@ public class End extends Telemetry {
         private String type;
         private String mode;
         private long duration;
-        private String pageid;
+        private String pageId;
         private List<Map<String, Object>> summaryList = null;
 
         /**
@@ -75,8 +75,8 @@ public class End extends Telemetry {
         /**
          * Page/Stage id where the end has happened.
          */
-        public Builder pageid(String pageid) {
-            this.pageid = pageid;
+        public Builder pageId(String pageId) {
+            this.pageId = pageId;
             return this;
         }
 
@@ -98,7 +98,19 @@ public class End extends Telemetry {
                 throw new IllegalStateException("type is required.");
             }
 
-            return new End(type, mode, duration, pageid, summaryList);
+            if (mode == null) {
+                mode = "";
+            }
+
+            if (pageId == null) {
+                pageId = "";
+            }
+
+            if (summaryList == null) {
+                summaryList = new ArrayList<>();
+            }
+
+            return new End(type, mode, duration, pageId, summaryList);
         }
     }
 }
