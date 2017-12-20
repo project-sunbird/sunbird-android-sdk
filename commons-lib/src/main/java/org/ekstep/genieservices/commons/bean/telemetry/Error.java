@@ -25,7 +25,9 @@ public class Error extends Telemetry {
         eData.put("err", errorCode);
         eData.put("errtype", errorType);
         eData.put("stacktrace", stacktrace);
-        eData.put("pageid", pageId);
+        if (!StringUtil.isNullOrEmpty(pageId)) {
+            eData.put("pageid", pageId);
+        }
         return eData;
     }
 
@@ -98,10 +100,6 @@ public class Error extends Telemetry {
 
             if (StringUtil.isNullOrEmpty(stacktrace)) {
                 throw new IllegalStateException("stacktrace is required.");
-            }
-
-            if (pageId == null) {
-                pageId = "";
             }
 
             return new Error(errorCode, errorType, stacktrace, pageId);

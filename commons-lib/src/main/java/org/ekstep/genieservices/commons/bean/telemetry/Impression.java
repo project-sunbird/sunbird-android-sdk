@@ -15,22 +15,28 @@ import java.util.Map;
  *
  * @author swayangjit
  */
-
 public class Impression extends Telemetry {
 
     private static final String EID = "IMPRESSION";
 
-    private Impression(String type, String subtype, String pageid, String uri, List<Visit> visits) {
+    private Impression(String type, String subtype, String pageId, String uri, List<Visit> visits) {
         super(EID);
-        setEData(createEData(type, subtype, pageid, uri, visits));
+        setEData(createEData(type, subtype, pageId, uri, visits));
     }
 
-    protected Map<String, Object> createEData(String type, String subtype, String pageid, String uri, List<Visit> visits) {
+    private Map<String, Object> createEData(String type, String subtype, String pageId, String uri, List<Visit> visits) {
         Map<String, Object> eData = new HashMap<>();
         eData.put("type", type);
-        eData.put("subtype", !StringUtil.isNullOrEmpty(subtype) ? subtype : "");
-        eData.put("pageid", !StringUtil.isNullOrEmpty(pageid) ? pageid : "");
-        eData.put("uri", !StringUtil.isNullOrEmpty(uri) ? uri : "");
+        eData.put("pageid", pageId);
+
+        if (!StringUtil.isNullOrEmpty(subtype)) {
+            eData.put("subtype", subtype);
+        }
+
+        if (!StringUtil.isNullOrEmpty(uri)) {
+            eData.put("uri", uri);
+        }
+
         if (!CollectionUtil.isNullOrEmpty(visits)) {
             eData.put("visits", visits);
         }
@@ -45,7 +51,7 @@ public class Impression extends Telemetry {
     public static class Builder {
         private String type;
         private String subType;
-        private String pageid;
+        private String pageId;
         private String uri;
         private List<CorrelationData> correlationData;
         private List<Visit> visitList;
@@ -72,11 +78,11 @@ public class Impression extends Telemetry {
         /**
          * Unique page id
          */
-        public Builder pageId(String pageid) {
-            if (StringUtil.isNullOrEmpty(pageid)) {
-                throw new IllegalArgumentException("pageid shouldn't be null or empty.");
+        public Builder pageId(String pageId) {
+            if (StringUtil.isNullOrEmpty(pageId)) {
+                throw new IllegalArgumentException("pageId shouldn't be null or empty.");
             }
-            this.pageid = pageid;
+            this.pageId = pageId;
             return this;
         }
 
@@ -118,10 +124,10 @@ public class Impression extends Telemetry {
                 throw new IllegalStateException("type is required.");
             }
 
-            if (StringUtil.isNullOrEmpty(pageid)) {
-                throw new IllegalStateException("pageid is required.");
+            if (StringUtil.isNullOrEmpty(pageId)) {
+                throw new IllegalStateException("pageId is required.");
             }
-            Impression event = new Impression(type, subType, pageid, uri, visitList);
+            Impression event = new Impression(type, subType, pageId, uri, visitList);
             event.setCoRrelationdata(correlationData);
             return event;
         }

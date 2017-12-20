@@ -1,5 +1,6 @@
 package org.ekstep.genieservices.commons.bean.telemetry;
 
+import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
@@ -25,10 +26,20 @@ public class End extends Telemetry {
     private Map<String, Object> createEData(String type, String mode, long duration, String pageId, List<Map<String, Object>> summaryList) {
         Map<String, Object> eData = new HashMap<>();
         eData.put("type", type);
-        eData.put("mode", mode);
         eData.put("duration", duration);
-        eData.put("pageid", pageId);
-        eData.put("summary", summaryList);
+
+        if (!StringUtil.isNullOrEmpty(mode)) {
+            eData.put("mode", mode);
+        }
+
+        if (!StringUtil.isNullOrEmpty(pageId)) {
+            eData.put("pageid", pageId);
+        }
+
+        if (!CollectionUtil.isNullOrEmpty(summaryList)) {
+            eData.put("summary", summaryList);
+        }
+
         return eData;
     }
 
@@ -96,18 +107,6 @@ public class End extends Telemetry {
         public End build() {
             if (StringUtil.isNullOrEmpty(type)) {
                 throw new IllegalStateException("type is required.");
-            }
-
-            if (mode == null) {
-                mode = "";
-            }
-
-            if (pageId == null) {
-                pageId = "";
-            }
-
-            if (summaryList == null) {
-                summaryList = new ArrayList<>();
             }
 
             return new End(type, mode, duration, pageId, summaryList);
