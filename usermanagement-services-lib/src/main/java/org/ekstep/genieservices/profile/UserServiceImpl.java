@@ -187,8 +187,12 @@ public class UserServiceImpl extends BaseService implements IUserService {
     }
 
     private void logGEError(GenieResponse response, String id) {
-        Error geError = new Error(response.getError(), response.getErrorMessages().toString(), id);
-        TelemetryLogger.log(geError);
+        Error.Builder error = new Error.Builder();
+        error.errorCode(response.getError())
+                .errorType(Error.Type.MOBILE_APP)
+                .stacktrace(response.getErrorMessages().toString())
+                .pageId(id);
+        TelemetryLogger.log(error.build());
     }
 
     /**
