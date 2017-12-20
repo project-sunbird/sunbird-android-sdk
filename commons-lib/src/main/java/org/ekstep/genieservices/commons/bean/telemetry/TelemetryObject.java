@@ -1,13 +1,14 @@
 package org.ekstep.genieservices.commons.bean.telemetry;
 
 /**
- * Created by swayangjit on 16/11/17.
+ * Created on 16/11/17.
+ *
+ * @author swayangjit
  */
-
 public class TelemetryObject {
 
     /**
-     * Id of the object. For ex: content id incase of content
+     * Id of the object. For ex: content id in case of content
      */
     private String id;
 

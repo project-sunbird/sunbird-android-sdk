@@ -28,14 +28,26 @@ public class Interact extends Telemetry {
     protected Map<String, Object> createEData(String type, String subType, String id, String pageId, List<Map<String, String>> positionList, List<Map<String, Object>> valueList) {
         Map<String, Object> eData = new HashMap<>();
         eData.put("type", type);
-        eData.put("subtype", !StringUtil.isNullOrEmpty(subType) ? subType : "");
-        eData.put("id", !StringUtil.isNullOrEmpty(id) ? id : "");
-        eData.put("pageid", !StringUtil.isNullOrEmpty(pageId) ? pageId : "");
+        if (!StringUtil.isNullOrEmpty(subType)) {
+            eData.put("subtype", subType);
+        }
+        if (!StringUtil.isNullOrEmpty(id)) {
+            eData.put("id", id);
+        }
+        if (!StringUtil.isNullOrEmpty(pageId)) {
+            eData.put("pageid", pageId);
+        }
 
-        Map<String, Object> extra = new HashMap<>();
-        extra.put("pos", !CollectionUtil.isNullOrEmpty(positionList) ? positionList : new ArrayList<>());
-        extra.put("values", !CollectionUtil.isNullOrEmpty(valueList) ? valueList : new ArrayList<>());
-        eData.put("extra", extra);
+        if (!CollectionUtil.isNullOrEmpty(positionList) || !CollectionUtil.isNullOrEmpty(valueList)) {
+            Map<String, Object> extra = new HashMap<>();
+            if (!CollectionUtil.isNullOrEmpty(positionList)) {
+                extra.put("pos", positionList);
+            }
+            if (!CollectionUtil.isNullOrEmpty(valueList)) {
+                extra.put("values", valueList);
+            }
+            eData.put("extra", extra);
+        }
 
         return eData;
     }
@@ -155,9 +167,9 @@ public class Interact extends Telemetry {
         }
 
         /**
-         * hierarcyLevel to be computed of the object. Only 4 levels are allowed.
+         * hierarchyLevel to be computed of the object. Only 4 levels are allowed.
          */
-        public Builder hierarcyLevel(Rollup rollup) {
+        public Builder hierarchyLevel(Rollup rollup) {
             this.rollup = rollup;
             return this;
         }
@@ -165,7 +177,7 @@ public class Interact extends Telemetry {
 
         public Interact build() {
             if (StringUtil.isNullOrEmpty(type)) {
-                throw new IllegalStateException("type is required.");
+                throw new IllegalStateException("interactionType is required.");
             }
 
             if (StringUtil.isNullOrEmpty(pageId)) {
