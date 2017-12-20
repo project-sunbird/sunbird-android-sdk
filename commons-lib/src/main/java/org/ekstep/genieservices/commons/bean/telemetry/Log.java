@@ -18,18 +18,22 @@ public class Log extends Telemetry {
 
     private static final String EID = "LOG";
 
-    private Log(String type, String level, String message, String pageid, List<Map<String, Object>> paramsList) {
+    private Log(String type, String level, String message, String pageId, List<Map<String, Object>> params) {
         super(EID);
-        setEData(createEData(type, level, message, pageid, paramsList));
+        setEData(createEData(type, level, message, pageId, params));
     }
 
-    protected Map<String, Object> createEData(String type, String level, String message, String pageid, List<Map<String, Object>> paramsList) {
+    private Map<String, Object> createEData(String type, String level, String message, String pageId, List<Map<String, Object>> params) {
         Map<String, Object> eData = new HashMap<>();
         eData.put("type", type);
         eData.put("level", level);
         eData.put("message", message);
-        eData.put("pageid", !StringUtil.isNullOrEmpty(pageid) ? pageid : "");
-        eData.put("params", !CollectionUtil.isNullOrEmpty(paramsList) ? paramsList : new ArrayList<>());
+        if (!StringUtil.isNullOrEmpty(pageId)) {
+            eData.put("pageid", pageId);
+        }
+        if (!CollectionUtil.isNullOrEmpty(params)) {
+            eData.put("params", params);
+        }
         return eData;
     }
 
@@ -51,9 +55,9 @@ public class Log extends Telemetry {
         private String type;
         private String level;
         private String message;
-        private String pageid;
+        private String pageId;
+        private List<Map<String, Object>> params;
         private String actorType;
-        private List<Map<String, Object>> paramList;
 
         /**
          * Type of log (system, process, api_access, api_call, job, app_update etc)
@@ -94,8 +98,8 @@ public class Log extends Telemetry {
         /**
          * Page where the log event has happened
          */
-        public Builder pageId(String pageid) {
-            this.pageid = pageid;
+        public Builder pageId(String pageId) {
+            this.pageId = pageId;
             return this;
         }
 
@@ -103,13 +107,13 @@ public class Log extends Telemetry {
          * Additional params in the log message
          */
         public Builder addParam(String key, Object value) {
-            if (paramList == null) {
-                paramList = new ArrayList<>();
+            if (params == null) {
+                params = new ArrayList<>();
             }
             if (key != null && value != null) {
                 Map<String, Object> map = new HashMap<>();
                 map.put(key, value);
-                this.paramList.add(map);
+                this.params.add(map);
             }
 
             return this;
@@ -136,7 +140,7 @@ public class Log extends Telemetry {
                 throw new IllegalStateException("message is required.");
             }
 
-            Log event = new Log(type, level, message, pageid, paramList);
+            Log event = new Log(type, level, message, pageId, params);
             event.setActor(new Actor(actorType));
             return event;
         }
