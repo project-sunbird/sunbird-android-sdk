@@ -126,6 +126,7 @@ public class DownloadServiceImpl implements IDownloadService {
                 .subType(subType)
                 .objectId(contentId)
                 .objectType(ServiceConstants.Telemetry.OBJECT_TYPE_CONTENT)
+                .resourceId(ServiceConstants.Telemetry.CONTENT_DETAIL)
                 .correlationData(correlationDataList);
         return interact.build();
     }

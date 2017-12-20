@@ -799,6 +799,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 .subType(ServiceConstants.Telemetry.CONTENT_IMPORT_INITIATED_SUB_TYPE)
                 .interactionType(InteractionType.TOUCH)
                 .objectType(ServiceConstants.Telemetry.OBJECT_TYPE_CONTENT)
+                .resourceId(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID)
                 .build();
         TelemetryLogger.log(interact);
     }
@@ -810,6 +811,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 .interactionType(InteractionType.OTHER)
                 .objectId(identifier)
                 .objectType(ServiceConstants.Telemetry.OBJECT_TYPE_CONTENT)
+                .resourceId(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID)
                 .build();
         TelemetryLogger.log(interact);
     }
