@@ -6,51 +6,54 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by swayangjit on 15/11/17.
+ * Created on 15/11/17.
+ *
+ * @author swayangjit
  */
-
 public class Share extends Telemetry {
 
     private static final String EID = "SHARE";
-
 
     private Share(String direction, String dataType, List<Map<String, Object>> contents) {
         super(EID);
         setEData(createEData(direction, dataType, contents));
     }
 
-    private Map<String, Object> createEData(String direction, String dataType, List<Map<String, Object>> contents) {
+    private Map<String, Object> createEData(String direction, String dataType, List<Map<String, Object>> items) {
         Map<String, Object> map = new HashMap<>();
         map.put("dir", direction);
         map.put("type", dataType);
-        map.put("items", contents);
+        map.put("items", items);
         return map;
     }
 
     public static class Builder {
         private String direction;
         private String dataType;
-        private int count;
-        private long size;
-        private List<Map<String, Object>> contents = new ArrayList<>();
+        private List<Map<String, Object>> items = new ArrayList<>();
 
-        public Share.Builder directionExport() {
-            this.direction = "out";
+        public Builder directionExport() {
+            this.direction = "Out";
             return this;
         }
 
-        public Share.Builder directionImport() {
-            this.direction = "in";
+        public Builder directionImport() {
+            this.direction = "In";
             return this;
         }
 
-        public Share.Builder dataTypeFile() {
+        public Builder dataTypeFile() {
             this.dataType = "File";
             return this;
         }
 
-        public Share.Builder dataTypeLink() {
+        public Builder dataTypeLink() {
             this.dataType = "Link";
+            return this;
+        }
+
+        public Builder dataTypeMessage() {
+            this.dataType = "Message";
             return this;
         }
 
@@ -66,7 +69,6 @@ public class Share extends Telemetry {
             return this.dataType = "TELEMETRY";
         }
 
-
         public String itemTypeProfile() {
             return this.dataType = "PROFILE";
         }
@@ -74,7 +76,7 @@ public class Share extends Telemetry {
         /**
          * Adds Transferred Item details.
          */
-        public Share.Builder addItem(String type, String origin, String identifier, Double pkgVersion, int transferCount, String size) {
+        public Builder addItem(String type, String origin, String identifier, Double pkgVersion, int transferCount, String size) {
             Map<String, Object> itemMap = new HashMap<>();
             itemMap.put("origin", origin);
             itemMap.put("id", identifier);
@@ -95,8 +97,6 @@ public class Share extends Telemetry {
                 itemMap.put("type", "Telemetry");
             }
 
-
-
             //Add Origin
             Map<String, Object> originMap = new HashMap<>();
             originMap.put("id", origin);
@@ -104,12 +104,12 @@ public class Share extends Telemetry {
 
             itemMap.put("origin", originMap);
 
-            this.contents.add(itemMap);
+            this.items.add(itemMap);
             return this;
         }
 
         public Share build() {
-            return new Share(direction, dataType, contents);
+            return new Share(direction, dataType, items);
         }
     }
 }
