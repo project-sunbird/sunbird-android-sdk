@@ -23,7 +23,9 @@ public class Interrupt extends Telemetry {
     private Map<String, Object> createEData(String type, String pageId) {
         Map<String, Object> eData = new HashMap<>();
         eData.put("type", type);
-        eData.put("pageid", !StringUtil.isNullOrEmpty(pageId) ? pageId : "");
+        if (!StringUtil.isNullOrEmpty(pageId)) {
+            eData.put("pageid", pageId);
+        }
         return eData;
     }
 
