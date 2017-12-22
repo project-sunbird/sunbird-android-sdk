@@ -33,11 +33,10 @@ public class Impression extends Telemetry {
             eData.put("subtype", subtype);
         }
 
-        // TODO: 12/20/2017
-//        if (!StringUtil.isNullOrEmpty(uri)) {
-//            eData.put("uri", uri);
-//        }
-        eData.put("uri", uri == null ? "" : uri);
+        if (StringUtil.isNullOrEmpty(uri)) {
+            uri = pageId;
+        }
+        eData.put("uri", uri);
 
         if (!CollectionUtil.isNullOrEmpty(visits)) {
             eData.put("visits", visits);
