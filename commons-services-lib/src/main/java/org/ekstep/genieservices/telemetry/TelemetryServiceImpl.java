@@ -128,7 +128,6 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         }
 
         decorateEvent(event);
-        System.out.println("Event:::" + " " + eventType + " " + GsonUtil.toJson(event));
 
         EventModel eventModel = EventModel.build(mAppContext.getDBSession(), event, eventType);
         eventModel.save();
