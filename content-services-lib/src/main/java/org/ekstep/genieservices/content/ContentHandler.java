@@ -1496,11 +1496,11 @@ public class ContentHandler {
         return filters;
     }
 
-    public static String getDownloadUrl(Map<String, Object> dataMap) {
+    public static String getDownloadUrl(ContentData contentData) {
         String downloadUrl = null;
 
-        if (ContentConstants.MimeType.COLLECTION.equals(readMimeType(dataMap))) {
-            Map variantMap = readVariant(dataMap);
+        if (ContentConstants.MimeType.COLLECTION.equals(contentData.getMimeType())) {
+            Map variantMap = contentData.getVariants();
             if (variantMap != null && variantMap.get("spine") != null) {
                 Map spineData = (Map) variantMap.get("spine");
                 if (spineData != null) {
@@ -1510,7 +1510,7 @@ public class ContentHandler {
         }
 
         if (StringUtil.isNullOrEmpty(downloadUrl)) {
-            downloadUrl = (String) dataMap.get(KEY_DOWNLOAD_URL);
+            downloadUrl = contentData.getDownloadUrl();
         }
 
         if (downloadUrl != null) {

@@ -735,32 +735,44 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             LinkedTreeMap map = GsonUtil.fromJson(body, LinkedTreeMap.class);
             LinkedTreeMap result = (LinkedTreeMap) map.get("result");
 
-            List<Map<String, Object>> contentDataList = null;
+            String contents = null;
             if (result.containsKey("content")) {
-                contentDataList = (List<Map<String, Object>>) result.get("content");
+                contents = GsonUtil.toJson(result.get("content"));
             }
 
-            if (contentDataList != null) {
+            List<ContentData> contentDataList = null;
+            if (!StringUtil.isNullOrEmpty(contents)) {
+                Type type = new TypeToken<List<ContentData>>() {
+                }.getType();
+                contentDataList = GsonUtil.getGson().fromJson(contents, type);
+            }
+
+            if (!CollectionUtil.isNullOrEmpty(contentDataList)) {
                 List<DownloadRequest> downloadRequestList = new ArrayList<>();
-                for (int i = 0; i < contentDataList.size(); i++) {
-                    Map<String, Object> dataMap = contentDataList.get(i);
-                    String contentId = ContentHandler.readIdentifier(dataMap);
-                    String downloadUrl = ContentHandler.getDownloadUrl(dataMap);
-                    ContentImportStatus status = ContentImportStatus.NOT_FOUND;
+                List<String> requestedContentIdList = new ArrayList<>(contentIds);
 
-                    if (!StringUtil.isNullOrEmpty(downloadUrl) && ServiceConstants.FileExtension.CONTENT.equalsIgnoreCase(FileUtil.getFileExtension(downloadUrl))) {
-                        status = ContentImportStatus.ENQUEUED_FOR_DOWNLOAD;
-                        ContentImport contentImport = (ContentImport) contentImportMap.get(contentId);
-                        DownloadRequest downloadRequest = new DownloadRequest(contentId, downloadUrl, ContentConstants.MimeType.ECAR, contentImport.getDestinationFolder(), contentImport.isChildContent());
-                        downloadRequest.setFilename(contentId + "." + ServiceConstants.FileExtension.CONTENT);
-                        downloadRequest.setCorrelationData(contentImport.getCorrelationData());
-                        downloadRequest.setProcessorClass("org.ekstep.genieservices.commons.download.ContentImportService");
+                for (String requestedContentId : requestedContentIdList) {
+                    int indexOfContentData = contentDataList.indexOf(new ContentData(requestedContentId));
+                    if (indexOfContentData != -1) {
+                        ContentData contentData = contentDataList.get(indexOfContentData);
+                        String contentId = contentData.getIdentifier();
+                        String downloadUrl = ContentHandler.getDownloadUrl(contentData);
+                        ContentImportStatus status = ContentImportStatus.NOT_FOUND;
 
-                        downloadRequestList.add(downloadRequest);
+                        if (!StringUtil.isNullOrEmpty(downloadUrl) && ServiceConstants.FileExtension.CONTENT.equalsIgnoreCase(FileUtil.getFileExtension(downloadUrl))) {
+                            status = ContentImportStatus.ENQUEUED_FOR_DOWNLOAD;
+                            ContentImport contentImport = (ContentImport) contentImportMap.get(contentId);
+                            DownloadRequest downloadRequest = new DownloadRequest(contentId, downloadUrl, ContentConstants.MimeType.ECAR, contentImport.getDestinationFolder(), contentImport.isChildContent());
+                            downloadRequest.setFilename(contentId + "." + ServiceConstants.FileExtension.CONTENT);
+                            downloadRequest.setCorrelationData(contentImport.getCorrelationData());
+                            downloadRequest.setProcessorClass("org.ekstep.genieservices.commons.download.ContentImportService");
+
+                            downloadRequestList.add(downloadRequest);
+                        }
+
+                        contentIds.remove(contentId);
+                        contentImportResponseList.add(new ContentImportResponse(contentId, status));
                     }
-
-                    contentIds.remove(contentId);
-                    contentImportResponseList.add(new ContentImportResponse(contentId, status));
                 }
 
                 if (downloadRequestList.size() > 0) {

@@ -2,7 +2,7 @@ package org.ekstep.genieservices.commons.bean;
 
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -32,7 +32,7 @@ public class ContentImportRequest {
         private String[] contentStatusArray;
 
         public Builder() {
-            this.contentImportMap = new HashMap<>();
+            this.contentImportMap = new LinkedHashMap<>();
         }
 
         /**

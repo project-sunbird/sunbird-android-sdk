@@ -46,6 +46,13 @@ public class ContentData implements Serializable {
     private String createdOn;
     private List<String> screenshots;
 
+    public ContentData() {
+    }
+
+    public ContentData(String identifier) {
+        this.identifier = identifier;
+    }
+
     public String getIdentifier() {
         return identifier;
     }
@@ -196,6 +203,16 @@ public class ContentData implements Serializable {
 
     public List<String> getScreenshots() {
         return screenshots;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ContentData contentData = (ContentData) o;
+
+        return identifier.equals(contentData.identifier);
     }
 
     @Override
