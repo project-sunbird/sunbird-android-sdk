@@ -30,24 +30,30 @@ public class DeleteSourceFolder implements IChainable<List<MoveContentResponse>,
         for (ContentModel contentModel : moveContentContext.getContentsInSource()) {
             if (existingContentAction == null) {
                 FileUtil.rm(new File(contentModel.getPath()));
-            }else{
-                if (existingContentAction == ExistingContentAction.KEEP_SOURCE && moveContentContext.getDuplicateContents().size() > 0){
-                    for (MoveContentResponse duplicateContent : moveContentContext.getDuplicateContents()){
-                        if (duplicateContent.getIdentifier().equalsIgnoreCase(contentModel.getIdentifier())){
-                            if (duplicateContent.getStatus() == MoveContentStatus.SAME_VERSION_IN_BOTH){
-                                FileUtil.rm(new File(contentModel.getPath()));
-                            }else{
+            } else {
+                if (existingContentAction != null && moveContentContext.getDuplicateContents().size() > 0) {
+                    for (MoveContentResponse duplicateContent : moveContentContext.getDuplicateContents()) {
+                        if (duplicateContent.getIdentifier().equalsIgnoreCase(contentModel.getIdentifier())) {
+                            if (duplicateContent.getStatus() == MoveContentStatus.HIGHER_VERSION_IN_DESTINATION && existingContentAction != ExistingContentAction.KEEP_HIGHER_VERSION) {
                                 //Remove the renamed destination folder
                                 FileUtil.rm(getRenamedFolder(moveContentContext, duplicateContent.getIdentifier()));
 
                                 //Remove source folder as well
                                 FileUtil.rm(new File(contentModel.getPath()));
+                            } else if (duplicateContent.getStatus() == MoveContentStatus.LOWER_VERSION_IN_DESTINATION && existingContentAction != ExistingContentAction.KEEP_LOWER_VERSION) {
+                                //Remove the renamed destination folder
+                                FileUtil.rm(getRenamedFolder(moveContentContext, duplicateContent.getIdentifier()));
+
+                                //Remove source folder as well
+                                FileUtil.rm(new File(contentModel.getPath()));
+                            } else {
+                                FileUtil.rm(new File(contentModel.getPath()));
                             }
-                        }else {
+                        } else {
                             FileUtil.rm(new File(contentModel.getPath()));
                         }
                     }
-                }else{
+                } else {
                     FileUtil.rm(new File(contentModel.getPath()));
                 }
             }
@@ -57,7 +63,7 @@ public class DeleteSourceFolder implements IChainable<List<MoveContentResponse>,
     }
 
     private File getRenamedFolder(MoveContentContext moveContentContext, String identifier) {
-        return new File(moveContentContext.getContentRootFolder(), identifier+"_temp");
+        return new File(moveContentContext.getContentRootFolder(), identifier + "_temp");
     }
 
     @Override

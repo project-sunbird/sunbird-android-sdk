@@ -52,19 +52,32 @@ public class CopyContentFromSourceToDestination implements IChainable<List<MoveC
                                 } else {
                                     switch (existingContentAction) {
                                         case KEEP_HIGHER_VERSION:
+                                            if (duplicateContent.getStatus() == MoveContentStatus.SAME_VERSION_IN_BOTH ||
+                                                    duplicateContent.getStatus() == MoveContentStatus.HIGHER_VERSION_IN_DESTINATION) {
+                                                currentCount++;
+                                            } else {
+                                                renameAndCopyToDestination(moveContentContext, contentModelInSource, duplicateContent);
+                                                currentCount++;
+                                            }
                                             break;
                                         case KEEP_LOWER_VERSION:
+                                            if (duplicateContent.getStatus() == MoveContentStatus.SAME_VERSION_IN_BOTH ||
+                                                    duplicateContent.getStatus() == MoveContentStatus.LOWER_VERSION_IN_DESTINATION) {
+                                                currentCount++;
+                                            } else {
+                                                renameAndCopyToDestination(moveContentContext, contentModelInSource, duplicateContent);
+                                                currentCount++;
+                                            }
                                             break;
                                         case KEEP_SOURCE:
                                             // TODO: 24/11/17
                                             //Rename the destination folder to identifier_temp
                                             //Delete of these temp folders will happen only on successful completion of copying the files
                                             //Else rollback of temp folders will happen when cancel is initiated
-                                            if (duplicateContent.getStatus() == MoveContentStatus.SAME_VERSION_IN_BOTH){
+                                            if (duplicateContent.getStatus() == MoveContentStatus.SAME_VERSION_IN_BOTH) {
                                                 currentCount++;
-                                            }else {
-                                                renameDestinationDuplicateFolder(moveContentContext, duplicateContent.getIdentifier());
-                                                copyFolder(moveContentContext, contentModelInSource);
+                                            } else {
+                                                renameAndCopyToDestination(moveContentContext, contentModelInSource, duplicateContent);
                                                 currentCount++;
                                             }
                                             break;
@@ -97,9 +110,14 @@ public class CopyContentFromSourceToDestination implements IChainable<List<MoveC
         return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.MOVE_FAILED, ServiceConstants.ErrorMessage.NO_CONTENT_TO_MOVE, TAG);
     }
 
+    private void renameAndCopyToDestination(MoveContentContext moveContentContext, ContentModel contentModelInSource, MoveContentResponse duplicateContent) throws IOException {
+        renameDestinationDuplicateFolder(moveContentContext, duplicateContent.getIdentifier());
+        copyFolder(moveContentContext, contentModelInSource);
+    }
+
     private void renameDestinationDuplicateFolder(MoveContentContext moveContentContext, String identifier) {
         File oldFile = new File(moveContentContext.getContentRootFolder(), identifier);
-        File newFile = new File(moveContentContext.getContentRootFolder(), identifier+"_temp");
+        File newFile = new File(moveContentContext.getContentRootFolder(), identifier + "_temp");
 
         oldFile.renameTo(newFile);
     }
