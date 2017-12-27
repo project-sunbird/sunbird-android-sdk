@@ -46,7 +46,6 @@ import org.ekstep.genieservices.commons.bean.enums.DownloadAction;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.enums.ScanStorageStatus;
 import org.ekstep.genieservices.commons.bean.telemetry.Interact;
-import org.ekstep.genieservices.commons.bean.telemetry.Search;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
@@ -389,14 +388,6 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(searchResult);
-            Search searchEvent = new Search.Builder()
-                    .type("Content")
-                    .query(contentSearchCriteria.getQuery())
-                    .filters((Map<String, Object>) requestMap.get("filters"))
-                    .sort((Map<String, Object>) requestMap.get("sort_by"))
-                    .correlationId(responseMessageId)
-                    .size(searchResult.getContentDataList().size()).build();
-            TelemetryLogger.log(searchEvent);
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
             return response;
         }
