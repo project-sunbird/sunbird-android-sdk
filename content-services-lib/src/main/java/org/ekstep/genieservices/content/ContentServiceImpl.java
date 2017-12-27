@@ -971,7 +971,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 if (scannedContent.getStatus().equals(ScanStorageStatus.DELETED)) {
                     ContentHandler.deleteContentsFromDb(mAppContext.getDBSession(), scannedContent.getIdentifier());
                 } else if (scannedContent.getStatus().equals(ScanStorageStatus.ADDED)) {
-                    ContentHandler.addContentToDb(mAppContext, scannedContent.getIdentifier(), storageFolder);
+                    ContentHandler.addContentToDb(mAppContext, scannedContent.getIdentifier(), storageFolder, false);
                 } else if (scannedContent.getStatus().equals(ScanStorageStatus.UPDATED)) {
                     // TODO: 12/10/17 Yet to be done - In progress
 //                    updateIdsList.add(scannedContent.getIdentifier());

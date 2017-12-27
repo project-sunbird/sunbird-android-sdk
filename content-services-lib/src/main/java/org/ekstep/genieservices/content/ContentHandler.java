@@ -782,7 +782,7 @@ public class ContentHandler {
      * @param newIdentifier New content identifier
      * @return True - if file exists, False- does not exists
      */
-    public static boolean isContentExist(ContentModel oldContent, String newIdentifier, Double newPkgVersion) {
+    public static boolean isContentExist(ContentModel oldContent, String newIdentifier, Double newPkgVersion, boolean keepLowerVersion) {
         if (oldContent == null) {
             return false;
         }
@@ -791,8 +791,20 @@ public class ContentHandler {
         try {
             String oldIdentifier = oldContent.getIdentifier();
             if (oldIdentifier.equalsIgnoreCase(newIdentifier)) {
-                if ((readPkgVersion(oldContent.getLocalData()) < newPkgVersion) // If old content's pkgVersion is less than the new content then return false.
-                        || oldContent.getContentState() != ContentConstants.State.ARTIFACT_AVAILABLE) {  //  If content_state is other than artifact available then also return  false.
+                boolean overrideDB = false;
+                if (keepLowerVersion) {
+                    if((readPkgVersion(oldContent.getLocalData()) < newPkgVersion)) {
+                        overrideDB = false;
+                    }else {
+                        overrideDB = true;
+                    }
+                } else if((readPkgVersion(oldContent.getLocalData()) < newPkgVersion)) {
+                    overrideDB = true;
+                }
+
+                if (overrideDB
+//                        && ((readPkgVersion(oldContent.getLocalData()) < newPkgVersion) // If old content's pkgVersion is less than the new content then return false.
+                        || (!keepLowerVersion && oldContent.getContentState() != ContentConstants.State.ARTIFACT_AVAILABLE)) {  //  If content_state is other than artifact available then also return  false.
                     isExist = false;
                 } else {
                     isExist = true;
@@ -1791,7 +1803,7 @@ public class ContentHandler {
      * @param identifier
      * @param storageFolder
      */
-    public static void addContentToDb(AppContext appContext, String identifier, File storageFolder) {
+    public static void addContentToDb(AppContext appContext, String identifier, File storageFolder, boolean keepLowerVersion) {
         String mimeType, contentType, visibility, audience, path;
         Double compatibilityLevel, pkgVersion;
         int refCount;
@@ -1824,7 +1836,7 @@ public class ContentHandler {
 
                 oldContentModel = ContentModel.find(appContext.getDBSession(), identifier);
                 oldContentPath = oldContentModel == null ? null : oldContentModel.getPath();
-                boolean isContentExist = isContentExist(oldContentModel, identifier, pkgVersion);
+                boolean isContentExist = isContentExist(oldContentModel, identifier, pkgVersion, keepLowerVersion);
 
                 //Apk files
                 if ((!StringUtil.isNullOrEmpty(mimeType) && mimeType.equalsIgnoreCase(ContentConstants.MimeType.APK)) ||

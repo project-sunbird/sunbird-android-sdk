@@ -84,7 +84,7 @@ public class ExtractPayloads implements IChainable<List<ContentImportResponse>, 
 
             oldContentModel = ContentModel.find(appContext.getDBSession(), identifier);
             oldContentPath = oldContentModel == null ? null : oldContentModel.getPath();
-            boolean isContentExist = ContentHandler.isContentExist(oldContentModel, identifier, pkgVersion);
+            boolean isContentExist = ContentHandler.isContentExist(oldContentModel, identifier, pkgVersion, false);
 
             //Apk files
             if ((!StringUtil.isNullOrEmpty(mimeType) && mimeType.equalsIgnoreCase(ContentConstants.MimeType.APK)) ||

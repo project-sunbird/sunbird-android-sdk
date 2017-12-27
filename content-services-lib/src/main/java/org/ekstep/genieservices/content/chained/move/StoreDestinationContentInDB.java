@@ -39,16 +39,25 @@ public class StoreDestinationContentInDB implements IChainable<List<MoveContentR
             for (MoveContentResponse duplicateContent : moveContentContext.getDuplicateContents()) {
                 duplicateContentIdsInDestn.add(duplicateContent.getIdentifier());
 
-                if (existingContentAction == ExistingContentAction.KEEP_HIGHER_VERSION) {
-                    if (duplicateContent.getStatus() == MoveContentStatus.HIGHER_VERSION_IN_DESTINATION) {
-                        ContentHandler.addContentToDb(appContext, duplicateContent.getIdentifier(), moveContentContext.getContentRootFolder());
-                    }
-                } else if (existingContentAction == ExistingContentAction.KEEP_LOWER_VERSION) {
-                    if (duplicateContent.getStatus() == MoveContentStatus.LOWER_VERSION_IN_DESTINATION) {
-                        ContentHandler.addContentToDb(appContext, duplicateContent.getIdentifier(), moveContentContext.getContentRootFolder());
-                    }
-                }else if (existingContentAction == ExistingContentAction.KEEP_DESTINATION || existingContentAction == ExistingContentAction.IGNORE) {
-                        ContentHandler.addContentToDb(appContext, duplicateContent.getIdentifier(), moveContentContext.getContentRootFolder());
+                switch (existingContentAction) {
+                    case KEEP_HIGHER_VERSION:
+                        if (duplicateContent.getStatus() == MoveContentStatus.HIGHER_VERSION_IN_DESTINATION) {
+                            ContentHandler.addContentToDb(appContext, duplicateContent.getIdentifier(), moveContentContext.getContentRootFolder(), false);
+                        }
+                        break;
+                    case KEEP_LOWER_VERSION:
+                        if (duplicateContent.getStatus() == MoveContentStatus.LOWER_VERSION_IN_DESTINATION) {
+                            ContentHandler.addContentToDb(appContext, duplicateContent.getIdentifier(), moveContentContext.getContentRootFolder(), true);
+                        }
+                        break;
+                    case KEEP_DESTINATION:
+                    case IGNORE:
+                        if (duplicateContent.getStatus() == MoveContentStatus.LOWER_VERSION_IN_DESTINATION) {
+                            ContentHandler.addContentToDb(appContext, duplicateContent.getIdentifier(), moveContentContext.getContentRootFolder(), true);
+                        } else {
+                            ContentHandler.addContentToDb(appContext, duplicateContent.getIdentifier(), moveContentContext.getContentRootFolder(), false);
+                        }
+                        break;
                 }
             }
         }
@@ -64,7 +73,7 @@ public class StoreDestinationContentInDB implements IChainable<List<MoveContentR
         if (!CollectionUtil.isNullOrEmpty(addedContentIdentifiers)) {
             // Read content in destination folder.
             for (String file : addedContentIdentifiers) {
-                ContentHandler.addContentToDb(appContext, file, moveContentContext.getContentRootFolder());
+                ContentHandler.addContentToDb(appContext, file, moveContentContext.getContentRootFolder(), false);
             }
         }
 
