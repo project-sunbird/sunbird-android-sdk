@@ -65,6 +65,7 @@ public class Interact extends Telemetry {
         private String pageId;
         private List<Map<String, String>> pos = new ArrayList<>();
         private List<Map<String, Object>> values = new ArrayList<>();
+        private Map<String, Object> valueMap = new HashMap<>();
         private List<CorrelationData> correlationData;
         private String objId;
         private String objType;
@@ -125,8 +126,9 @@ public class Interact extends Telemetry {
         /**
          * Extra attributes for an interaction
          */
-        public Builder values(List<Map<String, Object>> values) {
-            this.values = values;
+        public Builder addValue(String key, Object value) {
+            valueMap.put(key, value);
+            this.values.add(valueMap);
             return this;
         }
 
