@@ -12,11 +12,18 @@ import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
 import org.ekstep.genieservices.commons.db.contract.LearnerSummaryEntry;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
+import org.ekstep.genieservices.commons.utils.CollectionUtil;
+import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.importexport.bean.ImportProfileContext;
 import org.ekstep.genieservices.profile.db.model.LearnerAssessmentDetailsModel;
 import org.ekstep.genieservices.profile.db.model.LearnerSummaryEventsModel;
 import org.ekstep.genieservices.profile.db.model.LearnerSummaryModel;
+import org.ekstep.genieservices.profile.db.model.UserModel;
+import org.ekstep.genieservices.profile.db.model.UsersModel;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -36,6 +43,24 @@ public class TransportSummarizer implements IChainable<ProfileImportResponse, Im
         //check table exist
         if (isTableExist(externalDBSession, LearnerAssessmentsEntry.TABLE_NAME) &&
                 isTableExist(externalDBSession, LearnerSummaryEntry.TABLE_NAME)) {
+
+            // TODO: 27/12/17 Todo Remove this segment after subsequent release
+            ///////////////////////////////////////////////////////////////////
+            // Read from imported DB
+            UsersModel usersModel = UsersModel.findAll(externalDBSession);
+
+            if (usersModel != null) {
+                List<String> userIds = new ArrayList<>();
+                for (UserModel userModel : usersModel.getUserModelList()) {
+                    userIds.add(userModel.getUid());
+                }
+
+                if (!CollectionUtil.isNullOrEmpty(userIds)) {
+                    deleteUnwantedProfileSummary(externalDBSession, userIds);
+                }
+            }
+            /////////////////////////////////////////////////////////////////
+
 
             // Read the learner assessment data from imported DB and insert into GS DB.
             LearnerAssessmentDetailsModel importedLearnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.find(externalDBSession, "");
@@ -84,5 +109,20 @@ public class TransportSummarizer implements IChainable<ProfileImportResponse, Im
         String tableQuery = String.format(Locale.US, "select name from sqlite_master where type='%s' AND name='%s'", "table", tableName);
         CustomReaderModel customReaderModel = CustomReaderModel.find(dbSession, tableQuery);
         return customReaderModel != null;
+    }
+
+    private void deleteUnwantedProfileSummary(IDBSession dbSession, final List<String> userIds) {
+        dbSession.executeInTransaction(new IDBTransaction() {
+            @Override
+            public Void perform(IDBSession dbSession) {
+                String commaSeparatedUids = "'" + StringUtil.join("','", userIds) + "'";
+                String delLearnerAssesmentQuery = "DELETE FROM " + LearnerAssessmentsEntry.TABLE_NAME + " WHERE " + LearnerAssessmentsEntry.COLUMN_NAME_UID + " NOT IN(" + commaSeparatedUids + ")";
+                String delLearnerSummaryQuery = "DELETE FROM " + LearnerSummaryEntry.TABLE_NAME + " WHERE " + LearnerAssessmentsEntry.COLUMN_NAME_UID + " NOT IN(" + commaSeparatedUids + ")";
+
+                dbSession.execute(delLearnerAssesmentQuery);
+                dbSession.execute(delLearnerSummaryQuery);
+                return null;
+            }
+        });
     }
 }
