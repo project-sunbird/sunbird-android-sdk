@@ -55,6 +55,10 @@ public class Impression extends Telemetry {
         private String pageId;
         private String uri;
         private List<CorrelationData> correlationData;
+        private String objId;
+        private String objType;
+        private String objVer;
+        private Rollup rollup;
         private List<Visit> visitList;
 
         /**
@@ -108,6 +112,38 @@ public class Impression extends Telemetry {
         }
 
         /**
+         * Id of the object. For ex: content id incase of content
+         */
+        public Builder objectId(String objId) {
+            this.objId = objId;
+            return this;
+        }
+
+        /**
+         * Type of the object. For ex: "Content", "Community", "User" etc.
+         */
+        public Builder objectType(String objType) {
+            this.objType = objType;
+            return this;
+        }
+
+        /**
+         * version of the object
+         */
+        public Builder objectVersion(String objVer) {
+            this.objVer = objVer;
+            return this;
+        }
+
+        /**
+         * hierarchyLevel to be computed of the object. Only 4 levels are allowed.
+         */
+        public Builder hierarchyLevel(Rollup rollup) {
+            this.rollup = rollup;
+            return this;
+        }
+
+        /**
          * Object Visits description
          */
         public Builder addVisit(Visit visit) {
@@ -129,6 +165,7 @@ public class Impression extends Telemetry {
                 throw new IllegalStateException("pageId is required.");
             }
             Impression event = new Impression(type, subType, pageId, uri, visitList);
+            event.setObject(objId != null ? objId : "", objType != null ? objType : "", objVer != null ? objVer : "", rollup);
             event.setCoRrelationdata(correlationData);
             return event;
         }
