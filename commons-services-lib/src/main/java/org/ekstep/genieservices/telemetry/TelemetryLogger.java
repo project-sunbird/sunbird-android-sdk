@@ -5,7 +5,8 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.telemetry.GEServiceAPICall;
+import org.ekstep.genieservices.commons.bean.telemetry.Actor;
+import org.ekstep.genieservices.commons.bean.telemetry.Log;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 
@@ -66,12 +67,12 @@ public class TelemetryLogger {
     }
 
     public static void logFailure(AppContext appContext, GenieResponse response, String service, String method, Map<String, Object> params, String message) {
-        HashMap<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         result.put("message", message);
         log(appContext, response, service, method, params, result);
     }
 
-    private static void log(AppContext appContext, GenieResponse response, String service, String method, Map<String, Object> params, HashMap result) {
+    private static void log(AppContext appContext, GenieResponse response, String service, String method, Map<String, Object> params, Map<String, Object> result) {
         save(create(appContext, response, service, method, params, result));
     }
 
@@ -79,15 +80,21 @@ public class TelemetryLogger {
         save(telemetry);
     }
 
-    public static Telemetry create(AppContext appContext, GenieResponse response, String service, String method, Map<String, Object> params, HashMap result) {
-        GEServiceAPICall.Builder eventBuilder = new GEServiceAPICall.Builder();
-        return eventBuilder.service(service)
-                .method(method)
-                .mode(getNetworkMode(appContext.getConnectionInfo()))
-                .request(params)
-                .response(response)
-                .result(result)
+    public static Telemetry create(AppContext appContext, GenieResponse response, String service, String method, Map<String, Object> params, Map<String, Object> result) {
+        Log log = new Log.Builder()
+                .type("api_call")
+                .level(Log.Level.TRACE)
+                .actorType(Actor.TYPE_SYSTEM)
+                .message(service + " " + method)
+                .addParam("service", service)
+                .addParam("method", method)
+                .addParam("mode", getNetworkMode(appContext.getConnectionInfo()))
+                .addParam("request", params)
+                .addParam("response", response)
+                .addParam("result", result)
                 .build();
+
+        return log;
     }
 
     private static void save(Telemetry event) {

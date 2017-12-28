@@ -67,7 +67,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
     @Override
     public GenieResponse<Void> saveTelemetry(String eventString) {
         String methodName = "saveTelemetry@TelemetryServiceImpl";
-        HashMap params = new HashMap();
+        Map<String, Object> params = new HashMap<>();
         params.put("Event", eventString);
         params.put("logLevel", "2");
 
@@ -77,7 +77,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
             return response;
         } catch (InvalidDataException e) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.VALIDATION_ERROR, ServiceConstants.ErrorMessage.UNABLE_TO_SAVE_EVENT, TAG, Void.class);
-            saveEvent(TelemetryLogger.create(mAppContext, response, TAG, methodName, params, new HashMap()).toString());
+            saveEvent(TelemetryLogger.create(mAppContext, response, TAG, methodName, params, new HashMap<String, Object>()).toString());
             return response;
         }
     }
@@ -87,10 +87,11 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         return saveTelemetry(event.toString());
     }
 
+
     @Override
     public GenieResponse<TelemetryStat> getTelemetryStat() {
         String methodName = "getTelemetryStat@TelemetryServiceImpl";
-        HashMap params = new HashMap();
+        Map<String, Object> params = new HashMap<>();
         params.put("logLevel", "2");
 
         String telemetryEventCountQuery = "select count(*) from telemetry";
@@ -115,7 +116,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         GenieResponse<TelemetryStat> genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         genieResponse.setResult(new TelemetryStat(unSyncedEventCount, lastSyncTime));
 
-        saveEvent(TelemetryLogger.create(mAppContext, genieResponse, TAG, methodName, params, new HashMap()).toString());
+        saveEvent(TelemetryLogger.create(mAppContext, genieResponse, TAG, methodName, params, new HashMap<String, Object>()).toString());
         return genieResponse;
     }
 
@@ -130,8 +131,9 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
 
         EventModel eventModel = EventModel.build(mAppContext.getDBSession(), event, eventType);
         eventModel.save();
-
-        EventBus.postEvent(GsonUtil.fromMap(eventModel.getEventMap(), Telemetry.class));
+        if ("3.0".equals(readVersion(event))) {
+            EventBus.postEvent(GsonUtil.fromMap(eventModel.getEventMap(), Telemetry.class));
+        }
         Logger.i(TAG, "Event saved successfully");
         return GenieResponseBuilder.getSuccessResponse("Event Saved Successfully", Void.class);
     }
@@ -141,72 +143,73 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         String version = readVersion(event);
         if (version.equals("1.0")) {
             updateTs(event, DateUtil.getCurrentTimestamp());
-        } else if (version.equals("2.0") || version.equals("2.1") || version.equals("2.2")) {
+        } else if (version.equals("2.0") || version.equals("2.1") || version.equals("2.2") || version.equals("3.0")) {
             updateEts(event, DateUtil.getEpochTime());
         }
 
-        if (version.equals("2.1") || version.equals("2.2")) {
-            // Patch the channel
-            addChannel(event);
-
-            // Patch the pdata - ProducerData
-            addProducerData(event);
-
-            // Patch etags if missing.
-            if (!event.containsKey("etags")) {
-                event.put("etags", new HashMap<>());
-            }
-
-            Map<String, Object> etags = (Map<String, Object>) event.get("etags");
-            // Patch the app tags.
-            Set<String> activeProgramTags = TelemetryTagCache.activeTags(mAppContext);
-            List<String> tagList = new ArrayList<>();
-            tagList.addAll(activeProgramTags);
-            etags.put("app", tagList);
-
-            // Patch the partner tags if missing.
-            String partnerId = mAppContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.KEY_ACTIVE_PARTNER_ID, "");
-            if (!StringUtil.isNullOrEmpty(partnerId)) {
-                List<String> partnerTagList;
-                if (etags.containsKey("partner")) {
-                    partnerTagList = (List<String>) etags.get("partner");
-                } else {
-                    partnerTagList = new ArrayList<>();
-                }
-
-                if (!partnerTagList.contains(partnerId)) {
-                    partnerTagList.add(partnerId);
-                    etags.put("partner", partnerTagList);
-                }
-            }
-        } else {
-            //Patch Partner tags
-            String partnerId = mAppContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.KEY_ACTIVE_PARTNER_ID, "");
-            List<Map<String, Object>> tags = (List<Map<String, Object>>) event.get("tags");
-            if (!StringUtil.isNullOrEmpty(partnerId) && !CollectionUtil.containsMap(tags, ServiceConstants.Partner.KEY_PARTNER_ID)) {
-                addTagIfMissing(event, ServiceConstants.Partner.KEY_PARTNER_ID, partnerId);
-            }
-
-            //Patch Program tags
-            Set<String> activeProgramTags = TelemetryTagCache.activeTags(mAppContext);
-            List<String> tagList = new ArrayList<>();
-            tagList.addAll(activeProgramTags);
-            addTagIfMissing(event, "genie", tagList);
-        }
-
-        // Patch the gdata - GameData
-        addGameDataIfMissing(event);
-
-        //Patch the event with current Sid and Uid
+        UserSession currentUserSession = null;
         if (mUserService != null) {
-            UserSession currentUserSession = mUserService.getCurrentUserSession().getResult();
+            currentUserSession = mUserService.getCurrentUserSession().getResult();
+        }
+        if (version.equals("3.0")) {
+
+            //Patch Actor
+            if (isSessionValid(currentUserSession)) {
+                addActor(event, currentUserSession.getUid());
+            }
+            // Patch the Context
+            patchContext(currentUserSession, event);
+
+            // Patch tags if missing.
+            if (!event.containsKey("tags") || CollectionUtil.isNullOrEmpty((List<String>) event.get("tags"))) {
+                event.put("tags", new ArrayList<>());
+            }
+
+            List<String> tags = (List<String>) event.get("tags");
+            // Patch the app tags.
+            patchProgramTagsV3(tags);
+
+
+        } else {
+            if (version.equals("2.1") || version.equals("2.2")) {
+                // Patch the channel
+                addChannel(event);
+
+                // Patch the pdata - ProducerData
+                addProducerData(event);
+
+                // Patch etags if missing.
+                if (!event.containsKey("etags")) {
+                    event.put("etags", new HashMap<>());
+                }
+
+                Map<String, Object> etags = (Map<String, Object>) event.get("etags");
+                // Patch the app tags.
+                patchProgramTags(etags);
+                // Patch the partner tags if missing.
+                patchPartnerTags(etags);
+
+            } else if (version.equals("1.0")) {
+                //Patch Partner tags
+                patchProgramTagsV1(event);
+
+                //Patch Program tags
+                patchPartnerTagsV1(event);
+            }
+
+            // Patch the gdata - GameData
+            addGameDataIfMissing(event);
+
+            //Patch the event with current Sid and Uid
             if (currentUserSession != null && currentUserSession.isValid()) {
                 updateSessionDetails(event, currentUserSession.getSid(), currentUserSession.getUid());
             }
+
+            //Patch the event with did
+            updateDeviceInfo(event, mAppContext.getDeviceInfo().getDeviceID());
         }
 
-        //Patch the event with did
-        updateDeviceInfo(event, mAppContext.getDeviceInfo().getDeviceID());
+
     }
 
     private String readVersion(Map<String, Object> event) {
@@ -238,6 +241,27 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         event.put("channel", mAppContext.getParams().getString(IParams.Key.CHANNEL_ID));
     }
 
+    private void addProducerDataV3(Map<String, Object> event) {
+        if (!event.containsKey("pdata")) {
+            event.put("pdata", new HashMap<>());
+        }
+
+        Map<String, Object> pdata = (Map<String, Object>) event.get("pdata");
+
+        if (CollectionUtil.isKeyNotAvailable(pdata, "id")) {
+            pdata.put("id", mAppContext.getParams().getString(IParams.Key.PRODUCER_ID));
+        }
+
+        String id = (String) pdata.get("pid");
+        if (!isValidId(id)) {
+            pdata.put("pid", GENIE_SERVICE_GID);
+        }
+
+        if (CollectionUtil.isKeyNotAvailable(pdata, "ver")) {
+            pdata.put("ver", mAppContext.getParams().getString(IParams.Key.VERSION_NAME));
+        }
+    }
+
     private void addProducerData(Map<String, Object> event) {
         if (!event.containsKey("pdata")) {
             event.put("pdata", new HashMap<>());
@@ -246,13 +270,114 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         Map<String, Object> pdata = (Map<String, Object>) event.get("pdata");
 
         if (!pdata.containsKey("id") ||
-                (pdata.containsKey("id") && StringUtil.isNullOrEmpty(String.valueOf(pdata.containsKey("id"))))) {
+                (pdata.containsKey("id") && StringUtil.isNullOrEmpty(String.valueOf(pdata.get("id"))))) {
             pdata.put("id", mAppContext.getParams().getString(IParams.Key.PRODUCER_ID));
         }
 
         if (!pdata.containsKey("ver") ||
-                (pdata.containsKey("ver") && StringUtil.isNullOrEmpty(String.valueOf(pdata.containsKey("ver"))))) {
+                (pdata.containsKey("ver") && StringUtil.isNullOrEmpty(String.valueOf(pdata.get("ver"))))) {
             pdata.put("ver", mAppContext.getParams().getString(IParams.Key.VERSION_NAME));
+        }
+    }
+
+    private void patchProgramTagsV3(List<String> tags) {
+        Set<String> activeProgramTags = TelemetryTagCache.activeTags(mAppContext);
+        List<String> tagList = new ArrayList<>();
+        tagList.addAll(activeProgramTags);
+        tags.addAll(tagList);
+    }
+
+    private void patchProgramTags(Map<String, Object> tags) {
+        Set<String> activeProgramTags = TelemetryTagCache.activeTags(mAppContext);
+        List<String> tagList = new ArrayList<>();
+        tagList.addAll(activeProgramTags);
+        tags.put("app", tagList);
+    }
+
+    private void patchProgramTagsV1(Map<String, Object> event) {
+        Set<String> activeProgramTags = TelemetryTagCache.activeTags(mAppContext);
+        List<String> tagList = new ArrayList<>();
+        tagList.addAll(activeProgramTags);
+        addTagIfMissing(event, "genie", tagList);
+    }
+
+    private void patchPartnerTags(Map<String, Object> tags) {
+        String partnerId = mAppContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.KEY_ACTIVE_PARTNER_ID, "");
+        if (!StringUtil.isNullOrEmpty(partnerId)) {
+            List<String> partnerTagList;
+            if (tags.containsKey("partner")) {
+                partnerTagList = (List<String>) tags.get("partner");
+            } else {
+                partnerTagList = new ArrayList<>();
+            }
+
+            if (!partnerTagList.contains(partnerId)) {
+                partnerTagList.add(partnerId);
+                tags.put("partner", partnerTagList);
+            }
+        }
+    }
+
+    private void patchPartnerTagsV1(Map<String, Object> event) {
+        String partnerId = mAppContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.KEY_ACTIVE_PARTNER_ID, "");
+        List<Map<String, Object>> tags = (List<Map<String, Object>>) event.get("tags");
+        if (!StringUtil.isNullOrEmpty(partnerId) && !CollectionUtil.containsMap(tags, ServiceConstants.Partner.KEY_PARTNER_ID)) {
+            addTagIfMissing(event, ServiceConstants.Partner.KEY_PARTNER_ID, partnerId);
+        }
+    }
+
+
+    private void patchPartnerTagsV3(Map<String, Object> context) {
+        if (!context.containsKey("cdata")) {
+            context.put("cdata", new ArrayList<Map<String, String>>());
+        }
+        String partnerId = mAppContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.KEY_ACTIVE_PARTNER_ID, "");
+        if (!StringUtil.isNullOrEmpty(partnerId)) {
+            List<Map<String, String>> partnerTagList = (List<Map<String, String>>) context.get("cdata");
+
+            if (!containsPartnerId(partnerTagList, partnerId)) {
+                Map<String, String> cdata = new HashMap<>();
+                cdata.put("type", "partner");
+                cdata.put("id", partnerId);
+                partnerTagList.add(cdata);
+            }
+        }
+    }
+
+    private boolean containsPartnerId(List<Map<String, String>> partnerTagList, String partnerId) {
+        for (int i = 0; i < partnerTagList.size(); i++) {
+            Map<String, String> map = partnerTagList.get(i);
+            if (map.containsValue(partnerId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void patchContext(UserSession session, Map<String, Object> event) {
+        if (!event.containsKey("context")) {
+            event.put("context", new HashMap<>());
+        }
+        Map<String, Object> context = (Map<String, Object>) event.get("context");
+        context.put("channel", mAppContext.getParams().getString(IParams.Key.CHANNEL_ID));
+        addProducerDataV3(context);
+        if (!context.containsKey("env") || StringUtil.isNullOrEmpty(context.get("env").toString())) {
+            context.put("env", mAppContext.getParams().getString(IParams.Key.ENVIRONMENT));
+        }
+        context.put("sid", isSessionValid(session) ? session.getSid() : "");
+        context.put("did", mAppContext.getDeviceInfo().getDeviceID());
+        patchPartnerTagsV3(context);
+    }
+
+    private void addActor(Map<String, Object> event, String uid) {
+        if (!event.containsKey("actor")) {
+            event.put("actor", new HashMap<>());
+        }
+
+        Map<String, String> actorMap = (Map<String, String>) event.get("actor");
+
+        if (CollectionUtil.isKeyNotAvailable(actorMap, "id")) {
+            actorMap.put("id", uid);
         }
     }
 
@@ -276,6 +401,10 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
 
     private boolean isValidId(String gameID) {
         return gameID != null && !gameID.trim().isEmpty();
+    }
+
+    private boolean isSessionValid(UserSession userSession) {
+        return (userSession != null && userSession.isValid());
     }
 
     private void updateSessionDetails(Map<String, Object> event, String sid, String uid) {

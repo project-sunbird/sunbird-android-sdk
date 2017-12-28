@@ -11,6 +11,7 @@ import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
+import org.ekstep.genieservices.commons.bean.ContentDeleteResponse;
 import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentExportRequest;
 import org.ekstep.genieservices.commons.bean.ContentFeedback;
@@ -256,9 +257,9 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
-    public GenieResponse<Void> deleteContent(ContentDeleteRequest contentDeleteCriteria) {
+    public GenieResponse<List<ContentDeleteResponse>> deleteContent(ContentDeleteRequest contentDeleteCriteria) {
         idle = false;
-        GenieResponse genieResponse = mGenieService.getContentService().deleteContent(contentDeleteCriteria);
+        GenieResponse<List<ContentDeleteResponse>> genieResponse = mGenieService.getContentService().deleteContent(contentDeleteCriteria);
         return genieResponse;
     }
 

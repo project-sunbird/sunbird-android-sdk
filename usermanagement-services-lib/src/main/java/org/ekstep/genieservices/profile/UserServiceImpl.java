@@ -16,13 +16,11 @@ import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.enums.ContentAccessStatus;
-import org.ekstep.genieservices.commons.bean.telemetry.GECreateProfile;
-import org.ekstep.genieservices.commons.bean.telemetry.GECreateUser;
-import org.ekstep.genieservices.commons.bean.telemetry.GEDeleteProfile;
-import org.ekstep.genieservices.commons.bean.telemetry.GEError;
-import org.ekstep.genieservices.commons.bean.telemetry.GESessionEnd;
-import org.ekstep.genieservices.commons.bean.telemetry.GESessionStart;
-import org.ekstep.genieservices.commons.bean.telemetry.GEUpdateProfile;
+import org.ekstep.genieservices.commons.bean.telemetry.Actor;
+import org.ekstep.genieservices.commons.bean.telemetry.Audit;
+import org.ekstep.genieservices.commons.bean.telemetry.End;
+import org.ekstep.genieservices.commons.bean.telemetry.Error;
+import org.ekstep.genieservices.commons.bean.telemetry.Start;
 import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
@@ -113,16 +111,14 @@ public class UserServiceImpl extends BaseService implements IUserService {
         }
         final UserModel userModel = UserModel.build(dbSession, uid);
 
-        final GECreateUser geCreateUser = new GECreateUser(uid, mAppContext.getLocationInfo().getLocation());
         final UserProfileModel profileModel = UserProfileModel.build(dbSession, profile);
-        final GECreateProfile geCreateProfile = new GECreateProfile(profile, mAppContext.getLocationInfo().getLocation());
         dbSession.executeInTransaction(new IDBTransaction() {
             @Override
             public Void perform(IDBSession dbSession) {
                 userModel.save();
-                TelemetryLogger.log(geCreateUser);
+                logUserAuditEvent(userModel.getUid());
                 profileModel.save();
-                TelemetryLogger.log(geCreateProfile);
+                logProfileAuditEvent(profileModel.getProfile(), null);
                 return null;
             }
         });
@@ -130,6 +126,46 @@ public class UserServiceImpl extends BaseService implements IUserService {
         GenieResponse<Profile> successResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         successResponse.setResult(GsonUtil.fromJson(profileModel.getProfile().toString(), Profile.class));
         return successResponse;
+    }
+
+
+    private void logUserAuditEvent(String uid) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("action", "User-Created");
+        map.put("uid", uid);
+        map.put("loc", mAppContext.getLocationInfo().getLocation());
+
+        Audit.Builder audit = new Audit.Builder();
+        audit.currentState(GsonUtil.toJson(map))
+                .actorType(Actor.TYPE_SYSTEM);
+        TelemetryLogger.log(audit.build());
+    }
+
+    private void logProfileAuditEvent(Profile profile, Profile oldProfile) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("action", "Profile-Created");
+        map.put("profile", GsonUtil.toJson(profile));
+        map.put("loc", mAppContext.getLocationInfo().getLocation());
+
+        Audit.Builder audit = new Audit.Builder();
+        audit.currentState(GsonUtil.toJson(map))
+                .actorType(Actor.TYPE_SYSTEM);
+        if (oldProfile != null) {
+            audit.previousState(GsonUtil.toJson(oldProfile));
+        }
+        TelemetryLogger.log(audit.build());
+    }
+
+    private void logProfileDeleteAuditEvent(Profile profile) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("action", "Profile-Deleted");
+        map.put("uid", profile.getUid());
+        map.put("duration", DateUtil.elapsedTimeTillNow(profile.getCreatedAt().getTime()));
+
+        Audit.Builder audit = new Audit.Builder();
+        audit.currentState(GsonUtil.toJson(map))
+                .actorType(Actor.TYPE_SYSTEM);
+        TelemetryLogger.log(audit.build());
     }
 
     @Override
@@ -151,8 +187,12 @@ public class UserServiceImpl extends BaseService implements IUserService {
     }
 
     private void logGEError(GenieResponse response, String id) {
-        GEError geError = new GEError(response.getError(), id, "", response.getErrorMessages().toString());
-        TelemetryLogger.log(geError);
+        Error.Builder error = new Error.Builder();
+        error.errorCode(response.getError())
+                .errorType(Error.Type.MOBILE_APP)
+                .stacktrace(response.getErrorMessages().toString())
+                .pageId(id);
+        TelemetryLogger.log(error.build());
     }
 
     /**
@@ -180,18 +220,25 @@ public class UserServiceImpl extends BaseService implements IUserService {
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_UPDATE_PROFILE);
             return response;
         }
-        UserProfileModel userProfileModel = UserProfileModel.build(mAppContext.getDBSession(), profile);
-        // TODO: 6/6/2017 - check if profile exists or not before updating.
-        userProfileModel.update();
 
-        GEUpdateProfile geUpdateProfile = new GEUpdateProfile(profile, mAppContext.getDeviceInfo().getDeviceID());
-        TelemetryLogger.log(geUpdateProfile);
+        UserProfileModel userProfileDbModel = UserProfileModel.find(mAppContext.getDBSession(), profile.getUid());
+        if (userProfileDbModel != null) {
+            UserProfileModel userProfileModel = UserProfileModel.build(mAppContext.getDBSession(), profile);
+            userProfileModel.update();
 
-        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Profile.class);
-        response.setResult(profile);
+            logProfileAuditEvent(userProfileDbModel.getProfile(), profile);
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Profile.class);
+            response.setResult(profile);
 
-        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
-        return response;
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+            return response;
+        } else {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROFILE_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_PROFILE, TAG, Profile.class);
+            logGEError(response, "updateUserProfile");
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_UPDATE_PROFILE);
+            return response;
+        }
+
     }
 
     /**
@@ -226,7 +273,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
             Profile profile = new Profile("", "", "");
             profile.setUid(uid);
-            final GEDeleteProfile geDeleteProfile = new GEDeleteProfile(profile);
+            final Profile profileDB = userProfileModel.getProfile();
             mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
                 @Override
                 public Void perform(IDBSession dbSession) {
@@ -236,8 +283,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
                     userProfileModel.delete();
 
                     userModel.delete();
-                    TelemetryLogger.log(geDeleteProfile);
-
+                    logProfileDeleteAuditEvent(profileDB);
                     return null;
                 }
             });
@@ -280,8 +326,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         String uid = getAnonymousUserId();
         if (uid == null) {
             uid = createAnonymousUser();
-            GECreateUser geCreateUser = new GECreateUser(uid, mAppContext.getLocationInfo().getLocation());
-            TelemetryLogger.log(geCreateUser);
+            logUserAuditEvent(uid);
         }
         Profile profile = new Profile(uid);
         GenieResponse<Profile> response = GenieResponseBuilder.getSuccessResponse("", Profile.class);
@@ -322,8 +367,11 @@ public class UserServiceImpl extends BaseService implements IUserService {
         if (session == null) {
             sessionCreationRequired = true;
         } else if (!session.getUserSessionBean().getUid().equals(uid)) {
-            GESessionEnd geSessionEnd = new GESessionEnd(session.getUserSessionBean(), mAppContext.getDeviceInfo().getDeviceID());
-            TelemetryLogger.log(geSessionEnd);
+            End end = new End.Builder()
+                    .type(ServiceConstants.Telemetry.SESSION)
+                    .duration(DateUtil.elapsedTimeTillNow(session.getUserSessionBean().getCreatedTime()))
+                    .build();
+            TelemetryLogger.log(end);
             session.endSession();
             sessionCreationRequired = true;
         }
@@ -331,8 +379,11 @@ public class UserServiceImpl extends BaseService implements IUserService {
         if (sessionCreationRequired) {
             UserSessionModel userSessionModel = UserSessionModel.buildUserSession(mAppContext, uid);
             userSessionModel.startSession();
-            GESessionStart geSessionStart = new GESessionStart(userSessionModel.getUserSessionBean(), mAppContext.getLocationInfo().getLocation(), mAppContext.getDeviceInfo().getDeviceID());
-            TelemetryLogger.log(geSessionStart);
+            Start start = new Start.Builder().
+                    type(ServiceConstants.Telemetry.SESSION)
+                    .loc(mAppContext.getLocationInfo().getLocation())
+                    .build();
+            TelemetryLogger.log(start);
         }
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
@@ -396,9 +447,8 @@ public class UserServiceImpl extends BaseService implements IUserService {
         String uid = getAnonymousUserId();
         if (uid == null) {
             uid = createAnonymousUser();
+            logUserAuditEvent(uid);
             setCurrentUser(uid);
-            GECreateUser geCreateUser = new GECreateUser(uid, mAppContext.getLocationInfo().getLocation());
-            TelemetryLogger.log(geCreateUser);
         }
     }
 

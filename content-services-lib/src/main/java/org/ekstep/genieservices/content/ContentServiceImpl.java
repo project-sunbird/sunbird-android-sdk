@@ -46,7 +46,7 @@ import org.ekstep.genieservices.commons.bean.enums.ContentImportStatus;
 import org.ekstep.genieservices.commons.bean.enums.DownloadAction;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.enums.ScanStorageStatus;
-import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
+import org.ekstep.genieservices.commons.bean.telemetry.Interact;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
@@ -719,7 +719,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         Map<String, Object> contentImportMap = importRequest.getContentImportMap();
         Set<String> contentIds = contentImportMap.keySet();
 
-        ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, ContentHandler.getSearchRequest(mAppContext, contentIds));
+        ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, ContentHandler.getSearchRequest(mAppContext, contentIds, importRequest.getContentStatusArray()));
         GenieResponse apiResponse = contentSearchAPI.post();
         if (apiResponse.getStatus()) {
             String body = apiResponse.getResult().toString();
@@ -727,32 +727,44 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             LinkedTreeMap map = GsonUtil.fromJson(body, LinkedTreeMap.class);
             LinkedTreeMap result = (LinkedTreeMap) map.get("result");
 
-            List<Map<String, Object>> contentDataList = null;
+            String contents = null;
             if (result.containsKey("content")) {
-                contentDataList = (List<Map<String, Object>>) result.get("content");
+                contents = GsonUtil.toJson(result.get("content"));
             }
 
-            if (contentDataList != null) {
+            List<ContentData> contentDataList = null;
+            if (!StringUtil.isNullOrEmpty(contents)) {
+                Type type = new TypeToken<List<ContentData>>() {
+                }.getType();
+                contentDataList = GsonUtil.getGson().fromJson(contents, type);
+            }
+
+            if (!CollectionUtil.isNullOrEmpty(contentDataList)) {
                 List<DownloadRequest> downloadRequestList = new ArrayList<>();
-                for (int i = 0; i < contentDataList.size(); i++) {
-                    Map<String, Object> dataMap = contentDataList.get(i);
-                    String contentId = ContentHandler.readIdentifier(dataMap);
-                    String downloadUrl = ContentHandler.getDownloadUrl(dataMap);
-                    ContentImportStatus status = ContentImportStatus.NOT_FOUND;
+                List<String> requestedContentIdList = new ArrayList<>(contentIds);
 
-                    if (!StringUtil.isNullOrEmpty(downloadUrl) && ServiceConstants.FileExtension.CONTENT.equalsIgnoreCase(FileUtil.getFileExtension(downloadUrl))) {
-                        status = ContentImportStatus.ENQUEUED_FOR_DOWNLOAD;
-                        ContentImport contentImport = (ContentImport) contentImportMap.get(contentId);
-                        DownloadRequest downloadRequest = new DownloadRequest(contentId, downloadUrl, ContentConstants.MimeType.ECAR, contentImport.getDestinationFolder(), contentImport.isChildContent());
-                        downloadRequest.setFilename(contentId + "." + ServiceConstants.FileExtension.CONTENT);
-                        downloadRequest.setCorrelationData(contentImport.getCorrelationData());
-                        downloadRequest.setProcessorClass("org.ekstep.genieservices.commons.download.ContentImportService");
+                for (String requestedContentId : requestedContentIdList) {
+                    int indexOfContentData = contentDataList.indexOf(new ContentData(requestedContentId));
+                    if (indexOfContentData != -1) {
+                        ContentData contentData = contentDataList.get(indexOfContentData);
+                        String contentId = contentData.getIdentifier();
+                        String downloadUrl = ContentHandler.getDownloadUrl(contentData);
+                        ContentImportStatus status = ContentImportStatus.NOT_FOUND;
 
-                        downloadRequestList.add(downloadRequest);
+                        if (!StringUtil.isNullOrEmpty(downloadUrl) && ServiceConstants.FileExtension.CONTENT.equalsIgnoreCase(FileUtil.getFileExtension(downloadUrl))) {
+                            status = ContentImportStatus.ENQUEUED_FOR_DOWNLOAD;
+                            ContentImport contentImport = (ContentImport) contentImportMap.get(contentId);
+                            DownloadRequest downloadRequest = new DownloadRequest(contentId, downloadUrl, ContentConstants.MimeType.ECAR, contentImport.getDestinationFolder(), contentImport.isChildContent());
+                            downloadRequest.setFilename(contentId + "." + ServiceConstants.FileExtension.CONTENT);
+                            downloadRequest.setCorrelationData(contentImport.getCorrelationData());
+                            downloadRequest.setProcessorClass("org.ekstep.genieservices.commons.download.ContentImportService");
+
+                            downloadRequestList.add(downloadRequest);
+                        }
+
+                        contentIds.remove(contentId);
+                        contentImportResponseList.add(new ContentImportResponse(contentId, status));
                     }
-
-                    contentIds.remove(contentId);
-                    contentImportResponseList.add(new ContentImportResponse(contentId, status));
                 }
 
                 if (downloadRequestList.size() > 0) {
@@ -786,22 +798,26 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     private void buildInitiateEvent() {
-        GEInteract geInteract = new GEInteract.Builder().
-                stageId(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID).
-                subType(ServiceConstants.Telemetry.CONTENT_IMPORT_INITIATED_SUB_TYPE).
-                interActionType(InteractionType.TOUCH).
-                build();
-        TelemetryLogger.log(geInteract);
+        Interact interact = new Interact.Builder()
+                .pageId(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID)
+                .subType(ServiceConstants.Telemetry.CONTENT_IMPORT_INITIATED_SUB_TYPE)
+                .interactionType(InteractionType.TOUCH)
+                .objectType(ServiceConstants.Telemetry.OBJECT_TYPE_CONTENT)
+                .resourceId(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID)
+                .build();
+        TelemetryLogger.log(interact);
     }
 
     private void buildSuccessEvent(String identifier) {
-        GEInteract geInteract = new GEInteract.Builder().
-                stageId(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID).
-                subType(ServiceConstants.Telemetry.CONTENT_IMPORT_SUCCESS_SUB_TYPE).
-                interActionType(InteractionType.OTHER).
-                id(identifier).
-                build();
-        TelemetryLogger.log(geInteract);
+        Interact interact = new Interact.Builder()
+                .pageId(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID)
+                .subType(ServiceConstants.Telemetry.CONTENT_IMPORT_SUCCESS_SUB_TYPE)
+                .interactionType(InteractionType.OTHER)
+                .objectId(identifier)
+                .objectType(ServiceConstants.Telemetry.OBJECT_TYPE_CONTENT)
+                .resourceId(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID)
+                .build();
+        TelemetryLogger.log(interact);
     }
 
     @Override

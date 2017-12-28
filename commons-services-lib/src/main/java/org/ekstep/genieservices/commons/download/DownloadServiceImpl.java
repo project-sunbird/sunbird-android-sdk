@@ -10,7 +10,7 @@ import org.ekstep.genieservices.commons.bean.DownloadProgress;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.enums.ContentImportStatus;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
-import org.ekstep.genieservices.commons.bean.telemetry.GEInteract;
+import org.ekstep.genieservices.commons.bean.telemetry.Interact;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
@@ -119,14 +119,16 @@ public class DownloadServiceImpl implements IDownloadService {
         mDownloadQueueManager.removeFromQueue(identifier);
     }
 
-    private GEInteract buildGEInteractEvent(InteractionType type, String subType, List<CorrelationData> correlationDataList, String contendId) {
-        GEInteract.Builder geInteract = new GEInteract.Builder();
-        geInteract.interActionType(type)
-                .stageId(ServiceConstants.Telemetry.CONTENT_DETAIL)
+    private Interact buildGEInteractEvent(InteractionType type, String subType, List<CorrelationData> correlationDataList, String contentId) {
+        Interact.Builder interact = new Interact.Builder();
+        interact.interactionType(type)
+                .pageId(ServiceConstants.Telemetry.CONTENT_DETAIL)
                 .subType(subType)
-                .id(contendId)
+                .objectId(contentId)
+                .objectType(ServiceConstants.Telemetry.OBJECT_TYPE_CONTENT)
+                .resourceId(ServiceConstants.Telemetry.CONTENT_DETAIL)
                 .correlationData(correlationDataList);
-        return geInteract.build();
+        return interact.build();
     }
 
 

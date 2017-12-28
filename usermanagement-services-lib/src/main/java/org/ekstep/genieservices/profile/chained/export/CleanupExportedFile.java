@@ -145,8 +145,8 @@ public class CleanupExportedFile implements IChainable<ProfileExportResponse, Ex
             @Override
             public Void perform(IDBSession dbSession) {
                 String commaSeparatedUids = "'" + StringUtil.join("','", userIds) + "'";
-                String delLearnerAssesmentQuery = "DELETE FROM " + LearnerAssessmentsEntry.TABLE_NAME + " WHERE " + LearnerAssessmentsEntry.COLUMN_NAME_UID + "NOT IN(" + commaSeparatedUids + ")";
-                String delLearnerSummaryQuery = "DELETE FROM " + LearnerSummaryEntry.TABLE_NAME + " WHERE " + LearnerAssessmentsEntry.COLUMN_NAME_UID + "NOT IN(" + commaSeparatedUids + ")";
+                String delLearnerAssesmentQuery = "DELETE FROM " + LearnerAssessmentsEntry.TABLE_NAME + " WHERE " + LearnerAssessmentsEntry.COLUMN_NAME_UID + " NOT IN(" + commaSeparatedUids + ")";
+                String delLearnerSummaryQuery = "DELETE FROM " + LearnerSummaryEntry.TABLE_NAME + " WHERE " + LearnerAssessmentsEntry.COLUMN_NAME_UID + " NOT IN(" + commaSeparatedUids + ")";
 
                 dbSession.execute(delLearnerAssesmentQuery);
                 dbSession.execute(delLearnerSummaryQuery);

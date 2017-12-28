@@ -4,7 +4,6 @@ import org.ekstep.genieservices.commons.bean.CorrelationData;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +13,7 @@ import java.util.Map;
  */
 public class Telemetry {
 
-    private static final String TELEMETRY_VERSION = "2.2";
+    private static final String TELEMETRY_VERSION = "3.0";
 
     /**
      * unique event ID.
@@ -22,113 +21,93 @@ public class Telemetry {
     private String eid;
 
     /**
-     * timestamp of event capture in YYYY-MM-DDThh:mm:ss+/-nn:nn format, timezone is mandatory.
-     */
-    private String ts;
-
-    /**
      * epoch timestamp of event capture in epoch format (time in milli-seconds. For ex: 1442816723).
      */
     private long ets;
 
     /**
-     * version of the event data structure, currently "2.2".
+     * version of the event data structure, currently "3".
      */
     private String ver;
 
     /**
-     * Channel ID.
+     * Who did the event
+     * Actor of the event
      */
-    private String channel;
-    private ProducerData pdata;
-    private GameData gdata;
-    private List<CorrelationData> cdata;
-    private String sid = "";
-    private String uid = "";
-    private String did;
-    private Map<String, Object> edata = new HashMap<>();
-    private ETags etags;
+    private Actor actor;
+
+    /**
+     * Who did the event
+     * Context in which the event has occured.
+     */
+    private Context context;
+
+    /**
+     * What is the target of the event
+     * Object which is the subject of the event
+     */
+    private TelemetryObject object;
+
+    private Map<String, Object> edata;
+
+    private List<String> tags;
 
     public Telemetry(String eid) {
         this.eid = eid;
         this.ver = TELEMETRY_VERSION;
-        this.ts = DateUtil.getCurrentTimestamp();
         this.ets = DateUtil.getEpochTime();
+        this.actor = new Actor();
+        this.context = new Context();
+        this.edata = new HashMap<>();
     }
 
     public String getEid() {
         return this.eid;
     }
 
-    public String getTs() {
-        return this.ts;
-    }
-
-    public long getEts() {
-        return this.ets;
-    }
-
     public String getVer() {
         return this.ver;
     }
 
-    public GameData getGdata() {
-        return this.gdata;
+    public long getEts() {
+        return ets;
     }
 
-    public void setGdata(GameData gameData) {
-        this.gdata = gameData;
+    public Map<String, Object> getEdata() {
+        return edata;
     }
 
-    public List<CorrelationData> getCdata() {
-        return cdata;
+    public void setEData(Map<String, Object> edata) {
+        this.edata = edata;
     }
 
-    public void addCorrelationData(List<CorrelationData> correlationData) {
-        this.cdata = new ArrayList<>();
-        if (correlationData != null) {
-            this.cdata.addAll(correlationData);
-        }
+    public void setCoRrelationdata(List<CorrelationData> correlationData) {
+        this.context.setCdata(correlationData);
     }
 
-    public String getSid() {
-        return this.sid;
+    public void setObject(String id, String type, String ver, Rollup rollup) {
+        this.object = new TelemetryObject(id, type, ver);
+        this.object.setRollup(rollup);
     }
 
-    public void setSid(String sid) {
-        this.sid = sid;
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 
-    public String getUid() {
-        return this.uid;
+    public Actor getActor() {
+        return actor;
     }
 
-    public void setUid(String uid) {
-        this.uid = uid;
+    public void setActor(Actor actor) {
+        this.actor = actor;
     }
 
-    public String getDid() {
-        return this.did;
+    public Context getContext() {
+        return context;
     }
 
-    public void setDid(String did) {
-        this.did = did;
-    }
-
-    public Map<String, Object> getEData() {
-        return this.edata;
-    }
-
-    public void setEks(Map<String, Object> eks) {
-        edata.put("eks", eks);
-    }
-
-    public void setEks(Object eks) {
-        edata.put("eks", eks);
-    }
-
-    public void setEtags(ETags etags) {
-        this.etags = etags;
+    public TelemetryObject getObject() {
+        return object;
     }
 
     @Override

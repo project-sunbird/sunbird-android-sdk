@@ -60,4 +60,8 @@ public class CollectionUtil {
         return collection == null || collection.isEmpty();
     }
 
+    public static boolean isKeyNotAvailable(Map map, String key) {
+        return (!map.containsKey(key) || (map.containsKey(key) && StringUtil.isNullOrEmpty(String.valueOf(map.get(key)))));
+    }
+
 }

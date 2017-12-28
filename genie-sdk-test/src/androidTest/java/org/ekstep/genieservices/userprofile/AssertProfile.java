@@ -4,6 +4,7 @@ import android.util.Log;
 
 import org.ekstep.genieservices.GenieServiceDBHelper;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.telemetry.model.EventModel;
 import org.junit.Assert;
 
@@ -56,17 +57,41 @@ public class AssertProfile {
         Assert.assertNull(profile);
     }
 
-    public static void checkTelemtryEventIsLoggedIn(String telemetryEvent, Profile profile) {
-
-        List<EventModel> eventModelList = GenieServiceDBHelper.findEventById(telemetryEvent);
-        Map eventMap = eventModelList.get(0).getEventMap();
+    public static void checkUserTelemtryEventIsLoggedIn(Map eventMap, String telemetryEvent, Profile profile) {
 
         Map<String, Object> edata = (Map<String, Object>) eventMap.get("edata");
-        Map<String, Object> eks = (Map<String, Object>) edata.get("eks");
 
-        Assert.assertNotNull(eks);
+        Assert.assertNotNull(edata);
         Assert.assertEquals(telemetryEvent, eventMap.get("eid"));
-        Assert.assertEquals(profile.getLanguage(), eks.get("language"));
+        Map state = GsonUtil.fromJson(edata.get("state").toString(), Map.class);
+        Assert.assertEquals(profile.getUid(), state.get("uid"));
+    }
+
+    public static void checkCreateUserTelemtryEventIsLoggedIn(Map eventMap, String telemetryEvent, Profile profile) {
+
+
+        Map<String, Object> edata = (Map<String, Object>) eventMap.get("edata");
+
+        Assert.assertNotNull(edata);
+        Assert.assertEquals(telemetryEvent, eventMap.get("eid"));
+        Map state = GsonUtil.fromJson(edata.get("state").toString(), Map.class);
+        Assert.assertEquals(profile.getUid(), state.get("uid"));
+
+    }
+
+    public static void checkTelemtryEventIsLoggedIn(Map eventMap, String telemetryEvent, Profile profile) {
+
+
+        Map<String, Object> edata = (Map<String, Object>) eventMap.get("edata");
+
+        Assert.assertNotNull(edata);
+        Assert.assertEquals(telemetryEvent, eventMap.get("eid"));
+        Map state = GsonUtil.fromJson(edata.get("state").toString(), Map.class);
+
+        Map profileTelemetry = GsonUtil.fromJson(state.get("profile").toString(), Map.class);
+        Assert.assertEquals(profile.getLanguage(), profileTelemetry.get("language"));
+
+
     }
 
     public static void checkTelemetryDataForDeleteProfile(String telemetryEvent) {
@@ -76,9 +101,8 @@ public class AssertProfile {
         Log.v(TAG, "eventMap deleteProfile:: " + eventMap);
 
         Map<String, Object> edata = (Map<String, Object>) eventMap.get("edata");
-        Map<String, Object> eks = (Map<String, Object>) edata.get("eks");
 
-        Assert.assertNotNull(eks);
+        Assert.assertNotNull(edata);
         Assert.assertEquals(telemetryEvent, eventMap.get("eid"));
     }
 }

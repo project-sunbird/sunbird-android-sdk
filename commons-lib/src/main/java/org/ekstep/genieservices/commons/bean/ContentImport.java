@@ -4,8 +4,9 @@ import java.util.List;
 
 /**
  * Created by swayangjit on 28/9/17.
+ *
+ * @author swayangjit
  */
-
 public class ContentImport {
     private boolean isChildContent;
     private String destinationFolder;
@@ -26,7 +27,6 @@ public class ContentImport {
     public boolean isChildContent() {
         return isChildContent;
     }
-
 
     public String getDestinationFolder() {
         return destinationFolder;

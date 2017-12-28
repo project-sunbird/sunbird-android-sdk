@@ -10,7 +10,6 @@ import org.ekstep.genieservices.commons.bean.TelemetryExportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
 import org.ekstep.genieservices.commons.bean.TelemetryImportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryStat;
-import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.db.contract.TelemetryProcessedEntry;
 import org.ekstep.genieservices.telemetry.model.EventModel;
 import org.junit.Assert;

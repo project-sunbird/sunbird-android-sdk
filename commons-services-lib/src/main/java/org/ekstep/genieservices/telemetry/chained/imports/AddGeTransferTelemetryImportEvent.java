@@ -4,9 +4,8 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.telemetry.GETransfer;
+import org.ekstep.genieservices.commons.bean.telemetry.Share;
 import org.ekstep.genieservices.commons.chained.IChainable;
-import org.ekstep.genieservices.commons.utils.LongUtil;
 import org.ekstep.genieservices.importexport.bean.ImportTelemetryContext;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 import org.ekstep.genieservices.telemetry.model.ImportedMetadataListModel;
@@ -47,20 +46,15 @@ public class AddGeTransferTelemetryImportEvent implements IChainable<Void, Impor
     }
 
     private void logGETransferEvent(ImportTelemetryContext importContext, List<ImportedMetadataModel> importedMetadataModelList) {
-        int aggregateCount = 0;
-        GETransfer.Builder geTransfer = new GETransfer.Builder();
-        geTransfer.directionImport()
-                .dataTypeTelemetry()
-                .size(LongUtil.tryParseToLong((String) importContext.getMetadata().get(ServiceConstants.FILE_SIZE), 0));
+
+        Share.Builder share = new Share.Builder();
+        share.directionImport().dataTypeFile();
 
         for (ImportedMetadataModel importedMetadataModel : importedMetadataModelList) {
-            aggregateCount += importedMetadataModel.getCount();
-
-            geTransfer.addContent(importedMetadataModel.getDeviceId(), importedMetadataModel.getImportedId(), importedMetadataModel.getCount());
+            share.addItem(share.itemTypeTelemetry(), importedMetadataModel.getDeviceId(), importedMetadataModel.getImportedId(),
+                    0.0, 0, "");
         }
 
-        geTransfer.count(aggregateCount);
-
-        TelemetryLogger.log(geTransfer.build());
+        TelemetryLogger.log(share.build());
     }
 }

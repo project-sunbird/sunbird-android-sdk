@@ -50,6 +50,7 @@ public class BuildParams implements IParams {
         setParam(Key.APPLICATION_ID);
         setParam(Key.PRODUCER_ID);
         setParam(Key.CHANNEL_ID);
+        setParam(Key.ENVIRONMENT);
         setParam(Key.TELEMETRY_BASE_URL);
         setParam(Key.LANGUAGE_PLATFORM_BASE_URL);
         setParam(Key.TERMS_BASE_URL);
@@ -102,6 +103,7 @@ public class BuildParams implements IParams {
         setParam(params, Key.APPLICATION_ID);
         setParam(params, Key.PRODUCER_ID);
         setParam(params, Key.CHANNEL_ID);
+        setParam(params, Key.ENVIRONMENT);
         setParam(params, Key.TELEMETRY_BASE_URL);
         setParam(params, Key.LANGUAGE_PLATFORM_BASE_URL);
         setParam(params, Key.TERMS_BASE_URL);

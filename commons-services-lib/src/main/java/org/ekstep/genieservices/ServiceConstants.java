@@ -92,6 +92,10 @@ public interface ServiceConstants {
         String CONTENT_DOWNLOAD_SUCCESS = "ContentDownload-Success";
         String CONTENT_DOWNLOAD_CANCEL = "ContentDownload-Cancel";
         String CONTENT_DETAIL = "ContentDetail";
+
+        String CONTENT_PLAYER = "ContentPlayer";
+        String SESSION = "Session";
+        String OBJECT_TYPE_CONTENT = "Content";
     }
 
     interface ErrorCode {

@@ -1,5 +1,6 @@
 package org.ekstep.genieservices.profile.event;
 
+import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.utils.Logger;
@@ -17,9 +18,9 @@ public class SummaryHandler {
         if (event == null) {
             return;
         }
-        if ("OE_ASSESS".equals(event.getEid())) {
+        if ("ASSESS".equals(event.getEid()) && ServiceConstants.Telemetry.CONTENT_PLAYER.equals(event.getContext().getEnv())) {
             processOEAssess(event, appContext);
-        } else if ("OE_END".equals(event.getEid())) {
+        } else if ("END".equals(event.getEid()) && ServiceConstants.Telemetry.CONTENT_PLAYER.equals(event.getContext().getEnv())) {
             processOEEnd(event, appContext);
         }
     }
