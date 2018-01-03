@@ -39,6 +39,11 @@ public class StoreDestinationContentInDB implements IChainable<List<MoveContentR
             for (MoveContentResponse duplicateContent : moveContentContext.getDuplicateContents()) {
                 duplicateContentIdsInDestn.add(duplicateContent.getIdentifier());
 
+                //for the first time, the action can be null and if the package version of both contents are same, then we just ignore it
+                if(existingContentAction == null){
+                    existingContentAction = ExistingContentAction.IGNORE;
+                }
+
                 switch (existingContentAction) {
                     case KEEP_HIGHER_VERSION:
                         if (duplicateContent.getStatus() == MoveContentStatus.HIGHER_VERSION_IN_DESTINATION) {

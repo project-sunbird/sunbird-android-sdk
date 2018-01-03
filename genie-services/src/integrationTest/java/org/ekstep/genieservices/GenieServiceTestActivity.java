@@ -425,11 +425,11 @@ public class GenieServiceTestActivity extends Activity {
         return genieResponse;
     }
 
-    public GenieResponse<List<MoveContentErrorResponse>> moveContent(ContentMoveRequest.Builder contentMoveRequest){
-        idle = false;
-        GenieResponse<List<MoveContentErrorResponse>> genieResponse  = mGenieService.getContentService().moveContent(contentMoveRequest.build());
-        return genieResponse;
-    }
+//    public GenieResponse<List<MoveContentErrorResponse>> moveContent(ContentMoveRequest.Builder contentMoveRequest){
+//        idle = false;
+//        GenieResponse<List<MoveContentErrorResponse>> genieResponse  = mGenieService.getContentService().moveContent(contentMoveRequest.build());
+//        return genieResponse;
+//    }
 
     public void setIdle() {
         idle = true;
