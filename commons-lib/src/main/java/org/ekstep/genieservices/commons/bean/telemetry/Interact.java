@@ -115,8 +115,10 @@ public class Interact extends Telemetry {
          * List of {@link CorrelationData}
          */
         public Builder correlationData(List<CorrelationData> correlationData) {
-            this.correlationData = new ArrayList<>();
             if (!CollectionUtil.isNullOrEmpty(correlationData)) {
+                if (this.correlationData == null) {
+                    this.correlationData = new ArrayList<>();
+                }
                 this.correlationData.addAll(correlationData);
             }
 
@@ -128,7 +130,6 @@ public class Interact extends Telemetry {
          */
         public Builder addValue(String key, Object value) {
             valueMap.put(key, value);
-            this.values.add(valueMap);
             return this;
         }
 
@@ -184,6 +185,10 @@ public class Interact extends Telemetry {
 
             if (StringUtil.isNullOrEmpty(pageId)) {
                 throw new IllegalStateException("pageId is required.");
+            }
+
+            if (!valueMap.isEmpty()) {
+                this.values.add(valueMap);
             }
 
             Interact event = new Interact(type, subType, id, pageId, pos, values);
