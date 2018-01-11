@@ -40,7 +40,7 @@ public class AddGeTransferContentImportEvent implements IChainable<List<ContentI
         Map<String, Object> metadata = importContext.getMetadata();
         Share.Builder share = new Share.Builder();
         share.directionImport().dataTypeFile();
-
+        share.environment(ServiceConstants.Telemetry.SDK_ENVIRONMENT);
         for (Map item : importContext.getItems()) {
             String fileType = (String) metadata.get(ServiceConstants.FILE_TYPE);
             String type = StringUtil.isNullOrEmpty(fileType) ? share.itemTypeContent() : share.itemTypeExplodedContent();

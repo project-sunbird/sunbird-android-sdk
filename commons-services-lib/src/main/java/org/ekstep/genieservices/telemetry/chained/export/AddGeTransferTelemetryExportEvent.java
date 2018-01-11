@@ -59,7 +59,7 @@ public class AddGeTransferTelemetryExportEvent implements IChainable<TelemetryEx
 
         Share.Builder share = new Share.Builder();
         share.directionExport().dataTypeFile();
-
+        share.environment(ServiceConstants.Telemetry.SDK_ENVIRONMENT);
         for (ImportedMetadataModel importedMetadataModel : importedMetadataModelList) {
             share.addItem(share.itemTypeTelemetry(), importedMetadataModel.getDeviceId(), importedMetadataModel.getImportedId(),
                     0.0, 0, "");

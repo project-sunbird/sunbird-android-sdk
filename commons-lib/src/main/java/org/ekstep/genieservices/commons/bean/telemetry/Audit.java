@@ -44,10 +44,23 @@ public class Audit extends Telemetry {
     }
 
     public static class Builder {
+
+        private String env;
         private List<String> props;
         private String currentState;
         private String prevState;
         private String actorType;
+
+        /**
+         * Unique environment where the event has occured.
+         */
+        public Builder environment(String env) {
+            if (StringUtil.isNullOrEmpty(env)) {
+                throw new IllegalArgumentException("environment shouldn't be null or empty.");
+            }
+            this.env = env;
+            return this;
+        }
 
         public Builder updatedProperties(List<String> properties) {
             this.props = properties;
@@ -74,7 +87,10 @@ public class Audit extends Telemetry {
                 props = new ArrayList<>();
             }
 
-            return new Audit(props, currentState, prevState, actorType);
+            Audit audit = new Audit(props, currentState, prevState, actorType);
+            audit.setEnvironment(env);
+
+            return audit;
         }
     }
 }

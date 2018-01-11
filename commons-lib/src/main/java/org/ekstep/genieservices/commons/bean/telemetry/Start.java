@@ -49,12 +49,28 @@ public class Start extends Telemetry {
 
     public static class Builder {
 
+        private String env;
         private String type;
         private DeviceSpecification deviceSpecification;
         private String loc;
         private String mode;
         private long duration;
         private String pageId;
+        private String objId;
+        private String objType;
+        private String objVer;
+        private Rollup rollup;
+
+        /**
+         * Unique environment where the event has occured.
+         */
+        public Builder environment(String env) {
+            if (StringUtil.isNullOrEmpty(env)) {
+                throw new IllegalArgumentException("environment shouldn't be null or empty.");
+            }
+            this.env = env;
+            return this;
+        }
 
         /**
          * Type of event generator
@@ -108,11 +124,51 @@ public class Start extends Telemetry {
             return this;
         }
 
+        /**
+         * Id of the object. For ex: content id incase of content
+         */
+        public Builder objectId(String objId) {
+            this.objId = objId;
+            return this;
+        }
+
+        /**
+         * Type of the object. For ex: "Content", "Community", "User" etc.
+         */
+        public Builder objectType(String objType) {
+            this.objType = objType;
+            return this;
+        }
+
+        /**
+         * version of the object
+         */
+        public Builder objectVersion(String objVer) {
+            this.objVer = objVer;
+            return this;
+        }
+
+        /**
+         * hierarchyLevel to be computed of the object. Only 4 levels are allowed.
+         */
+        public Builder hierarchyLevel(Rollup rollup) {
+            this.rollup = rollup;
+            return this;
+        }
+
         public Start build() {
             if (StringUtil.isNullOrEmpty(type)) {
                 throw new IllegalStateException("type is required");
             }
-            return new Start(type, deviceSpecification, loc, mode, duration, pageId);
+
+            if (StringUtil.isNullOrEmpty(env)) {
+                throw new IllegalStateException("env is required.");
+            }
+
+            Start event = new Start(type, deviceSpecification, loc, mode, duration, pageId);
+            event.setObject(objId != null ? objId : "", objType != null ? objType : "", objVer != null ? objVer : "", rollup);
+            event.setEnvironment(env);
+            return event;
         }
     }
 }

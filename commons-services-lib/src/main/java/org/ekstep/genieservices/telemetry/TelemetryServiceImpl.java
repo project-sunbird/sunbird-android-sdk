@@ -362,7 +362,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         context.put("channel", mAppContext.getParams().getString(IParams.Key.CHANNEL_ID));
         addProducerDataV3(context);
         if (!context.containsKey("env") || StringUtil.isNullOrEmpty(context.get("env").toString())) {
-            context.put("env", mAppContext.getParams().getString(IParams.Key.ENVIRONMENT));
+            context.put("env", ServiceConstants.Telemetry.DEFAULT_ENVIRONMENT);
         }
         context.put("sid", isSessionValid(session) ? session.getSid() : "");
         context.put("did", mAppContext.getDeviceInfo().getDeviceID());

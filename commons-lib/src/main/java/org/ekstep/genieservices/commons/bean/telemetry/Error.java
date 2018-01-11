@@ -47,6 +47,19 @@ public class Error extends Telemetry {
         private String errorType;
         private String stacktrace;
         private String pageId;
+        private String env;
+
+
+        /**
+         * Unique environment where the event has occured.
+         */
+        public Builder environment(String env) {
+            if (StringUtil.isNullOrEmpty(env)) {
+                throw new IllegalArgumentException("environment shouldn't be null or empty.");
+            }
+            this.env = env;
+            return this;
+        }
 
         /**
          * Error code.
@@ -90,6 +103,11 @@ public class Error extends Telemetry {
         }
 
         public Error build() {
+
+            if (StringUtil.isNullOrEmpty(env)) {
+                throw new IllegalStateException("env is required.");
+            }
+
             if (StringUtil.isNullOrEmpty(errorCode)) {
                 throw new IllegalStateException("errorCode is required.");
             }
@@ -102,7 +120,9 @@ public class Error extends Telemetry {
                 throw new IllegalStateException("stacktrace is required.");
             }
 
-            return new Error(errorCode, errorType, stacktrace, pageId);
+            Error event = new Error(errorCode, errorType, stacktrace, pageId);
+            event.setEnvironment(env);
+            return event;
         }
     }
 

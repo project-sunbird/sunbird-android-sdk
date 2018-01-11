@@ -96,6 +96,8 @@ public interface ServiceConstants {
         String CONTENT_PLAYER = "ContentPlayer";
         String SESSION = "Session";
         String OBJECT_TYPE_CONTENT = "Content";
+        String DEFAULT_ENVIRONMENT = "app";
+        String SDK_ENVIRONMENT = "sdk";
     }
 
     interface ErrorCode {

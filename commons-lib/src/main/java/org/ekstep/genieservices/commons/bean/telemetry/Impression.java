@@ -50,6 +50,8 @@ public class Impression extends Telemetry {
     }
 
     public static class Builder {
+
+        private String env;
         private String type;
         private String subType;
         private String pageId;
@@ -60,6 +62,18 @@ public class Impression extends Telemetry {
         private String objVer;
         private Rollup rollup;
         private List<Visit> visitList;
+
+
+        /**
+         * Unique environment where the event has occured.
+         */
+        public Builder environment(String env) {
+            if (StringUtil.isNullOrEmpty(env)) {
+                throw new IllegalArgumentException("environment shouldn't be null or empty.");
+            }
+            this.env = env;
+            return this;
+        }
 
         /**
          * Impression type (list, detail, view, edit, workflow, search)
@@ -157,6 +171,11 @@ public class Impression extends Telemetry {
         }
 
         public Impression build() {
+
+            if (StringUtil.isNullOrEmpty(env)) {
+                throw new IllegalStateException("env is required.");
+            }
+
             if (StringUtil.isNullOrEmpty(type)) {
                 throw new IllegalStateException("type is required.");
             }
@@ -165,6 +184,7 @@ public class Impression extends Telemetry {
                 throw new IllegalStateException("pageId is required.");
             }
             Impression event = new Impression(type, subType, pageId, uri, visitList);
+            event.setEnvironment(env);
             event.setObject(objId != null ? objId : "", objType != null ? objType : "", objVer != null ? objVer : "", rollup);
             event.setCoRrelationdata(correlationData);
             return event;
