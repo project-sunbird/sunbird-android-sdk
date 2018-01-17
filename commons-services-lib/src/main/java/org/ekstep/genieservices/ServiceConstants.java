@@ -108,6 +108,7 @@ public interface ServiceConstants {
         String EXPORT_FAILED = "EXPORT_FAILED";
         String IMPORT_FAILED = "IMPORT_FAILED";
         String MOVE_FAILED = "MOVE_FAILED";
+        String SWITCH_FAILED = "SWITCH_FAILED";
 
         //Partner
         String UNREGISTERED_PARTNER = "UNREGISTERED_PARTNER";

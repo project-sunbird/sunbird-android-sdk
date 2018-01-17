@@ -30,6 +30,7 @@ import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentMoveRequest;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
+import org.ekstep.genieservices.commons.bean.ContentSwitchRequest;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -41,6 +42,7 @@ import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.ScanStorageRequest;
 import org.ekstep.genieservices.commons.bean.ScanStorageResponse;
+import org.ekstep.genieservices.commons.bean.SwitchContentResponse;
 import org.ekstep.genieservices.commons.bean.enums.ContentDeleteStatus;
 import org.ekstep.genieservices.commons.bean.enums.ContentImportStatus;
 import org.ekstep.genieservices.commons.bean.enums.DownloadAction;
@@ -57,6 +59,7 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.bean.ExportContentContext;
 import org.ekstep.genieservices.content.bean.ImportContentContext;
 import org.ekstep.genieservices.content.bean.MoveContentContext;
+import org.ekstep.genieservices.content.bean.SwitchContentContext;
 import org.ekstep.genieservices.content.chained.export.AddGeTransferContentExportEvent;
 import org.ekstep.genieservices.content.chained.export.CleanTempLoc;
 import org.ekstep.genieservices.content.chained.export.CompressContent;
@@ -894,6 +897,22 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 .then(new StoreDestinationContentInDB());
 
         return validateDestinationFolder.execute(mAppContext, moveContentContext);
+    }
+
+    @Override
+    public GenieResponse<List<SwitchContentResponse>> switchContent(ContentSwitchRequest contentSwitchRequest) {
+        File destinationFolder = new File(contentSwitchRequest.getDestinationFolder());
+
+        SwitchContentContext switchContentContext = new SwitchContentContext(destinationFolder);
+
+        org.ekstep.genieservices.content.chained.switchLocation.ValidateDestinationFolder validateDestinationFolder =
+                new org.ekstep.genieservices.content.chained.switchLocation.ValidateDestinationFolder();
+        validateDestinationFolder.then(new org.ekstep.genieservices.content.chained.switchLocation.ValidateDestinationFolder())
+                .then(new org.ekstep.genieservices.content.chained.switchLocation.ValidateDestinationContent())
+                .then(new org.ekstep.genieservices.content.chained.switchLocation.DeleteSourceFolder())
+                .then(new org.ekstep.genieservices.content.chained.switchLocation.StoreDestinationContentInDB());
+
+        return validateDestinationFolder.execute(mAppContext, switchContentContext);
     }
 
     @Override

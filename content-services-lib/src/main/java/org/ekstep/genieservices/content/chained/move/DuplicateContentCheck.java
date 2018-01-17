@@ -41,7 +41,10 @@ public class DuplicateContentCheck implements IChainable<List<MoveContentRespons
         } else {
             contentsInSource = ContentHandler.findAllContentsWithIdentifiers(appContext.getDBSession(), moveContentContext.getContentIds());
         }
-        moveContentContext.getContentsInSource().addAll(contentsInSource);
+
+        if (!CollectionUtil.isNullOrEmpty(contentsInSource)) {
+            moveContentContext.getContentsInSource().addAll(contentsInSource);
+        }
 
         List<ContentModel> duplicateContentsInSource = ContentHandler.findAllContentsWithIdentifiers(appContext.getDBSession(), moveContentContext.getValidContentIdsInDestination());
 

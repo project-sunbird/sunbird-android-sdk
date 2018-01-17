@@ -1,7 +1,5 @@
 package org.ekstep.genieservices;
 
-import org.ekstep.genieservices.commons.bean.MoveContentResponse;
-import org.ekstep.genieservices.commons.bean.ScanStorageRequest;
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
@@ -17,14 +15,18 @@ import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentMoveRequest;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
+import org.ekstep.genieservices.commons.bean.ContentSwitchRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
+import org.ekstep.genieservices.commons.bean.MoveContentResponse;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
+import org.ekstep.genieservices.commons.bean.ScanStorageRequest;
 import org.ekstep.genieservices.commons.bean.ScanStorageResponse;
+import org.ekstep.genieservices.commons.bean.SwitchContentResponse;
 import org.ekstep.genieservices.commons.bean.enums.DownloadAction;
 
 import java.util.List;
@@ -289,5 +291,19 @@ public interface IContentService {
      * @return
      */
     GenieResponse<List<ScanStorageResponse>> scanStorage(ScanStorageRequest scanStorageRequest);
+
+    /**
+     * This api is used to switch the location of the source folder, from where contents are shown
+     * <p>
+     * <p>
+     * On successful switching, the response will return status as TRUE, with response set in result
+     * <p>
+     * <p>
+     * On failing to move the content, the response will be with return status as FALSE and with the following error
+     * <p>SWITCH_FAILED
+     *
+     * @param contentSwitchRequest - {@link ContentSwitchRequest}
+     */
+    GenieResponse<List<SwitchContentResponse>> switchContent(ContentSwitchRequest contentSwitchRequest);
 
 }

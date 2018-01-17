@@ -4,8 +4,6 @@ import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.IContentFeedbackService;
 import org.ekstep.genieservices.IContentService;
 import org.ekstep.genieservices.commons.IResponseHandler;
-import org.ekstep.genieservices.commons.bean.MoveContentResponse;
-import org.ekstep.genieservices.commons.bean.ScanStorageRequest;
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
@@ -23,15 +21,19 @@ import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentMoveRequest;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
+import org.ekstep.genieservices.commons.bean.ContentSwitchRequest;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
+import org.ekstep.genieservices.commons.bean.MoveContentResponse;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RecommendedContentResult;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
+import org.ekstep.genieservices.commons.bean.ScanStorageRequest;
 import org.ekstep.genieservices.commons.bean.ScanStorageResponse;
+import org.ekstep.genieservices.commons.bean.SwitchContentResponse;
 import org.ekstep.genieservices.commons.bean.enums.DownloadAction;
 
 import java.util.List;
@@ -457,6 +459,28 @@ public class ContentService {
             @Override
             public GenieResponse<List<MoveContentResponse>> perform() {
                 return contentService.moveContent(contentMoveRequest);
+            }
+        });
+    }
+
+    /**
+     * This api is used to switch the location of the source folder, from where contents are shown
+     * <p>
+     * <p>
+     * On successful switching, the response will return status as TRUE, with response set in result
+     * <p>
+     * <p>
+     * On failing to move the content, the response will be with return status as FALSE and with the following error
+     * <p>SWITCH_FAILED
+     *
+     * @param contentSwitchRequest - {@link ContentSwitchRequest}
+     * @param responseHandler      - {@link IResponseHandler<Void>}
+     */
+    public void switchContent(final ContentSwitchRequest contentSwitchRequest, IResponseHandler<List<SwitchContentResponse>> responseHandler) {
+        new AsyncHandler<List<SwitchContentResponse>>(responseHandler).execute(new IPerformable<List<SwitchContentResponse>>() {
+            @Override
+            public GenieResponse<List<SwitchContentResponse>> perform() {
+                return contentService.switchContent(contentSwitchRequest);
             }
         });
     }
