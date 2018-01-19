@@ -78,6 +78,7 @@ import org.ekstep.genieservices.content.chained.imports.ExtractPayloads;
 import org.ekstep.genieservices.content.chained.imports.UpdateSizeOnDevice;
 import org.ekstep.genieservices.content.chained.imports.ValidateEcar;
 import org.ekstep.genieservices.content.chained.move.CopyContentFromSourceToDestination;
+import org.ekstep.genieservices.content.chained.move.DeleteDestinationFolder;
 import org.ekstep.genieservices.content.chained.move.DeleteSourceFolder;
 import org.ekstep.genieservices.content.chained.move.DuplicateContentCheck;
 import org.ekstep.genieservices.content.chained.move.StoreDestinationContentInDB;
@@ -885,14 +886,17 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     public GenieResponse<List<MoveContentResponse>> moveContent(ContentMoveRequest contentMoveRequest) {
         File destinationFolder = new File(contentMoveRequest.getDestinationFolder());
 
-        MoveContentContext moveContentContext = new MoveContentContext(contentMoveRequest.getContentIds(), destinationFolder, contentMoveRequest.getExistingContentAction());
+        MoveContentContext moveContentContext = new MoveContentContext(contentMoveRequest.getContentIds(), destinationFolder,
+                contentMoveRequest.getExistingContentAction(), contentMoveRequest.deleteDestination());
 
         ValidateDestinationFolder validateDestinationFolder = new ValidateDestinationFolder();
-        validateDestinationFolder.then(new org.ekstep.genieservices.content.chained.move.DeviceMemoryCheck())
+
+        validateDestinationFolder.then(new DeleteDestinationFolder())
+                .then(new org.ekstep.genieservices.content.chained.move.DeviceMemoryCheck())
                 .then(new ValidateDestinationContent())
                 .then(new DuplicateContentCheck())
                 .then(new CopyContentFromSourceToDestination())
-                .then(new DeleteSourceFolder())
+                .then(new DeleteSourceFolder()) //TODO : Check if the source has to be deleted or not, if needed, then add a builder method to check
                 .then(new UpdateSourceContentPathInDB())
                 .then(new StoreDestinationContentInDB());
 

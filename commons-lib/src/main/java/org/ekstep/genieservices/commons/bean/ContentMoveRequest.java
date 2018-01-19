@@ -15,11 +15,13 @@ public class ContentMoveRequest {
     private List<String> contentIds;
     private String destinationFolder;
     private ExistingContentAction existingContentAction;
+    private boolean deleteDestination;
 
-    public ContentMoveRequest(List<String> contentIds, String destinationFolder, ExistingContentAction existingContentAction) {
+    public ContentMoveRequest(List<String> contentIds, String destinationFolder, ExistingContentAction existingContentAction, boolean deleteDestination) {
         this.contentIds = contentIds;
         this.destinationFolder = destinationFolder;
         this.existingContentAction = existingContentAction;
+        this.deleteDestination = deleteDestination;
     }
 
     public List<String> getContentIds() {
@@ -34,10 +36,15 @@ public class ContentMoveRequest {
         return existingContentAction;
     }
 
+    public boolean deleteDestination() {
+        return deleteDestination;
+    }
+
     public static class Builder {
         private List<String> contentIds;
         private String destinationFolder;
         private ExistingContentAction existingContentAction;
+        private boolean deleteDestination = false;
 
         /**
          * List of content identifier which needs to move. If not set than by default will move all contents.
@@ -66,12 +73,20 @@ public class ContentMoveRequest {
             return this;
         }
 
+        /**
+         * Calling this method will delete all the contents in the destination folder.
+         */
+        public Builder deleteDestination() {
+            this.deleteDestination = true;
+            return this;
+        }
+
         public ContentMoveRequest build() {
             if (StringUtil.isNullOrEmpty(destinationFolder)) {
                 throw new IllegalStateException("To folder required.");
             }
 
-            return new ContentMoveRequest(contentIds, destinationFolder, existingContentAction);
+            return new ContentMoveRequest(contentIds, destinationFolder, existingContentAction, deleteDestination);
         }
     }
 }

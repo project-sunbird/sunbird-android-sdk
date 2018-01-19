@@ -23,8 +23,9 @@ public class MoveContentContext {
     private List<ContentModel> contentsInDestination;
     private ExistingContentAction existingContentAction;
     private List<MoveContentResponse> duplicateContents;
+    private boolean deleteDestination = false;
 
-    public MoveContentContext(List<String> contentIds, File destinationFolder, ExistingContentAction existingContentAction) {
+    public MoveContentContext(List<String> contentIds, File destinationFolder, ExistingContentAction existingContentAction, boolean deleteDestination) {
         this.contentIds = contentIds;
         this.validContentIdsInDestination = new ArrayList<>();
         this.duplicateContents = new ArrayList<>();
@@ -32,6 +33,11 @@ public class MoveContentContext {
         this.contentsInSource = new ArrayList<>();
         this.contentsInDestination = new ArrayList<>();
         this.existingContentAction = existingContentAction;
+        this.deleteDestination = deleteDestination;
+    }
+
+    public boolean deleteDestination() {
+        return deleteDestination;
     }
 
     public List<String> getContentIds() {
