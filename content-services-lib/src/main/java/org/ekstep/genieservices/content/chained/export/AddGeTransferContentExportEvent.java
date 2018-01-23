@@ -40,7 +40,7 @@ public class AddGeTransferContentExportEvent implements IChainable<ContentExport
     private void logGETransferEvent(ExportContentContext exportContext) {
         Share.Builder share = new Share.Builder();
         share.directionExport().dataTypeFile();
-
+        share.environment(ServiceConstants.Telemetry.SDK_ENVIRONMENT);
         for (Map item : exportContext.getItems()) {
             share.addItem(share.itemTypeContent(), ContentHandler.readOriginFromContentMap(item), ContentHandler.readIdentifier(item), ContentHandler.readPkgVersion(item),
                     ContentHandler.readTransferCountFromContentMap(item),

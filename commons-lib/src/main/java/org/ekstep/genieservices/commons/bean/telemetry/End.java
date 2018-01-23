@@ -26,7 +26,10 @@ public class End extends Telemetry {
     private Map<String, Object> createEData(String type, String mode, long duration, String pageId, List<Map<String, Object>> summaryList) {
         Map<String, Object> eData = new HashMap<>();
         eData.put("type", type);
-        eData.put("duration", duration);
+        if (duration > 0) {
+            eData.put("duration", duration);
+        }
+
 
         if (!StringUtil.isNullOrEmpty(mode)) {
             eData.put("mode", mode);
@@ -50,11 +53,28 @@ public class End extends Telemetry {
 
     public static class Builder {
 
+        private String env;
         private String type;
         private String mode;
         private long duration;
         private String pageId;
+        private String objId;
+        private String objType;
+        private String objVer;
+        private Rollup rollup;
         private List<Map<String, Object>> summaryList = null;
+
+
+        /**
+         * Unique environment where the event has occured.
+         */
+        public Builder environment(String env) {
+            if (StringUtil.isNullOrEmpty(env)) {
+                throw new IllegalArgumentException("environment shouldn't be null or empty.");
+            }
+            this.env = env;
+            return this;
+        }
 
         /**
          * Type of event generator
@@ -104,12 +124,52 @@ public class End extends Telemetry {
             return this;
         }
 
+        /**
+         * Id of the object. For ex: content id incase of content
+         */
+        public Builder objectId(String objId) {
+            this.objId = objId;
+            return this;
+        }
+
+        /**
+         * Type of the object. For ex: "Content", "Community", "User" etc.
+         */
+        public Builder objectType(String objType) {
+            this.objType = objType;
+            return this;
+        }
+
+        /**
+         * version of the object
+         */
+        public Builder objectVersion(String objVer) {
+            this.objVer = objVer;
+            return this;
+        }
+
+        /**
+         * hierarchyLevel to be computed of the object. Only 4 levels are allowed.
+         */
+        public Builder hierarchyLevel(Rollup rollup) {
+            this.rollup = rollup;
+            return this;
+        }
+
+
         public End build() {
             if (StringUtil.isNullOrEmpty(type)) {
                 throw new IllegalStateException("type is required.");
             }
 
-            return new End(type, mode, duration, pageId, summaryList);
+            if (StringUtil.isNullOrEmpty(env)) {
+                throw new IllegalStateException("env is required.");
+            }
+
+            End event = new End(type, mode, duration, pageId, summaryList);
+            event.setObject(objId != null ? objId : "", objType != null ? objType : "", objVer != null ? objVer : "", rollup);
+            event.setEnvironment(env);
+            return event;
         }
     }
 }

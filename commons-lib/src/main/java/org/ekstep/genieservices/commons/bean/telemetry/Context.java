@@ -17,7 +17,6 @@ public class Context {
     private String did;
     private List<CorrelationData> cdata;
 
-
     public String getChannel() {
         return channel;
     }
@@ -44,5 +43,9 @@ public class Context {
 
     public void setCdata(List<CorrelationData> cdata) {
         this.cdata = cdata;
+    }
+
+    public void setEnvironment(String env) {
+        this.env = env;
     }
 }

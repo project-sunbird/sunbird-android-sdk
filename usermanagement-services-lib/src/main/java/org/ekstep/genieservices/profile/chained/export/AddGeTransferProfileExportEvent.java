@@ -59,7 +59,7 @@ public class AddGeTransferProfileExportEvent implements IChainable<ProfileExport
 
         Share.Builder share = new Share.Builder();
         share.directionExport().dataTypeFile();
-
+        share.environment(ServiceConstants.Telemetry.SDK_ENVIRONMENT);
         for (ImportedMetadataModel importedMetadataModel : importedMetadataModelList) {
             share.addItem(share.itemTypeProfile(), importedMetadataModel.getDeviceId(), importedMetadataModel.getImportedId(),
                     0.0, 0, "");

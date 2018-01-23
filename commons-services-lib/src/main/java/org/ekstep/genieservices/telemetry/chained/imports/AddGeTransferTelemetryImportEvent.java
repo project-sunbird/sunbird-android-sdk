@@ -49,7 +49,7 @@ public class AddGeTransferTelemetryImportEvent implements IChainable<Void, Impor
 
         Share.Builder share = new Share.Builder();
         share.directionImport().dataTypeFile();
-
+        share.environment(ServiceConstants.Telemetry.SDK_ENVIRONMENT);
         for (ImportedMetadataModel importedMetadataModel : importedMetadataModelList) {
             share.addItem(share.itemTypeTelemetry(), importedMetadataModel.getDeviceId(), importedMetadataModel.getImportedId(),
                     0.0, 0, "");

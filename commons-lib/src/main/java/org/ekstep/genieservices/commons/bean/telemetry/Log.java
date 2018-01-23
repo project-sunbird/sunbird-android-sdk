@@ -52,12 +52,26 @@ public class Log extends Telemetry {
     }
 
     public static class Builder {
+
+        private String env;
         private String type;
         private String level;
         private String message;
         private String pageId;
         private List<Map<String, Object>> params;
         private String actorType;
+
+
+        /**
+         * Unique environment where the event has occured.
+         */
+        public Builder environment(String env) {
+            if (StringUtil.isNullOrEmpty(env)) {
+                throw new IllegalArgumentException("environment shouldn't be null or empty.");
+            }
+            this.env = env;
+            return this;
+        }
 
         /**
          * Type of log (system, process, api_access, api_call, job, app_update etc)
@@ -140,8 +154,13 @@ public class Log extends Telemetry {
                 throw new IllegalStateException("message is required.");
             }
 
+            if (StringUtil.isNullOrEmpty(env)) {
+                throw new IllegalStateException("env is required.");
+            }
+
             Log event = new Log(type, level, message, pageId, params);
             event.setActor(new Actor(actorType));
+            event.setEnvironment(env);
             return event;
         }
     }

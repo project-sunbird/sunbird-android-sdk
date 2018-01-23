@@ -35,8 +35,21 @@ public class Interrupt extends Telemetry {
     }
 
     public static class Builder {
+
+        private String env;
         private String type;
         private String pageId;
+
+        /**
+         * Unique environment where the event has occured.
+         */
+        public Builder environment(String env) {
+            if (StringUtil.isNullOrEmpty(env)) {
+                throw new IllegalArgumentException("environment shouldn't be null or empty.");
+            }
+            this.env = env;
+            return this;
+        }
 
         /**
          * Type of interrupt [m:background, m:resume]
@@ -58,11 +71,19 @@ public class Interrupt extends Telemetry {
         }
 
         public Interrupt build() {
+
+            if (StringUtil.isNullOrEmpty(env)) {
+                throw new IllegalStateException("env is required.");
+            }
+
             if (StringUtil.isNullOrEmpty(type)) {
                 throw new IllegalStateException("type is required.");
             }
 
-            return new Interrupt(type, pageId);
+            Interrupt event = new Interrupt(type, pageId);
+            event.setEnvironment(env);
+
+            return event;
         }
     }
 }

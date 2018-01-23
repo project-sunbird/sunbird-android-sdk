@@ -137,6 +137,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
         Audit.Builder audit = new Audit.Builder();
         audit.currentState(GsonUtil.toJson(map))
+                .environment(ServiceConstants.Telemetry.SDK_ENVIRONMENT)
                 .actorType(Actor.TYPE_SYSTEM);
         TelemetryLogger.log(audit.build());
     }
@@ -149,6 +150,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
         Audit.Builder audit = new Audit.Builder();
         audit.currentState(GsonUtil.toJson(map))
+                .environment(ServiceConstants.Telemetry.SDK_ENVIRONMENT)
                 .actorType(Actor.TYPE_SYSTEM);
         if (oldProfile != null) {
             audit.previousState(GsonUtil.toJson(oldProfile));
@@ -164,6 +166,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
         Audit.Builder audit = new Audit.Builder();
         audit.currentState(GsonUtil.toJson(map))
+                .environment(ServiceConstants.Telemetry.SDK_ENVIRONMENT)
                 .actorType(Actor.TYPE_SYSTEM);
         TelemetryLogger.log(audit.build());
     }
@@ -189,6 +192,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     private void logGEError(GenieResponse response, String id) {
         Error.Builder error = new Error.Builder();
         error.errorCode(response.getError())
+                .environment(ServiceConstants.Telemetry.SDK_ENVIRONMENT)
                 .errorType(Error.Type.MOBILE_APP)
                 .stacktrace(response.getErrorMessages().toString())
                 .pageId(id);
@@ -369,6 +373,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         } else if (!session.getUserSessionBean().getUid().equals(uid)) {
             End end = new End.Builder()
                     .type(ServiceConstants.Telemetry.SESSION)
+                    .environment(ServiceConstants.Telemetry.SDK_ENVIRONMENT)
                     .duration(DateUtil.elapsedTimeTillNow(session.getUserSessionBean().getCreatedTime()))
                     .build();
             TelemetryLogger.log(end);
@@ -382,6 +387,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
             Start start = new Start.Builder().
                     type(ServiceConstants.Telemetry.SESSION)
                     .loc(mAppContext.getLocationInfo().getLocation())
+                    .environment(ServiceConstants.Telemetry.SDK_ENVIRONMENT)
                     .build();
             TelemetryLogger.log(start);
         }

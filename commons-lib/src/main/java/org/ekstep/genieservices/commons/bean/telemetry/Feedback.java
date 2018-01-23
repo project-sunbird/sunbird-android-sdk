@@ -34,11 +34,25 @@ public class Feedback extends Telemetry {
     }
 
     public static class Builder {
+
+        private String env;
         private float rating;
         private String comments;
         private String id;
         private String version;
         private String type;
+
+
+        /**
+         * Unique environment where the event has occured.
+         */
+        public Builder environment(String env) {
+            if (StringUtil.isNullOrEmpty(env)) {
+                throw new IllegalArgumentException("environment shouldn't be null or empty.");
+            }
+            this.env = env;
+            return this;
+        }
 
         /**
          * Numeric score (+1 for like, -1 for dislike, or 4.5 stars given in a rating)
@@ -89,6 +103,11 @@ public class Feedback extends Telemetry {
         }
 
         public Feedback build() {
+
+            if (StringUtil.isNullOrEmpty(env)) {
+                throw new IllegalStateException("env is required.");
+            }
+
             if (StringUtil.isNullOrEmpty(id)) {
                 throw new IllegalStateException("objectId is required.");
             }
@@ -97,7 +116,10 @@ public class Feedback extends Telemetry {
                 throw new IllegalStateException("objectType is required.");
             }
 
-            return new Feedback(rating, comments, id, type, version);
+            Feedback event = new Feedback(rating, comments, id, type, version);
+            event.setEnvironment(env);
+
+            return event;
         }
     }
 }

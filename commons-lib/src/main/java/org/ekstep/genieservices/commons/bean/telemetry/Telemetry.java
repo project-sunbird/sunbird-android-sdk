@@ -81,6 +81,10 @@ public class Telemetry {
         this.edata = edata;
     }
 
+    public void setEnvironment(String env) {
+        this.context.setEnvironment(env);
+    }
+
     public void setCoRrelationdata(List<CorrelationData> correlationData) {
         this.context.setCdata(correlationData);
     }

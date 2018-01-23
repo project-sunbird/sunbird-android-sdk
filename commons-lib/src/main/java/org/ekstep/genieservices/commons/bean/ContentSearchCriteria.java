@@ -26,6 +26,7 @@ public class ContentSearchCriteria implements Serializable {
     private String[] contentStatusArray;
     private String[] facets;
     private String[] contentTypes;
+    private String[] keywords;
     private List<ContentSearchFilter> facetFilters;
     private List<ContentSearchFilter> impliedFilters;
     private List<ContentSortCriteria> sortCriteria;
@@ -34,7 +35,7 @@ public class ContentSearchCriteria implements Serializable {
 
     private ContentSearchCriteria(String query, long limit, String mode, int age, int grade, String medium, String board, String[] createdBy,
                                   String[] audience, String[] channel, String[] contentStatusArray, String[] facets, String[] contentTypes,
-                                  List<ContentSortCriteria> sortCriteria, SearchType searchType) {
+                                  String[] keywords, List<ContentSortCriteria> sortCriteria, SearchType searchType) {
         this.query = query;
         this.limit = limit;
         this.mode = mode;
@@ -48,6 +49,7 @@ public class ContentSearchCriteria implements Serializable {
         this.contentStatusArray = contentStatusArray;
         this.facets = facets;
         this.contentTypes = contentTypes;
+        this.keywords = keywords;
         this.sortCriteria = sortCriteria;
         this.searchType = searchType;
     }
@@ -110,6 +112,10 @@ public class ContentSearchCriteria implements Serializable {
         return contentTypes;
     }
 
+    public String[] getKeywords() {
+        return keywords;
+    }
+
     public List<ContentSearchFilter> getFacetFilters() {
         return facetFilters;
     }
@@ -149,6 +155,7 @@ public class ContentSearchCriteria implements Serializable {
         private String[] contentStatusArray;
         private String[] facets;
         private String[] contentTypes;
+        private String[] keywords;
         private List<ContentSortCriteria> sortCriteria;
 
         public SearchBuilder() {
@@ -262,6 +269,11 @@ public class ContentSearchCriteria implements Serializable {
             return this;
         }
 
+        public SearchBuilder keywords(String[] keywords) {
+            this.keywords = keywords;
+            return this;
+        }
+
         public ContentSearchCriteria build() {
             if (contentStatusArray == null || contentStatusArray.length == 0) {
                 this.contentStatusArray = new String[]{"Live"};
@@ -276,7 +288,7 @@ public class ContentSearchCriteria implements Serializable {
             }
 
             return new ContentSearchCriteria(query, limit, mode, age, grade, medium, board, createdBy,
-                    audience, channel, contentStatusArray, facets, contentTypes, sortCriteria, SearchType.SEARCH);
+                    audience, channel, contentStatusArray, facets, contentTypes, keywords, sortCriteria, SearchType.SEARCH);
         }
     }
 

@@ -1,5 +1,7 @@
 package org.ekstep.genieservices.commons.bean.telemetry;
 
+import org.ekstep.genieservices.commons.utils.StringUtil;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +30,8 @@ public class Share extends Telemetry {
     }
 
     public static class Builder {
+
+        private String env;
         private String direction;
         private String dataType;
         private List<Map<String, Object>> items = new ArrayList<>();
@@ -73,6 +77,19 @@ public class Share extends Telemetry {
             return this.dataType = "PROFILE";
         }
 
+
+        /**
+         * Unique environment where the event has occured.
+         */
+        public Builder environment(String env) {
+
+            if (StringUtil.isNullOrEmpty(env)) {
+                throw new IllegalArgumentException("environment shouldn't be null or empty.");
+            }
+            this.env = env;
+            return this;
+        }
+
         /**
          * Adds Transferred Item details.
          */
@@ -109,7 +126,14 @@ public class Share extends Telemetry {
         }
 
         public Share build() {
-            return new Share(direction, dataType, items);
+            if (StringUtil.isNullOrEmpty(env)) {
+                throw new IllegalStateException("env is required.");
+            }
+
+            Share event = new Share(direction, dataType, items);
+            event.setEnvironment(env);
+            return event;
+
         }
     }
 }

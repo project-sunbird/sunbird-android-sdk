@@ -26,10 +26,10 @@ ext {
     buildToolsVersion = '23.0.3'
     supportLibraryVersion = '23.4.0'
     playServiceVersion = '9.4.0'
-    eventbusVersion = '3.0.0'
-    okhttpVersion = '3.8.1'
-    gsonVersion = '2.8.1'
-    jodaTimeVersion = '2.8.2'
+    eventbusVersion = '3.1.1'
+    okhttpVersion = '3.9.1'
+    gsonVersion = '2.8.2'
+    jodaTimeVersion = '2.9.9'
     junitVersion = '4.12'
     buildNumber = System.getenv("BUILD_NUMBER") ?: "local"
     versionCode = 1

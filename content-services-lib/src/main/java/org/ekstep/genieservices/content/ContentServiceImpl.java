@@ -802,7 +802,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     private void buildInitiateEvent() {
-        Interact interact = new Interact.Builder()
+        Interact interact = new Interact.Builder().
+                environment(ServiceConstants.Telemetry.SDK_ENVIRONMENT)
                 .pageId(ServiceConstants.Telemetry.CONTENT_IMPORT_STAGE_ID)
                 .subType(ServiceConstants.Telemetry.CONTENT_IMPORT_INITIATED_SUB_TYPE)
                 .interactionType(InteractionType.TOUCH)

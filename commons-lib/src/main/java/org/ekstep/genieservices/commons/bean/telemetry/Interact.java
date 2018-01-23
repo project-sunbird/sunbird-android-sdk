@@ -59,6 +59,7 @@ public class Interact extends Telemetry {
 
     public static class Builder {
 
+        private String env;
         private String type;
         private String subType;
         private String id;
@@ -71,6 +72,17 @@ public class Interact extends Telemetry {
         private String objType;
         private String objVer;
         private Rollup rollup;
+
+        /**
+         * Unique environment where the event has occured.
+         */
+        public Builder environment(String env) {
+            if (StringUtil.isNullOrEmpty(env)) {
+                throw new IllegalArgumentException("environment shouldn't be null or empty.");
+            }
+            this.env = env;
+            return this;
+        }
 
         /**
          * Type of interaction TOUCH,DRAG,DROP,PINCH,ZOOM,SHAKE,ROTATE,SPEAK,LISTEN,WRITE,DRAW,START,ENDCHOOSE,ACTIVATE,SHOW,HIDE,SCROLL,HEARTBEAT,OTHER
@@ -115,8 +127,10 @@ public class Interact extends Telemetry {
          * List of {@link CorrelationData}
          */
         public Builder correlationData(List<CorrelationData> correlationData) {
-            this.correlationData = new ArrayList<>();
             if (!CollectionUtil.isNullOrEmpty(correlationData)) {
+                if (this.correlationData == null) {
+                    this.correlationData = new ArrayList<>();
+                }
                 this.correlationData.addAll(correlationData);
             }
 
@@ -128,7 +142,6 @@ public class Interact extends Telemetry {
          */
         public Builder addValue(String key, Object value) {
             valueMap.put(key, value);
-            this.values.add(valueMap);
             return this;
         }
 
@@ -178,6 +191,11 @@ public class Interact extends Telemetry {
 
 
         public Interact build() {
+
+            if (StringUtil.isNullOrEmpty(env)) {
+                throw new IllegalStateException("env is required.");
+            }
+
             if (StringUtil.isNullOrEmpty(type)) {
                 throw new IllegalStateException("interactionType is required.");
             }
@@ -186,7 +204,12 @@ public class Interact extends Telemetry {
                 throw new IllegalStateException("pageId is required.");
             }
 
+            if (!valueMap.isEmpty()) {
+                this.values.add(valueMap);
+            }
+
             Interact event = new Interact(type, subType, id, pageId, pos, values);
+            event.setEnvironment(env);
             event.setCoRrelationdata(correlationData);
             event.setObject(objId != null ? objId : "", objType != null ? objType : "", objVer != null ? objVer : "", rollup);
             return event;

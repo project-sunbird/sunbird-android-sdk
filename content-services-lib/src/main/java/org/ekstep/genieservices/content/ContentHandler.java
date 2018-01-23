@@ -1010,6 +1010,9 @@ public class ContentHandler {
         filterMap.put("status", Arrays.asList(criteria.getContentStatusArray()));
         filterMap.put("objectType", Collections.singletonList("Content"));
         filterMap.put("contentType", Arrays.asList(criteria.getContentTypes()));
+        if (criteria.getKeywords() != null && criteria.getKeywords().length > 0) {
+            filterMap.put("keywords", Arrays.asList(criteria.getKeywords()));
+        }
 
         // Add createdBy filter
         if (!CollectionUtil.hasEmptyData(criteria.getCreatedBy())) {
@@ -1498,7 +1501,7 @@ public class ContentHandler {
 
                     filters.add(contentSearchFilter);
                 } else {
-//                  TODO: No change required here. Best of genie will be removed soon and so we dont have to handle the genieScore. Also compatability level gets auto added into every search.
+//                  TODO: No change required here. Best of genie will be removed soon and so we don't have to handle the genieScore. Also compatibility level gets auto added into every search.
 //                  key.equals("compatibilityLevel") && key.equals("genieScore")
 //                  String[] stringArray = mFilterMap.get(values.getName());
 //                  filterSet.addAll(Arrays.asList(stringArray));

@@ -34,7 +34,6 @@ public interface IParams {
         String VERSION_NAME = "VERSION_NAME";
         String PRODUCER_ID = "PRODUCER_ID";
         String CHANNEL_ID = "CHANNEL_ID";
-        String ENVIRONMENT = "ENVIRONMENT";
         String TELEMETRY_BASE_URL = "TELEMETRY_BASE_URL";
         String LANGUAGE_PLATFORM_BASE_URL = "LANGUAGE_PLATFORM_BASE_URL";
         String TERMS_BASE_URL = "TERMS_BASE_URL";
