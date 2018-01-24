@@ -122,6 +122,7 @@ public class DownloadServiceImpl implements IDownloadService {
     private Interact buildGEInteractEvent(InteractionType type, String subType, List<CorrelationData> correlationDataList, String contentId) {
         Interact.Builder interact = new Interact.Builder();
         interact.interactionType(type)
+                .environment(ServiceConstants.Telemetry.SDK_ENVIRONMENT)
                 .pageId(ServiceConstants.Telemetry.CONTENT_DETAIL)
                 .subType(subType)
                 .objectId(contentId)
