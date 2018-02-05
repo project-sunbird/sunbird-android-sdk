@@ -22,9 +22,8 @@ import org.ekstep.genieservices.commons.bean.ContentMoveRequest;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.ContentSwitchRequest;
-import org.ekstep.genieservices.commons.bean.ContentUsedSpaceRequest;
-import org.ekstep.genieservices.commons.bean.ContentUsedSpaceResponse;
-import org.ekstep.genieservices.commons.bean.DownloadRequest;
+import org.ekstep.genieservices.commons.bean.ContentSpaceUsageSummaryRequest;
+import org.ekstep.genieservices.commons.bean.ContentSpaceUsageSummaryResponse;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
@@ -432,7 +431,7 @@ public class ContentService {
     /**
      * This api is used to get status of the downloadQueue
      *
-     * @param responseHandler - {@link IResponseHandler<List<DownloadRequest>>}
+     * @param responseHandler - {@link IResponseHandler<DownloadAction>}
      */
     public void getDownloadState(IResponseHandler<DownloadAction> responseHandler) {
         new AsyncHandler<DownloadAction>(responseHandler).execute(new IPerformable<DownloadAction>() {
@@ -454,7 +453,7 @@ public class ContentService {
      * <p>MOVE_FAILED
      *
      * @param contentMoveRequest - {@link ContentMoveRequest}
-     * @param responseHandler    - {@link IResponseHandler<Void>}
+     * @param responseHandler    - {@link IResponseHandler<List<MoveContentResponse>>}
      */
     public void moveContent(final ContentMoveRequest contentMoveRequest, IResponseHandler<List<MoveContentResponse>> responseHandler) {
         new AsyncHandler<List<MoveContentResponse>>(responseHandler).execute(new IPerformable<List<MoveContentResponse>>() {
@@ -476,7 +475,7 @@ public class ContentService {
      * <p>SWITCH_FAILED
      *
      * @param contentSwitchRequest - {@link ContentSwitchRequest}
-     * @param responseHandler      - {@link IResponseHandler<Void>}
+     * @param responseHandler      - {@link IResponseHandler<List<SwitchContentResponse>>}
      */
     public void switchContent(final ContentSwitchRequest contentSwitchRequest, IResponseHandler<List<SwitchContentResponse>> responseHandler) {
         new AsyncHandler<List<SwitchContentResponse>>(responseHandler).execute(new IPerformable<List<SwitchContentResponse>>() {
@@ -506,11 +505,17 @@ public class ContentService {
         });
     }
 
-    public void getUsedSpaceByContent(final ContentUsedSpaceRequest contentUsedSpaceRequest, IResponseHandler<List<ContentUsedSpaceResponse>> responseHandler) {
-        new AsyncHandler<List<ContentUsedSpaceResponse>>(responseHandler).execute(new IPerformable<List<ContentUsedSpaceResponse>>() {
+    /**
+     * This API is used to get the space used by contents.
+     *
+     * @param contentSpaceUsageSummaryRequest {@link ContentSpaceUsageSummaryRequest}
+     * @param responseHandler         {@link List< ContentSpaceUsageSummaryResponse >}
+     */
+    public void getContentSpaceUsageSummary(final ContentSpaceUsageSummaryRequest contentSpaceUsageSummaryRequest, IResponseHandler<List<ContentSpaceUsageSummaryResponse>> responseHandler) {
+        new AsyncHandler<List<ContentSpaceUsageSummaryResponse>>(responseHandler).execute(new IPerformable<List<ContentSpaceUsageSummaryResponse>>() {
             @Override
-            public GenieResponse<List<ContentUsedSpaceResponse>> perform() {
-                return contentService.getUsedSpaceByContent(contentUsedSpaceRequest);
+            public GenieResponse<List<ContentSpaceUsageSummaryResponse>> perform() {
+                return contentService.getContentSpaceUsageSummary(contentSpaceUsageSummaryRequest);
             }
         });
     }

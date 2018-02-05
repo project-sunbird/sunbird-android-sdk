@@ -7,5 +7,5 @@ import java.io.Serializable;
  *
  * @author anil
  */
-public class ContentUsedSpaceResponse implements Serializable {
+public class ContentSpaceUsageSummaryResponse implements Serializable {
 }
