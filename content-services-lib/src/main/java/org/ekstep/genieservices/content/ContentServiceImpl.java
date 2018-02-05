@@ -31,6 +31,8 @@ import org.ekstep.genieservices.commons.bean.ContentMoveRequest;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.ContentSwitchRequest;
+import org.ekstep.genieservices.commons.bean.ContentUsedSpaceRequest;
+import org.ekstep.genieservices.commons.bean.ContentUsedSpaceResponse;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -919,6 +921,11 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 .then(new org.ekstep.genieservices.content.chained.switchLocation.StoreDestinationContentInDB());
 
         return validateDestinationFolder.execute(mAppContext, switchContentContext);
+    }
+
+    @Override
+    public GenieResponse<List<ContentUsedSpaceResponse>> getUsedSpaceByContent(ContentUsedSpaceRequest contentUsedSpaceRequest) {
+        return null;
     }
 
     @Override

@@ -16,6 +16,8 @@ import org.ekstep.genieservices.commons.bean.ContentMoveRequest;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.ContentSwitchRequest;
+import org.ekstep.genieservices.commons.bean.ContentUsedSpaceRequest;
+import org.ekstep.genieservices.commons.bean.ContentUsedSpaceResponse;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
@@ -305,5 +307,13 @@ public interface IContentService {
      * @param contentSwitchRequest - {@link ContentSwitchRequest}
      */
     GenieResponse<List<SwitchContentResponse>> switchContent(ContentSwitchRequest contentSwitchRequest);
+
+    /**
+     * This API is used to get the space used by contents.
+     *
+     * @param contentUsedSpaceRequest {@link ContentUsedSpaceRequest}
+     * @return
+     */
+    GenieResponse<List<ContentUsedSpaceResponse>> getUsedSpaceByContent(ContentUsedSpaceRequest contentUsedSpaceRequest);
 
 }

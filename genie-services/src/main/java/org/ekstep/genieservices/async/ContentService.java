@@ -22,6 +22,8 @@ import org.ekstep.genieservices.commons.bean.ContentMoveRequest;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
 import org.ekstep.genieservices.commons.bean.ContentSwitchRequest;
+import org.ekstep.genieservices.commons.bean.ContentUsedSpaceRequest;
+import org.ekstep.genieservices.commons.bean.ContentUsedSpaceResponse;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -359,7 +361,7 @@ public class ContentService {
      * <p>
      * Response will always be status set TRUE, with {@link ContentImportResponse} set in result.
      *
-     * @param contentIdList       Content ids.
+     * @param contentIdList   Content ids.
      * @param responseHandler - {@link IResponseHandler<List<ContentImportResponse>>}
      */
     public void getImportStatus(final List<String> contentIdList, IResponseHandler<List<ContentImportResponse>> responseHandler) {
@@ -500,6 +502,15 @@ public class ContentService {
             @Override
             public GenieResponse<List<ScanStorageResponse>> perform() {
                 return contentService.scanStorage(scanStorageRequest);
+            }
+        });
+    }
+
+    public void getUsedSpaceByContent(final ContentUsedSpaceRequest contentUsedSpaceRequest, IResponseHandler<List<ContentUsedSpaceResponse>> responseHandler) {
+        new AsyncHandler<List<ContentUsedSpaceResponse>>(responseHandler).execute(new IPerformable<List<ContentUsedSpaceResponse>>() {
+            @Override
+            public GenieResponse<List<ContentUsedSpaceResponse>> perform() {
+                return contentService.getUsedSpaceByContent(contentUsedSpaceRequest);
             }
         });
     }
