@@ -8,4 +8,20 @@ import java.io.Serializable;
  * @author anil
  */
 public class ContentSpaceUsageSummaryResponse implements Serializable {
+
+    private String path;
+    private Long sizeOnDevice;
+
+    public ContentSpaceUsageSummaryResponse(String path, Long sizeOnDevice) {
+        this.path = path;
+        this.sizeOnDevice = sizeOnDevice;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public Long getSizeOnDevice() {
+        return sizeOnDevice;
+    }
 }

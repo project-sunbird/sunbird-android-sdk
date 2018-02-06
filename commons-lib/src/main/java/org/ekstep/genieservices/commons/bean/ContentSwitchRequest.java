@@ -10,7 +10,7 @@ public class ContentSwitchRequest {
 
     private String destinationFolder;
 
-    public ContentSwitchRequest(String destinationFolder) {
+    private ContentSwitchRequest(String destinationFolder) {
         this.destinationFolder = destinationFolder;
     }
 

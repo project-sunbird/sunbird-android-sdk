@@ -17,7 +17,7 @@ public class ContentMoveRequest {
     private ExistingContentAction existingContentAction;
     private boolean deleteDestination;
 
-    public ContentMoveRequest(List<String> contentIds, String destinationFolder, ExistingContentAction existingContentAction, boolean deleteDestination) {
+    private ContentMoveRequest(List<String> contentIds, String destinationFolder, ExistingContentAction existingContentAction, boolean deleteDestination) {
         this.contentIds = contentIds;
         this.destinationFolder = destinationFolder;
         this.existingContentAction = existingContentAction;

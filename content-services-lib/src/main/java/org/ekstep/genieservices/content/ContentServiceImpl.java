@@ -30,9 +30,9 @@ import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentMoveRequest;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
-import org.ekstep.genieservices.commons.bean.ContentSwitchRequest;
 import org.ekstep.genieservices.commons.bean.ContentSpaceUsageSummaryRequest;
 import org.ekstep.genieservices.commons.bean.ContentSpaceUsageSummaryResponse;
+import org.ekstep.genieservices.commons.bean.ContentSwitchRequest;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -908,28 +908,6 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<List<SwitchContentResponse>> switchContent(ContentSwitchRequest contentSwitchRequest) {
-        File destinationFolder = new File(contentSwitchRequest.getDestinationFolder());
-
-        SwitchContentContext switchContentContext = new SwitchContentContext(destinationFolder);
-
-        org.ekstep.genieservices.content.chained.switchLocation.ValidateDestinationFolder validateDestinationFolder =
-                new org.ekstep.genieservices.content.chained.switchLocation.ValidateDestinationFolder();
-        validateDestinationFolder.then(new org.ekstep.genieservices.content.chained.switchLocation.ValidateDestinationFolder())
-                .then(new org.ekstep.genieservices.content.chained.switchLocation.ValidateDestinationContent())
-                .then(new org.ekstep.genieservices.content.chained.switchLocation.DeleteSourceFolder())
-                .then(new org.ekstep.genieservices.content.chained.switchLocation.StoreDestinationContentInDB());
-
-        return validateDestinationFolder.execute(mAppContext, switchContentContext);
-    }
-
-    @Override
-    public GenieResponse<List<ContentSpaceUsageSummaryResponse>> getContentSpaceUsageSummary(ContentSpaceUsageSummaryRequest contentSpaceUsageSummaryRequest) {
-
-        return null;
-    }
-
-    @Override
     public GenieResponse<List<ScanStorageResponse>> scanStorage(ScanStorageRequest scanStorageRequest) {
         GenieResponse<List<ScanStorageResponse>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SuccessMessage.SCAN_SUCCESS_NO_CHANGES);
 
@@ -1004,6 +982,40 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 response.setResult(addedOrDeletedIdentifiersList);
             }
         }
+
+        return response;
+    }
+
+    @Override
+    public GenieResponse<List<SwitchContentResponse>> switchContent(ContentSwitchRequest contentSwitchRequest) {
+        File destinationFolder = new File(contentSwitchRequest.getDestinationFolder());
+
+        SwitchContentContext switchContentContext = new SwitchContentContext(destinationFolder);
+
+        org.ekstep.genieservices.content.chained.switchLocation.ValidateDestinationFolder validateDestinationFolder =
+                new org.ekstep.genieservices.content.chained.switchLocation.ValidateDestinationFolder();
+        validateDestinationFolder.then(new org.ekstep.genieservices.content.chained.switchLocation.ValidateDestinationFolder())
+                .then(new org.ekstep.genieservices.content.chained.switchLocation.ValidateDestinationContent())
+                .then(new org.ekstep.genieservices.content.chained.switchLocation.DeleteSourceFolder())
+                .then(new org.ekstep.genieservices.content.chained.switchLocation.StoreDestinationContentInDB());
+
+        return validateDestinationFolder.execute(mAppContext, switchContentContext);
+    }
+
+    @Override
+    public GenieResponse<List<ContentSpaceUsageSummaryResponse>> getContentSpaceUsageSummary(ContentSpaceUsageSummaryRequest contentSpaceUsageSummaryRequest) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("logLevel", "2");
+        String methodName = "getContentSpaceUsageSummary@ContentServiceImpl";
+
+        List<ContentSpaceUsageSummaryResponse> contentSpaceUsageSummaryList = new ArrayList<>();
+        for (String path : contentSpaceUsageSummaryRequest.getPaths()) {
+            // TODO: 6/2/18
+        }
+
+        GenieResponse<List<ContentSpaceUsageSummaryResponse>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        response.setResult(contentSpaceUsageSummaryList);
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
 
         return response;
     }

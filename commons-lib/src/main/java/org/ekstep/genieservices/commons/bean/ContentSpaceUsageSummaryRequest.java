@@ -14,7 +14,7 @@ public class ContentSpaceUsageSummaryRequest {
     private List<String> paths;
 
     private ContentSpaceUsageSummaryRequest(List<String> paths) {
-
+        this.paths = paths;
     }
 
     public List<String> getPaths() {
