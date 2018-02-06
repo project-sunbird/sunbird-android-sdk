@@ -40,6 +40,7 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
     private String localLastUpdatedTime;
     private String serverLastUpdatedOn;
     private String audience;
+    private String pragma;
     private Long sizeOnDevice;
     private Long lastUsedTime;
 
@@ -53,7 +54,7 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
     }
 
     private ContentModel(IDBSession dbSession, String identifier, String serverData, String serverLastUpdatedOn,
-                         String manifestVersion, String localData, String mimeType, String contentType, String visibility, String audience) {
+                         String manifestVersion, String localData, String mimeType, String contentType, String visibility, String audience, String pragma) {
         this.mDBSession = dbSession;
         this.identifier = identifier;
         this.serverData = serverData;
@@ -64,12 +65,13 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         this.contentType = contentType;
         this.visibility = visibility;
         this.audience = audience;
+        this.pragma = pragma;
     }
 
     private ContentModel(IDBSession dbSession, String identifier, String manifestVersion, String localData,
                          String mimeType, String contentType, String visibility, String path,
-                         int refCount, int contentState, String audience, long sizeOnDevice) {
-        this(dbSession, identifier, null, null, manifestVersion, localData, mimeType, contentType, visibility, audience);
+                         int refCount, int contentState, String audience, String pragma, long sizeOnDevice) {
+        this(dbSession, identifier, null, null, manifestVersion, localData, mimeType, contentType, visibility, audience, pragma);
         this.path = path;
         this.refCount = refCount;
         this.contentState = contentState;
@@ -92,17 +94,17 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
     }
 
     public static ContentModel build(IDBSession dbSession, String identifier, String serverData, String serverLastUpdatedOn,
-                                     String manifestVersion, String localData, String mimeType, String contentType, String visibility, String audience) {
+                                     String manifestVersion, String localData, String mimeType, String contentType, String visibility, String audience, String pragma) {
         ContentModel contentModel = new ContentModel(dbSession, identifier, serverData, serverLastUpdatedOn,
-                manifestVersion, localData, mimeType, contentType, visibility, audience);
+                manifestVersion, localData, mimeType, contentType, visibility, audience, pragma);
         return contentModel;
     }
 
     public static ContentModel build(IDBSession dbSession, String identifier, String manifestVersion, String localData,
                                      String mimeType, String contentType, String visibility, String path,
-                                     int refCount, int contentState, String audience, long sizeOnDevice) {
+                                     int refCount, int contentState, String audience, String pragma, long sizeOnDevice) {
         ContentModel contentModel = new ContentModel(dbSession, identifier, manifestVersion, localData,
-                mimeType, contentType, visibility, path, refCount, contentState, audience, sizeOnDevice);
+                mimeType, contentType, visibility, path, refCount, contentState, audience, pragma, sizeOnDevice);
 
         return contentModel;
     }
@@ -134,6 +136,7 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         with(contentValues, ContentEntry.COLUMN_NAME_REF_COUNT, refCount);
         with(contentValues, ContentEntry.COLUMN_NAME_CONTENT_STATE, contentState);
         with(contentValues, ContentEntry.COLUMN_NAME_AUDIENCE, audience);
+        with(contentValues, ContentEntry.COLUMN_NAME_PRAGMA, pragma);
 //        with(contentValues, ContentEntry.COLUMN_NAME_INDEX, null);
         with(contentValues, ContentEntry.COLUMN_NAME_SIZE_ON_DEVICE, sizeOnDevice);
 
@@ -170,6 +173,7 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         with(contentValues, ContentEntry.COLUMN_NAME_REF_COUNT, refCount);
         with(contentValues, ContentEntry.COLUMN_NAME_CONTENT_STATE, contentState);
         with(contentValues, ContentEntry.COLUMN_NAME_AUDIENCE, audience);
+        with(contentValues, ContentEntry.COLUMN_NAME_PRAGMA, pragma);
 //        with(contentValues, ContentEntry.COLUMN_NAME_INDEX, null);
         with(contentValues, ContentEntry.COLUMN_NAME_SIZE_ON_DEVICE, sizeOnDevice);
         return contentValues;
@@ -233,6 +237,7 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         contentType = resultSet.getString(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_CONTENT_TYPE));
         localLastUpdatedTime = resultSet.getString(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_LOCAL_LAST_UPDATED_ON));
         audience = resultSet.getString(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_AUDIENCE));
+        pragma = resultSet.getString(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_PRAGMA));
         sizeOnDevice = resultSet.getLong(resultSet.getColumnIndex(ContentEntry.COLUMN_NAME_SIZE_ON_DEVICE));
 
         if (resultSet.getColumnIndex(ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP) != -1) {

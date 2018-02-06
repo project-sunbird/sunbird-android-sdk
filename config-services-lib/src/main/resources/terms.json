@@ -193,7 +193,6 @@
           "description": "",
           "search": {
             "filters": {
-
             }
           }
         }
@@ -227,6 +226,40 @@
             "filters": {
               "audience": [
                 "instructor"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "pragma": {
+      "label": "pragma",
+      "value": "pragma",
+      "language": "en",
+      "description": "Content pragma",
+      "values": [
+        {
+          "label": "External",
+          "value": "external",
+          "telemetry": "external",
+          "description": "",
+          "search": {
+            "filters": {
+              "pragma": [
+                "external"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Ads",
+          "value": "ads",
+          "telemetry": "ads",
+          "description": "",
+          "search": {
+            "filters": {
+              "pragma": [
+                "ads"
               ]
             }
           }
@@ -759,7 +792,6 @@
           "description": "",
           "search": {
             "filters": {
-
             }
           }
         }
@@ -831,7 +863,6 @@
           "description": "",
           "search": {
             "filters": {
-
             }
           }
         }
@@ -1037,7 +1068,6 @@
           "description": "",
           "search": {
             "filters": {
-
             }
           }
         }

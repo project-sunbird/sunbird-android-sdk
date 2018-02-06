@@ -29,8 +29,8 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="commons-services-lib" exported="" />
     <orderEntry type="module" module-name="commons-lib" exported="" />
-    <orderEntry type="library" exported="" name="eventbus-3.0.0" level="project" />
-    <orderEntry type="library" exported="" name="gson-2.8.1" level="project" />
-    <orderEntry type="library" exported="" name="joda-time-2.8.2" level="project" />
+    <orderEntry type="library" exported="" name="eventbus-3.1.1" level="project" />
+    <orderEntry type="library" exported="" name="gson-2.8.2" level="project" />
+    <orderEntry type="library" exported="" name="joda-time-2.9.9" level="project" />
   </component>
 </module>

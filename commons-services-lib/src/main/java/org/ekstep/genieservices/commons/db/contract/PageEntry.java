@@ -20,6 +20,7 @@ public abstract class PageEntry implements BaseColumns {
     public static final String COLUMN_EXPIRY_TIME = "expiry_time";
     public static final String COLUMN_NAME_CHANNEL = "channel";
     public static final String COLUMN_NAME_AUDIENCE = "audience";
+    public static final String COLUMN_NAME_PRAGMA = "pragma";
 
     public static final String getCreateEntry() {
         return "CREATE TABLE " + TABLE_NAME + " (" +
@@ -45,5 +46,9 @@ public abstract class PageEntry implements BaseColumns {
     public static List<String> getAlterEntryForChannelAndAudience() {
         return asList("ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_NAME_CHANNEL + DbConstants.TEXT_TYPE + ";",
                 "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_NAME_AUDIENCE + DbConstants.TEXT_TYPE + ";");
+    }
+
+    public static String getAlterEntryForPragma() {
+        return "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_NAME_PRAGMA + DbConstants.TEXT_TYPE + ";";
     }
 }

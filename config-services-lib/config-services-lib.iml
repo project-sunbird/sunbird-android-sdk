@@ -13,7 +13,7 @@
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7" inherit-compiler-output="false">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7">
     <output url="file://$MODULE_DIR$/build/classes/main" />
     <output-test url="file://$MODULE_DIR$/build/classes/test" />
     <exclude-output />
@@ -29,12 +29,8 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="commons-services-lib" exported="" />
     <orderEntry type="module" module-name="commons-lib" exported="" />
-    <orderEntry type="library" exported="" name="eventbus-3.0.0" level="project" />
-    <orderEntry type="library" exported="" name="gson-2.8.1" level="project" />
-    <orderEntry type="library" exported="" name="joda-time-2.8.2" level="project" />
-    <orderEntry type="library" exported="" name="config-services-lib.config-services-1.0.local" level="project" />
-    <orderEntry type="library" exported="" name="config-services-lib.config-services-1.0.local" level="project" />
-    <orderEntry type="library" exported="" name="config-services-lib.config-services-1.0.local" level="project" />
-    <orderEntry type="library" exported="" name="config-services-lib.config-services-1.0.local" level="project" />
+    <orderEntry type="library" exported="" name="eventbus-3.1.1" level="project" />
+    <orderEntry type="library" exported="" name="gson-2.8.2" level="project" />
+    <orderEntry type="library" exported="" name="joda-time-2.9.9" level="project" />
   </component>
 </module>

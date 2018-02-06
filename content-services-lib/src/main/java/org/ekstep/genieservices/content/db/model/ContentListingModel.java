@@ -40,6 +40,7 @@ public class ContentListingModel implements IWritable, IUpdatable, IReadable, IC
     private long mExpiryTime;
     private String channelStr;
     private String audienceStr;
+    private String pragmaStr;
 
     private ContentListingModel(IDBSession dbSession, ContentListingCriteria listingCriteria) {
         this.mDBSession = dbSession;
@@ -51,6 +52,7 @@ public class ContentListingModel implements IWritable, IUpdatable, IReadable, IC
         this.mSubject = listingCriteria.getSubject() != null ? listingCriteria.getSubject() : "";
         this.channelStr = listingCriteria.getChannel() != null ? StringUtil.join(",", getSortedList(listingCriteria.getChannel())) : "";
         this.audienceStr = listingCriteria.getAudience() != null ? StringUtil.join(",", getSortedList(listingCriteria.getAudience())) : "";
+        this.pragmaStr = listingCriteria.getPragma() != null ? StringUtil.join(",", getSortedList(listingCriteria.getPragma())) : "";
     }
 
     private ContentListingModel(IDBSession dbSession, ContentListingCriteria listingCriteria, String json, long expiryTime) {
@@ -116,7 +118,7 @@ public class ContentListingModel implements IWritable, IUpdatable, IReadable, IC
     public String filterForRead() {
         Logger.i(TAG, String.format("SEARCH page: %s", mPageIdentifier));
 
-        String selectionCriteria = String.format(Locale.US, "%s = '%s' AND %s = %d  AND %s = %d  AND %s = '%s'  AND %s = '%s' AND %s = '%s' AND %s = '%s' AND %s = '%s'",
+        String selectionCriteria = String.format(Locale.US, "%s = '%s' AND %s = %d  AND %s = %d  AND %s = '%s'  AND %s = '%s' AND %s = '%s' AND %s = '%s' AND %s = '%s' AND %s = '%s'",
                 PageEntry.COLUMN_NAME_PAGE_IDENTIFIER, mPageIdentifier,
                 PageEntry.COLUMN_NAME_AGE, mAge,
                 PageEntry.COLUMN_NAME_STANDARD, mStandard,
@@ -124,7 +126,8 @@ public class ContentListingModel implements IWritable, IUpdatable, IReadable, IC
                 PageEntry.COLUMN_NAME_BOARD, mBoard,
                 PageEntry.COLUMN_NAME_SUBJECT, mSubject,
                 PageEntry.COLUMN_NAME_CHANNEL, channelStr,
-                PageEntry.COLUMN_NAME_AUDIENCE, audienceStr);
+                PageEntry.COLUMN_NAME_AUDIENCE, audienceStr,
+                PageEntry.COLUMN_NAME_PRAGMA, pragmaStr);
 
         Logger.i(TAG, String.format("SEARCH page: %s", selectionCriteria));
         return String.format(Locale.US, " where %s", selectionCriteria);
@@ -178,6 +181,7 @@ public class ContentListingModel implements IWritable, IUpdatable, IReadable, IC
         contentValues.put(PageEntry.COLUMN_NAME_SUBJECT, mSubject);
         contentValues.put(PageEntry.COLUMN_NAME_CHANNEL, channelStr);
         contentValues.put(PageEntry.COLUMN_NAME_AUDIENCE, audienceStr);
+        contentValues.put(PageEntry.COLUMN_NAME_PRAGMA, pragmaStr);
 
         return contentValues;
     }

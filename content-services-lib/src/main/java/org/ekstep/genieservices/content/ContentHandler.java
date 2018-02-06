@@ -90,6 +90,7 @@ public class ContentHandler {
     private static final String KEY_COMPATIBILITY_LEVEL = "compatibilityLevel";
     private static final String KEY_MIME_TYPE = "mimeType";
     private static final Object AUDIENCE_KEY = "audience";
+    private static final Object PRAGMA_KEY = "pragma";
     private static final String KEY_LAST_UPDATED_ON = "lastUpdatedOn";
     private static final String KEY_PRE_REQUISITES = "pre_requisites";
     private static final String KEY_CHILDREN = "children";
@@ -128,9 +129,10 @@ public class ContentHandler {
         String contentType = readContentType(contentData);
         String visibility = readVisibility(contentData);
         String audience = readAudience(contentData);
+        String pragma = readPragma(contentData);
 
         ContentModel contentModel = ContentModel.build(dbSession, identifier, serverData, serverLastUpdatedOn,
-                manifestVersion, localData, mimeType, contentType, visibility, audience);
+                manifestVersion, localData, mimeType, contentType, visibility, audience, pragma);
 
         return contentModel;
     }
@@ -226,6 +228,20 @@ public class ContentHandler {
         }
         Collections.sort(audienceList);
         return StringUtil.join(",", audienceList);
+    }
+
+    public static String readPragma(Map contentData) {
+        List<String> pragmaList = null;
+        if (contentData.containsKey(PRAGMA_KEY)) {
+            pragmaList = (ArrayList<String>) contentData.get(PRAGMA_KEY);
+        }
+
+        if (!CollectionUtil.isNullOrEmpty(pragmaList)) {
+            Collections.sort(pragmaList);
+            return StringUtil.join(",", pragmaList);
+        }
+
+        return null;
     }
 
     public static String readArtifactUrl(Map contentData) {
@@ -508,19 +524,34 @@ public class ContentHandler {
         String contentTypesStr = StringUtil.join("','", contentTypes);
 
         StringBuilder audienceFilterBuilder = new StringBuilder();
-        if (criteria.getAudience() != null && criteria.getAudience().length > 0) {
+        if (!CollectionUtil.isEmpty(criteria.getAudience())) {
             for (String audience : criteria.getAudience()) {
-                audienceFilterBuilder.append(audienceFilterBuilder.length() > 0 ? " or " : "");
+                audienceFilterBuilder.append(audienceFilterBuilder.length() > 0 ? " or " : "");     // "instructor", "learner", "instructor,learner"
                 audienceFilterBuilder.append(String.format(Locale.US, "c.%s like '%%%s%%'", ContentEntry.COLUMN_NAME_AUDIENCE, audience));
+            }
+        }
+
+        StringBuilder pragmaFilterBuilder = new StringBuilder();
+        if (!CollectionUtil.isEmpty(criteria.getPragma())) {
+            for (String pragma : criteria.getPragma()) {
+                pragmaFilterBuilder.append(pragmaFilterBuilder.length() > 0 ? " AND " : "");
+                pragmaFilterBuilder.append(String.format(Locale.US, "c.%s not like '%%%s%%'", ContentEntry.COLUMN_NAME_PRAGMA, pragma));
             }
         }
 
         String contentTypeFilter = String.format(Locale.US, "c.%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr.toLowerCase());
         String contentVisibilityFilter = String.format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_VISIBILITY, ContentConstants.Visibility.DEFAULT);
         String artifactAvailabilityFilter = String.format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
-        String filter = audienceFilterBuilder.length() == 0
-                ? String.format(Locale.US, "WHERE (%s AND %s AND %s)", contentVisibilityFilter, artifactAvailabilityFilter, contentTypeFilter)
-                : String.format(Locale.US, "WHERE (%s AND %s AND %s AND (%s))", contentVisibilityFilter, artifactAvailabilityFilter, contentTypeFilter, audienceFilterBuilder.toString());
+
+        String filter = String.format(Locale.US, "%s AND %s AND %s", contentVisibilityFilter, artifactAvailabilityFilter, contentTypeFilter);
+        if (audienceFilterBuilder.length() > 0) {
+            filter = String.format(Locale.US, " %s AND (%s)", filter, audienceFilterBuilder.toString());
+        }
+        if (pragmaFilterBuilder.length() > 0) {
+            filter = String.format(Locale.US, " %s AND (%s)", filter, pragmaFilterBuilder.toString());
+        }
+
+        String whereClause = String.format(Locale.US, "WHERE (%s)", filter);
 
         StringBuilder orderBy = new StringBuilder();
         int i = 0;
@@ -561,11 +592,11 @@ public class ContentHandler {
                     ContentEntry.TABLE_NAME, ContentAccessEntry.TABLE_NAME,
                     ContentEntry.COLUMN_NAME_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER,
                     ContentAccessEntry.COLUMN_NAME_UID, uid,
-                    filter, orderBy.toString());
+                    whereClause, orderBy.toString());
         } else {
             query = String.format(Locale.US, "SELECT c.* FROM  %s c %s %s;",
                     ContentEntry.TABLE_NAME,
-                    filter, orderBy.toString());
+                    whereClause, orderBy.toString());
         }
 
         List<ContentModel> contentModelListInDB;
@@ -788,18 +819,20 @@ public class ContentHandler {
             if (oldIdentifier.equalsIgnoreCase(newIdentifier)) {
                 boolean overrideDB = false;
                 if (keepLowerVersion) {
-                    if((readPkgVersion(oldContent.getLocalData()) < newPkgVersion)) {
+                    if ((readPkgVersion(oldContent.getLocalData()) < newPkgVersion)) {
                         overrideDB = false;
-                    }else {
+                    } else {
                         overrideDB = true;
                     }
-                } else if((readPkgVersion(oldContent.getLocalData()) < newPkgVersion)) {
+                } else if ((readPkgVersion(oldContent.getLocalData()) < newPkgVersion)) {
                     overrideDB = true;
                 }
 
                 if (overrideDB
-//                        && ((readPkgVersion(oldContent.getLocalData()) < newPkgVersion) // If old content's pkgVersion is less than the new content then return false.
-                        || (!keepLowerVersion && oldContent.getContentState() != ContentConstants.State.ARTIFACT_AVAILABLE)) {  //  If content_state is other than artifact available then also return  false.
+                        // If old content's pkgVersion is less than the new content then return false.
+//                        && ((readPkgVersion(oldContent.getLocalData()) < newPkgVersion)
+                        //  If content_state is other than artifact available then also return  false.
+                        || (!keepLowerVersion && oldContent.getContentState() != ContentConstants.State.ARTIFACT_AVAILABLE)) {
                     isExist = false;
                 } else {
                     isExist = true;
@@ -1041,16 +1074,24 @@ public class ContentHandler {
         }
 
         String[] audienceArr = criteria.getAudience();
-        if (audienceArr != null && audienceArr.length > 0) {
+        if (!CollectionUtil.isEmpty(audienceArr)) {
             for (String audience : audienceArr) {
                 applyListingFilter(configService, MasterDataType.AUDIENCE, audience, filterMap);
             }
         }
 
         String[] channelArr = criteria.getChannel();
-        if (channelArr != null && channelArr.length > 0) {
+        if (!CollectionUtil.isEmpty(channelArr)) {
             for (String channel : channelArr) {
                 applyListingFilter(configService, MasterDataType.CHANNEL, channel, filterMap);
+            }
+        }
+
+        String[] pragmaArr = criteria.getPragma();
+        if (!CollectionUtil.isEmpty(pragmaArr)) {
+            for (String pragma : pragmaArr) {
+                // TODO: 5/2/18 - Add not equal query
+//                applyListingFilter(configService, MasterDataType.PRAGMA, pragma, filterMap);
             }
         }
 
@@ -1112,7 +1153,6 @@ public class ContentHandler {
 
     private static void applyListingFilter(IConfigService configService, MasterDataType masterDataType, String propertyValue, Map<String, Object> filterMap) {
         if (configService != null && propertyValue != null) {
-//            String property = masterDataType.getValue();
 
             if (masterDataType == MasterDataType.AGEGROUP) {
                 masterDataType = MasterDataType.AGE;
@@ -1147,7 +1187,8 @@ public class ContentHandler {
         }
     }
 
-    public static ContentSearchCriteria createFilterCriteria(IConfigService configService, ContentSearchCriteria previousCriteria, List<Map<String, Object>> facets, Map<String, Object> appliedFilterMap) {
+    public static ContentSearchCriteria createFilterCriteria(IConfigService configService, ContentSearchCriteria previousCriteria,
+                                                             List<Map<String, Object>> facets, Map<String, Object> appliedFilterMap) {
         List<ContentSearchFilter> facetFilters = new ArrayList<>();
         ContentSearchCriteria.FilterBuilder filterBuilder = new ContentSearchCriteria.FilterBuilder();
         filterBuilder.query(previousCriteria.getQuery())
@@ -1285,7 +1326,8 @@ public class ContentHandler {
         return requestMap;
     }
 
-    public static void refreshContentListingFromServer(final AppContext appContext, final IConfigService configService, final ContentListingCriteria contentListingCriteria, final String did) {
+    public static void refreshContentListingFromServer(final AppContext appContext, final IConfigService configService,
+                                                       final ContentListingCriteria contentListingCriteria, final String did) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -1341,16 +1383,24 @@ public class ContentHandler {
             applyListingFilter(configService, MasterDataType.GRADELEVEL, String.valueOf(contentListingCriteria.getGrade()), filterMap);
 
         String[] audienceArr = contentListingCriteria.getAudience();
-        if (audienceArr != null && audienceArr.length > 0) {
+        if (!CollectionUtil.isEmpty(audienceArr)) {
             for (String audience : audienceArr) {
                 applyListingFilter(configService, MasterDataType.AUDIENCE, audience, filterMap);
             }
         }
 
         String[] channelArr = contentListingCriteria.getChannel();
-        if (channelArr != null && channelArr.length > 0) {
+        if (!CollectionUtil.isEmpty(channelArr)) {
             for (String channel : channelArr) {
                 applyListingFilter(configService, MasterDataType.CHANNEL, channel, filterMap);
+            }
+        }
+
+        String[] pragmaArr = contentListingCriteria.getPragma();
+        if (!CollectionUtil.isEmpty(pragmaArr)) {
+            for (String pragma : pragmaArr) {
+                // TODO: 5/2/18 - Add not equal query
+//                applyListingFilter(configService, MasterDataType.PRAGMA, pragma, filterMap);
             }
         }
 
@@ -1501,7 +1551,8 @@ public class ContentHandler {
 
                     filters.add(contentSearchFilter);
                 } else {
-//                  TODO: No change required here. Best of genie will be removed soon and so we don't have to handle the genieScore. Also compatibility level gets auto added into every search.
+//                  TODO: No change required here. Best of genie will be removed soon and so we don't have to handle the genieScore.
+//                  TODO: Also compatibility level gets auto added into every search.
 //                  key.equals("compatibilityLevel") && key.equals("genieScore")
 //                  String[] stringArray = mFilterMap.get(values.getName());
 //                  filterSet.addAll(Arrays.asList(stringArray));
@@ -1810,7 +1861,7 @@ public class ContentHandler {
      * @param storageFolder
      */
     public static void addContentToDb(AppContext appContext, String identifier, File storageFolder, boolean keepLowerVersion) {
-        String mimeType, contentType, visibility, audience, path;
+        String mimeType, contentType, visibility, audience, pragma, path;
         Double compatibilityLevel, pkgVersion;
         int refCount;
         int contentState = ContentConstants.State.ONLY_SPINE;
@@ -1836,6 +1887,7 @@ public class ContentHandler {
                 contentType = readContentType(item);
                 visibility = readVisibility(item);
                 audience = readAudience(item);
+                pragma = readPragma(item);
                 compatibilityLevel = readCompatibilityLevel(item);
                 pkgVersion = readPkgVersion(item);
                 artifactUrl = readArtifactUrl(item);
@@ -1915,7 +1967,7 @@ public class ContentHandler {
 
                 addOrUpdateViralityMetadata(item, appContext.getDeviceInfo().getDeviceID());
                 ContentModel newContentModel = ContentModel.build(appContext.getDBSession(), identifier, manifestVersion, GsonUtil.toJson(item),
-                        mimeType, contentType, visibility, path, refCount, contentState, audience, sizeOnDevice);
+                        mimeType, contentType, visibility, path, refCount, contentState, audience, pragma, sizeOnDevice);
 
                 if (oldContentModel == null) {
                     newContentModel.save();

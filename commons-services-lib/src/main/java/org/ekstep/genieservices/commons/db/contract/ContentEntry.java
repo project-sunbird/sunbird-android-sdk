@@ -19,7 +19,8 @@ public abstract class ContentEntry implements BaseColumns {
     public static final String COLUMN_NAME_REF_COUNT = "ref_count";
     public static final String COLUMN_NAME_CONTENT_STATE = "content_state"; // 0 - Seen but not available (only serverData will be available), 1 - Only spine, 2 - Artifact available
     public static final String COLUMN_NAME_CONTENT_TYPE = "content_type";   // Content type could be story, worksheet, game, collection, textbook.
-    public static final String COLUMN_NAME_AUDIENCE = "audience";   // learner or instructor
+    public static final String COLUMN_NAME_AUDIENCE = "audience";   // learner, instructor
+    public static final String COLUMN_NAME_PRAGMA = "pragma";   // external, ads
     public static final String COLUMN_NAME_UID = "uid";   // list of comma separated uid
     public static final String COLUMN_NAME_SIZE_ON_DEVICE = "size_on_device";   // list of comma separated uid
 
@@ -65,6 +66,10 @@ public abstract class ContentEntry implements BaseColumns {
 
     public static String getAlterEntryForContentSize() {
         return "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_NAME_SIZE_ON_DEVICE + DbConstants.INT_TYPE + " NOT NULL DEFAULT 0;";
+    }
+
+    public static String getAlterEntryForPragma() {
+        return "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_NAME_PRAGMA + DbConstants.TEXT_TYPE + ";";
     }
 
 }

@@ -10,8 +10,9 @@ public enum MasterDataType {
     AGE("age"),
     AGEGROUP("ageGroup"),
     GRADELEVEL("gradeLevel"),
+    AUDIENCE("audience"),
     CHANNEL("channel"),
-    AUDIENCE("audience");
+    PRAGMA("pragma");
 
     private final String value;
 

@@ -45,6 +45,8 @@ public class ContentData implements Serializable {
     private String lastPublishedOn;
     private String createdOn;
     private List<String> screenshots;
+    private List<String> audience;
+    private List<String> pragma;
 
     public ContentData() {
     }
@@ -205,6 +207,14 @@ public class ContentData implements Serializable {
         return screenshots;
     }
 
+    public List<String> getAudience() {
+        return audience;
+    }
+
+    public List<String> getPragma() {
+        return pragma;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -251,6 +261,8 @@ public class ContentData implements Serializable {
                 ", lastPublishedOn='" + lastPublishedOn + '\'' +
                 ", createdOn='" + createdOn + '\'' +
                 ", screenshots=" + screenshots +
+                ", audience=" + audience +
+                ", pragma=" + pragma +
                 '}';
     }
 }

@@ -23,6 +23,7 @@ public class ContentSearchCriteria implements Serializable {
     private String[] createdBy;
     private String[] audience;
     private String[] channel;
+    private String[] pragma;
     private String[] contentStatusArray;
     private String[] facets;
     private String[] contentTypes;
@@ -33,9 +34,10 @@ public class ContentSearchCriteria implements Serializable {
     // 1 - indicates search, 2 - filter
     private SearchType searchType;
 
-    private ContentSearchCriteria(String query, long limit, String mode, int age, int grade, String medium, String board, String[] createdBy,
-                                  String[] audience, String[] channel, String[] contentStatusArray, String[] facets, String[] contentTypes,
-                                  String[] keywords, List<ContentSortCriteria> sortCriteria, SearchType searchType) {
+    private ContentSearchCriteria(String query, long limit, String mode, int age, int grade, String medium, String board,
+                                  String[] createdBy, String[] audience, String[] channel, String[] pragma,
+                                  String[] contentStatusArray, String[] facets, String[] contentTypes, String[] keywords,
+                                  List<ContentSortCriteria> sortCriteria, SearchType searchType) {
         this.query = query;
         this.limit = limit;
         this.mode = mode;
@@ -46,6 +48,7 @@ public class ContentSearchCriteria implements Serializable {
         this.createdBy = createdBy;
         this.audience = audience;
         this.channel = channel;
+        this.pragma = pragma;
         this.contentStatusArray = contentStatusArray;
         this.facets = facets;
         this.contentTypes = contentTypes;
@@ -100,6 +103,10 @@ public class ContentSearchCriteria implements Serializable {
         return channel;
     }
 
+    public String[] getPragma() {
+        return pragma;
+    }
+
     public String[] getContentStatusArray() {
         return contentStatusArray;
     }
@@ -152,6 +159,7 @@ public class ContentSearchCriteria implements Serializable {
         private String[] createdBy;
         private String[] audience;
         private String[] channel;
+        private String[] pragma;
         private String[] contentStatusArray;
         private String[] facets;
         private String[] contentTypes;
@@ -240,8 +248,19 @@ public class ContentSearchCriteria implements Serializable {
             return this;
         }
 
+        /**
+         * Array of channels. i.e, "APSSDC", "GPF"
+         */
         public SearchBuilder channel(String[] channel) {
             this.channel = channel;
+            return this;
+        }
+
+        /**
+         * Array of pragma. i.e. "external", "ads".
+         */
+        public SearchBuilder pragma(String[] pragma) {
+            this.pragma = pragma;
             return this;
         }
 
@@ -288,7 +307,7 @@ public class ContentSearchCriteria implements Serializable {
             }
 
             return new ContentSearchCriteria(query, limit, mode, age, grade, medium, board, createdBy,
-                    audience, channel, contentStatusArray, facets, contentTypes, keywords, sortCriteria, SearchType.SEARCH);
+                    audience, channel, pragma, contentStatusArray, facets, contentTypes, keywords, sortCriteria, SearchType.SEARCH);
         }
     }
 

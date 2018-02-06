@@ -18,11 +18,12 @@ public class ContentListingCriteria {
     private String did;
     private String[] audience;
     private String[] channel;
+    private String[] pragma;
     private String[] facets;
 
     private ContentListingCriteria(String contentListingId, String uid, String language, String subject,
                                    int age, int grade, String medium, String board, String did,
-                                   String[] audience, String[] channel, String[] facets) {
+                                   String[] audience, String[] channel, String[] pragma, String[] facets) {
         this.contentListingId = contentListingId;
         this.uid = uid;
         this.language = language;
@@ -34,6 +35,7 @@ public class ContentListingCriteria {
         this.did = did;
         this.audience = audience;
         this.channel = channel;
+        this.pragma = pragma;
         this.facets = facets;
     }
 
@@ -81,6 +83,10 @@ public class ContentListingCriteria {
         return channel;
     }
 
+    public String[] getPragma() {
+        return pragma;
+    }
+
     public String[] getFacets() {
         return facets;
     }
@@ -97,6 +103,7 @@ public class ContentListingCriteria {
         private String did;
         private String[] audience;
         private String[] channel;
+        private String[] pragma;
         private String[] facets;
 
         /**
@@ -120,7 +127,7 @@ public class ContentListingCriteria {
 
         /**
          * Language id of the required content listing.
-         *
+         * <p>
          * ex - Hindi - hi, Kannada - kn etc
          */
         public Builder forLanguage(String language) {
@@ -193,6 +200,14 @@ public class ContentListingCriteria {
         }
 
         /**
+         * Array of pragma. i.e. "external", "ads".
+         */
+        public Builder pragma(String[] pragma) {
+            this.pragma = pragma;
+            return this;
+        }
+
+        /**
          * Array of facets. i.e. "contentType", "domain", "ageGroup", "language", "gradeLevel"
          */
         public Builder facets(String[] facets) {
@@ -209,7 +224,7 @@ public class ContentListingCriteria {
                 this.facets = new String[]{"contentType", "domain", "ageGroup", "language", "gradeLevel"};
             }
 
-            return new ContentListingCriteria(contentListingId, uid, language, subject, age, grade, medium, board, did, audience, channel, facets);
+            return new ContentListingCriteria(contentListingId, uid, language, subject, age, grade, medium, board, did, audience, channel, pragma, facets);
         }
     }
 }
