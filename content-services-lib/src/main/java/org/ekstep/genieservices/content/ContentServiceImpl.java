@@ -52,6 +52,7 @@ import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.enums.ScanStorageStatus;
 import org.ekstep.genieservices.commons.bean.telemetry.Interact;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.commons.db.contract.ContentEntry;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
@@ -89,6 +90,7 @@ import org.ekstep.genieservices.content.chained.move.ValidateDestinationContent;
 import org.ekstep.genieservices.content.chained.move.ValidateDestinationFolder;
 import org.ekstep.genieservices.content.db.model.ContentListingModel;
 import org.ekstep.genieservices.content.db.model.ContentModel;
+import org.ekstep.genieservices.content.db.model.ContentsModel;
 import org.ekstep.genieservices.content.network.ContentSearchAPI;
 import org.ekstep.genieservices.content.network.RecommendedContentAPI;
 import org.ekstep.genieservices.content.network.RelatedContentAPI;
@@ -102,6 +104,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -1010,7 +1013,10 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         List<ContentSpaceUsageSummaryResponse> contentSpaceUsageSummaryList = new ArrayList<>();
         for (String path : contentSpaceUsageSummaryRequest.getPaths()) {
-            // TODO: 6/2/18
+            String query = String.format(Locale.US, "select sum(%s) from %s where path LIKE '%s' AND mime_type != '%s';",
+                    ContentEntry.COLUMN_NAME_SIZE_ON_DEVICE, ContentEntry.TABLE_NAME, (path + "%"), ContentConstants.MimeType.COLLECTION);
+            long size = ContentsModel.totalSizeOnDevice(mAppContext.getDBSession(), query);
+            contentSpaceUsageSummaryList.add(new ContentSpaceUsageSummaryResponse(path, size));
         }
 
         GenieResponse<List<ContentSpaceUsageSummaryResponse>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);

@@ -18,12 +18,19 @@ public class ContentsModel implements IReadable {
 
     private IDBSession mDBSession;
     private String filterCondition;
+    private boolean onlySize;
+    private long totalSize;
 
     private List<ContentModel> contentModelList;
 
     private ContentsModel(IDBSession dbSession, String filter) {
         this.mDBSession = dbSession;
         this.filterCondition = filter;
+    }
+
+    private ContentsModel(IDBSession dbSession, boolean onlySize) {
+        this.mDBSession = dbSession;
+        this.onlySize = onlySize;
     }
 
     public static ContentsModel find(IDBSession dbSession, String filter) {
@@ -48,17 +55,27 @@ public class ContentsModel implements IReadable {
         }
     }
 
+    public static long totalSizeOnDevice(IDBSession dbSession, String query) {
+        ContentsModel model = new ContentsModel(dbSession, true);
+        dbSession.read(model, query);
+        return model.totalSize;
+    }
+
     @Override
     public IReadable read(IResultSet resultSet) {
         if (resultSet != null && resultSet.moveToFirst()) {
             contentModelList = new ArrayList<>();
+            if (onlySize) {
+                totalSize = resultSet.getLong(0);
+            } else {
 
-            do {
-                ContentModel content = ContentModel.build(mDBSession);
-                content.readWithoutMoving(resultSet);
+                do {
+                    ContentModel content = ContentModel.build(mDBSession);
+                    content.readWithoutMoving(resultSet);
 
-                contentModelList.add(content);
-            } while (resultSet.moveToNext());
+                    contentModelList.add(content);
+                } while (resultSet.moveToNext());
+            }
         }
 
         return this;
