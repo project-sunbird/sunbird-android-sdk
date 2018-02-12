@@ -1013,8 +1013,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         List<ContentSpaceUsageSummaryResponse> contentSpaceUsageSummaryList = new ArrayList<>();
         for (String path : contentSpaceUsageSummaryRequest.getPaths()) {
-            String query = String.format(Locale.US, "select sum(%s) from %s where path LIKE '%s' AND mime_type != '%s';",
-                    ContentEntry.COLUMN_NAME_SIZE_ON_DEVICE, ContentEntry.TABLE_NAME, (path + "%"), ContentConstants.MimeType.COLLECTION);
+            String query = String.format(Locale.US, "select sum(%s) from %s where %s LIKE '%s' AND %s != '%s';",
+                    ContentEntry.COLUMN_NAME_SIZE_ON_DEVICE, ContentEntry.TABLE_NAME, ContentEntry.COLUMN_NAME_PATH, (path + "%"), ContentEntry.COLUMN_NAME_MIME_TYPE, ContentConstants.MimeType.COLLECTION);
             long size = ContentsModel.totalSizeOnDevice(mAppContext.getDBSession(), query);
             contentSpaceUsageSummaryList.add(new ContentSpaceUsageSummaryResponse(path, size));
         }
