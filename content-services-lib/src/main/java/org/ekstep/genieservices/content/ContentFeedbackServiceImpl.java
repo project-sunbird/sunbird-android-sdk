@@ -61,6 +61,7 @@ public class ContentFeedbackServiceImpl extends BaseService implements IContentF
     private void saveContentFeedbackEvent(ContentFeedback contentFeedback) {
         Feedback.Builder feedback = new Feedback.Builder();
         feedback.rating(contentFeedback.getRating())
+                .environment(ServiceConstants.Telemetry.SDK_ENVIRONMENT)
                 .comments(contentFeedback.getComments())
                 .objectId(contentFeedback.getContentId())
                 .objectType(ServiceConstants.Telemetry.OBJECT_TYPE_CONTENT)
