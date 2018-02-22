@@ -2014,4 +2014,11 @@ public class ContentHandler {
         }
     }
 
+
+    public static long getUsageSpace(String path, AppContext appContext) {
+        String query = String.format(Locale.US, "select sum(%s) from %s where %s LIKE '%s' AND %s != '%s';",
+                ContentEntry.COLUMN_NAME_SIZE_ON_DEVICE, ContentEntry.TABLE_NAME, ContentEntry.COLUMN_NAME_PATH, (path + "%"), ContentEntry.COLUMN_NAME_MIME_TYPE, ContentConstants.MimeType.COLLECTION);
+        return ContentsModel.totalSizeOnDevice(appContext.getDBSession(), query);
+    }
+
 }

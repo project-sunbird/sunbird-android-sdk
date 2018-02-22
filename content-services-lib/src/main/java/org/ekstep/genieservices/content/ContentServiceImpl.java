@@ -52,7 +52,6 @@ import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.enums.ScanStorageStatus;
 import org.ekstep.genieservices.commons.bean.telemetry.Interact;
 import org.ekstep.genieservices.commons.chained.IChainable;
-import org.ekstep.genieservices.commons.db.contract.ContentEntry;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
@@ -90,7 +89,6 @@ import org.ekstep.genieservices.content.chained.move.ValidateDestinationContent;
 import org.ekstep.genieservices.content.chained.move.ValidateDestinationFolder;
 import org.ekstep.genieservices.content.db.model.ContentListingModel;
 import org.ekstep.genieservices.content.db.model.ContentModel;
-import org.ekstep.genieservices.content.db.model.ContentsModel;
 import org.ekstep.genieservices.content.network.ContentSearchAPI;
 import org.ekstep.genieservices.content.network.RecommendedContentAPI;
 import org.ekstep.genieservices.content.network.RelatedContentAPI;
@@ -104,7 +102,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -1013,9 +1010,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         List<ContentSpaceUsageSummaryResponse> contentSpaceUsageSummaryList = new ArrayList<>();
         for (String path : contentSpaceUsageSummaryRequest.getPaths()) {
-            String query = String.format(Locale.US, "select sum(%s) from %s where %s LIKE '%s' AND %s != '%s';",
-                    ContentEntry.COLUMN_NAME_SIZE_ON_DEVICE, ContentEntry.TABLE_NAME, ContentEntry.COLUMN_NAME_PATH, (path + "%"), ContentEntry.COLUMN_NAME_MIME_TYPE, ContentConstants.MimeType.COLLECTION);
-            long size = ContentsModel.totalSizeOnDevice(mAppContext.getDBSession(), query);
+            long size = ContentHandler.getUsageSpace(path, mAppContext);
             contentSpaceUsageSummaryList.add(new ContentSpaceUsageSummaryResponse(path, size));
         }
 
