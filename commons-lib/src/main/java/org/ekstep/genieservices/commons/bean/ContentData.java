@@ -4,6 +4,7 @@ import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +46,7 @@ public class ContentData implements Serializable {
     private String lastPublishedOn;
     private String createdOn;
     private List<String> screenshots;
-    private List<String> audience;
+    private Object audience;
     private List<String> pragma;
 
     public ContentData() {
@@ -208,7 +209,17 @@ public class ContentData implements Serializable {
     }
 
     public List<String> getAudience() {
-        return audience;
+        List<String> audienceList = null;
+        if (audience != null) {
+            if (audience instanceof String) {
+                audienceList = new ArrayList<>();
+                audienceList.add((String) audience);
+            } else {
+                audienceList = (ArrayList<String>) audience;
+            }
+        }
+
+        return audienceList;
     }
 
     public List<String> getPragma() {
