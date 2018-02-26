@@ -142,8 +142,10 @@ public class LearnerSummaryModel implements IReadable, IWritable, IUpdatable {
 
     @Override
     public String updateBy() {
-        return String.format(Locale.US, "where %s = ? AND %s = ? AND %s = ? ", LearnerSummaryEntry.COLUMN_NAME_UID, LearnerSummaryEntry.COLUMN_NAME_CONTENT_ID,
-                LearnerSummaryEntry.COLUMN_NAME_HIERARCHY_DATA);
+        return String.format(Locale.US, "%s = '%s' AND %s = '%s' AND %s = '%s' ",
+                LearnerSummaryEntry.COLUMN_NAME_UID, uid,
+                LearnerSummaryEntry.COLUMN_NAME_CONTENT_ID, contentId,
+                LearnerSummaryEntry.COLUMN_NAME_HIERARCHY_DATA, hierarchyData);
     }
 
     @Override

@@ -151,7 +151,7 @@ public class ImportedMetadataModel implements IWritable, IReadable, IUpdatable, 
 
     @Override
     public String updateBy() {
-        return String.format(Locale.US, "where %s = '%s' AND %s = '%s'",
+        return String.format(Locale.US, "%s = '%s' AND %s = '%s'",
                 ImportedMetadataEntry.COLUMN_NAME_IMPORTED_ID, importedId,
                 ImportedMetadataEntry.COLUMN_NAME_DEVICE_ID, deviceId);
     }

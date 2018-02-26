@@ -185,7 +185,8 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
 
     @Override
     public String updateBy() {
-        return String.format(Locale.US, "uid = '%s'", profile.getUid());
+        return String.format(Locale.US, "%s = '%s'",
+                ProfileEntry.COLUMN_NAME_UID, profile.getUid());
     }
 
     private void populateContentValues(ContentValues contentValues) {

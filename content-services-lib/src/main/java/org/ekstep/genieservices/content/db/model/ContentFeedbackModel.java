@@ -117,7 +117,9 @@ public class ContentFeedbackModel implements IWritable, IUpdatable, IReadable {
 
     @Override
     public String updateBy() {
-        return String.format(Locale.US, "where %s = ? and %s = ? ", ContentFeedbackEntry.COLUMN_NAME_UID, ContentFeedbackEntry.COLUMN_NAME_CONTENT_ID);
+        return String.format(Locale.US, "%s = '%s' and %s = '%s' ",
+                ContentFeedbackEntry.COLUMN_NAME_UID, uid,
+                ContentFeedbackEntry.COLUMN_NAME_CONTENT_ID, contentId);
     }
 
     @Override
