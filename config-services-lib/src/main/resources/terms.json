@@ -248,6 +248,13 @@
               "pragma": [
                 "external"
               ]
+            },
+            "exclFilters" : {
+              "pragma":{
+                "notIn":[
+                  "external"
+                ]
+              }
             }
           }
         },
@@ -261,6 +268,13 @@
               "pragma": [
                 "ads"
               ]
+            },
+            "exclFilters" : {
+              "pragma":{
+                "notIn":[
+                  "ads"
+                ]
+              }
             }
           }
         }
@@ -1072,6 +1086,11 @@
           }
         }
       ]
+    },
+    "genieConfig":{
+      "facets":["contentType", "domain", "ageGroup", "language", "gradeLevel"],
+      "contentType":["Story", "Worksheet", "Game", "Collection", "TextBook", "Resource"],
+      "exclPragma":["external","ads"]
     }
   }
 }

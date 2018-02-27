@@ -89,8 +89,8 @@ public class ContentHandler {
     private static final String KEY_DOWNLOAD_URL = "downloadUrl";
     private static final String KEY_COMPATIBILITY_LEVEL = "compatibilityLevel";
     private static final String KEY_MIME_TYPE = "mimeType";
-    private static final Object AUDIENCE_KEY = "audience";
-    private static final Object PRAGMA_KEY = "pragma";
+    private static final String AUDIENCE_KEY = "audience";
+    private static final String PRAGMA_KEY = "pragma";
     private static final String KEY_LAST_UPDATED_ON = "lastUpdatedOn";
     private static final String KEY_PRE_REQUISITES = "pre_requisites";
     private static final String KEY_CHILDREN = "children";
@@ -1055,43 +1055,47 @@ public class ContentHandler {
         //Add filters for criteria attributes
         // Add subject filter
         if (criteria.getAge() > 0) {
-            applyListingFilter(configService, MasterDataType.AGEGROUP, String.valueOf(criteria.getAge()), filterMap);
+            applyListingFilter(configService, MasterDataType.AGEGROUP, String.valueOf(criteria.getAge()), filterMap, false);
         }
 
         // Add standard filter
         if (criteria.getGrade() > 0) {
-            applyListingFilter(configService, MasterDataType.GRADELEVEL, String.valueOf(criteria.getGrade()), filterMap);
+            applyListingFilter(configService, MasterDataType.GRADELEVEL, String.valueOf(criteria.getGrade()), filterMap, false);
         }
 
         // Add medium filter
         if (!StringUtil.isNullOrEmpty(criteria.getMedium())) {
-            applyListingFilter(configService, MasterDataType.MEDIUM, criteria.getMedium(), filterMap);
+            applyListingFilter(configService, MasterDataType.MEDIUM, criteria.getMedium(), filterMap, false);
         }
 
         // Add board filter
         if (!StringUtil.isNullOrEmpty(criteria.getBoard())) {
-            applyListingFilter(configService, MasterDataType.BOARD, criteria.getBoard(), filterMap);
+            applyListingFilter(configService, MasterDataType.BOARD, criteria.getBoard(), filterMap, false);
         }
 
         String[] audienceArr = criteria.getAudience();
         if (!CollectionUtil.isEmpty(audienceArr)) {
             for (String audience : audienceArr) {
-                applyListingFilter(configService, MasterDataType.AUDIENCE, audience, filterMap);
+                applyListingFilter(configService, MasterDataType.AUDIENCE, audience, filterMap, false);
             }
         }
 
         String[] channelArr = criteria.getChannel();
         if (!CollectionUtil.isEmpty(channelArr)) {
             for (String channel : channelArr) {
-                applyListingFilter(configService, MasterDataType.CHANNEL, channel, filterMap);
+                applyListingFilter(configService, MasterDataType.CHANNEL, channel, filterMap, false);
             }
         }
 
         String[] pragmaArr = criteria.getPragma();
+        if (CollectionUtil.isEmpty(pragmaArr)) {
+            // If pragma array is empty than get the all pragma values from master data to apply the default exclusion/notIn filter.
+            pragmaArr = new String[]{"external", "ads"};
+        }
+
         if (!CollectionUtil.isEmpty(pragmaArr)) {
             for (String pragma : pragmaArr) {
-                // TODO: 5/2/18 - Add not equal query
-//                applyListingFilter(configService, MasterDataType.PRAGMA, pragma, filterMap);
+                applyListingFilter(configService, MasterDataType.PRAGMA, pragma, filterMap, true);
             }
         }
 
@@ -1145,13 +1149,7 @@ public class ContentHandler {
         return compatibilityLevelMap;
     }
 
-    private static void addFiltersIfNotAvailable(Map<String, Object> filterMap, String key, List<String> values) {
-        if (filterMap.isEmpty() || filterMap.get(key) == null) {
-            filterMap.put(key, values);
-        }
-    }
-
-    private static void applyListingFilter(IConfigService configService, MasterDataType masterDataType, String propertyValue, Map<String, Object> filterMap) {
+    private static void applyListingFilter(IConfigService configService, MasterDataType masterDataType, String propertyValue, Map<String, Object> filterMap, boolean excludeFilter) {
         if (configService != null && propertyValue != null) {
 
             if (masterDataType == MasterDataType.AGEGROUP) {
@@ -1166,23 +1164,69 @@ public class ContentHandler {
                 for (MasterDataValues masterDataValues : masterData.getValues()) {
                     if (propertyValue.equals(masterDataValues.getTelemetry())) {
                         Map<String, Object> searchMap = masterDataValues.getSearch();
-                        Map filtersMap = (Map) searchMap.get("filters");
-                        if (filtersMap != null) {
-                            Iterator it = filtersMap.entrySet().iterator();
-                            while (it.hasNext()) {
-                                Set values = new HashSet();
-                                Map.Entry entry = (Map.Entry) it.next();
-                                List filterMapValue = (List) filterMap.get(entry.getKey());
-                                if (filterMapValue != null) {
-                                    values.addAll(filterMapValue);
-                                }
-                                values.addAll((List) filtersMap.get(entry.getKey()));
-                                filterMap.put(entry.getKey().toString(), new ArrayList<>(values));
-                            }
+
+                        // inclusion/exclusion Filter map in terms API.
+                        if (excludeFilter) {
+                            applyExclusionFilter(filterMap, searchMap);
+                        } else {
+                            applyInclusionFilter(filterMap, searchMap);
                         }
                         break;
                     }
                 }
+            }
+        }
+    }
+
+    private static void applyInclusionFilter(Map<String, Object> filterMap, Map<String, Object> searchMap) {
+        Map<String, Object> filtersMap = (Map<String, Object>) searchMap.get("filters");
+        if (filtersMap != null) {
+            for (Map.Entry<String, Object> entry : filtersMap.entrySet()) {
+                Set values = new HashSet();
+
+                // Existing or already applied filter.
+                Object filterMapValue = filterMap.get(entry.getKey());
+                if (filterMapValue != null && filterMapValue instanceof List) {
+                    values.addAll((List) filterMapValue);
+                }
+
+                // Add new filter in existing filter.
+                values.addAll((List) filtersMap.get(entry.getKey()));
+
+                filterMap.put(entry.getKey(), new ArrayList<>(values));
+            }
+        }
+    }
+
+    private static void applyExclusionFilter(Map<String, Object> filterMap, Map<String, Object> searchMap) {
+        Map<String, Object> filtersMap = (Map<String, Object>) searchMap.get("exclFilters");
+        if (filtersMap != null) {
+            for (Map.Entry<String, Object> entry : filtersMap.entrySet()) {
+                Map appliedFilter = new HashMap<>();
+
+                // Existing or already applied filter.
+                Object filterMapValue = filterMap.get(entry.getKey());
+                if (filterMapValue != null && filterMapValue instanceof Map) {
+                    Map<String, Object> map = (Map) filterMapValue;
+                    for (Map.Entry<String, Object> e : map.entrySet()) {
+                        Set values = new HashSet();
+                        values.addAll((List) map.get(e.getKey()));  // e.g. key would be "notIn"
+                        appliedFilter.put(e.getKey(), new ArrayList<>(values));
+                    }
+                }
+
+                // Add new filter in existing filter.
+                Map<String, Object> masterDataFilterMapValue = (Map) filtersMap.get(entry.getKey());
+                for (Map.Entry<String, Object> e : masterDataFilterMapValue.entrySet()) {
+                    Set values = new HashSet();
+                    if(appliedFilter.get(e.getKey()) != null) {
+                        values.addAll((List) appliedFilter.get(e.getKey()));
+                    }
+                    values.addAll((List) masterDataFilterMapValue.get(e.getKey()));     // e.g. key would be "notIn"
+                    appliedFilter.put(e.getKey(), new ArrayList<>(values));
+                }
+
+                filterMap.put(entry.getKey(), appliedFilter);
             }
         }
     }
@@ -1365,34 +1409,34 @@ public class ContentHandler {
 
         // Add subject filter
         if (!StringUtil.isNullOrEmpty(contentListingCriteria.getSubject()))
-            applyListingFilter(configService, MasterDataType.SUBJECT, contentListingCriteria.getSubject(), filterMap);
+            applyListingFilter(configService, MasterDataType.SUBJECT, contentListingCriteria.getSubject(), filterMap, false);
 
         if (contentListingCriteria.getAge() > 0)
-            applyListingFilter(configService, MasterDataType.AGEGROUP, String.valueOf(contentListingCriteria.getAge()), filterMap);
+            applyListingFilter(configService, MasterDataType.AGEGROUP, String.valueOf(contentListingCriteria.getAge()), filterMap, false);
 
         // Add board filter
         if (!StringUtil.isNullOrEmpty(contentListingCriteria.getBoard()))
-            applyListingFilter(configService, MasterDataType.BOARD, contentListingCriteria.getBoard(), filterMap);
+            applyListingFilter(configService, MasterDataType.BOARD, contentListingCriteria.getBoard(), filterMap, false);
 
         // Add medium filter
         if (!StringUtil.isNullOrEmpty(contentListingCriteria.getMedium()))
-            applyListingFilter(configService, MasterDataType.MEDIUM, contentListingCriteria.getMedium(), filterMap);
+            applyListingFilter(configService, MasterDataType.MEDIUM, contentListingCriteria.getMedium(), filterMap, false);
 
         // Add standard filter
         if (contentListingCriteria.getGrade() > 0)
-            applyListingFilter(configService, MasterDataType.GRADELEVEL, String.valueOf(contentListingCriteria.getGrade()), filterMap);
+            applyListingFilter(configService, MasterDataType.GRADELEVEL, String.valueOf(contentListingCriteria.getGrade()), filterMap, false);
 
         String[] audienceArr = contentListingCriteria.getAudience();
         if (!CollectionUtil.isEmpty(audienceArr)) {
             for (String audience : audienceArr) {
-                applyListingFilter(configService, MasterDataType.AUDIENCE, audience, filterMap);
+                applyListingFilter(configService, MasterDataType.AUDIENCE, audience, filterMap, false);
             }
         }
 
         String[] channelArr = contentListingCriteria.getChannel();
         if (!CollectionUtil.isEmpty(channelArr)) {
             for (String channel : channelArr) {
-                applyListingFilter(configService, MasterDataType.CHANNEL, channel, filterMap);
+                applyListingFilter(configService, MasterDataType.CHANNEL, channel, filterMap, false);
             }
         }
 
@@ -1852,7 +1896,6 @@ public class ContentHandler {
         return validIdentifiers;
     }
 
-
     /**
      * This method adds the necessary information of the content to db, when the content is added manually.
      *
@@ -2014,11 +2057,14 @@ public class ContentHandler {
         }
     }
 
-
     public static long getUsageSpace(String path, AppContext appContext) {
         String query = String.format(Locale.US, "select sum(%s) from %s where %s LIKE '%s' AND %s != '%s';",
                 ContentEntry.COLUMN_NAME_SIZE_ON_DEVICE, ContentEntry.TABLE_NAME, ContentEntry.COLUMN_NAME_PATH, (path + "%"), ContentEntry.COLUMN_NAME_MIME_TYPE, ContentConstants.MimeType.COLLECTION);
         return ContentsModel.totalSizeOnDevice(appContext.getDBSession(), query);
+    }
+
+    private void applyNotInFilter() {
+
     }
 
 }
