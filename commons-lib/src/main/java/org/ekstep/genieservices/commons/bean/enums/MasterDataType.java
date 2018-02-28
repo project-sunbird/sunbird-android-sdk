@@ -12,7 +12,8 @@ public enum MasterDataType {
     GRADELEVEL("gradeLevel"),
     AUDIENCE("audience"),
     CHANNEL("channel"),
-    PRAGMA("pragma");
+    PRAGMA("pragma"),
+    CONFIG("config");
 
     private final String value;
 

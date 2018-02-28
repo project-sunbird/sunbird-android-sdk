@@ -11,6 +11,26 @@
   },
   "responseCode": "OK",
   "result": {
+    "config": {
+      "label": "Genie config",
+      "value": "config",
+      "language": "en",
+      "description": "Genie configurations",
+      "values": [
+        {
+          "label": "facets",
+          "value": "contentType,domain,ageGroup,language,gradeLevel"
+        },
+        {
+          "label": "contentType",
+          "value": "Story,Worksheet,Game,Collection,TextBook,Resource"
+        },
+        {
+          "label": "exclPragma",
+          "value": "external,ads"
+        }
+      ]
+    },
     "gradeLevel": {
       "label": "Grade Level",
       "value": "gradeLevel",
@@ -249,9 +269,9 @@
                 "external"
               ]
             },
-            "exclFilters" : {
-              "pragma":{
-                "notIn":[
+            "exclFilters": {
+              "pragma": {
+                "notIn": [
                   "external"
                 ]
               }
@@ -269,9 +289,9 @@
                 "ads"
               ]
             },
-            "exclFilters" : {
-              "pragma":{
-                "notIn":[
+            "exclFilters": {
+              "pragma": {
+                "notIn": [
                   "ads"
                 ]
               }
@@ -1086,11 +1106,6 @@
           }
         }
       ]
-    },
-    "genieConfig":{
-      "facets":["contentType", "domain", "ageGroup", "language", "gradeLevel"],
-      "contentType":["Story", "Worksheet", "Game", "Collection", "TextBook", "Resource"],
-      "exclPragma":["external","ads"]
     }
   }
 }
