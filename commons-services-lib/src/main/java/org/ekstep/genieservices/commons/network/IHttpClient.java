@@ -10,12 +10,13 @@ import java.util.Map;
  */
 public interface IHttpClient {
 
+
     Void createRequest(String url);
 
     Void setHeaders(Map<String, String> headers);
 
     ApiResponse doGet() throws IOException;
 
-    ApiResponse doPost(byte[] requestBody) throws IOException;
+    ApiResponse doPost(IRequestBody requestBody) throws IOException;
 
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
+import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -52,13 +53,35 @@ public class AndroidHttpClient implements IHttpClient {
     }
 
     @Override
-    public ApiResponse doPost(byte[] requestBody) throws IOException {
-        requestBuilder.post(RequestBody.create(MediaType.parse("application/json"), requestBody));
+    public ApiResponse doPost(IRequestBody requestBody) throws IOException {
+
+        requestBuilder.post(prepareRequestBody(requestBody));
         Request request = requestBuilder.build();
         Response response = mHttpClient.newCall(request).execute();
         ApiResponse apiResponse = new ApiResponse(response.isSuccessful(), response.body() != null ? response.body().string() : "", response.code());
         response.close();
         return apiResponse;
+    }
+
+    private RequestBody prepareRequestBody(IRequestBody requestBody) {
+
+        if (requestBody.getContentType().equals(IRequestBody.MIME_TYPE_JSON)) {
+            return RequestBody.create(MediaType.parse(IRequestBody.MIME_TYPE_JSON), (byte[])requestBody.getBody());
+        }
+
+
+        else if (requestBody.getContentType().equals(IRequestBody.MIME_TYPE_FORM)) {
+            Map<String, String> formData = (Map<String, String>) requestBody.getBody();
+            FormBody.Builder builder = new FormBody.Builder();
+            Iterator<String> iterator = formData.keySet().iterator();
+            while (iterator.hasNext()) {
+                String key = iterator.next();
+                String value = formData.get(key);
+                builder.add(key, value);
+            }
+            return builder.build();
+        }
+        return null;
     }
 
 }

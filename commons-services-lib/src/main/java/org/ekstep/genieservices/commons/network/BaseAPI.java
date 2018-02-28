@@ -20,6 +20,7 @@ public abstract class BaseAPI {
 
     private static final String GET = "GET";
     private static final String POST = "POST";
+    private static final String POST_FORM = "POST_FORM";
     private static final int AUTHENTICATION_FAILURE = 401;
 
     private AppContext mAppContext;
@@ -46,6 +47,8 @@ public abstract class BaseAPI {
     public GenieResponse post() {
         return fetchFromServer(POST, true);
     }
+
+
 
     private GenieResponse fetchFromServer(String requestType, boolean retryForAuthError) {
         if (!mAppContext.getConnectionInfo().isConnected()) {
@@ -77,7 +80,7 @@ public abstract class BaseAPI {
         if (GET.equals(requestType)) {
             apiResponse = httpClient.doGet();
         } else if (POST.equals(requestType)) {
-            apiResponse = httpClient.doPost(getRequestData());
+            apiResponse = httpClient.doPost(getRequestBody());
         }
         return apiResponse;
     }
@@ -102,6 +105,12 @@ public abstract class BaseAPI {
 
     private GenieResponse<String> getErrorResponse(String error, String errorMessage) {
         return GenieResponseBuilder.getErrorResponse(error, errorMessage, TAG, String.class);
+    }
+
+    protected IRequestBody getRequestBody() {
+        IRequestBody requestBody = new ByteArrayRequestBody();
+        requestBody.setBody(getRequestData());
+        return requestBody;
     }
 
     protected boolean shouldAuthenticate() {
