@@ -737,7 +737,7 @@ public class ContentHandler {
     }
 
     public static List<ContentModel> findAllContentsWithIdentifiers(IDBSession dbSession, List<String> identifiers) {
-        String filter = String.format(Locale.US, " where %s in ('%s') ", ContentEntry.COLUMN_NAME_IDENTIFIER, StringUtil.join("','", identifiers));
+        String filter = String.format(Locale.US, " where %s in ('%s') AND %s > 0", ContentEntry.COLUMN_NAME_IDENTIFIER, StringUtil.join("','", identifiers), ContentEntry.COLUMN_NAME_REF_COUNT);
 
         List<ContentModel> contentModelListInDB = null;
         ContentsModel contentsModel = ContentsModel.find(dbSession, filter);
