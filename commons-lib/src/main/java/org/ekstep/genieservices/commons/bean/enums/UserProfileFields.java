@@ -2,6 +2,19 @@ package org.ekstep.genieservices.commons.bean.enums;
 
 /**
  * Enum to hold user profile fields.
+ * <p>
+ * "address"
+ * "education"
+ * "jobProfile"
+ * "dob"
+ * "grade"
+ * "gender"
+ * "profileSummary"
+ * "lastName"
+ * "subject"
+ * "location"
+ * "language"
+ * "avatar"
  */
 public enum UserProfileFields {
 

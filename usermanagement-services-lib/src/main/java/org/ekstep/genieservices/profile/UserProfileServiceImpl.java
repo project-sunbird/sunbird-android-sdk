@@ -8,6 +8,7 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.UserProfile;
 import org.ekstep.genieservices.commons.bean.UserProfileDetailsRequest;
+import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
@@ -36,28 +37,58 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
         params.put("request", GsonUtil.toJson(userProfileDetailsRequest));
         String methodName = "getUserProfileDetails@UserProfileServiceImpl";
 
+        GenieResponse<UserProfile> response;
+
         String fields = "";
         if (!CollectionUtil.isNullOrEmpty(userProfileDetailsRequest.getRequiredFields())) {
             fields = "fields?" + StringUtil.join(",", userProfileDetailsRequest.getRequiredFields());
         }
 
-        UserProfileDetailsAPI userProfileDetailsAPI = new UserProfileDetailsAPI(mAppContext, userProfileDetailsRequest.getUserId(), fields);
-        GenieResponse genieResponse = userProfileDetailsAPI.get();
+        String key = userProfileDetailsRequest.getUserId();
+        NoSqlModel userProfileInDB = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
+        if (userProfileInDB == null) {
+            GenieResponse userProfileDetailsAPIResponse = fetchUserProfileDetailsFromServer(userProfileDetailsRequest.getUserId(), fields);
+            if (userProfileDetailsAPIResponse.getStatus()) {
+                String jsonResponse = userProfileDetailsAPIResponse.getResult().toString();
+                userProfileInDB = NoSqlModel.build(mAppContext.getDBSession(), key, jsonResponse);
+                userProfileInDB.save();
+            } else {
+                response = GenieResponseBuilder.getErrorResponse(userProfileDetailsAPIResponse.getError(), userProfileDetailsAPIResponse.getMessage(), TAG);
 
-        GenieResponse<UserProfile> response;
-        if (genieResponse.getStatus()) {
-            String jsonStr = genieResponse.getResult().toString();
-            UserProfile userProfile = new UserProfile(jsonStr);
+                TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, userProfileDetailsAPIResponse.getMessage());
+                return response;
+            }
 
-            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-            response.setResult(userProfile);
-
-            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
-        } else {
-            response = GenieResponseBuilder.getErrorResponse(genieResponse.getError(), genieResponse.getMessage(), TAG);
-
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, genieResponse.getMessage());
+        } else if (userProfileDetailsRequest.isRefreshUserProfileDetails()) {
+            refreshUserProfileDetailsFromServer(userProfileDetailsRequest.getUserId(), fields, userProfileInDB);
         }
+
+        UserProfile userProfile = new UserProfile(userProfileInDB.getValue());
+        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        response.setResult(userProfile);
+
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;
+    }
+
+    private GenieResponse fetchUserProfileDetailsFromServer(String userId, String fields) {
+        UserProfileDetailsAPI userProfileDetailsAPI = new UserProfileDetailsAPI(mAppContext, userId, fields);
+        return userProfileDetailsAPI.get();
+    }
+
+    private void refreshUserProfileDetailsFromServer(final String userId, final String fields, final NoSqlModel userProfileInDB) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                GenieResponse userProfileDetailsAPIResponse = fetchUserProfileDetailsFromServer(userId, fields);
+                if (userProfileDetailsAPIResponse.getStatus()) {
+                    String jsonResponse = userProfileDetailsAPIResponse.getResult().toString();
+                    if (!StringUtil.isNullOrEmpty(jsonResponse)) {
+                        userProfileInDB.setValue(jsonResponse);
+                        userProfileInDB.update();
+                    }
+                }
+            }
+        }).start();
     }
 }

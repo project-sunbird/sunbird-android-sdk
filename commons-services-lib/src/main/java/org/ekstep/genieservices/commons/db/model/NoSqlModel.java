@@ -71,7 +71,6 @@ public class NoSqlModel implements IWritable, IReadable, IUpdatable, ICleanable 
     @Override
     public ContentValues getFieldsToUpdate() {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(NoSqlEntry.COLUMN_NAME_KEY, mKey);
         contentValues.put(NoSqlEntry.COLUMN_NAME_VALUE, mValue);
         return contentValues;
     }
@@ -145,6 +144,10 @@ public class NoSqlModel implements IWritable, IReadable, IUpdatable, ICleanable 
 
     public String getValue() {
         return mValue;
+    }
+
+    public void setValue(String value) {
+        this.mValue = value;
     }
 
 }

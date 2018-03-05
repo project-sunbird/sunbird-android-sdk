@@ -22,7 +22,7 @@ public class UserProfileDetailsAPI extends BaseAPI {
     public UserProfileDetailsAPI(AppContext appContext, String userId, String queryParams) {
         super(appContext,
                 String.format(Locale.US, "%s/%s/%s?%s",
-                        appContext.getParams().getString(IParams.Key.USER_BASE_URL), SERVICE_ENDPOINTS,
+                        appContext.getParams().getString(IParams.Key.USER_PROFILE_BASE_URL), SERVICE_ENDPOINTS,
                         userId,
                         queryParams),
                 TAG);
