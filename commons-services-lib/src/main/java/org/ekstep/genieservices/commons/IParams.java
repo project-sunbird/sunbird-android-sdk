@@ -42,6 +42,7 @@ public interface IParams {
         String CONTENT_LISTING_BASE_URL = "CONTENT_LISTING_BASE_URL";
         String CONTENT_BASE_URL = "CONTENT_BASE_URL";
         String APIGATEWAY_BASE_URL = "APIGATEWAY_BASE_URL";
+        String USER_PROFILE_BASE_URL = "USER_PROFILE_BASE_URL";
         String API_PASS = "API_PASS";
         String API_USER = "API_USER";
         String MOBILE_APP_SECRET = "MOBILE_APP_SECRET";
