@@ -737,7 +737,7 @@ public class ContentHandler {
     }
 
     public static List<ContentModel> findAllContentsWithIdentifiers(IDBSession dbSession, List<String> identifiers) {
-        String filter = String.format(Locale.US, " where %s in ('%s') ", ContentEntry.COLUMN_NAME_IDENTIFIER, StringUtil.join("','", identifiers));
+        String filter = String.format(Locale.US, " where %s in ('%s') AND %s > 0", ContentEntry.COLUMN_NAME_IDENTIFIER, StringUtil.join("','", identifiers), ContentEntry.COLUMN_NAME_REF_COUNT);
 
         List<ContentModel> contentModelListInDB = null;
         ContentsModel contentsModel = ContentsModel.find(dbSession, filter);
@@ -1015,7 +1015,13 @@ public class ContentHandler {
         requestMap.put("query", criteria.getQuery());
         requestMap.put("limit", criteria.getLimit());
         requestMap.put("mode", criteria.getMode());
-        requestMap.put("facets", Arrays.asList(criteria.getFacets()));
+
+        String[] facets = criteria.getFacets();
+        if (CollectionUtil.isEmpty(facets)) {
+            facets = getFilterConfig(configService, ContentConstants.CONFIG_FACETS);
+        }
+        requestMap.put("facets", Arrays.asList(facets));
+
         addSortCriteria(requestMap, criteria);
         if (SearchType.SEARCH.equals(criteria.getSearchType())) {
             requestMap.put("filters", getSearchRequest(appContext, configService, criteria));
@@ -1087,19 +1093,47 @@ public class ContentHandler {
             }
         }
 
-        String[] pragmaArr = criteria.getPragma();
+        boolean exclPragma = true;
+        String[] pragmaArr = criteria.getExclPragma();
+        if (CollectionUtil.isEmpty(pragmaArr)) {
+            pragmaArr = criteria.getPragma();
+            exclPragma = false;
+        }
+
         if (CollectionUtil.isEmpty(pragmaArr)) {
             // If pragma array is empty than get the all pragma values from master data to apply the default exclusion/notIn filter.
-            pragmaArr = new String[]{"external", "ads"};
+            pragmaArr = getFilterConfig(configService, ContentConstants.CONFIG_EXCLUDE_PRAGMA);
+            exclPragma = true;
         }
 
         if (!CollectionUtil.isEmpty(pragmaArr)) {
             for (String pragma : pragmaArr) {
-                applyListingFilter(configService, MasterDataType.PRAGMA, pragma, filterMap, true);
+                applyListingFilter(configService, MasterDataType.PRAGMA, pragma, filterMap, exclPragma);
             }
         }
 
         return filterMap;
+    }
+
+    private static String[] getFilterConfig(IConfigService configService, String filter) {
+        if (configService != null) {
+            GenieResponse<MasterData> response = configService.getMasterData(MasterDataType.CONFIG);
+            if (response != null && response.getStatus()) {
+                MasterData masterData = response.getResult();
+                if (masterData != null && !CollectionUtil.isNullOrEmpty(masterData.getValues())) {
+                    for (MasterDataValues masterDataValues : masterData.getValues()) {
+                        if (filter.equals(masterDataValues.getLabel())) {
+                            String value = masterDataValues.getValue();
+                            if (!StringUtil.isNullOrEmpty(value)) {
+                                return value.split(",");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     private static Map<String, Object> getFilterRequest(AppContext appContext, ContentSearchCriteria criteria) {
@@ -1201,32 +1235,32 @@ public class ContentHandler {
     private static void applyExclusionFilter(Map<String, Object> filterMap, Map<String, Object> searchMap) {
         Map<String, Object> filtersMap = (Map<String, Object>) searchMap.get("exclFilters");
         if (filtersMap != null) {
-            for (Map.Entry<String, Object> entry : filtersMap.entrySet()) {
+            for (String key : filtersMap.keySet()) {
                 Map appliedFilter = new HashMap<>();
 
                 // Existing or already applied filter.
-                Object filterMapValue = filterMap.get(entry.getKey());
+                Object filterMapValue = filterMap.get(key);
                 if (filterMapValue != null && filterMapValue instanceof Map) {
                     Map<String, Object> map = (Map) filterMapValue;
-                    for (Map.Entry<String, Object> e : map.entrySet()) {
+                    for (Map.Entry<String, Object> entry : map.entrySet()) {
                         Set values = new HashSet();
-                        values.addAll((List) map.get(e.getKey()));  // e.g. key would be "notIn"
-                        appliedFilter.put(e.getKey(), new ArrayList<>(values));
+                        values.addAll((List) entry.getValue());  // e.g. key would be "notIn"
+                        appliedFilter.put(entry.getKey(), new ArrayList<>(values));
                     }
                 }
 
                 // Add new filter in existing filter.
-                Map<String, Object> masterDataFilterMapValue = (Map) filtersMap.get(entry.getKey());
-                for (Map.Entry<String, Object> e : masterDataFilterMapValue.entrySet()) {
+                Map<String, Object> masterDataFilterMapValue = (Map) filtersMap.get(key);
+                for (Map.Entry<String, Object> entry : masterDataFilterMapValue.entrySet()) {
                     Set values = new HashSet();
-                    if(appliedFilter.get(e.getKey()) != null) {
-                        values.addAll((List) appliedFilter.get(e.getKey()));
+                    if (appliedFilter.get(entry.getKey()) != null) {
+                        values.addAll((List) appliedFilter.get(entry.getKey()));
                     }
-                    values.addAll((List) masterDataFilterMapValue.get(e.getKey()));     // e.g. key would be "notIn"
-                    appliedFilter.put(e.getKey(), new ArrayList<>(values));
+                    values.addAll((List) entry.getValue());     // e.g. key would be "notIn"
+                    appliedFilter.put(entry.getKey(), new ArrayList<>(values));
                 }
 
-                filterMap.put(entry.getKey(), appliedFilter);
+                filterMap.put(key, appliedFilter);
             }
         }
     }

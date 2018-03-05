@@ -22,6 +22,10 @@ public interface ContentConstants {
     String IMPORT_FILE_EXIST = "IMPORT_FILE_EXIST";
     String ECAR_CLEANUP_FAILED = "ECAR_CLEANUP_FAILED";
 
+    String CONFIG_FACETS = "facets";
+    String CONFIG_CONTENT_TYPE = "contentType";
+    String CONFIG_EXCLUDE_PRAGMA = "exclPragma";
+
     interface Visibility {
         String DEFAULT = "Default";
         String PARENT = "Parent";

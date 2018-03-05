@@ -24,6 +24,7 @@ public class ContentSearchCriteria implements Serializable {
     private String[] audience;
     private String[] channel;
     private String[] pragma;
+    private String[] exclPragma;
     private String[] contentStatusArray;
     private String[] facets;
     private String[] contentTypes;
@@ -35,7 +36,7 @@ public class ContentSearchCriteria implements Serializable {
     private SearchType searchType;
 
     private ContentSearchCriteria(String query, long limit, String mode, int age, int grade, String medium, String board,
-                                  String[] createdBy, String[] audience, String[] channel, String[] pragma,
+                                  String[] createdBy, String[] audience, String[] channel, String[] pragma, String[] exclPragma,
                                   String[] contentStatusArray, String[] facets, String[] contentTypes, String[] keywords,
                                   List<ContentSortCriteria> sortCriteria, SearchType searchType) {
         this.query = query;
@@ -49,6 +50,7 @@ public class ContentSearchCriteria implements Serializable {
         this.audience = audience;
         this.channel = channel;
         this.pragma = pragma;
+        this.exclPragma = exclPragma;
         this.contentStatusArray = contentStatusArray;
         this.facets = facets;
         this.contentTypes = contentTypes;
@@ -107,6 +109,10 @@ public class ContentSearchCriteria implements Serializable {
         return pragma;
     }
 
+    public String[] getExclPragma() {
+        return exclPragma;
+    }
+
     public String[] getContentStatusArray() {
         return contentStatusArray;
     }
@@ -160,6 +166,7 @@ public class ContentSearchCriteria implements Serializable {
         private String[] audience;
         private String[] channel;
         private String[] pragma;
+        private String[] exclPragma;
         private String[] contentStatusArray;
         private String[] facets;
         private String[] contentTypes;
@@ -265,6 +272,14 @@ public class ContentSearchCriteria implements Serializable {
         }
 
         /**
+         * Array of pragma which needs to exclude from search result. i.e. "external", "ads".
+         */
+        public SearchBuilder excludePragma(String[] pragma) {
+            this.exclPragma = pragma;
+            return this;
+        }
+
+        /**
          * Array of status. i.e. "Live", "Draft"
          */
         public SearchBuilder contentStatusArray(String[] contentStatusArray) {
@@ -298,16 +313,13 @@ public class ContentSearchCriteria implements Serializable {
                 this.contentStatusArray = new String[]{"Live"};
             }
 
-            if (facets == null || facets.length == 0) {
-                this.facets = new String[]{"contentType", "domain", "ageGroup", "language", "gradeLevel"};
-            }
-
             if (contentTypes == null || contentTypes.length == 0) {
-                this.contentTypes = new String[]{"Story", "Worksheet", "Game", "Collection", "TextBook"};
+                this.contentTypes = new String[]{"Story", "Worksheet", "Game", "Collection", "TextBook", "Resource"};
             }
 
             return new ContentSearchCriteria(query, limit, mode, age, grade, medium, board, createdBy,
-                    audience, channel, pragma, contentStatusArray, facets, contentTypes, keywords, sortCriteria, SearchType.SEARCH);
+                    audience, channel, pragma, exclPragma, contentStatusArray, facets, contentTypes,
+                    keywords, sortCriteria, SearchType.SEARCH);
         }
     }
 
@@ -375,14 +387,9 @@ public class ContentSearchCriteria implements Serializable {
         }
 
         public ContentSearchCriteria build() {
-            if (facets == null || facets.length == 0) {
-                this.facets = new String[]{"contentType", "domain", "ageGroup", "language", "gradeLevel"};
-            }
-
             if (contentTypes == null || contentTypes.length == 0) {
                 this.contentTypes = new String[]{"Story", "Worksheet", "Game", "Collection", "TextBook", "Resource"};
             }
-
             return new ContentSearchCriteria(query, limit, mode, facets, contentTypes, facetFilters, impliedFilters, sortCriteria, SearchType.FILTER);
         }
     }
