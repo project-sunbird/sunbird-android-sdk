@@ -1,6 +1,8 @@
 package org.ekstep.genieservices;
 
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.TenantInfo;
+import org.ekstep.genieservices.commons.bean.TenantInfoRequest;
 import org.ekstep.genieservices.commons.bean.UserProfile;
 import org.ekstep.genieservices.commons.bean.UserProfileDetailsRequest;
 
@@ -10,4 +12,6 @@ import org.ekstep.genieservices.commons.bean.UserProfileDetailsRequest;
 public interface IUserProfileService {
 
     GenieResponse<UserProfile> getUserProfileDetails(UserProfileDetailsRequest userProfileDetailsRequest);
+
+    GenieResponse<TenantInfo> getTenantInfo(TenantInfoRequest tenantInfoRequest);
 }

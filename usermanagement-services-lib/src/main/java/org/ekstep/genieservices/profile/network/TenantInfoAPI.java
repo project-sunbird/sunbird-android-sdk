@@ -13,18 +13,17 @@ import java.util.Map;
  * @author anil
  */
 
-public class UserProfileDetailsAPI extends BaseAPI {
+public class TenantInfoAPI extends BaseAPI {
 
-    private static final String TAG = UserProfileDetailsAPI.class.getSimpleName();
+    private static final String TAG = TenantInfoAPI.class.getSimpleName();
 
-    private static final CharSequence SERVICE_ENDPOINTS = "read";
+    private static final CharSequence SERVICE_ENDPOINTS = "tenant/info";
 
-    public UserProfileDetailsAPI(AppContext appContext, String userId, String queryParams) {
+    public TenantInfoAPI(AppContext appContext, String slug) {
         super(appContext,
-                String.format(Locale.US, "%s/%s/%s?%s",
-                        appContext.getParams().getString(IParams.Key.USER_SERVICE_BASE_URL), SERVICE_ENDPOINTS,
-                        userId,
-                        queryParams),
+                String.format(Locale.US, "%s/%s/%s",
+                        appContext.getParams().getString(IParams.Key.ORG_SERVICE_BASE_URL), SERVICE_ENDPOINTS,
+                        slug),
                 TAG);
     }
 
