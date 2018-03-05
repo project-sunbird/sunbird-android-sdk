@@ -19,4 +19,7 @@ public interface NetworkConstants {
     String NETWORK_ERROR = "NETWORK_ERROR";
 
     String API_BEARER_TOKEN = "api_bearer_token";
+
+    String OAUTH_TOKEN = "oauth_token";
+
 }

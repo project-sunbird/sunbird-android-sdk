@@ -63,6 +63,7 @@ public class BuildParams implements IParams {
         setParam(Key.MOBILE_APP_SECRET);
         setParam(Key.MOBILE_APP_KEY);
         setParam(Key.MOBILE_APP_CONSUMER);
+        setParam(Key.OAUTH_SERVICE_IMPLEMENTATION);
         setParam(ServiceConstants.Params.PLAYER_CONFIG);
         put(Key.LOG_LEVEL, LogLevel.getLogLevel(BuildConfigUtil.getBuildConfigValue(packageName, Key.LOG_LEVEL)).getLevel());
 
@@ -115,6 +116,7 @@ public class BuildParams implements IParams {
         setParam(params, Key.MOBILE_APP_SECRET);
         setParam(params, Key.MOBILE_APP_KEY);
         setParam(params, Key.MOBILE_APP_CONSUMER);
+        setParam(params, Key.OAUTH_SERVICE_IMPLEMENTATION);
 
         if (!StringUtil.isNullOrEmpty(params.getString(Key.LOG_LEVEL))) {
             put(Key.LOG_LEVEL, LogLevel.getLogLevel(params.getString(Key.LOG_LEVEL)).getLevel());
