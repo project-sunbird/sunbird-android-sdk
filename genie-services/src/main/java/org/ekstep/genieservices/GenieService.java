@@ -25,6 +25,7 @@ import org.ekstep.genieservices.content.LanguageServiceImpl;
 import org.ekstep.genieservices.notification.NotificationServiceImpl;
 import org.ekstep.genieservices.partner.PartnerServiceImpl;
 import org.ekstep.genieservices.profile.SummarizerServiceImpl;
+import org.ekstep.genieservices.profile.UserProfileServiceImpl;
 import org.ekstep.genieservices.profile.UserServiceImpl;
 import org.ekstep.genieservices.profile.event.SummaryListener;
 import org.ekstep.genieservices.tag.TagServiceImpl;
@@ -50,6 +51,7 @@ public class GenieService {
     private IConfigService mConfigService;
     private ITelemetryService mTelemetryService;
     private IUserService mUserService;
+    private IUserProfileService mUserProfileService;
     private ISyncService mSyncService;
     private IPartnerService mPartnerService;
     private IContentFeedbackService mContentFeedbackService;
@@ -135,6 +137,22 @@ public class GenieService {
             mUserService = new UserServiceImpl(mAppContext);
         }
         return mUserService;
+    }
+
+    /**
+     * This api gets the {@link UserProfileServiceImpl}, when accessed in the below way
+     * <p>
+     * getService().getUserProfileService()
+     * <p>
+     *
+     * @return {@link IUserProfileService}
+     */
+    public IUserProfileService getUserProfileService() {
+        if (mUserProfileService == null) {
+            mUserProfileService = new UserProfileServiceImpl(mAppContext);
+        }
+
+        return mUserProfileService;
     }
 
     /**
