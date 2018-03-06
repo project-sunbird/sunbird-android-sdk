@@ -4,6 +4,7 @@ import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.IUserProfileService;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.ProfileVisibilityRequest;
 import org.ekstep.genieservices.commons.bean.TenantInfo;
 import org.ekstep.genieservices.commons.bean.TenantInfoRequest;
 import org.ekstep.genieservices.commons.bean.UserProfile;
@@ -49,4 +50,20 @@ public class UserProfileService {
             }
         }, responseHandler);
     }
+
+    /**
+     * This api is used to set the visibility details of the field related to profile
+     *
+     * @param profileVisibilityRequest - {@link ProfileVisibilityRequest}
+     * @param responseHandler   - {@link IResponseHandler<TenantInfo>}
+     */
+    public void setProfileVisibility(final ProfileVisibilityRequest profileVisibilityRequest, IResponseHandler<Void> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return userProfileService.setProfileVisibility(profileVisibilityRequest);
+            }
+        }, responseHandler);
+    }
+
 }

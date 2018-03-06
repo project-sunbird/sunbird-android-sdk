@@ -2,10 +2,15 @@ package org.ekstep.genieservices.profile;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.ProfileVisibilityRequest;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.StringUtil;
+import org.ekstep.genieservices.profile.network.ProfileVisibilityAPI;
 import org.ekstep.genieservices.profile.network.TenantInfoAPI;
 import org.ekstep.genieservices.profile.network.UserProfileDetailsAPI;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created on 5/3/18.
@@ -54,5 +59,25 @@ public class UserProfileHandler {
                 }
             }
         }).start();
+    }
+
+    public static GenieResponse setProfileVisibilityDetailsInServer(AppContext appContext, ProfileVisibilityRequest profileVisibilityRequest) {
+        ProfileVisibilityAPI profileVisibilityAPI = new ProfileVisibilityAPI(appContext, getProfileVisibilityRequest(profileVisibilityRequest));
+        return profileVisibilityAPI.post();
+    }
+
+    private static Map<String, Object> getProfileVisibilityRequest(ProfileVisibilityRequest profileVisibilityRequest) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("userId", profileVisibilityRequest.getUserId());
+
+        if (profileVisibilityRequest.getPrivateFields() != null) {
+            requestMap.put("private", profileVisibilityRequest.getPrivateFields());
+        }
+
+        if (profileVisibilityRequest.getPublicFields() != null) {
+            requestMap.put("public", profileVisibilityRequest.getPublicFields());
+        }
+
+        return requestMap;
     }
 }

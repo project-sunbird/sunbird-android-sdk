@@ -10,6 +10,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Session;
+import org.ekstep.genieservices.commons.bean.ProfileVisibilityRequest;
 import org.ekstep.genieservices.commons.bean.TenantInfo;
 import org.ekstep.genieservices.commons.bean.TenantInfoRequest;
 import org.ekstep.genieservices.commons.bean.UserProfile;
@@ -119,4 +120,28 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
         TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;
     }
+
+    @Override
+    public GenieResponse<Void> setProfileVisibility(ProfileVisibilityRequest profileVisibilityRequest) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("request", GsonUtil.toJson(profileVisibilityRequest));
+        String methodName = "setProfileVisibility@UserProfileServiceImpl";
+
+        GenieResponse<Void> response;
+
+        GenieResponse profileVisibilityAPIResponse = UserProfileHandler.setProfileVisibilityDetailsInServer(mAppContext, profileVisibilityRequest);
+
+        if (profileVisibilityAPIResponse.getStatus()) {
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        } else {
+            response = GenieResponseBuilder.getErrorResponse(profileVisibilityAPIResponse.getError(), profileVisibilityAPIResponse.getMessage(), TAG);
+
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, profileVisibilityAPIResponse.getMessage());
+        }
+
+        return response;
+    }
+
 }
