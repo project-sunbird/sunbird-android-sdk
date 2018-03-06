@@ -3,11 +3,13 @@ package org.ekstep.genieservices.profile;
 import com.google.gson.internal.LinkedTreeMap;
 
 import org.ekstep.genieservices.BaseService;
+import org.ekstep.genieservices.IAuthSession;
 import org.ekstep.genieservices.IUserProfileService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.Session;
 import org.ekstep.genieservices.commons.bean.TenantInfo;
 import org.ekstep.genieservices.commons.bean.TenantInfoRequest;
 import org.ekstep.genieservices.commons.bean.UserProfile;
@@ -33,8 +35,11 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
     private static final String USER_PROFILE_DETAILS_KEY_PREFIX = "userProfileDetails";
     private static final String TENANT_INFO_KEY_PREFIX = "tenantInfo";
 
-    public UserProfileServiceImpl(AppContext appContext) {
+    private IAuthSession<Session> authSession;
+
+    public UserProfileServiceImpl(AppContext appContext, IAuthSession<Session> authSession) {
         super(appContext);
+        this.authSession = authSession;
     }
 
     @Override

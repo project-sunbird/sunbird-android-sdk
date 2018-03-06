@@ -17,10 +17,10 @@ import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.download.DownloadServiceImpl;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.utils.Logger;
-import org.ekstep.genieservices.commons.utils.ReflectionUtil;
 import org.ekstep.genieservices.config.ConfigServiceImpl;
 import org.ekstep.genieservices.content.ContentFeedbackServiceImpl;
 import org.ekstep.genieservices.content.ContentServiceImpl;
+import org.ekstep.genieservices.content.CourseServiceImpl;
 import org.ekstep.genieservices.content.LanguageServiceImpl;
 import org.ekstep.genieservices.notification.NotificationServiceImpl;
 import org.ekstep.genieservices.partner.PartnerServiceImpl;
@@ -52,6 +52,7 @@ public class GenieService {
     private ITelemetryService mTelemetryService;
     private IUserService mUserService;
     private IUserProfileService mUserProfileService;
+    private ICourseService mCourseService;
     private ISyncService mSyncService;
     private IPartnerService mPartnerService;
     private IContentFeedbackService mContentFeedbackService;
@@ -149,10 +150,18 @@ public class GenieService {
      */
     public IUserProfileService getUserProfileService() {
         if (mUserProfileService == null) {
-            mUserProfileService = new UserProfileServiceImpl(mAppContext);
+            mUserProfileService = new UserProfileServiceImpl(mAppContext, getAuthSession());
         }
 
         return mUserProfileService;
+    }
+
+    public ICourseService getCourseService() {
+        if (mCourseService == null) {
+            mCourseService = new CourseServiceImpl(mAppContext, getAuthSession());
+        }
+
+        return mCourseService;
     }
 
     /**
