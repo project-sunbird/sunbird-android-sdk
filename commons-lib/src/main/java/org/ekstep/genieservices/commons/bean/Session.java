@@ -1,9 +1,12 @@
 package org.ekstep.genieservices.commons.bean;
 
-/**
- * Created by souvikmondal on 1/3/18.
- */
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 
+/**
+ * Created on 1/3/18.
+ *
+ * @author souvikmondal
+ */
 public class Session {
 
     private String accessToken;
@@ -14,23 +17,16 @@ public class Session {
         return accessToken;
     }
 
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
-
     public String getRefreshToken() {
         return refreshToken;
-    }
-
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
     }
 
     public String getUserToken() {
         return userToken;
     }
 
-    public void setUserToken(String userToken) {
-        this.userToken = userToken;
+    @Override
+    public String toString() {
+        return GsonUtil.toJson(this);
     }
 }

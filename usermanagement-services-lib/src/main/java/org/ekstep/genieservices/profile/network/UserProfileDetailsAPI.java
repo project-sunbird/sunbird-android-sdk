@@ -19,18 +19,22 @@ public class UserProfileDetailsAPI extends BaseAPI {
 
     private static final CharSequence SERVICE_ENDPOINTS = "read";
 
-    public UserProfileDetailsAPI(AppContext appContext, String userId, String queryParams) {
+    private Map<String, String> headers;
+
+    public UserProfileDetailsAPI(AppContext appContext, Map<String, String> customHeaders, String userId, String queryParams) {
         super(appContext,
                 String.format(Locale.US, "%s/%s/%s?%s",
                         appContext.getParams().getString(IParams.Key.USER_SERVICE_BASE_URL), SERVICE_ENDPOINTS,
                         userId,
                         queryParams),
                 TAG);
+
+        this.headers = customHeaders;
     }
 
     @Override
     protected Map<String, String> getRequestHeaders() {
-        return null;
+        return this.headers;
     }
 
     @Override

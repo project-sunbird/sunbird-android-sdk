@@ -21,19 +21,21 @@ public class ProfileVisibilityAPI extends BaseAPI {
     private static final String ENDPOINT = "visibility";
 
     private Map<String, Object> requestMap;
+    private Map<String, String> headers;
 
 
-    public ProfileVisibilityAPI(AppContext appContext, Map<String, Object> requestMap) {
+    public ProfileVisibilityAPI(AppContext appContext, Map<String, String> customHeaders, Map<String, Object> requestMap) {
         super(appContext, String.format(Locale.US, "%s/%s",
                 appContext.getParams().getString(IParams.Key.USER_SERVICE_BASE_URL),
                 ENDPOINT), TAG);
 
         this.requestMap = requestMap;
+        this.headers = customHeaders;
     }
 
     @Override
     protected Map<String, String> getRequestHeaders() {
-        return null;
+        return headers;
     }
 
     @Override

@@ -3,6 +3,7 @@ package org.ekstep.genieservices.profile;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ProfileVisibilityRequest;
+import org.ekstep.genieservices.commons.bean.Session;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.profile.network.ProfileVisibilityAPI;
@@ -19,16 +20,24 @@ import java.util.Map;
  */
 public class UserProfileHandler {
 
-    public static GenieResponse fetchUserProfileDetailsFromServer(AppContext appContext, String userId, String fields) {
-        UserProfileDetailsAPI userProfileDetailsAPI = new UserProfileDetailsAPI(appContext, userId, fields);
+    private static Map<String, String> getCustomHeaders(Session authSession) {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("X-Authenticated-User-Token", authSession.getAccessToken());
+        return headers;
+    }
+
+    public static GenieResponse fetchUserProfileDetailsFromServer(AppContext appContext, Session sessionData,
+                                                                  String userId, String fields) {
+        UserProfileDetailsAPI userProfileDetailsAPI = new UserProfileDetailsAPI(appContext, getCustomHeaders(sessionData), userId, fields);
         return userProfileDetailsAPI.get();
     }
 
-    public static void refreshUserProfileDetailsFromServer(final AppContext appContext, final String userId, final String fields, final NoSqlModel userProfileInDB) {
+    public static void refreshUserProfileDetailsFromServer(final AppContext appContext, Session sessionData,
+                                                           final String userId, final String fields, final NoSqlModel userProfileInDB) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                GenieResponse userProfileDetailsAPIResponse = fetchUserProfileDetailsFromServer(appContext, userId, fields);
+                GenieResponse userProfileDetailsAPIResponse = fetchUserProfileDetailsFromServer(appContext, sessionData, userId, fields);
                 if (userProfileDetailsAPIResponse.getStatus()) {
                     String jsonResponse = userProfileDetailsAPIResponse.getResult().toString();
                     if (!StringUtil.isNullOrEmpty(jsonResponse)) {
@@ -40,16 +49,17 @@ public class UserProfileHandler {
         }).start();
     }
 
-    public static GenieResponse fetchTenantInfoFromServer(AppContext appContext, String slug) {
-        TenantInfoAPI tenantInfoAPI = new TenantInfoAPI(appContext, slug);
+    public static GenieResponse fetchTenantInfoFromServer(AppContext appContext, Session sessionData, String slug) {
+        TenantInfoAPI tenantInfoAPI = new TenantInfoAPI(appContext, getCustomHeaders(sessionData), slug);
         return tenantInfoAPI.get();
     }
 
-    public static void refreshTenantInfoFromServer(final AppContext appContext, final String slug, final NoSqlModel tenantInfoInDB) {
+    public static void refreshTenantInfoFromServer(final AppContext appContext, Session sessionData,
+                                                   final String slug, final NoSqlModel tenantInfoInDB) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                GenieResponse tenantInfoAPIResponse = fetchTenantInfoFromServer(appContext, slug);
+                GenieResponse tenantInfoAPIResponse = fetchTenantInfoFromServer(appContext, sessionData, slug);
                 if (tenantInfoAPIResponse.getStatus()) {
                     String jsonResponse = tenantInfoAPIResponse.getResult().toString();
                     if (!StringUtil.isNullOrEmpty(jsonResponse)) {
@@ -61,8 +71,8 @@ public class UserProfileHandler {
         }).start();
     }
 
-    public static GenieResponse setProfileVisibilityDetailsInServer(AppContext appContext, ProfileVisibilityRequest profileVisibilityRequest) {
-        ProfileVisibilityAPI profileVisibilityAPI = new ProfileVisibilityAPI(appContext, getProfileVisibilityRequest(profileVisibilityRequest));
+    public static GenieResponse setProfileVisibilityDetailsInServer(AppContext appContext, Session sessionData, ProfileVisibilityRequest profileVisibilityRequest) {
+        ProfileVisibilityAPI profileVisibilityAPI = new ProfileVisibilityAPI(appContext, getCustomHeaders(sessionData), getProfileVisibilityRequest(profileVisibilityRequest));
         return profileVisibilityAPI.post();
     }
 
