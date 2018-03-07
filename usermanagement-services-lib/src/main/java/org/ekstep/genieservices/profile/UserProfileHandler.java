@@ -4,6 +4,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.StringUtil;
+import org.ekstep.genieservices.profile.network.ProfileSkillsAPI;
 import org.ekstep.genieservices.profile.network.TenantInfoAPI;
 import org.ekstep.genieservices.profile.network.UserProfileDetailsAPI;
 
@@ -50,6 +51,27 @@ public class UserProfileHandler {
                     if (!StringUtil.isNullOrEmpty(jsonResponse)) {
                         tenantInfoInDB.setValue(jsonResponse);
                         tenantInfoInDB.update();
+                    }
+                }
+            }
+        }).start();
+    }
+
+    public static GenieResponse fetchProfileSkillsFromServer(AppContext appContext) {
+        ProfileSkillsAPI profileSkillsAPI = new ProfileSkillsAPI(appContext);
+        return profileSkillsAPI.get();
+    }
+
+    public static void refreshProfileSkillsFromServer(final AppContext appContext,final NoSqlModel profileSkillsInDB) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                GenieResponse profileSkillsAPIResponse = fetchProfileSkillsFromServer(appContext);
+                if (profileSkillsAPIResponse.getStatus()) {
+                    String jsonResponse = profileSkillsAPIResponse.getResult().toString();
+                    if (!StringUtil.isNullOrEmpty(jsonResponse)) {
+                        profileSkillsInDB.setValue(jsonResponse);
+                        profileSkillsInDB.update();
                     }
                 }
             }

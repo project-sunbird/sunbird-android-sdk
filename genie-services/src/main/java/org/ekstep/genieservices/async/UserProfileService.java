@@ -8,6 +8,8 @@ import org.ekstep.genieservices.commons.bean.TenantInfo;
 import org.ekstep.genieservices.commons.bean.TenantInfoRequest;
 import org.ekstep.genieservices.commons.bean.UserProfile;
 import org.ekstep.genieservices.commons.bean.UserProfileDetailsRequest;
+import org.ekstep.genieservices.commons.bean.UserProfileSkills;
+import org.ekstep.genieservices.commons.bean.UserProfileSkillsRequest;
 
 /**
  * This class provides APIs for performing {@link UserProfileService} related operations on a separate thread.
@@ -46,6 +48,21 @@ public class UserProfileService {
             @Override
             public GenieResponse<TenantInfo> perform() {
                 return userProfileService.getTenantInfo(tenantInfoRequest);
+            }
+        }, responseHandler);
+    }
+
+    /**
+     * This api is used to get the user profile skills
+     *
+     * @param profileSkillsRequest - {@link UserProfileSkillsRequest}
+     * @param responseHandler      - {@link IResponseHandler<UserProfileSkills>}
+     */
+    public void getUserProfileSkills(final UserProfileSkillsRequest profileSkillsRequest, IResponseHandler<UserProfileSkills> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<UserProfileSkills>() {
+            @Override
+            public GenieResponse<UserProfileSkills> perform() {
+                return userProfileService.getUserProfileSkills(profileSkillsRequest);
             }
         }, responseHandler);
     }
