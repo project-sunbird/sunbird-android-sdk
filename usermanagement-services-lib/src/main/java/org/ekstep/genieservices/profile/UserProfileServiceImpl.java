@@ -7,6 +7,7 @@ import org.ekstep.genieservices.IUserProfileService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.bean.EndorseOrAddSkillRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.TenantInfo;
 import org.ekstep.genieservices.commons.bean.TenantInfoRequest;
@@ -154,4 +155,27 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
         TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;
     }
+
+    @Override
+    public GenieResponse<Void> endorseOrAddSkill(EndorseOrAddSkillRequest endorseOrAddSkillRequest) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("request", GsonUtil.toJson(endorseOrAddSkillRequest));
+        String methodName = "endorseOrAddSkill@UserProfileServiceImpl";
+
+        GenieResponse<Void> response = UserProfileHandler.
+                endorseOrAddSkillsFromServer(mAppContext, endorseOrAddSkillRequest.getUserId(), endorseOrAddSkillRequest.getSkills());
+
+        if (response.getStatus()) {
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        } else {
+            response = GenieResponseBuilder.getErrorResponse(response.getError(),
+                    response.getMessage(), TAG);
+
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, response.getMessage());
+        }
+        return response;
+    }
+
 }

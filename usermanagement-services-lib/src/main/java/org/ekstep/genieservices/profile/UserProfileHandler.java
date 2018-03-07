@@ -4,6 +4,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.StringUtil;
+import org.ekstep.genieservices.profile.network.EndorseOrAddSkillAPI;
 import org.ekstep.genieservices.profile.network.ProfileSkillsAPI;
 import org.ekstep.genieservices.profile.network.TenantInfoAPI;
 import org.ekstep.genieservices.profile.network.UserProfileDetailsAPI;
@@ -76,5 +77,10 @@ public class UserProfileHandler {
                 }
             }
         }).start();
+    }
+
+    public static GenieResponse endorseOrAddSkillsFromServer(AppContext appContext, String userId, String[] skills) {
+        EndorseOrAddSkillAPI endorseOrAddSkillAPI = new EndorseOrAddSkillAPI(appContext, userId, skills);
+        return endorseOrAddSkillAPI.get();
     }
 }

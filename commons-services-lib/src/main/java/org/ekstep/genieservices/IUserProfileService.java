@@ -1,5 +1,6 @@
 package org.ekstep.genieservices;
 
+import org.ekstep.genieservices.commons.bean.EndorseOrAddSkillRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.TenantInfo;
 import org.ekstep.genieservices.commons.bean.TenantInfoRequest;
@@ -18,4 +19,6 @@ public interface IUserProfileService {
     GenieResponse<TenantInfo> getTenantInfo(TenantInfoRequest tenantInfoRequest);
 
     GenieResponse<UserProfileSkills> getUserProfileSkills(UserProfileSkillsRequest profileSkillsRequest);
+
+    GenieResponse<Void> endorseOrAddSkill(EndorseOrAddSkillRequest endorseOrAddSkillRequest);
 }

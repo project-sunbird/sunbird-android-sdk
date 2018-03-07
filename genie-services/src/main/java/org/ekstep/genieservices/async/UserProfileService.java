@@ -3,6 +3,7 @@ package org.ekstep.genieservices.async;
 import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.IUserProfileService;
 import org.ekstep.genieservices.commons.IResponseHandler;
+import org.ekstep.genieservices.commons.bean.EndorseOrAddSkillRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.TenantInfo;
 import org.ekstep.genieservices.commons.bean.TenantInfoRequest;
@@ -63,6 +64,21 @@ public class UserProfileService {
             @Override
             public GenieResponse<UserProfileSkills> perform() {
                 return userProfileService.getUserProfileSkills(profileSkillsRequest);
+            }
+        }, responseHandler);
+    }
+
+    /**
+     * This api is used to endorse or add skill
+     *
+     * @param endorseOrAddSkillRequest - {@link EndorseOrAddSkillRequest}
+     * @param responseHandler          - {@link IResponseHandler<UserProfileSkills>}
+     */
+    public void endorseOrAddSkill(final EndorseOrAddSkillRequest endorseOrAddSkillRequest, IResponseHandler<Void> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return userProfileService.endorseOrAddSkill(endorseOrAddSkillRequest);
             }
         }, responseHandler);
     }
