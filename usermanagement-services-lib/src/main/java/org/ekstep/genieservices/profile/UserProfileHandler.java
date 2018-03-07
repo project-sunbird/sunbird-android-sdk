@@ -133,6 +133,6 @@ public class UserProfileHandler {
 
     public static GenieResponse endorseOrAddSkillsFromServer(AppContext appContext, String userId, String[] skills) {
         EndorseOrAddSkillAPI endorseOrAddSkillAPI = new EndorseOrAddSkillAPI(appContext, userId, skills);
-        return endorseOrAddSkillAPI.get();
+        return endorseOrAddSkillAPI.post();
     }
 }
