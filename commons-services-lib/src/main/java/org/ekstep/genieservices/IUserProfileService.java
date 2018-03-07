@@ -1,12 +1,15 @@
 package org.ekstep.genieservices;
 
 import org.ekstep.genieservices.commons.bean.EndorseOrAddSkillRequest;
+import org.ekstep.genieservices.commons.bean.FileUploadResult;
+import org.ekstep.genieservices.commons.bean.EndorseOrAddSkillRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ProfileVisibilityRequest;
 import org.ekstep.genieservices.commons.bean.SearchUserRequest;
 import org.ekstep.genieservices.commons.bean.SearchUserResult;
 import org.ekstep.genieservices.commons.bean.TenantInfo;
 import org.ekstep.genieservices.commons.bean.TenantInfoRequest;
+import org.ekstep.genieservices.commons.bean.UploadFileRequest;
 import org.ekstep.genieservices.commons.bean.UserProfile;
 import org.ekstep.genieservices.commons.bean.UserProfileDetailsRequest;
 import org.ekstep.genieservices.commons.bean.UserProfileSkills;
@@ -28,4 +31,7 @@ public interface IUserProfileService {
     GenieResponse<UserProfileSkills> getUserProfileSkills(UserProfileSkillsRequest profileSkillsRequest);
 
     GenieResponse<Void> endorseOrAddSkill(EndorseOrAddSkillRequest endorseOrAddSkillRequest);
+
+    GenieResponse<FileUploadResult> uploadFile(UploadFileRequest uploadFileRequest);
+
 }

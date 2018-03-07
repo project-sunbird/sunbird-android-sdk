@@ -9,6 +9,7 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.EndorseOrAddSkillRequest;
+import org.ekstep.genieservices.commons.bean.FileUploadResult;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ProfileVisibilityRequest;
 import org.ekstep.genieservices.commons.bean.SearchUserRequest;
@@ -16,6 +17,7 @@ import org.ekstep.genieservices.commons.bean.SearchUserResult;
 import org.ekstep.genieservices.commons.bean.Session;
 import org.ekstep.genieservices.commons.bean.TenantInfo;
 import org.ekstep.genieservices.commons.bean.TenantInfoRequest;
+import org.ekstep.genieservices.commons.bean.UploadFileRequest;
 import org.ekstep.genieservices.commons.bean.UserProfile;
 import org.ekstep.genieservices.commons.bean.UserProfileDetailsRequest;
 import org.ekstep.genieservices.commons.bean.UserProfileSkills;
@@ -55,12 +57,11 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
         params.put("request", GsonUtil.toJson(userProfileDetailsRequest));
         String methodName = "getUserProfileDetails@UserProfileServiceImpl";
 
-        GenieResponse<UserProfile> response;
+        GenieResponse<UserProfile> response = null;
 
-        if (authSession == null || authSession.getSessionData() == null) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.AUTH_SESSION, ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN, TAG);
+        response = isValidAuthSession(response, methodName, params);
 
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN);
+        if (response != null) {
             return response;
         }
 
@@ -103,12 +104,11 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
         params.put("request", GsonUtil.toJson(tenantInfoRequest));
         String methodName = "getTenantInfo@UserProfileServiceImpl";
 
-        GenieResponse<TenantInfo> response;
+        GenieResponse<TenantInfo> response = null;
 
-        if (authSession == null || authSession.getSessionData() == null) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.AUTH_SESSION, ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN, TAG);
+        response = isValidAuthSession(response, methodName, params);
 
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN);
+        if (response != null) {
             return response;
         }
 
@@ -147,12 +147,11 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
         params.put("request", GsonUtil.toJson(profileVisibilityRequest));
         String methodName = "setProfileVisibility@UserProfileServiceImpl";
 
-        GenieResponse<Void> response;
+        GenieResponse<Void> response = null;
 
-        if (authSession == null || authSession.getSessionData() == null) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.AUTH_SESSION, ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN, TAG);
+        response = isValidAuthSession(response, methodName, params);
 
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN);
+        if (response != null) {
             return response;
         }
 
@@ -176,12 +175,11 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
         params.put("request", GsonUtil.toJson(searchUserRequest));
         String methodName = "searchUser@UserProfileServiceImpl";
 
-        GenieResponse<SearchUserResult> response;
+        GenieResponse<SearchUserResult> response = null;
 
-        if (authSession == null || authSession.getSessionData() == null) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.AUTH_SESSION, ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN, TAG);
+        response = isValidAuthSession(response, methodName, params);
 
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN);
+        if (response != null) {
             return response;
         }
 
@@ -203,6 +201,51 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
         }
 
         return response;
+    }
+
+    @Override
+    public GenieResponse<FileUploadResult> uploadFile(UploadFileRequest uploadFileRequest) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("request", GsonUtil.toJson(uploadFileRequest));
+        String methodName = "searchUser@UserProfileServiceImpl";
+
+        GenieResponse<FileUploadResult> response = null;
+
+        response = isValidAuthSession(response, methodName, params);
+
+        if (response != null) {
+            return response;
+        }
+
+        GenieResponse fileUploadResponse = UserProfileHandler.uploadFile(mAppContext, authSession.getSessionData(), uploadFileRequest);
+
+        if (fileUploadResponse.getStatus()){
+            LinkedTreeMap map = GsonUtil.fromJson(fileUploadResponse.getResult().toString(), LinkedTreeMap.class);
+            String result = GsonUtil.toJson(map.get("result"));
+            FileUploadResult fileUploadResult = GsonUtil.fromJson(result, FileUploadResult.class);
+
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+            response.setResult(fileUploadResult);
+
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        } else {
+            response = GenieResponseBuilder.getErrorResponse(fileUploadResponse.getError(), fileUploadResponse.getMessage(), TAG);
+
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, fileUploadResponse.getMessage());
+        }
+
+        return response;
+    }
+
+    private <T> GenieResponse<T> isValidAuthSession(GenieResponse<T> response, String methodName, Map<String, Object> params) {
+        if (authSession == null || authSession.getSessionData() == null) {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.AUTH_SESSION, ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN, TAG);
+
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN);
+            return response;
+        }
+
+        return null;
     }
 
     public GenieResponse<UserProfileSkills> getUserProfileSkills(UserProfileSkillsRequest profileSkillsRequest) {

@@ -20,7 +20,6 @@ public abstract class BaseAPI {
 
     private static final String GET = "GET";
     private static final String POST = "POST";
-    private static final String POST_FORM = "POST_FORM";
     private static final int AUTHENTICATION_FAILURE = 401;
 
     private AppContext mAppContext;
@@ -47,7 +46,6 @@ public abstract class BaseAPI {
     public GenieResponse post() {
         return fetchFromServer(POST, true);
     }
-
 
 
     private GenieResponse fetchFromServer(String requestType, boolean retryForAuthError) {

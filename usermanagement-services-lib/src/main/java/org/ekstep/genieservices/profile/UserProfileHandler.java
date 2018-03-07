@@ -5,10 +5,12 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ProfileVisibilityRequest;
 import org.ekstep.genieservices.commons.bean.SearchUserRequest;
 import org.ekstep.genieservices.commons.bean.Session;
+import org.ekstep.genieservices.commons.bean.UploadFileRequest;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.profile.network.EndorseOrAddSkillAPI;
 import org.ekstep.genieservices.profile.network.ProfileSkillsAPI;
+import org.ekstep.genieservices.profile.network.FileUploadAPI;
 import org.ekstep.genieservices.profile.network.ProfileVisibilityAPI;
 import org.ekstep.genieservices.profile.network.SearchUserAPI;
 import org.ekstep.genieservices.profile.network.TenantInfoAPI;
@@ -135,4 +137,19 @@ public class UserProfileHandler {
         EndorseOrAddSkillAPI endorseOrAddSkillAPI = new EndorseOrAddSkillAPI(appContext, userId, skills);
         return endorseOrAddSkillAPI.post();
     }
+
+    public static GenieResponse uploadFile(AppContext appContext, Session sessionData, UploadFileRequest uploadFileRequest) {
+        FileUploadAPI fileUploadAPI = new FileUploadAPI(appContext, getCustomHeaders(sessionData), getFileUploadParameters(uploadFileRequest));
+        return fileUploadAPI.post();
+    }
+
+    private static Map<String, Object> getFileUploadParameters(UploadFileRequest uploadFileRequest) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("file", uploadFileRequest.getFilePath());
+        requestMap.put("container", uploadFileRequest.getUserId());
+
+        return requestMap;
+    }
+
+
 }

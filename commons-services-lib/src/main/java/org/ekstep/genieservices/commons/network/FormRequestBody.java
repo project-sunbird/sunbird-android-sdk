@@ -19,6 +19,6 @@ public class FormRequestBody implements IRequestBody<Map<String, String>> {
 
     @Override
     public String getContentType() {
-        return MIME_TYPE_JSON;
+        return MIME_TYPE_FORM;
     }
 }
