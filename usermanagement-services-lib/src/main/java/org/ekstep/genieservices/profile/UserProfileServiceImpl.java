@@ -10,6 +10,8 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ProfileVisibilityRequest;
+import org.ekstep.genieservices.commons.bean.SearchUserRequest;
+import org.ekstep.genieservices.commons.bean.SearchUserResult;
 import org.ekstep.genieservices.commons.bean.Session;
 import org.ekstep.genieservices.commons.bean.TenantInfo;
 import org.ekstep.genieservices.commons.bean.TenantInfoRequest;
@@ -165,4 +167,38 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
         return response;
     }
 
+    @Override
+    public GenieResponse<SearchUserResult> searchUser(SearchUserRequest searchUserRequest) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("request", GsonUtil.toJson(searchUserRequest));
+        String methodName = "searchUser@UserProfileServiceImpl";
+
+        GenieResponse<SearchUserResult> response;
+
+        if (authSession == null || authSession.getSessionData() == null) {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.AUTH_SESSION, ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN, TAG);
+
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN);
+            return response;
+        }
+
+        GenieResponse searchUserAPIResponse = UserProfileHandler.searchUser(mAppContext, authSession.getSessionData(), searchUserRequest);
+
+        if (searchUserAPIResponse.getStatus()) {
+            LinkedTreeMap map = GsonUtil.fromJson(searchUserAPIResponse.getResult().toString(), LinkedTreeMap.class);
+            String result = GsonUtil.toJson(map.get("result"));
+            SearchUserResult searchUserResult = GsonUtil.fromJson(result, SearchUserResult.class);
+
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+            response.setResult(searchUserResult);
+
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        } else {
+            response = GenieResponseBuilder.getErrorResponse(searchUserAPIResponse.getError(), searchUserAPIResponse.getMessage(), TAG);
+
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, searchUserAPIResponse.getMessage());
+        }
+
+        return response;
+    }
 }

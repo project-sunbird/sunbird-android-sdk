@@ -3,10 +3,12 @@ package org.ekstep.genieservices.profile;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ProfileVisibilityRequest;
+import org.ekstep.genieservices.commons.bean.SearchUserRequest;
 import org.ekstep.genieservices.commons.bean.Session;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.profile.network.ProfileVisibilityAPI;
+import org.ekstep.genieservices.profile.network.SearchUserAPI;
 import org.ekstep.genieservices.profile.network.TenantInfoAPI;
 import org.ekstep.genieservices.profile.network.UserProfileDetailsAPI;
 
@@ -32,7 +34,7 @@ public class UserProfileHandler {
         return userProfileDetailsAPI.get();
     }
 
-    public static void refreshUserProfileDetailsFromServer(final AppContext appContext, Session sessionData,
+    public static void refreshUserProfileDetailsFromServer(final AppContext appContext, final Session sessionData,
                                                            final String userId, final String fields, final NoSqlModel userProfileInDB) {
         new Thread(new Runnable() {
             @Override
@@ -54,7 +56,7 @@ public class UserProfileHandler {
         return tenantInfoAPI.get();
     }
 
-    public static void refreshTenantInfoFromServer(final AppContext appContext, Session sessionData,
+    public static void refreshTenantInfoFromServer(final AppContext appContext, final Session sessionData,
                                                    final String slug, final NoSqlModel tenantInfoInDB) {
         new Thread(new Runnable() {
             @Override
@@ -87,6 +89,20 @@ public class UserProfileHandler {
         if (profileVisibilityRequest.getPublicFields() != null) {
             requestMap.put("public", profileVisibilityRequest.getPublicFields());
         }
+
+        return requestMap;
+    }
+
+    public static GenieResponse searchUser(AppContext appContext, Session sessionData, SearchUserRequest searchUserRequest) {
+        SearchUserAPI searchUserAPI = new SearchUserAPI(appContext, getCustomHeaders(sessionData), getSearchUserParameters(searchUserRequest));
+        return searchUserAPI.post();
+    }
+
+    private static Map<String, Object> getSearchUserParameters(SearchUserRequest searchUserRequest) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("query", searchUserRequest.getQuery());
+        requestMap.put("offset", searchUserRequest.getOffset());
+        requestMap.put("limit", searchUserRequest.getLimit());
 
         return requestMap;
     }
