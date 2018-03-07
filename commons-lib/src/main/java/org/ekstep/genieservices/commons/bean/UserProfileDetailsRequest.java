@@ -1,6 +1,6 @@
 package org.ekstep.genieservices.commons.bean;
 
-import org.ekstep.genieservices.commons.bean.enums.UserProfileFields;
+import org.ekstep.genieservices.commons.bean.enums.UserProfileField;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ public class UserProfileDetailsRequest {
             return this;
         }
 
-        public Builder addRequiredFields(UserProfileFields field) {
+        public Builder addRequiredField(UserProfileField field) {
             if (this.requiredFields == null) {
                 this.requiredFields = new ArrayList<>();
             }

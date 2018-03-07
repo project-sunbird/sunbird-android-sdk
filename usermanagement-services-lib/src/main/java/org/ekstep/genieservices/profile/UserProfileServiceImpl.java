@@ -3,12 +3,17 @@ package org.ekstep.genieservices.profile;
 import com.google.gson.internal.LinkedTreeMap;
 
 import org.ekstep.genieservices.BaseService;
+import org.ekstep.genieservices.IAuthSession;
 import org.ekstep.genieservices.IUserProfileService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.EndorseOrAddSkillRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.ProfileVisibilityRequest;
+import org.ekstep.genieservices.commons.bean.SearchUserRequest;
+import org.ekstep.genieservices.commons.bean.SearchUserResult;
+import org.ekstep.genieservices.commons.bean.Session;
 import org.ekstep.genieservices.commons.bean.TenantInfo;
 import org.ekstep.genieservices.commons.bean.TenantInfoRequest;
 import org.ekstep.genieservices.commons.bean.UserProfile;
@@ -37,8 +42,11 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
     private static final String TENANT_INFO_KEY_PREFIX = "tenantInfo";
     private static final String USER_PROFILE_SKILLS = "userProfileSkills";
 
-    public UserProfileServiceImpl(AppContext appContext) {
+    private IAuthSession<Session> authSession;
+
+    public UserProfileServiceImpl(AppContext appContext, IAuthSession<Session> authSession) {
         super(appContext);
+        this.authSession = authSession;
     }
 
     @Override
@@ -49,6 +57,13 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
 
         GenieResponse<UserProfile> response;
 
+        if (authSession == null || authSession.getSessionData() == null) {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.AUTH_SESSION, ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN, TAG);
+
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN);
+            return response;
+        }
+
         String fields = "";
         if (!CollectionUtil.isNullOrEmpty(userProfileDetailsRequest.getRequiredFields())) {
             fields = "fields?" + StringUtil.join(",", userProfileDetailsRequest.getRequiredFields());
@@ -57,7 +72,7 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
         String key = USER_PROFILE_DETAILS_KEY_PREFIX + userProfileDetailsRequest.getUserId();
         NoSqlModel userProfileInDB = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
         if (userProfileInDB == null) {
-            GenieResponse userProfileDetailsAPIResponse = UserProfileHandler.fetchUserProfileDetailsFromServer(mAppContext, userProfileDetailsRequest.getUserId(), fields);
+            GenieResponse userProfileDetailsAPIResponse = UserProfileHandler.fetchUserProfileDetailsFromServer(mAppContext, authSession.getSessionData(), userProfileDetailsRequest.getUserId(), fields);
             if (userProfileDetailsAPIResponse.getStatus()) {
                 String body = userProfileDetailsAPIResponse.getResult().toString();
                 userProfileInDB = NoSqlModel.build(mAppContext.getDBSession(), key, body);
@@ -69,7 +84,7 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
                 return response;
             }
         } else if (userProfileDetailsRequest.isRefreshUserProfileDetails()) {
-            UserProfileHandler.refreshUserProfileDetailsFromServer(mAppContext, userProfileDetailsRequest.getUserId(), fields, userProfileInDB);
+            UserProfileHandler.refreshUserProfileDetailsFromServer(mAppContext, authSession.getSessionData(), userProfileDetailsRequest.getUserId(), fields, userProfileInDB);
         }
 
         LinkedTreeMap map = GsonUtil.fromJson(userProfileInDB.getValue(), LinkedTreeMap.class);
@@ -90,10 +105,17 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
 
         GenieResponse<TenantInfo> response;
 
+        if (authSession == null || authSession.getSessionData() == null) {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.AUTH_SESSION, ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN, TAG);
+
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN);
+            return response;
+        }
+
         String key = TENANT_INFO_KEY_PREFIX + tenantInfoRequest.getSlug();
         NoSqlModel tenantInfoInDB = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
         if (tenantInfoInDB == null) {
-            GenieResponse tenantInfoAPIResponse = UserProfileHandler.fetchTenantInfoFromServer(mAppContext, tenantInfoRequest.getSlug());
+            GenieResponse tenantInfoAPIResponse = UserProfileHandler.fetchTenantInfoFromServer(mAppContext, authSession.getSessionData(), tenantInfoRequest.getSlug());
             if (tenantInfoAPIResponse.getStatus()) {
                 String body = tenantInfoAPIResponse.getResult().toString();
                 tenantInfoInDB = NoSqlModel.build(mAppContext.getDBSession(), key, body);
@@ -105,7 +127,7 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
                 return response;
             }
         } else if (tenantInfoRequest.isRefreshTenantInfo()) {
-            UserProfileHandler.refreshTenantInfoFromServer(mAppContext, tenantInfoRequest.getSlug(), tenantInfoInDB);
+            UserProfileHandler.refreshTenantInfoFromServer(mAppContext, authSession.getSessionData(), tenantInfoRequest.getSlug(), tenantInfoInDB);
         }
 
         LinkedTreeMap map = GsonUtil.fromJson(tenantInfoInDB.getValue(), LinkedTreeMap.class);
@@ -120,6 +142,69 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
     }
 
     @Override
+    public GenieResponse<Void> setProfileVisibility(ProfileVisibilityRequest profileVisibilityRequest) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("request", GsonUtil.toJson(profileVisibilityRequest));
+        String methodName = "setProfileVisibility@UserProfileServiceImpl";
+
+        GenieResponse<Void> response;
+
+        if (authSession == null || authSession.getSessionData() == null) {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.AUTH_SESSION, ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN, TAG);
+
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN);
+            return response;
+        }
+
+        GenieResponse profileVisibilityAPIResponse = UserProfileHandler.setProfileVisibilityDetailsInServer(mAppContext, authSession.getSessionData(), profileVisibilityRequest);
+
+        if (profileVisibilityAPIResponse.getStatus()) {
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        } else {
+            response = GenieResponseBuilder.getErrorResponse(profileVisibilityAPIResponse.getError(), profileVisibilityAPIResponse.getMessage(), TAG);
+
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, profileVisibilityAPIResponse.getMessage());
+        }
+        return response;
+    }
+
+    @Override
+    public GenieResponse<SearchUserResult> searchUser(SearchUserRequest searchUserRequest) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("request", GsonUtil.toJson(searchUserRequest));
+        String methodName = "searchUser@UserProfileServiceImpl";
+
+        GenieResponse<SearchUserResult> response;
+
+        if (authSession == null || authSession.getSessionData() == null) {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.AUTH_SESSION, ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN, TAG);
+
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN);
+            return response;
+        }
+
+        GenieResponse searchUserAPIResponse = UserProfileHandler.searchUser(mAppContext, authSession.getSessionData(), searchUserRequest);
+
+        if (searchUserAPIResponse.getStatus()) {
+            LinkedTreeMap map = GsonUtil.fromJson(searchUserAPIResponse.getResult().toString(), LinkedTreeMap.class);
+            String result = GsonUtil.toJson(map.get("result"));
+            SearchUserResult searchUserResult = GsonUtil.fromJson(result, SearchUserResult.class);
+
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+            response.setResult(searchUserResult);
+
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        } else {
+            response = GenieResponseBuilder.getErrorResponse(searchUserAPIResponse.getError(), searchUserAPIResponse.getMessage(), TAG);
+
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, searchUserAPIResponse.getMessage());
+        }
+
+        return response;
+    }
+
     public GenieResponse<UserProfileSkills> getUserProfileSkills(UserProfileSkillsRequest profileSkillsRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(profileSkillsRequest));

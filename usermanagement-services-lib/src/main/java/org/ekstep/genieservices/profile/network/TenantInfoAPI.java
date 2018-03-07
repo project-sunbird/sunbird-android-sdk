@@ -19,17 +19,21 @@ public class TenantInfoAPI extends BaseAPI {
 
     private static final CharSequence SERVICE_ENDPOINTS = "tenant/info";
 
-    public TenantInfoAPI(AppContext appContext, String slug) {
+    private Map<String, String> headers;
+
+    public TenantInfoAPI(AppContext appContext, Map<String, String> customHeaders, String slug) {
         super(appContext,
                 String.format(Locale.US, "%s/%s/%s",
                         appContext.getParams().getString(IParams.Key.ORG_SERVICE_BASE_URL), SERVICE_ENDPOINTS,
                         slug),
                 TAG);
+
+        this.headers = customHeaders;
     }
 
     @Override
     protected Map<String, String> getRequestHeaders() {
-        return null;
+        return this.headers;
     }
 
     @Override

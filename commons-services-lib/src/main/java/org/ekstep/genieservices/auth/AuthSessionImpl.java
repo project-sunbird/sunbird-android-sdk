@@ -8,9 +8,10 @@ import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
 /**
- * Created by souvikmondal on 1/3/18.
+ * Created on 1/3/18.
+ *
+ * @author souvikmondal
  */
-
 public class AuthSessionImpl implements IAuthSession<Session> {
 
     private AppContext mAppContext;
@@ -22,8 +23,7 @@ public class AuthSessionImpl implements IAuthSession<Session> {
     }
 
     private void init() {
-        String s = mAppContext.getKeyValueStore().
-                getString(NetworkConstants.OAUTH_TOKEN, "");
+        String s = mAppContext.getKeyValueStore().getString(NetworkConstants.OAUTH_TOKEN, "");
         if (!StringUtil.isNullOrEmpty(s)) {
             mSession = GsonUtil.fromJson(s, Session.class);
         }
@@ -36,8 +36,7 @@ public class AuthSessionImpl implements IAuthSession<Session> {
     }
 
     private void saveSession(Session session) {
-        mAppContext.getKeyValueStore().putString(
-                NetworkConstants.OAUTH_TOKEN, GsonUtil.toJson(session));
+        mAppContext.getKeyValueStore().putString(NetworkConstants.OAUTH_TOKEN, GsonUtil.toJson(session));
     }
 
     @Override

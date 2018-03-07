@@ -80,7 +80,7 @@ public interface ServiceConstants {
     interface APIExecutionMode {
         String MODE_WIFI = "WIFI";
         String MODE_MDATA = "MDATA";
-//        String MODE_LOCAL = "LOCAL";
+        //        String MODE_LOCAL = "LOCAL";
         String MODE_NO_NETWORK = "";
     }
 
@@ -133,6 +133,8 @@ public interface ServiceConstants {
 
         // KeyValueStore
         String KEY_NOT_FOUND = "KEY_NOT_FOUND";
+
+        String AUTH_SESSION = "AUTH_SESSION";
     }
 
     interface ErrorMessage {
@@ -183,6 +185,8 @@ public interface ServiceConstants {
 
         String NOT_WRITABLE = "Destination folder is not writable.";
         String NO_CONTENT_TO_MOVE = "Nothing to move.";
+
+        String USER_NOT_SIGN_IN = "User is not sign in.";
     }
 
     interface SuccessMessage {

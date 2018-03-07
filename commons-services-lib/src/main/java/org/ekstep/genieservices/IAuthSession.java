@@ -1,9 +1,10 @@
 package org.ekstep.genieservices;
 
 /**
- * Created by souvikmondal on 1/3/18.
+ * Created on 1/3/18.
+ *
+ * @author souvikmondal
  */
-
 public interface IAuthSession<SessionData> {
 
     void startSession(SessionData sessionData);

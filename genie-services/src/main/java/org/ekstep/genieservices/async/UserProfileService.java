@@ -5,6 +5,9 @@ import org.ekstep.genieservices.IUserProfileService;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.EndorseOrAddSkillRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.ProfileVisibilityRequest;
+import org.ekstep.genieservices.commons.bean.SearchUserRequest;
+import org.ekstep.genieservices.commons.bean.SearchUserResult;
 import org.ekstep.genieservices.commons.bean.TenantInfo;
 import org.ekstep.genieservices.commons.bean.TenantInfoRequest;
 import org.ekstep.genieservices.commons.bean.UserProfile;
@@ -49,6 +52,36 @@ public class UserProfileService {
             @Override
             public GenieResponse<TenantInfo> perform() {
                 return userProfileService.getTenantInfo(tenantInfoRequest);
+            }
+        }, responseHandler);
+    }
+
+    /**
+     * This api is used to set the visibility details of the field related to profile
+     *
+     * @param profileVisibilityRequest - {@link ProfileVisibilityRequest}
+     * @param responseHandler          - {@link IResponseHandler<TenantInfo>}
+     */
+    public void setProfileVisibility(final ProfileVisibilityRequest profileVisibilityRequest, IResponseHandler<Void> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return userProfileService.setProfileVisibility(profileVisibilityRequest);
+            }
+        }, responseHandler);
+    }
+
+    /*
+     * This api is used search user
+     *
+             * @param searchUserRequest - {@link SearchUserRequest}
+     * @param responseHandler   - {@link IResponseHandler<TenantInfo>}
+     */
+    public void searchUser(final SearchUserRequest searchUserRequest, IResponseHandler<SearchUserResult> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<SearchUserResult>() {
+            @Override
+            public GenieResponse<SearchUserResult> perform() {
+                return userProfileService.searchUser(searchUserRequest);
             }
         }, responseHandler);
     }

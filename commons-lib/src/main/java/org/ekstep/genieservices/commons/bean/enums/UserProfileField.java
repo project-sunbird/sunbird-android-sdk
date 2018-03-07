@@ -16,14 +16,14 @@ package org.ekstep.genieservices.commons.bean.enums;
  * "language"
  * "avatar"
  */
-public enum UserProfileFields {
+public enum UserProfileField {
 
     COMPLETENESS("completeness"), MISSING_FIELDS("missingFields"),
     LAST_LOGIN_TIME("lastLoginTime"), TOPICS("topics");
 
     private String value;
 
-    UserProfileFields(String value) {
+    UserProfileField(String value) {
         this.value = value;
     }
 
