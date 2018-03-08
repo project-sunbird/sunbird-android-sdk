@@ -19,6 +19,12 @@ public class ProfileVisibilityRequest {
     private List<String> privateFields;
     private List<String> publicFields;
 
+    private ProfileVisibilityRequest(String userId, List<String> privateFields, List<String> publicFields) {
+        this.userId = userId;
+        this.privateFields = privateFields;
+        this.publicFields = publicFields;
+    }
+
     public String getUserId() {
         return userId;
     }
@@ -31,12 +37,6 @@ public class ProfileVisibilityRequest {
         return publicFields;
     }
 
-    private ProfileVisibilityRequest(String userId, List<String> privateFields, List<String> publicFields) {
-        this.userId = userId;
-        this.privateFields = privateFields;
-        this.publicFields = publicFields;
-    }
-
     public static class Builder {
 
         private String userId;
@@ -45,7 +45,7 @@ public class ProfileVisibilityRequest {
 
         public Builder forUser(String userId) {
             if (StringUtil.isNullOrEmpty(userId)) {
-                throw new IllegalArgumentException("userId required.");
+                throw new IllegalArgumentException("userId should not be null or empty.");
             }
 
             this.userId = userId;
@@ -55,7 +55,7 @@ public class ProfileVisibilityRequest {
 
         public Builder addPrivateField(UserProfileField privateField) {
             if (privateField == null) {
-                throw new IllegalStateException(" private field is required.");
+                throw new IllegalArgumentException("private field should not be null or empty.");
             }
 
             if (this.privateFieldsList == null) {
@@ -69,7 +69,7 @@ public class ProfileVisibilityRequest {
 
         public Builder addPrivateFields(List<UserProfileField> privateFields) {
             if (privateFields == null) {
-                throw new IllegalStateException("private fields are required.");
+                throw new IllegalArgumentException("private fields should not be null or empty.");
             }
 
             if (this.privateFieldsList == null) {
@@ -85,7 +85,7 @@ public class ProfileVisibilityRequest {
 
         public Builder addPublicField(UserProfileField publicField) {
             if (publicField == null) {
-                throw new IllegalStateException(" public field is required.");
+                throw new IllegalArgumentException("public field should not be null or empty.");
             }
 
             if (this.publicFieldsList == null) {
@@ -99,7 +99,7 @@ public class ProfileVisibilityRequest {
 
         public Builder addPublicFields(List<UserProfileField> publicFields) {
             if (publicFields == null) {
-                throw new IllegalStateException("public fields are required.");
+                throw new IllegalArgumentException("public fields should not be null or empty.");
             }
 
             if (this.publicFieldsList == null) {
@@ -114,6 +114,10 @@ public class ProfileVisibilityRequest {
         }
 
         public ProfileVisibilityRequest build() {
+            if (StringUtil.isNullOrEmpty(userId)) {
+                throw new IllegalStateException("userId required.");
+            }
+
             if (CollectionUtil.isNullOrEmpty(privateFieldsList) && CollectionUtil.isNullOrEmpty(publicFieldsList)) {
                 throw new IllegalStateException("Both public and private fields cannot be empty ");
             }

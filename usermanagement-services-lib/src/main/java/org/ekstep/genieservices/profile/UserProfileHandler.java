@@ -1,6 +1,7 @@
 package org.ekstep.genieservices.profile;
 
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.bean.EndorseOrAddSkillRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ProfileVisibilityRequest;
 import org.ekstep.genieservices.commons.bean.SearchUserRequest;
@@ -9,8 +10,8 @@ import org.ekstep.genieservices.commons.bean.UploadFileRequest;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.profile.network.EndorseOrAddSkillAPI;
-import org.ekstep.genieservices.profile.network.ProfileSkillsAPI;
 import org.ekstep.genieservices.profile.network.FileUploadAPI;
+import org.ekstep.genieservices.profile.network.ProfileSkillsAPI;
 import org.ekstep.genieservices.profile.network.ProfileVisibilityAPI;
 import org.ekstep.genieservices.profile.network.SearchUserAPI;
 import org.ekstep.genieservices.profile.network.TenantInfoAPI;
@@ -77,13 +78,14 @@ public class UserProfileHandler {
         }).start();
     }
 
-    public static GenieResponse setProfileVisibilityDetailsInServer(AppContext appContext, Session sessionData, ProfileVisibilityRequest profileVisibilityRequest) {
-        ProfileVisibilityAPI profileVisibilityAPI = new ProfileVisibilityAPI(appContext, getCustomHeaders(sessionData), getProfileVisibilityRequest(profileVisibilityRequest));
+    public static GenieResponse setProfileVisibilityDetailsInServer(AppContext appContext, Session sessionData,
+                                                                    ProfileVisibilityRequest profileVisibilityRequest) {
+        ProfileVisibilityAPI profileVisibilityAPI = new ProfileVisibilityAPI(appContext, getCustomHeaders(sessionData),
+                getProfileVisibilityRequest(profileVisibilityRequest));
         return profileVisibilityAPI.post();
     }
 
-    private static Map<String, Object> getProfileVisibilityRequest(ProfileVisibilityRequest
-                                                                           profileVisibilityRequest) {
+    private static Map<String, Object> getProfileVisibilityRequest(ProfileVisibilityRequest profileVisibilityRequest) {
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("userId", profileVisibilityRequest.getUserId());
 
@@ -99,7 +101,8 @@ public class UserProfileHandler {
     }
 
     public static GenieResponse searchUser(AppContext appContext, Session sessionData, SearchUserRequest searchUserRequest) {
-        SearchUserAPI searchUserAPI = new SearchUserAPI(appContext, getCustomHeaders(sessionData), getSearchUserParameters(searchUserRequest));
+        SearchUserAPI searchUserAPI = new SearchUserAPI(appContext, getCustomHeaders(sessionData),
+                getSearchUserParameters(searchUserRequest));
         return searchUserAPI.post();
     }
 
@@ -112,16 +115,17 @@ public class UserProfileHandler {
         return requestMap;
     }
 
-    public static GenieResponse fetchProfileSkillsFromServer(AppContext appContext) {
-        ProfileSkillsAPI profileSkillsAPI = new ProfileSkillsAPI(appContext);
+    public static GenieResponse fetchProfileSkillsFromServer(AppContext appContext, Session sessionData) {
+        ProfileSkillsAPI profileSkillsAPI = new ProfileSkillsAPI(appContext, getCustomHeaders(sessionData));
         return profileSkillsAPI.get();
     }
 
-    public static void refreshProfileSkillsFromServer(final AppContext appContext, final NoSqlModel profileSkillsInDB) {
+    public static void refreshProfileSkillsFromServer(final AppContext appContext, Session sessionData,
+                                                      final NoSqlModel profileSkillsInDB) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                GenieResponse profileSkillsAPIResponse = fetchProfileSkillsFromServer(appContext);
+                GenieResponse profileSkillsAPIResponse = fetchProfileSkillsFromServer(appContext, sessionData);
                 if (profileSkillsAPIResponse.getStatus()) {
                     String jsonResponse = profileSkillsAPIResponse.getResult().toString();
                     if (!StringUtil.isNullOrEmpty(jsonResponse)) {
@@ -133,8 +137,12 @@ public class UserProfileHandler {
         }).start();
     }
 
-    public static GenieResponse endorseOrAddSkillsFromServer(AppContext appContext, String userId, String[] skills) {
-        EndorseOrAddSkillAPI endorseOrAddSkillAPI = new EndorseOrAddSkillAPI(appContext, userId, skills);
+    public static GenieResponse endorseOrAddSkillsFromServer(AppContext appContext, Session sessionData, EndorseOrAddSkillRequest endorseOrAddSkillRequest) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("endorsedUserId", endorseOrAddSkillRequest.getUserId());
+        requestMap.put("skillName", endorseOrAddSkillRequest.getSkills());
+
+        EndorseOrAddSkillAPI endorseOrAddSkillAPI = new EndorseOrAddSkillAPI(appContext, getCustomHeaders(sessionData), requestMap);
         return endorseOrAddSkillAPI.post();
     }
 

@@ -1,8 +1,7 @@
 package org.ekstep.genieservices.commons.bean;
 
+import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
-
-import java.util.List;
 
 /**
  * Created on 7/3/18.
@@ -34,18 +33,28 @@ public class EndorseOrAddSkillRequest {
 
         public EndorseOrAddSkillRequest.Builder forUser(String userId) {
             if (StringUtil.isNullOrEmpty(userId)) {
-                throw new IllegalArgumentException("userId required.");
+                throw new IllegalArgumentException("userId should not be null or empty.");
             }
             this.userId = userId;
             return this;
         }
 
-        public EndorseOrAddSkillRequest.Builder AddSkills(String[] skills) {
+        public EndorseOrAddSkillRequest.Builder addSkills(String[] skills) {
+            if (CollectionUtil.isEmpty(skills)) {
+                throw new IllegalArgumentException("skills should not be null or empty.");
+            }
             this.skills = skills;
             return this;
         }
 
         public EndorseOrAddSkillRequest build() {
+            if (StringUtil.isNullOrEmpty(userId)) {
+                throw new IllegalStateException("userId required.");
+            }
+            if (CollectionUtil.isEmpty(skills)) {
+                throw new IllegalStateException("skills required.");
+            }
+
             return new EndorseOrAddSkillRequest(userId, skills);
         }
     }

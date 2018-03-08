@@ -12,7 +12,7 @@ import org.ekstep.genieservices.commons.bean.TenantInfo;
 import org.ekstep.genieservices.commons.bean.TenantInfoRequest;
 import org.ekstep.genieservices.commons.bean.UserProfile;
 import org.ekstep.genieservices.commons.bean.UserProfileDetailsRequest;
-import org.ekstep.genieservices.commons.bean.UserProfileSkills;
+import org.ekstep.genieservices.commons.bean.UserProfileSkill;
 import org.ekstep.genieservices.commons.bean.UserProfileSkillsRequest;
 
 /**
@@ -90,13 +90,13 @@ public class UserProfileService {
      * This api is used to get the user profile skills
      *
      * @param profileSkillsRequest - {@link UserProfileSkillsRequest}
-     * @param responseHandler      - {@link IResponseHandler<UserProfileSkills>}
+     * @param responseHandler      - {@link IResponseHandler< UserProfileSkill >}
      */
-    public void getUserProfileSkills(final UserProfileSkillsRequest profileSkillsRequest, IResponseHandler<UserProfileSkills> responseHandler) {
-        ThreadPool.getInstance().execute(new IPerformable<UserProfileSkills>() {
+    public void getUserProfileSkills(final UserProfileSkillsRequest profileSkillsRequest, IResponseHandler<UserProfileSkill> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<UserProfileSkill>() {
             @Override
-            public GenieResponse<UserProfileSkills> perform() {
-                return userProfileService.getUserProfileSkills(profileSkillsRequest);
+            public GenieResponse<UserProfileSkill> perform() {
+                return userProfileService.getSkills(profileSkillsRequest);
             }
         }, responseHandler);
     }
@@ -105,7 +105,7 @@ public class UserProfileService {
      * This api is used to endorse or add skill
      *
      * @param endorseOrAddSkillRequest - {@link EndorseOrAddSkillRequest}
-     * @param responseHandler          - {@link IResponseHandler<UserProfileSkills>}
+     * @param responseHandler          - {@link IResponseHandler< UserProfileSkill >}
      */
     public void endorseOrAddSkill(final EndorseOrAddSkillRequest endorseOrAddSkillRequest, IResponseHandler<Void> responseHandler) {
         ThreadPool.getInstance().execute(new IPerformable<Void>() {

@@ -13,16 +13,14 @@ import java.util.Map;
  * Created on 6/3/18.
  * shriharsh
  */
-
 public class ProfileVisibilityAPI extends BaseAPI {
 
     private static final String TAG = ProfileVisibilityAPI.class.getSimpleName();
 
     private static final String ENDPOINT = "visibility";
 
-    private Map<String, Object> requestMap;
     private Map<String, String> headers;
-
+    private Map<String, Object> requestMap;
 
     public ProfileVisibilityAPI(AppContext appContext, Map<String, String> customHeaders, Map<String, Object> requestMap) {
         super(appContext, String.format(Locale.US, "%s/%s",
