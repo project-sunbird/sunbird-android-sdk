@@ -53,7 +53,8 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
 
     private <T> GenieResponse<T> isValidAuthSession(String methodName, Map<String, Object> params) {
         if (authSession == null || authSession.getSessionData() == null) {
-            GenieResponse<T> response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.AUTH_SESSION, ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN, TAG);
+            GenieResponse<T> response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.AUTH_SESSION,
+                    ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN, TAG);
 
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN);
             return response;
@@ -81,7 +82,8 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
         String key = USER_PROFILE_DETAILS_KEY_PREFIX + userProfileDetailsRequest.getUserId();
         NoSqlModel userProfileInDB = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
         if (userProfileInDB == null) {
-            GenieResponse userProfileDetailsAPIResponse = UserProfileHandler.fetchUserProfileDetailsFromServer(mAppContext, authSession.getSessionData(), userProfileDetailsRequest.getUserId(), fields);
+            GenieResponse userProfileDetailsAPIResponse = UserProfileHandler.fetchUserProfileDetailsFromServer(mAppContext,
+                    authSession.getSessionData(), userProfileDetailsRequest.getUserId(), fields);
             if (userProfileDetailsAPIResponse.getStatus()) {
                 String body = userProfileDetailsAPIResponse.getResult().toString();
                 userProfileInDB = NoSqlModel.build(mAppContext.getDBSession(), key, body);
@@ -93,7 +95,8 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
                 return response;
             }
         } else if (userProfileDetailsRequest.isRefreshUserProfileDetails()) {
-            UserProfileHandler.refreshUserProfileDetailsFromServer(mAppContext, authSession.getSessionData(), userProfileDetailsRequest.getUserId(), fields, userProfileInDB);
+            UserProfileHandler.refreshUserProfileDetailsFromServer(mAppContext, authSession.getSessionData(),
+                    userProfileDetailsRequest.getUserId(), fields, userProfileInDB);
         }
 
         LinkedTreeMap map = GsonUtil.fromJson(userProfileInDB.getValue(), LinkedTreeMap.class);
@@ -120,7 +123,8 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
         String key = TENANT_INFO_KEY_PREFIX + tenantInfoRequest.getSlug();
         NoSqlModel tenantInfoInDB = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
         if (tenantInfoInDB == null) {
-            GenieResponse tenantInfoAPIResponse = UserProfileHandler.fetchTenantInfoFromServer(mAppContext, authSession.getSessionData(), tenantInfoRequest.getSlug());
+            GenieResponse tenantInfoAPIResponse = UserProfileHandler.fetchTenantInfoFromServer(mAppContext,
+                    authSession.getSessionData(), tenantInfoRequest.getSlug());
             if (tenantInfoAPIResponse.getStatus()) {
                 String body = tenantInfoAPIResponse.getResult().toString();
                 tenantInfoInDB = NoSqlModel.build(mAppContext.getDBSession(), key, body);
@@ -132,7 +136,8 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
                 return response;
             }
         } else if (tenantInfoRequest.isRefreshTenantInfo()) {
-            UserProfileHandler.refreshTenantInfoFromServer(mAppContext, authSession.getSessionData(), tenantInfoRequest.getSlug(), tenantInfoInDB);
+            UserProfileHandler.refreshTenantInfoFromServer(mAppContext, authSession.getSessionData(),
+                    tenantInfoRequest.getSlug(), tenantInfoInDB);
         }
 
         LinkedTreeMap map = GsonUtil.fromJson(tenantInfoInDB.getValue(), LinkedTreeMap.class);
@@ -251,7 +256,8 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
             return response;
         }
 
-        GenieResponse profileVisibilityAPIResponse = UserProfileHandler.setProfileVisibilityDetailsInServer(mAppContext, authSession.getSessionData(), profileVisibilityRequest);
+        GenieResponse profileVisibilityAPIResponse = UserProfileHandler.setProfileVisibilityDetailsInServer(mAppContext,
+                authSession.getSessionData(), profileVisibilityRequest);
 
         if (profileVisibilityAPIResponse.getStatus()) {
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);

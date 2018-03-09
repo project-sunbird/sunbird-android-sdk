@@ -2,11 +2,13 @@ package org.ekstep.genieservices.content;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.CourseBatchesRequest;
+import org.ekstep.genieservices.commons.bean.EnrolCourseRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Session;
 import org.ekstep.genieservices.commons.bean.UpdateContentStateRequest;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.StringUtil;
+import org.ekstep.genieservices.content.network.EnrolCourseAPI;
 import org.ekstep.genieservices.content.network.EnrolledCoursesAPI;
 import org.ekstep.genieservices.content.network.UpdateContentStateAPI;
 
@@ -46,6 +48,22 @@ public class CourseHandler {
                 }
             }
         }).start();
+    }
+
+
+    public static GenieResponse enrolCourseInServer(AppContext appContext, Session sessionData, EnrolCourseRequest enrolCourseRequest) {
+        EnrolCourseAPI enrolCourseAPI = new EnrolCourseAPI(appContext, getCustomHeaders(sessionData),
+                getEnrolCourseRequest(enrolCourseRequest));
+        return enrolCourseAPI.post();
+    }
+
+    private static Map<String, Object> getEnrolCourseRequest(EnrolCourseRequest enrolCourseRequest) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("userId", enrolCourseRequest.getUserId());
+        requestMap.put("contentId", enrolCourseRequest.getContentId());
+        requestMap.put("courseId", enrolCourseRequest.getCourseId());
+        requestMap.put("batchId", enrolCourseRequest.getBatchId());
+        return requestMap;
     }
 
     public static GenieResponse updateContentStateInServer(AppContext appContext, Session sessionData,

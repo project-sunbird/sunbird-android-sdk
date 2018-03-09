@@ -11,10 +11,14 @@ public class EnrolCourseRequest {
 
     private String userId;
     private String courseId;
+    private String contentId;
+    private String batchId;
 
-    private EnrolCourseRequest(String userId, String courseId) {
+    private EnrolCourseRequest(String userId, String courseId, String contentId, String batchId) {
         this.userId = userId;
         this.courseId = courseId;
+        this.contentId = contentId;
+        this.batchId = batchId;
     }
 
     public String getUserId() {
@@ -25,9 +29,19 @@ public class EnrolCourseRequest {
         return courseId;
     }
 
+    public String getContentId() {
+        return contentId;
+    }
+
+    public String getBatchId() {
+        return batchId;
+    }
+
     public static class Builder {
         private String userId;
         private String courseId;
+        private String contentId;
+        private String batchId;
 
         public Builder forUser(String userId) {
             if (StringUtil.isNullOrEmpty(userId)) {
@@ -45,6 +59,22 @@ public class EnrolCourseRequest {
             return this;
         }
 
+        public Builder forContent(String contentId) {
+            if (StringUtil.isNullOrEmpty(contentId)) {
+                throw new IllegalArgumentException("contentId should not be null or empty.");
+            }
+            this.contentId = contentId;
+            return this;
+        }
+
+        public Builder forBatch(String batchId) {
+            if (StringUtil.isNullOrEmpty(batchId)) {
+                throw new IllegalArgumentException("batchId should not be null or empty.");
+            }
+            this.batchId = batchId;
+            return this;
+        }
+
         public EnrolCourseRequest build() {
             if (StringUtil.isNullOrEmpty(userId)) {
                 throw new IllegalStateException("userId required.");
@@ -54,7 +84,15 @@ public class EnrolCourseRequest {
                 throw new IllegalStateException("courseId required.");
             }
 
-            return new EnrolCourseRequest(userId, courseId);
+            if (StringUtil.isNullOrEmpty(contentId)) {
+                throw new IllegalStateException("contentId required.");
+            }
+
+            if (StringUtil.isNullOrEmpty(batchId)) {
+                throw new IllegalStateException("batchId required.");
+            }
+
+            return new EnrolCourseRequest(userId, courseId, contentId, batchId);
         }
     }
 }

@@ -107,7 +107,21 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
             return response;
         }
 
-        return null;
+        GenieResponse enrolCourseAPIResponse = CourseHandler.enrolCourseInServer(mAppContext, authSession.getSessionData(),
+                enrolCourseRequest);
+
+        if (enrolCourseAPIResponse.getStatus()) {
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        } else {
+            response = GenieResponseBuilder.getErrorResponse(enrolCourseAPIResponse.getError(),
+                    enrolCourseAPIResponse.getMessage(), TAG);
+
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, response.getMessage());
+        }
+
+        return response;
     }
 
     @Override
@@ -135,7 +149,7 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, response.getMessage());
         }
 
-        return null;
+        return response;
     }
 
     @Override
@@ -156,6 +170,8 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
             LinkedTreeMap map = GsonUtil.fromJson(courseBatchesAPIResponse.getResult().toString(), LinkedTreeMap.class);
             LinkedTreeMap result = (LinkedTreeMap) map.get("result");
             String responseStr = GsonUtil.toJson(result.get("response"));
+
+            // TODO: 9/3/18 - Merge the batch list with creator name.
 
             CourseBatchesResponse searchUserResult = GsonUtil.fromJson(responseStr, CourseBatchesResponse.class);
 
