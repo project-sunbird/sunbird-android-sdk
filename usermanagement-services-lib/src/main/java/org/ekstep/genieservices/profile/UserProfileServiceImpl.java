@@ -224,13 +224,15 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
             return response;
         }
 
-        GenieResponse endorseOrAddSkillAPIResponse = UserProfileHandler.endorseOrAddSkillsFromServer(mAppContext, authSession.getSessionData(), endorseOrAddSkillRequest);
+        GenieResponse endorseOrAddSkillAPIResponse = UserProfileHandler.endorseOrAddSkillsInServer(mAppContext,
+                authSession.getSessionData(), endorseOrAddSkillRequest);
         if (endorseOrAddSkillAPIResponse.getStatus()) {
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
 
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         } else {
-            response = GenieResponseBuilder.getErrorResponse(endorseOrAddSkillAPIResponse.getError(), endorseOrAddSkillAPIResponse.getMessage(), TAG);
+            response = GenieResponseBuilder.getErrorResponse(endorseOrAddSkillAPIResponse.getError(),
+                    endorseOrAddSkillAPIResponse.getMessage(), TAG);
 
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, response.getMessage());
         }

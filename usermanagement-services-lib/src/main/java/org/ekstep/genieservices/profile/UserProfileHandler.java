@@ -35,16 +35,19 @@ public class UserProfileHandler {
 
     public static GenieResponse fetchUserProfileDetailsFromServer(AppContext appContext, Session sessionData,
                                                                   String userId, String fields) {
-        UserProfileDetailsAPI userProfileDetailsAPI = new UserProfileDetailsAPI(appContext, getCustomHeaders(sessionData), userId, fields);
+        UserProfileDetailsAPI userProfileDetailsAPI = new UserProfileDetailsAPI(appContext,
+                getCustomHeaders(sessionData), userId, fields);
         return userProfileDetailsAPI.get();
     }
 
     public static void refreshUserProfileDetailsFromServer(final AppContext appContext, final Session sessionData,
-                                                           final String userId, final String fields, final NoSqlModel userProfileInDB) {
+                                                           final String userId, final String fields,
+                                                           final NoSqlModel userProfileInDB) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                GenieResponse userProfileDetailsAPIResponse = fetchUserProfileDetailsFromServer(appContext, sessionData, userId, fields);
+                GenieResponse userProfileDetailsAPIResponse = fetchUserProfileDetailsFromServer(appContext,
+                        sessionData, userId, fields);
                 if (userProfileDetailsAPIResponse.getStatus()) {
                     String jsonResponse = userProfileDetailsAPIResponse.getResult().toString();
                     if (!StringUtil.isNullOrEmpty(jsonResponse)) {
@@ -137,17 +140,20 @@ public class UserProfileHandler {
         }).start();
     }
 
-    public static GenieResponse endorseOrAddSkillsFromServer(AppContext appContext, Session sessionData, EndorseOrAddSkillRequest endorseOrAddSkillRequest) {
+    public static GenieResponse endorseOrAddSkillsInServer(AppContext appContext, Session sessionData,
+                                                           EndorseOrAddSkillRequest endorseOrAddSkillRequest) {
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("endorsedUserId", endorseOrAddSkillRequest.getUserId());
         requestMap.put("skillName", endorseOrAddSkillRequest.getSkills());
 
-        EndorseOrAddSkillAPI endorseOrAddSkillAPI = new EndorseOrAddSkillAPI(appContext, getCustomHeaders(sessionData), requestMap);
+        EndorseOrAddSkillAPI endorseOrAddSkillAPI = new EndorseOrAddSkillAPI(appContext,
+                getCustomHeaders(sessionData), requestMap);
         return endorseOrAddSkillAPI.post();
     }
 
     public static GenieResponse uploadFile(AppContext appContext, Session sessionData, UploadFileRequest uploadFileRequest) {
-        FileUploadAPI fileUploadAPI = new FileUploadAPI(appContext, getCustomHeaders(sessionData), getFileUploadParameters(uploadFileRequest));
+        FileUploadAPI fileUploadAPI = new FileUploadAPI(appContext, getCustomHeaders(sessionData),
+                getFileUploadParameters(uploadFileRequest));
         return fileUploadAPI.post();
     }
 

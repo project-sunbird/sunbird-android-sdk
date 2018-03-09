@@ -15,16 +15,22 @@ public class UpdateContentStateRequest {
     private String batchId;
     private int status;
     private int progress;
-    private String lastAccessTime;
+    private String result;
+    private String grade;
+    private String score;
 
     private UpdateContentStateRequest(String userId, String courseId, String contentId,
-                                      String batchId, int status, int progress) {
+                                      String batchId, int status, int progress,
+                                      String result, String grade, String score) {
         this.userId = userId;
         this.courseId = courseId;
         this.contentId = contentId;
         this.batchId = batchId;
         this.status = status;
         this.progress = progress;
+        this.result = result;
+        this.grade = grade;
+        this.score = score;
     }
 
     public String getUserId() {
@@ -51,6 +57,18 @@ public class UpdateContentStateRequest {
         return progress;
     }
 
+    public String getResult() {
+        return result;
+    }
+
+    public String getGrade() {
+        return grade;
+    }
+
+    public String getScore() {
+        return score;
+    }
+
     public static class Builder {
         private String userId;
         private String courseId;
@@ -58,6 +76,9 @@ public class UpdateContentStateRequest {
         private String batchId;
         private int status;
         private int progress;
+        private String result;
+        private String grade;
+        private String score;
 
         public Builder forUser(String userId) {
             if (StringUtil.isNullOrEmpty(userId)) {
@@ -101,6 +122,30 @@ public class UpdateContentStateRequest {
             return this;
         }
 
+        public Builder result(String result) {
+            if (StringUtil.isNullOrEmpty(result)) {
+                throw new IllegalArgumentException("result should not be null or empty.");
+            }
+            this.result = result;
+            return this;
+        }
+
+        public Builder grade(String grade) {
+            if (StringUtil.isNullOrEmpty(grade)) {
+                throw new IllegalArgumentException("grade should not be null or empty.");
+            }
+            this.grade = grade;
+            return this;
+        }
+
+        public Builder score(String score) {
+            if (StringUtil.isNullOrEmpty(score)) {
+                throw new IllegalArgumentException("score should not be null or empty.");
+            }
+            this.score = score;
+            return this;
+        }
+
         public UpdateContentStateRequest build() {
             if (StringUtil.isNullOrEmpty(userId)) {
                 throw new IllegalStateException("userId required.");
@@ -118,8 +163,8 @@ public class UpdateContentStateRequest {
                 throw new IllegalStateException("batchId required.");
             }
 
-            return new UpdateContentStateRequest(userId, courseId, contentId, batchId,
-                    status, progress);
+            return new UpdateContentStateRequest(userId, courseId, contentId, batchId, status, progress,
+                    result, grade, score);
         }
     }
 }

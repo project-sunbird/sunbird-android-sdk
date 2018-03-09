@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.profile.network;
+package org.ekstep.genieservices.content.network;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IParams;
@@ -10,23 +10,23 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Created on 07/03/2018.
+ * Created on 9/3/18.
  *
  * @author anil
  */
-public class EndorseOrAddSkillAPI extends BaseAPI {
+public class UpdateContentStateAPI extends BaseAPI {
 
-    private static final String TAG = EndorseOrAddSkillAPI.class.getSimpleName();
+    private static final String TAG = UpdateContentStateAPI.class.getSimpleName();
 
-    private static final String ENDPOINT = "skill/add";
+    private static final String ENDPOINT = "content/state/update";
 
     private Map<String, String> headers;
     private Map<String, Object> requestMap;
 
-    public EndorseOrAddSkillAPI(AppContext appContext, Map<String, String> customHeaders, Map<String, Object> requestMap) {
+    public UpdateContentStateAPI(AppContext appContext, Map<String, String> customHeaders, Map<String, Object> requestMap) {
         super(appContext,
                 String.format(Locale.US, "%s/%s",
-                        appContext.getParams().getString(IParams.Key.USER_SERVICE_BASE_URL),
+                        appContext.getParams().getString(IParams.Key.COURSE_SERVICE_BASE_URL),
                         ENDPOINT),
                 TAG);
 

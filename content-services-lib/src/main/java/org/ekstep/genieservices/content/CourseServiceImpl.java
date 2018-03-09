@@ -98,11 +98,43 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
 
     @Override
     public GenieResponse<Void> enrolCourse(EnrolCourseRequest enrolCourseRequest) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("request", GsonUtil.toJson(enrolCourseRequest));
+        String methodName = "enrolCourse@CourseServiceImpl";
+
+        GenieResponse<Void> response = isValidAuthSession(methodName, params);
+        if (response != null) {
+            return response;
+        }
+
         return null;
     }
 
     @Override
     public GenieResponse<Void> updateContentState(UpdateContentStateRequest updateContentStateRequest) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("request", GsonUtil.toJson(updateContentStateRequest));
+        String methodName = "updateContentState@CourseServiceImpl";
+
+        GenieResponse<Void> response = isValidAuthSession(methodName, params);
+        if (response != null) {
+            return response;
+        }
+
+        GenieResponse updateContentStateAPIResponse = CourseHandler.updateContentStateInServer(mAppContext,
+                authSession.getSessionData(), updateContentStateRequest);
+
+        if (updateContentStateAPIResponse.getStatus()) {
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        } else {
+            response = GenieResponseBuilder.getErrorResponse(updateContentStateAPIResponse.getError(),
+                    updateContentStateAPIResponse.getMessage(), TAG);
+
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, response.getMessage());
+        }
+
         return null;
     }
 
@@ -117,7 +149,8 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
             return response;
         }
 
-        GenieResponse courseBatchesAPIResponse = CourseHandler.fetchCourseBatchesFromServer(mAppContext, authSession.getSessionData(), courseBatchesRequest);
+        GenieResponse courseBatchesAPIResponse = CourseHandler.fetchCourseBatchesFromServer(mAppContext,
+                authSession.getSessionData(), courseBatchesRequest);
 
         if (courseBatchesAPIResponse.getStatus()) {
             LinkedTreeMap map = GsonUtil.fromJson(courseBatchesAPIResponse.getResult().toString(), LinkedTreeMap.class);
