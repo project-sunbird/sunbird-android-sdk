@@ -6,14 +6,14 @@ import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.EndorseOrAddSkillRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ProfileVisibilityRequest;
-import org.ekstep.genieservices.commons.bean.SearchUserRequest;
-import org.ekstep.genieservices.commons.bean.SearchUserResult;
+import org.ekstep.genieservices.commons.bean.SearchUserCriteria;
 import org.ekstep.genieservices.commons.bean.TenantInfo;
 import org.ekstep.genieservices.commons.bean.TenantInfoRequest;
 import org.ekstep.genieservices.commons.bean.UserProfile;
 import org.ekstep.genieservices.commons.bean.UserProfileDetailsRequest;
 import org.ekstep.genieservices.commons.bean.UserProfileSkill;
 import org.ekstep.genieservices.commons.bean.UserProfileSkillsRequest;
+import org.ekstep.genieservices.commons.bean.UserSearchResult;
 
 /**
  * This class provides APIs for performing {@link UserProfileService} related operations on a separate thread.
@@ -74,14 +74,14 @@ public class UserProfileService {
     /*
      * This api is used search user
      *
-             * @param searchUserRequest - {@link SearchUserRequest}
+             * @param searchUserCriteria - {@link SearchUserCriteria}
      * @param responseHandler   - {@link IResponseHandler<TenantInfo>}
      */
-    public void searchUser(final SearchUserRequest searchUserRequest, IResponseHandler<SearchUserResult> responseHandler) {
-        ThreadPool.getInstance().execute(new IPerformable<SearchUserResult>() {
+    public void searchUser(final SearchUserCriteria searchUserCriteria, IResponseHandler<UserSearchResult> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<UserSearchResult>() {
             @Override
-            public GenieResponse<SearchUserResult> perform() {
-                return userProfileService.searchUser(searchUserRequest);
+            public GenieResponse<UserSearchResult> perform() {
+                return userProfileService.searchUser(searchUserCriteria);
             }
         }, responseHandler);
     }

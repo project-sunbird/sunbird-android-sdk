@@ -4,7 +4,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.EndorseOrAddSkillRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ProfileVisibilityRequest;
-import org.ekstep.genieservices.commons.bean.SearchUserRequest;
+import org.ekstep.genieservices.commons.bean.SearchUserCriteria;
 import org.ekstep.genieservices.commons.bean.Session;
 import org.ekstep.genieservices.commons.bean.UploadFileRequest;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
@@ -100,17 +100,17 @@ public class UserProfileHandler {
         return requestMap;
     }
 
-    public static GenieResponse searchUser(AppContext appContext, Session sessionData, SearchUserRequest searchUserRequest) {
+    public static GenieResponse searchUser(AppContext appContext, Session sessionData, SearchUserCriteria searchUserCriteria) {
         SearchUserAPI searchUserAPI = new SearchUserAPI(appContext, getCustomHeaders(sessionData),
-                getSearchUserParameters(searchUserRequest));
+                getSearchUserParameters(searchUserCriteria));
         return searchUserAPI.post();
     }
 
-    private static Map<String, Object> getSearchUserParameters(SearchUserRequest searchUserRequest) {
+    private static Map<String, Object> getSearchUserParameters(SearchUserCriteria searchUserCriteria) {
         Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("query", searchUserRequest.getQuery());
-        requestMap.put("offset", searchUserRequest.getOffset());
-        requestMap.put("limit", searchUserRequest.getLimit());
+        requestMap.put("query", searchUserCriteria.getQuery());
+        requestMap.put("offset", searchUserCriteria.getOffset());
+        requestMap.put("limit", searchUserCriteria.getLimit());
 
         return requestMap;
     }
@@ -120,7 +120,7 @@ public class UserProfileHandler {
         return profileSkillsAPI.get();
     }
 
-    public static void refreshProfileSkillsFromServer(final AppContext appContext, Session sessionData,
+    public static void refreshProfileSkillsFromServer(final AppContext appContext, final Session sessionData,
                                                       final NoSqlModel profileSkillsInDB) {
         new Thread(new Runnable() {
             @Override

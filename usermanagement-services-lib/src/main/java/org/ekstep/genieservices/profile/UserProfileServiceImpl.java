@@ -12,8 +12,7 @@ import org.ekstep.genieservices.commons.bean.EndorseOrAddSkillRequest;
 import org.ekstep.genieservices.commons.bean.FileUploadResult;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ProfileVisibilityRequest;
-import org.ekstep.genieservices.commons.bean.SearchUserRequest;
-import org.ekstep.genieservices.commons.bean.SearchUserResult;
+import org.ekstep.genieservices.commons.bean.SearchUserCriteria;
 import org.ekstep.genieservices.commons.bean.Session;
 import org.ekstep.genieservices.commons.bean.TenantInfo;
 import org.ekstep.genieservices.commons.bean.TenantInfoRequest;
@@ -22,6 +21,7 @@ import org.ekstep.genieservices.commons.bean.UserProfile;
 import org.ekstep.genieservices.commons.bean.UserProfileDetailsRequest;
 import org.ekstep.genieservices.commons.bean.UserProfileSkill;
 import org.ekstep.genieservices.commons.bean.UserProfileSkillsRequest;
+import org.ekstep.genieservices.commons.bean.UserSearchResult;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -147,25 +147,25 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
     }
 
     @Override
-    public GenieResponse<SearchUserResult> searchUser(SearchUserRequest searchUserRequest) {
+    public GenieResponse<UserSearchResult> searchUser(SearchUserCriteria searchUserCriteria) {
         Map<String, Object> params = new HashMap<>();
-        params.put("request", GsonUtil.toJson(searchUserRequest));
+        params.put("request", GsonUtil.toJson(searchUserCriteria));
         String methodName = "searchUser@UserProfileServiceImpl";
 
-        GenieResponse<SearchUserResult> response = isValidAuthSession(methodName, params);
+        GenieResponse<UserSearchResult> response = isValidAuthSession(methodName, params);
         if (response != null) {
             return response;
         }
 
-        GenieResponse searchUserAPIResponse = UserProfileHandler.searchUser(mAppContext, authSession.getSessionData(), searchUserRequest);
+        GenieResponse searchUserAPIResponse = UserProfileHandler.searchUser(mAppContext, authSession.getSessionData(), searchUserCriteria);
 
         if (searchUserAPIResponse.getStatus()) {
             LinkedTreeMap map = GsonUtil.fromJson(searchUserAPIResponse.getResult().toString(), LinkedTreeMap.class);
             String result = GsonUtil.toJson(map.get("result"));
-            SearchUserResult searchUserResult = GsonUtil.fromJson(result, SearchUserResult.class);
+            UserSearchResult userSearchResult = GsonUtil.fromJson(result, UserSearchResult.class);
 
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-            response.setResult(searchUserResult);
+            response.setResult(userSearchResult);
 
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         } else {

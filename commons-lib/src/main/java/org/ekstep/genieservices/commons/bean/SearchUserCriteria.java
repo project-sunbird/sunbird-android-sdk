@@ -7,12 +7,12 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
  * shriharsh
  */
 
-public class SearchUserRequest {
+public class SearchUserCriteria {
     private String query;
     private int offset;
     private int limit;
 
-    private SearchUserRequest(String query, int offset, int limit) {
+    private SearchUserCriteria(String query, int offset, int limit) {
         this.query = query;
         this.offset = offset;
         this.limit = limit;
@@ -64,9 +64,9 @@ public class SearchUserRequest {
             return this;
         }
 
-        public SearchUserRequest build() {
+        public SearchUserCriteria build() {
 
-            return new SearchUserRequest(query, offset, limit);
+            return new SearchUserCriteria(query, offset, limit);
         }
 
     }

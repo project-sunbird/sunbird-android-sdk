@@ -5,11 +5,11 @@ package org.ekstep.genieservices.commons.bean;
  *
  * @author anil
  */
-public class SearchUserResult {
+public class UserSearchResult {
 
     private String searchUser;
 
-    public SearchUserResult(String searchUser) {
+    public UserSearchResult(String searchUser) {
         this.searchUser = searchUser;
     }
 

@@ -1,14 +1,12 @@
 package org.ekstep.genieservices;
 
-import org.ekstep.genieservices.commons.bean.Batch;
-import org.ekstep.genieservices.commons.bean.BatchesForCourseRequest;
-import org.ekstep.genieservices.commons.bean.Course;
+import org.ekstep.genieservices.commons.bean.CourseBatchesRequest;
+import org.ekstep.genieservices.commons.bean.CourseBatchesResponse;
 import org.ekstep.genieservices.commons.bean.EnrolCourseRequest;
 import org.ekstep.genieservices.commons.bean.EnrolledCoursesRequest;
+import org.ekstep.genieservices.commons.bean.EnrolledCoursesResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.UpdateContentStateRequest;
-
-import java.util.List;
 
 /**
  * This is the interface with all the required APIs to perform necessary operations related to courses.
@@ -19,9 +17,9 @@ public interface ICourseService {
      * This api is used to get the enrolled courses.
      *
      * @param enrolledCoursesRequest {@link EnrolledCoursesRequest}
-     * @return {@link List<Course>}
+     * @return {@link EnrolledCoursesResponse}
      */
-    GenieResponse<List<Course>> getEnrolledCourses(EnrolledCoursesRequest enrolledCoursesRequest);
+    GenieResponse<EnrolledCoursesResponse> getEnrolledCourses(EnrolledCoursesRequest enrolledCoursesRequest);
 
     /**
      * This api is used to enrol the course.
@@ -42,8 +40,8 @@ public interface ICourseService {
     /**
      * This api is used to get available batches for course.
      *
-     * @param batchesForCourseRequest {@link BatchesForCourseRequest}
+     * @param courseBatchesRequest {@link CourseBatchesRequest}
      * @return
      */
-    GenieResponse<List<Batch>> getBatches(BatchesForCourseRequest batchesForCourseRequest);
+    GenieResponse<CourseBatchesResponse> getCourseBatches(CourseBatchesRequest courseBatchesRequest);
 }
