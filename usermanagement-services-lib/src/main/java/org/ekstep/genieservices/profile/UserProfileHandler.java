@@ -4,9 +4,9 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.EndorseOrAddSkillRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ProfileVisibilityRequest;
-import org.ekstep.genieservices.commons.bean.SearchUserCriteria;
 import org.ekstep.genieservices.commons.bean.Session;
 import org.ekstep.genieservices.commons.bean.UploadFileRequest;
+import org.ekstep.genieservices.commons.bean.UserSearchCriteria;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.profile.network.EndorseOrAddSkillAPI;
@@ -100,17 +100,17 @@ public class UserProfileHandler {
         return requestMap;
     }
 
-    public static GenieResponse searchUser(AppContext appContext, Session sessionData, SearchUserCriteria searchUserCriteria) {
+    public static GenieResponse searchUser(AppContext appContext, Session sessionData, UserSearchCriteria userSearchCriteria) {
         SearchUserAPI searchUserAPI = new SearchUserAPI(appContext, getCustomHeaders(sessionData),
-                getSearchUserParameters(searchUserCriteria));
+                getSearchUserParameters(userSearchCriteria));
         return searchUserAPI.post();
     }
 
-    private static Map<String, Object> getSearchUserParameters(SearchUserCriteria searchUserCriteria) {
+    private static Map<String, Object> getSearchUserParameters(UserSearchCriteria userSearchCriteria) {
         Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("query", searchUserCriteria.getQuery());
-        requestMap.put("offset", searchUserCriteria.getOffset());
-        requestMap.put("limit", searchUserCriteria.getLimit());
+        requestMap.put("query", userSearchCriteria.getQuery());
+        requestMap.put("offset", userSearchCriteria.getOffset());
+        requestMap.put("limit", userSearchCriteria.getLimit());
 
         return requestMap;
     }

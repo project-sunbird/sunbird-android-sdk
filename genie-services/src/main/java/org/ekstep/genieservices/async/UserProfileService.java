@@ -6,13 +6,13 @@ import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.EndorseOrAddSkillRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ProfileVisibilityRequest;
-import org.ekstep.genieservices.commons.bean.SearchUserCriteria;
 import org.ekstep.genieservices.commons.bean.TenantInfo;
 import org.ekstep.genieservices.commons.bean.TenantInfoRequest;
 import org.ekstep.genieservices.commons.bean.UserProfile;
 import org.ekstep.genieservices.commons.bean.UserProfileDetailsRequest;
 import org.ekstep.genieservices.commons.bean.UserProfileSkill;
 import org.ekstep.genieservices.commons.bean.UserProfileSkillsRequest;
+import org.ekstep.genieservices.commons.bean.UserSearchCriteria;
 import org.ekstep.genieservices.commons.bean.UserSearchResult;
 
 /**
@@ -74,14 +74,14 @@ public class UserProfileService {
     /*
      * This api is used search user
      *
-             * @param searchUserCriteria - {@link SearchUserCriteria}
+             * @param userSearchCriteria - {@link UserSearchCriteria}
      * @param responseHandler   - {@link IResponseHandler<TenantInfo>}
      */
-    public void searchUser(final SearchUserCriteria searchUserCriteria, IResponseHandler<UserSearchResult> responseHandler) {
+    public void searchUser(final UserSearchCriteria userSearchCriteria, IResponseHandler<UserSearchResult> responseHandler) {
         ThreadPool.getInstance().execute(new IPerformable<UserSearchResult>() {
             @Override
             public GenieResponse<UserSearchResult> perform() {
-                return userProfileService.searchUser(searchUserCriteria);
+                return userProfileService.searchUser(userSearchCriteria);
             }
         }, responseHandler);
     }

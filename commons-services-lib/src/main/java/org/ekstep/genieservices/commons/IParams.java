@@ -44,6 +44,7 @@ public interface IParams {
         String APIGATEWAY_BASE_URL = "APIGATEWAY_BASE_URL";
         String USER_SERVICE_BASE_URL = "USER_SERVICE_BASE_URL";
         String ORG_SERVICE_BASE_URL = "ORG_SERVICE_BASE_URL";
+        String COURSE_SERVICE_BASE_URL = "COURSE_SERVICE_BASE_URL";
         String API_PASS = "API_PASS";
         String API_USER = "API_USER";
         String MOBILE_APP_SECRET = "MOBILE_APP_SECRET";

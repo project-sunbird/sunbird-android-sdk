@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.profile.network;
+package org.ekstep.genieservices.content.network;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IParams;
@@ -8,27 +8,24 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Created on 1/3/18.
+ * Created on 9/3/18.
  *
  * @author anil
  */
+public class EnrolledCoursesAPI extends BaseAPI {
 
-public class UserProfileDetailsAPI extends BaseAPI {
+    private static final String TAG = EnrolledCoursesAPI.class.getSimpleName();
 
-    private static final String TAG = UserProfileDetailsAPI.class.getSimpleName();
-
-    private static final CharSequence SERVICE_ENDPOINTS = "read";
+    private static final CharSequence SERVICE_ENDPOINTS = "user/enrollment/list";
 
     private Map<String, String> headers;
 
-    public UserProfileDetailsAPI(AppContext appContext, Map<String, String> customHeaders,
-                                 String userId, String queryParams) {
+    public EnrolledCoursesAPI(AppContext appContext, Map<String, String> customHeaders, String userId) {
         super(appContext,
-                String.format(Locale.US, "%s/%s/%s?%s",
+                String.format(Locale.US, "%s/%s/%s",
                         appContext.getParams().getString(IParams.Key.USER_SERVICE_BASE_URL),
                         SERVICE_ENDPOINTS,
-                        userId,
-                        queryParams),
+                        userId),
                 TAG);
 
         this.headers = customHeaders;

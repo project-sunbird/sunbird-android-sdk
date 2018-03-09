@@ -4,7 +4,6 @@ import org.ekstep.genieservices.commons.bean.EndorseOrAddSkillRequest;
 import org.ekstep.genieservices.commons.bean.FileUploadResult;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ProfileVisibilityRequest;
-import org.ekstep.genieservices.commons.bean.SearchUserCriteria;
 import org.ekstep.genieservices.commons.bean.TenantInfo;
 import org.ekstep.genieservices.commons.bean.TenantInfoRequest;
 import org.ekstep.genieservices.commons.bean.UploadFileRequest;
@@ -12,6 +11,7 @@ import org.ekstep.genieservices.commons.bean.UserProfile;
 import org.ekstep.genieservices.commons.bean.UserProfileDetailsRequest;
 import org.ekstep.genieservices.commons.bean.UserProfileSkill;
 import org.ekstep.genieservices.commons.bean.UserProfileSkillsRequest;
+import org.ekstep.genieservices.commons.bean.UserSearchCriteria;
 import org.ekstep.genieservices.commons.bean.UserSearchResult;
 
 /**
@@ -23,7 +23,7 @@ public interface IUserProfileService {
 
     GenieResponse<TenantInfo> getTenantInfo(TenantInfoRequest tenantInfoRequest);
 
-    GenieResponse<UserSearchResult> searchUser(SearchUserCriteria profileVisibilityRequest);
+    GenieResponse<UserSearchResult> searchUser(UserSearchCriteria profileVisibilityRequest);
 
     GenieResponse<UserProfileSkill> getSkills(UserProfileSkillsRequest profileSkillsRequest);
 
