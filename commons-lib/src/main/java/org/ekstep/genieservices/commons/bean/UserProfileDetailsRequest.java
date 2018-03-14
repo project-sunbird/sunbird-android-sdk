@@ -43,7 +43,7 @@ public class UserProfileDetailsRequest {
 
         public Builder forUser(String userId) {
             if (StringUtil.isNullOrEmpty(userId)) {
-                throw new IllegalArgumentException("userId required.");
+                throw new IllegalArgumentException("userId should not be null or empty.");
             }
             this.userId = userId;
             return this;
