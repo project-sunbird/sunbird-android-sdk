@@ -5,9 +5,11 @@ import com.google.gson.internal.LinkedTreeMap;
 import org.ekstep.genieservices.BaseService;
 import org.ekstep.genieservices.IAuthSession;
 import org.ekstep.genieservices.ICourseService;
+import org.ekstep.genieservices.IUserProfileService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.bean.Batch;
 import org.ekstep.genieservices.commons.bean.CourseBatchesRequest;
 import org.ekstep.genieservices.commons.bean.CourseBatchesResponse;
 import org.ekstep.genieservices.commons.bean.EnrollCourseRequest;
@@ -16,12 +18,18 @@ import org.ekstep.genieservices.commons.bean.EnrolledCoursesResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Session;
 import org.ekstep.genieservices.commons.bean.UpdateContentStateRequest;
+import org.ekstep.genieservices.commons.bean.UserSearchCriteria;
+import org.ekstep.genieservices.commons.bean.UserSearchResult;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created on 6/3/18.
@@ -33,12 +41,17 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
     private static final String TAG = CourseServiceImpl.class.getSimpleName();
 
     private static final String GET_ENROLLED_COURSES_KEY_PREFIX = "enrolledCourses";
+    private static final String KEY_FIRST_NAME = "firstName";
+    private static final String KEY_LAST_NAME = "lastName";
+    private static final String KEY_IDENTIFIER = "identifier";
 
     private IAuthSession<Session> authSession;
+    private IUserProfileService userProfileService;
 
-    public CourseServiceImpl(AppContext appContext, IAuthSession<Session> authSession) {
+    public CourseServiceImpl(AppContext appContext, IAuthSession<Session> authSession, IUserProfileService userProfileService) {
         super(appContext);
         this.authSession = authSession;
+        this.userProfileService = userProfileService;
     }
 
     private <T> GenieResponse<T> isValidAuthSession(String methodName, Map<String, Object> params) {
@@ -171,12 +184,47 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
             LinkedTreeMap result = (LinkedTreeMap) map.get("result");
             String responseStr = GsonUtil.toJson(result.get("response"));
 
-            // TODO: 9/3/18 - Merge the batch list with creator name.
 
-            CourseBatchesResponse searchUserResult = GsonUtil.fromJson(responseStr, CourseBatchesResponse.class);
+            CourseBatchesResponse courseBatchesResponse = GsonUtil.fromJson(responseStr, CourseBatchesResponse.class);
+            if (courseBatchesResponse.getCount() > 0) {
+                List<Batch> batchList = courseBatchesResponse.getBatches();
+
+                Set<String> identifiers = new LinkedHashSet<>();
+                for (Batch batch : batchList) {
+                    identifiers.add(batch.getCreatedBy());
+                }
+                UserSearchCriteria.SearchBuilder builder = new UserSearchCriteria.SearchBuilder().identifiers(identifiers).
+                        limit(batchList.size()).fields(Arrays.asList(KEY_FIRST_NAME, KEY_LAST_NAME, KEY_IDENTIFIER));
+
+                GenieResponse<UserSearchResult> searchUserResponse = userProfileService.searchUser(builder.build());
+                if (searchUserResponse.getStatus()) {
+                    Map resultMap = GsonUtil.fromJson(searchUserResponse.getResult().getSearchUserResult(), Map.class);
+
+                    List<Map<String, String>> responseMapList = ((List<Map<String, String>>) resultMap.get("content"));
+                    if (responseMapList != null && responseMapList.size() > 0) {
+                        for (int i = 0; i < batchList.size(); i++) {
+                            Batch batch = batchList.get(i);
+                            for (Map<String, String> eachMap : responseMapList) {
+                                if (batch.getCreatedBy().equalsIgnoreCase(eachMap.get("identifier").toString())) {
+
+                                    if (eachMap.get("firstName") != null) {
+                                        batchList.get(i).setCreatorFirstName(eachMap.get("firstName"));
+                                    }
+
+                                    if (eachMap.get("lastName") != null) {
+                                        batchList.get(i).setCreatorLastName(eachMap.get("lastName"));
+                                    }
+
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
 
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-            response.setResult(searchUserResult);
+            response.setResult(courseBatchesResponse);
 
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         } else {

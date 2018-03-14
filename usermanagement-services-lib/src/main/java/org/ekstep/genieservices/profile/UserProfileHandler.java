@@ -27,6 +27,7 @@ import java.util.Map;
  */
 public class UserProfileHandler {
 
+
     private static Map<String, String> getCustomHeaders(Session authSession) {
         Map<String, String> headers = new HashMap<>();
         headers.put("X-Authenticated-User-Token", authSession.getAccessToken());
@@ -114,7 +115,11 @@ public class UserProfileHandler {
         requestMap.put("query", userSearchCriteria.getQuery());
         requestMap.put("offset", userSearchCriteria.getOffset());
         requestMap.put("limit", userSearchCriteria.getLimit());
-
+        if (userSearchCriteria.getIdentifiers() != null) {
+            Map<String, Object> identifiersMap = new HashMap<>();
+            identifiersMap.put("identifier", userSearchCriteria.getIdentifiers());
+            requestMap.put("filters", identifiersMap);
+        }
         return requestMap;
     }
 

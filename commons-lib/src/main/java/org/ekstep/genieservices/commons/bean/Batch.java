@@ -29,7 +29,8 @@ public class Batch {
     private int status;
     private String courseCreator;
     private String createdBy;
-    private String creatorName;
+    private String creatorFirstName;
+    private String creatorLastName;
 
     public String getIdentifier() {
         return identifier;
@@ -103,8 +104,20 @@ public class Batch {
         return createdBy;
     }
 
-    public String getCreatorName() {
-        return creatorName;
+    public String getCreatorFirstName() {
+        return creatorFirstName;
+    }
+
+    public void setCreatorFirstName(String firstName) {
+        this.creatorFirstName = firstName;
+    }
+
+    public String getCreatorLastName() {
+        return creatorLastName;
+    }
+
+    public void setCreatorLastName(String lastName) {
+        this.creatorLastName = lastName;
     }
 
     @Override

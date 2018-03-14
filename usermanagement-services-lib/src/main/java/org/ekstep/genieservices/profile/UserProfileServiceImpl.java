@@ -166,7 +166,7 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
 
         if (searchUserAPIResponse.getStatus()) {
             LinkedTreeMap map = GsonUtil.fromJson(searchUserAPIResponse.getResult().toString(), LinkedTreeMap.class);
-            String result = GsonUtil.toJson(map.get("result"));
+            String result = GsonUtil.toJson(((Map) map.get("result")).get("response"));
             UserSearchResult userSearchResult = GsonUtil.fromJson(result, UserSearchResult.class);
 
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);

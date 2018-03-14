@@ -156,9 +156,17 @@ public class GenieService {
         return mUserProfileService;
     }
 
+    /**
+     * This api gets the {@link CourseServiceImpl}, when accessed in the below way
+     * <p>
+     * getService().getCourseService()
+     * <p><p>
+     *
+     * @return {@link ICourseService}
+     */
     public ICourseService getCourseService() {
         if (mCourseService == null) {
-            mCourseService = new CourseServiceImpl(mAppContext, getAuthSession());
+            mCourseService = new CourseServiceImpl(mAppContext, getAuthSession(), getUserProfileService());
         }
 
         return mCourseService;
