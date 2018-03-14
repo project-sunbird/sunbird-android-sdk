@@ -10,7 +10,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.CourseBatchesRequest;
 import org.ekstep.genieservices.commons.bean.CourseBatchesResponse;
-import org.ekstep.genieservices.commons.bean.EnrolCourseRequest;
+import org.ekstep.genieservices.commons.bean.EnrollCourseRequest;
 import org.ekstep.genieservices.commons.bean.EnrolledCoursesRequest;
 import org.ekstep.genieservices.commons.bean.EnrolledCoursesResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -97,10 +97,10 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
     }
 
     @Override
-    public GenieResponse<Void> enrolCourse(EnrolCourseRequest enrolCourseRequest) {
+    public GenieResponse<Void> enrollCourse(EnrollCourseRequest enrollCourseRequest) {
         Map<String, Object> params = new HashMap<>();
-        params.put("request", GsonUtil.toJson(enrolCourseRequest));
-        String methodName = "enrolCourse@CourseServiceImpl";
+        params.put("request", GsonUtil.toJson(enrollCourseRequest));
+        String methodName = "enrollCourse@CourseServiceImpl";
 
         GenieResponse<Void> response = isValidAuthSession(methodName, params);
         if (response != null) {
@@ -108,7 +108,7 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
         }
 
         GenieResponse enrolCourseAPIResponse = CourseHandler.enrolCourseInServer(mAppContext, authSession.getSessionData(),
-                enrolCourseRequest);
+                enrollCourseRequest);
 
         if (enrolCourseAPIResponse.getStatus()) {
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);

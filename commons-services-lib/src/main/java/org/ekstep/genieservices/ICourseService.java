@@ -2,7 +2,7 @@ package org.ekstep.genieservices;
 
 import org.ekstep.genieservices.commons.bean.CourseBatchesRequest;
 import org.ekstep.genieservices.commons.bean.CourseBatchesResponse;
-import org.ekstep.genieservices.commons.bean.EnrolCourseRequest;
+import org.ekstep.genieservices.commons.bean.EnrollCourseRequest;
 import org.ekstep.genieservices.commons.bean.EnrolledCoursesRequest;
 import org.ekstep.genieservices.commons.bean.EnrolledCoursesResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -22,12 +22,12 @@ public interface ICourseService {
     GenieResponse<EnrolledCoursesResponse> getEnrolledCourses(EnrolledCoursesRequest enrolledCoursesRequest);
 
     /**
-     * This api is used to enrol the course.
+     * This api is used to enroll the course.
      *
-     * @param enrolCourseRequest {@link EnrolCourseRequest}
+     * @param enrollCourseRequest {@link EnrollCourseRequest}
      * @return
      */
-    GenieResponse<Void> enrolCourse(EnrolCourseRequest enrolCourseRequest);
+    GenieResponse<Void> enrollCourse(EnrollCourseRequest enrollCourseRequest);
 
     /**
      * This api is used to update the content state of course.

@@ -7,14 +7,14 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
  *
  * @author anil
  */
-public class EnrolCourseRequest {
+public class EnrollCourseRequest {
 
     private String userId;
     private String courseId;
     private String contentId;
     private String batchId;
 
-    private EnrolCourseRequest(String userId, String courseId, String contentId, String batchId) {
+    private EnrollCourseRequest(String userId, String courseId, String contentId, String batchId) {
         this.userId = userId;
         this.courseId = courseId;
         this.contentId = contentId;
@@ -75,7 +75,7 @@ public class EnrolCourseRequest {
             return this;
         }
 
-        public EnrolCourseRequest build() {
+        public EnrollCourseRequest build() {
             if (StringUtil.isNullOrEmpty(userId)) {
                 throw new IllegalStateException("userId required.");
             }
@@ -92,7 +92,7 @@ public class EnrolCourseRequest {
                 throw new IllegalStateException("batchId required.");
             }
 
-            return new EnrolCourseRequest(userId, courseId, contentId, batchId);
+            return new EnrollCourseRequest(userId, courseId, contentId, batchId);
         }
     }
 }

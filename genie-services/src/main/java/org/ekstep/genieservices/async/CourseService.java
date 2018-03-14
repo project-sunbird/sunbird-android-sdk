@@ -5,7 +5,7 @@ import org.ekstep.genieservices.ICourseService;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.CourseBatchesRequest;
 import org.ekstep.genieservices.commons.bean.CourseBatchesResponse;
-import org.ekstep.genieservices.commons.bean.EnrolCourseRequest;
+import org.ekstep.genieservices.commons.bean.EnrollCourseRequest;
 import org.ekstep.genieservices.commons.bean.EnrolledCoursesRequest;
 import org.ekstep.genieservices.commons.bean.EnrolledCoursesResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -38,16 +38,16 @@ public class CourseService {
     }
 
     /**
-     * This api is used to enrol the course.
+     * This api is used to enroll the course.
      *
-     * @param enrolCourseRequest - {@link EnrolCourseRequest}
+     * @param enrollCourseRequest - {@link EnrollCourseRequest}
      * @param responseHandler    - {@link IResponseHandler <Void>}
      */
-    public void enrolCourse(final EnrolCourseRequest enrolCourseRequest, IResponseHandler<Void> responseHandler) {
+    public void enrollCourse(final EnrollCourseRequest enrollCourseRequest, IResponseHandler<Void> responseHandler) {
         ThreadPool.getInstance().execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
-                return courseService.enrolCourse(enrolCourseRequest);
+                return courseService.enrollCourse(enrollCourseRequest);
             }
         }, responseHandler);
     }
