@@ -18,6 +18,7 @@ import org.ekstep.genieservices.commons.download.DownloadServiceImpl;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.config.ConfigServiceImpl;
+import org.ekstep.genieservices.config.FrameworkServiceImpl;
 import org.ekstep.genieservices.content.ContentFeedbackServiceImpl;
 import org.ekstep.genieservices.content.ContentServiceImpl;
 import org.ekstep.genieservices.content.CourseServiceImpl;
@@ -61,6 +62,7 @@ public class GenieService {
     private INotificationService mNotificationService;
     private ISummarizerService mSummarizerService;
     private IAuthService mAuthService;
+    private IFrameworkService mFrameworkService;
     private ITagService mTagService;
     private IDownloadService mDownloadService;
     private IAuthSession<Session> mAuthSession;
@@ -320,6 +322,21 @@ public class GenieService {
             mAuthService = new AuthServiceImpl(mAppContext);
         }
         return mAuthService;
+    }
+
+    /**
+     * This api gets the {@link org.ekstep.genieservices.config.FrameworkServiceImpl}, when accessed in the below way
+     * <p>
+     * getService().getFrameworkService()
+     * <p><p>
+     *
+     * @return {@link IFrameworkService}
+     */
+    public IFrameworkService getFrameworkService() {
+        if (mFrameworkService == null) {
+            mFrameworkService = new FrameworkServiceImpl(mAppContext, getAuthSession());
+        }
+        return mFrameworkService;
     }
 
     /**

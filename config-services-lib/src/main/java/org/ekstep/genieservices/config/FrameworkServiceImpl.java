@@ -1,0 +1,90 @@
+package org.ekstep.genieservices.config;
+
+import com.google.gson.internal.LinkedTreeMap;
+
+import org.ekstep.genieservices.BaseService;
+import org.ekstep.genieservices.IAuthSession;
+import org.ekstep.genieservices.IFrameworkService;
+import org.ekstep.genieservices.ServiceConstants;
+import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.bean.Category;
+import org.ekstep.genieservices.commons.bean.CategoryDetailsRequest;
+import org.ekstep.genieservices.commons.bean.Channel;
+import org.ekstep.genieservices.commons.bean.ChannelDetailsRequest;
+import org.ekstep.genieservices.commons.bean.Framework;
+import org.ekstep.genieservices.commons.bean.FrameworkDetailsRequest;
+import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.Session;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.config.network.ChannelAPI;
+import org.ekstep.genieservices.telemetry.TelemetryLogger;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * This is the implementation of the interface {@link IFrameworkService}
+ *
+ * @author indraja
+ */
+public class FrameworkServiceImpl extends BaseService implements IFrameworkService {
+
+    private static final String TAG = FrameworkServiceImpl.class.getSimpleName();
+
+    private IAuthSession<Session> authSession;
+
+    public FrameworkServiceImpl(AppContext appContext, IAuthSession<Session> authSession) {
+        super(appContext);
+        this.authSession = authSession;
+    }
+
+    private static Map<String, String> getCustomHeaders(Session authSession) {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("X-Authenticated-User-Token", authSession.getAccessToken());
+        return headers;
+    }
+
+    @Override
+    public GenieResponse<Channel> getChannelDetails(final ChannelDetailsRequest channelDetailsRequest) {
+        String methodName = "getChannelDetails@ConfigServiceImpl";
+        Map<String, Object> params = new HashMap<>();
+        params.put("request", GsonUtil.toJson(channelDetailsRequest));
+
+        // TODO 15/03/18 : add a thread if we are saving db for offline
+        ChannelAPI channelAPI = new ChannelAPI(mAppContext, getCustomHeaders(authSession.getSessionData()), channelDetailsRequest.getChannelId());
+        GenieResponse genieResponse = channelAPI.get();
+
+        LinkedTreeMap map = GsonUtil.fromJson(genieResponse.getResult().toString(), LinkedTreeMap.class);
+        String result = GsonUtil.toJson(map.get("result"));
+        Channel channel = GsonUtil.fromJson(result, Channel.class);
+
+        GenieResponse<Channel> response;
+        if (channel != null) {
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+            response.setResult(channel);
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        } else {
+            response = GenieResponseBuilder.getErrorResponse(genieResponse.getError(), genieResponse.getMessage(), TAG);
+
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, genieResponse.getMessage());
+        }
+        return response;
+    }
+
+    @Override
+    public GenieResponse<Framework> getFrameworkDetails(FrameworkDetailsRequest frameworkDetailsRequest) {
+        return null;
+    }
+
+    @Override
+    public GenieResponse<List<Category>> getAllCategory(CategoryDetailsRequest categoryDetailsRequest) {
+        return null;
+    }
+
+    @Override
+    public GenieResponse<Category> getCategoryDetails(CategoryDetailsRequest categoryDetailsRequest) {
+        return null;
+    }
+}
