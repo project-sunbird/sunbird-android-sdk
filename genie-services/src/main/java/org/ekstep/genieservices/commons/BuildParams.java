@@ -60,6 +60,8 @@ public class BuildParams implements IParams {
         setParam(Key.USER_SERVICE_BASE_URL);
         setParam(Key.ORG_SERVICE_BASE_URL);
         setParam(Key.COURSE_SERVICE_BASE_URL);
+        setParam(Key.CHANNEL_SERVICE_BASE_URL);
+        setParam(Key.FRAMEWORK_SERVICE_BASE_URL);
         setParam(Key.APIGATEWAY_BASE_URL);
         setParam(Key.API_USER);
         setParam(Key.API_PASS);

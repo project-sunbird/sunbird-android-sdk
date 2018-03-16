@@ -2,10 +2,8 @@ package org.ekstep.genieservices.config.network;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IParams;
-import org.ekstep.genieservices.commons.bean.Session;
 import org.ekstep.genieservices.commons.network.BaseAPI;
 
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -14,15 +12,15 @@ import java.util.Map;
  *
  * @author Indraja Machani
  */
-public class ChannelAPI extends BaseAPI {
+public class ChannelDetailsAPI extends BaseAPI {
 
-    private static final String TAG = ChannelAPI.class.getSimpleName();
+    private static final String TAG = ChannelDetailsAPI.class.getSimpleName();
 
     private static final String ENDPOINT = "read";
 
     private Map<String, String> headers;
 
-    public ChannelAPI(AppContext appContext, Map<String, String> headers, String channelId) {
+    public ChannelDetailsAPI(AppContext appContext, Map<String, String> headers, String channelId) {
         super(appContext,
                 String.format(Locale.US, "%s/%s/%s",
                         appContext.getParams().getString(IParams.Key.CHANNEL_SERVICE_BASE_URL),
