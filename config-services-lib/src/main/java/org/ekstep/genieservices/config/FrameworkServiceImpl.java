@@ -8,8 +8,6 @@ import org.ekstep.genieservices.IFrameworkService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
-import org.ekstep.genieservices.commons.bean.Category;
-import org.ekstep.genieservices.commons.bean.CategoryDetailsRequest;
 import org.ekstep.genieservices.commons.bean.Channel;
 import org.ekstep.genieservices.commons.bean.ChannelDetailsRequest;
 import org.ekstep.genieservices.commons.bean.Framework;
@@ -22,7 +20,6 @@ import org.ekstep.genieservices.config.network.FrameworkDetailsApi;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -102,13 +99,4 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         return response;
     }
 
-    @Override
-    public GenieResponse<List<Category>> getAllCategory(CategoryDetailsRequest categoryDetailsRequest) {
-        return null;
-    }
-
-    @Override
-    public GenieResponse<Category> getCategoryDetails(CategoryDetailsRequest categoryDetailsRequest) {
-        return null;
-    }
 }
