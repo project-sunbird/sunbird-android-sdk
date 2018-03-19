@@ -48,6 +48,7 @@ public class ContentData implements Serializable {
     private List<String> screenshots;
     private Object audience;
     private List<String> pragma;
+    private List<String> attributions;
 
     public ContentData() {
     }
@@ -226,6 +227,10 @@ public class ContentData implements Serializable {
         return pragma;
     }
 
+    public List<String> getAttributions() {
+        return attributions;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -238,42 +243,6 @@ public class ContentData implements Serializable {
 
     @Override
     public String toString() {
-        return "ContentData{" +
-                "identifier='" + identifier + '\'' +
-                ", name='" + name + '\'' +
-                ", appIcon='" + appIcon + '\'' +
-                ", description='" + description + '\'' +
-                ", pkgVersion='" + pkgVersion + '\'' +
-                ", status='" + status + '\'' +
-                ", size='" + size + '\'' +
-                ", owner='" + owner + '\'' +
-                ", subject='" + subject + '\'' +
-                ", publisher='" + publisher + '\'' +
-                ", me_totalRatings='" + me_totalRatings + '\'' +
-                ", me_averageRating='" + me_averageRating + '\'' +
-                ", me_totalDownloads='" + me_totalDownloads + '\'' +
-                ", copyright='" + copyright + '\'' +
-                ", license='" + license + '\'' +
-                ", expires='" + expires + '\'' +
-                ", downloadUrl='" + downloadUrl + '\'' +
-                ", variants='" + variants + '\'' +
-                ", artifactUrl='" + artifactUrl + '\'' +
-                ", language=" + language +
-                ", gradeLevel=" + gradeLevel +
-                ", osId='" + osId + '\'' +
-                ", contentType='" + contentType + '\'' +
-                ", resourceType='" + resourceType + '\'' +
-                ", mimeType='" + mimeType + '\'' +
-                ", artifactMimeType='" + artifactMimeType + '\'' +
-                ", versionKey='" + versionKey + '\'' +
-                ", contentEncoding='" + contentEncoding + '\'' +
-                ", contentDisposition='" + contentDisposition + '\'' +
-                ", contentTypesCount='" + contentTypesCount + '\'' +
-                ", lastPublishedOn='" + lastPublishedOn + '\'' +
-                ", createdOn='" + createdOn + '\'' +
-                ", screenshots=" + screenshots +
-                ", audience=" + audience +
-                ", pragma=" + pragma +
-                '}';
+        return GsonUtil.toJson(this);
     }
 }
