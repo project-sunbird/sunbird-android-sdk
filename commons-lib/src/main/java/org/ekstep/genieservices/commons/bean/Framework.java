@@ -11,8 +11,17 @@ public class Framework {
 
     private String framework;
 
+    public Framework(String framework) {
+        this.framework = framework;
+    }
+
     @Override
     public String toString() {
         return GsonUtil.toJson(this);
     }
+
+    public String getFramework() {
+        return framework;
+    }
+
 }

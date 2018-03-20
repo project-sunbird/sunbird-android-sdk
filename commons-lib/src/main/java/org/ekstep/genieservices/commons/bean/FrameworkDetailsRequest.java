@@ -29,12 +29,18 @@ public class FrameworkDetailsRequest {
 
         private String frameworkId;
         private boolean refreshFrameworkDetails;
+        private boolean isDefaultFrameworkDetails;
 
         public Builder forFramework(String frameworkId) {
             if (StringUtil.isNullOrEmpty(frameworkId)) {
                 throw new IllegalArgumentException("frameworkId should not be null or empty.");
             }
             this.frameworkId = frameworkId;
+            return this;
+        }
+
+        public Builder getDefaultFrameworkDetails() {
+            this.isDefaultFrameworkDetails = true;
             return this;
         }
 
@@ -47,8 +53,10 @@ public class FrameworkDetailsRequest {
         }
 
         public FrameworkDetailsRequest build() {
-            if (StringUtil.isNullOrEmpty(frameworkId)) {
-                throw new IllegalStateException("frameworkId required.");
+            if (!isDefaultFrameworkDetails) {
+                if (StringUtil.isNullOrEmpty(frameworkId)) {
+                    throw new IllegalStateException("frameworkId required.");
+                }
             }
 
             return new FrameworkDetailsRequest(frameworkId, refreshFrameworkDetails);

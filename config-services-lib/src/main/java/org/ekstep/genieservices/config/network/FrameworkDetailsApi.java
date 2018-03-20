@@ -16,15 +16,15 @@ public class FrameworkDetailsApi extends BaseAPI {
 
     private static final String TAG = FrameworkDetailsApi.class.getSimpleName();
 
-    private static final String ENDPOINT = "read/NCF";
+    private static final String ENDPOINT = "read";
 
     private Map<String, String> headers;
 
-    public FrameworkDetailsApi(AppContext appContext, Map<String, String> headers) {
+    public FrameworkDetailsApi(AppContext appContext, Map<String, String> headers, String frameworkId) {
         super(appContext,
-                String.format(Locale.US, "%s/%s",
+                String.format(Locale.US, "%s/%s/%s",
                         appContext.getParams().getString(IParams.Key.FRAMEWORK_SERVICE_BASE_URL),
-                        ENDPOINT),
+                        ENDPOINT, frameworkId),
                 TAG);
 
         this.headers = headers;
