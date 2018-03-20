@@ -54,25 +54,74 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(channelDetailsRequest));
 
-        // TODO 15/03/18 : add a thread if we are saving db for offline
-        ChannelDetailsAPI channelAPI = new ChannelDetailsAPI(mAppContext, getCustomHeaders(authSession.getSessionData()), channelDetailsRequest.getChannelId());
-        GenieResponse genieResponse = channelAPI.get();
+        long expirationTime = getLongFromKeyValueStore(FrameworkConstants.PreferenceKey.CHANNEL_DETAILS_API_EXPIRATION_KEY);
+        String channelId = channelDetailsRequest.getChannelId();
+        if (expirationTime == 0) {
+            initializeChannelDetails(channelId);
+        } else if (hasExpired(expirationTime)) {
+            refreshChannelDetails(channelId);
+        }
 
-        LinkedTreeMap map = GsonUtil.fromJson(genieResponse.getResult().toString(), LinkedTreeMap.class);
-        String result = GsonUtil.toJson(map.get("result"));
-        Channel channel = GsonUtil.fromJson(result, Channel.class);
+        NoSqlModel refreshDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), String.valueOf(FrameworkConstants.PreferenceKey.CHANNEL_DETAILS_API_EXPIRATION_KEY));
 
-        GenieResponse<Channel> response;
-        if (channel != null) {
+        Channel channelDetails = null;
+        if (refreshDetailsInDb != null) {
+            LinkedTreeMap map = GsonUtil.fromJson(refreshDetailsInDb.getValue(), LinkedTreeMap.class);
+            String result = GsonUtil.toJson(map.get("result"));
+            channelDetails = GsonUtil.fromJson(result, Channel.class);
+        }
+
+        GenieResponse<Channel> response = null;
+        if (channelDetails != null) {
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-            response.setResult(channel);
+            response.setResult(channelDetails);
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         } else {
-            response = GenieResponseBuilder.getErrorResponse(genieResponse.getError(), genieResponse.getMessage(), TAG);
-
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, genieResponse.getMessage());
+            response = GenieResponseBuilder.getErrorResponse(response.getError(), response.getMessage(), TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, response.getMessage());
         }
         return response;
+    }
+
+    private void initializeChannelDetails(String channelId) {
+        String storedData = FileUtil.readFileFromClasspath(FrameworkConstants.ResourceFile.CHANNEL_DETAILS_JSON_FILE);
+        if (!StringUtil.isNullOrEmpty(storedData)) {
+            saveChannelDetails(storedData);
+        }
+        refreshChannelDetails(channelId);
+    }
+
+    private void saveChannelDetails(String response) {
+        LinkedTreeMap map = GsonUtil.fromJson(response, LinkedTreeMap.class);
+        Map result = ((LinkedTreeMap) map.get("result"));
+        if (result != null) {
+            Double ttl = (Double) result.get("ttl");
+            saveDataExpirationTime(ttl, FrameworkConstants.PreferenceKey.CHANNEL_DETAILS_API_EXPIRATION_KEY);
+            result.remove("ttl");
+            for (Object key : result.keySet()) {
+                NoSqlModel channelDetails = NoSqlModel.build(mAppContext.getDBSession(), (String) key, GsonUtil.toJson(result.get(key)));
+                NoSqlModel channelDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), String.valueOf(key));
+                if (channelDetailsInDb != null) {
+                    channelDetails.update();
+                } else {
+                    channelDetails.save();
+                }
+            }
+        }
+    }
+
+    private void refreshChannelDetails(final String channelId) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ChannelDetailsAPI channelAPI = new ChannelDetailsAPI(mAppContext, getCustomHeaders(authSession.getSessionData()), channelId);
+                GenieResponse genieResponse = channelAPI.get();
+                if (genieResponse.getStatus()) {
+                    String body = genieResponse.getResult().toString();
+                    saveChannelDetails(body);
+                }
+            }
+        }).start();
     }
 
     @Override
@@ -82,10 +131,11 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         params.put("request", GsonUtil.toJson(frameworkDetailsRequest));
 
         long expirationTime = getLongFromKeyValueStore(FrameworkConstants.PreferenceKey.FRAMEWORK_DETAILS_API_EXPIRATION_KEY);
+        String frameworkId = frameworkDetailsRequest.getFrameworkId();
         if (expirationTime == 0) {
-            initializeFrameworkDetails(frameworkDetailsRequest.getFrameworkId());
+            initializeFrameworkDetails(frameworkId);
         } else if (hasExpired(expirationTime)) {
-            refreshFrameworkDetails(frameworkDetailsRequest.getFrameworkId());
+            refreshFrameworkDetails(frameworkId);
         }
 
         NoSqlModel refreshDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), String.valueOf(FrameworkConstants.PreferenceKey.FRAMEWORK_DETAILS_API_EXPIRATION_KEY));
@@ -104,7 +154,7 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         } else {
             response = GenieResponseBuilder.getErrorResponse(response.getError(), response.getMessage(), TAG);
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_MASTER_DATA);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, response.getMessage());
         }
         return response;
     }

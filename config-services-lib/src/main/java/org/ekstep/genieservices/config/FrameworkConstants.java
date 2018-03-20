@@ -9,9 +9,11 @@ public interface FrameworkConstants {
 
     interface ResourceFile {
         String FRAMEWORK_DETAILS_JSON_FILE = "framework_details.json";
+        String CHANNEL_DETAILS_JSON_FILE = "channel_details.json";
     }
 
     interface PreferenceKey {
         String FRAMEWORK_DETAILS_API_EXPIRATION_KEY = "FRAMEWORK_DETAILS_API_EXPIRATION_KEY";
+        String CHANNEL_DETAILS_API_EXPIRATION_KEY = "CHANNEL_DETAILS_API_EXPIRATION_KEY";
     }
 }
