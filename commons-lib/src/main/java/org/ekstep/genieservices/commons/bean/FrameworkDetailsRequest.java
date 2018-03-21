@@ -11,10 +11,12 @@ public class FrameworkDetailsRequest {
 
     private String frameworkId;
     private boolean refreshFrameworkDetails;
+    private boolean defaultFrameworkDetails;
 
     private FrameworkDetailsRequest(String frameworkId, boolean refreshFrameworkDetails) {
         this.frameworkId = frameworkId;
         this.refreshFrameworkDetails = refreshFrameworkDetails;
+        this.defaultFrameworkDetails = defaultFrameworkDetails;
     }
 
     public String getFrameworkId() {
@@ -25,11 +27,15 @@ public class FrameworkDetailsRequest {
         return refreshFrameworkDetails;
     }
 
+    public boolean isDefaultFrameworkDetails() {
+        return defaultFrameworkDetails;
+    }
+
     public static class Builder {
 
         private String frameworkId;
         private boolean refreshFrameworkDetails;
-        private boolean isDefaultFrameworkDetails;
+        private boolean defaultFrameworkDetails;
 
         public Builder forFramework(String frameworkId) {
             if (StringUtil.isNullOrEmpty(frameworkId)) {
@@ -39,8 +45,8 @@ public class FrameworkDetailsRequest {
             return this;
         }
 
-        public Builder getDefaultFrameworkDetails() {
-            this.isDefaultFrameworkDetails = true;
+        public Builder defaultFrameworkDetails() {
+            this.defaultFrameworkDetails = true;
             return this;
         }
 
@@ -53,7 +59,7 @@ public class FrameworkDetailsRequest {
         }
 
         public FrameworkDetailsRequest build() {
-            if (!isDefaultFrameworkDetails) {
+            if (!defaultFrameworkDetails) {
                 if (StringUtil.isNullOrEmpty(frameworkId)) {
                     throw new IllegalStateException("frameworkId required.");
                 }

@@ -135,6 +135,10 @@ public interface ServiceConstants {
         String KEY_NOT_FOUND = "KEY_NOT_FOUND";
 
         String AUTH_SESSION = "AUTH_SESSION";
+
+        //Framework
+        String NO_CHANNEL_DETAILS_FOUND = "NO_CHANNEL_DETAILS_FOUND";
+        String NO_FRAMEWORK_DETAILS_FOUND = "NO_FRAMEWORK_DETAILS_FOUND";
     }
 
     interface ErrorMessage {
@@ -187,6 +191,10 @@ public interface ServiceConstants {
         String NO_CONTENT_TO_MOVE = "Nothing to move.";
 
         String USER_NOT_SIGN_IN = "User is not sign in.";
+
+        //Framework
+        String UNABLE_TO_FIND_CHANNEL_DETAILS = "Unable to find channel details";
+        String UNABLE_TO_FIND_FRAMEWORK_DETAILS = "Unable to find framework details";
     }
 
     interface SuccessMessage {

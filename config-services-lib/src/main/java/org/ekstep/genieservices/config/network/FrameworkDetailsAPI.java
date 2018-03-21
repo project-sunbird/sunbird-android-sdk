@@ -12,15 +12,15 @@ import java.util.Map;
  *
  * @author Indraja Machani
  */
-public class FrameworkDetailsApi extends BaseAPI {
+public class FrameworkDetailsAPI extends BaseAPI {
 
-    private static final String TAG = FrameworkDetailsApi.class.getSimpleName();
+    private static final String TAG = FrameworkDetailsAPI.class.getSimpleName();
 
     private static final String ENDPOINT = "read";
 
     private Map<String, String> headers;
 
-    public FrameworkDetailsApi(AppContext appContext, Map<String, String> headers, String frameworkId) {
+    public FrameworkDetailsAPI(AppContext appContext, Map<String, String> headers, String frameworkId) {
         super(appContext,
                 String.format(Locale.US, "%s/%s/%s",
                         appContext.getParams().getString(IParams.Key.FRAMEWORK_SERVICE_BASE_URL),
