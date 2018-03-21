@@ -8,10 +8,12 @@ import org.ekstep.genieservices.commons.bean.Session;
 import org.ekstep.genieservices.commons.bean.UpdateContentStateRequest;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.StringUtil;
+import org.ekstep.genieservices.content.network.CourseBatchesAPI;
 import org.ekstep.genieservices.content.network.EnrolCourseAPI;
 import org.ekstep.genieservices.content.network.EnrolledCoursesAPI;
 import org.ekstep.genieservices.content.network.UpdateContentStateAPI;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -102,6 +104,17 @@ public class CourseHandler {
 
     public static GenieResponse fetchCourseBatchesFromServer(AppContext appContext, Session sessionData,
                                                              CourseBatchesRequest courseBatchesRequest) {
-        return null;
+        CourseBatchesAPI courseBatchesAPI = new CourseBatchesAPI(appContext, getCustomHeaders(sessionData),
+                getCourseBatchesRequest(courseBatchesRequest));
+        return courseBatchesAPI.post();
+    }
+
+    private static Map<String, Object> getCourseBatchesRequest(CourseBatchesRequest courseBatchesRequest) {
+        Map<String, Object> filterMap = new HashMap<>();
+        filterMap.put("courseId", Arrays.asList(courseBatchesRequest.getCourseIds()));
+
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("filters", filterMap);
+        return requestMap;
     }
 }
