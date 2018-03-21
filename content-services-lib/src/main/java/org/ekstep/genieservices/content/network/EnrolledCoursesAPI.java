@@ -23,7 +23,7 @@ public class EnrolledCoursesAPI extends BaseAPI {
     public EnrolledCoursesAPI(AppContext appContext, Map<String, String> customHeaders, String userId) {
         super(appContext,
                 String.format(Locale.US, "%s/%s/%s",
-                        appContext.getParams().getString(IParams.Key.USER_SERVICE_BASE_URL),
+                        appContext.getParams().getString(IParams.Key.COURSE_SERVICE_BASE_URL),
                         SERVICE_ENDPOINTS,
                         userId),
                 TAG);
