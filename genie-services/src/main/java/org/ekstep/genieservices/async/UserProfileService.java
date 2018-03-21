@@ -4,10 +4,12 @@ import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.IUserProfileService;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.EndorseOrAddSkillRequest;
+import org.ekstep.genieservices.commons.bean.FileUploadResult;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ProfileVisibilityRequest;
 import org.ekstep.genieservices.commons.bean.TenantInfo;
 import org.ekstep.genieservices.commons.bean.TenantInfoRequest;
+import org.ekstep.genieservices.commons.bean.UploadFileRequest;
 import org.ekstep.genieservices.commons.bean.UserProfile;
 import org.ekstep.genieservices.commons.bean.UserProfileDetailsRequest;
 import org.ekstep.genieservices.commons.bean.UserProfileSkill;
@@ -92,7 +94,7 @@ public class UserProfileService {
      * @param profileSkillsRequest - {@link UserProfileSkillsRequest}
      * @param responseHandler      - {@link IResponseHandler< UserProfileSkill >}
      */
-    public void getUserProfileSkills(final UserProfileSkillsRequest profileSkillsRequest, IResponseHandler<UserProfileSkill> responseHandler) {
+    public void getSkills(final UserProfileSkillsRequest profileSkillsRequest, IResponseHandler<UserProfileSkill> responseHandler) {
         ThreadPool.getInstance().execute(new IPerformable<UserProfileSkill>() {
             @Override
             public GenieResponse<UserProfileSkill> perform() {
@@ -112,6 +114,21 @@ public class UserProfileService {
             @Override
             public GenieResponse<Void> perform() {
                 return userProfileService.endorseOrAddSkill(endorseOrAddSkillRequest);
+            }
+        }, responseHandler);
+    }
+
+    /**
+     * This api is used to upload file
+     *
+     * @param uploadFileRequest
+     * @param responseHandler
+     */
+    public void uploadFile(final UploadFileRequest uploadFileRequest, IResponseHandler<FileUploadResult> responseHandler){
+        ThreadPool.getInstance().execute(new IPerformable<FileUploadResult>() {
+            @Override
+            public GenieResponse<FileUploadResult> perform() {
+                return userProfileService.uploadFile(uploadFileRequest);
             }
         }, responseHandler);
     }
