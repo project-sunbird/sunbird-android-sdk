@@ -87,26 +87,25 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
     private void initializeChannelDetails(String channelId) {
         String storedData = FileUtil.readFileFromClasspath(FrameworkConstants.ResourceFile.CHANNEL_DETAILS_JSON_FILE);
         if (!StringUtil.isNullOrEmpty(storedData)) {
-            saveChannelDetails(storedData);
+            saveChannelDetails(storedData, channelId);
         }
         refreshChannelDetails(channelId);
     }
 
-    private void saveChannelDetails(String response) {
+    private void saveChannelDetails(String response, String channelId) {
         LinkedTreeMap map = GsonUtil.fromJson(response, LinkedTreeMap.class);
         Map result = ((LinkedTreeMap) map.get("result"));
         if (result != null) {
+            String key = FrameworkConstants.PreferenceKey.CHANNEL_DETAILS_API_EXPIRATION_KEY + channelId;
             Double ttl = (Double) result.get("ttl");
-            saveDataExpirationTime(ttl, FrameworkConstants.PreferenceKey.CHANNEL_DETAILS_API_EXPIRATION_KEY);
+            saveDataExpirationTime(ttl, key);
             result.remove("ttl");
-            for (Object key : result.keySet()) {
-                NoSqlModel channelDetails = NoSqlModel.build(mAppContext.getDBSession(), (String) key, GsonUtil.toJson(result.get(key)));
-                NoSqlModel channelDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), String.valueOf(key));
-                if (channelDetailsInDb != null) {
-                    channelDetails.update();
-                } else {
-                    channelDetails.save();
-                }
+            NoSqlModel channelDetails = NoSqlModel.build(mAppContext.getDBSession(), (String) key, GsonUtil.toJson(result.get(key)));
+            NoSqlModel channelDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), String.valueOf(key));
+            if (channelDetailsInDb != null) {
+                channelDetails.update();
+            } else {
+                channelDetails.save();
             }
         }
     }
@@ -119,7 +118,7 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
                 GenieResponse genieResponse = channelAPI.get();
                 if (genieResponse.getStatus()) {
                     String body = genieResponse.getResult().toString();
-                    saveChannelDetails(body);
+                    saveChannelDetails(body, channelId);
                 }
             }
         }).start();
@@ -180,26 +179,25 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
     private void initializeFrameworkDetails(String frameworkId) {
         String storedData = FileUtil.readFileFromClasspath(FrameworkConstants.ResourceFile.FRAMEWORK_DETAILS_JSON_FILE);
         if (!StringUtil.isNullOrEmpty(storedData)) {
-            saveFrameworkDetails(storedData);
+            saveFrameworkDetails(storedData, frameworkId);
         }
         refreshFrameworkDetails(frameworkId);
     }
 
-    private void saveFrameworkDetails(String response) {
+    private void saveFrameworkDetails(String response, String frameworkId) {
         LinkedTreeMap map = GsonUtil.fromJson(response, LinkedTreeMap.class);
         Map result = ((LinkedTreeMap) map.get("result"));
         if (result != null) {
             Double ttl = (Double) result.get("ttl");
+            String key = FrameworkConstants.PreferenceKey.FRAMEWORK_DETAILS_API_EXPIRATION_KEY + frameworkId;
             saveDataExpirationTime(ttl, FrameworkConstants.PreferenceKey.FRAMEWORK_DETAILS_API_EXPIRATION_KEY);
             result.remove("ttl");
-            for (Object key : result.keySet()) {
-                NoSqlModel frameworkDetails = NoSqlModel.build(mAppContext.getDBSession(), (String) key, GsonUtil.toJson(result.get(key)));
-                NoSqlModel frameworkDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), String.valueOf(key));
-                if (frameworkDetailsInDb != null) {
-                    frameworkDetails.update();
-                } else {
-                    frameworkDetails.save();
-                }
+            NoSqlModel frameworkDetails = NoSqlModel.build(mAppContext.getDBSession(), (String) key, GsonUtil.toJson(result.get(key)));
+            NoSqlModel frameworkDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), String.valueOf(key));
+            if (frameworkDetailsInDb != null) {
+                frameworkDetails.update();
+            } else {
+                frameworkDetails.save();
             }
         }
     }
@@ -217,7 +215,7 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
                 GenieResponse genieResponse = frameworkDetailsAPI.get();
                 if (genieResponse.getStatus()) {
                     String body = genieResponse.getResult().toString();
-                    saveFrameworkDetails(body);
+                    saveFrameworkDetails(body, frameworkId);
                 }
             }
         }).start();
