@@ -15,9 +15,9 @@ import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentMoveRequest;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
-import org.ekstep.genieservices.commons.bean.ContentSwitchRequest;
 import org.ekstep.genieservices.commons.bean.ContentSpaceUsageSummaryRequest;
 import org.ekstep.genieservices.commons.bean.ContentSpaceUsageSummaryResponse;
+import org.ekstep.genieservices.commons.bean.ContentSwitchRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
@@ -28,6 +28,8 @@ import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.ScanStorageRequest;
 import org.ekstep.genieservices.commons.bean.ScanStorageResponse;
+import org.ekstep.genieservices.commons.bean.SunbirdContentSearchCriteria;
+import org.ekstep.genieservices.commons.bean.SunbirdContentSearchResult;
 import org.ekstep.genieservices.commons.bean.SwitchContentResponse;
 import org.ekstep.genieservices.commons.bean.enums.DownloadAction;
 
@@ -316,4 +318,20 @@ public interface IContentService {
      */
     GenieResponse<List<ContentSpaceUsageSummaryResponse>> getContentSpaceUsageSummary(ContentSpaceUsageSummaryRequest contentSpaceUsageSummaryRequest);
 
+    /**
+     * This api is used to search for contents with the search criterion mentioned in {@link ContentSearchCriteria}
+     * <p>
+     * <p>
+     * On successful finding the contents, matching with the search criterion, the response will return status as TRUE and the result set with {@link ContentSearchResult}
+     * <p>
+     * <p>
+     * On failing to find the contents, the response with return status as FALSE with one of the following errors
+     * <p>CONNECTION_ERROR
+     * <p>SERVER_ERROR
+     * <p>NETWORK_ERROR
+     *
+     * @param contentSearchCriteria - {@link SunbirdContentSearchCriteria}
+     * @return {@link GenieResponse<SunbirdContentSearchResult>}
+     */
+    GenieResponse<SunbirdContentSearchResult> searchSunbirdContent(SunbirdContentSearchCriteria contentSearchCriteria);
 }

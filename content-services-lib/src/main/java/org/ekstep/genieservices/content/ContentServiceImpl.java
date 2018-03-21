@@ -44,6 +44,8 @@ import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.ScanStorageRequest;
 import org.ekstep.genieservices.commons.bean.ScanStorageResponse;
+import org.ekstep.genieservices.commons.bean.SunbirdContentSearchCriteria;
+import org.ekstep.genieservices.commons.bean.SunbirdContentSearchResult;
 import org.ekstep.genieservices.commons.bean.SwitchContentResponse;
 import org.ekstep.genieservices.commons.bean.enums.ContentDeleteStatus;
 import org.ekstep.genieservices.commons.bean.enums.ContentImportStatus;
@@ -1071,4 +1073,86 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         return new ArrayList<>(dbContents);
     }
+
+    @Override
+    public GenieResponse<SunbirdContentSearchResult> searchSunbirdContent(SunbirdContentSearchCriteria contentSearchCriteria) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("request", GsonUtil.toJson(contentSearchCriteria));
+        params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
+        String methodName = "searchSunbirdContent@ContentServiceImpl";
+
+        GenieResponse<SunbirdContentSearchResult> response;
+
+        Map<String, Object> requestMap = ContentHandler.getSearchContentRequest(mAppContext, configService, contentSearchCriteria);
+
+        ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, requestMap);
+        GenieResponse apiResponse = contentSearchAPI.post();
+        if (apiResponse.getStatus()) {
+            String body = apiResponse.getResult().toString();
+
+            LinkedTreeMap map = GsonUtil.fromJson(body, LinkedTreeMap.class);
+            String id = (String) map.get("id");
+            LinkedTreeMap responseParams = (LinkedTreeMap) map.get("params");
+            LinkedTreeMap result = (LinkedTreeMap) map.get("result");
+
+            String responseMessageId = null;
+            if (responseParams.containsKey("resmsgid")) {
+                responseMessageId = (String) responseParams.get("resmsgid");
+            }
+
+            List<Map<String, Object>> facets = null;
+            if (result.containsKey("facets")) {
+                facets = (List<Map<String, Object>>) result.get("facets");
+            }
+
+            String contentDataList = null;
+            if (result.containsKey("content")) {
+                contentDataList = GsonUtil.toJson(result.get("content"));
+            }
+
+            String collectionDataList = null;
+            if (result.containsKey("collection")) {
+                collectionDataList = GsonUtil.toJson(result.get("collection"));
+            }
+
+            SunbirdContentSearchResult searchResult = new SunbirdContentSearchResult();
+            searchResult.setId(id);
+            searchResult.setResponseMessageId(responseMessageId);
+            searchResult.setRequest(requestMap);
+
+            if (!StringUtil.isNullOrEmpty(contentDataList)
+                    || !StringUtil.isNullOrEmpty(collectionDataList)) {
+
+                Type type = new TypeToken<List<ContentData>>() {
+                }.getType();
+
+                if (!StringUtil.isNullOrEmpty(contentDataList)) {
+                    List<ContentData> contentData = GsonUtil.getGson().fromJson(contentDataList, type);
+                    searchResult.setContentDataList(contentData);
+                }
+
+                if (!StringUtil.isNullOrEmpty(collectionDataList)) {
+                    List<ContentData> contentData = GsonUtil.getGson().fromJson(collectionDataList, type);
+                    searchResult.setCollectionDataList(contentData);
+                }
+
+                searchResult.setFilterCriteria(ContentHandler.createFilterCriteria(configService,
+                        contentSearchCriteria, facets, (Map<String, Object>) requestMap.get("filters")));
+            } else {
+                searchResult.setContentDataList(new ArrayList<ContentData>());
+                searchResult.setFilterCriteria(null);
+            }
+
+
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+            response.setResult(searchResult);
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+            return response;
+        }
+
+        response = GenieResponseBuilder.getErrorResponse(apiResponse.getError(), (String) apiResponse.getErrorMessages().get(0), TAG);
+        TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, (String) apiResponse.getErrorMessages().get(0));
+        return response;
+    }
+
 }

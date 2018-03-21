@@ -49,6 +49,8 @@ public class ContentData implements Serializable {
     private Object audience;
     private List<String> pragma;
     private List<String> attributions;
+    private List<String> dialcodes;
+    private List<String> childNodes;
 
     public ContentData() {
     }
@@ -229,6 +231,14 @@ public class ContentData implements Serializable {
 
     public List<String> getAttributions() {
         return attributions;
+    }
+
+    public List<String> getDialCodes() {
+        return dialcodes;
+    }
+
+    public List<String> getChildNodes() {
+        return childNodes;
     }
 
     @Override

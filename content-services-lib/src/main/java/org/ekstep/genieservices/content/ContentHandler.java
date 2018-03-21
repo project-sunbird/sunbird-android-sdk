@@ -28,6 +28,7 @@ import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.MasterDataValues;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
+import org.ekstep.genieservices.commons.bean.SunbirdContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
 import org.ekstep.genieservices.commons.bean.enums.SearchType;
@@ -1022,7 +1023,7 @@ public class ContentHandler {
         }
         requestMap.put("facets", Arrays.asList(facets));
 
-        addSortCriteria(requestMap, criteria);
+        addSortCriteria(requestMap, criteria.getSortCriteria());
         if (SearchType.SEARCH.equals(criteria.getSearchType())) {
             requestMap.put("filters", getSearchRequest(appContext, configService, criteria));
         } else {
@@ -1031,12 +1032,32 @@ public class ContentHandler {
         return requestMap;
     }
 
-    private static void addSortCriteria(Map<String, Object> requestMap, ContentSearchCriteria criteria) {
+    public static Map<String, Object> getSearchContentRequest(AppContext appContext, IConfigService configService, SunbirdContentSearchCriteria criteria) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("query", criteria.getQuery());
+        requestMap.put("limit", criteria.getLimit());
+        requestMap.put("mode", criteria.getMode());
+
+        String[] facets = criteria.getFacets();
+        if (CollectionUtil.isEmpty(facets)) {
+            facets = getFilterConfig(configService, ContentConstants.CONFIG_FACETS);
+        }
+        requestMap.put("facets", Arrays.asList(facets));
+
+        addSortCriteria(requestMap, criteria.getSortCriteria());
+        if (SearchType.SEARCH.equals(criteria.getSearchType())) {
+            requestMap.put("filters", getSearchRequest(appContext, configService, criteria));
+        } else {
+            requestMap.put("filters", getFilterRequest(appContext, criteria));
+        }
+        return requestMap;
+    }
+
+    private static void addSortCriteria(Map<String, Object> requestMap, List<ContentSortCriteria> sortCriteria) {
         Map<String, String> sortMap = new HashMap<>();
-        List<ContentSortCriteria> sortCriterias = criteria.getSortCriteria();
-        if (sortCriterias != null && sortCriterias.size() > 0) {
+        if (sortCriteria != null && sortCriteria.size() > 0) {
             //TODO for now only handling the first sort criteria. As of now only one criteria is used in the system and the list has been kept for future compatibility.
-            sortMap.put(sortCriterias.get(0).getSortAttribute(), sortCriterias.get(0).getSortOrder().getValue());
+            sortMap.put(sortCriteria.get(0).getSortAttribute(), sortCriteria.get(0).getSortOrder().getValue());
             requestMap.put("sort_by", sortMap);
         }
     }
@@ -1115,6 +1136,92 @@ public class ContentHandler {
         return filterMap;
     }
 
+    private static Map<String, Object> getSearchRequest(AppContext appContext, IConfigService configService, SunbirdContentSearchCriteria criteria) {
+        Map<String, Object> filterMap = new HashMap<>();
+
+        // Populating implicit search criteria.
+        filterMap.put("compatibilityLevel", getCompatibilityLevelFilter(appContext));
+        filterMap.put("status", Arrays.asList(criteria.getContentStatusArray()));
+        filterMap.put("objectType", Collections.singletonList("Content"));
+        filterMap.put("contentType", Arrays.asList(criteria.getContentTypes()));
+        if (!CollectionUtil.hasEmptyData(criteria.getKeywords())) {
+            filterMap.put("keywords", Arrays.asList(criteria.getKeywords()));
+        }
+        if (!CollectionUtil.hasEmptyData(criteria.getDialCodes())) {
+            filterMap.put("dialcodes", Arrays.asList(criteria.getDialCodes()));
+        }
+
+        // Add createdBy filter
+        if (!CollectionUtil.hasEmptyData(criteria.getCreatedBy())) {
+            filterMap.put("createdBy", Arrays.asList(criteria.getCreatedBy()));
+        }
+
+        //Add filters for criteria attributes
+        // Add subject filter
+        if (criteria.getAge() > 0) {
+            applyListingFilter(configService, MasterDataType.AGEGROUP, String.valueOf(criteria.getAge()), filterMap, false);
+        }
+
+        // Add standard filter
+        if (!CollectionUtil.hasEmptyData(criteria.getGrade())) {
+            filterMap.put("gradeLevel", Arrays.asList(criteria.getGrade()));
+        }
+//        if (criteria.getGrade() > 0) {
+//            applyListingFilter(configService, MasterDataType.GRADELEVEL, String.valueOf(criteria.getGrade()), filterMap, false);
+//        }
+
+        // Add medium filter
+        if (!CollectionUtil.hasEmptyData(criteria.getMedium())) {
+            filterMap.put("medium", Arrays.asList(criteria.getMedium()));
+        }
+//        if (!StringUtil.isNullOrEmpty(criteria.getMedium())) {
+//            applyListingFilter(configService, MasterDataType.MEDIUM, criteria.getMedium(), filterMap, false);
+//        }
+
+        // Add board filter
+        if (!CollectionUtil.hasEmptyData(criteria.getBoard())) {
+            filterMap.put("board", Arrays.asList(criteria.getBoard()));
+        }
+//        if (!StringUtil.isNullOrEmpty(criteria.getBoard())) {
+//            applyListingFilter(configService, MasterDataType.BOARD, criteria.getBoard(), filterMap, false);
+//        }
+
+        String[] audienceArr = criteria.getAudience();
+        if (!CollectionUtil.isEmpty(audienceArr)) {
+            for (String audience : audienceArr) {
+                applyListingFilter(configService, MasterDataType.AUDIENCE, audience, filterMap, false);
+            }
+        }
+
+        String[] channelArr = criteria.getChannel();
+        if (!CollectionUtil.isEmpty(channelArr)) {
+            for (String channel : channelArr) {
+                applyListingFilter(configService, MasterDataType.CHANNEL, channel, filterMap, false);
+            }
+        }
+
+        boolean exclPragma = true;
+        String[] pragmaArr = criteria.getExclPragma();
+        if (CollectionUtil.isEmpty(pragmaArr)) {
+            pragmaArr = criteria.getPragma();
+            exclPragma = false;
+        }
+
+        if (CollectionUtil.isEmpty(pragmaArr)) {
+            // If pragma array is empty than get the all pragma values from master data to apply the default exclusion/notIn filter.
+            pragmaArr = getFilterConfig(configService, ContentConstants.CONFIG_EXCLUDE_PRAGMA);
+            exclPragma = true;
+        }
+
+        if (!CollectionUtil.isEmpty(pragmaArr)) {
+            for (String pragma : pragmaArr) {
+                applyListingFilter(configService, MasterDataType.PRAGMA, pragma, filterMap, exclPragma);
+            }
+        }
+
+        return filterMap;
+    }
+
     private static String[] getFilterConfig(IConfigService configService, String filter) {
         if (configService != null) {
             GenieResponse<MasterData> response = configService.getMasterData(MasterDataType.CONFIG);
@@ -1137,6 +1244,46 @@ public class ContentHandler {
     }
 
     private static Map<String, Object> getFilterRequest(AppContext appContext, ContentSearchCriteria criteria) {
+        Map<String, Object> filterMap = new HashMap<>();
+        filterMap.put("compatibilityLevel", getCompatibilityLevelFilter(appContext));
+        if (criteria.getFacetFilters() != null) {
+            for (ContentSearchFilter filter : criteria.getFacetFilters()) {
+                List<String> filterValueList = new ArrayList<>();
+                for (FilterValue filterValue : filter.getValues()) {
+                    if (filterValue.isApply()) {
+                        filterValueList.add(filterValue.getName());
+                    }
+                }
+
+                if (!filterValueList.isEmpty()) {
+                    filterMap.put(filter.getName(), filterValueList);
+                }
+            }
+        }
+
+        if (criteria.getImpliedFilters() != null) {
+            for (ContentSearchFilter filter : criteria.getImpliedFilters()) {
+                List<String> filterValueList = new ArrayList<>();
+                for (FilterValue filterValue : filter.getValues()) {
+                    if (filterValue.isApply()) {
+                        filterValueList.add(filterValue.getName());
+                    }
+                }
+
+                if (!filterValueList.isEmpty()) {
+                    filterMap.put(filter.getName(), filterValueList);
+                }
+            }
+        }
+
+        if (!filterMap.containsKey("contentType")) {
+            filterMap.put("contentType", Arrays.asList(criteria.getContentTypes()));
+        }
+
+        return filterMap;
+    }
+
+    private static Map<String, Object> getFilterRequest(AppContext appContext, SunbirdContentSearchCriteria criteria) {
         Map<String, Object> filterMap = new HashMap<>();
         filterMap.put("compatibilityLevel", getCompatibilityLevelFilter(appContext));
         if (criteria.getFacetFilters() != null) {
@@ -1269,6 +1416,71 @@ public class ContentHandler {
                                                              List<Map<String, Object>> facets, Map<String, Object> appliedFilterMap) {
         List<ContentSearchFilter> facetFilters = new ArrayList<>();
         ContentSearchCriteria.FilterBuilder filterBuilder = new ContentSearchCriteria.FilterBuilder();
+        filterBuilder.query(previousCriteria.getQuery())
+                .limit(previousCriteria.getLimit())
+                .contentTypes(previousCriteria.getContentTypes())
+                .sort(previousCriteria.getSortCriteria() == null ? new ArrayList<ContentSortCriteria>() : previousCriteria.getSortCriteria());
+
+        if ("soft".equals(previousCriteria.getMode())) {
+            filterBuilder.softFilters();
+        }
+
+        if (facets == null) {
+            filterBuilder.facetFilters(facetFilters);
+            return filterBuilder.build();
+        }
+
+        Map<String, Object> ordinalsMap = new HashMap<>();
+        if (configService != null) {
+            GenieResponse<Map<String, Object>> ordinalsResponse = configService.getOrdinals();
+            if (ordinalsResponse.getStatus()) {
+                ordinalsMap = ordinalsResponse.getResult();
+            }
+        }
+
+        for (Map<String, Object> facetMap : facets) {
+            ContentSearchFilter filter = new ContentSearchFilter();
+            String facetName = null;
+            if (facetMap.containsKey("name")) {
+                facetName = (String) facetMap.get("name");
+            }
+
+            List<Map<String, Object>> facetValues = null;
+            if (facetMap.containsKey("values")) {
+                facetValues = (List<Map<String, Object>>) facetMap.get("values");
+            }
+
+            List<String> facetOrder = null;
+            if (ordinalsMap.containsKey(facetName)) {
+                facetOrder = (List<String>) ordinalsMap.get(facetName);
+            }
+
+            List<String> appliedFilter = null;
+            if (appliedFilterMap != null) {
+                appliedFilter = (List<String>) appliedFilterMap.get(facetName);
+            }
+
+            List<FilterValue> values = getSortedFilterValuesWithAppliedFilters(facetValues, facetOrder, appliedFilter);
+
+            if (!StringUtil.isNullOrEmpty(facetName)) {
+                filter.setName(facetName);
+                filter.setValues(values);
+
+                // Set the filter
+                facetFilters.add(filter);
+            }
+
+            appliedFilterMap.remove(facetName);
+        }
+        filterBuilder.facetFilters(facetFilters);
+        filterBuilder.impliedFilters(mapFilterValues(appliedFilterMap));
+        return filterBuilder.build();
+    }
+
+    public static SunbirdContentSearchCriteria createFilterCriteria(IConfigService configService, SunbirdContentSearchCriteria previousCriteria,
+                                                                    List<Map<String, Object>> facets, Map<String, Object> appliedFilterMap) {
+        List<ContentSearchFilter> facetFilters = new ArrayList<>();
+        SunbirdContentSearchCriteria.FilterBuilder filterBuilder = new SunbirdContentSearchCriteria.FilterBuilder();
         filterBuilder.query(previousCriteria.getQuery())
                 .limit(previousCriteria.getLimit())
                 .contentTypes(previousCriteria.getContentTypes())
