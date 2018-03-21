@@ -21,9 +21,9 @@ import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentMoveRequest;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
-import org.ekstep.genieservices.commons.bean.ContentSwitchRequest;
 import org.ekstep.genieservices.commons.bean.ContentSpaceUsageSummaryRequest;
 import org.ekstep.genieservices.commons.bean.ContentSpaceUsageSummaryResponse;
+import org.ekstep.genieservices.commons.bean.ContentSwitchRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
@@ -34,6 +34,8 @@ import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.ScanStorageRequest;
 import org.ekstep.genieservices.commons.bean.ScanStorageResponse;
+import org.ekstep.genieservices.commons.bean.SunbirdContentSearchCriteria;
+import org.ekstep.genieservices.commons.bean.SunbirdContentSearchResult;
 import org.ekstep.genieservices.commons.bean.SwitchContentResponse;
 import org.ekstep.genieservices.commons.bean.enums.DownloadAction;
 
@@ -158,6 +160,15 @@ public class ContentService {
             @Override
             public GenieResponse<ContentSearchResult> perform() {
                 return contentService.searchContent(contentSearchCriteria);
+            }
+        }, responseHandler);
+    }
+
+    public void searchSunbirdContent(final SunbirdContentSearchCriteria contentSearchCriteria, IResponseHandler<SunbirdContentSearchResult> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<SunbirdContentSearchResult>() {
+            @Override
+            public GenieResponse<SunbirdContentSearchResult> perform() {
+                return contentService.searchSunbirdContent(contentSearchCriteria);
             }
         }, responseHandler);
     }
@@ -509,7 +520,7 @@ public class ContentService {
      * This API is used to get the space used by contents.
      *
      * @param contentSpaceUsageSummaryRequest {@link ContentSpaceUsageSummaryRequest}
-     * @param responseHandler         {@link List< ContentSpaceUsageSummaryResponse >}
+     * @param responseHandler                 {@link List< ContentSpaceUsageSummaryResponse >}
      */
     public void getContentSpaceUsageSummary(final ContentSpaceUsageSummaryRequest contentSpaceUsageSummaryRequest, IResponseHandler<List<ContentSpaceUsageSummaryResponse>> responseHandler) {
         new AsyncHandler<List<ContentSpaceUsageSummaryResponse>>(responseHandler).execute(new IPerformable<List<ContentSpaceUsageSummaryResponse>>() {
