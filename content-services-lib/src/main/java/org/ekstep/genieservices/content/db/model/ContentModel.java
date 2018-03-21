@@ -353,6 +353,14 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         return lastUsedTime;
     }
 
+    public String getPragma() {
+        return pragma;
+    }
+
+    public void setPragma(String pragma) {
+        this.pragma = pragma;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

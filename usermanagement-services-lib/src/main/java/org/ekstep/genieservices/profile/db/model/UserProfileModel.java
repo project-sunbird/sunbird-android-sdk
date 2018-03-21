@@ -3,6 +3,7 @@ package org.ekstep.genieservices.profile.db.model;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.Profile;
+import org.ekstep.genieservices.commons.bean.enums.ProfileType;
 import org.ekstep.genieservices.commons.db.contract.ProfileEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
@@ -144,15 +145,45 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
         }
 
         if (cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_MEDIUM) != -1) {
-            profile.setMedium(cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_MEDIUM)));
+            String medium = cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_MEDIUM));
+            if (!StringUtil.isNullOrEmpty(medium)) {
+                profile.setMedium(medium != null ? medium.split(",") : new String[0]);
+            }
+
         }
 
         if (cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_BOARD) != -1) {
-            profile.setBoard(cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_BOARD)));
+            String board = cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_BOARD));
+            if (!StringUtil.isNullOrEmpty(board)) {
+                profile.setBoard(board != null ? board.split(",") : new String[0]);
+            }
         }
 
         if (cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_PROFILE_IMAGE) != -1) {
             profile.setProfileImage(cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_PROFILE_IMAGE)));
+        }
+
+        if (cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_SUBJECT) != -1) {
+            String subject = cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_SUBJECT));
+            if (!StringUtil.isNullOrEmpty(subject)) {
+                profile.setSubject(subject != null ? subject.split(",") : new String[]{});
+            }
+        }
+
+        if (cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_PROFILE_TYPE) != -1) {
+            String profileType = cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_PROFILE_TYPE));
+            if (profileType.equalsIgnoreCase("student")) {
+                profile.setProfileType(ProfileType.STUDENT);
+            } else if (profileType.equalsIgnoreCase("teacher")) {
+                profile.setProfileType(ProfileType.TEACHER);
+            }
+        }
+
+        if (cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_GRADE) != -1) {
+            String grade = cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_GRADE));
+            if (grade != null) {
+                profile.setGrade(grade != null ? grade.split(",") : new String[]{});
+            }
         }
     }
 
@@ -202,9 +233,24 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
         contentValues.put(ProfileEntry.COLUMN_NAME_MONTH, profile.getMonth());
         contentValues.put(ProfileEntry.COLUMN_NAME_IS_GROUP_USER, getGroupUser());
         contentValues.put(ProfileEntry.COLUMN_NAME_CREATED_AT, profile.getCreatedAt().getTime());
-        contentValues.put(ProfileEntry.COLUMN_NAME_MEDIUM, profile.getMedium());
-        contentValues.put(ProfileEntry.COLUMN_NAME_BOARD, profile.getBoard());
+
+        if (profile.getMedium() != null) {
+            contentValues.put(ProfileEntry.COLUMN_NAME_MEDIUM, StringUtil.join(",", profile.getMedium()));
+        }
+
+        if (profile.getBoard() != null) {
+            contentValues.put(ProfileEntry.COLUMN_NAME_BOARD, StringUtil.join(",", profile.getBoard()));
+        }
+
         contentValues.put(ProfileEntry.COLUMN_NAME_PROFILE_IMAGE, profile.getProfileImage());
+        contentValues.put(ProfileEntry.COLUMN_NAME_PROFILE_TYPE, profile.getProfileType());
+        if (profile.getSubject() != null) {
+            contentValues.put(ProfileEntry.COLUMN_NAME_SUBJECT, StringUtil.join(",", profile.getSubject()));
+        }
+
+        if (profile.getGrade() != null) {
+            contentValues.put(ProfileEntry.COLUMN_NAME_GRADE, StringUtil.join(",", profile.getGrade()));
+        }
     }
 
     private void updateFieldsForGroupUser() {
@@ -214,8 +260,8 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
             profile.setStandard(-1);
             profile.setAge(-1);
             profile.setGender("");
-            profile.setMedium("");
-            profile.setBoard("");
+            profile.setMedium(new String[]{});
+            profile.setBoard(new String[]{});
             profile.setProfileImage(profile.getProfileImage());
         }
     }

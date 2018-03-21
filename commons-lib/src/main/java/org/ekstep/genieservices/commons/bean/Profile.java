@@ -1,6 +1,7 @@
 package org.ekstep.genieservices.commons.bean;
 
 import org.ekstep.genieservices.commons.IValidate;
+import org.ekstep.genieservices.commons.bean.enums.ProfileType;
 import org.ekstep.genieservices.commons.bean.validator.DateValidator;
 import org.ekstep.genieservices.commons.bean.validator.StringValidator;
 import org.ekstep.genieservices.commons.utils.DateUtil;
@@ -30,12 +31,15 @@ public class Profile implements Serializable, IValidate {
     private int month = -1;
     private int standard = -1;
     private String language = "";
-    private String medium = "";
-    private String board = "";
+    private String[] medium;
+    private String[] board;
     private boolean isGroupUser;
     private Date createdAt;
     private transient List<IValidate> validators;
     private String profileImage = "";
+    private ProfileType profileType;
+    private String[] subject;
+    private String[] grade;
 
     public Profile(String uid) {
         this.uid = uid;
@@ -48,7 +52,7 @@ public class Profile implements Serializable, IValidate {
         this.createdAt = DateUtil.now();
     }
 
-    public Profile(String handle, String avatar, String language, int standard, String medium) {
+    public Profile(String handle, String avatar, String language, int standard, String[] medium) {
         this.handle = handle;
         this.avatar = avatar;
         this.language = language;
@@ -142,19 +146,19 @@ public class Profile implements Serializable, IValidate {
         this.isGroupUser = groupUser;
     }
 
-    public String getBoard() {
+    public String[] getBoard() {
         return this.board;
     }
 
-    public void setBoard(String board) {
+    public void setBoard(String[] board) {
         this.board = board;
     }
 
-    public String getMedium() {
+    public String[] getMedium() {
         return this.medium;
     }
 
-    public void setMedium(String medium) {
+    public void setMedium(String[] medium) {
         this.medium = medium;
     }
 
@@ -172,6 +176,30 @@ public class Profile implements Serializable, IValidate {
 
     public void setProfileImage(String profileImage) {
         this.profileImage = profileImage;
+    }
+
+    public String getProfileType() {
+        return profileType.getValue();
+    }
+
+    public void setProfileType(ProfileType profileType) {
+        this.profileType = profileType;
+    }
+
+    public String[] getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String[] subject) {
+        this.subject = subject;
+    }
+
+    public String[] getGrade() {
+        return grade;
+    }
+
+    public void setGrade(String[] grade) {
+        this.grade = grade;
     }
 
     public String toString() {
