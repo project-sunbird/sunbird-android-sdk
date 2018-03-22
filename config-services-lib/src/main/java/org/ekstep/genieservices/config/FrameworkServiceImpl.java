@@ -3,7 +3,6 @@ package org.ekstep.genieservices.config;
 import com.google.gson.internal.LinkedTreeMap;
 
 import org.ekstep.genieservices.BaseService;
-import org.ekstep.genieservices.IAuthSession;
 import org.ekstep.genieservices.IFrameworkService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
@@ -34,8 +33,8 @@ import java.util.Map;
 public class FrameworkServiceImpl extends BaseService implements IFrameworkService {
 
     private static final String TAG = FrameworkServiceImpl.class.getSimpleName();
-    private static final String DB_KEY_CHANNEL_DETAILS = "channel_details_key";
-    private static final String DB_KEY_FRAMEWORK_DETAILS = "framework_details_key";
+    private static final String DB_KEY_CHANNEL_DETAILS = "channel_details_key-";
+    private static final String DB_KEY_FRAMEWORK_DETAILS = "framework_details_key-";
 
     public FrameworkServiceImpl(AppContext appContext) {
         super(appContext);
@@ -60,8 +59,9 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         Channel channelDetails = null;
         if (refreshDetailsInDb != null) {
             LinkedTreeMap map = GsonUtil.fromJson(refreshDetailsInDb.getValue(), LinkedTreeMap.class);
-            String result = GsonUtil.toJson(((Map) map.get("result")).get("channel"));
-            channelDetails = GsonUtil.fromJson(result, Channel.class);
+            LinkedTreeMap result = (LinkedTreeMap) map.get("result");
+            String channel = GsonUtil.toJson(result.get("channel"));
+            channelDetails = GsonUtil.fromJson(channel, Channel.class);
         }
 
         GenieResponse<Channel> response;
@@ -81,6 +81,7 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         if (!StringUtil.isNullOrEmpty(storedData)) {
             saveChannelDetails(storedData, channelId);
         }
+
         refreshChannelDetails(channelId);
     }
 
@@ -90,10 +91,9 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         if (result != null) {
             Double ttl = (Double) result.get("ttl");
             saveDataExpirationTime(ttl, FrameworkConstants.PreferenceKey.CHANNEL_DETAILS_API_EXPIRATION_KEY);
-            result.remove("ttl");
             String key = DB_KEY_CHANNEL_DETAILS + channelId;
-            NoSqlModel channelDetails = NoSqlModel.build(mAppContext.getDBSession(), (String) key, GsonUtil.toJson(result));
-            NoSqlModel channelDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), String.valueOf(key));
+            NoSqlModel channelDetails = NoSqlModel.build(mAppContext.getDBSession(), key, response);
+            NoSqlModel channelDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
             if (channelDetailsInDb != null) {
                 channelDetails.update();
             } else {
@@ -141,8 +141,9 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         Framework frameworkDetails = null;
         if (refreshDetailsInDb != null) {
             LinkedTreeMap map = GsonUtil.fromJson(refreshDetailsInDb.getValue(), LinkedTreeMap.class);
-            String result = GsonUtil.toJson(((Map) map.get("result")).get("framework"));
-            frameworkDetails = new Framework(result);
+            LinkedTreeMap result = (LinkedTreeMap) map.get("result");
+            String framework = GsonUtil.toJson(result.get("framework"));
+            frameworkDetails = new Framework(framework);
         }
 
         GenieResponse<Framework> response;
@@ -184,10 +185,9 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         if (result != null) {
             Double ttl = (Double) result.get("ttl");
             saveDataExpirationTime(ttl, FrameworkConstants.PreferenceKey.FRAMEWORK_DETAILS_API_EXPIRATION_KEY);
-            result.remove("ttl");
             String key = DB_KEY_FRAMEWORK_DETAILS + frameworkId;
-            NoSqlModel frameworkDetails = NoSqlModel.build(mAppContext.getDBSession(), (String) key, GsonUtil.toJson(result));
-            NoSqlModel frameworkDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), String.valueOf(key));
+            NoSqlModel frameworkDetails = NoSqlModel.build(mAppContext.getDBSession(), key, response);
+            NoSqlModel frameworkDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
             if (frameworkDetailsInDb != null) {
                 frameworkDetails.update();
             } else {
