@@ -33,6 +33,7 @@ public interface IParams {
         String APPLICATION_ID = "APPLICATION_ID";
         String VERSION_NAME = "VERSION_NAME";
         String PRODUCER_ID = "PRODUCER_ID";
+        String PRODUCER_UNIQUE_ID = "PRODUCER_UNIQUE_ID";
         String CHANNEL_ID = "CHANNEL_ID";
         String TELEMETRY_BASE_URL = "TELEMETRY_BASE_URL";
         String LANGUAGE_PLATFORM_BASE_URL = "LANGUAGE_PLATFORM_BASE_URL";

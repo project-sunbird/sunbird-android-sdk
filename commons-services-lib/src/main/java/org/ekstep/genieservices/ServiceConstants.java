@@ -35,14 +35,9 @@ public interface ServiceConstants {
 
     interface BundleKey {
         //ContentPlayer
-        String BUNDLE_KEY_ORIGIN = "origin";
-        String BUNDLE_KEY_MODE = "mode";
-        String BUNDLE_KEY_CONTENT_EXTRAS = "contentExtras";
-        String BUNDLE_KEY_APP_INFO = "appInfo";
-        String BUNDLE_KEY_LANGUAGE_INFO = "languageInfo";
-        String BUNDLE_KEY_APP_QUALIFIER = "appQualifier";
 
         String BUNDLE_KEY_DOWNLOAD_REQUEST = "download_request";
+
     }
 
     interface FileExtension {
