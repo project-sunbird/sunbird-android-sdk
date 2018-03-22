@@ -13,7 +13,7 @@ public class FrameworkDetailsRequest {
     private boolean refreshFrameworkDetails;
     private boolean defaultFrameworkDetails;
 
-    private FrameworkDetailsRequest(String frameworkId, boolean refreshFrameworkDetails) {
+    private FrameworkDetailsRequest(String frameworkId, boolean refreshFrameworkDetails, boolean defaultFrameworkDetails) {
         this.frameworkId = frameworkId;
         this.refreshFrameworkDetails = refreshFrameworkDetails;
         this.defaultFrameworkDetails = defaultFrameworkDetails;
@@ -65,7 +65,7 @@ public class FrameworkDetailsRequest {
                 }
             }
 
-            return new FrameworkDetailsRequest(frameworkId, refreshFrameworkDetails);
+            return new FrameworkDetailsRequest(frameworkId, refreshFrameworkDetails, defaultFrameworkDetails);
         }
     }
 }
