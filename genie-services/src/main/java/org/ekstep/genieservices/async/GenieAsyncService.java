@@ -20,6 +20,8 @@ public class GenieAsyncService {
     private SummarizerService mSummarizerService;
     private AuthService mAuthService;
     private FrameworkService mFrameworkService;
+    private PageService mPageService;
+
 
     private GenieAsyncService(GenieService genieService) {
         sService = genieService;
@@ -118,5 +120,12 @@ public class GenieAsyncService {
             mFrameworkService = new FrameworkService(sService);
         }
         return mFrameworkService;
+    }
+
+    public PageService getPageService() {
+        if (mPageService == null) {
+            mPageService = new PageService(sService);
+        }
+        return mPageService;
     }
 }

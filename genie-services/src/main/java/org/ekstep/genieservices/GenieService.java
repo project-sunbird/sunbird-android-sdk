@@ -24,6 +24,7 @@ import org.ekstep.genieservices.content.ContentServiceImpl;
 import org.ekstep.genieservices.content.CourseServiceImpl;
 import org.ekstep.genieservices.content.LanguageServiceImpl;
 import org.ekstep.genieservices.notification.NotificationServiceImpl;
+import org.ekstep.genieservices.page.PageServiceImpl;
 import org.ekstep.genieservices.partner.PartnerServiceImpl;
 import org.ekstep.genieservices.profile.SummarizerServiceImpl;
 import org.ekstep.genieservices.profile.UserProfileServiceImpl;
@@ -66,6 +67,7 @@ public class GenieService {
     private ITagService mTagService;
     private IDownloadService mDownloadService;
     private IAuthSession<Session> mAuthSession;
+    private IPageService mPageService;
 
     private GenieService(AppContext<Context> appContext) {
         this.mAppContext = appContext;
@@ -337,6 +339,13 @@ public class GenieService {
             mFrameworkService = new FrameworkServiceImpl(mAppContext, getAuthSession());
         }
         return mFrameworkService;
+    }
+
+    public IPageService getPageService() {
+        if (mPageService == null) {
+            mPageService = new PageServiceImpl(mAppContext, getAuthSession());
+        }
+        return mPageService;
     }
 
     /**
