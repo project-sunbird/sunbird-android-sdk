@@ -92,11 +92,12 @@ public class GenieService {
         if (sService == null) {
             AppContext<Context> appContext = AndroidAppContext.buildAppContext(context, packageName);
             Logger.init(new AndroidLogger());
-            ContentPlayer.init(appContext.getParams().getString(IParams.Key.APPLICATION_ID), appContext.getParams().getString(ServiceConstants.Params.PLAYER_CONFIG));
+
             TelemetryLogger.init(new TelemetryServiceImpl(appContext, new UserServiceImpl(appContext)));
             //initializing event bus for Telemetry
             SummaryListener.init(appContext);
             sService = new GenieService(appContext);
+            ContentPlayer.init(appContext);
         }
 
         sAsyncService = GenieAsyncService.init(sService);
@@ -336,7 +337,7 @@ public class GenieService {
      */
     public IFrameworkService getFrameworkService() {
         if (mFrameworkService == null) {
-            mFrameworkService = new FrameworkServiceImpl(mAppContext, getAuthSession());
+            mFrameworkService = new FrameworkServiceImpl(mAppContext);
         }
         return mFrameworkService;
     }

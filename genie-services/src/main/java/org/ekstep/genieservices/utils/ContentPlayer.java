@@ -4,16 +4,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
 
+import org.ekstep.genieservices.GenieService;
+import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.ServiceConstants;
+import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.IPlayerConfig;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentData;
+import org.ekstep.genieservices.commons.bean.CorrelationData;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
-import org.ekstep.genieservices.commons.utils.CollectionUtil;
+import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.ReflectionUtil;
+import org.ekstep.genieservices.tag.cache.TelemetryTagCache;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,29 +35,33 @@ public class ContentPlayer {
     private static final String TAG = ContentPlayer.class.getSimpleName();
 
     private static ContentPlayer sContentPlayer;
+    private AppContext mAppContext;
+    private IUserService mUserService;
     private String mQualifier;
     private IPlayerConfig playerConfig;
 
-    private ContentPlayer(String qualifier, IPlayerConfig playerConfig) {
+    private ContentPlayer(AppContext appContext, String qualifier, IPlayerConfig playerConfig) {
         this.mQualifier = qualifier;
         this.playerConfig = playerConfig;
+        this.mAppContext = appContext;
+        this.mUserService = GenieService.getService().getUserService();
     }
 
-    public static void init(String qualifier, String playerConfigClass) {
+    public static void init(AppContext appContext) {
         if (sContentPlayer == null) {
             IPlayerConfig playerConfig = null;
-            if (playerConfigClass != null) {
-                Class<?> classInstance = ReflectionUtil.getClass(playerConfigClass);
-                if (classInstance != null) {
-                    playerConfig = (IPlayerConfig) ReflectionUtil.getInstance(classInstance);
-                }
+            String playerConfigClass = appContext.getParams().getString(ServiceConstants.Params.PLAYER_CONFIG);
+            String qualifier = appContext.getParams().getString(IParams.Key.APPLICATION_ID);
+            Class<?> classInstance = ReflectionUtil.getClass(playerConfigClass);
+            if (classInstance != null) {
+                playerConfig = (IPlayerConfig) ReflectionUtil.getInstance(classInstance);
             }
 
-            sContentPlayer = new ContentPlayer(qualifier, playerConfig);
+            sContentPlayer = new ContentPlayer(appContext, qualifier, playerConfig);
         }
     }
 
-    public static void play(Context context, Content content, Map<String, Object> resourceBundle) {
+    public static void play(Context context, Content content, Map<String, String> rollup) {
         ContentData contentData = content.getContentData();
         if (sContentPlayer.mQualifier == null) {
             Toast.makeText(context, "App qualifier not found", Toast.LENGTH_SHORT).show();
@@ -67,14 +78,54 @@ public class ContentPlayer {
             return;
         }
 
-        intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_ORIGIN, "Genie");
-        intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_MODE, "play");
-        if (!CollectionUtil.isNullOrEmpty(content.getHierarchyInfo())) {
-            intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_CONTENT_EXTRAS, GsonUtil.toJson(createHierarchyData(content.getHierarchyInfo())));
+        UserSession currentUserSession = null;
+        String sid = null;
+        String uid = null;
+        if (sContentPlayer.mUserService != null) {
+            currentUserSession = sContentPlayer.mUserService.getCurrentUserSession().getResult();
         }
-        intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_APP_INFO, GsonUtil.toJson(contentData));
-        intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_LANGUAGE_INFO, GsonUtil.toJson(resourceBundle));
-        intent.putExtra(ServiceConstants.BundleKey.BUNDLE_KEY_APP_QUALIFIER, sContentPlayer.mQualifier);
+        if (currentUserSession != null && currentUserSession.isValid()) {
+            sid = currentUserSession.getSid();
+            uid = currentUserSession.getUid();
+        }
+
+        Map<String, Object> bundleMap = new HashMap<>();
+        Map<String, Object> contextMap = new HashMap<>();
+        contextMap.put("origin", "Genie");
+        Map<String, String> languageInfoMap = (Map<String, String>) intent.getSerializableExtra("languageInfo");
+        contextMap.put("languageInfo", languageInfoMap != null ? GsonUtil.toJson(languageInfoMap) : "");
+        contextMap.put("appQualifier", sContentPlayer.mQualifier);
+        contextMap.put("tags", TelemetryTagCache.activeTags(sContentPlayer.mAppContext));
+        contextMap.put("rollup", rollup != null ? rollup : "");
+        contextMap.put("basepath", content.getBasePath());
+        contextMap.put("mode", "play");
+        contextMap.put("contentId", content.getIdentifier());
+        contextMap.put("sid", sid != null ? sid : "");
+        contextMap.put("did", sContentPlayer.mAppContext.getDeviceInfo().getDeviceID());
+
+        Map<String, Object> actorMap = new HashMap<>();
+        actorMap.put("id", uid != null ? uid : "");
+        actorMap.put("type", "User");
+        contextMap.put("actor", actorMap);
+
+        contextMap.put("channel", sContentPlayer.mAppContext.getParams().getString(IParams.Key.CHANNEL_ID));
+        Map<String, Object> pDataMap = new HashMap<>();
+        pDataMap.put("id", sContentPlayer.mAppContext.getParams().getString(IParams.Key.PRODUCER_ID));
+        pDataMap.put("ver", sContentPlayer.mAppContext.getParams().getString(IParams.Key.VERSION_NAME));
+        pDataMap.put("pid", sContentPlayer.mAppContext.getParams().getString(IParams.Key.PRODUCER_UNIQUE_ID));
+        contextMap.put("pdata", pDataMap);
+
+        contextMap.put("cdata", createcDataList(content.getHierarchyInfo()));
+
+        bundleMap.put("context", contextMap);
+
+        Map<String, Object> configMap = (Map<String, Object>) intent.getSerializableExtra("config");
+        if (configMap != null) {
+            bundleMap.put("config", GsonUtil.toJson(configMap));
+        }
+
+        bundleMap.put("metadata", GsonUtil.toJson(contentData));
+        intent.putExtra("playerConfig", GsonUtil.toJson(bundleMap));
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
 
         context.startActivity(intent);
@@ -94,5 +145,17 @@ public class ContentPlayer {
         hierarchyData.put("id", id);
         hierarchyData.put("type", identifierType);
         return hierarchyData;
+    }
+
+    private static List<CorrelationData> createcDataList(List<HierarchyInfo> hierarchyInfo) {
+        List<CorrelationData> correlationDataList = new ArrayList<>();
+        if (hierarchyInfo != null) {
+            for (HierarchyInfo infoItem : hierarchyInfo) {
+                correlationDataList.add(new CorrelationData(infoItem.getIdentifier(), infoItem.getContentType()));
+            }
+        }
+        return correlationDataList;
+
+
     }
 }

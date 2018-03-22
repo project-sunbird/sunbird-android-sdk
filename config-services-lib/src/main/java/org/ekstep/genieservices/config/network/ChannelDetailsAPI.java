@@ -18,22 +18,18 @@ public class ChannelDetailsAPI extends BaseAPI {
 
     private static final String ENDPOINT = "read";
 
-    private Map<String, String> headers;
-
-    public ChannelDetailsAPI(AppContext appContext, Map<String, String> headers, String channelId) {
+    public ChannelDetailsAPI(AppContext appContext, String channelId) {
         super(appContext,
                 String.format(Locale.US, "%s/%s/%s",
                         appContext.getParams().getString(IParams.Key.CHANNEL_SERVICE_BASE_URL),
                         ENDPOINT, channelId),
                 TAG);
-
-        this.headers = headers;
     }
 
 
     @Override
     protected Map<String, String> getRequestHeaders() {
-        return headers;
+        return null;
     }
 
     @Override
