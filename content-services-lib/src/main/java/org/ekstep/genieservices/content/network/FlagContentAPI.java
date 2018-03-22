@@ -12,15 +12,15 @@ import java.util.Map;
  *
  * @author IndrajaMachani
  */
-public class FlagDetailsAPI extends BaseAPI {
+public class FlagContentAPI extends BaseAPI {
 
-    private static final String TAG = FlagDetailsAPI.class.getSimpleName();
+    private static final String TAG = FlagContentAPI.class.getSimpleName();
 
     private static final CharSequence SERVICE_ENDPOINTS = "flag";
 
     private Map<String, String> headers;
 
-    public FlagDetailsAPI(AppContext appContext, Map<String, String> headers, String contentId) {
+    public FlagContentAPI(AppContext appContext, Map<String, String> headers, String contentId) {
         super(appContext,
                 String.format(Locale.US, "%s/%s/%s",
                         appContext.getParams().getString(IParams.Key.CONTENT_BASE_URL), SERVICE_ENDPOINTS,

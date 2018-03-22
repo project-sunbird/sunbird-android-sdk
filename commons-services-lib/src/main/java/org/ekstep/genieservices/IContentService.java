@@ -1,7 +1,5 @@
 package org.ekstep.genieservices;
 
-import org.ekstep.genieservices.commons.bean.FlagContent;
-import org.ekstep.genieservices.commons.bean.FlagContentRequest;
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
@@ -21,6 +19,7 @@ import org.ekstep.genieservices.commons.bean.ContentSpaceUsageSummaryRequest;
 import org.ekstep.genieservices.commons.bean.ContentSpaceUsageSummaryResponse;
 import org.ekstep.genieservices.commons.bean.ContentSwitchRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
+import org.ekstep.genieservices.commons.bean.FlagContentRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
 import org.ekstep.genieservices.commons.bean.MoveContentResponse;
@@ -341,7 +340,7 @@ public interface IContentService {
      * This api is used to flag content with the content flag request mentioned in {@link FlagContentRequest}
      * <p>
      * <p>
-     * On successful, the response will return status as TRUE and the result set with {@link FlagContent}
+     * On successful, the response will return status as TRUE and the result set with {@link Void}
      * <p>
      * <p>
      * On failure, the response with return status as FALSE with one of the following errors
@@ -350,7 +349,7 @@ public interface IContentService {
      * <p>NETWORK_ERROR
      *
      * @param flagContentRequest - {@link FlagContentRequest}
-     * @return {@link GenieResponse<FlagContent>}
+     * @return {@link GenieResponse<Void>}
      */
-    GenieResponse<FlagContent> flagContent(FlagContentRequest flagContentRequest);
+    GenieResponse<Void> flagContent(FlagContentRequest flagContentRequest);
 }

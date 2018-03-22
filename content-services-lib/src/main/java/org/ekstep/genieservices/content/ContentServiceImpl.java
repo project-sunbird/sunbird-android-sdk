@@ -12,8 +12,6 @@ import org.ekstep.genieservices.IDownloadService;
 import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.bean.FlagContent;
-import org.ekstep.genieservices.commons.bean.FlagContentRequest;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
@@ -38,6 +36,7 @@ import org.ekstep.genieservices.commons.bean.ContentSpaceUsageSummaryResponse;
 import org.ekstep.genieservices.commons.bean.ContentSwitchRequest;
 import org.ekstep.genieservices.commons.bean.DownloadRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
+import org.ekstep.genieservices.commons.bean.FlagContentRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
 import org.ekstep.genieservices.commons.bean.MoveContentResponse;
@@ -96,7 +95,7 @@ import org.ekstep.genieservices.content.chained.move.ValidateDestinationFolder;
 import org.ekstep.genieservices.content.db.model.ContentListingModel;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.network.ContentSearchAPI;
-import org.ekstep.genieservices.content.network.FlagDetailsAPI;
+import org.ekstep.genieservices.content.network.FlagContentAPI;
 import org.ekstep.genieservices.content.network.RecommendedContentAPI;
 import org.ekstep.genieservices.content.network.RelatedContentAPI;
 import org.ekstep.genieservices.eventbus.EventBus;
@@ -128,7 +127,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     private IDownloadService downloadService;
     private IAuthSession<Session> authSession;
 
-    public ContentServiceImpl(AppContext appContext, IAuthSession<Session> authSession, IUserService userService, IContentFeedbackService contentFeedbackService, IConfigService configService, IDownloadService downloadService) {
+    public ContentServiceImpl(AppContext appContext, IUserService userService, IContentFeedbackService contentFeedbackService,
+                              IConfigService configService, IDownloadService downloadService, IAuthSession<Session> authSession) {
         super(appContext);
 
         this.userService = userService;
@@ -1170,22 +1170,18 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     }
 
     @Override
-    public GenieResponse<FlagContent> flagContent(FlagContentRequest flagContentRequest) {
+    public GenieResponse<Void> flagContent(FlagContentRequest flagContentRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(flagContentRequest));
         String methodName = "flagContent@ContentServiceImpl";
 
-        FlagDetailsAPI channelAPI = new FlagDetailsAPI(mAppContext, getCustomHeaders(authSession.getSessionData()), flagContentRequest.getContentId());
-        GenieResponse genieResponse = channelAPI.get();
+        FlagContentAPI flagContentAPI = new FlagContentAPI(mAppContext, getCustomHeaders(authSession.getSessionData()),
+                flagContentRequest.getContentId());
+        GenieResponse genieResponse = flagContentAPI.post();
 
-        LinkedTreeMap map = GsonUtil.fromJson(genieResponse.getResult().toString(), LinkedTreeMap.class);
-        String result = GsonUtil.toJson(map.get("result"));
-        FlagContent flagContent = GsonUtil.fromJson(result, FlagContent.class);
-
-        GenieResponse<FlagContent> response;
-        if (flagContent != null) {
+        GenieResponse<Void> response;
+        if (genieResponse.getStatus()) {
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-            response.setResult(flagContent);
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         } else {
             response = GenieResponseBuilder.getErrorResponse(genieResponse.getError(), genieResponse.getMessage(), TAG);

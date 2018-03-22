@@ -94,23 +94,23 @@ public class FlagContentRequest {
 
         public FlagContentRequest build() {
             if (StringUtil.isNullOrEmpty(contentId)) {
-                throw new IllegalArgumentException("contentId should not be null or empty.");
+                throw new IllegalStateException("contentId required.");
             }
 
             if (CollectionUtil.isEmpty(flagReasons)) {
-                throw new IllegalArgumentException("flagReasons should not be null or empty.");
+                throw new IllegalStateException("flagReasons required.");
             }
 
             if (StringUtil.isNullOrEmpty(flaggedBy)) {
-                throw new IllegalArgumentException("flaggedBy should not be null or empty.");
+                throw new IllegalStateException("flaggedBy required.");
             }
 
             if (StringUtil.isNullOrEmpty(versionKey)) {
-                throw new IllegalArgumentException("versionKey should not be null or empty.");
+                throw new IllegalStateException("versionKey required.");
             }
 
             if (CollectionUtil.isEmpty(flags)) {
-                throw new IllegalArgumentException("flags should not be null or empty.");
+                throw new IllegalStateException("flags required.");
             }
 
             return new FlagContentRequest(contentId, flagReasons, flaggedBy, versionKey, flags);
