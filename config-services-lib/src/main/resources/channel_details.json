@@ -1,0 +1,181 @@
+{
+    "id": "api.channel.read",
+    "ver": "1.0",
+    "ts": "2018-03-22T10:40:00.164Z",
+    "params": {
+        "resmsgid": "5f0e4640-2dbd-11e8-9b92-d7d5d25f508b",
+        "msgid": "5eee1410-2dbd-11e8-8c1c-f7918425be41",
+        "status": "successful",
+        "err": null,
+        "errmsg": null
+    },
+    "responseCode": "OK",
+    "result": {
+        "channel": {
+            "identifier": "b00bc992ef25f1a9a8d63291e20efc8d",
+            "code": "b00bc992ef25f1a9a8d63291e20efc8d",
+            "consumerId": "fa271a76-c15a-4aa1-adff-31dd04682a1f",
+            "channel": "in.ekstep",
+            "description": "Sunbird",
+            "suggested_frameworks": [
+                {
+                    "identifier": "JuliaComputingtest1",
+                    "code": "JuliaComputingtest1",
+                    "name": "JuliaComputingtest1",
+                    "objectType": "Framework"
+                },
+                {
+                    "identifier": "FWATMPTOrgFour2",
+                    "code": "FWATMPTOrgFour2",
+                    "name": "FW Attempt Org Four 2",
+                    "objectType": "Framework"
+                },
+                {
+                    "identifier": "FWATMPT1",
+                    "code": "FWATMPT1",
+                    "name": "FW Attempt 1",
+                    "objectType": "Framework"
+                },
+                {
+                    "identifier": "FWATMPT4",
+                    "code": "FWATMPT4",
+                    "name": "FW Attempt 4",
+                    "objectType": "Framework"
+                },
+                {
+                    "identifier": "FWATMPTOrgThree1",
+                    "code": "FWATMPTOrgThree1",
+                    "name": "FW Attempt Org Three 1",
+                    "objectType": "Framework"
+                },
+                {
+                    "identifier": "JuliaComputing",
+                    "code": "JuliaComputing",
+                    "name": "JuliaComputing",
+                    "objectType": "Framework"
+                },
+                {
+                    "identifier": "Sunbird",
+                    "code": "Sunbird",
+                    "name": "Sunbird",
+                    "objectType": "Framework"
+                },
+                {
+                    "identifier": "FWATMPTOrgOne3",
+                    "code": "FWATMPTOrgOne3",
+                    "name": "FW Attempt Org One 3",
+                    "objectType": "Framework"
+                },
+                {
+                    "identifier": ".FWATMPTOrgOne1",
+                    "code": ".FWATMPTOrgOne1",
+                    "name": "FW Attempt Org One 1",
+                    "objectType": "Framework"
+                },
+                {
+                    "identifier": "FWATMPT6",
+                    "code": "FWATMPT6",
+                    "name": "FW Attempt 6",
+                    "objectType": "Framework"
+                },
+                {
+                    "identifier": "NCF",
+                    "code": "NCF",
+                    "name": "NCF framework",
+                    "objectType": "Framework"
+                },
+                {
+                    "identifier": "NCERTCOPY 105",
+                    "code": "NCERTCOPY 105",
+                    "name": "NCERTCOPY 105",
+                    "objectType": "Framework"
+                },
+                {
+                    "identifier": "Sunbird1",
+                    "code": "Sunbird1",
+                    "name": "Sunbird1",
+                    "objectType": "Framework"
+                },
+                {
+                    "identifier": "FWATMPT3",
+                    "code": "FWATMPT3",
+                    "name": "FW Attempt 3",
+                    "objectType": "Framework"
+                },
+                {
+                    "identifier": "FWATMPTOrgTwo1",
+                    "code": "FWATMPTOrgTwo1",
+                    "name": "FW Attempt Org Two 1",
+                    "objectType": "Framework"
+                },
+                {
+                    "identifier": "FWATMPTOrgThree4",
+                    "code": "FWATMPTOrgThree4",
+                    "name": "FW Attempt Org Three 4",
+                    "objectType": "Framework"
+                },
+                {
+                    "identifier": "FWATMPT2",
+                    "code": "FWATMPT2",
+                    "name": "FW Attempt 2",
+                    "objectType": "Framework"
+                },
+                {
+                    "identifier": "MH_FW",
+                    "code": "MH_FW",
+                    "name": "TESTMHCHANNEL",
+                    "objectType": "Framework"
+                },
+                {
+                    "identifier": "FWATMPTOrgOne1",
+                    "code": "FWATMPTOrgOne1",
+                    "name": "FW Attempt Org One 1",
+                    "objectType": "Framework"
+                },
+                {
+                    "identifier": "FWATMPT7",
+                    "code": "FWATMPT7",
+                    "name": "FW Attempt 7",
+                    "objectType": "Framework"
+                },
+                {
+                    "identifier": "FWATMPTOrgFour1",
+                    "code": "FWATMPTOrgFour1",
+                    "name": "FW Attempt Org Four 1",
+                    "objectType": "Framework"
+                },
+                {
+                    "identifier": "FWATMPTOrgThree3",
+                    "code": "FWATMPTOrgThree3",
+                    "name": "FW Attempt Org Three 3",
+                    "objectType": "Framework"
+                },
+                {
+                    "identifier": "FWATMPT8",
+                    "code": "FWATMPT8",
+                    "name": "FW Attempt 8",
+                    "objectType": "Framework"
+                },
+                {
+                    "identifier": "FWATMPT5",
+                    "code": "FWATMPT5",
+                    "name": "FW Attempt 5",
+                    "objectType": "Framework"
+                },
+                {
+                    "identifier": "FWATMPTOrgThree2",
+                    "code": "FWATMPTOrgThree2",
+                    "name": "FW Attempt Org Three 2",
+                    "objectType": "Framework"
+                }
+            ],
+            "createdOn": "2018-01-25T05:40:03.251+0000",
+            "versionKey": "1516858803251",
+            "appId": "ekstep_portal",
+            "name": "ROOT_ORG",
+            "lastUpdatedOn": "2018-01-25T05:40:03.251+0000",
+            "defaultFramework": "NCF",
+            "status": "Live"
+        }
+    }
+}
