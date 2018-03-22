@@ -1176,7 +1176,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         String methodName = "flagContent@ContentServiceImpl";
 
         FlagContentAPI flagContentAPI = new FlagContentAPI(mAppContext, getCustomHeaders(authSession.getSessionData()),
-                flagContentRequest.getContentId());
+                flagContentRequest);
         GenieResponse genieResponse = flagContentAPI.post();
 
         GenieResponse<Void> response;
