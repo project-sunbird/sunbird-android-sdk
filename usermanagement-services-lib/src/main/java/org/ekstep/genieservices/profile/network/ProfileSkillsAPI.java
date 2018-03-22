@@ -23,7 +23,7 @@ public class ProfileSkillsAPI extends BaseAPI {
     public ProfileSkillsAPI(AppContext appContext, Map<String, String> customHeaders) {
         super(appContext,
                 String.format(Locale.US, "%s/%s",
-                        appContext.getParams().getString(IParams.Key.USER_SERVICE_BASE_URL),
+                        appContext.getParams().getString(IParams.Key.DATA_SERVICE_BASE_URL),
                         SERVICE_ENDPOINTS),
                 TAG);
 
