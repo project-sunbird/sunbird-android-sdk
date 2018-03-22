@@ -1,5 +1,7 @@
 package org.ekstep.genieservices;
 
+import org.ekstep.genieservices.commons.bean.FlagContent;
+import org.ekstep.genieservices.commons.bean.FlagContentRequest;
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentDeleteRequest;
@@ -334,4 +336,21 @@ public interface IContentService {
      * @return {@link GenieResponse<SunbirdContentSearchResult>}
      */
     GenieResponse<SunbirdContentSearchResult> searchSunbirdContent(SunbirdContentSearchCriteria contentSearchCriteria);
+
+    /**
+     * This api is used to flag content with the content flag request mentioned in {@link FlagContentRequest}
+     * <p>
+     * <p>
+     * On successful, the response will return status as TRUE and the result set with {@link FlagContent}
+     * <p>
+     * <p>
+     * On failure, the response with return status as FALSE with one of the following errors
+     * <p>CONNECTION_ERROR
+     * <p>SERVER_ERROR
+     * <p>NETWORK_ERROR
+     *
+     * @param flagContentRequest - {@link FlagContentRequest}
+     * @return {@link GenieResponse<FlagContent>}
+     */
+    GenieResponse<FlagContent> flagContent(FlagContentRequest flagContentRequest);
 }

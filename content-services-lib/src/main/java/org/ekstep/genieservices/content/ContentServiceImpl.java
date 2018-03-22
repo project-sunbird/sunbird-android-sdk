@@ -4,6 +4,7 @@ import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
 
 import org.ekstep.genieservices.BaseService;
+import org.ekstep.genieservices.IAuthSession;
 import org.ekstep.genieservices.IConfigService;
 import org.ekstep.genieservices.IContentFeedbackService;
 import org.ekstep.genieservices.IContentService;
@@ -11,6 +12,8 @@ import org.ekstep.genieservices.IDownloadService;
 import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.bean.FlagContent;
+import org.ekstep.genieservices.commons.bean.FlagContentRequest;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.ChildContentRequest;
 import org.ekstep.genieservices.commons.bean.Content;
@@ -44,6 +47,7 @@ import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.ScanStorageRequest;
 import org.ekstep.genieservices.commons.bean.ScanStorageResponse;
+import org.ekstep.genieservices.commons.bean.Session;
 import org.ekstep.genieservices.commons.bean.SunbirdContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.SunbirdContentSearchResult;
 import org.ekstep.genieservices.commons.bean.SwitchContentResponse;
@@ -92,6 +96,7 @@ import org.ekstep.genieservices.content.chained.move.ValidateDestinationFolder;
 import org.ekstep.genieservices.content.db.model.ContentListingModel;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.network.ContentSearchAPI;
+import org.ekstep.genieservices.content.network.FlagDetailsAPI;
 import org.ekstep.genieservices.content.network.RecommendedContentAPI;
 import org.ekstep.genieservices.content.network.RelatedContentAPI;
 import org.ekstep.genieservices.eventbus.EventBus;
@@ -121,15 +126,24 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     private IContentFeedbackService contentFeedbackService;
     private IConfigService configService;
     private IDownloadService downloadService;
+    private IAuthSession<Session> authSession;
 
-    public ContentServiceImpl(AppContext appContext, IUserService userService, IContentFeedbackService contentFeedbackService, IConfigService configService, IDownloadService downloadService) {
+    public ContentServiceImpl(AppContext appContext, IAuthSession<Session> authSession, IUserService userService, IContentFeedbackService contentFeedbackService, IConfigService configService, IDownloadService downloadService) {
         super(appContext);
 
         this.userService = userService;
         this.contentFeedbackService = contentFeedbackService;
         this.configService = configService;
         this.downloadService = downloadService;
+        this.authSession = authSession;
     }
+
+    private static Map<String, String> getCustomHeaders(Session authSession) {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("X-Authenticated-User-Token", authSession.getAccessToken());
+        return headers;
+    }
+
 
     @Override
     public GenieResponse<Content> getContentDetails(ContentDetailsRequest contentDetailsRequest) {
@@ -1152,6 +1166,31 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         response = GenieResponseBuilder.getErrorResponse(apiResponse.getError(), (String) apiResponse.getErrorMessages().get(0), TAG);
         TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, (String) apiResponse.getErrorMessages().get(0));
+        return response;
+    }
+
+    @Override
+    public GenieResponse<FlagContent> flagContent(FlagContentRequest flagContentRequest) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("request", GsonUtil.toJson(flagContentRequest));
+        String methodName = "flagContent@ContentServiceImpl";
+
+        FlagDetailsAPI channelAPI = new FlagDetailsAPI(mAppContext, getCustomHeaders(authSession.getSessionData()), flagContentRequest.getContentId());
+        GenieResponse genieResponse = channelAPI.get();
+
+        LinkedTreeMap map = GsonUtil.fromJson(genieResponse.getResult().toString(), LinkedTreeMap.class);
+        String result = GsonUtil.toJson(map.get("result"));
+        FlagContent flagContent = GsonUtil.fromJson(result, FlagContent.class);
+
+        GenieResponse<FlagContent> response;
+        if (flagContent != null) {
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+            response.setResult(flagContent);
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        } else {
+            response = GenieResponseBuilder.getErrorResponse(genieResponse.getError(), genieResponse.getMessage(), TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, genieResponse.getMessage());
+        }
         return response;
     }
 

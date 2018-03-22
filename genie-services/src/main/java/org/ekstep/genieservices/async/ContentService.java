@@ -25,6 +25,8 @@ import org.ekstep.genieservices.commons.bean.ContentSpaceUsageSummaryRequest;
 import org.ekstep.genieservices.commons.bean.ContentSpaceUsageSummaryResponse;
 import org.ekstep.genieservices.commons.bean.ContentSwitchRequest;
 import org.ekstep.genieservices.commons.bean.EcarImportRequest;
+import org.ekstep.genieservices.commons.bean.FlagContent;
+import org.ekstep.genieservices.commons.bean.FlagContentRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
 import org.ekstep.genieservices.commons.bean.MoveContentResponse;
@@ -531,5 +533,19 @@ public class ContentService {
         });
     }
 
+    /**
+     * This api is used to flag content with the content flag request mentioned in {@link FlagContentRequest}
+     *
+     * @param flagContentRequest - {@link FlagContentRequest}
+     * @return {@link GenieResponse<FlagContent>}
+     */
+    public void flagContent(final FlagContentRequest flagContentRequest, IResponseHandler<FlagContent> responseHandler) {
+        new AsyncHandler<FlagContent>(responseHandler).execute(new IPerformable<FlagContent>() {
+            @Override
+            public GenieResponse<FlagContent> perform() {
+                return contentService.flagContent(flagContentRequest);
+            }
+        });
+    }
 
 }
