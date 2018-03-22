@@ -18,22 +18,18 @@ public class FrameworkDetailsAPI extends BaseAPI {
 
     private static final String ENDPOINT = "read";
 
-    private Map<String, String> headers;
-
-    public FrameworkDetailsAPI(AppContext appContext, Map<String, String> headers, String frameworkId) {
+    public FrameworkDetailsAPI(AppContext appContext, String frameworkId) {
         super(appContext,
                 String.format(Locale.US, "%s/%s/%s",
                         appContext.getParams().getString(IParams.Key.FRAMEWORK_SERVICE_BASE_URL),
                         ENDPOINT, frameworkId),
                 TAG);
-
-        this.headers = headers;
     }
 
 
     @Override
     protected Map<String, String> getRequestHeaders() {
-        return headers;
+        return null;
     }
 
     @Override
