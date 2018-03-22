@@ -13,6 +13,12 @@ public class Session {
     private String refreshToken;
     private String userToken;
 
+    public Session(String accessToken, String refreshToken, String userToken) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+        this.userToken = userToken;
+    }
+
     public String getAccessToken() {
         return accessToken;
     }
