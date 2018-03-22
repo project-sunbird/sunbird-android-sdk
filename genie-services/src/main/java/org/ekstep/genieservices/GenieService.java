@@ -335,7 +335,7 @@ public class GenieService {
      */
     public IFrameworkService getFrameworkService() {
         if (mFrameworkService == null) {
-            mFrameworkService = new FrameworkServiceImpl(mAppContext, getAuthSession());
+            mFrameworkService = new FrameworkServiceImpl(mAppContext);
         }
         return mFrameworkService;
     }

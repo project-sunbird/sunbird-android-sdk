@@ -38,11 +38,8 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
     private static final String DB_KEY_CHANNEL_DETAILS = "channel_details_key";
     private static final String DB_KEY_FRAMEWORK_DETAILS = "framework_details_key";
 
-    private IAuthSession<Session> authSession;
-
-    public FrameworkServiceImpl(AppContext appContext, IAuthSession<Session> authSession) {
+    public FrameworkServiceImpl(AppContext appContext) {
         super(appContext);
-        this.authSession = authSession;
     }
 
     @Override
