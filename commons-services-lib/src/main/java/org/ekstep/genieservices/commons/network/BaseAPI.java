@@ -5,6 +5,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 
 import java.io.IOException;
@@ -61,10 +62,12 @@ public abstract class BaseAPI {
                     AuthHandler.resetAuthToken(mAppContext);
                     return fetchFromServer(requestType, false);
                 } else {
-                    return getErrorResponse(NetworkConstants.SERVERAUTH_ERROR, NetworkConstants.SERVERAUTH_ERROR_MESSAGE);
+                    return getErrorResponse(NetworkConstants.SERVERAUTH_ERROR,
+                            NetworkConstants.SERVERAUTH_ERROR_MESSAGE + ": " + GsonUtil.toJson(apiResponse));
                 }
             } else {
-                return getErrorResponse(NetworkConstants.SERVER_ERROR, NetworkConstants.SERVER_ERROR_MESSAGE);
+                return getErrorResponse(NetworkConstants.SERVER_ERROR,
+                        NetworkConstants.SERVER_ERROR_MESSAGE + ": " + GsonUtil.toJson(apiResponse));
             }
         } catch (IOException e) {
             Logger.e(TAG, e.getMessage());
