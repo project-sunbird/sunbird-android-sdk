@@ -19,4 +19,6 @@ public interface IHttpClient {
 
     ApiResponse doPost(IRequestBody requestBody) throws IOException;
 
+    ApiResponse doPatch(IRequestBody requestBody) throws IOException;
+
 }

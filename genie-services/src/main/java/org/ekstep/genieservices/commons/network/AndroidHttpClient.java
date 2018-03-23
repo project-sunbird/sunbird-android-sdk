@@ -54,8 +54,17 @@ public class AndroidHttpClient implements IHttpClient {
 
     @Override
     public ApiResponse doPost(IRequestBody requestBody) throws IOException {
-
         requestBuilder.post(prepareRequestBody(requestBody));
+        Request request = requestBuilder.build();
+        Response response = mHttpClient.newCall(request).execute();
+        ApiResponse apiResponse = new ApiResponse(response.isSuccessful(), response.body() != null ? response.body().string() : "", response.code());
+        response.close();
+        return apiResponse;
+    }
+
+    @Override
+    public ApiResponse doPatch(IRequestBody requestBody) throws IOException {
+        requestBuilder.patch(prepareRequestBody(requestBody));
         Request request = requestBuilder.build();
         Response response = mHttpClient.newCall(request).execute();
         ApiResponse apiResponse = new ApiResponse(response.isSuccessful(), response.body() != null ? response.body().string() : "", response.code());
@@ -66,11 +75,8 @@ public class AndroidHttpClient implements IHttpClient {
     private RequestBody prepareRequestBody(IRequestBody requestBody) {
 
         if (requestBody.getContentType().equals(IRequestBody.MIME_TYPE_JSON)) {
-            return RequestBody.create(MediaType.parse(IRequestBody.MIME_TYPE_JSON), (byte[])requestBody.getBody());
-        }
-
-
-        else if (requestBody.getContentType().equals(IRequestBody.MIME_TYPE_FORM)) {
+            return RequestBody.create(MediaType.parse(IRequestBody.MIME_TYPE_JSON), (byte[]) requestBody.getBody());
+        } else if (requestBody.getContentType().equals(IRequestBody.MIME_TYPE_FORM)) {
             Map<String, String> formData = (Map<String, String>) requestBody.getBody();
             FormBody.Builder builder = new FormBody.Builder();
             Iterator<String> iterator = formData.keySet().iterator();

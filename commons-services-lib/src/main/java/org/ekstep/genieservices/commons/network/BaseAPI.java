@@ -21,6 +21,7 @@ public abstract class BaseAPI {
 
     private static final String GET = "GET";
     private static final String POST = "POST";
+    private static final String PATCH = "PATCH";
     private static final int AUTHENTICATION_FAILURE = 401;
 
     private AppContext mAppContext;
@@ -46,6 +47,10 @@ public abstract class BaseAPI {
 
     public GenieResponse post() {
         return fetchFromServer(POST, true);
+    }
+
+    public GenieResponse patch() {
+        return fetchFromServer(PATCH, true);
     }
 
 
@@ -82,6 +87,8 @@ public abstract class BaseAPI {
             apiResponse = httpClient.doGet();
         } else if (POST.equals(requestType)) {
             apiResponse = httpClient.doPost(getRequestBody());
+        } else if (PATCH.equals(requestType)) {
+            apiResponse = httpClient.doPatch(getRequestBody());
         }
         return apiResponse;
     }
