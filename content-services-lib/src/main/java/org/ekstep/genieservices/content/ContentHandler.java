@@ -1122,11 +1122,11 @@ public class ContentHandler {
             exclPragma = false;
         }
 
-        if (CollectionUtil.isEmpty(pragmaArr)) {
-            // If pragma array is empty than get the all pragma values from master data to apply the default exclusion/notIn filter.
-            pragmaArr = getFilterConfig(configService, ContentConstants.CONFIG_EXCLUDE_PRAGMA);
-            exclPragma = true;
-        }
+//        if (CollectionUtil.isEmpty(pragmaArr)) {
+//            // If pragma array is empty than get the all pragma values from master data to apply the default exclusion/notIn filter.
+//            pragmaArr = getFilterConfig(configService, ContentConstants.CONFIG_EXCLUDE_PRAGMA);
+//            exclPragma = true;
+//        }
 
         if (!CollectionUtil.isEmpty(pragmaArr)) {
             for (String pragma : pragmaArr) {
@@ -1208,11 +1208,11 @@ public class ContentHandler {
             exclPragma = false;
         }
 
-        if (CollectionUtil.isEmpty(pragmaArr)) {
-            // If pragma array is empty than get the all pragma values from master data to apply the default exclusion/notIn filter.
-            pragmaArr = getFilterConfig(configService, ContentConstants.CONFIG_EXCLUDE_PRAGMA);
-            exclPragma = true;
-        }
+//        if (CollectionUtil.isEmpty(pragmaArr)) {
+//            // If pragma array is empty than get the all pragma values from master data to apply the default exclusion/notIn filter.
+//            pragmaArr = getFilterConfig(configService, ContentConstants.CONFIG_EXCLUDE_PRAGMA);
+//            exclPragma = true;
+//        }
 
         if (!CollectionUtil.isEmpty(pragmaArr)) {
             for (String pragma : pragmaArr) {
