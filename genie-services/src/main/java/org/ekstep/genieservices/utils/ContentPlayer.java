@@ -52,12 +52,14 @@ public class ContentPlayer {
             IPlayerConfig playerConfig = null;
             String playerConfigClass = appContext.getParams().getString(ServiceConstants.Params.PLAYER_CONFIG);
             String qualifier = appContext.getParams().getString(IParams.Key.APPLICATION_ID);
-            Class<?> classInstance = ReflectionUtil.getClass(playerConfigClass);
-            if (classInstance != null) {
-                playerConfig = (IPlayerConfig) ReflectionUtil.getInstance(classInstance);
+            if (playerConfigClass != null) {
+                Class<?> classInstance = ReflectionUtil.getClass(playerConfigClass);
+                if (classInstance != null) {
+                    playerConfig = (IPlayerConfig) ReflectionUtil.getInstance(classInstance);
+                }
+                sContentPlayer = new ContentPlayer(appContext, qualifier, playerConfig);
             }
 
-            sContentPlayer = new ContentPlayer(appContext, qualifier, playerConfig);
         }
     }
 
@@ -121,10 +123,10 @@ public class ContentPlayer {
 
         Map<String, Object> configMap = (Map<String, Object>) intent.getSerializableExtra("config");
         if (configMap != null) {
-            bundleMap.put("config", GsonUtil.toJson(configMap));
+            bundleMap.put("config", configMap);
         }
 
-        bundleMap.put("metadata", GsonUtil.toJson(contentData));
+        bundleMap.put("metadata", contentData);
         intent.putExtra("playerConfig", GsonUtil.toJson(bundleMap));
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
 
