@@ -318,9 +318,7 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
 
         UpdateUserInfoAPI updateUserInfoAPI = new UpdateUserInfoAPI(mAppContext, getCustomHeaders(authSession.getSessionData()),
                 UserProfileHandler.getUpdateUserInfoRequestMap(updateUserInfoRequest));
-
-        //TODO 22/3/2018 change it to patch
-        GenieResponse genieResponse = updateUserInfoAPI.post();
+        GenieResponse genieResponse = updateUserInfoAPI.patch();
 
         GenieResponse<Void> response;
         if (genieResponse.getStatus()) {
