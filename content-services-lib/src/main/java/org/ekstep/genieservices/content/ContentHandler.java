@@ -2310,10 +2310,6 @@ public class ContentHandler {
         return ContentsModel.totalSizeOnDevice(appContext.getDBSession(), query);
     }
 
-    private void applyNotInFilter() {
-
-    }
-
     public static Map<String, Object> getFlagContentRequestMap(FlagContentRequest flagContentRequest) {
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("flagReasons", flagContentRequest.getFlagReasons());

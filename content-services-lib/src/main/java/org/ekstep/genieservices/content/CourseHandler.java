@@ -73,9 +73,7 @@ public class CourseHandler {
 
         UpdateContentStateAPI updateContentStateAPI = new UpdateContentStateAPI(appContext, getCustomHeaders(sessionData),
                 getUpdateContentStateRequest(updateContentStateRequest));
-
-//      // todo:  return updateContentStateAPI.patch();
-        return null;
+        return updateContentStateAPI.patch();
     }
 
     private static Map<String, Object> getUpdateContentStateRequest(UpdateContentStateRequest updateContentStateRequest) {

@@ -16,6 +16,7 @@ import org.ekstep.genieservices.profile.network.ProfileSkillsAPI;
 import org.ekstep.genieservices.profile.network.ProfileVisibilityAPI;
 import org.ekstep.genieservices.profile.network.SearchUserAPI;
 import org.ekstep.genieservices.profile.network.TenantInfoAPI;
+import org.ekstep.genieservices.profile.network.UpdateUserInfoAPI;
 import org.ekstep.genieservices.profile.network.UserProfileDetailsAPI;
 
 import java.util.HashMap;
@@ -171,7 +172,13 @@ public class UserProfileHandler {
         return requestMap;
     }
 
-    public static Map<String, Object> getUpdateUserInfoRequestMap(UpdateUserInfoRequest updateUserInfoRequest) {
+    public static GenieResponse updateUserInfoInServer(AppContext appContext, Session sessionData, UpdateUserInfoRequest updateUserInfoRequest) {
+        UpdateUserInfoAPI updateUserInfoAPI = new UpdateUserInfoAPI(appContext, getCustomHeaders(sessionData),
+                getUpdateUserInfoRequestMap(updateUserInfoRequest));
+        return updateUserInfoAPI.patch();
+    }
+
+    private static Map<String, Object> getUpdateUserInfoRequestMap(UpdateUserInfoRequest updateUserInfoRequest) {
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("userId", updateUserInfoRequest.getUserId());
 

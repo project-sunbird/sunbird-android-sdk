@@ -138,12 +138,23 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         this.authSession = authSession;
     }
 
-    private static Map<String, String> getCustomHeaders(Session authSession) {
+    private Map<String, String> getCustomHeaders(Session authSession) {
         Map<String, String> headers = new HashMap<>();
         headers.put("X-Authenticated-User-Token", authSession.getAccessToken());
         return headers;
     }
 
+    private <T> GenieResponse<T> isValidAuthSession(String methodName, Map<String, Object> params) {
+        if (authSession == null || authSession.getSessionData() == null) {
+            GenieResponse<T> response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.AUTH_SESSION,
+                    ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN, TAG);
+
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN);
+            return response;
+        }
+
+        return null;
+    }
 
     @Override
     public GenieResponse<Content> getContentDetails(ContentDetailsRequest contentDetailsRequest) {
@@ -1157,7 +1168,6 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 searchResult.setFilterCriteria(null);
             }
 
-
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(searchResult);
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
@@ -1175,18 +1185,23 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         params.put("request", GsonUtil.toJson(flagContentRequest));
         String methodName = "flagContent@ContentServiceImpl";
 
+        GenieResponse<Void> response = isValidAuthSession(methodName, params);
+        if (response != null) {
+            return response;
+        }
+
         FlagContentAPI flagContentAPI = new FlagContentAPI(mAppContext, getCustomHeaders(authSession.getSessionData()),
                 flagContentRequest.getContentId(), ContentHandler.getFlagContentRequestMap(flagContentRequest));
         GenieResponse genieResponse = flagContentAPI.post();
 
-        GenieResponse<Void> response;
         if (genieResponse.getStatus()) {
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         } else {
             response = GenieResponseBuilder.getErrorResponse(genieResponse.getError(), genieResponse.getMessage(), TAG);
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, genieResponse.getMessage());
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, response.getMessage());
         }
+
         return response;
     }
 

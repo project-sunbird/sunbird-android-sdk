@@ -27,7 +27,6 @@ import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
-import org.ekstep.genieservices.profile.network.UpdateUserInfoAPI;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.util.HashMap;
@@ -51,12 +50,6 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
     public UserProfileServiceImpl(AppContext appContext, IAuthSession<Session> authSession) {
         super(appContext);
         this.authSession = authSession;
-    }
-
-    private static Map<String, String> getCustomHeaders(Session authSession) {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("X-Authenticated-User-Token", authSession.getAccessToken());
-        return headers;
     }
 
     private <T> GenieResponse<T> isValidAuthSession(String methodName, Map<String, Object> params) {
@@ -316,18 +309,23 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
         params.put("request", GsonUtil.toJson(updateUserInfoRequest));
         String methodName = "updateUserInfo@UserProfileServiceImpl";
 
-        UpdateUserInfoAPI updateUserInfoAPI = new UpdateUserInfoAPI(mAppContext, getCustomHeaders(authSession.getSessionData()),
-                UserProfileHandler.getUpdateUserInfoRequestMap(updateUserInfoRequest));
-        GenieResponse genieResponse = updateUserInfoAPI.patch();
+        GenieResponse<Void> response = isValidAuthSession(methodName, params);
+        if (response != null) {
+            return response;
+        }
 
-        GenieResponse<Void> response;
-        if (genieResponse.getStatus()) {
+        GenieResponse updateUserInfoAPIResponse = UserProfileHandler.updateUserInfoInServer(mAppContext,
+                authSession.getSessionData(), updateUserInfoRequest);
+
+        if (updateUserInfoAPIResponse.getStatus()) {
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         } else {
-            response = GenieResponseBuilder.getErrorResponse(genieResponse.getError(), genieResponse.getMessage(), TAG);
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, genieResponse.getMessage());
+            response = GenieResponseBuilder.getErrorResponse(updateUserInfoAPIResponse.getError(),
+                    updateUserInfoAPIResponse.getMessage(), TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, response.getMessage());
         }
+
         return response;
     }
 

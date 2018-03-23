@@ -2,7 +2,6 @@ package org.ekstep.genieservices.content.network;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IParams;
-import org.ekstep.genieservices.commons.bean.FlagContentRequest;
 import org.ekstep.genieservices.commons.network.BaseAPI;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
