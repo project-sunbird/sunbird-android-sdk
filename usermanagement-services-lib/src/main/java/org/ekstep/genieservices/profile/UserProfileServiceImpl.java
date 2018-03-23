@@ -15,6 +15,7 @@ import org.ekstep.genieservices.commons.bean.ProfileVisibilityRequest;
 import org.ekstep.genieservices.commons.bean.Session;
 import org.ekstep.genieservices.commons.bean.TenantInfo;
 import org.ekstep.genieservices.commons.bean.TenantInfoRequest;
+import org.ekstep.genieservices.commons.bean.UpdateUserInfoRequest;
 import org.ekstep.genieservices.commons.bean.UploadFileRequest;
 import org.ekstep.genieservices.commons.bean.UserProfile;
 import org.ekstep.genieservices.commons.bean.UserProfileDetailsRequest;
@@ -26,6 +27,7 @@ import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
+import org.ekstep.genieservices.profile.network.UpdateUserInfoAPI;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.util.HashMap;
@@ -49,6 +51,12 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
     public UserProfileServiceImpl(AppContext appContext, IAuthSession<Session> authSession) {
         super(appContext);
         this.authSession = authSession;
+    }
+
+    private static Map<String, String> getCustomHeaders(Session authSession) {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("X-Authenticated-User-Token", authSession.getAccessToken());
+        return headers;
     }
 
     private <T> GenieResponse<T> isValidAuthSession(String methodName, Map<String, Object> params) {
@@ -275,7 +283,7 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
     public GenieResponse<FileUploadResult> uploadFile(UploadFileRequest uploadFileRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(uploadFileRequest));
-        String methodName = "uploadFile@UserProfileServiceImpl";
+        String methodName = "updateUserInfo@UserProfileServiceImpl";
 
         GenieResponse<FileUploadResult> response = isValidAuthSession(methodName, params);
         if (response != null) {
@@ -299,6 +307,29 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, fileUploadResponse.getMessage());
         }
 
+        return response;
+    }
+
+    @Override
+    public GenieResponse<Void> updateUserInfo(UpdateUserInfoRequest updateUserInfoRequest) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("request", GsonUtil.toJson(updateUserInfoRequest));
+        String methodName = "updateUserInfo@UserProfileServiceImpl";
+
+        UpdateUserInfoAPI updateUserInfoAPI = new UpdateUserInfoAPI(mAppContext, getCustomHeaders(authSession.getSessionData()),
+                UserProfileHandler.getUpdateUserInfoRequestMap(updateUserInfoRequest));
+
+        //TODO 22/3/2018 change it to patch
+        GenieResponse genieResponse = updateUserInfoAPI.post();
+
+        GenieResponse<Void> response;
+        if (genieResponse.getStatus()) {
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        } else {
+            response = GenieResponseBuilder.getErrorResponse(genieResponse.getError(), genieResponse.getMessage(), TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, genieResponse.getMessage());
+        }
         return response;
     }
 

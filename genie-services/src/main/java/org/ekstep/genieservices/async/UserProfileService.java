@@ -9,6 +9,7 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ProfileVisibilityRequest;
 import org.ekstep.genieservices.commons.bean.TenantInfo;
 import org.ekstep.genieservices.commons.bean.TenantInfoRequest;
+import org.ekstep.genieservices.commons.bean.UpdateUserInfoRequest;
 import org.ekstep.genieservices.commons.bean.UploadFileRequest;
 import org.ekstep.genieservices.commons.bean.UserProfile;
 import org.ekstep.genieservices.commons.bean.UserProfileDetailsRequest;
@@ -124,11 +125,26 @@ public class UserProfileService {
      * @param uploadFileRequest
      * @param responseHandler
      */
-    public void uploadFile(final UploadFileRequest uploadFileRequest, IResponseHandler<FileUploadResult> responseHandler){
+    public void uploadFile(final UploadFileRequest uploadFileRequest, IResponseHandler<FileUploadResult> responseHandler) {
         ThreadPool.getInstance().execute(new IPerformable<FileUploadResult>() {
             @Override
             public GenieResponse<FileUploadResult> perform() {
                 return userProfileService.uploadFile(uploadFileRequest);
+            }
+        }, responseHandler);
+    }
+
+    /**
+     * This api is used to update user info
+     *
+     * @param updateUserInfoRequest
+     * @param responseHandler
+     */
+    public void updateUserInfo(final UpdateUserInfoRequest updateUserInfoRequest, IResponseHandler<Void> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return userProfileService.updateUserInfo(updateUserInfoRequest);
             }
         }, responseHandler);
     }

@@ -6,6 +6,7 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ProfileVisibilityRequest;
 import org.ekstep.genieservices.commons.bean.TenantInfo;
 import org.ekstep.genieservices.commons.bean.TenantInfoRequest;
+import org.ekstep.genieservices.commons.bean.UpdateUserInfoRequest;
 import org.ekstep.genieservices.commons.bean.UploadFileRequest;
 import org.ekstep.genieservices.commons.bean.UserProfile;
 import org.ekstep.genieservices.commons.bean.UserProfileDetailsRequest;
@@ -32,5 +33,7 @@ public interface IUserProfileService {
     GenieResponse<Void> setProfileVisibility(ProfileVisibilityRequest profileVisibilityRequest);
 
     GenieResponse<FileUploadResult> uploadFile(UploadFileRequest uploadFileRequest);
+
+    GenieResponse<Void> updateUserInfo(UpdateUserInfoRequest updateUserInfoRequest);
 
 }

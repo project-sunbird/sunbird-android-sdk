@@ -5,6 +5,7 @@ import org.ekstep.genieservices.commons.bean.EndorseOrAddSkillRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ProfileVisibilityRequest;
 import org.ekstep.genieservices.commons.bean.Session;
+import org.ekstep.genieservices.commons.bean.UpdateUserInfoRequest;
 import org.ekstep.genieservices.commons.bean.UploadFileRequest;
 import org.ekstep.genieservices.commons.bean.UserSearchCriteria;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
@@ -170,5 +171,11 @@ public class UserProfileHandler {
         return requestMap;
     }
 
+    public static Map<String, Object> getUpdateUserInfoRequestMap(UpdateUserInfoRequest updateUserInfoRequest) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("userId", updateUserInfoRequest.getUserId());
+
+        return requestMap;
+    }
 
 }
