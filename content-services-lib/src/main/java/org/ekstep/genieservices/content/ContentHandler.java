@@ -23,6 +23,7 @@ import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchFilter;
 import org.ekstep.genieservices.commons.bean.ContentSortCriteria;
 import org.ekstep.genieservices.commons.bean.FilterValue;
+import org.ekstep.genieservices.commons.bean.FlagContentRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.MasterDataValues;
@@ -2311,6 +2312,15 @@ public class ContentHandler {
 
     private void applyNotInFilter() {
 
+    }
+
+    public static Map<String, Object> getFlagContentRequestMap(FlagContentRequest flagContentRequest) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("flagReasons", flagContentRequest.getFlagReasons());
+        requestMap.put("flaggedBy", flagContentRequest.getFlaggedBy());
+        requestMap.put("versionKey", flagContentRequest.getVersionKey());
+        requestMap.put("flags", flagContentRequest.getFlags());
+        return requestMap;
     }
 
 }

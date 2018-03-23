@@ -24,24 +24,15 @@ public class FlagContentAPI extends BaseAPI {
     private Map<String, String> headers;
     private Map<String, Object> requestMap;
 
-    public FlagContentAPI(AppContext appContext, Map<String, String> headers, FlagContentRequest flagContentRequest) {
+    public FlagContentAPI(AppContext appContext, Map<String, String> headers, String contentId, Map<String, Object> requestMap) {
         super(appContext,
                 String.format(Locale.US, "%s/%s/%s",
                         appContext.getParams().getString(IParams.Key.CONTENT_BASE_URL), SERVICE_ENDPOINTS,
-                        flagContentRequest.getContentId()),
+                        contentId),
                 TAG);
 
         this.headers = headers;
-        this.requestMap = getRequestMap(flagContentRequest);
-    }
-
-    private Map<String, Object> getRequestMap(FlagContentRequest flagContentRequest) {
-        Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("flagReasons", flagContentRequest.getFlagReasons());
-        requestMap.put("flaggedBy", flagContentRequest.getFlaggedBy());
-        requestMap.put("versionKey", flagContentRequest.getVersionKey());
-        requestMap.put("flags", flagContentRequest.getFlags());
-        return requestMap;
+        this.requestMap = requestMap;
     }
 
     @Override
