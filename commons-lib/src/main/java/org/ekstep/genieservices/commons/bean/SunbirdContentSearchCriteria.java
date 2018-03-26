@@ -335,7 +335,7 @@ public class SunbirdContentSearchCriteria implements Serializable {
             return this;
         }
 
-        public SearchBuilder dialCodes() {
+        public SearchBuilder offlineSearch() {
             this.offlineSearch = true;
             return this;
         }
