@@ -254,7 +254,12 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
 
         String id = (String) pdata.get("pid");
         if (!isValidId(id)) {
-            pdata.put("pid", GENIE_SERVICE_GID);
+            String pid = mAppContext.getParams().getString(IParams.Key.PRODUCER_UNIQUE_ID);
+            if (!StringUtil.isNullOrEmpty(pid)) {
+                pdata.put("pid", pid);
+            } else {
+                pdata.put("pid", GENIE_SERVICE_GID);
+            }
         }
 
         if (CollectionUtil.isKeyNotAvailable(pdata, "ver")) {
