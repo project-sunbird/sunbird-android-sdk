@@ -100,6 +100,7 @@ public class ContentHandler {
     private static final String KEY_NAME = "name";
     private static final String KEY_CONTENT_ENCODING = "contentEncoding";
     private static final String KEY_CONTENT_DISPOSITION = "contentDisposition";
+    private static final String KEY_DIAL_CODES = "dialcodes";
 
     private static final String KEY_CONTENT_METADATA = "contentMetadata";
     private static final String KEY_VIRALITY_METADATA = "virality";
@@ -163,6 +164,13 @@ public class ContentHandler {
     public static String readContentDisposition(Map contentData) {
         if (contentData.containsKey(KEY_CONTENT_DISPOSITION)) {
             return (String) contentData.get(KEY_CONTENT_DISPOSITION);
+        }
+        return null;
+    }
+
+    public static List<String> readDialcodes(Map contentData) {
+        if (contentData.containsKey(KEY_DIAL_CODES)) {
+            return (ArrayList<String>) contentData.get(KEY_DIAL_CODES);
         }
         return null;
     }
@@ -2319,4 +2327,26 @@ public class ContentHandler {
         return requestMap;
     }
 
+    public static String addOrUpdateDialcodeMapping(String jsonStr, String identifier, String rootNodeIdentifier) {
+        Map<String, Object> dialcodeMapping;
+        if (StringUtil.isNullOrEmpty(jsonStr)) {
+            dialcodeMapping = GsonUtil.fromJson(jsonStr, Map.class);
+        } else {
+            dialcodeMapping = new HashMap<>();
+        }
+
+        if (!dialcodeMapping.containsKey("identifier")) {
+            dialcodeMapping.put("identifier", identifier);
+        }
+
+        Set<String> childNodes = new HashSet<>();
+        if (dialcodeMapping.containsKey("childNodes")) {
+            childNodes.addAll((List) dialcodeMapping.get("childNodes"));
+        }
+
+        childNodes.add(rootNodeIdentifier);
+        dialcodeMapping.put("childNodes", new ArrayList<>(childNodes));
+
+        return GsonUtil.toJson(dialcodeMapping);
+    }
 }

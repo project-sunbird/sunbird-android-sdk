@@ -7,6 +7,7 @@ import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ImportContentProgress;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.Decompress;
 import org.ekstep.genieservices.commons.utils.FileUtil;
@@ -44,7 +45,8 @@ public class ExtractPayloads implements IChainable<List<ContentImportResponse>, 
     public GenieResponse<List<ContentImportResponse>> execute(AppContext appContext, ImportContentContext importContext) {
 
         File destinationFolder = new File(importContext.getDestinationFolder());
-        String identifier, mimeType, contentType, visibility, audience, pragma, path, contentEncoding, contentDisposition;
+        String identifier, mimeType, contentType, visibility, audience, pragma, path,
+                contentEncoding, contentDisposition;
         Double compatibilityLevel, pkgVersion;
         int refCount;
         int contentState = ContentConstants.State.ONLY_SPINE;
@@ -53,6 +55,8 @@ public class ExtractPayloads implements IChainable<List<ContentImportResponse>, 
         File payload;
         File payloadDestination = null;
         ContentModel oldContentModel;
+        List<String> dialcodes;
+        String rootNodeIdentifier = null;
 
         //this count is for maintaining how many contents are imported so far
         int currentCount = 0;
@@ -81,10 +85,14 @@ public class ExtractPayloads implements IChainable<List<ContentImportResponse>, 
             iconURL = ContentHandler.readAppIcon(item);
             posterImage = ContentHandler.readPosterImage(item);
             grayScaleAppIcon = ContentHandler.readGrayScaleAppIcon(item);
+            dialcodes = ContentHandler.readDialcodes(item);
 
             oldContentModel = ContentModel.find(appContext.getDBSession(), identifier);
             oldContentPath = oldContentModel == null ? null : oldContentModel.getPath();
             boolean isContentExist = ContentHandler.isContentExist(oldContentModel, identifier, pkgVersion, false);
+            if (ContentConstants.Visibility.DEFAULT.equals(visibility)) {
+                rootNodeIdentifier = identifier;
+            }
 
             //Apk files
             if ((!StringUtil.isNullOrEmpty(mimeType) && mimeType.equalsIgnoreCase(ContentConstants.MimeType.APK)) ||
@@ -239,6 +247,21 @@ public class ExtractPayloads implements IChainable<List<ContentImportResponse>, 
             //increase the current count
             currentCount++;
             EventBus.postEvent(new ImportContentProgress(currentCount, importContext.getItems().size()));
+
+            // Store dial code mapping in DB
+            if (!StringUtil.isNullOrEmpty(rootNodeIdentifier) && !CollectionUtil.isNullOrEmpty(dialcodes)) {
+                for (String dialcode : dialcodes) {
+                    String key = "DIAL_CODES-" + dialcode;
+                    NoSqlModel dialcodeInDB = NoSqlModel.findByKey(appContext.getDBSession(), key);
+                    if (dialcodeInDB == null) {
+                        dialcodeInDB = NoSqlModel.build(appContext.getDBSession(), key,
+                                ContentHandler.addOrUpdateDialcodeMapping(null, identifier, rootNodeIdentifier));
+                        dialcodeInDB.save();
+                    } else {
+                        dialcodeInDB.setValue(ContentHandler.addOrUpdateDialcodeMapping(dialcodeInDB.getValue(), identifier, rootNodeIdentifier));
+                    }
+                }
+            }
         }
 
         if (nextLink != null) {
