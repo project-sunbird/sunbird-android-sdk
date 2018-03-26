@@ -1209,8 +1209,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 }
 
                 String collectionDataList = null;
-                if (result.containsKey("collection")) {
-                    collectionDataList = GsonUtil.toJson(result.get("collection"));
+                if (result.containsKey("collections")) {
+                    collectionDataList = GsonUtil.toJson(result.get("collections"));
                 }
 
                 SunbirdContentSearchResult searchResult = new SunbirdContentSearchResult();
