@@ -2331,7 +2331,7 @@ public class ContentHandler {
 
     public static String addOrUpdateDialcodeMapping(String jsonStr, String identifier, String rootNodeIdentifier) {
         Map<String, Object> dialcodeMapping;
-        if (StringUtil.isNullOrEmpty(jsonStr)) {
+        if (!StringUtil.isNullOrEmpty(jsonStr)) {
             dialcodeMapping = GsonUtil.fromJson(jsonStr, Map.class);
         } else {
             dialcodeMapping = new HashMap<>();
