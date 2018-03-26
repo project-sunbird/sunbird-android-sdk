@@ -57,6 +57,7 @@ import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.enums.ScanStorageStatus;
 import org.ekstep.genieservices.commons.bean.telemetry.Interact;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
@@ -1108,74 +1109,148 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         GenieResponse<SunbirdContentSearchResult> response;
 
-        Map<String, Object> requestMap = ContentHandler.getSearchContentRequest(mAppContext, configService, contentSearchCriteria);
+        if (contentSearchCriteria.isOfflineSearch()) {
+            Map<String, ContentData> contentDataMap = new HashMap<>();
+            Map<String, ContentData> collectionDataMap = new HashMap<>();
 
-        ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, requestMap);
-        GenieResponse apiResponse = contentSearchAPI.post();
-        if (apiResponse.getStatus()) {
-            String body = apiResponse.getResult().toString();
+            if (!CollectionUtil.isEmpty(contentSearchCriteria.getDialCodes())) {
+                for (String dialcode : contentSearchCriteria.getDialCodes()) {
 
-            LinkedTreeMap map = GsonUtil.fromJson(body, LinkedTreeMap.class);
-            String id = (String) map.get("id");
-            LinkedTreeMap responseParams = (LinkedTreeMap) map.get("params");
-            LinkedTreeMap result = (LinkedTreeMap) map.get("result");
+                    String key = ContentHandler.KEY_DB_DIAL_CODES + dialcode;
 
-            String responseMessageId = null;
-            if (responseParams.containsKey("resmsgid")) {
-                responseMessageId = (String) responseParams.get("resmsgid");
-            }
+                    NoSqlModel dialcodeInDB = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
+                    if (dialcodeInDB != null && !StringUtil.isNullOrEmpty(dialcodeInDB.getValue())) {
+                        Map<String, Object> dialcodeMapping = GsonUtil.fromJson(dialcodeInDB.getValue(), Map.class);
 
-            List<Map<String, Object>> facets = null;
-            if (result.containsKey("facets")) {
-                facets = (List<Map<String, Object>>) result.get("facets");
-            }
+                        String childNode = null;
+                        String identifier = (String) dialcodeMapping.get("identifier");
+                        if (!contentDataMap.containsKey(identifier)) {
+                            ContentModel contentModelInDB = ContentModel.find(mAppContext.getDBSession(), identifier);
+                            if (contentModelInDB != null) {
+                                childNode = contentModelInDB.getIdentifier();
 
-            String contentDataList = null;
-            if (result.containsKey("content")) {
-                contentDataList = GsonUtil.toJson(result.get("content"));
-            }
+                                contentDataMap.put(contentModelInDB.getIdentifier(),
+                                        GsonUtil.fromJson(contentModelInDB.getLocalData(), ContentData.class));
+                            }
+                        }
 
-            String collectionDataList = null;
-            if (result.containsKey("collection")) {
-                collectionDataList = GsonUtil.toJson(result.get("collection"));
-            }
+                        List<String> rootNodes = (List) dialcodeMapping.get("rootNodes");
+                        for (String rootNodeIdentifier : rootNodes) {
+                            ContentData rootContent = null;
+                            if (!collectionDataMap.containsKey(rootNodeIdentifier)) {
+                                ContentModel rootContentModelInDB = ContentModel.find(mAppContext.getDBSession(), rootNodeIdentifier);
+                                if (rootContentModelInDB != null) {
+                                    rootContent = GsonUtil.fromJson(rootContentModelInDB.getLocalData(), ContentData.class);
+                                }
+                            } else {
+                                rootContent = GsonUtil.fromJson(String.valueOf(collectionDataMap.get(rootNodeIdentifier)), ContentData.class);
+                            }
 
-            SunbirdContentSearchResult searchResult = new SunbirdContentSearchResult();
-            searchResult.setId(id);
-            searchResult.setResponseMessageId(responseMessageId);
-            searchResult.setRequest(requestMap);
+                            if (rootContent != null) {
+                                if (!StringUtil.isNullOrEmpty(childNode)) {
+                                    List<String> childNodes = rootContent.getChildNodes();
+                                    if (CollectionUtil.isNullOrEmpty(childNodes)) {
+                                        childNodes = new ArrayList<>();
+                                    }
 
-            if (!StringUtil.isNullOrEmpty(contentDataList)
-                    || !StringUtil.isNullOrEmpty(collectionDataList)) {
-
-                Type type = new TypeToken<List<ContentData>>() {
-                }.getType();
-
-                if (!StringUtil.isNullOrEmpty(contentDataList)) {
-                    List<ContentData> contentData = GsonUtil.getGson().fromJson(contentDataList, type);
-                    searchResult.setContentDataList(contentData);
+                                    if (!childNodes.contains(childNode)) {
+                                        childNodes.add(childNode);
+                                        rootContent.setChildNodes(childNodes);
+                                    }
+                                }
+                                collectionDataMap.put(rootNodeIdentifier, rootContent);
+                            }
+                        }
+                    }
                 }
+            }
 
-                if (!StringUtil.isNullOrEmpty(collectionDataList)) {
-                    List<ContentData> contentData = GsonUtil.getGson().fromJson(collectionDataList, type);
-                    searchResult.setCollectionDataList(contentData);
-                }
-
-                searchResult.setFilterCriteria(ContentHandler.createFilterCriteria(configService,
-                        contentSearchCriteria, facets, (Map<String, Object>) requestMap.get("filters")));
+            if (contentDataMap.isEmpty() && collectionDataMap.isEmpty()) {
+                response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.DATA_NOT_FOUND_ERROR,
+                        ServiceConstants.ErrorMessage.NO_CONTENT_LISTING_DATA, TAG);
+                TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, response.getMessage());
             } else {
-                searchResult.setContentDataList(new ArrayList<ContentData>());
-                searchResult.setFilterCriteria(null);
+                SunbirdContentSearchResult searchResult = new SunbirdContentSearchResult();
+                searchResult.setContentDataList((List<ContentData>) contentDataMap.values());
+                searchResult.setCollectionDataList((List<ContentData>) collectionDataMap.values());
+
+                response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+                response.setResult(searchResult);
+                TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+                return response;
             }
 
-            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-            response.setResult(searchResult);
-            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
-            return response;
+        } else {
+            Map<String, Object> requestMap = ContentHandler.getSearchContentRequest(mAppContext, configService, contentSearchCriteria);
+
+            ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, requestMap);
+            GenieResponse apiResponse = contentSearchAPI.post();
+            if (apiResponse.getStatus()) {
+                String body = apiResponse.getResult().toString();
+
+                LinkedTreeMap map = GsonUtil.fromJson(body, LinkedTreeMap.class);
+                String id = (String) map.get("id");
+                LinkedTreeMap responseParams = (LinkedTreeMap) map.get("params");
+                LinkedTreeMap result = (LinkedTreeMap) map.get("result");
+
+                String responseMessageId = null;
+                if (responseParams.containsKey("resmsgid")) {
+                    responseMessageId = (String) responseParams.get("resmsgid");
+                }
+
+                List<Map<String, Object>> facets = null;
+                if (result.containsKey("facets")) {
+                    facets = (List<Map<String, Object>>) result.get("facets");
+                }
+
+                String contentDataList = null;
+                if (result.containsKey("content")) {
+                    contentDataList = GsonUtil.toJson(result.get("content"));
+                }
+
+                String collectionDataList = null;
+                if (result.containsKey("collection")) {
+                    collectionDataList = GsonUtil.toJson(result.get("collection"));
+                }
+
+                SunbirdContentSearchResult searchResult = new SunbirdContentSearchResult();
+                searchResult.setId(id);
+                searchResult.setResponseMessageId(responseMessageId);
+                searchResult.setRequest(requestMap);
+
+                if (!StringUtil.isNullOrEmpty(contentDataList)
+                        || !StringUtil.isNullOrEmpty(collectionDataList)) {
+
+                    Type type = new TypeToken<List<ContentData>>() {
+                    }.getType();
+
+                    if (!StringUtil.isNullOrEmpty(contentDataList)) {
+                        List<ContentData> contentData = GsonUtil.getGson().fromJson(contentDataList, type);
+                        searchResult.setContentDataList(contentData);
+                    }
+
+                    if (!StringUtil.isNullOrEmpty(collectionDataList)) {
+                        List<ContentData> contentData = GsonUtil.getGson().fromJson(collectionDataList, type);
+                        searchResult.setCollectionDataList(contentData);
+                    }
+
+                    searchResult.setFilterCriteria(ContentHandler.createFilterCriteria(configService,
+                            contentSearchCriteria, facets, (Map<String, Object>) requestMap.get("filters")));
+                } else {
+                    searchResult.setContentDataList(new ArrayList<ContentData>());
+                    searchResult.setFilterCriteria(null);
+                }
+
+                response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+                response.setResult(searchResult);
+                TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+                return response;
+            }
+
+            response = GenieResponseBuilder.getErrorResponse(apiResponse.getError(), (String) apiResponse.getErrorMessages().get(0), TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, (String) apiResponse.getErrorMessages().get(0));
         }
 
-        response = GenieResponseBuilder.getErrorResponse(apiResponse.getError(), (String) apiResponse.getErrorMessages().get(0), TAG);
-        TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, (String) apiResponse.getErrorMessages().get(0));
         return response;
     }
 

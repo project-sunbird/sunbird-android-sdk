@@ -241,6 +241,10 @@ public class ContentData implements Serializable {
         return childNodes;
     }
 
+    public void setChildNodes(List<String> childNodes) {
+        this.childNodes = childNodes;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

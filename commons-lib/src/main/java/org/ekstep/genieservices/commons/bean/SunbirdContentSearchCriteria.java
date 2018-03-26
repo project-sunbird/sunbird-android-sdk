@@ -30,6 +30,7 @@ public class SunbirdContentSearchCriteria implements Serializable {
     private String[] contentTypes;
     private String[] keywords;
     private String[] dialCodes;
+    private boolean offlineSearch;
     private List<ContentSearchFilter> facetFilters;
     private List<ContentSearchFilter> impliedFilters;
     private List<ContentSortCriteria> sortCriteria;
@@ -42,7 +43,7 @@ public class SunbirdContentSearchCriteria implements Serializable {
                                          String[] pragma, String[] exclPragma,
                                          String[] contentStatusArray, String[] facets, String[] contentTypes,
                                          String[] keywords, String[] dialCodes,
-                                         List<ContentSortCriteria> sortCriteria, SearchType searchType) {
+                                         boolean offlineSearch, List<ContentSortCriteria> sortCriteria, SearchType searchType) {
         this.query = query;
         this.limit = limit;
         this.mode = mode;
@@ -60,6 +61,7 @@ public class SunbirdContentSearchCriteria implements Serializable {
         this.contentTypes = contentTypes;
         this.keywords = keywords;
         this.dialCodes = dialCodes;
+        this.offlineSearch = offlineSearch;
         this.sortCriteria = sortCriteria;
         this.searchType = searchType;
     }
@@ -138,6 +140,10 @@ public class SunbirdContentSearchCriteria implements Serializable {
         return dialCodes;
     }
 
+    public boolean isOfflineSearch() {
+        return offlineSearch;
+    }
+
     public List<ContentSearchFilter> getFacetFilters() {
         return facetFilters;
     }
@@ -181,6 +187,7 @@ public class SunbirdContentSearchCriteria implements Serializable {
         private String[] contentTypes;
         private String[] keywords;
         private String[] dialCodes;
+        private boolean offlineSearch;
         private List<ContentSortCriteria> sortCriteria;
 
         public SearchBuilder() {
@@ -328,6 +335,11 @@ public class SunbirdContentSearchCriteria implements Serializable {
             return this;
         }
 
+        public SearchBuilder dialCodes() {
+            this.offlineSearch = true;
+            return this;
+        }
+
         public SunbirdContentSearchCriteria build() {
             if (contentStatusArray == null || contentStatusArray.length == 0) {
                 this.contentStatusArray = new String[]{"Live"};
@@ -339,7 +351,7 @@ public class SunbirdContentSearchCriteria implements Serializable {
 
             return new SunbirdContentSearchCriteria(query, limit, mode, age, grade, medium, board, createdBy,
                     audience, channel, pragma, exclPragma, contentStatusArray, facets, contentTypes,
-                    keywords, dialCodes, sortCriteria, SearchType.SEARCH);
+                    keywords, dialCodes, offlineSearch, sortCriteria, SearchType.SEARCH);
         }
     }
 

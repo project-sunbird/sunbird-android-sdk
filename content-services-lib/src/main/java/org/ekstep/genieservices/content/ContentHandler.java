@@ -76,6 +76,8 @@ import java.util.TreeMap;
 public class ContentHandler {
 
     public static final String KEY_VISIBILITY = "visibility";
+    public static final String KEY_DB_DIAL_CODES = "DIAL_CODES-";
+
     private static final String TAG = ContentHandler.class.getSimpleName();
 
     private static final String KEY_IDENTIFIER = "identifier";
@@ -2339,13 +2341,13 @@ public class ContentHandler {
             dialcodeMapping.put("identifier", identifier);
         }
 
-        Set<String> childNodes = new HashSet<>();
-        if (dialcodeMapping.containsKey("childNodes")) {
-            childNodes.addAll((List) dialcodeMapping.get("childNodes"));
+        Set<String> rootNodes = new HashSet<>();
+        if (dialcodeMapping.containsKey("rootNodes")) {
+            rootNodes.addAll((List) dialcodeMapping.get("rootNodes"));
         }
 
-        childNodes.add(rootNodeIdentifier);
-        dialcodeMapping.put("childNodes", new ArrayList<>(childNodes));
+        rootNodes.add(rootNodeIdentifier);
+        dialcodeMapping.put("rootNodes", new ArrayList<>(rootNodes));
 
         return GsonUtil.toJson(dialcodeMapping);
     }

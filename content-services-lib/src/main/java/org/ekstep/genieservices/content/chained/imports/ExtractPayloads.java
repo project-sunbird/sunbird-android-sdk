@@ -251,7 +251,7 @@ public class ExtractPayloads implements IChainable<List<ContentImportResponse>, 
             // Store dial code mapping in DB
             if (!StringUtil.isNullOrEmpty(rootNodeIdentifier) && !CollectionUtil.isNullOrEmpty(dialcodes)) {
                 for (String dialcode : dialcodes) {
-                    String key = "DIAL_CODES-" + dialcode;
+                    String key = ContentHandler.KEY_DB_DIAL_CODES + dialcode;
                     NoSqlModel dialcodeInDB = NoSqlModel.findByKey(appContext.getDBSession(), key);
                     if (dialcodeInDB == null) {
                         dialcodeInDB = NoSqlModel.build(appContext.getDBSession(), key,
