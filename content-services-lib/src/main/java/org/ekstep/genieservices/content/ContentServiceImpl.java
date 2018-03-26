@@ -1171,8 +1171,14 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, response.getMessage());
             } else {
                 SunbirdContentSearchResult searchResult = new SunbirdContentSearchResult();
-                searchResult.setContentDataList((List<ContentData>) contentDataMap.values());
-                searchResult.setCollectionDataList((List<ContentData>) collectionDataMap.values());
+                if (!contentDataMap.isEmpty()) {
+                    List<ContentData> contentDataList = new ArrayList<>(contentDataMap.values());
+                    searchResult.setContentDataList(contentDataList);
+                }
+                if (!collectionDataMap.isEmpty()) {
+                    List<ContentData> collectionDataList = new ArrayList<>(collectionDataMap.values());
+                    searchResult.setCollectionDataList(collectionDataList);
+                }
 
                 response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
                 response.setResult(searchResult);
