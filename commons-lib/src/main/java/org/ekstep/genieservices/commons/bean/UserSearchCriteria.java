@@ -71,7 +71,7 @@ public class UserSearchCriteria {
 
 
         public SearchBuilder setOffset(int offset) {
-            if (offset > 0) {
+            if (offset < 0) {
                 throw new IllegalArgumentException("offset should be greater than 0");
             }
 
@@ -80,7 +80,7 @@ public class UserSearchCriteria {
         }
 
         public SearchBuilder limit(int limit) {
-            if (limit > 0) {
+            if (limit < 0) {
                 throw new IllegalArgumentException("limit should be greater than 0");
             }
 
