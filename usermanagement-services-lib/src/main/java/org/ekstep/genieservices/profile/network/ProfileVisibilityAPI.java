@@ -17,7 +17,7 @@ public class ProfileVisibilityAPI extends BaseAPI {
 
     private static final String TAG = ProfileVisibilityAPI.class.getSimpleName();
 
-    private static final String ENDPOINT = "visibility";
+    private static final String ENDPOINT = "profile/visibility";
 
     private Map<String, String> headers;
     private Map<String, Object> requestMap;
