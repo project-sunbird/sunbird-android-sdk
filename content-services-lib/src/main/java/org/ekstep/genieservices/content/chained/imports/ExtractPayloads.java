@@ -259,6 +259,7 @@ public class ExtractPayloads implements IChainable<List<ContentImportResponse>, 
                         dialcodeInDB.save();
                     } else {
                         dialcodeInDB.setValue(ContentHandler.addOrUpdateDialcodeMapping(dialcodeInDB.getValue(), identifier, rootNodeIdentifier));
+                        dialcodeInDB.update();
                     }
                 }
             }
