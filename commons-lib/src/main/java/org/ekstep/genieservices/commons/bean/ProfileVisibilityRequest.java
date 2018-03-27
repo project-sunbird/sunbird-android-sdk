@@ -40,8 +40,8 @@ public class ProfileVisibilityRequest {
     public static class Builder {
 
         private String userId;
-        private List<String> privateFieldsList;
-        private List<String> publicFieldsList;
+        private List<String> privateFields;
+        private List<String> publicFields;
 
         public Builder forUser(String userId) {
             if (StringUtil.isNullOrEmpty(userId)) {
@@ -58,11 +58,11 @@ public class ProfileVisibilityRequest {
                 throw new IllegalArgumentException("private field should not be null or empty.");
             }
 
-            if (this.privateFieldsList == null) {
-                this.privateFieldsList = new ArrayList<>();
+            if (this.privateFields == null) {
+                this.privateFields = new ArrayList<>();
             }
 
-            privateFieldsList.add(privateField.getValue());
+            privateFields.add(privateField.getValue());
 
             return this;
         }
@@ -72,12 +72,12 @@ public class ProfileVisibilityRequest {
                 throw new IllegalArgumentException("private fields should not be null or empty.");
             }
 
-            if (this.privateFieldsList == null) {
-                this.privateFieldsList = new ArrayList<>();
+            if (this.privateFields == null) {
+                this.privateFields = new ArrayList<>();
             }
 
             for (UserProfileField userProfileField : privateFields) {
-                privateFieldsList.add(userProfileField.getValue());
+                this.privateFields.add(userProfileField.getValue());
             }
 
             return this;
@@ -88,11 +88,11 @@ public class ProfileVisibilityRequest {
                 throw new IllegalArgumentException("public field should not be null or empty.");
             }
 
-            if (this.publicFieldsList == null) {
-                this.publicFieldsList = new ArrayList<>();
+            if (this.publicFields == null) {
+                this.publicFields = new ArrayList<>();
             }
 
-            publicFieldsList.add(publicField.getValue());
+            publicFields.add(publicField.getValue());
 
             return this;
         }
@@ -102,12 +102,12 @@ public class ProfileVisibilityRequest {
                 throw new IllegalArgumentException("public fields should not be null or empty.");
             }
 
-            if (this.publicFieldsList == null) {
-                this.publicFieldsList = new ArrayList<>();
+            if (this.publicFields == null) {
+                this.publicFields = new ArrayList<>();
             }
 
             for (UserProfileField userProfileField : publicFields) {
-                publicFieldsList.add(userProfileField.getValue());
+                this.publicFields.add(userProfileField.getValue());
             }
 
             return this;
@@ -118,11 +118,11 @@ public class ProfileVisibilityRequest {
                 throw new IllegalStateException("userId required.");
             }
 
-            if (CollectionUtil.isNullOrEmpty(privateFieldsList) && CollectionUtil.isNullOrEmpty(publicFieldsList)) {
+            if (CollectionUtil.isNullOrEmpty(privateFields) && CollectionUtil.isNullOrEmpty(publicFields)) {
                 throw new IllegalStateException("Both public and private fields cannot be empty ");
             }
 
-            return new ProfileVisibilityRequest(userId, privateFieldsList, publicFieldsList);
+            return new ProfileVisibilityRequest(userId, privateFields, publicFields);
         }
     }
 
