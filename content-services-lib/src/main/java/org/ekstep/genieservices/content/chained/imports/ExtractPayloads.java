@@ -244,10 +244,6 @@ public class ExtractPayloads implements IChainable<List<ContentImportResponse>, 
             }
             importContext.getIdentifiers().add(identifier);
 
-            //increase the current count
-            currentCount++;
-            EventBus.postEvent(new ImportContentProgress(currentCount, importContext.getItems().size()));
-
             // Store dial code mapping in DB
             if (!StringUtil.isNullOrEmpty(rootNodeIdentifier) && !CollectionUtil.isNullOrEmpty(dialcodes)) {
                 for (String dialcode : dialcodes) {
@@ -263,6 +259,10 @@ public class ExtractPayloads implements IChainable<List<ContentImportResponse>, 
                     }
                 }
             }
+
+            //increase the current count
+            currentCount++;
+            EventBus.postEvent(new ImportContentProgress(currentCount, importContext.getItems().size()));
         }
 
         if (nextLink != null) {
