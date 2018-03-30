@@ -9,8 +9,8 @@ public class AnnouncementRequest {
 
     private String announcementId;
 
-    private AnnouncementRequest(String channelId) {
-        this.announcementId = channelId;
+    private AnnouncementRequest(String announcementId) {
+        this.announcementId = announcementId;
     }
 
     public String getAnnouncementId() {
