@@ -6,6 +6,7 @@ import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.Announcement;
 import org.ekstep.genieservices.commons.bean.AnnouncementRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.UserInboxRequest;
 
 /**
  * This class provides APIs for performing {@link AnnouncementService} related operations on a separate thread.
@@ -32,4 +33,21 @@ public class AnnouncementService {
             }
         }, responseHandler);
     }
+
+
+    /**
+     * This api is used to get the user inbox
+     *
+     * @param userInboxRequest - {@link UserInboxRequest}
+     * @param responseHandler  - {@link IResponseHandler <EnrolledCoursesResponse>}
+     */
+    public void userInbox(final UserInboxRequest userInboxRequest, IResponseHandler<Void> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return announcementService.userInbox(userInboxRequest);
+            }
+        }, responseHandler);
+    }
+
 }

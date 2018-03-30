@@ -3,6 +3,7 @@ package org.ekstep.genieservices;
 import org.ekstep.genieservices.commons.bean.Announcement;
 import org.ekstep.genieservices.commons.bean.AnnouncementRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.UserInboxRequest;
 
 /**
  * This is the interface with all the required APIs to perform necessary operations related to Announcement.
@@ -25,5 +26,7 @@ public interface IAnnouncementService {
      * @return {@link GenieResponse<Announcement>}
      */
     GenieResponse<Announcement> getAnnouncementById(AnnouncementRequest announcementRequest);
+
+    GenieResponse<Void> userInbox(UserInboxRequest userInboxRequest);
 
 }

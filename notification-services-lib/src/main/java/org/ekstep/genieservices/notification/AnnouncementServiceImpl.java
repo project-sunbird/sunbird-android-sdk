@@ -12,8 +12,10 @@ import org.ekstep.genieservices.commons.bean.Announcement;
 import org.ekstep.genieservices.commons.bean.AnnouncementRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Session;
+import org.ekstep.genieservices.commons.bean.UserInboxRequest;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.notification.network.GetAnnouncementAPI;
+import org.ekstep.genieservices.notification.network.UserInboxAPI;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.util.HashMap;
@@ -86,4 +88,30 @@ public class AnnouncementServiceImpl extends BaseService implements IAnnouncemen
 
         return response;
     }
+
+    @Override
+    public GenieResponse<Void> userInbox(UserInboxRequest userInboxRequest) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("request", GsonUtil.toJson(userInboxRequest));
+        String methodName = "userInbox@AnnouncementServiceImpl";
+
+        GenieResponse<Void> response = isValidAuthSession(methodName, params);
+        if (response != null) {
+            return response;
+        }
+
+        UserInboxAPI userInboxAPI = new UserInboxAPI(mAppContext, getCustomHeaders(authSession.getSessionData()),
+                AnnoucementHandler.getUserInboxRequestMap(userInboxRequest));
+        GenieResponse genieResponse = userInboxAPI.post();
+
+        if (genieResponse.getStatus()) {
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        } else {
+            response = GenieResponseBuilder.getErrorResponse(genieResponse.getError(), genieResponse.getMessage(), TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, response.getMessage());
+        }
+        return response;
+    }
+
 }
