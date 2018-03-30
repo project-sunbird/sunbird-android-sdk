@@ -181,7 +181,20 @@ public class UserProfileHandler {
     private static Map<String, Object> getUpdateUserInfoRequestMap(UpdateUserInfoRequest updateUserInfoRequest) {
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("userId", updateUserInfoRequest.getUserId());
-
+        requestMap.put("firstName", updateUserInfoRequest.getFirstName());
+        requestMap.put("lastName", updateUserInfoRequest.getLastName());
+        requestMap.put("language", updateUserInfoRequest.getLanguage());
+        requestMap.put("phone", updateUserInfoRequest.getPhone());
+        requestMap.put("profileSummary", updateUserInfoRequest.getProfileSummary());
+        requestMap.put("subject", updateUserInfoRequest.getSubject());
+        requestMap.put("gender", updateUserInfoRequest.getGender());
+        requestMap.put("dob", updateUserInfoRequest.getDob());
+        requestMap.put("grade", updateUserInfoRequest.getGrade());
+        requestMap.put("location", updateUserInfoRequest.getLocation());
+        requestMap.put("webPages", updateUserInfoRequest.getWebPages());
+        requestMap.put("education", updateUserInfoRequest.getEducation());
+        requestMap.put("jobProfile", updateUserInfoRequest.getJobProfile());
+        requestMap.put("address", updateUserInfoRequest.getAddress());
         return requestMap;
     }
 
