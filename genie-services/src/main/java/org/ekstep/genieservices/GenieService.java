@@ -23,6 +23,7 @@ import org.ekstep.genieservices.content.ContentFeedbackServiceImpl;
 import org.ekstep.genieservices.content.ContentServiceImpl;
 import org.ekstep.genieservices.content.CourseServiceImpl;
 import org.ekstep.genieservices.content.LanguageServiceImpl;
+import org.ekstep.genieservices.notification.AnnouncementServiceImpl;
 import org.ekstep.genieservices.notification.NotificationServiceImpl;
 import org.ekstep.genieservices.page.PageServiceImpl;
 import org.ekstep.genieservices.partner.PartnerServiceImpl;
@@ -68,6 +69,7 @@ public class GenieService {
     private IDownloadService mDownloadService;
     private IAuthSession<Session> mAuthSession;
     private IPageService mPageService;
+    private IAnnouncementService mAnnouncementService;
 
     private GenieService(AppContext<Context> appContext) {
         this.mAppContext = appContext;
@@ -326,6 +328,21 @@ public class GenieService {
             mAuthService = new AuthServiceImpl(mAppContext);
         }
         return mAuthService;
+    }
+
+    /**
+     * This api gets the {@link AnnouncementServiceImpl}, when accessed in the below way
+     * <p>
+     * getService().getAnnouncementService()
+     * <p><p>
+     *
+     * @return {@link IAnnouncementService}
+     */
+    public IAnnouncementService getAnnouncementService() {
+        if (mAnnouncementService == null) {
+            mAnnouncementService = new AnnouncementServiceImpl(mAppContext, getAuthSession());
+        }
+        return mAnnouncementService;
     }
 
     /**

@@ -72,6 +72,7 @@ public class BuildParams implements IParams {
         setParam(Key.MOBILE_APP_KEY);
         setParam(Key.MOBILE_APP_CONSUMER);
         setParam(Key.OAUTH_SERVICE_IMPLEMENTATION);
+        setParam(Key.ANNOUNCEMENT_BASE_URL);
         setParam(ServiceConstants.Params.PLAYER_CONFIG);
         put(Key.LOG_LEVEL, LogLevel.getLogLevel(BuildConfigUtil.getBuildConfigValue(packageName, Key.LOG_LEVEL)).getLevel());
 
