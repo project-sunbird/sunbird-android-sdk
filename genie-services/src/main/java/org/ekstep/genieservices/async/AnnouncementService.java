@@ -39,7 +39,7 @@ public class AnnouncementService {
      * This api is used to get the user inbox
      *
      * @param userInboxRequest - {@link UserInboxRequest}
-     * @param responseHandler  - {@link IResponseHandler <EnrolledCoursesResponse>}
+     * @param responseHandler  - {@link IResponseHandler <Void>}
      */
     public void userInbox(final UserInboxRequest userInboxRequest, IResponseHandler<Void> responseHandler) {
         ThreadPool.getInstance().execute(new IPerformable<Void>() {
