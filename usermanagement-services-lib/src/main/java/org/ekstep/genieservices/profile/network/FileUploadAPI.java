@@ -21,11 +21,11 @@ public class FileUploadAPI extends BaseAPI {
 
     private static final String ENDPOINT = "media/upload";
 
-    private Map<String, Object> requestMap;
+    private Map<String, String> requestMap;
     private Map<String, String> headers;
 
 
-    public FileUploadAPI(AppContext appContext, Map<String, String> customHeaders, Map<String, Object> requestMap) {
+    public FileUploadAPI(AppContext appContext, Map<String, String> customHeaders, Map<String, String> requestMap) {
         super(appContext, String.format(Locale.US, "%s/%s",
                 appContext.getParams().getString(IParams.Key.CONTENT_BASE_URL),
                 ENDPOINT), TAG);
@@ -42,14 +42,12 @@ public class FileUploadAPI extends BaseAPI {
 
     @Override
     protected String createRequestData() {
-        Map<String, Object> request = new HashMap<>();
-        request.put("request", requestMap);
-        return GsonUtil.toJson(request);
+        return null;
     }
 
     protected IRequestBody getRequestBody() {
         IRequestBody requestBody = new FormRequestBody();
-        requestBody.setBody(getRequestData());
+        requestBody.setBody(requestMap);
         return requestBody;
     }
 }
