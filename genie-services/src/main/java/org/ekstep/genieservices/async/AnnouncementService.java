@@ -6,6 +6,7 @@ import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.Announcement;
 import org.ekstep.genieservices.commons.bean.AnnouncementRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.ReceivedAnnouncementRequest;
 import org.ekstep.genieservices.commons.bean.UserInboxRequest;
 
 /**
@@ -50,4 +51,34 @@ public class AnnouncementService {
         }, responseHandler);
     }
 
+    /**
+     * This api is used for received announcement
+     *
+     * @param receivedAnnouncementRequest - {@link ReceivedAnnouncementRequest}
+     * @param {@link                      GenieResponse<Void>}
+     */
+    public void receivedAnnouncement(final ReceivedAnnouncementRequest receivedAnnouncementRequest, IResponseHandler<Void> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return announcementService.receivedAnnouncement(receivedAnnouncementRequest);
+            }
+        }, responseHandler);
+    }
+
+
+    /**
+     * This api is used to read announcement
+     *
+     * @param receivedAnnouncementRequest - {@link ReceivedAnnouncementRequest}
+     * @param {@link                      GenieResponse<Void>}
+     */
+    public void readAnnouncement(final ReceivedAnnouncementRequest receivedAnnouncementRequest, IResponseHandler<Void> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return announcementService.readAnnouncement(receivedAnnouncementRequest);
+            }
+        }, responseHandler);
+    }
 }

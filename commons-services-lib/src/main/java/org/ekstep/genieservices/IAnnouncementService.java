@@ -4,6 +4,7 @@ import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.Announcement;
 import org.ekstep.genieservices.commons.bean.AnnouncementRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.ReceivedAnnouncementRequest;
 import org.ekstep.genieservices.commons.bean.UserInboxRequest;
 
 /**
@@ -39,7 +40,34 @@ public interface IAnnouncementService {
      * @param userInboxRequest - {@link UserInboxRequest}
      * @param {@link           GenieResponse<Void>}
      */
-
     GenieResponse<Void> userInbox(UserInboxRequest userInboxRequest);
+
+    /**
+     * This api is used for received announcement
+     * <p>
+     * <p>
+     * On successful, the response will return status as TRUE.
+     * <p>
+     * <p>
+     * On failing, the response will return status as FALSE with the following error code
+     *
+     * @param receivedAnnouncementRequest - {@link ReceivedAnnouncementRequest}
+     * @param {@link GenieResponse<Void>}
+     */
+    GenieResponse<Void> receivedAnnouncement(ReceivedAnnouncementRequest receivedAnnouncementRequest);
+
+    /**
+     * This api is used to read announcement
+     * <p>
+     * <p>
+     * On successful, the response will return status as TRUE.
+     * <p>
+     * <p>
+     * On failing, the response will return status as FALSE with the following error code
+     *
+     * @param receivedAnnouncementRequest - {@link ReceivedAnnouncementRequest}
+     * @param {@link GenieResponse<Void>}
+     */
+    GenieResponse<Void> readAnnouncement(ReceivedAnnouncementRequest receivedAnnouncementRequest);
 
 }

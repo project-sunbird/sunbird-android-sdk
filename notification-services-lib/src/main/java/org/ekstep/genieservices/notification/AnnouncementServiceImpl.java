@@ -11,10 +11,13 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.Announcement;
 import org.ekstep.genieservices.commons.bean.AnnouncementRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.ReceivedAnnouncementRequest;
 import org.ekstep.genieservices.commons.bean.Session;
 import org.ekstep.genieservices.commons.bean.UserInboxRequest;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.notification.network.GetAnnouncementAPI;
+import org.ekstep.genieservices.notification.network.ReadAPI;
+import org.ekstep.genieservices.notification.network.ReceivedAPI;
 import org.ekstep.genieservices.notification.network.UserInboxAPI;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
@@ -101,8 +104,58 @@ public class AnnouncementServiceImpl extends BaseService implements IAnnouncemen
         }
 
         UserInboxAPI userInboxAPI = new UserInboxAPI(mAppContext, getCustomHeaders(authSession.getSessionData()),
-                AnnoucementHandler.getUserInboxRequestMap(userInboxRequest));
+                announcementHandler.getUserInboxRequestMap(userInboxRequest));
         GenieResponse genieResponse = userInboxAPI.post();
+
+        if (genieResponse.getStatus()) {
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        } else {
+            response = GenieResponseBuilder.getErrorResponse(genieResponse.getError(), genieResponse.getMessage(), TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, response.getMessage());
+        }
+        return response;
+    }
+
+    @Override
+    public GenieResponse<Void> receivedAnnouncement(ReceivedAnnouncementRequest receivedAnnouncementRequest) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("request", GsonUtil.toJson(receivedAnnouncementRequest));
+        String methodName = "receivedAnnouncement@AnnouncementServiceImpl";
+
+        GenieResponse<Void> response = isValidAuthSession(methodName, params);
+        if (response != null) {
+            return response;
+        }
+
+        ReceivedAPI receivedAPI = new ReceivedAPI(mAppContext, getCustomHeaders(authSession.getSessionData()),
+                announcementHandler.getReceivedAnnouncementRequestMap(receivedAnnouncementRequest));
+        GenieResponse genieResponse = receivedAPI.post();
+
+        if (genieResponse.getStatus()) {
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        } else {
+            response = GenieResponseBuilder.getErrorResponse(genieResponse.getError(), genieResponse.getMessage(), TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, response.getMessage());
+        }
+        return response;
+    }
+
+    @Override
+    public GenieResponse<Void> readAnnouncement(ReceivedAnnouncementRequest receivedAnnouncementRequest) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("request", GsonUtil.toJson(receivedAnnouncementRequest));
+        String methodName = "readAnnouncement@AnnouncementServiceImpl";
+
+        GenieResponse<Void> response = isValidAuthSession(methodName, params);
+        if (response != null) {
+            return response;
+        }
+
+        ReadAPI readAPI = new ReadAPI(mAppContext, getCustomHeaders(authSession.getSessionData()),
+                announcementHandler.getReceivedAnnouncementRequestMap(receivedAnnouncementRequest));
+        GenieResponse genieResponse = readAPI.post();
 
         if (genieResponse.getStatus()) {
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
