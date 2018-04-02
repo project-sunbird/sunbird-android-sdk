@@ -21,6 +21,7 @@ public class GenieAsyncService {
     private AuthService mAuthService;
     private FrameworkService mFrameworkService;
     private PageService mPageService;
+    private AnnouncementService mAnnouncementService;
 
 
     private GenieAsyncService(GenieService genieService) {
@@ -127,5 +128,12 @@ public class GenieAsyncService {
             mPageService = new PageService(sService);
         }
         return mPageService;
+    }
+
+    public AnnouncementService getAnnouncementService() {
+        if (mAnnouncementService == null) {
+            mAnnouncementService = new AnnouncementService(sService);
+        }
+        return mAnnouncementService;
     }
 }
