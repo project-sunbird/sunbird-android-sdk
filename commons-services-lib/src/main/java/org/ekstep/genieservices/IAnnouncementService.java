@@ -1,10 +1,10 @@
 package org.ekstep.genieservices;
 
-import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.Announcement;
 import org.ekstep.genieservices.commons.bean.AnnouncementRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ReceivedAnnouncementRequest;
+import org.ekstep.genieservices.commons.bean.UserInboxAnnouncements;
 import org.ekstep.genieservices.commons.bean.UserInboxRequest;
 
 /**
@@ -38,9 +38,9 @@ public interface IAnnouncementService {
      * On failing, the response will return status as FALSE with the following error code
      *
      * @param userInboxRequest - {@link UserInboxRequest}
-     * @param {@link           GenieResponse<Void>}
+     * @return {@link GenieResponse<UserInboxAnnouncements>}
      */
-    GenieResponse<Void> userInbox(UserInboxRequest userInboxRequest);
+    GenieResponse<UserInboxAnnouncements> userInbox(UserInboxRequest userInboxRequest);
 
     /**
      * This api is used for received announcement
@@ -52,7 +52,7 @@ public interface IAnnouncementService {
      * On failing, the response will return status as FALSE with the following error code
      *
      * @param receivedAnnouncementRequest - {@link ReceivedAnnouncementRequest}
-     * @param {@link GenieResponse<Void>}
+     * @return {@link GenieResponse<Void>}
      */
     GenieResponse<Void> receivedAnnouncement(ReceivedAnnouncementRequest receivedAnnouncementRequest);
 
@@ -66,7 +66,7 @@ public interface IAnnouncementService {
      * On failing, the response will return status as FALSE with the following error code
      *
      * @param receivedAnnouncementRequest - {@link ReceivedAnnouncementRequest}
-     * @param {@link GenieResponse<Void>}
+     * @return {@link GenieResponse<Void>}
      */
     GenieResponse<Void> readAnnouncement(ReceivedAnnouncementRequest receivedAnnouncementRequest);
 

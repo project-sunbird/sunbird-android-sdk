@@ -7,6 +7,7 @@ import org.ekstep.genieservices.commons.bean.Announcement;
 import org.ekstep.genieservices.commons.bean.AnnouncementRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ReceivedAnnouncementRequest;
+import org.ekstep.genieservices.commons.bean.UserInboxAnnouncements;
 import org.ekstep.genieservices.commons.bean.UserInboxRequest;
 
 /**
@@ -42,10 +43,10 @@ public class AnnouncementService {
      * @param userInboxRequest - {@link UserInboxRequest}
      * @param responseHandler  - {@link IResponseHandler <Void>}
      */
-    public void userInbox(final UserInboxRequest userInboxRequest, IResponseHandler<Void> responseHandler) {
-        ThreadPool.getInstance().execute(new IPerformable<Void>() {
+    public void userInbox(final UserInboxRequest userInboxRequest, IResponseHandler<UserInboxAnnouncements> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<UserInboxAnnouncements>() {
             @Override
-            public GenieResponse<Void> perform() {
+            public GenieResponse<UserInboxAnnouncements> perform() {
                 return announcementService.userInbox(userInboxRequest);
             }
         }, responseHandler);

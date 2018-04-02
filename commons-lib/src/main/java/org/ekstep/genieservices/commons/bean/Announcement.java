@@ -16,6 +16,8 @@ public class Announcement {
     private List<Attachment> attachments;
     private String createdDate;
     private String status;
+    private boolean read;
+    private boolean received;
 
 
     public String getId() {
@@ -88,5 +90,21 @@ public class Announcement {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public boolean isRead() {
+        return read;
+    }
+
+    public void setRead(boolean read) {
+        this.read = read;
+    }
+
+    public boolean isReceived() {
+        return received;
+    }
+
+    public void setReceived(boolean received) {
+        this.received = received;
     }
 }

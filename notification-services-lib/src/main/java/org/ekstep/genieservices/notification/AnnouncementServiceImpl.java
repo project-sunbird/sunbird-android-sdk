@@ -13,6 +13,7 @@ import org.ekstep.genieservices.commons.bean.AnnouncementRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ReceivedAnnouncementRequest;
 import org.ekstep.genieservices.commons.bean.Session;
+import org.ekstep.genieservices.commons.bean.UserInboxAnnouncements;
 import org.ekstep.genieservices.commons.bean.UserInboxRequest;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.notification.network.GetAnnouncementAPI;
@@ -93,12 +94,12 @@ public class AnnouncementServiceImpl extends BaseService implements IAnnouncemen
     }
 
     @Override
-    public GenieResponse<Void> userInbox(UserInboxRequest userInboxRequest) {
+    public GenieResponse<UserInboxAnnouncements> userInbox(UserInboxRequest userInboxRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(userInboxRequest));
         String methodName = "userInbox@AnnouncementServiceImpl";
 
-        GenieResponse<Void> response = isValidAuthSession(methodName, params);
+        GenieResponse<UserInboxAnnouncements> response = isValidAuthSession(methodName, params);
         if (response != null) {
             return response;
         }
@@ -108,7 +109,12 @@ public class AnnouncementServiceImpl extends BaseService implements IAnnouncemen
         GenieResponse genieResponse = userInboxAPI.post();
 
         if (genieResponse.getStatus()) {
+            LinkedTreeMap map = GsonUtil.fromJson(genieResponse.getResult().toString(), LinkedTreeMap.class);
+            UserInboxAnnouncements userInboxAnnouncements = GsonUtil.fromJson(GsonUtil.toJson(map.get("result")),
+                    UserInboxAnnouncements.class);
+
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+            response.setResult(userInboxAnnouncements);
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         } else {
             response = GenieResponseBuilder.getErrorResponse(genieResponse.getError(), genieResponse.getMessage(), TAG);
