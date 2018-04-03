@@ -85,12 +85,12 @@ public class UserServiceImpl extends BaseService implements IUserService {
         GenieResponse<Profile> response;
         if (profile == null) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_PROFILE, ServiceConstants.ErrorMessage.INVALID_PROFILE, methodName, Profile.class);
-            logGEError(response, "createUserProfile");
+            logGEError(response, "create-user-profile");
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_CREATE_PROFILE);
             return response;
         } else if (!profile.isValid()) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.VALIDATION_ERROR, profile.getErrors().toString(), methodName, Profile.class);
-            logGEError(response, "createUserProfile");
+            logGEError(response, "create-user-profile");
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_CREATE_PROFILE);
             return response;
         } else {
@@ -213,14 +213,14 @@ public class UserServiceImpl extends BaseService implements IUserService {
         GenieResponse<Profile> response;
         if (profile == null || StringUtil.isNullOrEmpty(profile.getUid())) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROFILE_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_PROFILE, TAG, Profile.class);
-            logGEError(response, "updateUserProfile");
+            logGEError(response, "update-user-profile");
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_UPDATE_PROFILE);
             return response;
         }
 
         if (!profile.isValid()) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.VALIDATION_ERROR, profile.getErrors().toString(), TAG, Profile.class);
-            logGEError(response, "updateUserProfile");
+            logGEError(response, "update-user-profile");
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_UPDATE_PROFILE);
             return response;
         }
@@ -238,11 +238,10 @@ public class UserServiceImpl extends BaseService implements IUserService {
             return response;
         } else {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROFILE_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_PROFILE, TAG, Profile.class);
-            logGEError(response, "updateUserProfile");
+            logGEError(response, "update-user-profile");
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_UPDATE_PROFILE);
             return response;
         }
-
     }
 
     /**

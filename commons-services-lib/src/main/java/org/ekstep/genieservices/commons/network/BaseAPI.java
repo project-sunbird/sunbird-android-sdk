@@ -53,7 +53,6 @@ public abstract class BaseAPI {
         return fetchFromServer(PATCH, true);
     }
 
-
     private GenieResponse fetchFromServer(String requestType, boolean retryForAuthError) {
         if (!mAppContext.getConnectionInfo().isConnected()) {
             return getErrorResponse(NetworkConstants.CONNECTION_ERROR, NetworkConstants.CONNECTION_ERROR_MESSAGE);
@@ -68,11 +67,11 @@ public abstract class BaseAPI {
                     return fetchFromServer(requestType, false);
                 } else {
                     return getErrorResponse(NetworkConstants.SERVERAUTH_ERROR,
-                            NetworkConstants.SERVERAUTH_ERROR_MESSAGE + ": " + GsonUtil.toJson(apiResponse));
+                            NetworkConstants.SERVERAUTH_ERROR_MESSAGE + " " + GsonUtil.toJson(apiResponse));
                 }
             } else {
                 return getErrorResponse(NetworkConstants.SERVER_ERROR,
-                        NetworkConstants.SERVER_ERROR_MESSAGE + ": " + GsonUtil.toJson(apiResponse));
+                        NetworkConstants.SERVER_ERROR_MESSAGE + " " + GsonUtil.toJson(apiResponse));
             }
         } catch (IOException e) {
             Logger.e(TAG, e.getMessage());
