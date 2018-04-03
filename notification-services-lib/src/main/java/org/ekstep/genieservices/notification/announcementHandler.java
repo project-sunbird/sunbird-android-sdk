@@ -1,7 +1,7 @@
 package org.ekstep.genieservices.notification;
 
-import org.ekstep.genieservices.commons.bean.ReceivedAnnouncementRequest;
-import org.ekstep.genieservices.commons.bean.UserInboxRequest;
+import org.ekstep.genieservices.commons.bean.UpdateAnnouncementStateRequest;
+import org.ekstep.genieservices.commons.bean.AnnouncementListRequest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,17 +12,17 @@ import java.util.Map;
 
 public class announcementHandler {
 
-    public static Map<String, Object> getUserInboxRequestMap(UserInboxRequest userInboxRequest) {
+    public static Map<String, Object> getUserInboxRequestMap(AnnouncementListRequest announcementListRequest) {
         Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("limit", userInboxRequest.getLimit());
-        requestMap.put("offset", userInboxRequest.getOffset());
+        requestMap.put("limit", announcementListRequest.getLimit());
+        requestMap.put("offset", announcementListRequest.getOffset());
         return requestMap;
     }
 
-    public static Map<String, Object> getReceivedAnnouncementRequestMap(ReceivedAnnouncementRequest receivedAnnouncementRequest) {
+    public static Map<String, Object> getUpdateAnnouncementRequestMap(UpdateAnnouncementStateRequest updateAnnouncementStateRequest) {
         Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("announcementId", receivedAnnouncementRequest.getAnnouncementId());
-        requestMap.put("channel", receivedAnnouncementRequest.getChannel());
+        requestMap.put("announcementId", updateAnnouncementStateRequest.getAnnouncementId());
+        requestMap.put("channel", UpdateAnnouncementStateRequest.Constant.CHANNEL);
         return requestMap;
     }
 

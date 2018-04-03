@@ -1,32 +1,36 @@
 package org.ekstep.genieservices.commons.bean;
 
+import org.ekstep.genieservices.commons.bean.enums.AnnouncementStatus;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
 /**
  * @author indraja on 30/3/18.
  */
-public class ReceivedAnnouncementRequest {
+public class UpdateAnnouncementStateRequest {
 
     private String announcementId;
-    private String channel;
+    private AnnouncementStatus announcementStatus;
 
-    private ReceivedAnnouncementRequest(String announcementId, String channel) {
+    private UpdateAnnouncementStateRequest(String announcementId, AnnouncementStatus announcementStatus) {
         this.announcementId = announcementId;
-        this.channel = channel;
+        this.announcementStatus = announcementStatus;
     }
 
     public String getAnnouncementId() {
         return announcementId;
     }
 
-    public String getChannel() {
-        return channel;
+    public AnnouncementStatus getAnnouncementStatus() {
+        return announcementStatus;
+    }
+
+    public interface Constant {
+        String CHANNEL = "mobile";
     }
 
     public static class Builder {
-
         private String announcementId;
-        private String channel;
+        private AnnouncementStatus announcementStatus;
 
         public Builder forAnnouncement(String announcementId) {
             if (StringUtil.isNullOrEmpty(announcementId)) {
@@ -36,24 +40,17 @@ public class ReceivedAnnouncementRequest {
             return this;
         }
 
-        public Builder channel(String channel) {
-            if (StringUtil.isNullOrEmpty(channel)) {
-                throw new IllegalArgumentException("channel should not be null or empty.");
-            }
-            this.channel = channel;
+        public Builder announcementStatus(AnnouncementStatus announcementStatus) {
+            this.announcementStatus = announcementStatus;
             return this;
         }
 
-        public ReceivedAnnouncementRequest build() {
+        public UpdateAnnouncementStateRequest build() {
             if (StringUtil.isNullOrEmpty(announcementId)) {
                 throw new IllegalStateException("announcementId required.");
             }
 
-            if (StringUtil.isNullOrEmpty(channel)) {
-                throw new IllegalStateException("channel required.");
-            }
-
-            return new ReceivedAnnouncementRequest(announcementId, channel);
+            return new UpdateAnnouncementStateRequest(announcementId, announcementStatus);
         }
     }
 }

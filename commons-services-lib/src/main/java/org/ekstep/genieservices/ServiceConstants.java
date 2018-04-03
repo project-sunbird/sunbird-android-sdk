@@ -134,6 +134,9 @@ public interface ServiceConstants {
         //Framework
         String NO_CHANNEL_DETAILS_FOUND = "NO_CHANNEL_DETAILS_FOUND";
         String NO_FRAMEWORK_DETAILS_FOUND = "NO_FRAMEWORK_DETAILS_FOUND";
+
+        //Announcement
+        String UPDATE_ANNOUNCEMENT_FAILED = "UPDATE_ANNOUNCEMENT_FAILED";
     }
 
     interface ErrorMessage {
@@ -190,6 +193,7 @@ public interface ServiceConstants {
         //Framework
         String UNABLE_TO_FIND_CHANNEL_DETAILS = "Unable to find channel details";
         String UNABLE_TO_FIND_FRAMEWORK_DETAILS = "Unable to find framework details";
+        String UNABLE_TO_UPDATE_ANNOUNCEMENT = "Unable to update announcement";
     }
 
     interface SuccessMessage {

@@ -11,10 +11,11 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.Announcement;
 import org.ekstep.genieservices.commons.bean.AnnouncementRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ReceivedAnnouncementRequest;
+import org.ekstep.genieservices.commons.bean.UpdateAnnouncementStateRequest;
 import org.ekstep.genieservices.commons.bean.Session;
-import org.ekstep.genieservices.commons.bean.UserInboxAnnouncements;
-import org.ekstep.genieservices.commons.bean.UserInboxRequest;
+import org.ekstep.genieservices.commons.bean.AnnouncementList;
+import org.ekstep.genieservices.commons.bean.AnnouncementListRequest;
+import org.ekstep.genieservices.commons.bean.enums.AnnouncementStatus;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.notification.network.GetAnnouncementAPI;
 import org.ekstep.genieservices.notification.network.ReadAPI;
@@ -62,10 +63,10 @@ public class AnnouncementServiceImpl extends BaseService implements IAnnouncemen
     }
 
     @Override
-    public GenieResponse<Announcement> getAnnouncementById(AnnouncementRequest announcementRequest) {
+    public GenieResponse<Announcement> getAnnouncementDetails(AnnouncementRequest announcementRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(announcementRequest));
-        String methodName = "getAnnouncementById@AnnouncementServiceImpl";
+        String methodName = "getAnnouncementDetails@AnnouncementServiceImpl";
 
         GenieResponse<Announcement> response = isValidAuthSession(methodName, params);
         if (response != null) {
@@ -94,24 +95,24 @@ public class AnnouncementServiceImpl extends BaseService implements IAnnouncemen
     }
 
     @Override
-    public GenieResponse<UserInboxAnnouncements> userInbox(UserInboxRequest userInboxRequest) {
+    public GenieResponse<AnnouncementList> getAnnouncementList(AnnouncementListRequest announcementListRequest) {
         Map<String, Object> params = new HashMap<>();
-        params.put("request", GsonUtil.toJson(userInboxRequest));
-        String methodName = "userInbox@AnnouncementServiceImpl";
+        params.put("request", GsonUtil.toJson(announcementListRequest));
+        String methodName = "getAnnouncementList@AnnouncementServiceImpl";
 
-        GenieResponse<UserInboxAnnouncements> response = isValidAuthSession(methodName, params);
+        GenieResponse<AnnouncementList> response = isValidAuthSession(methodName, params);
         if (response != null) {
             return response;
         }
 
         UserInboxAPI userInboxAPI = new UserInboxAPI(mAppContext, getCustomHeaders(authSession.getSessionData()),
-                announcementHandler.getUserInboxRequestMap(userInboxRequest));
+                announcementHandler.getUserInboxRequestMap(announcementListRequest));
         GenieResponse genieResponse = userInboxAPI.post();
 
         if (genieResponse.getStatus()) {
             LinkedTreeMap map = GsonUtil.fromJson(genieResponse.getResult().toString(), LinkedTreeMap.class);
-            UserInboxAnnouncements userInboxAnnouncements = GsonUtil.fromJson(GsonUtil.toJson(map.get("result")),
-                    UserInboxAnnouncements.class);
+            AnnouncementList userInboxAnnouncements = GsonUtil.fromJson(GsonUtil.toJson(map.get("result")),
+                    AnnouncementList.class);
 
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(userInboxAnnouncements);
@@ -124,51 +125,36 @@ public class AnnouncementServiceImpl extends BaseService implements IAnnouncemen
     }
 
     @Override
-    public GenieResponse<Void> receivedAnnouncement(ReceivedAnnouncementRequest receivedAnnouncementRequest) {
+    public GenieResponse<Void> updateAnnouncementState(UpdateAnnouncementStateRequest updateAnnouncementStateRequest) {
         Map<String, Object> params = new HashMap<>();
-        params.put("request", GsonUtil.toJson(receivedAnnouncementRequest));
-        String methodName = "receivedAnnouncement@AnnouncementServiceImpl";
+        params.put("request", GsonUtil.toJson(updateAnnouncementStateRequest));
+        String methodName = "updateAnnouncementState@AnnouncementServiceImpl";
 
         GenieResponse<Void> response = isValidAuthSession(methodName, params);
         if (response != null) {
             return response;
         }
 
-        ReceivedAPI receivedAPI = new ReceivedAPI(mAppContext, getCustomHeaders(authSession.getSessionData()),
-                announcementHandler.getReceivedAnnouncementRequestMap(receivedAnnouncementRequest));
-        GenieResponse genieResponse = receivedAPI.post();
+        AnnouncementStatus status = updateAnnouncementStateRequest.getAnnouncementStatus();
+        GenieResponse genieResponse = null;
+        if (status.getValue().equalsIgnoreCase(AnnouncementStatus.RECEIVED.getValue())) {
+            ReceivedAPI receivedAPI = new ReceivedAPI(mAppContext, getCustomHeaders(authSession.getSessionData()),
+                    announcementHandler.getUpdateAnnouncementRequestMap(updateAnnouncementStateRequest));
+            genieResponse = receivedAPI.post();
+        } else if (status.getValue().equalsIgnoreCase(AnnouncementStatus.READ.getValue())) {
+            ReadAPI readAPI = new ReadAPI(mAppContext, getCustomHeaders(authSession.getSessionData()),
+                    announcementHandler.getUpdateAnnouncementRequestMap(updateAnnouncementStateRequest));
+            genieResponse = readAPI.post();
+        }
 
-        if (genieResponse.getStatus()) {
+        if (genieResponse != null && genieResponse.getStatus()) {
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         } else {
-            response = GenieResponseBuilder.getErrorResponse(genieResponse.getError(), genieResponse.getMessage(), TAG);
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, response.getMessage());
-        }
-        return response;
-    }
-
-    @Override
-    public GenieResponse<Void> readAnnouncement(ReceivedAnnouncementRequest receivedAnnouncementRequest) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("request", GsonUtil.toJson(receivedAnnouncementRequest));
-        String methodName = "readAnnouncement@AnnouncementServiceImpl";
-
-        GenieResponse<Void> response = isValidAuthSession(methodName, params);
-        if (response != null) {
-            return response;
-        }
-
-        ReadAPI readAPI = new ReadAPI(mAppContext, getCustomHeaders(authSession.getSessionData()),
-                announcementHandler.getReceivedAnnouncementRequestMap(receivedAnnouncementRequest));
-        GenieResponse genieResponse = readAPI.post();
-
-        if (genieResponse.getStatus()) {
-            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
-        } else {
-            response = GenieResponseBuilder.getErrorResponse(genieResponse.getError(), genieResponse.getMessage(), TAG);
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, response.getMessage());
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.UPDATE_ANNOUNCEMENT_FAILED,
+                    ServiceConstants.ErrorMessage.UNABLE_TO_UPDATE_ANNOUNCEMENT + "-" + status.getValue(), TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params,
+                    ServiceConstants.ErrorMessage.UNABLE_TO_UPDATE_ANNOUNCEMENT + "-" + status.getValue());
         }
         return response;
     }

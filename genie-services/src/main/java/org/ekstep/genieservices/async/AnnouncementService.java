@@ -6,9 +6,9 @@ import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.Announcement;
 import org.ekstep.genieservices.commons.bean.AnnouncementRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.ReceivedAnnouncementRequest;
-import org.ekstep.genieservices.commons.bean.UserInboxAnnouncements;
-import org.ekstep.genieservices.commons.bean.UserInboxRequest;
+import org.ekstep.genieservices.commons.bean.UpdateAnnouncementStateRequest;
+import org.ekstep.genieservices.commons.bean.AnnouncementList;
+import org.ekstep.genieservices.commons.bean.AnnouncementListRequest;
 
 /**
  * This class provides APIs for performing {@link AnnouncementService} related operations on a separate thread.
@@ -27,11 +27,11 @@ public class AnnouncementService {
      * @param announcementRequest - {@link AnnouncementRequest}
      * @param responseHandler     - {@link IResponseHandler <EnrolledCoursesResponse>}
      */
-    public void getAnnouncementById(final AnnouncementRequest announcementRequest, IResponseHandler<Announcement> responseHandler) {
+    public void getAnnouncementDetails(final AnnouncementRequest announcementRequest, IResponseHandler<Announcement> responseHandler) {
         ThreadPool.getInstance().execute(new IPerformable<Announcement>() {
             @Override
             public GenieResponse<Announcement> perform() {
-                return announcementService.getAnnouncementById(announcementRequest);
+                return announcementService.getAnnouncementDetails(announcementRequest);
             }
         }, responseHandler);
     }
@@ -40,14 +40,14 @@ public class AnnouncementService {
     /**
      * This api is used to get the user inbox
      *
-     * @param userInboxRequest - {@link UserInboxRequest}
+     * @param userInboxRequest - {@link AnnouncementListRequest}
      * @param responseHandler  - {@link IResponseHandler <Void>}
      */
-    public void userInbox(final UserInboxRequest userInboxRequest, IResponseHandler<UserInboxAnnouncements> responseHandler) {
-        ThreadPool.getInstance().execute(new IPerformable<UserInboxAnnouncements>() {
+    public void getAnnouncementList(final AnnouncementListRequest userInboxRequest, IResponseHandler<AnnouncementList> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<AnnouncementList>() {
             @Override
-            public GenieResponse<UserInboxAnnouncements> perform() {
-                return announcementService.userInbox(userInboxRequest);
+            public GenieResponse<AnnouncementList> perform() {
+                return announcementService.getAnnouncementList(userInboxRequest);
             }
         }, responseHandler);
     }
@@ -55,30 +55,14 @@ public class AnnouncementService {
     /**
      * This api is used for received announcement
      *
-     * @param receivedAnnouncementRequest - {@link ReceivedAnnouncementRequest}
-     * @param {@link                      GenieResponse<Void>}
+     * @param updateAnnouncementStateRequest - {@link UpdateAnnouncementStateRequest}
+     * @param {@link                         GenieResponse<Void>}
      */
-    public void receivedAnnouncement(final ReceivedAnnouncementRequest receivedAnnouncementRequest, IResponseHandler<Void> responseHandler) {
+    public void receivedAnnouncement(final UpdateAnnouncementStateRequest updateAnnouncementStateRequest, IResponseHandler<Void> responseHandler) {
         ThreadPool.getInstance().execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
-                return announcementService.receivedAnnouncement(receivedAnnouncementRequest);
-            }
-        }, responseHandler);
-    }
-
-
-    /**
-     * This api is used to read announcement
-     *
-     * @param receivedAnnouncementRequest - {@link ReceivedAnnouncementRequest}
-     * @param {@link                      GenieResponse<Void>}
-     */
-    public void readAnnouncement(final ReceivedAnnouncementRequest receivedAnnouncementRequest, IResponseHandler<Void> responseHandler) {
-        ThreadPool.getInstance().execute(new IPerformable<Void>() {
-            @Override
-            public GenieResponse<Void> perform() {
-                return announcementService.readAnnouncement(receivedAnnouncementRequest);
+                return announcementService.updateAnnouncementState(updateAnnouncementStateRequest);
             }
         }, responseHandler);
     }

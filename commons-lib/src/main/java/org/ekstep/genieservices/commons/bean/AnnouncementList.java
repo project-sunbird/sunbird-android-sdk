@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * @author indraja on 02/04/18.
  */
-public class UserInboxAnnouncements {
+public class AnnouncementList {
     private int count;
     private List<Announcement> announcements;
 

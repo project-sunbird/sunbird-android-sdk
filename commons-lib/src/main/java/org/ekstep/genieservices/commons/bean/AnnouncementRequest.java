@@ -17,7 +17,7 @@ public class AnnouncementRequest {
         return announcementId;
     }
 
-        public static class Builder {
+    public static class Builder {
 
         private String announcementId;
 
