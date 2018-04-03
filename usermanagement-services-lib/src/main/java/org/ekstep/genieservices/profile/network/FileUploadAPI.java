@@ -5,6 +5,7 @@ import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.network.BaseAPI;
 import org.ekstep.genieservices.commons.network.FormRequestBody;
 import org.ekstep.genieservices.commons.network.IRequestBody;
+import org.ekstep.genieservices.commons.network.MultipartFormRequestBody;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 import java.util.HashMap;
@@ -21,11 +22,11 @@ public class FileUploadAPI extends BaseAPI {
 
     private static final String ENDPOINT = "media/upload";
 
-    private Map<String, String> requestMap;
+    private Map<String, Object> requestMap;
     private Map<String, String> headers;
 
 
-    public FileUploadAPI(AppContext appContext, Map<String, String> customHeaders, Map<String, String> requestMap) {
+    public FileUploadAPI(AppContext appContext, Map<String, String> customHeaders, Map<String, Object> requestMap) {
         super(appContext, String.format(Locale.US, "%s/%s",
                 appContext.getParams().getString(IParams.Key.CONTENT_BASE_URL),
                 ENDPOINT), TAG);
@@ -46,7 +47,7 @@ public class FileUploadAPI extends BaseAPI {
     }
 
     protected IRequestBody getRequestBody() {
-        IRequestBody requestBody = new FormRequestBody();
+        IRequestBody<Map<String, Object>> requestBody = new MultipartFormRequestBody();
         requestBody.setBody(requestMap);
         return requestBody;
     }

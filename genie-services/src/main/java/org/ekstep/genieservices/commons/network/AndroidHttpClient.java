@@ -1,11 +1,13 @@
 package org.ekstep.genieservices.commons.network;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
 import okhttp3.FormBody;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -84,6 +86,22 @@ public class AndroidHttpClient implements IHttpClient {
                 String key = iterator.next();
                 String value = formData.get(key);
                 builder.add(key, value);
+            }
+            return builder.build();
+        } else if (requestBody.getContentType().equals(IRequestBody.MIME_TYPE_FORM_MULTIPART)) {
+            Map<String, Object> formData = (Map<String, Object>) requestBody.getBody();
+            MultipartBody.Builder builder = new MultipartBody.Builder();
+            builder.setType(MultipartBody.FORM);
+            Iterator<String> iterator = formData.keySet().iterator();
+            while (iterator.hasNext()) {
+                String key = iterator.next();
+                Object value = formData.get(key);
+                if (value instanceof String) {
+                    builder.addFormDataPart(key, (String) value);
+                } else if (value instanceof File) {
+                    File file = (File) value;
+                    builder.addFormDataPart(key, file.getName(), RequestBody.create(MediaType.parse("application/octet-stream"), file));
+                }
             }
             return builder.build();
         }

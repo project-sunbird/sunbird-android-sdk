@@ -164,9 +164,9 @@ public class UserProfileHandler {
         return fileUploadAPI.post();
     }
 
-    private static Map<String, String> getFileUploadParameters(UploadFileRequest uploadFileRequest) {
-        Map<String, String> requestMap = new HashMap<>();
-        requestMap.put("file", uploadFileRequest.getFilePath());
+    private static Map<String, Object> getFileUploadParameters(UploadFileRequest uploadFileRequest) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("file", uploadFileRequest.getFile());
         requestMap.put("container", uploadFileRequest.getUserId());
 
         return requestMap;

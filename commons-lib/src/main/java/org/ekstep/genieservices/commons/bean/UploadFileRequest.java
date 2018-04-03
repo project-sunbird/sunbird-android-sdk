@@ -2,6 +2,8 @@ package org.ekstep.genieservices.commons.bean;
 
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
+import java.io.File;
+
 /**
  * Created on 7/3/18.
  * shriharsh
@@ -11,14 +13,18 @@ public class UploadFileRequest {
 
     private String filePath;
     private String userId;
+    private File file;
 
     public UploadFileRequest(String filePath, String userId) {
         this.filePath = filePath;
         this.userId = "user/" + userId;
     }
 
-    public String getFilePath() {
-        return filePath;
+    public File getFile() {
+        if (file == null) {
+            file = new File(this.filePath);
+        }
+        return file;
     }
 
     public String getUserId() {
