@@ -1,7 +1,7 @@
 package org.ekstep.genieservices;
 
 import org.ekstep.genieservices.commons.bean.Announcement;
-import org.ekstep.genieservices.commons.bean.AnnouncementRequest;
+import org.ekstep.genieservices.commons.bean.AnnouncementDetailsRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.UpdateAnnouncementStateRequest;
 import org.ekstep.genieservices.commons.bean.AnnouncementList;
@@ -23,10 +23,10 @@ public interface IAnnouncementService {
      * <p>
      * On failing, the response will return status as FALSE with the following error code
      *
-     * @param announcementRequest - {@link AnnouncementRequest}
+     * @param announcementRequest - {@link AnnouncementDetailsRequest}
      * @return {@link GenieResponse<Announcement>}
      */
-    GenieResponse<Announcement> getAnnouncementDetails(AnnouncementRequest announcementRequest);
+    GenieResponse<Announcement> getAnnouncementDetails(AnnouncementDetailsRequest announcementRequest);
 
     /**
      * This api is used to get the user inbox

@@ -4,7 +4,7 @@ import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.IAnnouncementService;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.Announcement;
-import org.ekstep.genieservices.commons.bean.AnnouncementRequest;
+import org.ekstep.genieservices.commons.bean.AnnouncementDetailsRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.UpdateAnnouncementStateRequest;
 import org.ekstep.genieservices.commons.bean.AnnouncementList;
@@ -24,10 +24,10 @@ public class AnnouncementService {
     /**
      * This api is used to get the announcement by Id
      *
-     * @param announcementRequest - {@link AnnouncementRequest}
+     * @param announcementRequest - {@link AnnouncementDetailsRequest}
      * @param responseHandler     - {@link IResponseHandler <EnrolledCoursesResponse>}
      */
-    public void getAnnouncementDetails(final AnnouncementRequest announcementRequest, IResponseHandler<Announcement> responseHandler) {
+    public void getAnnouncementDetails(final AnnouncementDetailsRequest announcementRequest, IResponseHandler<Announcement> responseHandler) {
         ThreadPool.getInstance().execute(new IPerformable<Announcement>() {
             @Override
             public GenieResponse<Announcement> perform() {

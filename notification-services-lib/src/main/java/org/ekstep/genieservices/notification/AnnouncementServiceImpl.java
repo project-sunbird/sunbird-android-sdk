@@ -9,7 +9,7 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.Announcement;
-import org.ekstep.genieservices.commons.bean.AnnouncementRequest;
+import org.ekstep.genieservices.commons.bean.AnnouncementDetailsRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.UpdateAnnouncementStateRequest;
 import org.ekstep.genieservices.commons.bean.Session;
@@ -63,7 +63,7 @@ public class AnnouncementServiceImpl extends BaseService implements IAnnouncemen
     }
 
     @Override
-    public GenieResponse<Announcement> getAnnouncementDetails(AnnouncementRequest announcementRequest) {
+    public GenieResponse<Announcement> getAnnouncementDetails(AnnouncementDetailsRequest announcementRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(announcementRequest));
         String methodName = "getAnnouncementDetails@AnnouncementServiceImpl";

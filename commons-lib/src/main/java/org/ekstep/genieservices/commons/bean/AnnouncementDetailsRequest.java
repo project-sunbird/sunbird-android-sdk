@@ -5,11 +5,11 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
 /**
  * @author indraja on 29/3/18.
  */
-public class AnnouncementRequest {
+public class AnnouncementDetailsRequest {
 
     private String announcementId;
 
-    private AnnouncementRequest(String announcementId) {
+    private AnnouncementDetailsRequest(String announcementId) {
         this.announcementId = announcementId;
     }
 
@@ -29,12 +29,12 @@ public class AnnouncementRequest {
             return this;
         }
 
-        public AnnouncementRequest build() {
+        public AnnouncementDetailsRequest build() {
             if (StringUtil.isNullOrEmpty(announcementId)) {
                 throw new IllegalStateException("announcementId required.");
             }
 
-            return new AnnouncementRequest(announcementId);
+            return new AnnouncementDetailsRequest(announcementId);
         }
     }
 }
