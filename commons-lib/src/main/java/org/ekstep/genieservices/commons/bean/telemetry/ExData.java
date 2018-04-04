@@ -35,6 +35,7 @@ public class ExData extends Telemetry {
     public static class Builder {
         private String type;
         private String data;
+        private String env;
 
         /**
          * Free flowing text. For ex: partnerdata, xapi etc
@@ -60,6 +61,14 @@ public class ExData extends Telemetry {
             return this;
         }
 
+        /**
+         * Unique environment where the event has occured.
+         */
+        public Builder environment(String env) {
+            this.env = env;
+            return this;
+        }
+
         public ExData build() {
             if (StringUtil.isNullOrEmpty(type)) {
                 throw new IllegalStateException("type is required.");
@@ -69,7 +78,11 @@ public class ExData extends Telemetry {
                 throw new IllegalStateException("data is required.");
             }
 
-            return new ExData(type, data);
+            ExData exData = new ExData(type, data);
+            if (!StringUtil.isNullOrEmpty(env)) {
+                exData.setEnvironment(env);
+            }
+            return exData;
         }
     }
 }

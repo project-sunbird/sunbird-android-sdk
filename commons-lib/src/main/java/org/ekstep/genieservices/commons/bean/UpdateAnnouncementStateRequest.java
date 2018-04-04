@@ -40,14 +40,21 @@ public class UpdateAnnouncementStateRequest {
             return this;
         }
 
-        public Builder announcementStatus(AnnouncementStatus announcementStatus) {
-            this.announcementStatus = announcementStatus;
+        public Builder status(AnnouncementStatus status) {
+            if (status == null) {
+                throw new IllegalArgumentException("announcement status should not be null.");
+            }
+            this.announcementStatus = status;
             return this;
         }
 
         public UpdateAnnouncementStateRequest build() {
             if (StringUtil.isNullOrEmpty(announcementId)) {
                 throw new IllegalStateException("announcementId required.");
+            }
+
+            if (announcementStatus == null) {
+                throw new IllegalStateException("announcement status required.");
             }
 
             return new UpdateAnnouncementStateRequest(announcementId, announcementStatus);
