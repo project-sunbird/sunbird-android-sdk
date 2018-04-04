@@ -40,14 +40,14 @@ public class AnnouncementService {
     /**
      * This api is used to get the user inbox
      *
-     * @param userInboxRequest - {@link AnnouncementListRequest}
+     * @param announcementListRequest - {@link AnnouncementListRequest}
      * @param responseHandler  - {@link IResponseHandler <Void>}
      */
-    public void getAnnouncementList(final AnnouncementListRequest userInboxRequest, IResponseHandler<AnnouncementList> responseHandler) {
+    public void getAnnouncementList(final AnnouncementListRequest announcementListRequest, IResponseHandler<AnnouncementList> responseHandler) {
         ThreadPool.getInstance().execute(new IPerformable<AnnouncementList>() {
             @Override
             public GenieResponse<AnnouncementList> perform() {
-                return announcementService.getAnnouncementList(userInboxRequest);
+                return announcementService.getAnnouncementList(announcementListRequest);
             }
         }, responseHandler);
     }
