@@ -8,7 +8,6 @@ import org.ekstep.genieservices.IPageService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
-import org.ekstep.genieservices.commons.bean.EnrolledCoursesResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.PageAssemble;
 import org.ekstep.genieservices.commons.bean.PageAssembleCriteria;
@@ -39,23 +38,34 @@ public class PageServiceImpl extends BaseService implements IPageService {
         this.authSession = authSession;
     }
 
+    private <T> GenieResponse<T> isValidAuthSession(String methodName, Map<String, Object> params) {
+        if (authSession == null || authSession.getSessionData() == null) {
+            GenieResponse<T> response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.AUTH_SESSION,
+                    ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN, TAG);
+
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.USER_NOT_SIGN_IN);
+            return response;
+        }
+
+        return null;
+    }
+
     @Override
     public GenieResponse<PageAssemble> getPageAssemble(PageAssembleCriteria pageAssembleCriteria) {
-
-        GenieResponse<PageAssemble> response = null;
-
-        String requestJson = GsonUtil.toJson(pageAssembleCriteria);
-
         Map<String, Object> params = new HashMap<>();
-        params.put("request", requestJson);
+        params.put("request", GsonUtil.toJson(pageAssembleCriteria));
         String methodName = "getPageAssemble@PageServiceImpl";
+
+        GenieResponse<PageAssemble> response = isValidAuthSession(methodName, params);
+        if (response != null) {
+            return response;
+        }
 
         String key = getKeyForDB(pageAssembleCriteria);
 
         NoSqlModel pageData = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
 
         if (pageData == null) {
-
             Map<String, String> headers = new HashMap<>();
             headers.put("X-Authenticated-User-Token", authSession.getSessionData().getAccessToken());
 
@@ -74,12 +84,10 @@ public class PageServiceImpl extends BaseService implements IPageService {
                 TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, pageAssembleResponse.getMessage());
                 return response;
             }
-        } else {
         }
 
         LinkedTreeMap map = GsonUtil.fromJson(pageData.getValue(), LinkedTreeMap.class);
         LinkedTreeMap responseMap = (LinkedTreeMap) ((LinkedTreeMap) map.get("result")).get("response");
-
 
         PageAssemble pageAssemble = new PageAssemble();
         pageAssemble.setId((String) responseMap.get("id"));
