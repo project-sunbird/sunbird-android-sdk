@@ -88,7 +88,7 @@ public class AnnouncementServiceImpl extends BaseService implements IAnnouncemen
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         } else {
             response = GenieResponseBuilder.getErrorResponse(genieResponse.getError(), genieResponse.getMessage(), TAG);
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, response.getMessage());
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, genieResponse.getMessage());
         }
 
         return response;
@@ -119,7 +119,7 @@ public class AnnouncementServiceImpl extends BaseService implements IAnnouncemen
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         } else {
             response = GenieResponseBuilder.getErrorResponse(genieResponse.getError(), genieResponse.getMessage(), TAG);
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, response.getMessage());
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, genieResponse.getMessage());
         }
         return response;
     }
