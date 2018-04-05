@@ -14,16 +14,16 @@ import java.util.Map;
  *
  * @author IndrajaMachani
  */
-public class UserInboxAPI extends BaseAPI {
+public class ReceivedAnnouncementAPI extends BaseAPI {
 
-    private static final String TAG = UserInboxAPI.class.getSimpleName();
+    private static final String TAG = ReceivedAnnouncementAPI.class.getSimpleName();
 
-    private static final CharSequence SERVICE_ENDPOINTS = "user/inbox";
+    private static final CharSequence SERVICE_ENDPOINTS = "received";
 
     private Map<String, String> headers;
     private Map<String, Object> requestMap;
 
-    public UserInboxAPI(AppContext appContext, Map<String, String> headers, Map<String, Object> requestMap) {
+    public ReceivedAnnouncementAPI(AppContext appContext, Map<String, String> headers, Map<String, Object> requestMap) {
         super(appContext,
                 String.format(Locale.US, "%s/%s",
                         appContext.getParams().getString(IParams.Key.ANNOUNCEMENT_BASE_URL), SERVICE_ENDPOINTS),

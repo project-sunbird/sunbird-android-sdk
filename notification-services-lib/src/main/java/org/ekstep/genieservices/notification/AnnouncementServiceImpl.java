@@ -17,10 +17,10 @@ import org.ekstep.genieservices.commons.bean.AnnouncementList;
 import org.ekstep.genieservices.commons.bean.AnnouncementListRequest;
 import org.ekstep.genieservices.commons.bean.enums.AnnouncementStatus;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
-import org.ekstep.genieservices.notification.network.GetAnnouncementAPI;
-import org.ekstep.genieservices.notification.network.ReadAPI;
-import org.ekstep.genieservices.notification.network.ReceivedAPI;
-import org.ekstep.genieservices.notification.network.UserInboxAPI;
+import org.ekstep.genieservices.notification.network.AnnouncementDetailsAPI;
+import org.ekstep.genieservices.notification.network.ReadAnnouncementAPI;
+import org.ekstep.genieservices.notification.network.ReceivedAnnouncementAPI;
+import org.ekstep.genieservices.notification.network.AnnouncementListAPI;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.util.HashMap;
@@ -73,7 +73,7 @@ public class AnnouncementServiceImpl extends BaseService implements IAnnouncemen
             return response;
         }
 
-        GetAnnouncementAPI getAnnouncementAPI = new GetAnnouncementAPI(mAppContext, getCustomHeaders(authSession.getSessionData()),
+        AnnouncementDetailsAPI getAnnouncementAPI = new AnnouncementDetailsAPI(mAppContext, getCustomHeaders(authSession.getSessionData()),
                 announcementRequest.getAnnouncementId());
         GenieResponse genieResponse = getAnnouncementAPI.get();
 
@@ -105,9 +105,9 @@ public class AnnouncementServiceImpl extends BaseService implements IAnnouncemen
             return response;
         }
 
-        UserInboxAPI userInboxAPI = new UserInboxAPI(mAppContext, getCustomHeaders(authSession.getSessionData()),
-                announcementHandler.getUserInboxRequestMap(announcementListRequest));
-        GenieResponse genieResponse = userInboxAPI.post();
+        AnnouncementListAPI announcementListAPI = new AnnouncementListAPI(mAppContext, getCustomHeaders(authSession.getSessionData()),
+                AnnouncementHandler.getUserInboxRequestMap(announcementListRequest));
+        GenieResponse genieResponse = announcementListAPI.post();
 
         if (genieResponse.getStatus()) {
             LinkedTreeMap map = GsonUtil.fromJson(genieResponse.getResult().toString(), LinkedTreeMap.class);
@@ -138,23 +138,23 @@ public class AnnouncementServiceImpl extends BaseService implements IAnnouncemen
         AnnouncementStatus status = updateAnnouncementStateRequest.getAnnouncementStatus();
         GenieResponse genieResponse = null;
         if (status.getValue().equalsIgnoreCase(AnnouncementStatus.RECEIVED.getValue())) {
-            ReceivedAPI receivedAPI = new ReceivedAPI(mAppContext, getCustomHeaders(authSession.getSessionData()),
-                    announcementHandler.getUpdateAnnouncementRequestMap(updateAnnouncementStateRequest));
-            genieResponse = receivedAPI.post();
+            ReceivedAnnouncementAPI receivedAnnouncementAPI = new ReceivedAnnouncementAPI(mAppContext, getCustomHeaders(authSession.getSessionData()),
+                    AnnouncementHandler.getUpdateAnnouncementRequestMap(updateAnnouncementStateRequest));
+            genieResponse = receivedAnnouncementAPI.post();
         } else if (status.getValue().equalsIgnoreCase(AnnouncementStatus.READ.getValue())) {
-            ReadAPI readAPI = new ReadAPI(mAppContext, getCustomHeaders(authSession.getSessionData()),
-                    announcementHandler.getUpdateAnnouncementRequestMap(updateAnnouncementStateRequest));
-            genieResponse = readAPI.post();
+            ReadAnnouncementAPI readAnnouncementAPI = new ReadAnnouncementAPI(mAppContext, getCustomHeaders(authSession.getSessionData()),
+                    AnnouncementHandler.getUpdateAnnouncementRequestMap(updateAnnouncementStateRequest));
+            genieResponse = readAnnouncementAPI.post();
         }
 
-        if (genieResponse != null && genieResponse.getStatus()) {
+        if (genieResponse.getStatus()) {
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         } else {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.UPDATE_ANNOUNCEMENT_FAILED,
-                    ServiceConstants.ErrorMessage.UNABLE_TO_UPDATE_ANNOUNCEMENT + "-" + status.getValue(), TAG);
+            response = GenieResponseBuilder.getErrorResponse(genieResponse.getError(),
+                    genieResponse.getMessage(), TAG);
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params,
-                    ServiceConstants.ErrorMessage.UNABLE_TO_UPDATE_ANNOUNCEMENT + "-" + status.getValue());
+                    genieResponse.getMessage());
         }
         return response;
     }

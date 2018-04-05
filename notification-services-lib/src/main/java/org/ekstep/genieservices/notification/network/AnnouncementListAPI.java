@@ -14,16 +14,16 @@ import java.util.Map;
  *
  * @author IndrajaMachani
  */
-public class ReadAPI extends BaseAPI {
+public class AnnouncementListAPI extends BaseAPI {
 
-    private static final String TAG = ReadAPI.class.getSimpleName();
+    private static final String TAG = AnnouncementListAPI.class.getSimpleName();
 
-    private static final CharSequence SERVICE_ENDPOINTS = "read";
+    private static final CharSequence SERVICE_ENDPOINTS = "user/inbox";
 
     private Map<String, String> headers;
     private Map<String, Object> requestMap;
 
-    public ReadAPI(AppContext appContext, Map<String, String> headers, Map<String, Object> requestMap) {
+    public AnnouncementListAPI(AppContext appContext, Map<String, String> headers, Map<String, Object> requestMap) {
         super(appContext,
                 String.format(Locale.US, "%s/%s",
                         appContext.getParams().getString(IParams.Key.ANNOUNCEMENT_BASE_URL), SERVICE_ENDPOINTS),

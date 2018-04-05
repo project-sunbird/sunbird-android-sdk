@@ -10,7 +10,7 @@ import java.util.Map;
  * Created by indraja on 30/3/18.
  */
 
-public class announcementHandler {
+public class AnnouncementHandler {
 
     public static Map<String, Object> getUserInboxRequestMap(AnnouncementListRequest announcementListRequest) {
         Map<String, Object> requestMap = new HashMap<>();

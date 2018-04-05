@@ -12,13 +12,13 @@ import java.util.Map;
  *
  * @author IndrajaMachani
  */
-public class GetAnnouncementAPI extends BaseAPI {
+public class AnnouncementDetailsAPI extends BaseAPI {
 
-    private static final String TAG = GetAnnouncementAPI.class.getSimpleName();
+    private static final String TAG = AnnouncementDetailsAPI.class.getSimpleName();
     private static final CharSequence SERVICE_ENDPOINTS = "get";
     private Map<String, String> headers;
 
-    public GetAnnouncementAPI(AppContext appContext, Map<String, String> headers, String announcementId) {
+    public AnnouncementDetailsAPI(AppContext appContext, Map<String, String> headers, String announcementId) {
         super(appContext,
                 String.format(Locale.US, "%s/%s/%s",
                         appContext.getParams().getString(IParams.Key.ANNOUNCEMENT_BASE_URL),
