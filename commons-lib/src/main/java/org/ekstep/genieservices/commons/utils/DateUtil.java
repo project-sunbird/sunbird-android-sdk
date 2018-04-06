@@ -84,6 +84,9 @@ public class DateUtil {
         LocalDate date = parse(dateToCompare, DATE_FORMAT).toLocalDate();
         LocalDate startDateTime = (startDate == null) ? date : parse(startDate, DATE_FORMAT).toLocalDate();
         LocalDate endDateTime = (endDate == null) ? date : parse(endDate, DATE_FORMAT).toLocalDate();
+        if (startDateTime.compareTo(LocalDate.now()) == 0 || endDateTime.compareTo(LocalDate.now()) == 0) {
+            return true;
+        }
         return date.isAfter(startDateTime) && date.isBefore(endDateTime);
     }
 

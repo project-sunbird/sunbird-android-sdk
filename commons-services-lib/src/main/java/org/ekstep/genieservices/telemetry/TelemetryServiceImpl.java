@@ -283,21 +283,21 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
     private void patchProgramTagsV3(List<String> tags) {
         Set<String> activeProgramTags = TelemetryTagCache.activeTags(mAppContext);
         List<String> tagList = new ArrayList<>();
-        tagList.addAll(activeProgramTags);
+        tagList.addAll(activeProgramTags != null ? activeProgramTags : new ArrayList<String>());
         tags.addAll(tagList);
     }
 
     private void patchProgramTags(Map<String, Object> tags) {
         Set<String> activeProgramTags = TelemetryTagCache.activeTags(mAppContext);
         List<String> tagList = new ArrayList<>();
-        tagList.addAll(activeProgramTags);
+        tagList.addAll(activeProgramTags != null ? activeProgramTags : new ArrayList<String>());
         tags.put("app", tagList);
     }
 
     private void patchProgramTagsV1(Map<String, Object> event) {
         Set<String> activeProgramTags = TelemetryTagCache.activeTags(mAppContext);
         List<String> tagList = new ArrayList<>();
-        tagList.addAll(activeProgramTags);
+        tagList.addAll(activeProgramTags != null ? activeProgramTags : new ArrayList<String>());
         addTagIfMissing(event, "genie", tagList);
     }
 
