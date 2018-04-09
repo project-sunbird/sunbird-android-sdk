@@ -3,7 +3,8 @@ package org.ekstep.genieservices.commons.bean;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
 /**
- * This class accepts contentListingId, subject, age, grade, medium, board, audience array, channel array and device id while building the criteria for content listing request.
+ * This class accepts contentListingId, subject, age, grade, medium, board, audience array,
+ * channel array and device id while building the criteria for content listing request.
  */
 public class ContentListingCriteria {
 
@@ -19,11 +20,12 @@ public class ContentListingCriteria {
     private String[] audience;
     private String[] channel;
     private String[] pragma;
+    private String[] exclPragma;
     private String[] facets;
 
     private ContentListingCriteria(String contentListingId, String uid, String language, String subject,
                                    int age, int grade, String medium, String board, String did,
-                                   String[] audience, String[] channel, String[] pragma, String[] facets) {
+                                   String[] audience, String[] channel, String[] pragma, String[] exclPragma, String[] facets) {
         this.contentListingId = contentListingId;
         this.uid = uid;
         this.language = language;
@@ -36,6 +38,7 @@ public class ContentListingCriteria {
         this.audience = audience;
         this.channel = channel;
         this.pragma = pragma;
+        this.exclPragma = exclPragma;
         this.facets = facets;
     }
 
@@ -87,6 +90,10 @@ public class ContentListingCriteria {
         return pragma;
     }
 
+    public String[] getExclPragma() {
+        return exclPragma;
+    }
+
     public String[] getFacets() {
         return facets;
     }
@@ -104,6 +111,7 @@ public class ContentListingCriteria {
         private String[] audience;
         private String[] channel;
         private String[] pragma;
+        private String[] exclPragma;
         private String[] facets;
 
         /**
@@ -208,6 +216,14 @@ public class ContentListingCriteria {
         }
 
         /**
+         * Array of pragma which needs to exclude from search result. i.e. "external", "ads".
+         */
+        public Builder excludePragma(String[] pragma) {
+            this.exclPragma = pragma;
+            return this;
+        }
+
+        /**
          * Array of facets. i.e. "contentType", "domain", "ageGroup", "language", "gradeLevel"
          */
         public Builder facets(String[] facets) {
@@ -224,7 +240,8 @@ public class ContentListingCriteria {
                 this.facets = new String[]{"contentType", "domain", "ageGroup", "language", "gradeLevel"};
             }
 
-            return new ContentListingCriteria(contentListingId, uid, language, subject, age, grade, medium, board, did, audience, channel, pragma, facets);
+            return new ContentListingCriteria(contentListingId, uid, language, subject, age,
+                    grade, medium, board, did, audience, channel, pragma, exclPragma, facets);
         }
     }
 }

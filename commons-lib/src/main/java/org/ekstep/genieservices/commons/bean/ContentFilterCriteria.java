@@ -16,16 +16,18 @@ public class ContentFilterCriteria {
     private String[] contentTypes;
     private String[] audience;
     private String[] pragma;
+    private String[] exclPragma;
     private boolean attachFeedback;
     private boolean attachContentAccess;
     private List<ContentSortCriteria> sortCriteria;
 
-    private ContentFilterCriteria(String uid, String[] contentTypes, String[] audience, String[] pragma,
+    private ContentFilterCriteria(String uid, String[] contentTypes, String[] audience, String[] pragma, String[] exclPragma,
                                   boolean attachFeedback, boolean attachContentAccess, List<ContentSortCriteria> sortCriteria) {
         this.uid = uid;
         this.contentTypes = contentTypes;
         this.audience = audience;
         this.pragma = pragma;
+        this.exclPragma = exclPragma;
         this.attachFeedback = attachFeedback;
         this.attachContentAccess = attachContentAccess;
         this.sortCriteria = sortCriteria;
@@ -45,6 +47,10 @@ public class ContentFilterCriteria {
 
     public String[] getPragma() {
         return pragma;
+    }
+
+    public String[] getExclPragma() {
+        return exclPragma;
     }
 
     public boolean attachFeedback() {
@@ -69,6 +75,7 @@ public class ContentFilterCriteria {
         private String[] contentTypes;
         private String[] audience;
         private String[] pragma;
+        private String[] exclPragma;
         private boolean attachFeedback;
         private boolean attachContentAccess;
         private List<ContentSortCriteria> sortCriteria;
@@ -112,6 +119,14 @@ public class ContentFilterCriteria {
         }
 
         /**
+         * Array of pragma which needs to exclude from search result. i.e. "external", "ads".
+         */
+        public Builder excludePragma(String[] pragma) {
+            this.exclPragma = pragma;
+            return this;
+        }
+
+        /**
          * Call it if you want content access by given uid.
          */
         public Builder withContentAccess() {
@@ -136,7 +151,7 @@ public class ContentFilterCriteria {
                 sortCriteria.add(new ContentSortCriteria("lastUsedOn", SortOrder.DESC));
                 sortCriteria.add(new ContentSortCriteria("localLastUpdatedOn", SortOrder.DESC));
             }
-            return new ContentFilterCriteria(uid, contentTypes, audience, pragma,
+            return new ContentFilterCriteria(uid, contentTypes, audience, pragma, exclPragma,
                     attachFeedback, attachContentAccess, sortCriteria);
         }
     }

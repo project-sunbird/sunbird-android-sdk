@@ -544,10 +544,15 @@ public class ContentHandler {
         }
 
         StringBuilder pragmaFilterBuilder = new StringBuilder();
-        if (!CollectionUtil.isEmpty(criteria.getPragma())) {
-            for (String pragma : criteria.getPragma()) {
+        if (!CollectionUtil.isEmpty(criteria.getExclPragma())) {
+            for (String pragma : criteria.getExclPragma()) {
                 pragmaFilterBuilder.append(pragmaFilterBuilder.length() > 0 ? " AND " : "");
                 pragmaFilterBuilder.append(String.format(Locale.US, "c.%s not like '%%%s%%'", ContentEntry.COLUMN_NAME_PRAGMA, pragma));
+            }
+        } else if (!CollectionUtil.isEmpty(criteria.getPragma())) {
+            for (String pragma : criteria.getPragma()) {
+                pragmaFilterBuilder.append(pragmaFilterBuilder.length() > 0 ? " AND " : "");
+                pragmaFilterBuilder.append(String.format(Locale.US, "c.%s like '%%%s%%'", ContentEntry.COLUMN_NAME_PRAGMA, pragma));
             }
         }
 
@@ -1132,12 +1137,6 @@ public class ContentHandler {
             exclPragma = false;
         }
 
-//        if (CollectionUtil.isEmpty(pragmaArr)) {
-//            // If pragma array is empty than get the all pragma values from master data to apply the default exclusion/notIn filter.
-//            pragmaArr = getFilterConfig(configService, ContentConstants.CONFIG_EXCLUDE_PRAGMA);
-//            exclPragma = true;
-//        }
-
         if (!CollectionUtil.isEmpty(pragmaArr)) {
             for (String pragma : pragmaArr) {
                 applyListingFilter(configService, MasterDataType.PRAGMA, pragma, filterMap, exclPragma);
@@ -1233,7 +1232,7 @@ public class ContentHandler {
         return filterMap;
     }
 
-    private static String[] getFilterConfig(IConfigService configService, String filter) {
+    public static String[] getFilterConfig(IConfigService configService, String filter) {
         if (configService != null) {
             GenieResponse<MasterData> response = configService.getMasterData(MasterDataType.CONFIG);
             if (response != null && response.getStatus()) {
@@ -1697,11 +1696,16 @@ public class ContentHandler {
             }
         }
 
-        String[] pragmaArr = contentListingCriteria.getPragma();
+        boolean exclPragma = true;
+        String[] pragmaArr = contentListingCriteria.getExclPragma();
+        if (CollectionUtil.isEmpty(pragmaArr)) {
+            pragmaArr = contentListingCriteria.getPragma();
+            exclPragma = false;
+        }
+
         if (!CollectionUtil.isEmpty(pragmaArr)) {
             for (String pragma : pragmaArr) {
-                // TODO: 5/2/18 - Add not equal query
-//                applyListingFilter(configService, MasterDataType.PRAGMA, pragma, filterMap);
+                applyListingFilter(configService, MasterDataType.PRAGMA, pragma, filterMap, exclPragma);
             }
         }
 

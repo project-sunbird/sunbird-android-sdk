@@ -32,7 +32,7 @@ public class _11_PragmanProfileMigration extends Migration {
     //DON'T CHANGE THESE VALUES
     private static final int MIGRATION_NUMBER = 11;
     private static final int TARGET_DB_VERSION = 16;
-    HashMap<String, String> standardMap = new LinkedHashMap<String, String>() {{
+    private HashMap<String, String> standardMap = new LinkedHashMap<String, String>() {{
         put("0", "KG");
         put("1", "Grade 1");
         put("2", "Grade 2");

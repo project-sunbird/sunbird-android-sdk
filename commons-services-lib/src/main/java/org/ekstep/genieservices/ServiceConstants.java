@@ -27,6 +27,7 @@ public interface ServiceConstants {
     String FILE_SIZE = "FILE_SIZE";
     String FILE_TYPE = "FILE_TYPE";
     String CONTENT_ITEMS_COUNT_KEY = "content_count";
+    String MASTER_DATA_TYPE_GENIE_CONFIG = "genieConfig";
 
     interface Params {
         String PROFILE_CONFIG = "PROFILE_CONFIG";
