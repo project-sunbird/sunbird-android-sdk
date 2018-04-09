@@ -1035,9 +1035,8 @@ public class ContentHandler {
 
         String[] facets = criteria.getFacets();
         if (CollectionUtil.isEmpty(facets)) {
-            facets = getFilterConfig(configService, ContentConstants.CONFIG_FACETS);
+            requestMap.put("facets", Arrays.asList(facets));
         }
-        requestMap.put("facets", Arrays.asList(facets));
 
         addSortCriteria(requestMap, criteria.getSortCriteria());
         if (SearchType.SEARCH.equals(criteria.getSearchType())) {
@@ -1055,10 +1054,9 @@ public class ContentHandler {
         requestMap.put("mode", criteria.getMode());
 
         String[] facets = criteria.getFacets();
-        if (CollectionUtil.isEmpty(facets)) {
-            facets = getFilterConfig(configService, ContentConstants.CONFIG_FACETS);
+        if (!CollectionUtil.isEmpty(facets)) {
+            requestMap.put("facets", Arrays.asList(facets));
         }
-        requestMap.put("facets", Arrays.asList(facets));
 
         addSortCriteria(requestMap, criteria.getSortCriteria());
         if (SearchType.SEARCH.equals(criteria.getSearchType())) {
@@ -1176,25 +1174,16 @@ public class ContentHandler {
         if (!CollectionUtil.hasEmptyData(criteria.getGrade())) {
             filterMap.put("gradeLevel", Arrays.asList(criteria.getGrade()));
         }
-//        if (criteria.getGrade() > 0) {
-//            applyListingFilter(configService, MasterDataType.GRADELEVEL, String.valueOf(criteria.getGrade()), filterMap, false);
-//        }
 
         // Add medium filter
         if (!CollectionUtil.hasEmptyData(criteria.getMedium())) {
             filterMap.put("medium", Arrays.asList(criteria.getMedium()));
         }
-//        if (!StringUtil.isNullOrEmpty(criteria.getMedium())) {
-//            applyListingFilter(configService, MasterDataType.MEDIUM, criteria.getMedium(), filterMap, false);
-//        }
 
         // Add board filter
         if (!CollectionUtil.hasEmptyData(criteria.getBoard())) {
             filterMap.put("board", Arrays.asList(criteria.getBoard()));
         }
-//        if (!StringUtil.isNullOrEmpty(criteria.getBoard())) {
-//            applyListingFilter(configService, MasterDataType.BOARD, criteria.getBoard(), filterMap, false);
-//        }
 
         String[] audienceArr = criteria.getAudience();
         if (!CollectionUtil.isEmpty(audienceArr)) {
@@ -1217,12 +1206,6 @@ public class ContentHandler {
             exclPragma = false;
         }
 
-//        if (CollectionUtil.isEmpty(pragmaArr)) {
-//            // If pragma array is empty than get the all pragma values from master data to apply the default exclusion/notIn filter.
-//            pragmaArr = getFilterConfig(configService, ContentConstants.CONFIG_EXCLUDE_PRAGMA);
-//            exclPragma = true;
-//        }
-
         if (!CollectionUtil.isEmpty(pragmaArr)) {
             for (String pragma : pragmaArr) {
                 applyListingFilter(configService, MasterDataType.PRAGMA, pragma, filterMap, exclPragma);
@@ -1230,27 +1213,6 @@ public class ContentHandler {
         }
 
         return filterMap;
-    }
-
-    public static String[] getFilterConfig(IConfigService configService, String filter) {
-        if (configService != null) {
-            GenieResponse<MasterData> response = configService.getMasterData(MasterDataType.CONFIG);
-            if (response != null && response.getStatus()) {
-                MasterData masterData = response.getResult();
-                if (masterData != null && !CollectionUtil.isNullOrEmpty(masterData.getValues())) {
-                    for (MasterDataValues masterDataValues : masterData.getValues()) {
-                        if (filter.equals(masterDataValues.getLabel())) {
-                            String value = masterDataValues.getValue();
-                            if (!StringUtil.isNullOrEmpty(value)) {
-                                return value.split(",");
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return null;
     }
 
     private static Map<String, Object> getFilterRequest(AppContext appContext, ContentSearchCriteria criteria) {
