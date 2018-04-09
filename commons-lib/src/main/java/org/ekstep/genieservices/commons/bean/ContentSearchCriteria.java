@@ -391,6 +391,10 @@ public class ContentSearchCriteria implements Serializable {
         }
 
         public ContentSearchCriteria build() {
+            if (facets == null || facets.length == 0) {
+                this.facets = new String[]{"contentType", "domain", "ageGroup", "language", "gradeLevel"};
+            }
+
             if (contentTypes == null || contentTypes.length == 0) {
                 this.contentTypes = new String[]{"Story", "Worksheet", "Game", "Collection", "TextBook", "Resource"};
             }
