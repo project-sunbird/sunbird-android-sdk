@@ -1084,7 +1084,9 @@ public class ContentHandler {
         filterMap.put("compatibilityLevel", getCompatibilityLevelFilter(appContext));
         filterMap.put("status", Arrays.asList(criteria.getContentStatusArray()));
         filterMap.put("objectType", Collections.singletonList("Content"));
-        filterMap.put("contentType", Arrays.asList(criteria.getContentTypes()));
+        if(!CollectionUtil.isEmpty(criteria.getContentTypes())) {
+            filterMap.put("contentType", Arrays.asList(criteria.getContentTypes()));
+        }
         if (criteria.getKeywords() != null && criteria.getKeywords().length > 0) {
             filterMap.put("keywords", Arrays.asList(criteria.getKeywords()));
         }
@@ -1160,7 +1162,9 @@ public class ContentHandler {
         filterMap.put("compatibilityLevel", getCompatibilityLevelFilter(appContext));
         filterMap.put("status", Arrays.asList(criteria.getContentStatusArray()));
         filterMap.put("objectType", Collections.singletonList("Content"));
-        filterMap.put("contentType", Arrays.asList(criteria.getContentTypes()));
+        if(!CollectionUtil.isEmpty(criteria.getContentTypes())) {
+            filterMap.put("contentType", Arrays.asList(criteria.getContentTypes()));
+        }
         if (!CollectionUtil.hasEmptyData(criteria.getKeywords())) {
             filterMap.put("keywords", Arrays.asList(criteria.getKeywords()));
         }
