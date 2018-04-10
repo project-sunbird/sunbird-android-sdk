@@ -14,8 +14,8 @@ public class ContentListingCriteria {
     private String subject;
     private int age;
     private int grade;
-    private String medium;
-    private String board;
+    private String[] medium;
+    private String[] board;
     private String did;
     private String[] audience;
     private String[] channel;
@@ -24,7 +24,7 @@ public class ContentListingCriteria {
     private String[] facets;
 
     private ContentListingCriteria(String contentListingId, String uid, String language, String subject,
-                                   int age, int grade, String medium, String board, String did,
+                                   int age, int grade, String[] medium, String[] board, String did,
                                    String[] audience, String[] channel, String[] pragma, String[] exclPragma, String[] facets) {
         this.contentListingId = contentListingId;
         this.uid = uid;
@@ -66,11 +66,11 @@ public class ContentListingCriteria {
         return grade;
     }
 
-    public String getMedium() {
+    public String[] getMedium() {
         return medium;
     }
 
-    public String getBoard() {
+    public String[] getBoard() {
         return board;
     }
 
@@ -105,8 +105,8 @@ public class ContentListingCriteria {
         private String subject;
         private int age;
         private int grade;
-        private String medium;
-        private String board;
+        private String[] medium;
+        private String[] board;
         private String did;
         private String[] audience;
         private String[] channel;
@@ -170,7 +170,7 @@ public class ContentListingCriteria {
         /**
          * Medium of the User for required content listing.
          */
-        public Builder medium(String medium) {
+        public Builder medium(String[] medium) {
             this.medium = medium;
             return this;
         }
@@ -178,7 +178,7 @@ public class ContentListingCriteria {
         /**
          * Board of the User for required content listing.
          */
-        public Builder board(String board) {
+        public Builder board(String[] board) {
             this.board = board;
             return this;
         }

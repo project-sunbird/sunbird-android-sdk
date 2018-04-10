@@ -47,8 +47,8 @@ public class ContentListingModel implements IWritable, IUpdatable, IReadable, IC
         this.mPageIdentifier = listingCriteria.getContentListingId();
         this.mAge = listingCriteria.getAge() != 0 ? listingCriteria.getAge() : -1;
         this.mStandard = listingCriteria.getGrade() != 0 ? listingCriteria.getGrade() : -1;
-        this.mMedium = listingCriteria.getMedium() != null ? listingCriteria.getMedium() : "";
-        this.mBoard = listingCriteria.getBoard() != null ? listingCriteria.getBoard() : "";
+        this.mMedium = listingCriteria.getMedium() != null ? StringUtil.join(",", getSortedList(listingCriteria.getMedium())) : "";
+        this.mBoard = listingCriteria.getBoard() != null ? StringUtil.join(",", getSortedList(listingCriteria.getBoard())) : "";
         this.mSubject = listingCriteria.getSubject() != null ? listingCriteria.getSubject() : "";
         this.channelStr = listingCriteria.getChannel() != null ? StringUtil.join(",", getSortedList(listingCriteria.getChannel())) : "";
         this.audienceStr = listingCriteria.getAudience() != null ? StringUtil.join(",", getSortedList(listingCriteria.getAudience())) : "";

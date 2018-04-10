@@ -18,8 +18,8 @@ public class ContentSearchCriteria implements Serializable {
     private String mode;
     private int age;
     private int grade;
-    private String medium;
-    private String board;
+    private String[] medium;
+    private String[] board;
     private String[] createdBy;
     private String[] audience;
     private String[] channel;
@@ -35,7 +35,7 @@ public class ContentSearchCriteria implements Serializable {
     // 1 - indicates search, 2 - filter
     private SearchType searchType;
 
-    private ContentSearchCriteria(String query, long limit, String mode, int age, int grade, String medium, String board,
+    private ContentSearchCriteria(String query, long limit, String mode, int age, int grade, String[] medium, String[] board,
                                   String[] createdBy, String[] audience, String[] channel, String[] pragma, String[] exclPragma,
                                   String[] contentStatusArray, String[] facets, String[] contentTypes, String[] keywords,
                                   List<ContentSortCriteria> sortCriteria, SearchType searchType) {
@@ -85,11 +85,11 @@ public class ContentSearchCriteria implements Serializable {
         return grade;
     }
 
-    public String getMedium() {
+    public String[] getMedium() {
         return medium;
     }
 
-    public String getBoard() {
+    public String[] getBoard() {
         return board;
     }
 
@@ -160,8 +160,8 @@ public class ContentSearchCriteria implements Serializable {
         private String mode;
         private int age;
         private int grade;
-        private String medium;
-        private String board;
+        private String[] medium;
+        private String[] board;
         private String[] createdBy;
         private String[] audience;
         private String[] channel;
@@ -226,7 +226,7 @@ public class ContentSearchCriteria implements Serializable {
         /**
          * Medium of the user.
          */
-        public SearchBuilder medium(String medium) {
+        public SearchBuilder medium(String[] medium) {
             this.medium = medium;
             return this;
         }
@@ -234,7 +234,7 @@ public class ContentSearchCriteria implements Serializable {
         /**
          * Board of the user.
          */
-        public SearchBuilder board(String board) {
+        public SearchBuilder board(String[] board) {
             this.board = board;
             return this;
         }

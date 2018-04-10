@@ -179,7 +179,7 @@ public class Profile implements Serializable, IValidate {
     }
 
     public String getProfileType() {
-        return profileType.getValue();
+        return profileType != null ? profileType.getValue() : "";
     }
 
     public void setProfileType(ProfileType profileType) {

@@ -1105,13 +1105,21 @@ public class ContentHandler {
         }
 
         // Add medium filter
-        if (!StringUtil.isNullOrEmpty(criteria.getMedium())) {
-            applyListingFilter(configService, MasterDataType.MEDIUM, criteria.getMedium(), filterMap, false);
+        String[] mediumArr = criteria.getMedium();
+
+        if (!CollectionUtil.isEmpty(mediumArr)) {
+            for (String medium : mediumArr) {
+                applyListingFilter(configService, MasterDataType.MEDIUM, medium, filterMap, false);
+            }
+
         }
 
         // Add board filter
-        if (!StringUtil.isNullOrEmpty(criteria.getBoard())) {
-            applyListingFilter(configService, MasterDataType.BOARD, criteria.getBoard(), filterMap, false);
+        String[] boardArr = criteria.getBoard();
+        if (!CollectionUtil.isEmpty(boardArr)) {
+            for (String board : boardArr) {
+                applyListingFilter(configService, MasterDataType.BOARD, board, filterMap, false);
+            }
         }
 
         String[] audienceArr = criteria.getAudience();
@@ -1633,12 +1641,20 @@ public class ContentHandler {
             applyListingFilter(configService, MasterDataType.AGEGROUP, String.valueOf(contentListingCriteria.getAge()), filterMap, false);
 
         // Add board filter
-        if (!StringUtil.isNullOrEmpty(contentListingCriteria.getBoard()))
-            applyListingFilter(configService, MasterDataType.BOARD, contentListingCriteria.getBoard(), filterMap, false);
+        String[] boardArr = contentListingCriteria.getBoard();
+        if (!CollectionUtil.isEmpty(boardArr))
+            for (String board : boardArr) {
+                applyListingFilter(configService, MasterDataType.BOARD, board, filterMap, false);
+            }
+
 
         // Add medium filter
-        if (!StringUtil.isNullOrEmpty(contentListingCriteria.getMedium()))
-            applyListingFilter(configService, MasterDataType.MEDIUM, contentListingCriteria.getMedium(), filterMap, false);
+        String[] mediumArr = contentListingCriteria.getMedium();
+        if (!CollectionUtil.isEmpty(mediumArr))
+            for (String medium : mediumArr) {
+                applyListingFilter(configService, MasterDataType.MEDIUM, medium, filterMap, false);
+
+            }
 
         // Add standard filter
         if (contentListingCriteria.getGrade() > 0)
