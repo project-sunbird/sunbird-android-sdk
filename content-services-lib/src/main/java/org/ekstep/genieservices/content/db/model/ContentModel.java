@@ -350,7 +350,6 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
 
     public void setSizeOnDevice(Long sizeOnDevice) {
         this.sizeOnDevice = sizeOnDevice;
-        this.updateLocalLastUpdatedTime = false;
     }
 
     public Long getLastUsedTime() {
@@ -363,6 +362,10 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
 
     public void setPragma(String pragma) {
         this.pragma = pragma;
+    }
+
+    public void doNotUpdateLocalLastUpdatedTime() {
+        this.updateLocalLastUpdatedTime = false;
     }
 
     @Override

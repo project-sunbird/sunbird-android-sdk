@@ -713,6 +713,7 @@ public class ContentHandler {
             contentModel.addOrUpdateRefCount(refCount);
             contentModel.addOrUpdateContentState(contentState);
             contentModel.setSizeOnDevice(FileUtil.getFileSize(new File(contentModel.getPath())));
+            contentModel.doNotUpdateLocalLastUpdatedTime();
 
             contentModel.update();
         }
@@ -2292,6 +2293,7 @@ public class ContentHandler {
                     }
 
                     contentModel.setSizeOnDevice(sizeOnDevice);
+                    contentModel.doNotUpdateLocalLastUpdatedTime();
                     contentModel.update();
                 }
             }
