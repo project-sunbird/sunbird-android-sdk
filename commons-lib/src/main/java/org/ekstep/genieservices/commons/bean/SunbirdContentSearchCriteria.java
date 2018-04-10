@@ -345,10 +345,6 @@ public class SunbirdContentSearchCriteria implements Serializable {
                 this.contentStatusArray = new String[]{"Live"};
             }
 
-            if (contentTypes == null || contentTypes.length == 0) {
-                this.contentTypes = new String[]{"Story", "Worksheet", "Game", "Collection", "TextBook", "Resource"};
-            }
-
             return new SunbirdContentSearchCriteria(query, limit, mode, age, grade, medium, board, createdBy,
                     audience, channel, pragma, exclPragma, contentStatusArray, facets, contentTypes,
                     keywords, dialCodes, offlineSearch, sortCriteria, SearchType.SEARCH);
@@ -424,9 +420,6 @@ public class SunbirdContentSearchCriteria implements Serializable {
         }
 
         public SunbirdContentSearchCriteria build() {
-            if (contentTypes == null || contentTypes.length == 0) {
-                this.contentTypes = new String[]{"Story", "Worksheet", "Game", "Collection", "TextBook", "Resource"};
-            }
             return new SunbirdContentSearchCriteria(query, limit, mode, facets, contentTypes, facetFilters, impliedFilters, sortCriteria, SearchType.FILTER);
         }
     }
