@@ -50,6 +50,10 @@ public class Audit extends Telemetry {
         private String currentState;
         private String prevState;
         private String actorType;
+        private String objId;
+        private String objType;
+        private String objVer;
+        private Rollup rollup;
 
         /**
          * Unique environment where the event has occured.
@@ -82,6 +86,38 @@ public class Audit extends Telemetry {
             return this;
         }
 
+        /**
+         * Id of the object. For ex: content id incase of content
+         */
+        public Builder objectId(String objId) {
+            this.objId = objId;
+            return this;
+        }
+
+        /**
+         * Type of the object. For ex: "Content", "Community", "User" etc.
+         */
+        public Builder objectType(String objType) {
+            this.objType = objType;
+            return this;
+        }
+
+        /**
+         * version of the object
+         */
+        public Builder objectVersion(String objVer) {
+            this.objVer = objVer;
+            return this;
+        }
+
+        /**
+         * hierarchyLevel to be computed of the object. Only 4 levels are allowed.
+         */
+        public Builder hierarchyLevel(Rollup rollup) {
+            this.rollup = rollup;
+            return this;
+        }
+
         public Audit build() {
             if (props == null) {
                 props = new ArrayList<>();
@@ -89,7 +125,7 @@ public class Audit extends Telemetry {
 
             Audit audit = new Audit(props, currentState, prevState, actorType);
             audit.setEnvironment(env);
-
+            audit.setObject(objId != null ? objId : "", objType != null ? objType : "", objVer != null ? objVer : "", rollup);
             return audit;
         }
     }

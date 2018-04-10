@@ -94,6 +94,13 @@ public interface ServiceConstants {
         String OBJECT_TYPE_CONTENT = "Content";
         String DEFAULT_ENVIRONMENT = "app";
         String SDK_ENVIRONMENT = "sdk";
+
+        String AUDIT_CREATED = "Created";
+        String AUDIT_UPDATED = "Updated";
+        String AUDIT_DELETED = "Deleted";
+        String OBJECT_TYPE_PROFILE = "Profile";
+        String OBJECT_TYPE_USER = "User";
+
     }
 
     interface ErrorCode {

@@ -52,6 +52,7 @@ import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -69,6 +70,125 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
     public UserServiceImpl(AppContext appContext) {
         super(appContext);
+    }
+
+    private static List<String> findProfilePropDiff(Profile firstInstance, Profile secondInstance) {
+        List<String> changedProps = new ArrayList<>();
+        try {
+            if (firstInstance != null && secondInstance != null) {
+                if ((firstInstance.getHandle() != null && !firstInstance.getHandle().equals(secondInstance.getHandle()))
+                        || (firstInstance.getHandle() == null && secondInstance.getHandle() != null)) {
+                    changedProps.add("handle");
+                }
+                if ((firstInstance.getAvatar() != null && !firstInstance.getAvatar().equals(secondInstance.getAvatar()))
+                        || (firstInstance.getAvatar() == null && secondInstance.getAvatar() != null)) {
+                    changedProps.add("avatar");
+                }
+                if ((firstInstance.getGender() != null && !firstInstance.getGender().equals(secondInstance.getGender()))
+                        || (firstInstance.getGender() == null && secondInstance.getGender() != null)) {
+                    changedProps.add("gender");
+                }
+                if (!(firstInstance.getAge() == secondInstance.getAge())) {
+                    changedProps.add("age");
+                }
+                if (!(firstInstance.getDay() == secondInstance.getDay())) {
+                    changedProps.add("day");
+                }
+                if (!(firstInstance.getMonth() == secondInstance.getMonth())) {
+                    changedProps.add("month");
+                }
+                if (!(firstInstance.getStandard() == secondInstance.getStandard())) {
+                    changedProps.add("standard");
+                }
+                if ((firstInstance.getMedium() != null && !Arrays.equals(firstInstance.getMedium(), secondInstance.getMedium()))
+                        || (firstInstance.getMedium() == null && secondInstance.getMedium() != null)) {
+                    changedProps.add("medium");
+                }
+                if ((firstInstance.getBoard() != null && !Arrays.equals(firstInstance.getBoard(), secondInstance.getBoard()))
+                        || firstInstance.getBoard() == null && secondInstance.getBoard() != null) {
+                    changedProps.add("board");
+                }
+                if (!(firstInstance.isGroupUser() == secondInstance.isGroupUser())) {
+                    changedProps.add("isGroupUser");
+                }
+                if ((firstInstance.getCreatedAt() != null && !firstInstance.getCreatedAt().equals(secondInstance.getCreatedAt()))
+                        || (firstInstance.getCreatedAt() == null && secondInstance.getCreatedAt() != null)) {
+                    changedProps.add("createdAt");
+                }
+                if ((firstInstance.getProfileImage() != null && !firstInstance.getProfileImage().equals(secondInstance.getProfileImage()))
+                        || (firstInstance.getProfileImage() == null && secondInstance.getProfileImage() != null)) {
+                    changedProps.add("profileImage");
+                }
+                if ((firstInstance.getProfileType() != null && firstInstance.getProfileType().equals(secondInstance.getProfileType()))
+                        || (firstInstance.getProfileType() == null && secondInstance.getProfileType() != null)) {
+                    changedProps.add("profileType");
+                }
+                if ((firstInstance.getSubject() != null && !Arrays.equals(firstInstance.getSubject(), secondInstance.getSubject()))
+                        || (firstInstance.getSubject() == null && secondInstance.getSubject() != null)) {
+                    changedProps.add("subject");
+                }
+                if (firstInstance.getGrade() != null && (!Arrays.equals(firstInstance.getGrade(), secondInstance.getGrade()))
+                        || (firstInstance.getGrade() == null && secondInstance.getGrade() != null)) {
+                    changedProps.add("grade");
+                }
+            }
+        } catch (Exception e) {
+
+        }
+
+        return changedProps;
+    }
+
+    public List<String> findAvailableProps(Profile profile) {
+        List<String> availableFields = new ArrayList<>();
+        if (profile != null) {
+            if (!StringUtil.isNullOrEmpty(profile.getHandle())) {
+                availableFields.add("handle");
+            }
+
+            if (!StringUtil.isNullOrEmpty(profile.getAvatar())) {
+                availableFields.add("avatar");
+            }
+
+            if (!StringUtil.isNullOrEmpty(profile.getGender()))
+                availableFields.add("gender");
+
+            if (profile.getAge() != -1) {
+                availableFields.add("age");
+            }
+            if (profile.getDay() != -1) {
+                availableFields.add("day");
+            }
+            if (profile.getMonth() != -1) {
+                availableFields.add("month");
+            }
+            if (profile.getStandard() != -1) {
+                availableFields.add("standard");
+            }
+            if (profile.getMedium() != null) {
+                availableFields.add("medium");
+            }
+            if (profile.getBoard() != null) {
+                availableFields.add("board");
+            }
+            availableFields.add("isGroupUser");
+            if (profile.getCreatedAt() != null) {
+                availableFields.add("createdAt");
+            }
+            if (!StringUtil.isNullOrEmpty(profile.getProfileImage())) {
+                availableFields.add("profileImage");
+            }
+            if (!StringUtil.isNullOrEmpty(profile.getProfileType())) {
+                availableFields.add("profileType");
+            }
+            if (profile.getSubject() != null) {
+                availableFields.add("subject");
+            }
+            if (profile.getGrade() != null) {
+                availableFields.add("grade");
+            }
+        }
+        return availableFields;
     }
 
     /**
@@ -128,45 +248,35 @@ public class UserServiceImpl extends BaseService implements IUserService {
         return successResponse;
     }
 
-
     private void logUserAuditEvent(String uid) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("action", "User-Created");
-        map.put("uid", uid);
-        map.put("loc", mAppContext.getLocationInfo().getLocation());
-
         Audit.Builder audit = new Audit.Builder();
-        audit.currentState(GsonUtil.toJson(map))
+        audit.currentState(ServiceConstants.Telemetry.AUDIT_CREATED)
                 .environment(ServiceConstants.Telemetry.SDK_ENVIRONMENT)
+                .objectType(ServiceConstants.Telemetry.OBJECT_TYPE_USER)
+                .objectId(uid)
                 .actorType(Actor.TYPE_SYSTEM);
         TelemetryLogger.log(audit.build());
     }
 
-    private void logProfileAuditEvent(Profile profile, Profile oldProfile) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("action", "Profile-Created");
-        map.put("profile", GsonUtil.toJson(profile));
-        map.put("loc", mAppContext.getLocationInfo().getLocation());
+    private void logProfileAuditEvent(Profile profile, Profile updatedProfile) {
 
         Audit.Builder audit = new Audit.Builder();
-        audit.currentState(GsonUtil.toJson(map))
+        audit.currentState(updatedProfile == null ? ServiceConstants.Telemetry.AUDIT_CREATED : ServiceConstants.Telemetry.AUDIT_UPDATED)
                 .environment(ServiceConstants.Telemetry.SDK_ENVIRONMENT)
+                .updatedProperties(updatedProfile == null ? findAvailableProps(profile) : findProfilePropDiff(profile, updatedProfile))
+                .objectType(ServiceConstants.Telemetry.OBJECT_TYPE_PROFILE)
+                .objectId(profile.getUid())
                 .actorType(Actor.TYPE_SYSTEM);
-        if (oldProfile != null) {
-            audit.previousState(GsonUtil.toJson(oldProfile));
-        }
         TelemetryLogger.log(audit.build());
     }
+
 
     private void logProfileDeleteAuditEvent(Profile profile) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("action", "Profile-Deleted");
-        map.put("uid", profile.getUid());
-        map.put("duration", DateUtil.elapsedTimeTillNow(profile.getCreatedAt().getTime()));
-
         Audit.Builder audit = new Audit.Builder();
-        audit.currentState(GsonUtil.toJson(map))
+        audit.currentState(ServiceConstants.Telemetry.AUDIT_DELETED)
                 .environment(ServiceConstants.Telemetry.SDK_ENVIRONMENT)
+                .objectType(ServiceConstants.Telemetry.OBJECT_TYPE_PROFILE)
+                .objectId(profile.getUid())
                 .actorType(Actor.TYPE_SYSTEM);
         TelemetryLogger.log(audit.build());
     }
@@ -626,5 +736,6 @@ public class UserServiceImpl extends BaseService implements IUserService {
         }
         return eparFile.getAbsolutePath();
     }
+
 
 }
