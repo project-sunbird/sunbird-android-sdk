@@ -1399,6 +1399,7 @@ public class ContentHandler {
         filterBuilder.query(previousCriteria.getQuery())
                 .limit(previousCriteria.getLimit())
                 .contentTypes(previousCriteria.getContentTypes())
+                .facets(previousCriteria.getFacets())
                 .sort(previousCriteria.getSortCriteria() == null ? new ArrayList<ContentSortCriteria>() : previousCriteria.getSortCriteria());
 
         if ("soft".equals(previousCriteria.getMode())) {
@@ -1464,6 +1465,7 @@ public class ContentHandler {
         filterBuilder.query(previousCriteria.getQuery())
                 .limit(previousCriteria.getLimit())
                 .contentTypes(previousCriteria.getContentTypes())
+                .facets(previousCriteria.getFacets())
                 .sort(previousCriteria.getSortCriteria() == null ? new ArrayList<ContentSortCriteria>() : previousCriteria.getSortCriteria());
 
         if ("soft".equals(previousCriteria.getMode())) {
