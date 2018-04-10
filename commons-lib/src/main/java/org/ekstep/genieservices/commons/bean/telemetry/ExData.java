@@ -1,9 +1,13 @@
 package org.ekstep.genieservices.commons.bean.telemetry;
 
+import org.ekstep.genieservices.commons.bean.CorrelationData;
+import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,6 +40,7 @@ public class ExData extends Telemetry {
         private String type;
         private String data;
         private String env;
+        private List<CorrelationData> correlationData;
 
         /**
          * Free flowing text. For ex: partnerdata, xapi etc
@@ -61,6 +66,22 @@ public class ExData extends Telemetry {
             return this;
         }
 
+
+        /**
+         * List of {@link CorrelationData}
+         */
+        public Builder correlationData(List<CorrelationData> correlationData) {
+            if (!CollectionUtil.isNullOrEmpty(correlationData)) {
+                if (this.correlationData == null) {
+                    this.correlationData = new ArrayList<>();
+                }
+                this.correlationData.addAll(correlationData);
+            }
+
+            return this;
+        }
+
+
         /**
          * Unique environment where the event has occured.
          */
@@ -77,11 +98,12 @@ public class ExData extends Telemetry {
             if (StringUtil.isNullOrEmpty(data)) {
                 throw new IllegalStateException("data is required.");
             }
-
             ExData exData = new ExData(type, data);
+            exData.setCoRrelationdata(correlationData);
             if (!StringUtil.isNullOrEmpty(env)) {
                 exData.setEnvironment(env);
             }
+
             return exData;
         }
     }

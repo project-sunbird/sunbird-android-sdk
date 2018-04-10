@@ -5,6 +5,7 @@ import org.ekstep.genieservices.IPartnerService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.bean.CorrelationData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.PartnerData;
 import org.ekstep.genieservices.commons.bean.telemetry.Actor;
@@ -236,8 +237,10 @@ public class PartnerServiceImpl extends BaseService implements IPartnerService {
                 eventMap.put("key", data.get("encrypted_key"));
                 eventMap.put("iv", data.get("iv"));
 
+                List<CorrelationData> correlationDataList = new ArrayList<>();
+                correlationDataList.add(new CorrelationData(partnerModel.getPartnerID(), "partner"));
                 ExData.Builder exData = new ExData.Builder()
-                        .type("partnerdata")
+                        .type("partnerdata").correlationData(correlationDataList)
                         .data(GsonUtil.toJson(eventMap));
                 TelemetryLogger.log(exData.build());
 

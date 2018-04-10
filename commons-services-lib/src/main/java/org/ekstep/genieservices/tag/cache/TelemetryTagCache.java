@@ -1,6 +1,7 @@
 package org.ekstep.genieservices.tag.cache;
 
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.tag.model.TagModel;
 import org.ekstep.genieservices.tag.model.TagsModel;
@@ -20,7 +21,7 @@ public class TelemetryTagCache {
     private static long validUntil;
 
     public static Set<String> activeTags(AppContext appContext) {
-        if (hashedtags == null || (DateUtil.getEpochTime() > validUntil)) {
+        if (CollectionUtil.isNullOrEmpty(hashedtags) || (DateUtil.getEpochTime() > validUntil)) {
             hashedtags = new HashSet<>();
             TagsModel telemetryTags = TagsModel.find(appContext.getDBSession());
             hashedtags.addAll(activeTagHashes(telemetryTags.getTags()));
