@@ -125,6 +125,8 @@ public class BuildParams implements IParams {
         setParam(params, Key.ORG_SERVICE_BASE_URL);
         setParam(params, Key.COURSE_SERVICE_BASE_URL);
         setParam(params, Key.PAGE_SERVICE_BASE_URL);
+        setParam(params, Key.CHANNEL_SERVICE_BASE_URL);
+        setParam(params, Key.FRAMEWORK_SERVICE_BASE_URL);
         setParam(params, Key.APIGATEWAY_BASE_URL);
         setParam(params, Key.API_USER);
         setParam(params, Key.API_PASS);

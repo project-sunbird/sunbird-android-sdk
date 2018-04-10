@@ -165,7 +165,9 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
      * @return
      */
     private String getDefaultFrameworkDetails() {
-        ChannelDetailsRequest channelDetailsRequest = new ChannelDetailsRequest.Builder().forChannel(IParams.Key.CHANNEL_ID).build();
+        ChannelDetailsRequest channelDetailsRequest = new ChannelDetailsRequest.Builder()
+                .forChannel(mAppContext.getParams().getString(IParams.Key.CHANNEL_ID))
+                .build();
         GenieResponse<Channel> channelDetailsResponse = getChannelDetails(channelDetailsRequest);
         Channel channelDetails = channelDetailsResponse.getResult();
         return channelDetails.getDefaultFramework();
