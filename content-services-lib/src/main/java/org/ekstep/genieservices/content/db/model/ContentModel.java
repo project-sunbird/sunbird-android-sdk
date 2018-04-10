@@ -43,6 +43,7 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
     private String pragma;
     private Long sizeOnDevice;
     private Long lastUsedTime;
+    private boolean updateLocalLastUpdatedTime = true;
 
     private ContentModel(IDBSession dbSession) {
         this.mDBSession = dbSession;
@@ -168,7 +169,9 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         with(contentValues, ContentEntry.COLUMN_NAME_PATH, path);
         with(contentValues, ContentEntry.COLUMN_NAME_VISIBILITY, visibility);
         with(contentValues, ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentType);
-        with(contentValues, ContentEntry.COLUMN_NAME_LOCAL_LAST_UPDATED_ON, localLastUpdatedOn());
+        if (updateLocalLastUpdatedTime) {
+            with(contentValues, ContentEntry.COLUMN_NAME_LOCAL_LAST_UPDATED_ON, localLastUpdatedOn());
+        }
         with(contentValues, ContentEntry.COLUMN_NAME_SERVER_LAST_UPDATED_ON, serverLastUpdatedOn);
         with(contentValues, ContentEntry.COLUMN_NAME_REF_COUNT, refCount);
         with(contentValues, ContentEntry.COLUMN_NAME_CONTENT_STATE, contentState);
@@ -347,6 +350,7 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
 
     public void setSizeOnDevice(Long sizeOnDevice) {
         this.sizeOnDevice = sizeOnDevice;
+        this.updateLocalLastUpdatedTime = false;
     }
 
     public Long getLastUsedTime() {
