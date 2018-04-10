@@ -546,12 +546,12 @@ public class ContentHandler {
         StringBuilder pragmaFilterBuilder = new StringBuilder();
         if (!CollectionUtil.isEmpty(criteria.getExclPragma())) {
             for (String pragma : criteria.getExclPragma()) {
-                pragmaFilterBuilder.append(pragmaFilterBuilder.length() > 0 ? " AND " : "");
+                pragmaFilterBuilder.append(pragmaFilterBuilder.length() > 0 ? " OR " : "");
                 pragmaFilterBuilder.append(String.format(Locale.US, "c.%s not like '%%%s%%'", ContentEntry.COLUMN_NAME_PRAGMA, pragma));
             }
         } else if (!CollectionUtil.isEmpty(criteria.getPragma())) {
             for (String pragma : criteria.getPragma()) {
-                pragmaFilterBuilder.append(pragmaFilterBuilder.length() > 0 ? " AND " : "");
+                pragmaFilterBuilder.append(pragmaFilterBuilder.length() > 0 ? " OR " : "");
                 pragmaFilterBuilder.append(String.format(Locale.US, "c.%s like '%%%s%%'", ContentEntry.COLUMN_NAME_PRAGMA, pragma));
             }
         }

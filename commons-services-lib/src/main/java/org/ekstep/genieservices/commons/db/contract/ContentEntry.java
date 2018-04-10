@@ -69,7 +69,7 @@ public abstract class ContentEntry implements BaseColumns {
     }
 
     public static String getAlterEntryForPragma() {
-        return "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_NAME_PRAGMA + DbConstants.TEXT_TYPE + ";";
+        return "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_NAME_PRAGMA + DbConstants.TEXT_TYPE + " DEFAULT '';";
     }
 
 }
