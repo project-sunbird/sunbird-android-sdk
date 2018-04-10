@@ -98,6 +98,7 @@ public class ExData extends Telemetry {
             if (StringUtil.isNullOrEmpty(data)) {
                 throw new IllegalStateException("data is required.");
             }
+
             ExData exData = new ExData(type, data);
             exData.setCoRrelationdata(correlationData);
             if (!StringUtil.isNullOrEmpty(env)) {
