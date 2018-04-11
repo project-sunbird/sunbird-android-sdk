@@ -5,8 +5,8 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
+import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -66,12 +66,20 @@ public abstract class BaseAPI {
                     AuthHandler.resetAuthToken(mAppContext);
                     return fetchFromServer(requestType, false);
                 } else {
-                    return getErrorResponse(NetworkConstants.SERVERAUTH_ERROR,
-                            NetworkConstants.SERVERAUTH_ERROR_MESSAGE + " " + GsonUtil.toJson(apiResponse));
+                    String errorMsg = NetworkConstants.SERVERAUTH_ERROR_MESSAGE;
+                    if (!StringUtil.isNullOrEmpty(apiResponse.getResponseBody())) {
+                        errorMsg = apiResponse.getResponseBody();
+                    }
+
+                    return getErrorResponse(NetworkConstants.SERVERAUTH_ERROR, errorMsg);
                 }
             } else {
-                return getErrorResponse(NetworkConstants.SERVER_ERROR,
-                        NetworkConstants.SERVER_ERROR_MESSAGE + " " + GsonUtil.toJson(apiResponse));
+                String errorMsg = NetworkConstants.SERVER_ERROR_MESSAGE;
+                if (!StringUtil.isNullOrEmpty(apiResponse.getResponseBody())) {
+                    errorMsg = apiResponse.getResponseBody();
+                }
+
+                return getErrorResponse(NetworkConstants.SERVERAUTH_ERROR, errorMsg);
             }
         } catch (IOException e) {
             Logger.e(TAG, e.getMessage());
