@@ -1035,7 +1035,7 @@ public class ContentHandler {
         requestMap.put("mode", criteria.getMode());
 
         String[] facets = criteria.getFacets();
-        if (CollectionUtil.isEmpty(facets)) {
+        if (!CollectionUtil.isEmpty(facets)) {
             requestMap.put("facets", Arrays.asList(facets));
         }
 
