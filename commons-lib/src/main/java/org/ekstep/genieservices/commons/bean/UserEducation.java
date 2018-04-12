@@ -8,24 +8,25 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
  */
 public class UserEducation {
 
+    private String id;
     private String degree;
     private String name;
+    private String grade;
     private int yearOfPassing;
     private double percentage;
-    private boolean isDeleted;
-    private String grade;
     private String boardOrUniversity;
-    private String id;
+    private boolean isDeleted;
 
-    public UserEducation(String degree, String name, int yearOfPassing, double percentage, boolean isDeleted, String grade, String boardOrUniversity, String id) {
+    private UserEducation(String id, String degree, String name, String grade, int yearOfPassing,
+                          double percentage, String boardOrUniversity, boolean isDeleted) {
+        this.id = id;
         this.degree = degree;
         this.name = name;
+        this.grade = grade;
         this.yearOfPassing = yearOfPassing;
         this.percentage = percentage;
-        this.isDeleted = isDeleted;
-        this.grade = grade;
         this.boardOrUniversity = boardOrUniversity;
-        this.id = id;
+        this.isDeleted = isDeleted;
     }
 
     public String getDegree() {
@@ -61,14 +62,14 @@ public class UserEducation {
     }
 
     public static class Builder {
+        private String id;
         private String degree;
         private String name;
+        private String grade;
         private int yearOfPassing;
         private double percentage;
-        private boolean isDeleted;
-        private String grade;
         private String boardOrUniversity;
-        private String id;
+        private boolean isDeleted;
 
         public Builder id(String id) {
             this.id = id;
@@ -101,8 +102,8 @@ public class UserEducation {
             return this;
         }
 
-        public Builder isDeleted(boolean isDeleted) {
-            this.isDeleted = isDeleted;
+        public Builder deleteEducation() {
+            this.isDeleted = true;
             return this;
         }
 
@@ -125,7 +126,7 @@ public class UserEducation {
                 throw new IllegalStateException("Institution name is required");
             }
 
-            return new UserEducation(degree, name, yearOfPassing, percentage, isDeleted, grade, boardOrUniversity, id);
+            return new UserEducation(id, degree, name, grade, yearOfPassing, percentage, boardOrUniversity, isDeleted);
         }
 
     }

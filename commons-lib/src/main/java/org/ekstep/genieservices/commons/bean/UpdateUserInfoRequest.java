@@ -28,11 +28,10 @@ public class UpdateUserInfoRequest {
     private List<UserJobProfile> jobProfile;
     private List<UserAddress> address;
 
-
-    public UpdateUserInfoRequest(String userId, String firstName, String lastName, String[] language,
-                                 String phone, String profileSummary, String[] subject, String gender,
-                                 String dob, String[] grade, String location, List<UserWebPages> webPages,
-                                 List<UserEducation> education, List<UserJobProfile> jobProfile, List<UserAddress> address) {
+    private UpdateUserInfoRequest(String userId, String firstName, String lastName, String[] language,
+                                  String phone, String profileSummary, String[] subject, String gender,
+                                  String dob, String[] grade, String location, List<UserWebPages> webPages,
+                                  List<UserEducation> education, List<UserJobProfile> jobProfile, List<UserAddress> address) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -267,20 +266,8 @@ public class UpdateUserInfoRequest {
                 throw new IllegalStateException("userId required.");
             }
 
-            if (StringUtil.isNullOrEmpty(firstName)) {
-                throw new IllegalStateException("name required.");
-            }
-
-            if (language == null || language.length == 0) {
-                throw new IllegalStateException("language required.");
-            }
-
-            if (StringUtil.isNullOrEmpty(phone)) {
-                throw new IllegalStateException("phone required.");
-            }
-
-            return new UpdateUserInfoRequest(userId, firstName, lastName, language, phone, profileSummary, subject, gender, dob, grade, location, webPages,
-                    education, jobProfile, address);
+            return new UpdateUserInfoRequest(userId, firstName, lastName, language, phone, profileSummary,
+                    subject, gender, dob, grade, location, webPages, education, jobProfile, address);
         }
     }
 }

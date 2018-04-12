@@ -8,25 +8,26 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
  */
 public class UserJobProfile {
 
+    private String id;
     private String jobName;
     private String orgName;
     private String role;
-    private String subject;
+    private String[] subject;
+    private String joiningDate; //YYYY-MM-DD
+    private String endDate;     //YYYY-MM-DD
     private boolean isCurrentJob;
-    private String joiningDate;
-    private String endDate;
-    private String id;
     private boolean isDeleted;
 
-    public UserJobProfile(String jobName, String orgName, String role, String subject, boolean isCurrentJob, String joiningDate, String endDate, String id, boolean isDeleted) {
+    private UserJobProfile(String id, String jobName, String orgName, String role, String[] subject,
+                           String joiningDate, String endDate, boolean isCurrentJob, boolean isDeleted) {
+        this.id = id;
         this.jobName = jobName;
         this.orgName = orgName;
         this.role = role;
         this.subject = subject;
-        this.isCurrentJob = isCurrentJob;
         this.joiningDate = joiningDate;
         this.endDate = endDate;
-        this.id = id;
+        this.isCurrentJob = isCurrentJob;
         this.isDeleted = isDeleted;
     }
 
@@ -42,7 +43,7 @@ public class UserJobProfile {
         return role;
     }
 
-    public String getSubject() {
+    public String[] getSubject() {
         return subject;
     }
 
@@ -67,14 +68,15 @@ public class UserJobProfile {
     }
 
     public static class Builder {
+
+        private String id;
         private String jobName;
         private String orgName;
         private String role;
-        private String subject;
-        private boolean isCurrentJob;
+        private String[] subject;
         private String joiningDate;
         private String endDate;
-        private String id;
+        private boolean isCurrentJob;
         private boolean isDeleted;
 
         public Builder jobName(String jobName) {
@@ -101,13 +103,13 @@ public class UserJobProfile {
             return this;
         }
 
-        public Builder subjects(String subject) {
+        public Builder subjects(String[] subject) {
             this.subject = subject;
             return this;
         }
 
-        public Builder isCurrentJob(boolean isCurrentJob) {
-            this.isCurrentJob = isCurrentJob;
+        public Builder currentJob() {
+            this.isCurrentJob = true;
             return this;
         }
 
@@ -126,8 +128,8 @@ public class UserJobProfile {
             return this;
         }
 
-        public Builder isDeleted(boolean isDeleted) {
-            this.isCurrentJob = isDeleted;
+        public Builder deletedJobProfile() {
+            this.isDeleted = true;
             return this;
         }
 
@@ -140,10 +142,8 @@ public class UserJobProfile {
                 throw new IllegalStateException("orgName is required");
             }
 
-            return new UserJobProfile(jobName, orgName, role, subject, isCurrentJob, joiningDate, endDate, id, isDeleted);
+            return new UserJobProfile(id, jobName, orgName, role, subject, joiningDate, endDate, isCurrentJob, isDeleted);
         }
-
-
     }
 
 }

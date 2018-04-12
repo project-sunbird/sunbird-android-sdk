@@ -18,7 +18,8 @@ public class UserAddress {
     private boolean isDeleted;
     private String id;
 
-    public UserAddress(String addType, String addressLine1, String addressLine2, String city, String state, String country, String zipcode, boolean isDeleted, String id) {
+    private UserAddress(String addType, String addressLine1, String addressLine2, String city,
+                        String state, String country, String zipcode, boolean isDeleted, String id) {
         this.addType = addType;
         this.addressLine1 = addressLine1;
         this.addressLine2 = addressLine2;
@@ -129,6 +130,11 @@ public class UserAddress {
             return this;
         }
 
+        public Builder deleteAddress() {
+            this.isDeleted = true;
+            return this;
+        }
+
         public UserAddress build() {
             if (StringUtil.isNullOrEmpty(addType)) {
                 throw new IllegalStateException("address type is required.");
@@ -140,8 +146,6 @@ public class UserAddress {
 
             return new UserAddress(addType, addressLine1, addressLine2, city, state, country, zipcode, isDeleted, id);
         }
-
     }
-
 
 }
