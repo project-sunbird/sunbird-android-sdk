@@ -191,6 +191,7 @@ public class UserProfileHandler {
         requestMap.put("dob", updateUserInfoRequest.getDob());
         requestMap.put("grade", updateUserInfoRequest.getGrade());
         requestMap.put("location", updateUserInfoRequest.getLocation());
+        requestMap.put("avatar", updateUserInfoRequest.getAvatar());
         requestMap.put("webPages", updateUserInfoRequest.getWebPages());
         requestMap.put("education", updateUserInfoRequest.getEducation());
         requestMap.put("jobProfile", updateUserInfoRequest.getJobProfile());

@@ -23,6 +23,7 @@ public class UpdateUserInfoRequest {
     private String dob;
     private String[] grade;
     private String location;
+    private String avatar;
     private List<UserWebPages> webPages;
     private List<UserEducation> education;
     private List<UserJobProfile> jobProfile;
@@ -30,7 +31,7 @@ public class UpdateUserInfoRequest {
 
     private UpdateUserInfoRequest(String userId, String firstName, String lastName, String[] language,
                                   String phone, String profileSummary, String[] subject, String gender,
-                                  String dob, String[] grade, String location, List<UserWebPages> webPages,
+                                  String dob, String[] grade, String location, String avatar, List<UserWebPages> webPages,
                                   List<UserEducation> education, List<UserJobProfile> jobProfile, List<UserAddress> address) {
         this.userId = userId;
         this.firstName = firstName;
@@ -43,10 +44,15 @@ public class UpdateUserInfoRequest {
         this.dob = dob;
         this.grade = grade;
         this.location = location;
+        this.avatar = avatar;
         this.webPages = webPages;
         this.education = education;
         this.jobProfile = jobProfile;
         this.address = address;
+    }
+
+    public String getUserId() {
+        return userId;
     }
 
     public String getFirstName() {
@@ -89,6 +95,10 @@ public class UpdateUserInfoRequest {
         return location;
     }
 
+    public String getAvatar() {
+        return avatar;
+    }
+
     public List<UserWebPages> getWebPages() {
         return webPages;
     }
@@ -100,15 +110,9 @@ public class UpdateUserInfoRequest {
     public List<UserJobProfile> getJobProfile() {
         return jobProfile;
     }
-    // TODO: 30/3/18 Check if avatar is required while updating, because user can remove avatar later or upload a new profile pic
-    // TODO: 30/3/18 Check if thumbnail is needed or not and its usage
 
     public List<UserAddress> getAddress() {
         return address;
-    }
-
-    public String getUserId() {
-        return userId;
     }
 
     public static class Builder {
@@ -124,6 +128,7 @@ public class UpdateUserInfoRequest {
         private String dob;
         private String[] grade;
         private String location;
+        private String avatar;
         private List<UserWebPages> webPages;
         private List<UserEducation> education;
         private List<UserJobProfile> jobProfile;
@@ -204,6 +209,14 @@ public class UpdateUserInfoRequest {
             return this;
         }
 
+        public Builder avatar(String avatar) {
+            if (avatar == null) {
+                throw new IllegalArgumentException("avatar cannot be null.");
+            }
+            this.avatar = avatar;
+            return this;
+        }
+
         public Builder webPages(List<UserWebPages> webPages) {
             if (webPages == null || webPages.size() == 0) {
                 throw new IllegalArgumentException("web pages cannot be null or empty.");
@@ -267,7 +280,7 @@ public class UpdateUserInfoRequest {
             }
 
             return new UpdateUserInfoRequest(userId, firstName, lastName, language, phone, profileSummary,
-                    subject, gender, dob, grade, location, webPages, education, jobProfile, address);
+                    subject, gender, dob, grade, location, avatar, webPages, education, jobProfile, address);
         }
     }
 }
