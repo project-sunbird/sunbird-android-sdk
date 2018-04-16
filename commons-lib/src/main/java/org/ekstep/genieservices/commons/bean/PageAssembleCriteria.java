@@ -13,7 +13,7 @@ public class PageAssembleCriteria {
     private PageAssembleFilter filters;
 
     private PageAssembleCriteria() {
-        this.source = "web";
+        this.source = "app";
         this.filters = new PageAssembleFilter();
     }
 
@@ -66,9 +66,11 @@ public class PageAssembleCriteria {
             return this;
         }
 
-        public PageAssembleCriteria build() throws IllegalArgumentException{
-            if (!pageAssembleCriteria.isValid())
-                throw new IllegalArgumentException();
+        public PageAssembleCriteria build() throws IllegalStateException {
+            if (!pageAssembleCriteria.isValid()) {
+                throw new IllegalStateException();
+            }
+
             return pageAssembleCriteria;
         }
 

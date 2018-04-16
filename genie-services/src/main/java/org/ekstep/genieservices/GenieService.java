@@ -362,7 +362,7 @@ public class GenieService {
 
     public IPageService getPageService() {
         if (mPageService == null) {
-            mPageService = new PageServiceImpl(mAppContext, getAuthSession());
+            mPageService = new PageServiceImpl(mAppContext);
         }
         return mPageService;
     }

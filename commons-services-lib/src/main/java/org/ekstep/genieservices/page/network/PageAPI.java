@@ -13,28 +13,25 @@ import java.util.Map;
 /**
  * Created by souvikmondal on 21/3/18.
  */
-
 public class PageAPI extends BaseAPI {
     private static final String TAG = PageAPI.class.getSimpleName();
 
     private static final CharSequence SERVICE_ENDPOINTS = "page/assemble";
 
     private PageAssembleCriteria criteria;
-    private Map<String, String> customHeaders;
 
-    public PageAPI(AppContext appContext, Map<String, String> customHeaders, PageAssembleCriteria criteria) {
+    public PageAPI(AppContext appContext, PageAssembleCriteria criteria) {
         super(appContext,
                 String.format(Locale.US, "%s/%s",
                         appContext.getParams().getString(IParams.Key.PAGE_SERVICE_BASE_URL),
                         SERVICE_ENDPOINTS),
                 TAG);
         this.criteria = criteria;
-        this.customHeaders = customHeaders;
     }
 
     @Override
     protected Map<String, String> getRequestHeaders() {
-        return this.customHeaders;
+        return null;
     }
 
     @Override
