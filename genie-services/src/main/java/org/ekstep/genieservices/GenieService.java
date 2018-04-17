@@ -4,7 +4,6 @@ import android.content.Context;
 
 import org.ekstep.genieservices.async.GenieAsyncService;
 import org.ekstep.genieservices.auth.AuthServiceImpl;
-import org.ekstep.genieservices.auth.AuthSessionImpl;
 import org.ekstep.genieservices.commons.AndroidAppContext;
 import org.ekstep.genieservices.commons.AndroidLogger;
 import org.ekstep.genieservices.commons.AppContext;
@@ -17,6 +16,7 @@ import org.ekstep.genieservices.commons.db.cache.IKeyValueStore;
 import org.ekstep.genieservices.commons.download.DownloadServiceImpl;
 import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.utils.Logger;
+import org.ekstep.genieservices.commons.utils.ReflectionUtil;
 import org.ekstep.genieservices.config.ConfigServiceImpl;
 import org.ekstep.genieservices.config.FrameworkServiceImpl;
 import org.ekstep.genieservices.content.ContentFeedbackServiceImpl;
@@ -411,7 +411,14 @@ public class GenieService {
 
     public IAuthSession<Session> getAuthSession() {
         if (mAuthSession == null) {
-            mAuthSession = new AuthSessionImpl(mAppContext);
+            String authSessionClass = mAppContext.getParams().getString(ServiceConstants.Params.OAUTH_SESSION);
+            if (authSessionClass != null) {
+                Class<?> classInstance = ReflectionUtil.getClass(authSessionClass);
+                if (classInstance != null) {
+                    mAuthSession = (IAuthSession) ReflectionUtil.getInstance(classInstance);
+                }
+                mAuthSession.initAuth(mAppContext);
+            }
         }
         return mAuthSession;
     }

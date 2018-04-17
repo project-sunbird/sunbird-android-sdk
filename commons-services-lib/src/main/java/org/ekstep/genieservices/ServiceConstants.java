@@ -32,6 +32,7 @@ public interface ServiceConstants {
     interface Params {
         String PROFILE_CONFIG = "PROFILE_CONFIG";
         String PLAYER_CONFIG = "PLAYER_CONFIG";
+        String OAUTH_SESSION = "OAUTH_SESSION";
     }
 
     interface BundleKey {

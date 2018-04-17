@@ -12,12 +12,13 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
  *
  * @author souvikmondal
  */
-public class AuthSessionImpl implements IAuthSession<Session> {
+public abstract class AbstractAuthSessionImpl implements IAuthSession<Session> {
 
     private AppContext mAppContext;
     private Session mSession;
 
-    public AuthSessionImpl(AppContext appContext) {
+    @Override
+    public void initAuth(AppContext appContext) {
         mAppContext = appContext;
         init();
     }

@@ -2,7 +2,7 @@ package org.ekstep.genieservices.profile.network;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IParams;
-import org.ekstep.genieservices.commons.network.BaseAPI;
+import org.ekstep.genieservices.commons.network.SunbirdBaseAPI;
 
 import java.util.Locale;
 import java.util.Map;
@@ -12,7 +12,7 @@ import java.util.Map;
  *
  * @author indraja
  */
-public class ProfileSkillsAPI extends BaseAPI {
+public class ProfileSkillsAPI extends SunbirdBaseAPI {
 
     private static final String TAG = ProfileSkillsAPI.class.getSimpleName();
 

@@ -2,7 +2,7 @@ package org.ekstep.genieservices.content.network;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IParams;
-import org.ekstep.genieservices.commons.network.BaseAPI;
+import org.ekstep.genieservices.commons.network.SunbirdBaseAPI;
 
 import java.util.Locale;
 import java.util.Map;
@@ -12,7 +12,7 @@ import java.util.Map;
  *
  * @author anil
  */
-public class EnrolledCoursesAPI extends BaseAPI {
+public class EnrolledCoursesAPI extends SunbirdBaseAPI {
 
     private static final String TAG = EnrolledCoursesAPI.class.getSimpleName();
 

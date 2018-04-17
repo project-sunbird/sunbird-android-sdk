@@ -2,9 +2,7 @@ package org.ekstep.genieservices.profile.network;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IParams;
-import org.ekstep.genieservices.commons.network.BaseAPI;
-import org.ekstep.genieservices.commons.network.FormRequestBody;
-import org.ekstep.genieservices.commons.network.IRequestBody;
+import org.ekstep.genieservices.commons.network.SunbirdBaseAPI;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 import java.util.HashMap;
@@ -17,7 +15,7 @@ import java.util.Map;
  * @author indraja
  */
 
-public class UpdateUserInfoAPI extends BaseAPI {
+public class UpdateUserInfoAPI extends SunbirdBaseAPI {
     private static final String TAG = UpdateUserInfoAPI.class.getSimpleName();
 
     private static final String ENDPOINT = "update";

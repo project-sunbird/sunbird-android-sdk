@@ -2,13 +2,10 @@ package org.ekstep.genieservices.profile.network;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IParams;
-import org.ekstep.genieservices.commons.network.BaseAPI;
-import org.ekstep.genieservices.commons.network.FormRequestBody;
 import org.ekstep.genieservices.commons.network.IRequestBody;
 import org.ekstep.genieservices.commons.network.MultipartFormRequestBody;
-import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.commons.network.SunbirdBaseAPI;
 
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -17,7 +14,7 @@ import java.util.Map;
  * shriharsh
  */
 
-public class FileUploadAPI extends BaseAPI {
+public class FileUploadAPI extends SunbirdBaseAPI {
     private static final String TAG = ProfileVisibilityAPI.class.getSimpleName();
 
     private static final String ENDPOINT = "media/upload";

@@ -2,7 +2,7 @@ package org.ekstep.genieservices.content.network;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IParams;
-import org.ekstep.genieservices.commons.network.BaseAPI;
+import org.ekstep.genieservices.commons.network.SunbirdBaseAPI;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 import java.util.HashMap;
@@ -14,7 +14,7 @@ import java.util.Map;
  *
  * @author anil
  */
-public class CourseBatchesAPI extends BaseAPI {
+public class CourseBatchesAPI extends SunbirdBaseAPI {
 
     private static final String TAG = EnrolCourseAPI.class.getSimpleName();
 

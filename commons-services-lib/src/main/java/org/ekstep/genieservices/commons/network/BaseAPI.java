@@ -53,6 +53,11 @@ public abstract class BaseAPI {
         return fetchFromServer(PATCH, true);
     }
 
+    protected void processAuthFailure(ApiResponse apiResponse) {
+        AuthHandler.resetAuthToken(mAppContext);
+    }
+
+
     private GenieResponse fetchFromServer(String requestType, boolean retryForAuthError) {
         if (!mAppContext.getConnectionInfo().isConnected()) {
             return getErrorResponse(NetworkConstants.CONNECTION_ERROR, NetworkConstants.CONNECTION_ERROR_MESSAGE);
@@ -63,7 +68,7 @@ public abstract class BaseAPI {
                 return getSuccessResponse(apiResponse.getResponseBody());
             } else if (apiResponse.getResponseCode() == AUTHENTICATION_FAILURE) {
                 if (retryForAuthError) {
-                    AuthHandler.resetAuthToken(mAppContext);
+                    processAuthFailure(apiResponse);
                     return fetchFromServer(requestType, false);
                 } else {
                     String errorMsg = NetworkConstants.SERVERAUTH_ERROR_MESSAGE;
