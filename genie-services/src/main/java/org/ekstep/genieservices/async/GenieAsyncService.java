@@ -19,6 +19,7 @@ public class GenieAsyncService {
     private NotificationService mNotificationService;
     private SummarizerService mSummarizerService;
     private AuthService mAuthService;
+    private AuthSessionService mAuthSessionService;
     private FrameworkService mFrameworkService;
     private PageService mPageService;
     private AnnouncementService mAnnouncementService;
@@ -114,6 +115,13 @@ public class GenieAsyncService {
             mAuthService = new AuthService(sService);
         }
         return mAuthService;
+    }
+
+    public AuthSessionService getAuthSessionService() {
+        if (mAuthSessionService == null) {
+            mAuthSessionService = new AuthSessionService(sService);
+        }
+        return mAuthSessionService;
     }
 
     public FrameworkService getFrameworkService() {

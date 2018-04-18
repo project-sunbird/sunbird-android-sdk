@@ -1,6 +1,9 @@
 package org.ekstep.genieservices;
 
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.bean.GenieResponse;
+
+import java.util.Map;
 
 /**
  * Created on 1/3/18.
@@ -11,9 +14,9 @@ public interface IAuthSession<SessionData> {
 
     void initAuth(AppContext appContext);
 
-    void createSession(String callBackUrl);
+    GenieResponse<Map<String, Object>> createSession(String usrToken);
 
-    void refreshSession(String refreshToken);
+    GenieResponse<Map<String, Object>> refreshSession(String refreshToken);
 
     void startSession(SessionData sessionData);
 
