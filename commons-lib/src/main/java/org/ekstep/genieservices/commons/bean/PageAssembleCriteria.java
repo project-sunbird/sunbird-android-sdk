@@ -51,18 +51,38 @@ public class PageAssembleCriteria {
             return this;
         }
 
-        public Builder subject(String subject) {
+        public Builder subject(String[] subject) {
             pageAssembleCriteria.filters.setSubject(subject);
             return this;
         }
 
-        public Builder grade(String grade) {
-            pageAssembleCriteria.filters.setGrade(grade);
+        public Builder grade(String[] grade) {
+            pageAssembleCriteria.filters.setGradeLevel(grade);
             return this;
         }
 
-        public Builder medium(String medium) {
+        public Builder medium(String[] medium) {
             pageAssembleCriteria.filters.setMedium(medium);
+            return this;
+        }
+
+        public Builder ageGroup(String[] ageGroup) {
+            pageAssembleCriteria.filters.setAgeGroup(ageGroup);
+            return this;
+        }
+
+        public Builder language(String[] language) {
+            pageAssembleCriteria.filters.setLanguage(language);
+            return this;
+        }
+
+        public Builder ownership(String[] ownership) {
+            pageAssembleCriteria.filters.setOwnership(ownership);
+            return this;
+        }
+
+        public Builder concepts(String[] concepts) {
+            pageAssembleCriteria.filters.setConcepts(concepts);
             return this;
         }
 

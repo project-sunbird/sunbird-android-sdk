@@ -6,31 +6,67 @@ package org.ekstep.genieservices.commons.bean;
 
 public class PageAssembleFilter {
 
-    private String subject;
-    private String medium;
-    private String grade;
+    private String[] subject;
+    private String[] medium;
+    private String[] gradeLevel;
+    private String[] ageGroup;
+    private String[] language;
+    private String[] ownership;
+    private String[] concepts;
 
-    public String getSubject() {
+    public String[] getSubject() {
         return subject;
     }
 
-    public void setSubject(String subject) {
+    public void setSubject(String[] subject) {
         this.subject = subject;
     }
 
-    public String getMedium() {
+    public String[] getMedium() {
         return medium;
     }
 
-    public void setMedium(String medium) {
+    public void setMedium(String[] medium) {
         this.medium = medium;
     }
 
-    public String getGrade() {
-        return grade;
+    public String[] getGradeLevel() {
+        return gradeLevel;
     }
 
-    public void setGrade(String grade) {
-        this.grade = grade;
+    public void setGradeLevel(String[] gradeLevel) {
+        this.gradeLevel = gradeLevel;
+    }
+
+    public String[] getAgeGroup() {
+        return ageGroup;
+    }
+
+    public void setAgeGroup(String[] ageGroup) {
+        this.ageGroup = ageGroup;
+    }
+
+    public String[] getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String[] language) {
+        this.language = language;
+    }
+
+    public String[] getOwnership() {
+        return ownership;
+    }
+
+    public void setOwnership(String[] ownership) {
+        this.ownership = ownership;
+    }
+
+    public String[] getConcepts() {
+        return concepts;
+    }
+
+    public void setConcepts(String[] concepts) {
+        this.concepts = concepts;
     }
 }

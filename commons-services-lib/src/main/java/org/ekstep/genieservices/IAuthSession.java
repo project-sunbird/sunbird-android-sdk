@@ -14,7 +14,7 @@ public interface IAuthSession<SessionData> {
 
     void initAuth(AppContext appContext);
 
-    GenieResponse<Map<String, Object>> createSession(String usrToken);
+    GenieResponse<Map<String, Object>> createSession(String userToken);
 
     GenieResponse<Map<String, Object>> refreshSession(String refreshToken);
 
