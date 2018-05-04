@@ -1815,6 +1815,55 @@ public class ContentHandler {
         return contentListingSectionList;
     }
 
+    public static SunbirdContentSearchCriteria getSearchCriteria(Map<String, Object> searchMap) {
+        SunbirdContentSearchCriteria contentSearchCriteria = null;
+        if (searchMap != null) {
+            SunbirdContentSearchCriteria.FilterBuilder builder = new SunbirdContentSearchCriteria.FilterBuilder();
+            if (searchMap.containsKey("query")) {
+                builder.query((String) searchMap.get("query"));
+            }
+
+            if (searchMap.containsKey("mode") && "soft".equals(searchMap.get("mode"))) {
+                builder.softFilters();
+            }
+
+            if (searchMap.containsKey("sort_by")) {
+                Map sortMap = (Map) searchMap.get("sort_by");
+                if (sortMap != null) {
+                    Iterator it = sortMap.entrySet().iterator();
+                    List<ContentSortCriteria> sortCriterias = new ArrayList<>();
+                    while (it.hasNext()) {
+                        Map.Entry keyValue = (Map.Entry) it.next();
+                        ContentSortCriteria criteria = new ContentSortCriteria(keyValue.getKey().toString(), SortOrder.valueOf(keyValue.getValue().toString().toUpperCase()));
+                        sortCriterias.add(criteria);
+                    }
+                    builder.sort(sortCriterias);
+                }
+            } else {
+                builder.sort(new ArrayList<ContentSortCriteria>());
+            }
+
+            if (searchMap.containsKey("filters")) {
+                Map filtersMap = (Map) searchMap.get("filters");
+                if (filtersMap.containsKey("contentType")) {
+                    List<String> contentType = (ArrayList<String>) filtersMap.get("contentType");
+                    builder.contentTypes(contentType.toArray(new String[contentType.size()]));
+                }
+
+                builder.impliedFilters(mapFilterValues(filtersMap));
+            }
+
+            if (searchMap.containsKey("facets")) {
+                List<String> facets = (ArrayList<String>) searchMap.get("facets");
+                builder.facets(facets.toArray(new String[facets.size()]));
+            }
+
+            contentSearchCriteria = builder.build();
+        }
+
+        return contentSearchCriteria;
+    }
+
     private static List<ContentSearchFilter> mapFilterValues(Map filtersMap) {
         List<ContentSearchFilter> filters = new ArrayList<>();
         if (filtersMap != null && !filtersMap.isEmpty()) {
