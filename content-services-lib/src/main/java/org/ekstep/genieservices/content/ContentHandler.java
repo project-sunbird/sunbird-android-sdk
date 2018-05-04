@@ -1054,6 +1054,10 @@ public class ContentHandler {
         requestMap.put("limit", criteria.getLimit());
         requestMap.put("mode", criteria.getMode());
 
+        if(!CollectionUtil.isEmpty(criteria.getExists())) {
+            requestMap.put("exists", Arrays.asList(criteria.getExists()));
+        }
+
         String[] facets = criteria.getFacets();
         if (!CollectionUtil.isEmpty(facets)) {
             requestMap.put("facets", Arrays.asList(facets));
@@ -1084,7 +1088,7 @@ public class ContentHandler {
         filterMap.put("compatibilityLevel", getCompatibilityLevelFilter(appContext));
         filterMap.put("status", Arrays.asList(criteria.getContentStatusArray()));
         filterMap.put("objectType", Collections.singletonList("Content"));
-        if(!CollectionUtil.isEmpty(criteria.getContentTypes())) {
+        if (!CollectionUtil.isEmpty(criteria.getContentTypes())) {
             filterMap.put("contentType", Arrays.asList(criteria.getContentTypes()));
         }
         if (criteria.getKeywords() != null && criteria.getKeywords().length > 0) {
@@ -1162,7 +1166,7 @@ public class ContentHandler {
         filterMap.put("compatibilityLevel", getCompatibilityLevelFilter(appContext));
         filterMap.put("status", Arrays.asList(criteria.getContentStatusArray()));
         filterMap.put("objectType", Collections.singletonList("Content"));
-        if(!CollectionUtil.isEmpty(criteria.getContentTypes())) {
+        if (!CollectionUtil.isEmpty(criteria.getContentTypes())) {
             filterMap.put("contentType", Arrays.asList(criteria.getContentTypes()));
         }
         if (!CollectionUtil.hasEmptyData(criteria.getKeywords())) {
@@ -1196,6 +1200,10 @@ public class ContentHandler {
         // Add board filter
         if (!CollectionUtil.hasEmptyData(criteria.getBoard())) {
             filterMap.put("board", Arrays.asList(criteria.getBoard()));
+        }
+
+        if (!CollectionUtil.hasEmptyData(criteria.getLanguage())) {
+            filterMap.put("language", Arrays.asList(criteria.getLanguage()));
         }
 
         String[] audienceArr = criteria.getAudience();
@@ -1821,6 +1829,11 @@ public class ContentHandler {
             SunbirdContentSearchCriteria.FilterBuilder builder = new SunbirdContentSearchCriteria.FilterBuilder();
             if (searchMap.containsKey("query")) {
                 builder.query((String) searchMap.get("query"));
+            }
+
+            if (searchMap.containsKey("exists")) {
+                List<String> exists = (ArrayList<String>) searchMap.get("exists");
+                builder.exists(exists.toArray(new String[exists.size()]));
             }
 
             if (searchMap.containsKey("mode") && "soft".equals(searchMap.get("mode"))) {
