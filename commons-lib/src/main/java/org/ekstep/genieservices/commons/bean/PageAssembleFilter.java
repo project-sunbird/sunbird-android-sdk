@@ -1,5 +1,10 @@
 package org.ekstep.genieservices.commons.bean;
 
+import org.ekstep.genieservices.commons.utils.CollectionUtil;
+import org.ekstep.genieservices.commons.utils.StringUtil;
+
+import java.util.Arrays;
+
 /**
  * Created by souvikmondal on 21/3/18.
  */
@@ -68,5 +73,52 @@ public class PageAssembleFilter {
 
     public void setConcepts(String[] concepts) {
         this.concepts = concepts;
+    }
+
+    @Override
+    public String toString() {
+        Arrays.sort(subject);
+        Arrays.sort(medium);
+        Arrays.sort(gradeLevel);
+        Arrays.sort(ageGroup);
+        Arrays.sort(language);
+        Arrays.sort(ownership);
+        Arrays.sort(concepts);
+        StringBuilder builder = new StringBuilder();
+
+        if(!CollectionUtil.isEmpty(subject)) {
+            builder.append(StringUtil.join(",",subject));
+        }
+
+        if(!CollectionUtil.isEmpty(medium)) {
+            builder.append(StringUtil.join(",",medium));
+        }
+
+        if(!CollectionUtil.isEmpty(gradeLevel)) {
+            builder.append(StringUtil.join(",",gradeLevel));
+        }
+
+        if(!CollectionUtil.isEmpty(ageGroup)) {
+            builder.append(StringUtil.join(",",ageGroup));
+        }
+
+        if(!CollectionUtil.isEmpty(language)) {
+            builder.append(StringUtil.join(",",language));
+        }
+
+        if(!CollectionUtil.isEmpty(ownership)) {
+            builder.append(StringUtil.join(",",ownership));
+        }
+
+        if(!CollectionUtil.isEmpty(concepts)) {
+            builder.append(StringUtil.join(",",concepts));
+        }
+
+        return builder.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return toString().hashCode();
     }
 }

@@ -79,7 +79,7 @@ public class PageServiceImpl extends BaseService implements IPageService {
     }
 
     private String getKeyForDB(PageAssembleCriteria pageAssembleCriteria) {
-        return KEY_PAGE_ASSEMBLE + pageAssembleCriteria.getName();
+        return KEY_PAGE_ASSEMBLE + pageAssembleCriteria.getName() + pageAssembleCriteria.getFilters().toString();
     }
 
 }
