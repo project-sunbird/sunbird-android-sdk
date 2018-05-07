@@ -77,41 +77,41 @@ public class PageAssembleFilter {
 
     @Override
     public String toString() {
-        Arrays.sort(subject);
-        Arrays.sort(medium);
-        Arrays.sort(gradeLevel);
-        Arrays.sort(ageGroup);
-        Arrays.sort(language);
-        Arrays.sort(ownership);
-        Arrays.sort(concepts);
         StringBuilder builder = new StringBuilder();
 
-        if(!CollectionUtil.isEmpty(subject)) {
-            builder.append(StringUtil.join(",",subject));
+        if (!CollectionUtil.isEmpty(subject)) {
+            Arrays.sort(subject);
+            builder.append(StringUtil.join(",", subject));
         }
 
-        if(!CollectionUtil.isEmpty(medium)) {
-            builder.append(StringUtil.join(",",medium));
+        if (!CollectionUtil.isEmpty(medium)) {
+            Arrays.sort(medium);
+            builder.append(StringUtil.join(",", medium));
         }
 
-        if(!CollectionUtil.isEmpty(gradeLevel)) {
-            builder.append(StringUtil.join(",",gradeLevel));
+        if (!CollectionUtil.isEmpty(gradeLevel)) {
+            Arrays.sort(gradeLevel);
+            builder.append(StringUtil.join(",", gradeLevel));
         }
 
-        if(!CollectionUtil.isEmpty(ageGroup)) {
-            builder.append(StringUtil.join(",",ageGroup));
+        if (!CollectionUtil.isEmpty(ageGroup)) {
+            Arrays.sort(ageGroup);
+            builder.append(StringUtil.join(",", ageGroup));
         }
 
-        if(!CollectionUtil.isEmpty(language)) {
-            builder.append(StringUtil.join(",",language));
+        if (!CollectionUtil.isEmpty(language)) {
+            Arrays.sort(language);
+            builder.append(StringUtil.join(",", language));
         }
 
-        if(!CollectionUtil.isEmpty(ownership)) {
-            builder.append(StringUtil.join(",",ownership));
+        if (!CollectionUtil.isEmpty(ownership)) {
+            Arrays.sort(ownership);
+            builder.append(StringUtil.join(",", ownership));
         }
 
-        if(!CollectionUtil.isEmpty(concepts)) {
-            builder.append(StringUtil.join(",",concepts));
+        if (!CollectionUtil.isEmpty(concepts)) {
+            Arrays.sort(concepts);
+            builder.append(StringUtil.join(",", concepts));
         }
 
         return builder.toString();
