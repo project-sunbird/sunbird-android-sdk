@@ -18,6 +18,9 @@ public class PageAssembleFilter {
     private String[] language;
     private String[] ownership;
     private String[] concepts;
+    private String[] board;
+    private String[] contentType;
+    private String[] domain;
 
     public String[] getSubject() {
         return subject;
@@ -75,6 +78,30 @@ public class PageAssembleFilter {
         this.concepts = concepts;
     }
 
+    public String[] getBoard() {
+        return board;
+    }
+
+    public void setBoard(String[] board) {
+        this.board = board;
+    }
+
+    public String[] getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String[] contentType) {
+        this.contentType = contentType;
+    }
+
+    public String[] getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String[] domain) {
+        this.domain = domain;
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -112,6 +139,21 @@ public class PageAssembleFilter {
         if (!CollectionUtil.isEmpty(concepts)) {
             Arrays.sort(concepts);
             builder.append(StringUtil.join(",", concepts));
+        }
+
+        if (!CollectionUtil.isEmpty(board)) {
+            Arrays.sort(board);
+            builder.append(StringUtil.join(",", board));
+        }
+
+        if (!CollectionUtil.isEmpty(contentType)) {
+            Arrays.sort(contentType);
+            builder.append(StringUtil.join(",", contentType));
+        }
+
+        if (!CollectionUtil.isEmpty(domain)) {
+            Arrays.sort(domain);
+            builder.append(StringUtil.join(",", domain));
         }
 
         return builder.toString();
