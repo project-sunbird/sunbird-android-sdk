@@ -16,11 +16,13 @@ public class UserProfileDetailsRequest {
     private String userId;
     private List<String> requiredFields;
     private boolean refreshUserProfileDetails;
+    private boolean returnRefreshedUserProfileDetails;
 
-    private UserProfileDetailsRequest(String userId, List<String> requiredFields, boolean refreshUserProfileDetails) {
+    private UserProfileDetailsRequest(String userId, List<String> requiredFields, boolean refreshUserProfileDetails, boolean returnRefreshedUserProfileDetails) {
         this.userId = userId;
         this.requiredFields = requiredFields;
         this.refreshUserProfileDetails = refreshUserProfileDetails;
+        this.returnRefreshedUserProfileDetails = returnRefreshedUserProfileDetails;
     }
 
     public String getUserId() {
@@ -35,11 +37,16 @@ public class UserProfileDetailsRequest {
         return refreshUserProfileDetails;
     }
 
+    public boolean isReturnRefreshedUserProfileDetails() {
+        return returnRefreshedUserProfileDetails;
+    }
+
     public static class Builder {
 
         private String userId;
         private List<String> requiredFields;
         private boolean refreshUserProfileDetails;
+        private boolean returnRefreshedUserProfileDetails;
 
         public Builder forUser(String userId) {
             if (StringUtil.isNullOrEmpty(userId)) {
@@ -71,12 +78,20 @@ public class UserProfileDetailsRequest {
             return this;
         }
 
+        /**
+         * The user profile details are refreshed from the server only if this flag is set.
+         */
+        public Builder returnRefreshedUserProfileDetailsFromServer(boolean returnRefreshedUserProfileDetails) {
+            this.returnRefreshedUserProfileDetails = returnRefreshedUserProfileDetails;
+            return this;
+        }
+
         public UserProfileDetailsRequest build() {
             if (StringUtil.isNullOrEmpty(userId)) {
                 throw new IllegalStateException("userId required.");
             }
 
-            return new UserProfileDetailsRequest(userId, requiredFields, refreshUserProfileDetails);
+            return new UserProfileDetailsRequest(userId, requiredFields, refreshUserProfileDetails, returnRefreshedUserProfileDetails);
         }
     }
 }

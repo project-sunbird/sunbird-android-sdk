@@ -95,6 +95,17 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
                 TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, userProfileDetailsAPIResponse.getMessage());
                 return response;
             }
+        } else if (userProfileDetailsRequest.isReturnRefreshedUserProfileDetails()) {
+            GenieResponse userProfileDetailsAPIResponse = UserProfileHandler.fetchUserProfileDetailsFromServer(mAppContext,
+                    authSession.getSessionData(), userProfileDetailsRequest.getUserId(), fields);
+
+            if (userProfileDetailsAPIResponse.getStatus()) {
+                String jsonResponse = userProfileDetailsAPIResponse.getResult().toString();
+                if (!StringUtil.isNullOrEmpty(jsonResponse)) {
+                    userProfileInDB.setValue(jsonResponse);
+                    userProfileInDB.update();
+                }
+            }
         } else if (userProfileDetailsRequest.isRefreshUserProfileDetails()) {
             UserProfileHandler.refreshUserProfileDetailsFromServer(mAppContext, authSession.getSessionData(),
                     userProfileDetailsRequest.getUserId(), fields, userProfileInDB);
