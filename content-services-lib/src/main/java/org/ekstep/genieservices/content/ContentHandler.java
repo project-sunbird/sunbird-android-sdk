@@ -1051,10 +1051,11 @@ public class ContentHandler {
     public static Map<String, Object> getSearchContentRequest(AppContext appContext, IConfigService configService, SunbirdContentSearchCriteria criteria) {
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("query", criteria.getQuery());
+        requestMap.put("offset", criteria.getOffset());
         requestMap.put("limit", criteria.getLimit());
         requestMap.put("mode", criteria.getMode());
 
-        if(!CollectionUtil.isEmpty(criteria.getExists())) {
+        if (!CollectionUtil.isEmpty(criteria.getExists())) {
             requestMap.put("exists", Arrays.asList(criteria.getExists()));
         }
 
@@ -1477,6 +1478,7 @@ public class ContentHandler {
         SunbirdContentSearchCriteria.FilterBuilder filterBuilder = new SunbirdContentSearchCriteria.FilterBuilder();
         filterBuilder.query(previousCriteria.getQuery())
                 .limit(previousCriteria.getLimit())
+                .offset(previousCriteria.getOffset())
                 .contentTypes(previousCriteria.getContentTypes())
                 .facets(previousCriteria.getFacets())
                 .sort(previousCriteria.getSortCriteria() == null ? new ArrayList<ContentSortCriteria>() : previousCriteria.getSortCriteria());

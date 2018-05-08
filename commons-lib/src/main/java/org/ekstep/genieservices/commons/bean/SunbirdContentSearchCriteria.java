@@ -15,6 +15,7 @@ public class SunbirdContentSearchCriteria implements Serializable {
 
     private String query;
     private String[] exists;
+    private long offset;
     private long limit;
     private String mode;
     private int age;
@@ -39,7 +40,7 @@ public class SunbirdContentSearchCriteria implements Serializable {
     // 1 - indicates search, 2 - filter
     private SearchType searchType;
 
-    private SunbirdContentSearchCriteria(String query, String[] exists, long limit, String mode, int age,
+    private SunbirdContentSearchCriteria(String query, String[] exists, long offset, long limit, String mode, int age,
                                          String[] grade, String[] medium, String[] board,
                                          String[] createdBy, String[] audience, String[] channel,
                                          String[] pragma, String[] exclPragma,
@@ -48,6 +49,7 @@ public class SunbirdContentSearchCriteria implements Serializable {
                                          boolean offlineSearch, List<ContentSortCriteria> sortCriteria, SearchType searchType) {
         this.query = query;
         this.exists = exists;
+        this.offset = offset;
         this.limit = limit;
         this.mode = mode;
         this.age = age;
@@ -70,11 +72,12 @@ public class SunbirdContentSearchCriteria implements Serializable {
         this.searchType = searchType;
     }
 
-    private SunbirdContentSearchCriteria(String query, String[] exists, long limit, String mode, String[] facets, String[] contentTypes,
+    private SunbirdContentSearchCriteria(String query, String[] exists, long offset, long limit, String mode, String[] facets, String[] contentTypes,
                                          List<ContentSearchFilter> facetFilters, List<ContentSearchFilter> impliedFilters,
                                          List<ContentSortCriteria> sortCriteria, SearchType searchType) {
         this.query = query;
         this.exists = exists;
+        this.offset = offset;
         this.limit = limit;
         this.mode = mode;
         this.facets = facets;
@@ -91,6 +94,18 @@ public class SunbirdContentSearchCriteria implements Serializable {
 
     public String[] getExists() {
         return exists;
+    }
+
+    public long getOffset() {
+        return offset;
+    }
+
+    public long getLimit() {
+        return limit;
+    }
+
+    public String getMode() {
+        return mode;
     }
 
     public int getAge() {
@@ -173,19 +188,12 @@ public class SunbirdContentSearchCriteria implements Serializable {
         return searchType;
     }
 
-    public long getLimit() {
-        return limit;
-    }
-
-    public String getMode() {
-        return mode;
-    }
-
     public static class SearchBuilder {
 
         private String query;
         private String[] exists;
         private long limit;
+        private long offset;
         private String mode;
         private int age;
         private String[] grade;
@@ -220,6 +228,14 @@ public class SunbirdContentSearchCriteria implements Serializable {
 
         public SearchBuilder exists(String[] exists) {
             this.exists = exists;
+            return this;
+        }
+
+        /**
+         * Search results offset.
+         */
+        public SearchBuilder offset(long offset) {
+            this.offset = offset;
             return this;
         }
 
@@ -370,7 +386,7 @@ public class SunbirdContentSearchCriteria implements Serializable {
                 this.contentStatusArray = new String[]{"Live"};
             }
 
-            return new SunbirdContentSearchCriteria(query, exists, limit, mode, age, grade, medium, board, createdBy,
+            return new SunbirdContentSearchCriteria(query, exists, offset, limit, mode, age, grade, medium, board, createdBy,
                     audience, channel, pragma, exclPragma, contentStatusArray, facets, contentTypes,
                     keywords, dialCodes, language, offlineSearch, sortCriteria, SearchType.SEARCH);
         }
@@ -381,6 +397,7 @@ public class SunbirdContentSearchCriteria implements Serializable {
 
         private String query;
         private String[] exists;
+        private long offset;
         private long limit;
         private String mode;
         private String[] facets;
@@ -401,6 +418,11 @@ public class SunbirdContentSearchCriteria implements Serializable {
 
         public FilterBuilder exists(String[] exists) {
             this.exists = exists;
+            return this;
+        }
+
+        public FilterBuilder offset(long offset) {
+            this.offset = offset;
             return this;
         }
 
@@ -451,7 +473,7 @@ public class SunbirdContentSearchCriteria implements Serializable {
         }
 
         public SunbirdContentSearchCriteria build() {
-            return new SunbirdContentSearchCriteria(query, exists, limit, mode, facets, contentTypes,
+            return new SunbirdContentSearchCriteria(query, exists, offset, limit, mode, facets, contentTypes,
                     facetFilters, impliedFilters, sortCriteria, SearchType.FILTER);
         }
     }
