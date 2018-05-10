@@ -1541,6 +1541,7 @@ public class ContentHandler {
 
     private static List<FilterValue> getSortedFilterValuesWithAppliedFilters(List<Map<String, Object>> facetValues, List<String> facetOrder, List<String> appliedFilter) {
         Map<Integer, FilterValue> map = new TreeMap<>();
+        List<FilterValue> list = new ArrayList<>();
 
         for (Map<String, Object> valueMap : facetValues) {
             String name = (String) valueMap.get("name");
@@ -1559,6 +1560,22 @@ public class ContentHandler {
                 filterValue.setCount(count.intValue());
             }
 
+            if (index == -1) {
+                list.add(filterValue);
+            } else {
+                map.put(index, filterValue);
+            }
+        }
+
+        int index = 0;
+        List<Integer> keys = new ArrayList<>(map.keySet());
+        if (keys.size() > 0) {
+//            Collections.sort(keys);
+            index = keys.get(keys.size() - 1);
+        }
+
+        for (FilterValue filterValue : list) {
+            index++;
             map.put(index, filterValue);
         }
 
