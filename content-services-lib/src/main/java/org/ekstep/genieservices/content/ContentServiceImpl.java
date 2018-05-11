@@ -163,7 +163,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(contentDetailsRequest));
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
-
+        params.put("logLevel", "2");
         GenieResponse<Content> response;
         ContentModel contentModelInDB = ContentModel.find(mAppContext.getDBSession(), contentDetailsRequest.getContentId());
 
@@ -204,7 +204,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         String methodName = "getAllLocalContent@ContentServiceImpl";
         Map<String, Object> params = new HashMap<>();
         params.put("criteria", GsonUtil.toJson(criteria));
-
+        params.put("logLevel", "2");
         GenieResponse<List<Content>> response;
 
         List<ContentModel> contentModelListInDB = ContentHandler.getAllLocalContent(mAppContext.getDBSession(), criteria);

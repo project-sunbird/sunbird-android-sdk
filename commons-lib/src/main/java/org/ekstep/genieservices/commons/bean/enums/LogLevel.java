@@ -6,7 +6,7 @@ package org.ekstep.genieservices.commons.bean.enums;
 
 public enum LogLevel {
 
-    TRACE("TRACE", 1), DEBUG("DEBUG", 2), INFO("INFO", 3), ERROR("INFO", 4);
+    TRACE("TRACE", 1), DEBUG("DEBUG", 2), INFO("INFO", 3), ERROR("ERROR", 4);
 
     private String value;
     private int level;

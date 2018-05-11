@@ -31,7 +31,7 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
         String methodName = "sync@SyncServiceImpl";
         HashMap params = new HashMap();
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
-
+        params.put("logLevel", "2");
         EventProcessorFactory.processEvents(mAppContext);
 
         int numberOfSync = 0;

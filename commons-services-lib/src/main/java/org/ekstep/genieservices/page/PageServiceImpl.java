@@ -37,6 +37,7 @@ public class PageServiceImpl extends BaseService implements IPageService {
     public GenieResponse<PageAssemble> getPageAssemble(PageAssembleCriteria pageAssembleCriteria) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(pageAssembleCriteria));
+        params.put("logLevel", "2");
         String methodName = "getPageAssemble@PageServiceImpl";
 
         GenieResponse<PageAssemble> response;

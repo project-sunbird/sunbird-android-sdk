@@ -115,8 +115,6 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         Long lastSyncTime = keyValueStore.getLong(ServiceConstants.PreferenceKey.LAST_SYNC_TIME, 0L);
         GenieResponse<TelemetryStat> genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         genieResponse.setResult(new TelemetryStat(unSyncedEventCount, lastSyncTime));
-
-        saveEvent(TelemetryLogger.create(mAppContext, genieResponse, TAG, methodName, params, new HashMap<String, Object>()).toString());
         return genieResponse;
     }
 

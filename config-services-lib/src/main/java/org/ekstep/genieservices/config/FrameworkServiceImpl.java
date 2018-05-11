@@ -45,6 +45,7 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         String methodName = "getChannelDetails@FrameworkServiceImpl";
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(channelDetailsRequest));
+        params.put("logLevel", "2");
 
         long expirationTime = getLongFromKeyValueStore(FrameworkConstants.PreferenceKey.CHANNEL_DETAILS_API_EXPIRATION_KEY);
         String channelId = channelDetailsRequest.getChannelId();
@@ -121,6 +122,7 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         String methodName = "getFrameworkDetails@FrameworkServiceImpl";
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(frameworkDetailsRequest));
+        params.put("logLevel", "2");
 
         long expirationTime = getLongFromKeyValueStore(FrameworkConstants.PreferenceKey.FRAMEWORK_DETAILS_API_EXPIRATION_KEY);
         String frameworkId = null;
