@@ -233,6 +233,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         String methodName = "getChildContents@ContentServiceImpl";
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(childContentRequest));
+        params.put("logLevel", "2");
 
         GenieResponse<Content> response;
         ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), childContentRequest.getContentId());
