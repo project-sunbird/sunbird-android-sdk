@@ -5,6 +5,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
@@ -71,12 +72,23 @@ public abstract class BaseAPI {
                     processAuthFailure(apiResponse);
                     return fetchFromServer(requestType, false);
                 } else {
+                    String error = NetworkConstants.SERVERAUTH_ERROR;
                     String errorMsg = NetworkConstants.SERVERAUTH_ERROR_MESSAGE;
                     if (!StringUtil.isNullOrEmpty(apiResponse.getResponseBody())) {
-                        errorMsg = apiResponse.getResponseBody();
+                        try {
+                            Map<String, Object> errorResponseBodyMap = GsonUtil.fromJson(apiResponse.getResponseBody(), Map.class);
+                            if (errorResponseBodyMap != null && !errorResponseBodyMap.isEmpty()
+                                    && errorResponseBodyMap.containsKey("params")) {
+                                Map<String, Object> params = (Map<String, Object>) errorResponseBodyMap.get("params");
+                                error = (String) params.get("err");
+                                errorMsg = (String) params.get("errmsg");
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
 
-                    return getErrorResponse(NetworkConstants.SERVERAUTH_ERROR, errorMsg);
+                    return getErrorResponse(error, errorMsg);
                 }
             } else {
                 String errorMsg = NetworkConstants.SERVER_ERROR_MESSAGE;
