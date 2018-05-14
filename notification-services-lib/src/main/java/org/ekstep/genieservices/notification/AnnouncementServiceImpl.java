@@ -10,17 +10,17 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.Announcement;
 import org.ekstep.genieservices.commons.bean.AnnouncementDetailsRequest;
-import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.UpdateAnnouncementStateRequest;
-import org.ekstep.genieservices.commons.bean.Session;
 import org.ekstep.genieservices.commons.bean.AnnouncementList;
 import org.ekstep.genieservices.commons.bean.AnnouncementListRequest;
+import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.Session;
+import org.ekstep.genieservices.commons.bean.UpdateAnnouncementStateRequest;
 import org.ekstep.genieservices.commons.bean.enums.AnnouncementStatus;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.notification.network.AnnouncementDetailsAPI;
+import org.ekstep.genieservices.notification.network.AnnouncementListAPI;
 import org.ekstep.genieservices.notification.network.ReadAnnouncementAPI;
 import org.ekstep.genieservices.notification.network.ReceivedAnnouncementAPI;
-import org.ekstep.genieservices.notification.network.AnnouncementListAPI;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.util.HashMap;
@@ -151,10 +151,8 @@ public class AnnouncementServiceImpl extends BaseService implements IAnnouncemen
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         } else {
-            response = GenieResponseBuilder.getErrorResponse(genieResponse.getError(),
-                    genieResponse.getMessage(), TAG);
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params,
-                    genieResponse.getMessage());
+            response = GenieResponseBuilder.getErrorResponse(genieResponse.getError(), genieResponse.getMessage(), TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, genieResponse.getMessage());
         }
         return response;
     }

@@ -5,10 +5,10 @@ import org.ekstep.genieservices.IAnnouncementService;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.Announcement;
 import org.ekstep.genieservices.commons.bean.AnnouncementDetailsRequest;
-import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.UpdateAnnouncementStateRequest;
 import org.ekstep.genieservices.commons.bean.AnnouncementList;
 import org.ekstep.genieservices.commons.bean.AnnouncementListRequest;
+import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.UpdateAnnouncementStateRequest;
 
 /**
  * This class provides APIs for performing {@link AnnouncementService} related operations on a separate thread.
@@ -58,7 +58,7 @@ public class AnnouncementService {
      * @param updateAnnouncementStateRequest - {@link UpdateAnnouncementStateRequest}
      * @param {@link                         GenieResponse<Void>}
      */
-    public void receivedAnnouncement(final UpdateAnnouncementStateRequest updateAnnouncementStateRequest, IResponseHandler<Void> responseHandler) {
+    public void updateAnnouncementState(final UpdateAnnouncementStateRequest updateAnnouncementStateRequest, IResponseHandler<Void> responseHandler) {
         ThreadPool.getInstance().execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
