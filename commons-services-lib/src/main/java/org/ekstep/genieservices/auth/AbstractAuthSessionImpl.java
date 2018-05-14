@@ -14,7 +14,7 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
  */
 public abstract class AbstractAuthSessionImpl implements IAuthSession<Session> {
 
-    private AppContext mAppContext;
+    protected AppContext mAppContext;
     private Session mSession;
 
     @Override
