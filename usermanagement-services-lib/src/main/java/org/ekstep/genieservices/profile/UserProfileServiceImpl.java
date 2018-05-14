@@ -30,6 +30,7 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -332,9 +333,13 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         } else {
-            response = GenieResponseBuilder.getErrorResponse(updateUserInfoAPIResponse.getError(),
-                    updateUserInfoAPIResponse.getMessage(), TAG);
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, response.getMessage());
+            List<String> errorMessages = updateUserInfoAPIResponse.getErrorMessages();
+            String errorMessage = null;
+            if (!CollectionUtil.isNullOrEmpty(errorMessages)) {
+                errorMessage = errorMessages.get(0);
+            }
+            response = GenieResponseBuilder.getErrorResponse(updateUserInfoAPIResponse.getError(), errorMessage, TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
         }
 
         return response;
