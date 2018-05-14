@@ -75,28 +75,29 @@ public abstract class BaseAPI {
                     String error = NetworkConstants.SERVERAUTH_ERROR;
                     String errorMsg = NetworkConstants.SERVERAUTH_ERROR_MESSAGE;
                     if (!StringUtil.isNullOrEmpty(apiResponse.getResponseBody())) {
-                        try {
-                            Map<String, Object> errorResponseBodyMap = GsonUtil.fromJson(apiResponse.getResponseBody(), Map.class);
-                            if (errorResponseBodyMap != null && !errorResponseBodyMap.isEmpty()
-                                    && errorResponseBodyMap.containsKey("params")) {
-                                Map<String, Object> params = (Map<String, Object>) errorResponseBodyMap.get("params");
-                                error = (String) params.get("err");
-                                errorMsg = (String) params.get("errmsg");
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                        errorMsg = apiResponse.getResponseBody();
                     }
 
                     return getErrorResponse(error, errorMsg);
                 }
             } else {
+                String error = NetworkConstants.SERVER_ERROR;
                 String errorMsg = NetworkConstants.SERVER_ERROR_MESSAGE;
                 if (!StringUtil.isNullOrEmpty(apiResponse.getResponseBody())) {
-                    errorMsg = apiResponse.getResponseBody();
+                    try {
+                        Map<String, Object> errorResponseBodyMap = GsonUtil.fromJson(apiResponse.getResponseBody(), Map.class);
+                        if (errorResponseBodyMap != null && !errorResponseBodyMap.isEmpty()
+                                && errorResponseBodyMap.containsKey("params")) {
+                            Map<String, Object> params = (Map<String, Object>) errorResponseBodyMap.get("params");
+                            error = (String) params.get("err");
+                            errorMsg = (String) params.get("errmsg");
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
 
-                return getErrorResponse(NetworkConstants.SERVERAUTH_ERROR, errorMsg);
+                return getErrorResponse(error, errorMsg);
             }
         } catch (IOException e) {
             Logger.e(TAG, e.getMessage());
