@@ -1,9 +1,9 @@
 {
-  "id": "ekstep.learning.terms.list",
-  "ver": "3.0",
-  "ts": "2017-08-02T10:19:39ZZ",
+  "id": "listTerms_v3",
+  "ver": "2.0",
+  "ts": "2018-05-17T11:56:08ZZ",
   "params": {
-    "resmsgid": "b064bc17-9410-4892-b03d-650dc2bbd9e3",
+    "resmsgid": "1b9a3460-6422-4aab-b4cf-0a78f756db4a",
     "msgid": null,
     "err": null,
     "status": "successful",
@@ -11,26 +11,6 @@
   },
   "responseCode": "OK",
   "result": {
-    "config": {
-      "label": "Genie config",
-      "value": "config",
-      "language": "en",
-      "description": "Genie configurations",
-      "values": [
-        {
-          "label": "facets",
-          "value": "contentType,domain,ageGroup,language,gradeLevel"
-        },
-        {
-          "label": "contentType",
-          "value": "Story,Worksheet,Game,Collection,TextBook,Resource"
-        },
-        {
-          "label": "exclPragma",
-          "value": "external,ads"
-        }
-      ]
-    },
     "gradeLevel": {
       "label": "Grade Level",
       "value": "gradeLevel",
@@ -45,174 +25,175 @@
           "search": {
             "filters": {
               "gradeLevel": [
-                "Kindergarten"
+                "KG"
               ]
             }
           }
         },
         {
-          "label": "Grade 1",
+          "label": "Class 1",
           "value": "1",
           "telemetry": "1",
           "description": "",
           "search": {
             "filters": {
               "gradeLevel": [
-                "Grade 1"
+                "Class 1"
               ]
             }
           }
         },
         {
-          "label": "Grade 2",
+          "label": "Class 2",
           "value": "2",
           "telemetry": "2",
           "description": "",
           "search": {
             "filters": {
               "gradeLevel": [
-                "Grade 2"
+                "Class 2"
               ]
             }
           }
         },
         {
-          "label": "Grade 3",
+          "label": "Class 3",
           "value": "3",
           "telemetry": "3",
           "description": "",
           "search": {
             "filters": {
               "gradeLevel": [
-                "Grade 3"
+                "Class 3"
               ]
             }
           }
         },
         {
-          "label": "Grade 4",
+          "label": "Class 4",
           "value": "4",
           "telemetry": "4",
           "description": "",
           "search": {
             "filters": {
               "gradeLevel": [
-                "Grade 4"
+                "Class 4"
               ]
             }
           }
         },
         {
-          "label": "Grade 5",
+          "label": "Class 5",
           "value": "5",
           "telemetry": "5",
           "description": "",
           "search": {
             "filters": {
               "gradeLevel": [
-                "Grade 5"
+                "Class 5"
               ]
             }
           }
         },
         {
-          "label": "Grade 6",
+          "label": "Class 6",
           "value": "6",
           "telemetry": "6",
           "description": "",
           "search": {
             "filters": {
               "gradeLevel": [
-                "Grade 6"
+                "Class 6"
               ]
             }
           }
         },
         {
-          "label": "Grade 7",
+          "label": "Class 7",
           "value": "7",
           "telemetry": "7",
           "description": "",
           "search": {
             "filters": {
               "gradeLevel": [
-                "Grade 7"
+                "Class 7"
               ]
             }
           }
         },
         {
-          "label": "Grade 8",
+          "label": "Class 8",
           "value": "8",
           "telemetry": "8",
           "description": "",
           "search": {
             "filters": {
               "gradeLevel": [
-                "Grade 8"
+                "Class 8"
               ]
             }
           }
         },
         {
-          "label": "Grade 9",
+          "label": "Class 9",
           "value": "9",
           "telemetry": "9",
           "description": "",
           "search": {
             "filters": {
               "gradeLevel": [
-                "Grade 9"
+                "Class 9"
               ]
             }
           }
         },
         {
-          "label": "Grade 10",
+          "label": "Class 10",
           "value": "10",
           "telemetry": "10",
           "description": "",
           "search": {
             "filters": {
               "gradeLevel": [
-                "Grade 10"
+                "Class 10"
               ]
             }
           }
         },
         {
-          "label": "Grade 11",
+          "label": "Class 11",
           "value": "11",
           "telemetry": "11",
           "description": "",
           "search": {
             "filters": {
               "gradeLevel": [
-                "Grade 11"
+                "Class 11"
               ]
             }
           }
         },
         {
-          "label": "Grade 12",
+          "label": "Class 12",
           "value": "12",
           "telemetry": "12",
           "description": "",
           "search": {
             "filters": {
               "gradeLevel": [
-                "Grade 12"
+                "Class 12"
               ]
             }
           }
         },
         {
-          "label": "Others",
+          "label": "Other",
           "value": "-1",
           "telemetry": "-1",
           "description": "",
           "search": {
             "filters": {
+
             }
           }
         }
@@ -252,73 +233,12 @@
         }
       ]
     },
-    "pragma": {
-      "label": "pragma",
-      "value": "pragma",
-      "language": "en",
-      "description": "Content pragma",
-      "values": [
-        {
-          "label": "External",
-          "value": "external",
-          "telemetry": "external",
-          "description": "",
-          "search": {
-            "filters": {
-              "pragma": [
-                "external"
-              ]
-            },
-            "exclFilters": {
-              "pragma": {
-                "notIn": [
-                  "external"
-                ]
-              }
-            }
-          }
-        },
-        {
-          "label": "Ads",
-          "value": "ads",
-          "telemetry": "ads",
-          "description": "",
-          "search": {
-            "filters": {
-              "pragma": [
-                "ads"
-              ]
-            },
-            "exclFilters": {
-              "pragma": {
-                "notIn": [
-                  "ads"
-                ]
-              }
-            }
-          }
-        }
-      ]
-    },
     "subject": {
       "label": "Subject",
       "value": "subject",
       "language": "en",
       "description": "Subject of the content",
       "values": [
-        {
-          "label": "Maths",
-          "value": "Maths",
-          "telemetry": "Maths",
-          "description": "",
-          "search": {
-            "filters": {
-              "subject": [
-                "MATHS"
-              ]
-            }
-          }
-        },
         {
           "label": "English",
           "value": "English",
@@ -437,14 +357,14 @@
           }
         },
         {
-          "label": "Oriya",
-          "value": "Oriya",
-          "telemetry": "Oriya",
+          "label": "Odia",
+          "value": "Odia",
+          "telemetry": "Odia",
           "description": "",
           "search": {
             "filters": {
               "subject": [
-                "Oriya"
+                "Odia"
               ]
             }
           }
@@ -500,6 +420,136 @@
               ]
             }
           }
+        },
+        {
+          "label": "Biology",
+          "value": "Biology",
+          "telemetry": "Biology",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Biology"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Chemistry",
+          "value": "Chemistry",
+          "telemetry": "Chemistry",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Chemistry"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Physics",
+          "value": "Physics",
+          "telemetry": "Physics",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Physics"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Mathematics",
+          "value": "Mathematics",
+          "telemetry": "Mathematics",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Mathematics"
+              ]
+            }
+          }
+        },
+        {
+          "label": "EvS",
+          "value": "EvS",
+          "telemetry": "EvS",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "EvS"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Geography",
+          "value": "Geography",
+          "telemetry": "Geography",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Geography"
+              ]
+            }
+          }
+        },
+        {
+          "label": "History",
+          "value": "History",
+          "telemetry": "History",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "History"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Political Science",
+          "value": "Political Science",
+          "telemetry": "Political Science",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Political Science"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Economics",
+          "value": "Economics",
+          "telemetry": "Economics",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Economics"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Sanskrit",
+          "value": "Sanskrit",
+          "telemetry": "Sanskrit",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Sanskrit"
+              ]
+            }
+          }
         }
       ]
     },
@@ -531,6 +581,32 @@
             "filters": {
               "tags": [
                 "GPF"
+              ]
+            }
+          }
+        },
+        {
+          "label": "AKSHARA-ESL",
+          "value": "AKSHARA-ESL",
+          "telemetry": "AKSHARA-ESL",
+          "description": "",
+          "search": {
+            "filters": {
+              "tags": [
+                "AKSHARA-ESL"
+              ]
+            }
+          }
+        },
+        {
+          "label": "LFW",
+          "value": "LFW_1",
+          "telemetry": "LFW_1",
+          "description": "",
+          "search": {
+            "filters": {
+              "tags": [
+                "LFW"
               ]
             }
           }
@@ -661,14 +737,14 @@
           }
         },
         {
-          "label": "Oriya",
-          "value": "Oriya",
-          "telemetry": "Oriya",
+          "label": "Odia",
+          "value": "Odia",
+          "telemetry": "Odia",
           "description": "",
           "search": {
             "filters": {
               "medium": [
-                "Oriya"
+                "Odia"
               ]
             }
           }
@@ -731,6 +807,7 @@
           "telemetry": "",
           "description": "",
           "search": {
+
           }
         }
       ]
@@ -826,8 +903,29 @@
           "description": "",
           "search": {
             "filters": {
+
             }
           }
+        }
+      ]
+    },
+    "config": {
+      "label": "Genie config",
+      "value": "config",
+      "language": "en",
+      "description": "Genie configurations",
+      "values": [
+        {
+          "label": "facets",
+          "value": "contentType,domain,ageGroup,language,gradeLevel"
+        },
+        {
+          "label": "contentType",
+          "value": "Story,Worksheet,Game,Collection,TextBook,Resource"
+        },
+        {
+          "label": "exclPragma",
+          "value": "external,ads"
         }
       ]
     },
@@ -878,14 +976,79 @@
           }
         },
         {
-          "label": "MSCERT",
-          "value": "MSCERT",
-          "telemetry": "MSCERT",
+          "label": "State (Uttar Pradesh)",
+          "value": "State (Uttar Pradesh)",
+          "telemetry": "State (Uttar Pradesh)",
           "description": "",
           "search": {
             "filters": {
               "board": [
-                "MSCERT"
+                "State (Uttar Pradesh)"
+              ]
+            }
+          }
+        },
+        {
+          "label": "State (Andhra Pradesh)",
+          "value": "State (Andhra Pradesh)",
+          "telemetry": "State (Andhra Pradesh)",
+          "description": "",
+          "search": {
+            "filters": {
+              "board": [
+                "State (Andhra Pradesh)"
+              ]
+            }
+          }
+        },
+        {
+          "label": "State (Tamil Nadu)",
+          "value": "State (Tamil Nadu)",
+          "telemetry": "State (Tamil Nadu)",
+          "description": "",
+          "search": {
+            "filters": {
+              "board": [
+                "State (Tamil Nadu)"
+              ]
+            }
+          }
+        },
+        {
+          "label": "NCTE",
+          "value": "NCTE",
+          "telemetry": "NCTE",
+          "description": "",
+          "search": {
+            "filters": {
+              "board": [
+                "NCTE"
+              ]
+            }
+          }
+        },
+        {
+          "label": "State (Maharashtra)",
+          "value": "State (Maharashtra)",
+          "telemetry": "State (Maharashtra)",
+          "description": "",
+          "search": {
+            "filters": {
+              "board": [
+                "State (Maharashtra)"
+              ]
+            }
+          }
+        },
+        {
+          "label": "State (Rajasthan)",
+          "value": "State (Rajasthan)",
+          "telemetry": "State (Rajasthan)",
+          "description": "",
+          "search": {
+            "filters": {
+              "board": [
+                "State (Rajasthan)"
               ]
             }
           }
