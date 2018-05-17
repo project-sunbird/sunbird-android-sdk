@@ -47,16 +47,16 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         params.put("request", GsonUtil.toJson(channelDetailsRequest));
         params.put("logLevel", "2");
 
-        long expirationTime = getLongFromKeyValueStore(FrameworkConstants.PreferenceKey.CHANNEL_DETAILS_API_EXPIRATION_KEY);
         String channelId = channelDetailsRequest.getChannelId();
-        if (expirationTime == 0) {
+        long expirationTime = getLongFromKeyValueStore(FrameworkConstants.PreferenceKey.CHANNEL_DETAILS_API_EXPIRATION_KEY);
+        NoSqlModel refreshDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), DB_KEY_CHANNEL_DETAILS + channelId);
+        if (expirationTime == 0 && refreshDetailsInDb == null) {
             initializeChannelDetails(channelId);
         } else if (hasExpired(expirationTime)) {
             refreshChannelDetails(channelId);
         }
 
-        NoSqlModel refreshDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), DB_KEY_CHANNEL_DETAILS + channelId);
-
+        refreshDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), DB_KEY_CHANNEL_DETAILS + channelId);
         Channel channelDetails = null;
         if (refreshDetailsInDb != null) {
             LinkedTreeMap map = GsonUtil.fromJson(refreshDetailsInDb.getValue(), LinkedTreeMap.class);
@@ -124,22 +124,22 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         params.put("request", GsonUtil.toJson(frameworkDetailsRequest));
         params.put("logLevel", "2");
 
-        long expirationTime = getLongFromKeyValueStore(FrameworkConstants.PreferenceKey.FRAMEWORK_DETAILS_API_EXPIRATION_KEY);
-        String frameworkId = null;
+        String frameworkId;
         if (frameworkDetailsRequest.isDefaultFrameworkDetails()) {
             frameworkId = getDefaultFrameworkDetails();
         } else {
             frameworkId = frameworkDetailsRequest.getFrameworkId();
         }
 
-        if (expirationTime == 0) {
+        long expirationTime = getLongFromKeyValueStore(FrameworkConstants.PreferenceKey.FRAMEWORK_DETAILS_API_EXPIRATION_KEY);
+        NoSqlModel refreshDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), DB_KEY_FRAMEWORK_DETAILS + frameworkId);
+        if (expirationTime == 0 && refreshDetailsInDb == null) {
             initializeFrameworkDetails(frameworkId);
         } else if (hasExpired(expirationTime)) {
             refreshFrameworkDetails(frameworkId);
         }
 
-        NoSqlModel refreshDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), DB_KEY_FRAMEWORK_DETAILS + frameworkId);
-
+        refreshDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), DB_KEY_FRAMEWORK_DETAILS + frameworkId);
         Framework frameworkDetails = null;
         if (refreshDetailsInDb != null) {
             LinkedTreeMap map = GsonUtil.fromJson(refreshDetailsInDb.getValue(), LinkedTreeMap.class);
