@@ -1,10 +1,10 @@
 {
     "id": "api.framework.read",
     "ver": "1.0",
-    "ts": "2018-03-22T10:36:33.990Z",
+    "ts": "2018-05-17T06:53:59.905Z",
     "params": {
-        "resmsgid": "e42a9e60-2dbc-11e8-8756-e56ac99b48c4",
-        "msgid": "e414a560-2dbc-11e8-82fc-69aa15ddb045",
+        "resmsgid": "13a4f510-599f-11e8-93b3-fd947d871a8a",
+        "msgid": "139fc4f0-599f-11e8-9d42-f53ca24c2aa8",
         "status": "successful",
         "err": null,
         "errmsg": null
@@ -15,26 +15,13 @@
             "owner": "in.ekstep",
             "identifier": "NCF",
             "code": "NCF",
-            "consumerId": "8d856593-ac2d-4c10-b5fa-64dfb268aeb3",
+            "consumerId": "62e15662-bb09-439f-86e2-d65bd84f3c23",
             "channel": "in.ekstep",
-            "description": " NCF framework.",
+            "description": "NCF",
             "type": "K-12",
-            "createdOn": "2018-01-23T17:07:56.405+0000",
-            "versionKey": "1516728015032",
+            "createdOn": "2018-02-06T14:07:32.478+0000",
+            "versionKey": "1524231835974",
             "channels": [
-                {
-                    "identifier": "ORG_001",
-                    "name": "Org 001",
-                    "objectType": "Channel",
-                    "relation": "hasSequenceMember",
-                    "description": "Channel for Org 001",
-                    "index": null,
-                    "status": null,
-                    "depth": null,
-                    "mimeType": null,
-                    "visibility": null,
-                    "compatibilityLevel": null
-                },
                 {
                     "identifier": "in.ekstep",
                     "name": "Ekstep",
@@ -47,11 +34,24 @@
                     "mimeType": null,
                     "visibility": null,
                     "compatibilityLevel": null
+                },
+                {
+                    "identifier": "01231801647892889628",
+                    "name": "TRUE",
+                    "objectType": "Channel",
+                    "relation": "hasSequenceMember",
+                    "description": "test",
+                    "index": null,
+                    "status": null,
+                    "depth": null,
+                    "mimeType": null,
+                    "visibility": null,
+                    "compatibilityLevel": null
                 }
             ],
             "appId": "ekstep_portal",
             "name": "NCF framework",
-            "lastUpdatedOn": "2018-01-23T17:20:15.032+0000",
+            "lastUpdatedOn": "2018-04-20T13:43:55.974+0000",
             "categories": [
                 {
                     "identifier": "ncf_board",
@@ -87,8 +87,8 @@
                         {
                             "identifier": "ncf_board_upboard",
                             "code": "upboard",
-                            "name": "UP Board",
-                            "description": "",
+                            "name": "State (Uttar Pradesh)",
+                            "description": "State (Uttar Pradesh)",
                             "index": 4,
                             "category": "board",
                             "status": "Live"
@@ -96,8 +96,8 @@
                         {
                             "identifier": "ncf_board_apboard",
                             "code": "apboard",
-                            "name": "AP Board",
-                            "description": "",
+                            "name": "State (Andhra Pradesh)",
+                            "description": "State (Andhra Pradesh)",
                             "index": 5,
                             "category": "board",
                             "status": "Live"
@@ -105,8 +105,8 @@
                         {
                             "identifier": "ncf_board_tnboard",
                             "code": "tnboard",
-                            "name": "TN Board",
-                            "description": "",
+                            "name": "State (Tamil Nadu)",
+                            "description": "State (Tamil Nadu)",
                             "index": 6,
                             "category": "board",
                             "status": "Live"
@@ -123,8 +123,8 @@
                         {
                             "identifier": "ncf_board_mscert",
                             "code": "mscert",
-                            "name": "MSCERT",
-                            "description": "",
+                            "name": "State (Maharashtra)",
+                            "description": "State (Maharashtra)",
                             "index": 8,
                             "category": "board",
                             "status": "Live"
@@ -132,8 +132,8 @@
                         {
                             "identifier": "ncf_board_bser",
                             "code": "bser",
-                            "name": "BSER",
-                            "description": "",
+                            "name": "State (Rajasthan)",
+                            "description": "State (Rajasthan)",
                             "index": 9,
                             "category": "board",
                             "status": "Live"
@@ -141,14 +141,14 @@
                         {
                             "identifier": "ncf_board_others",
                             "code": "others",
-                            "name": "Others",
-                            "description": "",
+                            "name": "Other",
+                            "description": "Other",
                             "index": 10,
                             "category": "board",
                             "status": "Live"
                         }
                     ],
-                    "name": "Curriculum",
+                    "name": "Board",
                     "description": "",
                     "index": 1,
                     "status": "Live"
@@ -160,26 +160,26 @@
                         {
                             "identifier": "ncf_gradelevel_kindergarten",
                             "code": "kindergarten",
-                            "name": "Kindergarten",
-                            "description": "",
+                            "name": "KG",
+                            "description": "KG",
                             "index": 1,
-                            "category": "gradeLevel",
+                            "category": "gradelevel",
                             "status": "Live"
                         },
                         {
                             "identifier": "ncf_gradelevel_grade1",
                             "code": "grade1",
-                            "name": "Grade 1",
-                            "description": "",
+                            "name": "Class 1",
+                            "description": "Class 1",
                             "index": 2,
-                            "category": "gradeLevel",
+                            "category": "gradelevel",
                             "status": "Live"
                         },
                         {
                             "identifier": "ncf_gradelevel_grade2",
                             "code": "grade2",
-                            "name": "Grade 2",
-                            "description": "",
+                            "name": "Class 2",
+                            "description": "Class 2",
                             "index": 3,
                             "category": "gradeLevel",
                             "status": "Live"
@@ -187,91 +187,91 @@
                         {
                             "identifier": "ncf_gradelevel_grade3",
                             "code": "grade3",
-                            "name": "Grade 3",
-                            "description": "",
+                            "name": "Class 3",
+                            "description": "Class 3",
                             "index": 4,
-                            "category": "gradeLevel",
+                            "category": "gradelevel",
                             "status": "Live"
                         },
                         {
                             "identifier": "ncf_gradelevel_grade4",
                             "code": "grade4",
-                            "name": "Grade 4",
-                            "description": "",
+                            "name": "Class 4",
+                            "description": "Class 4",
                             "index": 5,
-                            "category": "gradeLevel",
+                            "category": "gradelevel",
                             "status": "Live"
                         },
                         {
                             "identifier": "ncf_gradelevel_grade5",
                             "code": "grade5",
-                            "name": "Grade 5",
-                            "description": "",
+                            "name": "Class 5",
+                            "description": "Class 5",
                             "index": 6,
-                            "category": "gradeLevel",
+                            "category": "gradelevel",
                             "status": "Live"
                         },
                         {
                             "identifier": "ncf_gradelevel_grade6",
                             "code": "grade6",
-                            "name": "Grade 6",
-                            "description": "",
+                            "name": "Class 6",
+                            "description": "Class 6",
                             "index": 7,
-                            "category": "gradeLevel",
+                            "category": "gradelevel",
                             "status": "Live"
                         },
                         {
                             "identifier": "ncf_gradelevel_grade7",
                             "code": "grade7",
-                            "name": "Grade 7",
-                            "description": "",
+                            "name": "Class 7",
+                            "description": "Class 7",
                             "index": 8,
-                            "category": "gradeLevel",
+                            "category": "gradelevel",
                             "status": "Live"
                         },
                         {
                             "identifier": "ncf_gradelevel_grade8",
                             "code": "grade8",
-                            "name": "Grade 8",
-                            "description": "",
+                            "name": "Class 8",
+                            "description": "Class 8",
                             "index": 9,
-                            "category": "gradeLevel",
+                            "category": "gradelevel",
                             "status": "Live"
                         },
                         {
                             "identifier": "ncf_gradelevel_grade9",
                             "code": "grade9",
-                            "name": "Grade 9",
-                            "description": "",
+                            "name": "Class 9",
+                            "description": "Class 9",
                             "index": 10,
-                            "category": "gradeLevel",
+                            "category": "gradelevel",
                             "status": "Live"
                         },
                         {
                             "identifier": "ncf_gradelevel_grade10",
                             "code": "grade10",
-                            "name": "Grade 10",
-                            "description": "",
+                            "name": "Class 10",
+                            "description": "Class 10",
                             "index": 11,
-                            "category": "gradeLevel",
+                            "category": "gradelevel",
                             "status": "Live"
                         },
                         {
                             "identifier": "ncf_gradelevel_grade11",
                             "code": "grade11",
-                            "name": "Grade 11",
-                            "description": "",
+                            "name": "Class 11",
+                            "description": "Class 11",
                             "index": 12,
-                            "category": "gradeLevel",
+                            "category": "gradelevel",
                             "status": "Live"
                         },
                         {
                             "identifier": "ncf_gradelevel_grade12",
                             "code": "grade12",
-                            "name": "Grade 12",
-                            "description": "",
+                            "name": "Class 12",
+                            "description": "Class 12",
                             "index": 13,
-                            "category": "gradeLevel",
+                            "category": "gradelevel",
                             "status": "Live"
                         },
                         {
@@ -404,8 +404,8 @@
                         {
                             "identifier": "ncf_subject_environmentalstudies",
                             "code": "environmentalstudies",
-                            "name": "Environmental Studies",
-                            "description": "",
+                            "name": "EvS",
+                            "description": "EvS",
                             "index": 13,
                             "category": "subject",
                             "status": "Live"
@@ -458,8 +458,8 @@
                         {
                             "identifier": "ncf_subject_oriya",
                             "code": "oriya",
-                            "name": "Oriya",
-                            "description": "",
+                            "name": "Odia",
+                            "description": "Odia",
                             "index": 19,
                             "category": "subject",
                             "status": "Live"
@@ -488,6 +488,60 @@
                             "name": "Malayalam",
                             "description": "",
                             "index": 22,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_sanskrit",
+                            "code": "sanskrit",
+                            "name": "Sanskrit",
+                            "description": "Sanskrit",
+                            "index": 23,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_socialstudies",
+                            "code": "socialstudies",
+                            "name": "Social Studies",
+                            "description": "Social Studies",
+                            "index": 24,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_science",
+                            "code": "science",
+                            "name": "Science",
+                            "description": "Science",
+                            "index": 25,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_healthandphysicaleducation",
+                            "code": "healthandphysicaleducation",
+                            "name": "Health and Physical Education",
+                            "description": "Health and Physical Education",
+                            "index": 26,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_economics",
+                            "code": "economics",
+                            "name": "Economics",
+                            "description": "Economics",
+                            "index": 27,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_other",
+                            "code": "other",
+                            "name": "Other",
+                            "description": "Other",
+                            "index": 28,
                             "category": "subject",
                             "status": "Live"
                         }
@@ -522,8 +576,8 @@
                         {
                             "identifier": "ncf_medium_oriya",
                             "code": "oriya",
-                            "name": "Oriya",
-                            "description": "",
+                            "name": "Odia",
+                            "description": "Odia",
                             "index": 3,
                             "category": "medium",
                             "status": "Live"
