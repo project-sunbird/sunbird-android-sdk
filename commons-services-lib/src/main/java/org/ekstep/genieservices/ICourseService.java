@@ -1,5 +1,7 @@
 package org.ekstep.genieservices;
 
+import org.ekstep.genieservices.commons.bean.Batch;
+import org.ekstep.genieservices.commons.bean.BatchDetailsRequest;
 import org.ekstep.genieservices.commons.bean.CourseBatchesRequest;
 import org.ekstep.genieservices.commons.bean.CourseBatchesResponse;
 import org.ekstep.genieservices.commons.bean.EnrollCourseRequest;
@@ -44,4 +46,13 @@ public interface ICourseService {
      * @return
      */
     GenieResponse<CourseBatchesResponse> getCourseBatches(CourseBatchesRequest courseBatchesRequest);
+
+    /**
+     * This api is used to get batch detail.
+     *
+     * @param batchDetailsRequest
+     * @return
+     */
+    GenieResponse<Batch> getBatchDetails(BatchDetailsRequest batchDetailsRequest);
+
 }

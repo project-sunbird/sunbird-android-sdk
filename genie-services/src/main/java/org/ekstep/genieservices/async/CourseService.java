@@ -3,6 +3,8 @@ package org.ekstep.genieservices.async;
 import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.ICourseService;
 import org.ekstep.genieservices.commons.IResponseHandler;
+import org.ekstep.genieservices.commons.bean.Batch;
+import org.ekstep.genieservices.commons.bean.BatchDetailsRequest;
 import org.ekstep.genieservices.commons.bean.CourseBatchesRequest;
 import org.ekstep.genieservices.commons.bean.CourseBatchesResponse;
 import org.ekstep.genieservices.commons.bean.EnrollCourseRequest;
@@ -41,7 +43,7 @@ public class CourseService {
      * This api is used to enroll the course.
      *
      * @param enrollCourseRequest - {@link EnrollCourseRequest}
-     * @param responseHandler    - {@link IResponseHandler <Void>}
+     * @param responseHandler     - {@link IResponseHandler <Void>}
      */
     public void enrollCourse(final EnrollCourseRequest enrollCourseRequest, IResponseHandler<Void> responseHandler) {
         ThreadPool.getInstance().execute(new IPerformable<Void>() {
@@ -78,6 +80,15 @@ public class CourseService {
             @Override
             public GenieResponse<CourseBatchesResponse> perform() {
                 return courseService.getCourseBatches(courseBatchesRequest);
+            }
+        }, responseHandler);
+    }
+
+    public void getBatchDetails(final BatchDetailsRequest batchDetailsRequest, IResponseHandler<Batch> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<Batch>() {
+            @Override
+            public GenieResponse<Batch> perform() {
+                return courseService.getBatchDetails(batchDetailsRequest);
             }
         }, responseHandler);
     }

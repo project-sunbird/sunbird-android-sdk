@@ -8,6 +8,7 @@ import org.ekstep.genieservices.commons.bean.Session;
 import org.ekstep.genieservices.commons.bean.UpdateContentStateRequest;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.StringUtil;
+import org.ekstep.genieservices.content.network.BatchDetailsAPI;
 import org.ekstep.genieservices.content.network.CourseBatchesAPI;
 import org.ekstep.genieservices.content.network.EnrolCourseAPI;
 import org.ekstep.genieservices.content.network.EnrolledCoursesAPI;
@@ -114,5 +115,11 @@ public class CourseHandler {
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("filters", filterMap);
         return requestMap;
+    }
+
+    public static GenieResponse fetchBatchDetailsFromServer(AppContext appContext, Session sessionData,
+                                                            String batchId) {
+        BatchDetailsAPI batchDetailsAPI = new BatchDetailsAPI(appContext, getCustomHeaders(sessionData), batchId);
+        return batchDetailsAPI.get();
     }
 }

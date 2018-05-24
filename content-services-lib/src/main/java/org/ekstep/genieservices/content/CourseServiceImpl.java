@@ -10,6 +10,7 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.Batch;
+import org.ekstep.genieservices.commons.bean.BatchDetailsRequest;
 import org.ekstep.genieservices.commons.bean.CourseBatchesRequest;
 import org.ekstep.genieservices.commons.bean.CourseBatchesResponse;
 import org.ekstep.genieservices.commons.bean.EnrollCourseRequest;
@@ -21,6 +22,7 @@ import org.ekstep.genieservices.commons.bean.UpdateContentStateRequest;
 import org.ekstep.genieservices.commons.bean.UserSearchCriteria;
 import org.ekstep.genieservices.commons.bean.UserSearchResult;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
+import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
@@ -88,10 +90,13 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
                 enrolledCoursesInDB = NoSqlModel.build(mAppContext.getDBSession(), key, body);
                 enrolledCoursesInDB.save();
             } else {
-                response = GenieResponseBuilder.getErrorResponse(enrolledCoursesAPIResponse.getError(),
-                        enrolledCoursesAPIResponse.getMessage(), TAG);
-
-                TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, enrolledCoursesAPIResponse.getMessage());
+                List<String> errorMessages = enrolledCoursesAPIResponse.getErrorMessages();
+                String errorMessage = null;
+                if (!CollectionUtil.isNullOrEmpty(errorMessages)) {
+                    errorMessage = errorMessages.get(0);
+                }
+                response = GenieResponseBuilder.getErrorResponse(enrolledCoursesAPIResponse.getError(), errorMessage, TAG);
+                TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
                 return response;
             }
         } else if (enrolledCoursesRequest.isRefreshEnrolledCourses()) {
@@ -128,10 +133,13 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
 
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         } else {
-            response = GenieResponseBuilder.getErrorResponse(enrolCourseAPIResponse.getError(),
-                    enrolCourseAPIResponse.getMessage(), TAG);
-
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, response.getMessage());
+            List<String> errorMessages = enrolCourseAPIResponse.getErrorMessages();
+            String errorMessage = null;
+            if (!CollectionUtil.isNullOrEmpty(errorMessages)) {
+                errorMessage = errorMessages.get(0);
+            }
+            response = GenieResponseBuilder.getErrorResponse(enrolCourseAPIResponse.getError(), errorMessage, TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
         }
 
         return response;
@@ -156,10 +164,13 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
 
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         } else {
-            response = GenieResponseBuilder.getErrorResponse(updateContentStateAPIResponse.getError(),
-                    updateContentStateAPIResponse.getMessage(), TAG);
-
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, response.getMessage());
+            List<String> errorMessages = updateContentStateAPIResponse.getErrorMessages();
+            String errorMessage = null;
+            if (!CollectionUtil.isNullOrEmpty(errorMessages)) {
+                errorMessage = errorMessages.get(0);
+            }
+            response = GenieResponseBuilder.getErrorResponse(updateContentStateAPIResponse.getError(), errorMessage, TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
         }
 
         return response;
@@ -214,7 +225,6 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
                                     if (eachMap.get("lastName") != null) {
                                         batchList.get(i).setCreatorLastName(eachMap.get("lastName"));
                                     }
-
                                 }
                             }
                         }
@@ -228,9 +238,51 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
 
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         } else {
-            response = GenieResponseBuilder.getErrorResponse(courseBatchesAPIResponse.getError(), courseBatchesAPIResponse.getMessage(), TAG);
+            List<String> errorMessages = courseBatchesAPIResponse.getErrorMessages();
+            String errorMessage = null;
+            if (!CollectionUtil.isNullOrEmpty(errorMessages)) {
+                errorMessage = errorMessages.get(0);
+            }
+            response = GenieResponseBuilder.getErrorResponse(courseBatchesAPIResponse.getError(), errorMessage, TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
+        }
 
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, courseBatchesAPIResponse.getMessage());
+        return response;
+    }
+
+    @Override
+    public GenieResponse<Batch> getBatchDetails(BatchDetailsRequest batchDetailsRequest) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("request", GsonUtil.toJson(batchDetailsRequest));
+        String methodName = "getBatchDetails@CourseServiceImpl";
+
+        GenieResponse<Batch> response = isValidAuthSession(methodName, params);
+        if (response != null) {
+            return response;
+        }
+
+        GenieResponse batchDetailsAPIResponse = CourseHandler.fetchBatchDetailsFromServer(mAppContext,
+                authSession.getSessionData(), batchDetailsRequest.getBatchId());
+
+        if (batchDetailsAPIResponse.getStatus()) {
+            LinkedTreeMap map = GsonUtil.fromJson(batchDetailsAPIResponse.getResult().toString(), LinkedTreeMap.class);
+            LinkedTreeMap result = (LinkedTreeMap) map.get("result");
+            String responseStr = GsonUtil.toJson(result.get("response"));
+
+            Batch batch = GsonUtil.fromJson(responseStr, Batch.class);
+
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+            response.setResult(batch);
+
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        } else {
+            List<String> errorMessages = batchDetailsAPIResponse.getErrorMessages();
+            String errorMessage = null;
+            if (!CollectionUtil.isNullOrEmpty(errorMessages)) {
+                errorMessage = errorMessages.get(0);
+            }
+            response = GenieResponseBuilder.getErrorResponse(batchDetailsAPIResponse.getError(), errorMessage, TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
         }
 
         return response;
