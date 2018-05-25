@@ -15,7 +15,6 @@ public class Session {
     private String accessToken;
     @SerializedName("refresh_token")
     private String refreshToken;
-    @SerializedName("user_token")
     private String userToken;
 
     public Session(String accessToken, String refreshToken, String userToken) {
