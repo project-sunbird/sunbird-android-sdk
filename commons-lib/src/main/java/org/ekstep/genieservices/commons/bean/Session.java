@@ -1,5 +1,7 @@
 package org.ekstep.genieservices.commons.bean;
 
+import com.google.gson.annotations.SerializedName;
+
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
 /**
@@ -9,8 +11,11 @@ import org.ekstep.genieservices.commons.utils.GsonUtil;
  */
 public class Session {
 
+    @SerializedName("access_token")
     private String accessToken;
+    @SerializedName("refresh_token")
     private String refreshToken;
+    @SerializedName("user_token")
     private String userToken;
 
     public Session(String accessToken, String refreshToken, String userToken) {
