@@ -22,6 +22,8 @@ public class ContentData implements Serializable {
     private String size;
     private String owner;
     private String subject;
+    private String board;
+    private String medium;
     private String publisher;
     private String me_totalRatings;
     private String me_averageRating;
@@ -106,6 +108,14 @@ public class ContentData implements Serializable {
 
     public String getSubject() {
         return subject;
+    }
+
+    public String getBoard() {
+        return board;
+    }
+
+    public String getMedium() {
+        return medium;
     }
 
     public String getPublisher() {
