@@ -292,6 +292,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     public GenieResponse<List<ContentDeleteResponse>> deleteContent(ContentDeleteRequest deleteRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(deleteRequest));
+        params.put("logLevel", "2");
         String methodName = "deleteContent@ContentServiceImpl";
 
         List<ContentDeleteResponse> contentDeleteResponseList = new ArrayList<>();
@@ -337,6 +338,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         Map<String, Object> params = new HashMap<>();
         params.put("criteria", GsonUtil.toJson(contentListingCriteria));
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
+        params.put("logLevel", "2");
         String methodName = "getContentListing@ContentServiceImpl";
 
         GenieResponse<ContentListing> response;
@@ -373,6 +375,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     public GenieResponse<ContentSearchResult> searchContent(ContentSearchCriteria contentSearchCriteria) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(contentSearchCriteria));
+        params.put("logLevel", "2");
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
         String methodName = "searchContent@ContentServiceImpl";
 
@@ -437,6 +440,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     public GenieResponse<RecommendedContentResult> getRecommendedContent(RecommendedContentRequest request) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(request));
+        params.put("logLevel", "2");
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
         String methodName = "getRecommendedContents@ContentServiceImpl";
 
@@ -485,6 +489,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     public GenieResponse<RelatedContentResult> getRelatedContent(RelatedContentRequest request) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(request));
+        params.put("logLevel", "2");
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
         String methodName = "getRelatedContent@ContentServiceImpl";
 
@@ -1266,6 +1271,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
     public GenieResponse<Void> flagContent(FlagContentRequest flagContentRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(flagContentRequest));
+        params.put("logLevel", "2");
         String methodName = "flagContent@ContentServiceImpl";
 
         GenieResponse<Void> response = isValidAuthSession(methodName, params);

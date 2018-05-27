@@ -170,6 +170,7 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
     public GenieResponse<UserSearchResult> searchUser(UserSearchCriteria userSearchCriteria) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(userSearchCriteria));
+        params.put("logLevel", "2");
         String methodName = "searchUser@UserProfileServiceImpl";
 
         GenieResponse<UserSearchResult> response = isValidAuthSession(methodName, params);
@@ -200,6 +201,7 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
     public GenieResponse<UserProfileSkill> getSkills(UserProfileSkillsRequest profileSkillsRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(profileSkillsRequest));
+        params.put("logLevel", "2");
         String methodName = "getSkills@UserProfileServiceImpl";
 
         GenieResponse<UserProfileSkill> response;
@@ -237,6 +239,7 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
     public GenieResponse<Void> endorseOrAddSkill(EndorseOrAddSkillRequest endorseOrAddSkillRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(endorseOrAddSkillRequest));
+        params.put("logLevel", "2");
         String methodName = "endorseOrAddSkill@UserProfileServiceImpl";
 
         GenieResponse<Void> response = isValidAuthSession(methodName, params);
@@ -264,6 +267,7 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
     public GenieResponse<Void> setProfileVisibility(ProfileVisibilityRequest profileVisibilityRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(profileVisibilityRequest));
+        params.put("logLevel", "2");
         String methodName = "setProfileVisibility@UserProfileServiceImpl";
 
         GenieResponse<Void> response = isValidAuthSession(methodName, params);
@@ -290,6 +294,7 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
     public GenieResponse<FileUploadResult> uploadFile(UploadFileRequest uploadFileRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(uploadFileRequest));
+        params.put("logLevel", "2");
         String methodName = "updateUserInfo@UserProfileServiceImpl";
 
         GenieResponse<FileUploadResult> response = isValidAuthSession(methodName, params);
@@ -321,6 +326,7 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
     public GenieResponse<Void> updateUserInfo(UpdateUserInfoRequest updateUserInfoRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(updateUserInfoRequest));
+        params.put("logLevel", "2");
         String methodName = "updateUserInfo@UserProfileServiceImpl";
 
         GenieResponse<Void> response = isValidAuthSession(methodName, params);

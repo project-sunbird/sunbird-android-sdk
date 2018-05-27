@@ -72,6 +72,7 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
     public GenieResponse<EnrolledCoursesResponse> getEnrolledCourses(EnrolledCoursesRequest enrolledCoursesRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(enrolledCoursesRequest));
+        params.put("logLevel", "2");
         String methodName = "getEnrolledCourses@CourseServiceImpl";
 
         GenieResponse<EnrolledCoursesResponse> response = isValidAuthSession(methodName, params);
@@ -118,6 +119,7 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
     public GenieResponse<Void> enrollCourse(EnrollCourseRequest enrollCourseRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(enrollCourseRequest));
+        params.put("logLevel", "2");
         String methodName = "enrollCourse@CourseServiceImpl";
 
         GenieResponse<Void> response = isValidAuthSession(methodName, params);
@@ -149,6 +151,7 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
     public GenieResponse<Void> updateContentState(UpdateContentStateRequest updateContentStateRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(updateContentStateRequest));
+        params.put("logLevel", "2");
         String methodName = "updateContentState@CourseServiceImpl";
 
         GenieResponse<Void> response = isValidAuthSession(methodName, params);
@@ -180,6 +183,7 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
     public GenieResponse<CourseBatchesResponse> getCourseBatches(CourseBatchesRequest courseBatchesRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(courseBatchesRequest));
+        params.put("logLevel", "2");
         String methodName = "getCourseBatches@CourseServiceImpl";
 
         GenieResponse<CourseBatchesResponse> response = isValidAuthSession(methodName, params);
@@ -254,6 +258,7 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
     public GenieResponse<Batch> getBatchDetails(BatchDetailsRequest batchDetailsRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(batchDetailsRequest));
+        params.put("logLevel", "2");
         String methodName = "getBatchDetails@CourseServiceImpl";
 
         GenieResponse<Batch> response = isValidAuthSession(methodName, params);

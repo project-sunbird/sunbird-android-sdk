@@ -66,6 +66,7 @@ public class AnnouncementServiceImpl extends BaseService implements IAnnouncemen
     public GenieResponse<Announcement> getAnnouncementDetails(AnnouncementDetailsRequest announcementRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(announcementRequest));
+        params.put("logLevel", "2");
         String methodName = "getAnnouncementDetails@AnnouncementServiceImpl";
 
         GenieResponse<Announcement> response = isValidAuthSession(methodName, params);
@@ -98,6 +99,7 @@ public class AnnouncementServiceImpl extends BaseService implements IAnnouncemen
     public GenieResponse<AnnouncementList> getAnnouncementList(AnnouncementListRequest announcementListRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(announcementListRequest));
+        params.put("logLevel", "2");
         String methodName = "getAnnouncementList@AnnouncementServiceImpl";
 
         GenieResponse<AnnouncementList> response = isValidAuthSession(methodName, params);
@@ -128,6 +130,7 @@ public class AnnouncementServiceImpl extends BaseService implements IAnnouncemen
     public GenieResponse<Void> updateAnnouncementState(UpdateAnnouncementStateRequest updateAnnouncementStateRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(updateAnnouncementStateRequest));
+        params.put("logLevel", "2");
         String methodName = "updateAnnouncementState@AnnouncementServiceImpl";
 
         GenieResponse<Void> response = isValidAuthSession(methodName, params);
