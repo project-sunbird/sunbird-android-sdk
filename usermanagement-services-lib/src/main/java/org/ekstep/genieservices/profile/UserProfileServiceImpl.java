@@ -69,6 +69,7 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
     public GenieResponse<UserProfile> getUserProfileDetails(UserProfileDetailsRequest userProfileDetailsRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(userProfileDetailsRequest));
+        params.put("logLevel", "2");
         String methodName = "getUserProfileDetails@UserProfileServiceImpl";
 
         GenieResponse<UserProfile> response = isValidAuthSession(methodName, params);
@@ -126,6 +127,7 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
     public GenieResponse<TenantInfo> getTenantInfo(TenantInfoRequest tenantInfoRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(tenantInfoRequest));
+        params.put("logLevel", "2");
         String methodName = "getTenantInfo@UserProfileServiceImpl";
 
         GenieResponse<TenantInfo> response = isValidAuthSession(methodName, params);

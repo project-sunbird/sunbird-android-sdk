@@ -1106,6 +1106,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(contentSearchCriteria));
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
+        params.put("logLevel", "2");
         String methodName = "searchSunbirdContent@ContentServiceImpl";
 
         GenieResponse<SunbirdContentSearchResult> response;
