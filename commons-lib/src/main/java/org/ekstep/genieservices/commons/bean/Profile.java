@@ -40,6 +40,7 @@ public class Profile implements Serializable, IValidate {
     private ProfileType profileType;
     private String[] subject;
     private String[] grade;
+    private String[] syllabus;
 
     public Profile(String uid) {
         this.uid = uid;
@@ -200,6 +201,14 @@ public class Profile implements Serializable, IValidate {
 
     public void setGrade(String[] grade) {
         this.grade = grade;
+    }
+
+    public String[] getSyllabus() {
+        return syllabus;
+    }
+
+    public void setSyllabus(String[] syllabus) {
+        this.syllabus = syllabus;
     }
 
     public String toString() {

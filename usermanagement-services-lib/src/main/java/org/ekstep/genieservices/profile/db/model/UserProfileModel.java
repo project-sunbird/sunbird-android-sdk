@@ -242,6 +242,14 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
             contentValues.put(ProfileEntry.COLUMN_NAME_BOARD, StringUtil.join(",", profile.getBoard()));
         }
 
+        if (profile.getProfileType() != null) {
+            contentValues.put(ProfileEntry.COLUMN_NAME_PROFILE_TYPE, profile.getProfileType());
+        }
+
+        if (profile.getSyllabus() != null) {
+            contentValues.put(ProfileEntry.COLUMN_NAME_SYLLABUS, profile.getSyllabus());
+        }
+
         contentValues.put(ProfileEntry.COLUMN_NAME_PROFILE_IMAGE, profile.getProfileImage());
         contentValues.put(ProfileEntry.COLUMN_NAME_PROFILE_TYPE, profile.getProfileType());
         if (profile.getSubject() != null) {

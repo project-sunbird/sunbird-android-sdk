@@ -28,6 +28,7 @@ public abstract class ProfileEntry implements BaseColumns {
     public static final String COLUMN_NAME_PROFILE_TYPE = "profile_type";
     public static final String COLUMN_NAME_SUBJECT = "subject";
     public static final String COLUMN_NAME_GRADE = "grade";
+    public static final String COLUMN_NAME_SYLLABUS = "syllabus";
 
     public static final String getCreateEntry() {
         return "CREATE TABLE " + TABLE_NAME + " (" +
@@ -79,6 +80,10 @@ public abstract class ProfileEntry implements BaseColumns {
         return Arrays.asList("ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_NAME_SUBJECT + DbConstants.TEXT_TYPE + "  DEFAULT '';",
                 "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_NAME_PROFILE_TYPE + DbConstants.TEXT_TYPE + "  DEFAULT 'teacher';",
                 "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_NAME_GRADE + DbConstants.TEXT_TYPE + "  DEFAULT '';");
+    }
+
+    public static String getAlterEntryForProfileSyllabus() {
+        return "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_NAME_SYLLABUS + DbConstants.TEXT_TYPE + "  DEFAULT '';";
     }
 
     public static List<String> getUpdateProfileImage(String basePath) {
