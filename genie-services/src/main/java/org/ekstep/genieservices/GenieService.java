@@ -18,6 +18,7 @@ import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.ReflectionUtil;
 import org.ekstep.genieservices.config.ConfigServiceImpl;
+import org.ekstep.genieservices.config.FormServiceImpl;
 import org.ekstep.genieservices.config.FrameworkServiceImpl;
 import org.ekstep.genieservices.content.ContentFeedbackServiceImpl;
 import org.ekstep.genieservices.content.ContentServiceImpl;
@@ -70,6 +71,7 @@ public class GenieService {
     private IAuthSession<Session> mAuthSession;
     private IPageService mPageService;
     private IAnnouncementService mAnnouncementService;
+    private IFormService mFormService;
 
     private GenieService(AppContext<Context> appContext) {
         this.mAppContext = appContext;
@@ -365,6 +367,13 @@ public class GenieService {
             mPageService = new PageServiceImpl(mAppContext);
         }
         return mPageService;
+    }
+
+    public IFormService getFormService() {
+        if (mFormService == null) {
+            mFormService = new FormServiceImpl(mAppContext);
+        }
+        return mFormService;
     }
 
     /**

@@ -23,6 +23,7 @@ public class GenieAsyncService {
     private FrameworkService mFrameworkService;
     private PageService mPageService;
     private AnnouncementService mAnnouncementService;
+    private FormService mFormService;
 
 
     private GenieAsyncService(GenieService genieService) {
@@ -143,5 +144,12 @@ public class GenieAsyncService {
             mAnnouncementService = new AnnouncementService(sService);
         }
         return mAnnouncementService;
+    }
+
+    public FormService getFormService() {
+        if (mFormService == null) {
+            mFormService = new FormService(sService);
+        }
+        return mFormService;
     }
 }

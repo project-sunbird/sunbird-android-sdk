@@ -65,6 +65,7 @@ public class BuildParams implements IParams {
         setParam(Key.PAGE_SERVICE_BASE_URL);
         setParam(Key.CHANNEL_SERVICE_BASE_URL);
         setParam(Key.FRAMEWORK_SERVICE_BASE_URL);
+        setParam(Key.FORM_SERVICE_BASE_URL);
         setParam(Key.APIGATEWAY_BASE_URL);
         setParam(Key.API_USER);
         setParam(Key.API_PASS);
@@ -126,6 +127,9 @@ public class BuildParams implements IParams {
         setParam(params, Key.ORG_SERVICE_BASE_URL);
         setParam(params, Key.COURSE_SERVICE_BASE_URL);
         setParam(params, Key.PAGE_SERVICE_BASE_URL);
+        setParam(params, Key.CHANNEL_SERVICE_BASE_URL);
+        setParam(params, Key.FRAMEWORK_SERVICE_BASE_URL);
+        setParam(params, Key.FORM_SERVICE_BASE_URL);
         setParam(params, Key.APIGATEWAY_BASE_URL);
         setParam(params, Key.API_USER);
         setParam(params, Key.API_PASS);
@@ -133,6 +137,7 @@ public class BuildParams implements IParams {
         setParam(params, Key.MOBILE_APP_KEY);
         setParam(params, Key.MOBILE_APP_CONSUMER);
         setParam(params, Key.OAUTH_SERVICE_IMPLEMENTATION);
+        setParam(params, ServiceConstants.Params.PLAYER_CONFIG);
 
         if (!StringUtil.isNullOrEmpty(params.getString(Key.LOG_LEVEL))) {
             put(Key.LOG_LEVEL, LogLevel.getLogLevel(params.getString(Key.LOG_LEVEL)).getLevel());
