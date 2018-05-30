@@ -60,6 +60,7 @@ public class Log extends Telemetry {
         private String pageId;
         private List<Map<String, Object>> params;
         private String actorType;
+        private String actorId;
 
 
         /**
@@ -141,6 +142,11 @@ public class Log extends Telemetry {
             return this;
         }
 
+        public Builder actorId(String actorId) {
+            this.actorId = actorId;
+            return this;
+        }
+
         public Log build() {
             if (StringUtil.isNullOrEmpty(type)) {
                 throw new IllegalStateException("type is required.");
@@ -159,7 +165,9 @@ public class Log extends Telemetry {
             }
 
             Log event = new Log(type, level, message, pageId, params);
-            event.setActor(new Actor(actorType));
+            Actor actor = new Actor(actorType);
+            actor.setId(actorId);
+            event.setActor(actor);
             event.setEnvironment(env);
             return event;
         }

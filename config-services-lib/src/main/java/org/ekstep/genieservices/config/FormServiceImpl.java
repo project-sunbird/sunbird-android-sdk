@@ -27,7 +27,7 @@ public class FormServiceImpl extends BaseService implements IFormService {
 
     @Override
     public GenieResponse<Map<String, Object>> getForm(FormRequest formRequest) {
-        String methodName = "getMasterData@ConfigServiceImpl";
+        String methodName = "getForm@ConfigServiceImpl";
         Map<String, Object> params = new HashMap<>();
         params.put("logLevel", "2");
         FormReadAPI formReadAPI = new FormReadAPI(mAppContext, formRequest);
