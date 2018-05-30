@@ -254,7 +254,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
                 .environment(ServiceConstants.Telemetry.SDK_ENVIRONMENT)
                 .objectType(ServiceConstants.Telemetry.OBJECT_TYPE_USER)
                 .objectId(uid)
-                .actorType(Actor.TYPE_SYSTEM);
+                .actorType(Actor.TYPE_SYSTEM).actorId(mAppContext.getDeviceInfo().getDeviceID());
         TelemetryLogger.log(audit.build());
     }
 
@@ -264,9 +264,9 @@ public class UserServiceImpl extends BaseService implements IUserService {
         audit.currentState(updatedProfile == null ? ServiceConstants.Telemetry.AUDIT_CREATED : ServiceConstants.Telemetry.AUDIT_UPDATED)
                 .environment(ServiceConstants.Telemetry.SDK_ENVIRONMENT)
                 .updatedProperties(updatedProfile == null ? findAvailableProps(profile) : findProfilePropDiff(profile, updatedProfile))
-                .objectType(ServiceConstants.Telemetry.OBJECT_TYPE_PROFILE)
+                .objectType(ServiceConstants.Telemetry.OBJECT_TYPE_USER)
                 .objectId(profile.getUid())
-                .actorType(Actor.TYPE_SYSTEM);
+                .actorType(Actor.TYPE_SYSTEM).actorId(mAppContext.getDeviceInfo().getDeviceID());
         TelemetryLogger.log(audit.build());
     }
 
@@ -275,9 +275,9 @@ public class UserServiceImpl extends BaseService implements IUserService {
         Audit.Builder audit = new Audit.Builder();
         audit.currentState(ServiceConstants.Telemetry.AUDIT_DELETED)
                 .environment(ServiceConstants.Telemetry.SDK_ENVIRONMENT)
-                .objectType(ServiceConstants.Telemetry.OBJECT_TYPE_PROFILE)
+                .objectType(ServiceConstants.Telemetry.OBJECT_TYPE_USER)
                 .objectId(profile.getUid())
-                .actorType(Actor.TYPE_SYSTEM);
+                .actorType(Actor.TYPE_SYSTEM).actorId(mAppContext.getDeviceInfo().getDeviceID());
         TelemetryLogger.log(audit.build());
     }
 

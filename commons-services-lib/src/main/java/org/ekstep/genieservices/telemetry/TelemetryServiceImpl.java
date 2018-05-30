@@ -154,6 +154,9 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
             //Patch Actor
             if (isSessionValid(currentUserSession)) {
                 addActor(event, currentUserSession.getUid());
+            } else {
+                addActor(event, "");
+
             }
             // Patch the Context
             patchContext(currentUserSession, event);

@@ -17,10 +17,12 @@ public class Audit extends Telemetry {
 
     private static final String EID = "AUDIT";
 
-    private Audit(List<String> props, String currentState, String prevState, String actorType) {
+    private Audit(List<String> props, String currentState, String prevState, String actorType, String actorId) {
         super(EID);
         setEData(createEData(props, currentState, prevState));
-        setActor(new Actor(actorType));
+        Actor actor = new Actor(actorType);
+        actor.setId(actorId);
+        setActor(actor);
     }
 
     private Map<String, Object> createEData(List<String> props, String currentState, String prevState) {
@@ -50,6 +52,7 @@ public class Audit extends Telemetry {
         private String currentState;
         private String prevState;
         private String actorType;
+        private String actorId;
         private String objId;
         private String objType;
         private String objVer;
@@ -83,6 +86,11 @@ public class Audit extends Telemetry {
 
         public Builder actorType(String actorType) {
             this.actorType = actorType;
+            return this;
+        }
+
+        public Builder actorId(String actorId) {
+            this.actorId = actorId;
             return this;
         }
 
@@ -123,7 +131,7 @@ public class Audit extends Telemetry {
                 props = new ArrayList<>();
             }
 
-            Audit audit = new Audit(props, currentState, prevState, actorType);
+            Audit audit = new Audit(props, currentState, prevState, actorType, actorId != null ? actorId : "");
             audit.setEnvironment(env);
             audit.setObject(objId != null ? objId : "", objType != null ? objType : "", objVer != null ? objVer : "", rollup);
             return audit;
