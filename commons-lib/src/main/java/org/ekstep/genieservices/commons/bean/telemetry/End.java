@@ -1,5 +1,6 @@
 package org.ekstep.genieservices.commons.bean.telemetry;
 
+import org.ekstep.genieservices.commons.bean.CorrelationData;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
@@ -63,6 +64,7 @@ public class End extends Telemetry {
         private String objVer;
         private Rollup rollup;
         private List<Map<String, Object>> summaryList = null;
+        private List<CorrelationData> correlationData;
 
 
         /**
@@ -156,6 +158,18 @@ public class End extends Telemetry {
             return this;
         }
 
+        /**
+         * List of {@link CorrelationData}
+         */
+        public Builder correlationData(List<CorrelationData> correlationData) {
+            this.correlationData = new ArrayList<>();
+            if (!CollectionUtil.isNullOrEmpty(correlationData)) {
+                this.correlationData.addAll(correlationData);
+            }
+
+            return this;
+        }
+
 
         public End build() {
             if (StringUtil.isNullOrEmpty(type)) {
@@ -169,6 +183,7 @@ public class End extends Telemetry {
             End event = new End(type, mode, duration, pageId, summaryList);
             event.setObject(objId != null ? objId : "", objType != null ? objType : "", objVer != null ? objVer : "", rollup);
             event.setEnvironment(env);
+            event.setCoRrelationdata(correlationData);
             return event;
         }
     }

@@ -1,9 +1,13 @@
 package org.ekstep.genieservices.commons.bean.telemetry;
 
+import org.ekstep.genieservices.commons.bean.CorrelationData;
+import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -60,6 +64,7 @@ public class Start extends Telemetry {
         private String objType;
         private String objVer;
         private Rollup rollup;
+        private List<CorrelationData> correlationData;
 
         /**
          * Unique environment where the event has occured.
@@ -156,6 +161,18 @@ public class Start extends Telemetry {
             return this;
         }
 
+        /**
+         * List of {@link CorrelationData}
+         */
+        public Builder correlationData(List<CorrelationData> correlationData) {
+            this.correlationData = new ArrayList<>();
+            if (!CollectionUtil.isNullOrEmpty(correlationData)) {
+                this.correlationData.addAll(correlationData);
+            }
+
+            return this;
+        }
+
         public Start build() {
             if (StringUtil.isNullOrEmpty(type)) {
                 throw new IllegalStateException("type is required");
@@ -168,6 +185,7 @@ public class Start extends Telemetry {
             Start event = new Start(type, deviceSpecification, loc, mode, duration, pageId);
             event.setObject(objId != null ? objId : "", objType != null ? objType : "", objVer != null ? objVer : "", rollup);
             event.setEnvironment(env);
+            event.setCoRrelationdata(correlationData);
             return event;
         }
     }
