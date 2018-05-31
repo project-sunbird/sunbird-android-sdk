@@ -168,14 +168,28 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         ContentModel contentModelInDB = ContentModel.find(mAppContext.getDBSession(), contentDetailsRequest.getContentId());
 
         if (contentModelInDB == null) {     // Fetch from server if detail is not available in DB
-            Map contentData = ContentHandler.fetchContentDetailsFromServer(mAppContext, contentDetailsRequest.getContentId());
-            if (contentData == null) {
-                response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, ServiceConstants.ErrorMessage.CONTENT_NOT_FOUND + contentDetailsRequest.getContentId(), TAG);
-                TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.CONTENT_NOT_FOUND + contentDetailsRequest.getContentId());
+            GenieResponse contentDetailsAPIResponse = ContentHandler.fetchContentDetailsFromServer(mAppContext, contentDetailsRequest.getContentId());
+            if (contentDetailsAPIResponse.getStatus()) {
+                Map contentData = ContentHandler.getContentDetailsMap(contentDetailsAPIResponse.getResult().toString());
+                if (contentData == null) {
+                    response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND,
+                            ServiceConstants.ErrorMessage.CONTENT_NOT_FOUND + contentDetailsRequest.getContentId(), TAG);
+                    TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params,
+                            ServiceConstants.ErrorMessage.CONTENT_NOT_FOUND + contentDetailsRequest.getContentId());
+                    return response;
+                }
+
+                contentModelInDB = ContentHandler.convertContentMapToModel(mAppContext.getDBSession(), contentData, null);
+            } else {
+                List<String> errorMessages = contentDetailsAPIResponse.getErrorMessages();
+                String errorMessage = null;
+                if (!CollectionUtil.isNullOrEmpty(errorMessages)) {
+                    errorMessage = errorMessages.get(0);
+                }
+                response = GenieResponseBuilder.getErrorResponse(contentDetailsAPIResponse.getError(), errorMessage, TAG);
+                TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
                 return response;
             }
-
-            contentModelInDB = ContentHandler.convertContentMapToModel(mAppContext.getDBSession(), contentData, null);
         } else if (contentDetailsRequest.isRefreshContentDetails()) {
             ContentHandler.refreshContentDetailsFromServer(mAppContext, contentDetailsRequest.getContentId(), contentModelInDB);
         }

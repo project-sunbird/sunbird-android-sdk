@@ -403,33 +403,33 @@ public class ContentHandler {
         return childIdentifiers;
     }
 
-    public static Map fetchContentDetailsFromServer(AppContext appContext, String contentIdentifier) {
+    public static GenieResponse fetchContentDetailsFromServer(AppContext appContext, String contentIdentifier) {
         ContentDetailsAPI api = new ContentDetailsAPI(appContext, contentIdentifier);
-        GenieResponse apiResponse = api.get();
+        return api.get();
+    }
 
-        if (apiResponse.getStatus()) {
-            String body = apiResponse.getResult().toString();
+    public static Map getContentDetailsMap(String body) {
+        Map map = GsonUtil.fromJson(body, Map.class);
+        Map result = (Map) map.get("result");
 
-            Map map = GsonUtil.fromJson(body, Map.class);
-            Map result = (Map) map.get("result");
-
-            return (Map) result.get("content");
-        }
-
-        return null;
+        return (Map) result.get("content");
     }
 
     public static void refreshContentDetailsFromServer(final AppContext appContext, final String contentIdentifier, final ContentModel existingContentModel) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Map contentData = fetchContentDetailsFromServer(appContext, contentIdentifier);
 
-                if (contentData != null) {
-                    existingContentModel.setServerData(GsonUtil.toJson(contentData));
-                    existingContentModel.setServerLastUpdatedOn(serverLastUpdatedOn(contentData));
-                    existingContentModel.setAudience(readAudience(contentData));
-                    existingContentModel.update();
+                GenieResponse contentDetailsAPIResponse = fetchContentDetailsFromServer(appContext, contentIdentifier);
+                if (contentDetailsAPIResponse.getStatus()) {
+                    Map contentData = getContentDetailsMap(contentDetailsAPIResponse.getResult().toString());
+
+                    if (contentData != null) {
+                        existingContentModel.setServerData(GsonUtil.toJson(contentData));
+                        existingContentModel.setServerLastUpdatedOn(serverLastUpdatedOn(contentData));
+                        existingContentModel.setAudience(readAudience(contentData));
+                        existingContentModel.update();
+                    }
                 }
             }
         }).start();
