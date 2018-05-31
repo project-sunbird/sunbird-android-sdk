@@ -162,7 +162,7 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
         if (cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_SYLLABUS) != -1) {
             String syllabus = cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_SYLLABUS));
             if (!StringUtil.isNullOrEmpty(syllabus)) {
-                profile.setBoard(syllabus != null ? syllabus.split(",") : new String[0]);
+                profile.setSyllabus(syllabus != null ? syllabus.split(",") : new String[0]);
             }
         }
 
