@@ -12,7 +12,7 @@ public class _12_ProfileSyllabusMigration extends Migration {
 
     //DON'T CHANGE THESE VALUES
     private static final int MIGRATION_NUMBER = 12;
-    private static final int TARGET_DB_VERSION = 16;
+    private static final int TARGET_DB_VERSION = 17;
 
     public _12_ProfileSyllabusMigration() {
         super(MIGRATION_NUMBER, TARGET_DB_VERSION);
