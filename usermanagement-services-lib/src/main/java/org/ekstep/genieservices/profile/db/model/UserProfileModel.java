@@ -159,6 +159,13 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
             }
         }
 
+        if (cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_SYLLABUS) != -1) {
+            String syllabus = cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_SYLLABUS));
+            if (!StringUtil.isNullOrEmpty(syllabus)) {
+                profile.setBoard(syllabus != null ? syllabus.split(",") : new String[0]);
+            }
+        }
+
         if (cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_PROFILE_IMAGE) != -1) {
             profile.setProfileImage(cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_PROFILE_IMAGE)));
         }
@@ -247,7 +254,7 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
         }
 
         if (profile.getSyllabus() != null) {
-            contentValues.put(ProfileEntry.COLUMN_NAME_SYLLABUS, profile.getSyllabus());
+            contentValues.put(ProfileEntry.COLUMN_NAME_SYLLABUS, StringUtil.join(",", profile.getSyllabus()));
         }
 
         contentValues.put(ProfileEntry.COLUMN_NAME_PROFILE_IMAGE, profile.getProfileImage());
