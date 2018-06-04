@@ -21,6 +21,7 @@ public class ContentData implements Serializable {
     private String status;
     private String size;
     private String owner;
+    private String creator;
     private String subject;
     private String board;
     private String medium;
@@ -104,6 +105,10 @@ public class ContentData implements Serializable {
 
     public String getOwner() {
         return owner;
+    }
+
+    public String getCreator() {
+        return creator;
     }
 
     public String getSubject() {
