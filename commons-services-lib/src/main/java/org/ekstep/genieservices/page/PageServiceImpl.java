@@ -25,7 +25,7 @@ import java.util.Map;
 
 public class PageServiceImpl extends BaseService implements IPageService {
 
-    private static final String TAG = PageServiceImpl.class.getName();
+    private static final String TAG = PageServiceImpl.class.getSimpleName();
 
     private static final String KEY_PAGE_ASSEMBLE = "pageAssemble-";
 

@@ -10,6 +10,7 @@ public class PageAssembleCriteria {
 
     private String source;
     private String name;
+    private String mode;
     private PageAssembleFilter filters;
 
     private PageAssembleCriteria() {
@@ -23,6 +24,10 @@ public class PageAssembleCriteria {
 
     public String getName() {
         return name;
+    }
+
+    public String getMode() {
+        return mode;
     }
 
     public PageAssembleFilter getFilters() {
@@ -48,6 +53,11 @@ public class PageAssembleCriteria {
 
         public Builder source(String source) {
             pageAssembleCriteria.source = source;
+            return this;
+        }
+
+        public Builder mode(String mode) {
+            pageAssembleCriteria.mode = mode;
             return this;
         }
 
