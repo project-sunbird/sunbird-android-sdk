@@ -14,6 +14,7 @@ import org.ekstep.genieservices.commons.bean.Framework;
 import org.ekstep.genieservices.commons.bean.FrameworkDetailsRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
+import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -23,6 +24,7 @@ import org.ekstep.genieservices.config.network.FrameworkDetailsAPI;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -124,6 +126,8 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         params.put("request", GsonUtil.toJson(frameworkDetailsRequest));
         params.put("logLevel", "2");
 
+        GenieResponse<Framework> response;
+
         String frameworkId;
         if (frameworkDetailsRequest.isDefaultFrameworkDetails()) {
             frameworkId = getDefaultFrameworkDetails();
@@ -131,12 +135,28 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
             frameworkId = frameworkDetailsRequest.getFrameworkId();
         }
 
-        long expirationTime = getLongFromKeyValueStore(FrameworkConstants.PreferenceKey.FRAMEWORK_DETAILS_API_EXPIRATION_KEY);
+        String expirationKey = FrameworkConstants.PreferenceKey.FRAMEWORK_DETAILS_API_EXPIRATION_KEY + "-" + frameworkId;
+        long expirationTime = getLongFromKeyValueStore(expirationKey);
         NoSqlModel refreshDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), DB_KEY_FRAMEWORK_DETAILS + frameworkId);
-        if (expirationTime == 0 && refreshDetailsInDb == null) {
+
+        if (expirationTime == 0 && refreshDetailsInDb == null && frameworkDetailsRequest.isDefaultFrameworkDetails()) {
             initializeFrameworkDetails(frameworkId);
         } else if (hasExpired(expirationTime)) {
-            refreshFrameworkDetails(frameworkId);
+            GenieResponse frameworkDetailsAPIResponse = getFrameworkDetailsFromServer(frameworkId);
+            if (frameworkDetailsAPIResponse.getStatus()) {
+                String body = frameworkDetailsAPIResponse.getResult().toString();
+                saveFrameworkDetails(body, frameworkId);
+            } else {
+                List<String> errorMessages = frameworkDetailsAPIResponse.getErrorMessages();
+                String errorMessage = null;
+                if (!CollectionUtil.isNullOrEmpty(errorMessages)) {
+                    errorMessage = errorMessages.get(0);
+                }
+                response = GenieResponseBuilder.getErrorResponse(frameworkDetailsAPIResponse.getError(), errorMessage, TAG);
+                TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
+
+                return response;
+            }
         }
 
         refreshDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), DB_KEY_FRAMEWORK_DETAILS + frameworkId);
@@ -148,7 +168,6 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
             frameworkDetails = new Framework(framework);
         }
 
-        GenieResponse<Framework> response;
         if (frameworkDetails != null) {
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(frameworkDetails);
@@ -158,6 +177,7 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_FRAMEWORK_DETAILS);
 
         }
+
         return response;
     }
 
@@ -188,7 +208,8 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         Map result = ((LinkedTreeMap) map.get("result"));
         if (result != null) {
             Double ttl = (Double) result.get("ttl");
-            saveDataExpirationTime(ttl, FrameworkConstants.PreferenceKey.FRAMEWORK_DETAILS_API_EXPIRATION_KEY);
+            String expirationKey = FrameworkConstants.PreferenceKey.FRAMEWORK_DETAILS_API_EXPIRATION_KEY + "-" + frameworkId;
+            saveDataExpirationTime(ttl, expirationKey);
             String key = DB_KEY_FRAMEWORK_DETAILS + frameworkId;
             NoSqlModel frameworkDetails = NoSqlModel.build(mAppContext.getDBSession(), key, response);
             NoSqlModel frameworkDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
@@ -209,14 +230,18 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         new Thread(new Runnable() {
             @Override
             public void run() {
-                FrameworkDetailsAPI frameworkDetailsAPI = new FrameworkDetailsAPI(mAppContext, frameworkId);
-                GenieResponse genieResponse = frameworkDetailsAPI.get();
+                GenieResponse genieResponse = getFrameworkDetailsFromServer(frameworkId);
                 if (genieResponse.getStatus()) {
                     String body = genieResponse.getResult().toString();
                     saveFrameworkDetails(body, frameworkId);
                 }
             }
         }).start();
+    }
+
+    private GenieResponse getFrameworkDetailsFromServer(String frameworkId) {
+        FrameworkDetailsAPI frameworkDetailsAPI = new FrameworkDetailsAPI(mAppContext, frameworkId);
+        return frameworkDetailsAPI.get();
     }
 
     private void saveDataExpirationTime(Double ttl, String key) {
