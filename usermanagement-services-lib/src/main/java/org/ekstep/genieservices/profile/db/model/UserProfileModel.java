@@ -96,10 +96,8 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
     }
 
     public void readWithoutMoving(IResultSet cursor) {
-        /**
-         * The column index checks below are required because we allow exporting and importing profiles and profiles from previous Genie versions
-         * may not have some of these columns.
-         */
+        //The column index checks below are required because we allow exporting and importing profiles and profiles from previous Genie versions
+        // may not have some of these columns.
         id = cursor.getLong(0);
         profile.setUid(cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_UID)));
 
@@ -147,7 +145,7 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
         if (cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_MEDIUM) != -1) {
             String medium = cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_MEDIUM));
             if (!StringUtil.isNullOrEmpty(medium)) {
-                profile.setMedium(medium != null ? medium.split(",") : new String[0]);
+                profile.setMedium(medium.split(","));
             }
 
         }
@@ -155,14 +153,14 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
         if (cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_BOARD) != -1) {
             String board = cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_BOARD));
             if (!StringUtil.isNullOrEmpty(board)) {
-                profile.setBoard(board != null ? board.split(",") : new String[0]);
+                profile.setBoard(board.split(","));
             }
         }
 
         if (cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_SYLLABUS) != -1) {
             String syllabus = cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_SYLLABUS));
             if (!StringUtil.isNullOrEmpty(syllabus)) {
-                profile.setSyllabus(syllabus != null ? syllabus.split(",") : new String[0]);
+                profile.setSyllabus(syllabus.split(","));
             }
         }
 
@@ -173,7 +171,7 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
         if (cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_SUBJECT) != -1) {
             String subject = cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_SUBJECT));
             if (!StringUtil.isNullOrEmpty(subject)) {
-                profile.setSubject(subject != null ? subject.split(",") : new String[]{});
+                profile.setSubject(subject.split(","));
             }
         }
 
@@ -188,8 +186,8 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
 
         if (cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_GRADE) != -1) {
             String grade = cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_GRADE));
-            if (grade != null) {
-                profile.setGrade(grade != null ? grade.split(",") : new String[]{});
+            if (!StringUtil.isNullOrEmpty(grade)) {
+                profile.setGrade(grade.split(","));
             }
         }
     }
