@@ -38,11 +38,17 @@ public class FormServiceImpl extends BaseService implements IFormService {
             if (body != null) {
                 Map map = GsonUtil.fromJson(body, Map.class);
                 Map result = (Map) map.get("result");
-                Map from = (Map) result.get("form");
-                Map fromData = (Map) from.get("data");
-                response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-                response.setResult(fromData);
-                TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+                Map form = (Map) result.get("form");
+                Map formData = (Map) form.get("data");
+                if (formData != null) {
+                    response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+                    response.setResult(formData);
+                    TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+                } else {
+                    response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_FORM_DATA_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_FORM, TAG);
+                    TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_FORM_DATA);
+                }
+
             } else {
                 response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_FORM_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_FORM, TAG);
                 TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_FORM);

@@ -148,7 +148,8 @@ public interface ServiceConstants {
         String UPDATE_ANNOUNCEMENT_FAILED = "UPDATE_ANNOUNCEMENT_FAILED";
 
         //FORM
-        String NO_FORM_FOUND = "NO_FORM_DATA_FOUND";
+        String NO_FORM_FOUND = "NO_FORM_FOUND";
+        String NO_FORM_DATA_FOUND = "NO_FORM_DATA_FOUND";
     }
 
     interface ErrorMessage {
@@ -207,6 +208,7 @@ public interface ServiceConstants {
         String UNABLE_TO_FIND_FRAMEWORK_DETAILS = "Unable to find framework details";
         String UNABLE_TO_UPDATE_ANNOUNCEMENT = "Unable to update announcement";
         String UNABLE_TO_FIND_FORM = "Unable to find form";
+        String UNABLE_TO_FIND_FORM_DATA = "Unable to find form data";
     }
 
     interface SuccessMessage {
