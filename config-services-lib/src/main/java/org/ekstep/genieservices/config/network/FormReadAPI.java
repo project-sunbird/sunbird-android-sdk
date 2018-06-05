@@ -18,7 +18,7 @@ public class FormReadAPI extends SunbirdBaseAPI {
 
     private static final String TAG = FormReadAPI.class.getSimpleName();
 
-    private static final String ENDPOINT = "read";
+    private static final String ENDPOINT = "form/read";
 
     private FormRequest formRequest;
 

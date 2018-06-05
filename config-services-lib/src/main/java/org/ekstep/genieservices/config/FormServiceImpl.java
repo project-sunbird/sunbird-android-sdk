@@ -35,23 +35,25 @@ public class FormServiceImpl extends BaseService implements IFormService {
         if (genieResponse.getStatus()) {
             String body = genieResponse.getResult().toString();
             GenieResponse<Map<String, Object>> response;
+            Map formData = null;
+
             if (body != null) {
                 Map map = GsonUtil.fromJson(body, Map.class);
                 Map result = (Map) map.get("result");
                 Map form = (Map) result.get("form");
-                Map formData = (Map) form.get("data");
-                if (formData != null) {
-                    response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-                    response.setResult(formData);
-                    TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
-                } else {
-                    response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_FORM_DATA_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_FORM, TAG);
-                    TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_FORM_DATA);
-                }
 
+                if (form != null) {
+                    formData = (Map) form.get("data");
+                }
+            }
+
+            if (formData != null) {
+                response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+                response.setResult(formData);
+                TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
             } else {
-                response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_FORM_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_FORM, TAG);
-                TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_FORM);
+                response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_FORM_DATA_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_FORM, TAG);
+                TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_FORM_DATA);
             }
             return response;
         }
