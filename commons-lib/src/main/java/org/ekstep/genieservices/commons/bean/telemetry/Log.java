@@ -59,7 +59,7 @@ public class Log extends Telemetry {
         private String message;
         private String pageId;
         private List<Map<String, Object>> params;
-        private String actorType;
+        private String actorType=Actor.TYPE_USER;
         private String actorId;
 
 
