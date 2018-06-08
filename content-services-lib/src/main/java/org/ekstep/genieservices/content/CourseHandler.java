@@ -14,8 +14,10 @@ import org.ekstep.genieservices.content.network.EnrolCourseAPI;
 import org.ekstep.genieservices.content.network.EnrolledCoursesAPI;
 import org.ekstep.genieservices.content.network.UpdateContentStateAPI;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,7 +55,6 @@ public class CourseHandler {
         }).start();
     }
 
-
     public static GenieResponse enrolCourseInServer(AppContext appContext, Session sessionData, EnrollCourseRequest enrollCourseRequest) {
         EnrolCourseAPI enrolCourseAPI = new EnrolCourseAPI(appContext, getCustomHeaders(sessionData),
                 getEnrolCourseRequest(enrollCourseRequest));
@@ -78,26 +79,29 @@ public class CourseHandler {
     }
 
     private static Map<String, Object> getUpdateContentStateRequest(UpdateContentStateRequest updateContentStateRequest) {
-        Map<String, Object> contentsMap = new HashMap<>();
-        contentsMap.put("contentId", updateContentStateRequest.getContentId());
-        contentsMap.put("courseId", updateContentStateRequest.getCourseId());
-        contentsMap.put("batchId", updateContentStateRequest.getBatchId());
-        contentsMap.put("status", updateContentStateRequest.getStatus());
-        contentsMap.put("progress", updateContentStateRequest.getProgress());
+        Map<String, Object> contentMap = new HashMap<>();
+        contentMap.put("contentId", updateContentStateRequest.getContentId());
+        contentMap.put("courseId", updateContentStateRequest.getCourseId());
+        contentMap.put("batchId", updateContentStateRequest.getBatchId());
+        contentMap.put("status", updateContentStateRequest.getStatus());
+        contentMap.put("progress", updateContentStateRequest.getProgress());
 
         if (!StringUtil.isNullOrEmpty(updateContentStateRequest.getResult())) {
-            contentsMap.put("result", updateContentStateRequest.getResult());
+            contentMap.put("result", updateContentStateRequest.getResult());
         }
         if (!StringUtil.isNullOrEmpty(updateContentStateRequest.getGrade())) {
-            contentsMap.put("grade", updateContentStateRequest.getGrade());
+            contentMap.put("grade", updateContentStateRequest.getGrade());
         }
         if (!StringUtil.isNullOrEmpty(updateContentStateRequest.getScore())) {
-            contentsMap.put("score", updateContentStateRequest.getScore());
+            contentMap.put("score", updateContentStateRequest.getScore());
         }
+
+        List<Map<String, Object>> contents = new ArrayList<>();
+        contents.add(contentMap);
 
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("userId", updateContentStateRequest.getUserId());
-        requestMap.put("contents", contentsMap);
+        requestMap.put("contents", contents);
         return requestMap;
     }
 
