@@ -94,7 +94,7 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
             } else {
                 response = GenieResponseBuilder.getErrorResponse(userProfileDetailsAPIResponse.getError(), userProfileDetailsAPIResponse.getMessage(), TAG);
 
-                TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, userProfileDetailsAPIResponse.getMessage());
+                TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, response.getMessage());
                 return response;
             }
         } else if (userProfileDetailsRequest.isReturnRefreshedUserProfileDetails()) {
@@ -114,12 +114,20 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
         }
 
         LinkedTreeMap map = GsonUtil.fromJson(userProfileInDB.getValue(), LinkedTreeMap.class);
-        String result = GsonUtil.toJson(map.get("result"));
-        UserProfile userProfile = new UserProfile(result);
-        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-        response.setResult(userProfile);
+        LinkedTreeMap resultMap = (LinkedTreeMap) map.get("result");
+        if (resultMap != null && map.containsKey("response")) {
+            String responseString = GsonUtil.toJson(map.get("response"));
+            UserProfile userProfile = new UserProfile(responseString);
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+            response.setResult(userProfile);
 
-        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        } else {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_PROFILE, TAG);
+
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, response.getMessage());
+        }
+
         return response;
     }
 
