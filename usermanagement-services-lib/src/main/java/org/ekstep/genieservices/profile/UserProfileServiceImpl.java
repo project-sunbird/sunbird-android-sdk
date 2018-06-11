@@ -115,8 +115,8 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
 
         LinkedTreeMap map = GsonUtil.fromJson(userProfileInDB.getValue(), LinkedTreeMap.class);
         LinkedTreeMap resultMap = (LinkedTreeMap) map.get("result");
-        if (resultMap != null && map.containsKey("response")) {
-            String responseString = GsonUtil.toJson(map.get("response"));
+        if (resultMap != null && resultMap.containsKey("response")) {
+            String responseString = GsonUtil.toJson(resultMap.get("response"));
             UserProfile userProfile = new UserProfile(responseString);
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(userProfile);
