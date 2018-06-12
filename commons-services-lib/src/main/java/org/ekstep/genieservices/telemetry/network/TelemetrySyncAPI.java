@@ -31,7 +31,6 @@ public class TelemetrySyncAPI extends BaseAPI {
     protected Map<String, String> getRequestHeaders() {
         Map<String, String> headerMap = new HashMap<>();
         headerMap.put("Content-Encoding", "gzip");
-        headerMap.put("Content-Type", "application/zip");
         return headerMap;
     }
 
