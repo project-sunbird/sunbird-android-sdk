@@ -189,7 +189,7 @@ public class CryptoUtil {
             mac = Mac.getInstance(algorithm);
             mac.init(new SecretKeySpec(key, algorithm));
             signature = mac.doFinal(payLoad.getBytes(US_ASCII));
-        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+        } catch (NoSuchAlgorithmException | InvalidKeyException | IllegalArgumentException e) {
             return null;
         }
         return signature;
