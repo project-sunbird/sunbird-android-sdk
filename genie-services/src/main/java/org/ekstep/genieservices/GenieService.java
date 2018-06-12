@@ -206,7 +206,7 @@ public class GenieService {
      */
     public ISyncService getSyncService() {
         if (mSyncService == null) {
-            mSyncService = new SyncServiceImpl(mAppContext);
+            mSyncService = new SyncServiceImpl(mAppContext, getTelemetryService());
         }
         return mSyncService;
     }

@@ -2,11 +2,13 @@ package org.ekstep.genieservices.telemetry;
 
 import org.ekstep.genieservices.BaseService;
 import org.ekstep.genieservices.ISyncService;
+import org.ekstep.genieservices.ITelemetryService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.SyncStat;
+import org.ekstep.genieservices.commons.bean.TelemetryStat;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.telemetry.model.ProcessedEventModel;
 import org.ekstep.genieservices.telemetry.network.TelemetrySyncAPI;
@@ -21,9 +23,11 @@ import java.util.Locale;
 public class SyncServiceImpl extends BaseService implements ISyncService {
 
     private static final String TAG = TelemetryServiceImpl.class.getSimpleName();
+    private ITelemetryService mTelemetryService;
 
-    public SyncServiceImpl(AppContext appContext) {
+    public SyncServiceImpl(AppContext appContext, ITelemetryService telemetryService) {
         super(appContext);
+        this.mTelemetryService = telemetryService;
     }
 
     @Override
@@ -32,6 +36,10 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
         HashMap params = new HashMap();
         params.put("mode", TelemetryLogger.getNetworkMode(mAppContext.getConnectionInfo()));
         params.put("logLevel", "2");
+        TelemetryStat telemetryStat = mTelemetryService.getTelemetryStat().getResult();
+        if (!mAppContext.getConnectionInfo().isConnected() && telemetryStat.getUnSyncedEventCount() < 300) {
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.THRESHOLD_LIMIT_NOT_REACHED, ServiceConstants.ErrorMessage.THRESHOLD_LIMIT_NOT_REACHED, TAG);
+        }
         EventProcessorFactory.processEvents(mAppContext);
 
         int numberOfSync = 0;

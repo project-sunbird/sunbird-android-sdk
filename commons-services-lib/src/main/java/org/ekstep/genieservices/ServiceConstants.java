@@ -150,6 +150,8 @@ public interface ServiceConstants {
         //FORM
         String NO_FORM_FOUND = "NO_FORM_FOUND";
         String NO_FORM_DATA_FOUND = "NO_FORM_DATA_FOUND";
+
+        String THRESHOLD_LIMIT_NOT_REACHED = "OFFLINE_SYNC_THRESHOLD_LIMIT_NOT_REACHED";
     }
 
     interface ErrorMessage {
@@ -209,6 +211,8 @@ public interface ServiceConstants {
         String UNABLE_TO_UPDATE_ANNOUNCEMENT = "Unable to update announcement";
         String UNABLE_TO_FIND_FORM = "Unable to find form";
         String UNABLE_TO_FIND_FORM_DATA = "Unable to find form data";
+
+        String THRESHOLD_LIMIT_NOT_REACHED = "Offline Threshold limit not reached";
     }
 
     interface SuccessMessage {
