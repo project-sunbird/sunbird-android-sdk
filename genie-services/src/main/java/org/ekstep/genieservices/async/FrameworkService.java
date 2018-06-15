@@ -26,9 +26,7 @@ public class FrameworkService {
     /**
      * This api is used to get all the platform specific data.
      * <p>
-     * <p>
      * On successful fetching the data, the response will return status as TRUE and with List<Channel> in the result
-     * <p>
      * <p>
      * On failing to fetch the data, the response will return status as FALSE with the following error.
      * <p>NO_DATA_FOUND
@@ -48,10 +46,7 @@ public class FrameworkService {
     /**
      * This api is used to get the specific platform data, selected from any of the {@link MasterDataType}
      * <p>
-     * <p>
      * On successful fetching the data, the response will return status as TRUE and with MasterData in the result
-     * <p>
-     * <p>
      * <p>
      * On failing to fetch the data, the response will return status as FALSE with the following error.
      * <p>NO_DATA_FOUND
@@ -68,4 +63,23 @@ public class FrameworkService {
         }, responseHandler);
     }
 
+    /**
+     * This api is used to persist the framework details in DB.
+     * <p>
+     * On successful, the response will return status as TRUE.
+     * <p>
+     * On failing, the response will return status as FALSE with the following error.
+     * <p>NO_DATA_FOUND
+     *
+     * @param responseBody          -{@link String}
+     * @param responseHandler - {@link IResponseHandler<Void>}
+     */
+    public void persistFrameworkDetails(final String responseBody, IResponseHandler<Void> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return frameworkService.persistFrameworkDetails(responseBody);
+            }
+        }, responseHandler);
+    }
 }

@@ -14,4 +14,6 @@ public interface IFrameworkService {
     GenieResponse<Channel> getChannelDetails(ChannelDetailsRequest channelDetailsRequest);
 
     GenieResponse<Framework> getFrameworkDetails(FrameworkDetailsRequest frameworkDetailsRequest);
+
+    GenieResponse<Void> persistFrameworkDetails(String responseBody);
 }

@@ -37,6 +37,7 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
     private static final String TAG = FrameworkServiceImpl.class.getSimpleName();
     private static final String DB_KEY_CHANNEL_DETAILS = "channel_details_key-";
     private static final String DB_KEY_FRAMEWORK_DETAILS = "framework_details_key-";
+    private static final Double DEFAULT_TTL = 1d;   // In hours
 
     public FrameworkServiceImpl(AppContext appContext) {
         super(appContext);
@@ -93,7 +94,8 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         LinkedTreeMap result = (LinkedTreeMap) map.get("result");
         if (result != null) {
             Double ttl = (Double) result.get("ttl");
-            saveDataExpirationTime(ttl, FrameworkConstants.PreferenceKey.CHANNEL_DETAILS_API_EXPIRATION_KEY);
+            String expirationKey = FrameworkConstants.PreferenceKey.CHANNEL_DETAILS_API_EXPIRATION_KEY + "-" + channelId;
+            saveDataExpirationTime(ttl, expirationKey);
             String key = DB_KEY_CHANNEL_DETAILS + channelId;
             NoSqlModel channelDetails = NoSqlModel.build(mAppContext.getDBSession(), key, response);
             NoSqlModel channelDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
@@ -127,6 +129,7 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         params.put("logLevel", "2");
 
         GenieResponse<Framework> response;
+        String responseBody = null;
 
         String frameworkId;
         if (frameworkDetailsRequest.isDefaultFrameworkDetails()) {
@@ -137,15 +140,29 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
 
         String expirationKey = FrameworkConstants.PreferenceKey.FRAMEWORK_DETAILS_API_EXPIRATION_KEY + "-" + frameworkId;
         long expirationTime = getLongFromKeyValueStore(expirationKey);
-        NoSqlModel refreshDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), DB_KEY_FRAMEWORK_DETAILS + frameworkId);
+        if (expirationTime == 0) {
+            if (frameworkDetailsRequest.isDefaultFrameworkDetails()) {  //  && !frameworkDetailsRequest.isRefreshFrameworkDetails()
+                responseBody = FileUtil.readFileFromClasspath(FrameworkConstants.ResourceFile.FRAMEWORK_DETAILS_JSON_FILE);
+            } else {
+                GenieResponse frameworkDetailsAPIResponse = getFrameworkDetailsFromServer(frameworkId);
+                if (frameworkDetailsAPIResponse.getStatus()) {
+                    responseBody = frameworkDetailsAPIResponse.getResult().toString();
+                } else {
+                    List<String> errorMessages = frameworkDetailsAPIResponse.getErrorMessages();
+                    String errorMessage = null;
+                    if (!CollectionUtil.isNullOrEmpty(errorMessages)) {
+                        errorMessage = errorMessages.get(0);
+                    }
+                    response = GenieResponseBuilder.getErrorResponse(frameworkDetailsAPIResponse.getError(), errorMessage, TAG);
+                    TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
 
-        if (expirationTime == 0 && refreshDetailsInDb == null && frameworkDetailsRequest.isDefaultFrameworkDetails()) {
-            initializeFrameworkDetails(frameworkId);
+                    return response;
+                }
+            }
         } else if (hasExpired(expirationTime)) {
             GenieResponse frameworkDetailsAPIResponse = getFrameworkDetailsFromServer(frameworkId);
             if (frameworkDetailsAPIResponse.getStatus()) {
-                String body = frameworkDetailsAPIResponse.getResult().toString();
-                saveFrameworkDetails(body, frameworkId);
+                responseBody = frameworkDetailsAPIResponse.getResult().toString();
             } else {
                 List<String> errorMessages = frameworkDetailsAPIResponse.getErrorMessages();
                 String errorMessage = null;
@@ -157,18 +174,15 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
 
                 return response;
             }
+        } else {
+            NoSqlModel frameworkDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), DB_KEY_FRAMEWORK_DETAILS + frameworkId);
+            if (frameworkDetailsInDb != null) {
+                responseBody = frameworkDetailsInDb.getValue();
+            }
         }
 
-        refreshDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), DB_KEY_FRAMEWORK_DETAILS + frameworkId);
-        Framework frameworkDetails = null;
-        if (refreshDetailsInDb != null) {
-            LinkedTreeMap map = GsonUtil.fromJson(refreshDetailsInDb.getValue(), LinkedTreeMap.class);
-            LinkedTreeMap result = (LinkedTreeMap) map.get("result");
-            String framework = GsonUtil.toJson(result.get("framework"));
-            frameworkDetails = new Framework(framework);
-        }
-
-        if (frameworkDetails != null) {
+        if (responseBody != null) {
+            Framework frameworkDetails = new Framework(responseBody);
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(frameworkDetails);
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
@@ -195,48 +209,9 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         return channelDetails.getDefaultFramework();
     }
 
-    private void initializeFrameworkDetails(String frameworkId) {
-        String storedData = FileUtil.readFileFromClasspath(FrameworkConstants.ResourceFile.FRAMEWORK_DETAILS_JSON_FILE);
-        if (!StringUtil.isNullOrEmpty(storedData)) {
-            saveFrameworkDetails(storedData, frameworkId);
-        }
-        refreshFrameworkDetails(frameworkId);
-    }
-
-    private void saveFrameworkDetails(String response, String frameworkId) {
-        LinkedTreeMap map = GsonUtil.fromJson(response, LinkedTreeMap.class);
-        Map result = ((LinkedTreeMap) map.get("result"));
-        if (result != null) {
-            Double ttl = (Double) result.get("ttl");
-            String expirationKey = FrameworkConstants.PreferenceKey.FRAMEWORK_DETAILS_API_EXPIRATION_KEY + "-" + frameworkId;
-            saveDataExpirationTime(ttl, expirationKey);
-            String key = DB_KEY_FRAMEWORK_DETAILS + frameworkId;
-            NoSqlModel frameworkDetails = NoSqlModel.build(mAppContext.getDBSession(), key, response);
-            NoSqlModel frameworkDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
-            if (frameworkDetailsInDb != null) {
-                frameworkDetails.update();
-            } else {
-                frameworkDetails.save();
-            }
-        }
-    }
-
     private boolean hasExpired(long expirationTime) {
         Long currentTime = DateUtil.getEpochTime();
         return currentTime > expirationTime;
-    }
-
-    private void refreshFrameworkDetails(final String frameworkId) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                GenieResponse genieResponse = getFrameworkDetailsFromServer(frameworkId);
-                if (genieResponse.getStatus()) {
-                    String body = genieResponse.getResult().toString();
-                    saveFrameworkDetails(body, frameworkId);
-                }
-            }
-        }).start();
     }
 
     private GenieResponse getFrameworkDetailsFromServer(String frameworkId) {
@@ -245,13 +220,38 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
     }
 
     private void saveDataExpirationTime(Double ttl, String key) {
-        if (ttl != null) {
-            long ttlInMilliSeconds = (long) (ttl * DateUtil.MILLISECONDS_IN_AN_HOUR);
-            Long currentTime = DateUtil.getEpochTime();
-            long expiration_time = ttlInMilliSeconds + currentTime;
-
-            mAppContext.getKeyValueStore().putLong(key, expiration_time);
+        if (ttl == null || ttl == 0) {
+            ttl = DEFAULT_TTL;
         }
+        long ttlInMilliSeconds = (long) (ttl * DateUtil.MILLISECONDS_IN_AN_HOUR);
+        Long currentTime = DateUtil.getEpochTime();
+        long expiration_time = ttlInMilliSeconds + currentTime;
+
+        mAppContext.getKeyValueStore().putLong(key, expiration_time);
+    }
+
+    @Override
+    public GenieResponse<Void> persistFrameworkDetails(String responseBody) {
+        LinkedTreeMap map = GsonUtil.fromJson(responseBody, LinkedTreeMap.class);
+        Map resultMap = ((LinkedTreeMap) map.get("result"));
+        if (resultMap != null) {
+            Double ttl = (Double) resultMap.get("ttl");
+            LinkedTreeMap frameworkMap = (LinkedTreeMap) resultMap.get("framework");
+            String frameworkId = (String) frameworkMap.get("identifier");
+
+            String expirationKey = FrameworkConstants.PreferenceKey.FRAMEWORK_DETAILS_API_EXPIRATION_KEY + "-" + frameworkId;
+            saveDataExpirationTime(ttl, expirationKey);
+            String key = DB_KEY_FRAMEWORK_DETAILS + frameworkId;
+            NoSqlModel frameworkDetails = NoSqlModel.build(mAppContext.getDBSession(), key, responseBody);
+            NoSqlModel frameworkDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
+            if (frameworkDetailsInDb != null) {
+                frameworkDetails.update();
+            } else {
+                frameworkDetails.save();
+            }
+        }
+
+        return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
     }
 
 }
