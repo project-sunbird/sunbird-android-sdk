@@ -41,6 +41,34 @@ public class FormRequest {
         return framework;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+
+        if (!StringUtil.isNullOrEmpty(type)) {
+            builder.append(type);
+        }
+        if (!StringUtil.isNullOrEmpty(subType)) {
+            builder.append(subType);
+        }
+        if (!StringUtil.isNullOrEmpty(action)) {
+            builder.append(action);
+        }
+        if (!StringUtil.isNullOrEmpty(rootOrgId)) {
+            builder.append(rootOrgId);
+        }
+        if (!StringUtil.isNullOrEmpty(framework)) {
+            builder.append(false);
+        }
+
+        return builder.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return toString().hashCode();
+    }
+
     public static class Builder {
         private String type;
         private String subType;
