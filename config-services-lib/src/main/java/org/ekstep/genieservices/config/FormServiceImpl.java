@@ -25,7 +25,7 @@ public class FormServiceImpl extends BaseService implements IFormService {
 
     private static final String TAG = FormServiceImpl.class.getSimpleName();
     private static final String SYLLABUS_INFO_KEY_PREFIX = "syllabusInfo-";
-    private static final Double DEFAULT_TTL = 1d;   // In hours
+    private static final Double DEFAULT_TTL = 3d;   // In hours
 
     public FormServiceImpl(AppContext appContext) {
         super(appContext);
@@ -36,9 +36,10 @@ public class FormServiceImpl extends BaseService implements IFormService {
         String methodName = "getForm@ConfigServiceImpl";
         Map<String, Object> params = new HashMap<>();
         params.put("logLevel", "2");
-
-        String key = getKeyForDB(formRequest);
+        String expirationKey = FormConstants.PreferenceKey.SYLLABUS_API_EXPIRATION_KEY + "_" + formRequest.getType() + "_" + formRequest.getSubType() + "_" + formRequest.getAction();
+        long expirationTime = getLongFromKeyValueStore(expirationKey);
         GenieResponse<Map<String, Object>> response;
+        String key = getKeyForDB(formRequest);
         NoSqlModel syllabusInfoInDB = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
         if (syllabusInfoInDB == null) {
             FormReadAPI formReadAPI = new FormReadAPI(mAppContext, formRequest);
@@ -46,7 +47,7 @@ public class FormServiceImpl extends BaseService implements IFormService {
             if (formReadAPIResponse.getStatus()) {
                 String body = formReadAPIResponse.getResult().toString();
                 syllabusInfoInDB = NoSqlModel.build(mAppContext.getDBSession(), key, body);
-                syllabusInfoInDB.save();
+                saveFormData(syllabusInfoInDB.getValue(), formRequest);
             } else {
                 List<String> errorMessages = formReadAPIResponse.getErrorMessages();
                 String errorMessage = null;
@@ -57,18 +58,21 @@ public class FormServiceImpl extends BaseService implements IFormService {
                 TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
                 return response;
             }
+        } else if (hasExpired(expirationTime)) {
+            refreshFormData(formRequest);
         }
 
-        Map formData = GsonUtil.fromJson(syllabusInfoInDB.getValue(), Map.class);
-        if (formData != null) {
-            Map result = (Map) formData.get("result");
-            Map form = (Map) result.get("form");
-
-            if (form != null) {
-                formData = (Map) form.get("data");
+        Map map = GsonUtil.fromJson(syllabusInfoInDB.getValue(), Map.class);
+        Map formData = null;
+        if (map != null) {
+            Map result = (Map) map.get("result");
+            if (result != null) {
+                Map form = (Map) result.get("form");
+                if (form != null) {
+                    formData = (Map) form.get("data");
+                }
             }
         }
-
         if (formData != null) {
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(formData);
@@ -79,6 +83,37 @@ public class FormServiceImpl extends BaseService implements IFormService {
         }
 
         return response;
+    }
+
+    private void saveFormData(String response, FormRequest formRequest) {
+        String expirationKey = FormConstants.PreferenceKey.SYLLABUS_API_EXPIRATION_KEY + "_" + formRequest.getType() + "_" + formRequest.getSubType() + "_" + formRequest.getAction();
+        NoSqlModel syllabusInfoInDB = NoSqlModel.build(mAppContext.getDBSession(), expirationKey, response);
+        Map map = GsonUtil.fromJson(syllabusInfoInDB.getValue(), Map.class);
+        if (map != null) {
+            Map result = (Map) map.get("result");
+            Double ttl = (Double) result.get("ttl");
+            saveDataExpirationTime(ttl, expirationKey);
+        }
+        syllabusInfoInDB.save();
+    }
+
+    private void refreshFormData(final FormRequest formRequest) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                invokeAPI(formRequest);
+            }
+        }).start();
+    }
+
+    private GenieResponse invokeAPI(FormRequest formRequest) {
+        FormReadAPI formReadAPI = new FormReadAPI(mAppContext, formRequest);
+        GenieResponse formReadAPIResponse = formReadAPI.post();
+        if (formReadAPIResponse.getStatus()) {
+            String body = formReadAPIResponse.getResult().toString();
+            saveFormData(body, formRequest);
+        }
+        return formReadAPIResponse;
     }
 
     private String getKeyForDB(FormRequest formRequest) {
@@ -96,7 +131,9 @@ public class FormServiceImpl extends BaseService implements IFormService {
         mAppContext.getKeyValueStore().putLong(key, expiration_time);
     }
 
-    private void persistSyllabusDetail() {
-
+    private boolean hasExpired(long expirationTime) {
+        Long currentTime = DateUtil.getEpochTime();
+        return currentTime > expirationTime;
     }
+
 }
