@@ -2,6 +2,7 @@ package org.ekstep.genieservices.profile.event;
 
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.bean.telemetry.ProducerData;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.profile.SummarizerServiceImpl;
@@ -18,9 +19,9 @@ public class SummaryHandler {
         if (event == null) {
             return;
         }
-        if ("ASSESS".equals(event.getEid()) && ServiceConstants.Telemetry.CONTENT_PLAYER.equals(event.getContext().getEnv())) {
+        if ("ASSESS".equals(event.getEid()) && checkPdata(event.getContext().getPdata())) {
             processOEAssess(event, appContext);
-        } else if ("END".equals(event.getEid()) && ServiceConstants.Telemetry.CONTENT_PLAYER.equals(event.getContext().getEnv())) {
+        } else if ("END".equals(event.getEid()) && checkPdata(event.getContext().getPdata())) {
             processOEEnd(event, appContext);
         }
     }
@@ -35,6 +36,14 @@ public class SummaryHandler {
         Logger.i(TAG, "Process OE END");
         SummarizerServiceImpl summarizerService = new SummarizerServiceImpl(appContext);
         summarizerService.saveLearnerContentSummaryDetails(event);
+    }
+
+    private static boolean checkPdata(ProducerData pdata) {
+        if (pdata != null && pdata.getPid() != null) {
+            String pid = pdata.getPid();
+            return pid.contains(ServiceConstants.Telemetry.CONTENT_PLAYER_PID);
+        }
+        return false;
     }
 
 }

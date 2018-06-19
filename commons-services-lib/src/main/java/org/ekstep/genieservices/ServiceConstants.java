@@ -101,6 +101,7 @@ public interface ServiceConstants {
         String AUDIT_DELETED = "Deleted";
         String OBJECT_TYPE_PROFILE = "Profile";
         String OBJECT_TYPE_USER = "User";
+        String CONTENT_PLAYER_PID = "contentplayer";
 
     }
 
