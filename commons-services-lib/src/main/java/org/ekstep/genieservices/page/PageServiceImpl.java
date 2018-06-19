@@ -13,7 +13,6 @@ import org.ekstep.genieservices.commons.bean.PageAssembleCriteria;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
-import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.page.network.PageAPI;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
@@ -58,10 +57,8 @@ public class PageServiceImpl extends BaseService implements IPageService {
             GenieResponse pageAssembleResponse = invokeAPI(pageAssembleCriteria);
             if (pageAssembleResponse.getStatus()) {
                 String jsonResponse = pageAssembleResponse.getResult().toString();
-                if (!StringUtil.isNullOrEmpty(jsonResponse)) {
-                    pageData = NoSqlModel.build(mAppContext.getDBSession(), key, jsonResponse);
-                    savePageData(pageData.getValue(), pageAssembleCriteria);
-                }
+                pageData = NoSqlModel.build(mAppContext.getDBSession(), key, jsonResponse);
+                savePageData(pageData.getValue(), pageAssembleCriteria);
             } else {
                 response = GenieResponseBuilder.getErrorResponse(pageAssembleResponse.getError(),
                         pageAssembleResponse.getMessage(), TAG);
@@ -74,17 +71,29 @@ public class PageServiceImpl extends BaseService implements IPageService {
         }
 
         LinkedTreeMap map = GsonUtil.fromJson(pageData.getValue(), LinkedTreeMap.class);
-        LinkedTreeMap responseMap = (LinkedTreeMap) ((LinkedTreeMap) map.get("result")).get("response");
 
-        PageAssemble pageAssemble = new PageAssemble();
-        pageAssemble.setId((String) responseMap.get("id"));
-        pageAssemble.setName((String) responseMap.get("name"));
-        pageAssemble.setSections(GsonUtil.toJson(responseMap.get("sections")));
+        PageAssemble pageAssemble = null;
 
-        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-        response.setResult(pageAssemble);
+        if (map != null && map.get("result") != null) {
+            LinkedTreeMap responseMap = (LinkedTreeMap) ((LinkedTreeMap) map.get("result")).get("response");
 
-        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+            if (responseMap != null) {
+                pageAssemble = new PageAssemble();
+                pageAssemble.setId((String) responseMap.get("id"));
+                pageAssemble.setName((String) responseMap.get("name"));
+                pageAssemble.setSections(GsonUtil.toJson(responseMap.get("sections")));
+            }
+        }
+
+        if (pageAssemble != null) {
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+            response.setResult(pageAssemble);
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        } else {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_PAGE_DATA_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_PAGE, TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_PAGE_DATA);
+        }
+
         return response;
     }
 
