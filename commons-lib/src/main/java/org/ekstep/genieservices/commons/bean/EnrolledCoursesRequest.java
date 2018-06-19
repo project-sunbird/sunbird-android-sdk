@@ -11,10 +11,12 @@ public class EnrolledCoursesRequest {
 
     private String userId;
     private boolean refreshEnrolledCourses;
+    private boolean returnRefreshedEnrolledCourses;
 
-    private EnrolledCoursesRequest(String userId, boolean refreshEnrolledCourses) {
+    private EnrolledCoursesRequest(String userId, boolean refreshEnrolledCourses, boolean returnRefreshedEnrolledCourses) {
         this.userId = userId;
         this.refreshEnrolledCourses = refreshEnrolledCourses;
+        this.returnRefreshedEnrolledCourses = returnRefreshedEnrolledCourses;
     }
 
     public String getUserId() {
@@ -25,9 +27,14 @@ public class EnrolledCoursesRequest {
         return refreshEnrolledCourses;
     }
 
+    public boolean isReturnRefreshedEnrolledCourses() {
+        return returnRefreshedEnrolledCourses;
+    }
+
     public static class Builder {
         private String userId;
         private boolean refreshEnrolledCourses;
+        private boolean returnRefreshedEnrolledCourses;
 
         public Builder forUser(String userId) {
             if (StringUtil.isNullOrEmpty(userId)) {
@@ -45,12 +52,20 @@ public class EnrolledCoursesRequest {
             return this;
         }
 
+        /**
+         * The enrolled courses are refreshed from the server only if this flag is set and returned immediately.
+         */
+        public Builder returnRefreshedEnrolledCoursesFromServer() {
+            this.returnRefreshedEnrolledCourses = true;
+            return this;
+        }
+
         public EnrolledCoursesRequest build() {
             if (StringUtil.isNullOrEmpty(userId)) {
                 throw new IllegalStateException("userId required.");
             }
 
-            return new EnrolledCoursesRequest(userId, refreshEnrolledCourses);
+            return new EnrolledCoursesRequest(userId, refreshEnrolledCourses, returnRefreshedEnrolledCourses);
         }
     }
 }

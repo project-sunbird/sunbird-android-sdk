@@ -24,6 +24,7 @@ import org.ekstep.genieservices.commons.bean.UserSearchResult;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.util.Arrays;
@@ -99,6 +100,17 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
                 response = GenieResponseBuilder.getErrorResponse(enrolledCoursesAPIResponse.getError(), errorMessage, TAG);
                 TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
                 return response;
+            }
+        } else if (enrolledCoursesRequest.isReturnRefreshedEnrolledCourses()) {
+            GenieResponse enrolledCoursesAPIResponse = CourseHandler.fetchEnrolledCoursesFromServer(mAppContext,
+                    authSession.getSessionData(), enrolledCoursesRequest.getUserId());
+
+            if (enrolledCoursesAPIResponse.getStatus()) {
+                String jsonResponse = enrolledCoursesAPIResponse.getResult().toString();
+                if (!StringUtil.isNullOrEmpty(jsonResponse)) {
+                    enrolledCoursesInDB.setValue(jsonResponse);
+                    enrolledCoursesInDB.update();
+                }
             }
         } else if (enrolledCoursesRequest.isRefreshEnrolledCourses()) {
             CourseHandler.refreshEnrolledCoursesFromServer(mAppContext, authSession.getSessionData(),
