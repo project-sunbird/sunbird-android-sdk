@@ -45,4 +45,8 @@ public class ProducerData {
     public void setVer(String ver) {
         this.ver = ver;
     }
+
+    public String getPid() {
+        return pid;
+    }
 }
