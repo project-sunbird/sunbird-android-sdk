@@ -36,10 +36,10 @@ public class FormServiceImpl extends BaseService implements IFormService {
         String methodName = "getForm@ConfigServiceImpl";
         Map<String, Object> params = new HashMap<>();
         params.put("logLevel", "2");
-        String expirationKey = FormConstants.PreferenceKey.SYLLABUS_API_EXPIRATION_KEY + "_" + formRequest.getType() + "_" + formRequest.getSubType() + "_" + formRequest.getAction();
-        long expirationTime = getLongFromKeyValueStore(expirationKey);
-        GenieResponse<Map<String, Object>> response;
+
         String key = getKeyForDB(formRequest);
+        long expirationTime = getLongFromKeyValueStore(key);
+        GenieResponse<Map<String, Object>> response;
         NoSqlModel syllabusInfoInDB = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
         if (syllabusInfoInDB == null) {
             GenieResponse formReadAPIResponse = invokeAPI(formRequest);
@@ -85,15 +85,21 @@ public class FormServiceImpl extends BaseService implements IFormService {
     }
 
     private void saveFormData(String response, FormRequest formRequest) {
-        String expirationKey = FormConstants.PreferenceKey.SYLLABUS_API_EXPIRATION_KEY + "_" + formRequest.getType() + "_" + formRequest.getSubType() + "_" + formRequest.getAction();
-        NoSqlModel syllabusInfoInDB = NoSqlModel.build(mAppContext.getDBSession(), expirationKey, response);
-        Map map = GsonUtil.fromJson(syllabusInfoInDB.getValue(), Map.class);
+        String key = getKeyForDB(formRequest);
+        NoSqlModel syllabusInfo = NoSqlModel.build(mAppContext.getDBSession(), key, response);
+        Map map = GsonUtil.fromJson(syllabusInfo.getValue(), Map.class);
         if (map != null) {
             Map result = (Map) map.get("result");
             Double ttl = (Double) result.get("ttl");
-            saveDataExpirationTime(ttl, expirationKey);
+            saveDataExpirationTime(ttl, key);
         }
-        syllabusInfoInDB.save();
+
+        NoSqlModel syllabusInfoInDB = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
+        if (syllabusInfoInDB == null) {
+            syllabusInfo.save();
+        } else {
+            syllabusInfo.update();
+        }
     }
 
     private void refreshFormData(final FormRequest formRequest) {

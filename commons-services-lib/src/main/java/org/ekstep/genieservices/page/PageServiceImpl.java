@@ -126,13 +126,20 @@ public class PageServiceImpl extends BaseService implements IPageService {
     }
 
     private void savePageData(String response, PageAssembleCriteria pageAssembleCriteria) {
-        String expirationKey = getKeyForDB(pageAssembleCriteria);
-        NoSqlModel pageData = NoSqlModel.build(mAppContext.getDBSession(), expirationKey, response);
+        String key = getKeyForDB(pageAssembleCriteria);
+        NoSqlModel pageData = NoSqlModel.build(mAppContext.getDBSession(), key, response);
         Map map = GsonUtil.fromJson(pageData.getValue(), Map.class);
         if (map != null) {
             Map result = (Map) map.get("result");
             Double ttl = (Double) result.get("ttl");
-            saveDataExpirationTime(ttl, expirationKey);
+            saveDataExpirationTime(ttl, key);
+        }
+
+        NoSqlModel pageDataInDB = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
+        if (pageDataInDB == null) {
+            pageData.save();
+        } else {
+            pageData.update();
         }
         pageData.save();
     }
