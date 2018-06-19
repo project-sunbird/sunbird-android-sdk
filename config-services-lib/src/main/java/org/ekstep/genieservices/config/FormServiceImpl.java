@@ -42,8 +42,7 @@ public class FormServiceImpl extends BaseService implements IFormService {
         String key = getKeyForDB(formRequest);
         NoSqlModel syllabusInfoInDB = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
         if (syllabusInfoInDB == null) {
-            FormReadAPI formReadAPI = new FormReadAPI(mAppContext, formRequest);
-            GenieResponse formReadAPIResponse = formReadAPI.post();
+            GenieResponse formReadAPIResponse = invokeAPI(formRequest);
             if (formReadAPIResponse.getStatus()) {
                 String body = formReadAPIResponse.getResult().toString();
                 syllabusInfoInDB = NoSqlModel.build(mAppContext.getDBSession(), key, body);
@@ -101,19 +100,19 @@ public class FormServiceImpl extends BaseService implements IFormService {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                invokeAPI(formRequest);
+                GenieResponse formReadAPIResponse = invokeAPI(formRequest);
+                if (formReadAPIResponse.getStatus()) {
+                    String body = formReadAPIResponse.getResult().toString();
+                    saveFormData(body, formRequest);
+                }
             }
         }).start();
     }
 
     private GenieResponse invokeAPI(FormRequest formRequest) {
         FormReadAPI formReadAPI = new FormReadAPI(mAppContext, formRequest);
-        GenieResponse formReadAPIResponse = formReadAPI.post();
-        if (formReadAPIResponse.getStatus()) {
-            String body = formReadAPIResponse.getResult().toString();
-            saveFormData(body, formRequest);
-        }
-        return formReadAPIResponse;
+
+        return formReadAPI.post();
     }
 
     private String getKeyForDB(FormRequest formRequest) {
