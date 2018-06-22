@@ -185,7 +185,8 @@ public class UserProfileHandler {
         requestMap.put("lastName", updateUserInfoRequest.getLastName());
         requestMap.put("language", updateUserInfoRequest.getLanguage());
         requestMap.put("phone", updateUserInfoRequest.getPhone());
-        requestMap.put("phoneVerified", updateUserInfoRequest.isPhoneVerified());
+        // TODO: 22/6/18 : Not required for now, need more discussion. 
+//        requestMap.put("phoneVerified", updateUserInfoRequest.isPhoneVerified());
         requestMap.put("profileSummary", updateUserInfoRequest.getProfileSummary());
         requestMap.put("subject", updateUserInfoRequest.getSubject());
         requestMap.put("gender", updateUserInfoRequest.getGender());
