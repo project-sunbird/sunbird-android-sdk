@@ -4,6 +4,7 @@ import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.util.Arrays;
+import java.util.Map;
 
 /**
  * Created by souvikmondal on 21/3/18.
@@ -21,6 +22,7 @@ public class PageAssembleFilter {
     private String[] board;
     private String[] contentType;
     private String[] domain;
+    private Map<String, Integer> compatibilityLevel;
 
     public String[] getSubject() {
         return subject;
@@ -100,6 +102,14 @@ public class PageAssembleFilter {
 
     public void setDomain(String[] domain) {
         this.domain = domain;
+    }
+
+    public Map<String, Integer> getCompatibilityLevel() {
+        return compatibilityLevel;
+    }
+
+    public void setCompatibilityLevel(Map<String, Integer> compatibilityLevel) {
+        this.compatibilityLevel = compatibilityLevel;
     }
 
     @Override

@@ -7,6 +7,7 @@ import org.ekstep.genieservices.IPageService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.PageAssemble;
 import org.ekstep.genieservices.commons.bean.PageAssembleCriteria;
@@ -43,6 +44,7 @@ public class PageServiceImpl extends BaseService implements IPageService {
         params.put("logLevel", "2");
         String methodName = "getPageAssemble@PageServiceImpl";
 
+        pageAssembleCriteria.getFilters().setCompatibilityLevel(getCompatibilityLevelFilter(mAppContext));
         String key = getKeyForDB(pageAssembleCriteria);
 
         //get the expiration time to check if the cached data has expired
@@ -155,5 +157,11 @@ public class PageServiceImpl extends BaseService implements IPageService {
         mAppContext.getKeyValueStore().putLong(key, expiration_time);
     }
 
+    private Map<String, Integer> getCompatibilityLevelFilter(AppContext appContext) {
+        Map<String, Integer> compatibilityLevelMap = new HashMap<>();
+        compatibilityLevelMap.put("min", appContext.getParams().getInt(IParams.Key.MIN_COMPATIBILITY_LEVEL));
+        compatibilityLevelMap.put("max", appContext.getParams().getInt(IParams.Key.MAX_COMPATIBILITY_LEVEL));
+        return compatibilityLevelMap;
+    }
 
 }

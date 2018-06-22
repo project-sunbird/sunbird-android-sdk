@@ -17,6 +17,7 @@ public class UpdateUserInfoRequest {
     private String lastName;
     private String[] language;
     private String phone;
+    private boolean phoneVerified;
     private String profileSummary;
     private String[] subject;
     private String gender;
@@ -30,7 +31,7 @@ public class UpdateUserInfoRequest {
     private List<UserAddress> address;
 
     private UpdateUserInfoRequest(String userId, String firstName, String lastName, String[] language,
-                                  String phone, String profileSummary, String[] subject, String gender,
+                                  String phone, boolean phoneVerified, String profileSummary, String[] subject, String gender,
                                   String dob, String[] grade, String location, String avatar, List<UserWebPages> webPages,
                                   List<UserEducation> education, List<UserJobProfile> jobProfile, List<UserAddress> address) {
         this.userId = userId;
@@ -38,6 +39,7 @@ public class UpdateUserInfoRequest {
         this.lastName = lastName;
         this.language = language;
         this.phone = phone;
+        this.phoneVerified = phoneVerified;
         this.profileSummary = profileSummary;
         this.subject = subject;
         this.gender = gender;
@@ -69,6 +71,10 @@ public class UpdateUserInfoRequest {
 
     public String getPhone() {
         return phone;
+    }
+
+    public boolean isPhoneVerified() {
+        return phoneVerified;
     }
 
     public String getProfileSummary() {
@@ -122,6 +128,7 @@ public class UpdateUserInfoRequest {
         private String lastName;
         private String[] language;
         private String phone;
+        private boolean phoneVerified;
         private String profileSummary;
         private String[] subject;
         private String gender;
@@ -279,8 +286,13 @@ public class UpdateUserInfoRequest {
                 throw new IllegalStateException("userId required.");
             }
 
-            return new UpdateUserInfoRequest(userId, firstName, lastName, language, phone, profileSummary,
-                    subject, gender, dob, grade, location, avatar, webPages, education, jobProfile, address);
+            if (!StringUtil.isNullOrEmpty(phone)) {
+                this.phoneVerified = true;
+            }
+
+            return new UpdateUserInfoRequest(userId, firstName, lastName, language, phone, phoneVerified,
+                    profileSummary, subject, gender, dob, grade, location, avatar, webPages,
+                    education, jobProfile, address);
         }
     }
 }
