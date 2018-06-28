@@ -1,10 +1,10 @@
 {
     "id": "api.framework.read",
     "ver": "1.0",
-    "ts": "2018-05-17T06:53:59.905Z",
+    "ts": "2018-06-28T14:38:17.598Z",
     "params": {
-        "resmsgid": "13a4f510-599f-11e8-93b3-fd947d871a8a",
-        "msgid": "139fc4f0-599f-11e8-9d42-f53ca24c2aa8",
+        "resmsgid": "e57911e0-7ae0-11e8-b7c3-b95b62ca3051",
+        "msgid": "e573e1c0-7ae0-11e8-9c29-61dcea789257",
         "status": "successful",
         "err": null,
         "errmsg": null
@@ -144,6 +144,15 @@
                             "name": "Other",
                             "description": "Other",
                             "index": 10,
+                            "category": "board",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_board_dscertka",
+                            "code": "dscertka",
+                            "name": "State (Karnataka)",
+                            "description": "State (Karnataka)",
+                            "index": 11,
                             "category": "board",
                             "status": "Live"
                         }
@@ -542,6 +551,249 @@
                             "name": "Other",
                             "description": "Other",
                             "index": 28,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_botany",
+                            "code": "botany",
+                            "name": "Botany",
+                            "description": "Botany",
+                            "index": 29,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_zoology",
+                            "code": "zoology",
+                            "name": "Zoology",
+                            "description": "Zoology",
+                            "index": 30,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_commerce",
+                            "code": "commerce",
+                            "name": "Commerce",
+                            "description": "Commerce",
+                            "index": 31,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_accountancy",
+                            "code": "accountancy",
+                            "name": "Accountancy",
+                            "description": "Accountancy",
+                            "index": 32,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_statistics",
+                            "code": "statistics",
+                            "name": "Statistics",
+                            "description": "Statistics",
+                            "index": 33,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_computerscience",
+                            "code": "computerscience",
+                            "name": "Computer Science",
+                            "description": "Computer Science",
+                            "index": 34,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_computerapplications",
+                            "code": "computerapplications",
+                            "name": "Computer Applications",
+                            "description": "Computer Applications",
+                            "index": 35,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_biochemistry",
+                            "code": "biochemistry",
+                            "name": "Bio Chemistry",
+                            "description": "Bio Chemistry",
+                            "index": 36,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_microbiology",
+                            "code": "microbiology",
+                            "name": "Micro Biology",
+                            "description": "Micro Biology",
+                            "index": 37,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_homescience",
+                            "code": "homescience",
+                            "name": "Home Science",
+                            "description": "Home Science",
+                            "index": 38,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_nutritiondiabetics",
+                            "code": "nutritiondiabetics",
+                            "name": "Nutrition Diabetics",
+                            "description": "Nutrition Diabetics",
+                            "index": 39,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_communicativeenglish",
+                            "code": "communicativeenglish",
+                            "name": "Communicative English",
+                            "description": "Communicative English",
+                            "index": 40,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_advancetamil",
+                            "code": "advancetamil",
+                            "name": "Advance Tamil",
+                            "description": "Advance Tamil",
+                            "index": 41,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_businessmaths",
+                            "code": "businessmaths",
+                            "name": "Business Maths",
+                            "description": "Business Maths",
+                            "index": 42,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_ethicsindianculture",
+                            "code": "ethicsindianculture",
+                            "name": "Ethics Indian Culture",
+                            "description": "Ethics Indian Culture",
+                            "index": 43,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_computertechnology",
+                            "code": "computertechnology",
+                            "name": "Computer Technology",
+                            "description": "Computer Technology",
+                            "index": 44,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_foodmanagement",
+                            "code": "foodmanagement",
+                            "name": "Food Management",
+                            "description": "Food Management",
+                            "index": 45,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_officemanagement",
+                            "code": "officemanagement",
+                            "name": "Office Management",
+                            "description": "Office Management",
+                            "index": 46,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_accountancyauditing",
+                            "code": "accountancyauditing",
+                            "name": "Accountancy Auditing",
+                            "description": "Accountancy Auditing",
+                            "index": 47,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_agriculture",
+                            "code": "agriculture",
+                            "name": "Agriculture",
+                            "description": "Agriculture",
+                            "index": 48,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_generalmachinist",
+                            "code": "generalmachinist",
+                            "name": "General Machinist",
+                            "description": "General Machinist",
+                            "index": 49,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_electricalmachinesappliances",
+                            "code": "electricalmachinesappliances",
+                            "name": "Electrical Machines Appliances",
+                            "description": "Electrical Machines Appliances",
+                            "index": 50,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_electricalequipments",
+                            "code": "electricalequipments",
+                            "name": "Electrical Equipments",
+                            "description": "Electrical Equipments",
+                            "index": 51,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_draughtsmancivil",
+                            "code": "draughtsmancivil",
+                            "name": "Draughtsman Civil",
+                            "description": "Draughtsman Civil",
+                            "index": 52,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_automechanic",
+                            "code": "automechanic",
+                            "name": "Auto Mechanic",
+                            "description": "Auto Mechanic",
+                            "index": 53,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_textiletechnology",
+                            "code": "textiletechnology",
+                            "name": "Textile Technology",
+                            "description": "Textile Technology",
+                            "index": 54,
+                            "category": "subject",
+                            "status": "Live"
+                        },
+                        {
+                            "identifier": "ncf_subject_textiledressdesigning",
+                            "code": "textiledressdesigning",
+                            "name": "Textile Dress Designing",
+                            "description": "Textile Dress Designing",
+                            "index": 55,
                             "category": "subject",
                             "status": "Live"
                         }
