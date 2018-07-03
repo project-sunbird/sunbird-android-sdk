@@ -41,6 +41,7 @@ public class DialCodeServiceImpl extends BaseService implements IDialCodeService
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(result);
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+            return response;
         }
 
         response = GenieResponseBuilder.getErrorResponse(apiResponse.getError(), (String) apiResponse.getErrorMessages().get(0), TAG);
