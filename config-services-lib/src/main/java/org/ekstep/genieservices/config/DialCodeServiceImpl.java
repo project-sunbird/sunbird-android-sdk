@@ -50,7 +50,7 @@ public class DialCodeServiceImpl extends BaseService implements IDialCodeService
 
     private Map<String, Object> getDialCodeRequest(DialCodeRequest dialCodeRequest) {
         Map<String, Object> dialcodeMap = new HashMap<>();
-        dialcodeMap.put("compatibilityLevel", dialCodeRequest.getIdentifier());
+        dialcodeMap.put("identifier", dialCodeRequest.getIdentifier());
 
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("dialcode", dialcodeMap);
