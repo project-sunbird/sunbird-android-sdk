@@ -25,7 +25,7 @@ public class DialCodeService {
      * @param dialCodeRequest - {@link DialCodeRequest}
      * @param responseHandler - {@link IResponseHandler <Map<String,Object>>}
      */
-    public void getForm(final DialCodeRequest dialCodeRequest, IResponseHandler<Map<String, Object>> responseHandler) {
+    public void getDialCode(final DialCodeRequest dialCodeRequest, IResponseHandler<Map<String, Object>> responseHandler) {
         ThreadPool.getInstance().execute(new IPerformable<Map<String, Object>>() {
             @Override
             public GenieResponse<Map<String, Object>> perform() {
