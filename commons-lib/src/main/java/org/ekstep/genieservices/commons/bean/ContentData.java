@@ -49,6 +49,7 @@ public class ContentData implements Serializable {
     private String lastPublishedOn;
     private String createdOn;
     private String createdBy;
+    private String channel;
     private List<String> screenshots;
     private Object audience;
     private List<String> pragma;
@@ -225,6 +226,10 @@ public class ContentData implements Serializable {
 
     public String getCreatedBy() {
         return createdBy;
+    }
+
+    public String getChannel() {
+        return channel;
     }
 
     public List<String> getScreenshots() {

@@ -1,6 +1,6 @@
 package org.ekstep.genieservices;
 
-import org.ekstep.genieservices.commons.FormRequest;
+import org.ekstep.genieservices.commons.bean.FormRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 
 import java.util.Map;

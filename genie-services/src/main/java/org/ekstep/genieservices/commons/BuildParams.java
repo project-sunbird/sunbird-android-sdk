@@ -66,6 +66,7 @@ public class BuildParams implements IParams {
         setParam(Key.CHANNEL_SERVICE_BASE_URL);
         setParam(Key.FRAMEWORK_SERVICE_BASE_URL);
         setParam(Key.FORM_SERVICE_BASE_URL);
+        setParam(Key.DIALCODE_SERVICE_BASE_URL);
         setParam(Key.APIGATEWAY_BASE_URL);
         setParam(Key.API_USER);
         setParam(Key.API_PASS);
@@ -130,6 +131,7 @@ public class BuildParams implements IParams {
         setParam(params, Key.CHANNEL_SERVICE_BASE_URL);
         setParam(params, Key.FRAMEWORK_SERVICE_BASE_URL);
         setParam(params, Key.FORM_SERVICE_BASE_URL);
+        setParam(params, Key.DIALCODE_SERVICE_BASE_URL);
         setParam(params, Key.APIGATEWAY_BASE_URL);
         setParam(params, Key.API_USER);
         setParam(params, Key.API_PASS);

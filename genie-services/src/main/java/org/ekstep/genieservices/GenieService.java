@@ -18,6 +18,7 @@ import org.ekstep.genieservices.commons.network.IConnectionInfo;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.ReflectionUtil;
 import org.ekstep.genieservices.config.ConfigServiceImpl;
+import org.ekstep.genieservices.config.DialCodeServiceImpl;
 import org.ekstep.genieservices.config.FormServiceImpl;
 import org.ekstep.genieservices.config.FrameworkServiceImpl;
 import org.ekstep.genieservices.content.ContentFeedbackServiceImpl;
@@ -72,6 +73,7 @@ public class GenieService {
     private IPageService mPageService;
     private IAnnouncementService mAnnouncementService;
     private IFormService mFormService;
+    private IDialCodeService mDialCodeService;
 
     private GenieService(AppContext<Context> appContext) {
         this.mAppContext = appContext;
@@ -374,6 +376,13 @@ public class GenieService {
             mFormService = new FormServiceImpl(mAppContext);
         }
         return mFormService;
+    }
+
+    public IDialCodeService getDialCodeService() {
+        if (mDialCodeService == null) {
+            mDialCodeService = new DialCodeServiceImpl(mAppContext);
+        }
+        return mDialCodeService;
     }
 
     /**

@@ -24,6 +24,7 @@ public class GenieAsyncService {
     private PageService mPageService;
     private AnnouncementService mAnnouncementService;
     private FormService mFormService;
+    private DialCodeService mDialCodeService;
 
 
     private GenieAsyncService(GenieService genieService) {
@@ -151,5 +152,12 @@ public class GenieAsyncService {
             mFormService = new FormService(sService);
         }
         return mFormService;
+    }
+
+    public DialCodeService getDialCodeService() {
+        if (mDialCodeService == null) {
+            mDialCodeService = new DialCodeService(sService);
+        }
+        return mDialCodeService;
     }
 }

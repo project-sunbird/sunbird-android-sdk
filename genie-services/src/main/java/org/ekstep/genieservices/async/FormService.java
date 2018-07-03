@@ -2,8 +2,8 @@ package org.ekstep.genieservices.async;
 
 import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.IFormService;
-import org.ekstep.genieservices.commons.FormRequest;
 import org.ekstep.genieservices.commons.IResponseHandler;
+import org.ekstep.genieservices.commons.bean.FormRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 
 import java.util.Map;
