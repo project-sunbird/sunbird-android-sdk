@@ -37,7 +37,7 @@ public abstract class BaseAPI {
         this.TAG = TAG;
         this.httpClientFactory = appContext.getHttpClientFactory();
         this.headers = new HashMap<>();
-        this.headers.put("Accept-Encoding", "gzip, deflate");
+//        this.headers.put("Accept-Encoding", "gzip, deflate");
         this.headers.put("X-Channel-Id", mAppContext.getParams().getString(IParams.Key.CHANNEL_ID));
         this.headers.put("X-App-Id", mAppContext.getParams().getString(IParams.Key.PRODUCER_ID));
         this.headers.put("X-Device-Id", mAppContext.getDeviceInfo().getDeviceID());
