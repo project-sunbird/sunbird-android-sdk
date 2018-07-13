@@ -156,8 +156,7 @@ public class ContentPlayer {
                 correlationDataList.add(new CorrelationData(infoItem.getIdentifier(), infoItem.getContentType()));
             }
         }
+
         return correlationDataList;
-
-
     }
 }

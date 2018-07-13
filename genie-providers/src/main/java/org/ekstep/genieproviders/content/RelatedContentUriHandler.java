@@ -70,7 +70,7 @@ public class RelatedContentUriHandler implements IUriHandler {
                 RelatedContentRequest request = new RelatedContentRequest.Builder().forContent(currentContentIdentifier).byUser(userId).build();
                 genieResponse = genieService.getContentService().getRelatedContent(request);
                 resultMap.put("nextContent", genieResponse.getResult());
-            } else if (hierarchyData != null) {
+            } else {
                 // TODO: 29/5/17 NEED TO DECIDE RESULT MAP KEY FOR NEXT CONTENT
                 Content content = genieService.getContentService().nextContent(createHierarchyInfo(hierarchyData), currentContentIdentifier).getResult();
                 resultMap.put("nextContent", content);

@@ -252,7 +252,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         GenieResponse<Content> response;
         ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), childContentRequest.getContentId());
         if (contentModel == null) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND, ServiceConstants.ErrorMessage.CONTENT_NOT_FOUND + childContentRequest.getContentId(), TAG);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_DATA_FOUND,
+                    ServiceConstants.ErrorMessage.CONTENT_NOT_FOUND + childContentRequest.getContentId(), TAG);
             return response;
         }
 
@@ -459,7 +460,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         String methodName = "getRecommendedContents@ContentServiceImpl";
 
         GenieResponse<RecommendedContentResult> response;
-        RecommendedContentAPI recommendedContentAPI = new RecommendedContentAPI(mAppContext, ContentHandler.getRecommendedContentRequest(request, mAppContext.getDeviceInfo().getDeviceID()));
+        RecommendedContentAPI recommendedContentAPI = new RecommendedContentAPI(mAppContext,
+                ContentHandler.getRecommendedContentRequest(request, mAppContext.getDeviceInfo().getDeviceID()));
         GenieResponse apiResponse = recommendedContentAPI.post();
         if (apiResponse.getStatus()) {
             String body = apiResponse.getResult().toString();
@@ -545,6 +547,105 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         response = GenieResponseBuilder.getErrorResponse(apiResponse.getError(), (String) apiResponse.getErrorMessages().get(0), TAG);
         TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, (String) apiResponse.getErrorMessages().get(0));
+        return response;
+    }
+
+    @Override
+    public GenieResponse<Content> prevContent(List<HierarchyInfo> hierarchyInfo, String currentContentIdentifier) {
+        String methodName = "nextContent@ContentServiceImpl";
+        Map<String, Object> params = new HashMap<>();
+        params.put("contentIdentifiers", GsonUtil.toJson(hierarchyInfo));
+        params.put("logLevel", "2");
+
+        List<HierarchyInfo> nextContentHierarchyList = new ArrayList<>();
+        Content nextContent = null;
+        try {
+            List<String> contentsKeyList = new ArrayList<>();
+            List<String> parentChildRelation = new ArrayList<>();
+            String key = null;
+
+            ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), hierarchyInfo.get(0).getIdentifier());
+
+            Stack<ContentModel> stack = new Stack<>();
+            stack.push(contentModel);
+
+            ContentModel node;
+            while (!stack.isEmpty()) {
+                node = stack.pop();
+                if (ContentHandler.hasChildren(node.getLocalData())) {
+                    List<ContentModel> childContents = ContentHandler.getSortedChildrenList(mAppContext.getDBSession(), node.getLocalData(), ContentConstants.ChildContents.ALL);
+                    stack.addAll(childContents);
+
+                    for (ContentModel c : childContents) {
+                        parentChildRelation.add(node.getIdentifier() + "/" + c.getIdentifier());
+                    }
+                }
+
+                if (StringUtil.isNullOrEmpty(key)) {
+                    key = node.getIdentifier();
+
+                    // First content
+//                contents.put(key, node);
+
+                } else {
+                    String tempKey;
+
+                    for (int i = key.split("/").length - 1; i >= 0; i--) {
+                        String immediateParent = key.split("/")[i];
+
+                        if (parentChildRelation.contains(immediateParent + "/" + node.getIdentifier())) {
+                            break;
+                        } else {
+                            key = key.substring(0, key.lastIndexOf("/"));
+                        }
+                    }
+
+                    if (ContentConstants.MimeType.COLLECTION.equals(node.getMimeType())) {
+                        key = key + "/" + node.getIdentifier();
+
+                    } else {
+                        tempKey = key + "/" + node.getIdentifier();
+
+                        contentsKeyList.add(tempKey);
+                    }
+                }
+            }
+
+            String currentIdentifiers = null;
+            for (HierarchyInfo hierarchyItem : hierarchyInfo) {
+                if (StringUtil.isNullOrEmpty(currentIdentifiers)) {
+                    currentIdentifiers = hierarchyItem.getIdentifier();
+                } else {
+                    currentIdentifiers = currentIdentifiers + "/" + hierarchyItem.getIdentifier();
+                }
+            }
+            currentIdentifiers += "/" + currentContentIdentifier;
+
+            int indexOfCurrentContentIdentifier = contentsKeyList.indexOf(currentIdentifiers);
+            String nextContentIdentifier = null;
+            if (indexOfCurrentContentIdentifier > 0) {
+                nextContentIdentifier = contentsKeyList.get(indexOfCurrentContentIdentifier - 1);
+            }
+
+            if (!StringUtil.isNullOrEmpty(nextContentIdentifier)) {
+
+                String nextContentIdentifierList[] = nextContentIdentifier.split("/");
+                int idCount = nextContentIdentifierList.length;
+                for (int i = 0; i < (idCount - 1); i++) {
+                    ContentModel contentModelObj = ContentModel.find(mAppContext.getDBSession(), nextContentIdentifierList[i]);
+                    nextContentHierarchyList.add(new HierarchyInfo(contentModelObj.getIdentifier(), contentModelObj.getContentType()));
+                }
+                ContentModel nextContentModel = ContentModel.find(mAppContext.getDBSession(), nextContentIdentifierList[idCount - 1]);
+                nextContent = ContentHandler.convertContentModelToBean(nextContentModel);
+                nextContent.setHierarchyInfo(nextContentHierarchyList);
+            }
+        } catch (Exception e) {
+            Logger.e(TAG, "" + e.getMessage());
+        }
+
+        GenieResponse<Content> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        response.setResult(nextContent);
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;
     }
 
@@ -687,7 +788,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             response = deviceMemoryCheck.execute(mAppContext, importContentContext);
 
             if (response.getStatus()) {
-                String identifier = importContentContext.getIdentifiers() != null && !importContentContext.getIdentifiers().isEmpty() ? importContentContext.getIdentifiers().get(0) : "";
+                String identifier = importContentContext.getIdentifiers() != null
+                        && !importContentContext.getIdentifiers().isEmpty() ? importContentContext.getIdentifiers().get(0) : "";
                 buildSuccessEvent(identifier);
                 TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
 
@@ -808,7 +910,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                         if (!StringUtil.isNullOrEmpty(downloadUrl) && ServiceConstants.FileExtension.CONTENT.equalsIgnoreCase(FileUtil.getFileExtension(downloadUrl))) {
                             status = ContentImportStatus.ENQUEUED_FOR_DOWNLOAD;
                             ContentImport contentImport = (ContentImport) contentImportMap.get(contentId);
-                            DownloadRequest downloadRequest = new DownloadRequest(contentId, downloadUrl, ContentConstants.MimeType.ECAR, contentImport.getDestinationFolder(), contentImport.isChildContent());
+                            DownloadRequest downloadRequest = new DownloadRequest(contentId, downloadUrl,
+                                    ContentConstants.MimeType.ECAR, contentImport.getDestinationFolder(), contentImport.isChildContent());
                             downloadRequest.setFilename(contentId + "." + ServiceConstants.FileExtension.CONTENT);
                             downloadRequest.setCorrelationData(contentImport.getCorrelationData());
                             downloadRequest.setProcessorClass("org.ekstep.genieservices.commons.download.ContentImportService");

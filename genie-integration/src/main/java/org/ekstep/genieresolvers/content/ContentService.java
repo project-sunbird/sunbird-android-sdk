@@ -60,7 +60,27 @@ public class ContentService extends BaseService {
     }
 
     /**
-     *  This api is used to send the feedback about content.
+     * This api is used to get the relevant contents as similar to the identifier passed.
+     * <p>
+     * <p>
+     * On successful finding the contents, matching with the language preferred, the response will return status as TRUE
+     * <p>
+     * <p>
+     * On failing to find the contents, the response with return status as FALSE with one of the following errors
+     * <p>CONNECTION_ERROR
+     * <p>SERVER_ERROR
+     * <p>NETWORK_ERROR
+     *
+     * @param requestData     -
+     * @param responseHandler
+     */
+    public void getRelevantContent(String requestData, IResponseHandler<Map> responseHandler) {
+        GetRelevantContentTask getRelevantContentTask = new GetRelevantContentTask(context, appQualifier, requestData);
+        createAndExecuteTask(responseHandler, getRelevantContentTask);
+    }
+
+    /**
+     * This api is used to send the feedback about content.
      *
      * @param feedbackString
      * @param responseHandler

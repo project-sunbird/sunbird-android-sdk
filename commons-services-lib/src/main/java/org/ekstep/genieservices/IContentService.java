@@ -164,6 +164,18 @@ public interface IContentService {
     GenieResponse<RelatedContentResult> getRelatedContent(RelatedContentRequest relatedContentRequest);
 
     /**
+     * This api is used to get all the previous {@link List<Content>} based on the hierarchy of {@link List<String>} identifiers passed
+     * <p>
+     * <p>
+     * On successful finding the previous list of contents, the response will return status as TRUE and the result will be set with {@link List<Content>}
+     *
+     * @param contentHierarchy         - {@link List<HierarchyInfo>}
+     * @param currentContentIdentifier The current content identifier
+     * @return - {@link GenieResponse<Content>}
+     */
+    GenieResponse<Content> prevContent(List<HierarchyInfo> contentHierarchy, String currentContentIdentifier);
+
+    /**
      * This api is used to get all the next {@link List<Content>} based on the hierarchy of {@link List<String>} identifiers passed
      * <p>
      * <p>
