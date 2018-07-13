@@ -25,6 +25,7 @@ import org.ekstep.genieservices.content.ContentFeedbackServiceImpl;
 import org.ekstep.genieservices.content.ContentServiceImpl;
 import org.ekstep.genieservices.content.CourseServiceImpl;
 import org.ekstep.genieservices.content.LanguageServiceImpl;
+import org.ekstep.genieservices.group.GroupServiceImpl;
 import org.ekstep.genieservices.notification.AnnouncementServiceImpl;
 import org.ekstep.genieservices.notification.NotificationServiceImpl;
 import org.ekstep.genieservices.page.PageServiceImpl;
@@ -74,6 +75,7 @@ public class GenieService {
     private IAnnouncementService mAnnouncementService;
     private IFormService mFormService;
     private IDialCodeService mDialCodeService;
+    private IGroupService mGroupService;
 
     private GenieService(AppContext<Context> appContext) {
         this.mAppContext = appContext;
@@ -384,6 +386,22 @@ public class GenieService {
         }
         return mDialCodeService;
     }
+
+    /**
+     * This api gets the {@link GroupServiceImpl}, when accessed in the below way
+     * <p>
+     * getService().getGroupService()
+     * <p><p>
+     *
+     * @return {@link IGroupService}
+     */
+    public IGroupService getGroupService() {
+        if (mGroupService == null) {
+            mGroupService = new GroupServiceImpl(mAppContext);
+        }
+        return mGroupService;
+    }
+
 
     /**
      * This api gets the {@link IKeyValueStore} set in the {@link AndroidAppContext}
