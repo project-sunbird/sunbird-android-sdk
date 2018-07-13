@@ -15,14 +15,12 @@ import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.Content;
-import org.ekstep.genieservices.commons.bean.CorrelationData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -57,28 +55,36 @@ public class RelevantContentUriHandler implements IUriHandler {
             }.getType();
             Map data = GsonUtil.getGson().fromJson(selection, type);
 
-            Map cdata = (Map) data.get("cdata");
+            Map hierarchyInfoMap = (Map) data.get("hierarchyInfo");
 
             GenieResponse genieResponse = null;
-            if (cdata != null) {
+            if (hierarchyInfoMap != null) {
+                Type hierarchyInfoType = new TypeToken<List<HierarchyInfo>>() {
+                }.getType();
+
+                String cdataJson = GsonUtil.getGson().toJson(hierarchyInfoMap);
+                List<HierarchyInfo> hierarchyInfo = GsonUtil.getGson().fromJson(cdataJson, hierarchyInfoType);
+
                 Map<String, Object> resultMap = new HashMap<>();
                 String currentContentIdentifier = data.get("contentIdentifier").toString();
 
+                // Next Content
                 boolean next = false;
                 if (data.containsKey("next")) {
                     next = (boolean) data.get("next");
                 }
                 if (next) {
-                    Content nextContent = genieService.getContentService().nextContent(createHierarchyInfo(cdata), currentContentIdentifier).getResult();
+                    Content nextContent = genieService.getContentService().nextContent(hierarchyInfo, currentContentIdentifier).getResult();
                     resultMap.put("nextContent", nextContent);
                 }
 
+                // Previous Content
                 boolean prev = false;
                 if (data.containsKey("prev")) {
                     prev = (boolean) data.get("prev");
                 }
                 if (prev) {
-                    Content prevContent = genieService.getContentService().prevContent(createHierarchyInfo(cdata), currentContentIdentifier).getResult();
+                    Content prevContent = genieService.getContentService().prevContent(hierarchyInfo, currentContentIdentifier).getResult();
                     resultMap.put("prevContent", prevContent);
                 }
 
@@ -94,20 +100,6 @@ public class RelevantContentUriHandler implements IUriHandler {
         }
 
         return cursor;
-    }
-
-    private List<HierarchyInfo> createHierarchyInfo(Map cdata) {
-        Type cdataType = new TypeToken<List<CorrelationData>>() {
-        }.getType();
-
-        String cdataJson = GsonUtil.getGson().toJson(cdata);
-        List<CorrelationData> cdataList = GsonUtil.getGson().fromJson(cdataJson, cdataType);
-
-        List<HierarchyInfo> hierarchyInfo = new ArrayList<>();
-        for (CorrelationData c : cdataList) {
-            hierarchyInfo.add(new HierarchyInfo(c.getId(), c.getType()));
-        }
-        return hierarchyInfo;
     }
 
     @NonNull
