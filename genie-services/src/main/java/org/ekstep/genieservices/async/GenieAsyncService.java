@@ -13,6 +13,7 @@ public class GenieAsyncService {
     private PartnerService mPartnerService;
     private UserService mUserService;
     private UserProfileService mUserProfileService;
+    private GroupService mGroupService;
     private CourseService mCourseService;
     private ContentService mContentService;
     private TagService mTagService;
@@ -25,7 +26,6 @@ public class GenieAsyncService {
     private AnnouncementService mAnnouncementService;
     private FormService mFormService;
     private DialCodeService mDialCodeService;
-
 
     private GenieAsyncService(GenieService genieService) {
         sService = genieService;
@@ -75,6 +75,13 @@ public class GenieAsyncService {
             mUserProfileService = new UserProfileService(sService);
         }
         return mUserProfileService;
+    }
+
+    public GroupService getGroupService() {
+        if (mGroupService == null) {
+            mGroupService = new GroupService(sService);
+        }
+        return mGroupService;
     }
 
     public CourseService getCourseService() {

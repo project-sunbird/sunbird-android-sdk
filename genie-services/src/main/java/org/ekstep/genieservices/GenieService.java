@@ -58,6 +58,7 @@ public class GenieService {
     private ITelemetryService mTelemetryService;
     private IUserService mUserService;
     private IUserProfileService mUserProfileService;
+    private IGroupService mGroupService;
     private ICourseService mCourseService;
     private ISyncService mSyncService;
     private IPartnerService mPartnerService;
@@ -75,7 +76,6 @@ public class GenieService {
     private IAnnouncementService mAnnouncementService;
     private IFormService mFormService;
     private IDialCodeService mDialCodeService;
-    private IGroupService mGroupService;
 
     private GenieService(AppContext<Context> appContext) {
         this.mAppContext = appContext;
@@ -167,6 +167,21 @@ public class GenieService {
         }
 
         return mUserProfileService;
+    }
+
+    /**
+     * This api gets the {@link GroupServiceImpl}, when accessed in the below way
+     * <p>
+     * getService().getGroupService()
+     * <p><p>
+     *
+     * @return {@link IGroupService}
+     */
+    public IGroupService getGroupService() {
+        if (mGroupService == null) {
+            mGroupService = new GroupServiceImpl(mAppContext);
+        }
+        return mGroupService;
     }
 
     /**
@@ -386,22 +401,6 @@ public class GenieService {
         }
         return mDialCodeService;
     }
-
-    /**
-     * This api gets the {@link GroupServiceImpl}, when accessed in the below way
-     * <p>
-     * getService().getGroupService()
-     * <p><p>
-     *
-     * @return {@link IGroupService}
-     */
-    public IGroupService getGroupService() {
-        if (mGroupService == null) {
-            mGroupService = new GroupServiceImpl(mAppContext);
-        }
-        return mGroupService;
-    }
-
 
     /**
      * This api gets the {@link IKeyValueStore} set in the {@link AndroidAppContext}

@@ -24,24 +24,26 @@ public interface IGroupService {
     GenieResponse<Group> createGroup(Group group);
 
     /**
-     * This api is used to create  list of groups with specific {@link List<Group>}.
+     * This api updates the specific group.
      * <p>
-     * <p>On Successful creation of list group, the response will return status as TRUE and with successful message
+     * <p>On successful updating the group, the response will return status as TRUE and with the updated group set in result.
      * <p>
-     * <p>On failing to create a group, the response will have status as FALSE with the following error:
-     * <p>FAILED - createGroup
+     * <p>
+     * <p>On failing to update the group, the response will have status as FALSE with one of the following errors:
+     * <p>INVALID_GROUP
+     * <p>VALIDATION_ERROR
      *
-     * @param groupList - {@link List<Group>}
+     * @param group - {@link Group}
      * @return {@link GenieResponse<Group>}
      */
-    GenieResponse<List<Group>> createGroups(List<Group> groupList);
+    GenieResponse<Group> updateGroup(Group group);
 
     /**
      * This api returns the list of all groups.
      *
      * @return {@link GenieResponse<List<Group>>}
      */
-    GenieResponse<List<Group>> getAllGroups();
+    GenieResponse<List<Group>> getAllGroup();
 
     /**
      * This api is used to delete a existing group with a specific gid
@@ -80,21 +82,5 @@ public interface IGroupService {
      * @return {@link GenieResponse<Group>}
      */
     GenieResponse<Group> getCurrentGroup();
-
-
-    /**
-     * This api updates the specific group.
-     * <p>
-     * <p>On successful updating the group, the response will return status as TRUE and with the updated group set in result.
-     * <p>
-     * <p>
-     * <p>On failing to update the group, the response will have status as FALSE with one of the following errors:
-     * <p>INVALID_GROUP
-     * <p>VALIDATION_ERROR
-     *
-     * @param group - {@link Group}
-     * @return {@link GenieResponse<Group>}
-     */
-    GenieResponse<Group> updateGroup(Group group);
 
 }

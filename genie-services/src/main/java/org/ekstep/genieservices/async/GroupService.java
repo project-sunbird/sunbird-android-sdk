@@ -40,22 +40,21 @@ public class GroupService {
     }
 
     /**
-     * This api is used to create  list of groups with specific {@link List<Group>}.
+     * This api is used to create a new group with specific {@link Group}.
      * <p>
-     * <p>On Successful creation of list group, the response will return status as TRUE and with successful message
+     * <p>On Successful creation of new group, the response will return status as TRUE and with successful message
      * <p>
      * <p>On failing to create a group, the response will have status as FALSE with the following error:
      * <p>FAILED - createGroup
-     * <p>
-     * * @param List<Group>         - {@link Group}
      *
-     * @param responseHandler - {@link IResponseHandler<List<Group>>}
+     * @param group           - {@link Group}
+     * @param responseHandler - {@link IResponseHandler<Group>}
      */
-    public void createGroups(final List<Group> groupList, IResponseHandler<List<Group>> responseHandler) {
-        ThreadPool.getInstance().execute(new IPerformable<List<Group>>() {
+    public void updateGroup(final Group group, IResponseHandler<Group> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<Group>() {
             @Override
-            public GenieResponse<List<Group>> perform() {
-                return groupService.createGroups(groupList);
+            public GenieResponse<Group> perform() {
+                return groupService.updateGroup(group);
             }
         }, responseHandler);
     }
@@ -65,11 +64,11 @@ public class GroupService {
      *
      * @param responseHandler {@link IResponseHandler<List<Group>>}
      */
-    public void getAllGroups(IResponseHandler<List<Group>> responseHandler) {
+    public void getAllGroup(IResponseHandler<List<Group>> responseHandler) {
         ThreadPool.getInstance().execute(new IPerformable<List<Group>>() {
             @Override
             public GenieResponse<List<Group>> perform() {
-                return groupService.getAllGroups();
+                return groupService.getAllGroup();
             }
         }, responseHandler);
     }
@@ -115,38 +114,18 @@ public class GroupService {
         }, responseHandler);
     }
 
-
     /**
-     * This api gets the current active group.
+     * This api sets the specific gid passed to it as active current group.
      * <p>
-     * <p>On successful fetching the active group, the response will return status as TRUE and with the active group set in result.
      * <p>
-     * <p>Their would be no failure case with this api.
+     * <p>On successful setting a group active, the response will return status as TRUE and with successful message
+     * <p>
+     * <p>On failing to set the uid to current user, the response will have status as FALSE with the following error:
+     * <p>INVALID_GROUP
      *
-     * @param responseHandler - {@link IResponseHandler<Group>}
+     * @return {@link String}
      */
     public void getCurrentGroup(IResponseHandler<Group> responseHandler) {
-        ThreadPool.getInstance().execute(new IPerformable<Group>() {
-            @Override
-            public GenieResponse<Group> perform() {
-                return groupService.getCurrentGroup();
-            }
-        }, responseHandler);
-    }
-
-    /**
-     * This api updates the specific group.
-     * <p>
-     * <p>On successful updating the group, the response will return status as TRUE and with the updated group set in result.
-     * <p>
-     * <p>
-     * <p>On failing to update the group, the response will have status as FALSE with one of the following errors:
-     * <p>INVALID_GROUP
-     * <p>VALIDATION_ERROR
-     *
-     * @param responseHandler - {@link IResponseHandler<Group>}
-     */
-    public void getCurrentUser(IResponseHandler<Group> responseHandler) {
         ThreadPool.getInstance().execute(new IPerformable<Group>() {
             @Override
             public GenieResponse<Group> perform() {

@@ -28,12 +28,12 @@ public class GroupServiceImpl extends BaseService implements IGroupService {
     }
 
     @Override
-    public GenieResponse<List<Group>> createGroups(List<Group> groupList) {
+    public GenieResponse<Group> updateGroup(Group group) {
         return null;
     }
 
     @Override
-    public GenieResponse<List<Group>> getAllGroups() {
+    public GenieResponse<List<Group>> getAllGroup() {
         return null;
     }
 
@@ -52,8 +52,4 @@ public class GroupServiceImpl extends BaseService implements IGroupService {
         return null;
     }
 
-    @Override
-    public GenieResponse<Group> updateGroup(Group group) {
-        return null;
-    }
 }
