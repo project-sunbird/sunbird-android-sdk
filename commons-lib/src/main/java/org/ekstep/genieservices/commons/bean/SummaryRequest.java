@@ -1,23 +1,26 @@
 package org.ekstep.genieservices.commons.bean;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * This class accepts uid, contentId and hierarchyInfo when requesting for learner summary details.
+ * This class accepts uids, contentId and hierarchyInfo when requesting for learner summary details.
  *
  */
 public class SummaryRequest {
 
-    private String uid;
+    private List<String> uids;
     private String contentId;
     private String hierarchyData;
 
-    private SummaryRequest(String uid, String contentId, String hierarchyData) {
-        this.uid = uid;
+    private SummaryRequest(List<String> uids, String contentId, String hierarchyData) {
+        this.uids = uids;
         this.contentId = contentId;
         this.hierarchyData = hierarchyData;
     }
 
-    public String getUid() {
-        return uid;
+    public List<String> getUids() {
+        return uids;
     }
 
     public String getContentId() {
@@ -29,11 +32,12 @@ public class SummaryRequest {
     }
 
     public static class Builder {
-        private String uid;
+        private List<String> uids;
         private String contentId;
         private String hierarchyData;
 
         public Builder() {
+            this.uids = new ArrayList<>();
         }
 
         /**
@@ -48,7 +52,15 @@ public class SummaryRequest {
          * User id for whom you want the summary.
          */
         public Builder uid(String uid) {
-            this.uid = uid;
+            this.uids.add(uid);
+            return this;
+        }
+
+        /**
+         * User id for whom you want the summary.
+         */
+        public Builder forUsers(List<String> uids) {
+            this.uids.addAll(uids);
             return this;
         }
 
@@ -61,7 +73,7 @@ public class SummaryRequest {
         }
 
         public SummaryRequest build() {
-            return new SummaryRequest(uid, contentId, hierarchyData);
+            return new SummaryRequest(uids, contentId, hierarchyData);
         }
     }
 

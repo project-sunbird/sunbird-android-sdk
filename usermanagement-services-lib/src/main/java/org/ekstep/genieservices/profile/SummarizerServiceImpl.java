@@ -44,8 +44,8 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         Map<String, Object> params = new HashMap<>();
         params.put("logLevel", "2");
 
-        if (summaryRequest.getUid() != null) {
-            learnerAssessmentSummaryModel = LearnerAssessmentSummaryModel.findChildProgressSummary(mAppContext.getDBSession(), summaryRequest.getUid());
+        if (summaryRequest.getUids() != null) {
+            learnerAssessmentSummaryModel = LearnerAssessmentSummaryModel.findChildProgressSummary(mAppContext.getDBSession(), summaryRequest.getUids());
         } else if (summaryRequest.getContentId() != null) {
             learnerAssessmentSummaryModel = LearnerAssessmentSummaryModel.findContentProgressSummary(mAppContext.getDBSession(), summaryRequest.getContentId());
         }
@@ -68,7 +68,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         Map<String, Object> params = new HashMap<>();
         params.put("logLevel", "2");
 
-        String filter = getFilterForLearnerAssessmentDetails(null, summaryRequest.getUid(), summaryRequest.getContentId(), summaryRequest.getHierarchyData());
+        String filter = getFilterForLearnerAssessmentDetails(null, summaryRequest.getUids(), summaryRequest.getContentId(), summaryRequest.getHierarchyData());
 
         LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.find(mAppContext.getDBSession(), filter);
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
@@ -79,6 +79,21 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         }
 
         return response;
+    }
+
+    private String getFilterForLearnerAssessmentDetails(String qid, List<String> uids, String contentId, String hierarchyData) {
+        String isQid = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_QID, qid);
+        String isUid = String.format(Locale.US, "%s IN '%s'", LearnerAssessmentsEntry.COLUMN_NAME_UID, StringUtil.join("','", uids));
+        String isContentId = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID, contentId);
+        String isHData = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA, hierarchyData == null ? "" : hierarchyData);
+
+        String filter;
+        if (StringUtil.isNullOrEmpty(qid)) {
+            filter = String.format(Locale.US, "where %s AND %s AND %s", isUid, isContentId, isHData);
+        } else {
+            filter = String.format(Locale.US, "where %s AND %s AND %s AND %s", isUid, isContentId, isHData, isQid);
+        }
+        return filter;
     }
 
     private String getFilterForLearnerAssessmentDetails(String qid, String uid, String contentId, String hierarchyData) {

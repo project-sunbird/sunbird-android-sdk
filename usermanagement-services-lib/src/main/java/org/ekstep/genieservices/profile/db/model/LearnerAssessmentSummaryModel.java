@@ -5,6 +5,7 @@ import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,9 +32,9 @@ public class LearnerAssessmentSummaryModel implements IReadable {
 
     }
 
-    public static LearnerAssessmentSummaryModel findChildProgressSummary(IDBSession idbSession, String uid) {
+    public static LearnerAssessmentSummaryModel findChildProgressSummary(IDBSession idbSession, List<String> uids) {
         LearnerAssessmentSummaryModel learnerAssessmentSummaryModel = new LearnerAssessmentSummaryModel(idbSession);
-        idbSession.read(learnerAssessmentSummaryModel, getChildProgressQuery(uid));
+        idbSession.read(learnerAssessmentSummaryModel, getChildProgressQuery(uids));
         return learnerAssessmentSummaryModel;
     }
 
@@ -43,12 +44,15 @@ public class LearnerAssessmentSummaryModel implements IReadable {
         return learnerAssessmentSummaryModel;
     }
 
-    private static String getChildProgressQuery(String uid) {
-        return "select uid, content_id, count(qid), sum(correct), sum(time_spent), h_data from " + LearnerAssessmentsEntry.TABLE_NAME + " where uid = '" + uid + "' group by content_id ";
+    private static String getChildProgressQuery(List<String> uids) {
+        return "select uid, content_id, count(qid), sum(correct), sum(time_spent), h_data from " +
+                LearnerAssessmentsEntry.TABLE_NAME + " where uid IN '" + StringUtil.join("','", uids) +
+                "' group by content_id ";
     }
 
     private static String getContentProgressQuery(String contentId) {
-        return "select uid, content_id, count(qid), sum(correct), sum(time_spent), h_data from " + LearnerAssessmentsEntry.TABLE_NAME + " where content_id = '" + contentId + "' group by uid";
+        return "select uid, content_id, count(qid), sum(correct), sum(time_spent), h_data from " +
+                LearnerAssessmentsEntry.TABLE_NAME + " where content_id = '" + contentId + "' group by uid";
     }
 
     @Override

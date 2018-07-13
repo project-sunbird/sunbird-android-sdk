@@ -42,8 +42,8 @@ public class TransportProfiles implements IChainable<ProfileImportResponse, Impo
                     }
 
                     // TODO: 6/9/2017 Instead of exporting and importing user table read uid from profile and create entry.
-//                    final UserModel userModel = UserModel.build(appContext.getDBSession(), profile.getUid());
-//                    final GECreateUser geCreateUser = new GECreateUser(gameData, profile.getUid(), appContext.getLocationInfo().getLocation());
+//                    final UserModel userModel = UserModel.build(appContext.getDBSession(), profile.getUids());
+//                    final GECreateUser geCreateUser = new GECreateUser(gameData, profile.getUids(), appContext.getLocationInfo().getLocation());
 
                     final UserProfileModel profileModel = UserProfileModel.build(appContext.getDBSession(), profile);
                     appContext.getDBSession().executeInTransaction(new IDBTransaction() {
