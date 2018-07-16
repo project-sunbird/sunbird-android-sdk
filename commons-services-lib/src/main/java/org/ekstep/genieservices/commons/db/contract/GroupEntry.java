@@ -9,7 +9,7 @@ import org.ekstep.genieservices.commons.db.DbConstants;
  */
 public class GroupEntry implements BaseColumns {
 
-    public static final String TABLE_NAME = "group";
+    public static final String TABLE_NAME = "groups";
     public static final String COLUMN_NAME_GID = "gid";
     public static final String COLUMN_NAME_GROUP_NAME = "name";
     public static final String COLUMN_NAME_SYLLABUS = "syllabus";
