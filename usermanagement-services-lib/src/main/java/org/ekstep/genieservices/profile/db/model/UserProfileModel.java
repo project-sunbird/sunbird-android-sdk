@@ -4,6 +4,7 @@ package org.ekstep.genieservices.profile.db.model;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.enums.ProfileType;
+import org.ekstep.genieservices.commons.bean.enums.UserCreatedIn;
 import org.ekstep.genieservices.commons.db.contract.ProfileEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
@@ -12,6 +13,7 @@ import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.util.Date;
@@ -190,6 +192,16 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
                 profile.setGrade(grade.split(","));
             }
         }
+
+
+        if (cursor.getColumnIndex(ProfileEntry.COLUMN_USER_CREATED_IN) != -1) {
+            String userCreatedIn = cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_USER_CREATED_IN));
+            if (userCreatedIn.equalsIgnoreCase("server")) {
+                profile.setUserCreatedIn(UserCreatedIn.SERVER);
+            } else if (userCreatedIn.equalsIgnoreCase("local")) {
+                profile.setUserCreatedIn(UserCreatedIn.LOCAL);
+            }
+        }
     }
 
     @Override
@@ -264,6 +276,12 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
         if (profile.getGrade() != null) {
             contentValues.put(ProfileEntry.COLUMN_NAME_GRADE, StringUtil.join(",", profile.getGrade()));
         }
+
+        if (profile.getUserCreatedIn() != null) {
+            contentValues.put(ProfileEntry.COLUMN_USER_CREATED_IN, profile.getUserCreatedIn());
+        }
+
+        contentValues.put(ProfileEntry.COLUMN_VALUE, GsonUtil.toJson(profile));
     }
 
     private void updateFieldsForGroupUser() {

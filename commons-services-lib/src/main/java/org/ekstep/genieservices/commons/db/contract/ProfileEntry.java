@@ -29,6 +29,8 @@ public abstract class ProfileEntry implements BaseColumns {
     public static final String COLUMN_NAME_SUBJECT = "subject";
     public static final String COLUMN_NAME_GRADE = "grade";
     public static final String COLUMN_NAME_SYLLABUS = "syllabus";
+    public static final String COLUMN_VALUE = "value";
+    public static final String COLUMN_USER_CREATED_IN = "user_created_in";
 
     public static final String getCreateEntry() {
         return "CREATE TABLE " + TABLE_NAME + " (" +
@@ -42,7 +44,9 @@ public abstract class ProfileEntry implements BaseColumns {
                 COLUMN_NAME_LANGUAGE + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
                 COLUMN_NAME_DAY + DbConstants.INT_TYPE + " NOT NULL DEFAULT -1" + DbConstants.COMMA_SEP +
                 COLUMN_NAME_MONTH + DbConstants.INT_TYPE + " NOT NULL DEFAULT -1" + DbConstants.COMMA_SEP +
-                COLUMN_NAME_IS_GROUP_USER + DbConstants.INT_TYPE + " NOT NULL DEFAULT 0" +
+                COLUMN_NAME_IS_GROUP_USER + DbConstants.INT_TYPE + " NOT NULL DEFAULT 0" + DbConstants.COMMA_SEP +
+                COLUMN_VALUE + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
+                COLUMN_USER_CREATED_IN + DbConstants.TEXT_TYPE +
                 " )";
     }
 
@@ -106,6 +110,14 @@ public abstract class ProfileEntry implements BaseColumns {
                 String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "/img_badge09.png", COLUMN_NAME_AVATAR, "@drawable/ic_badge9"),
                 String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "/img_badge10.png", COLUMN_NAME_AVATAR, "@drawable/ic_badge10"),
                 String.format(Locale.US, "UPDATE %s SET %s = '%s' where %s = '%s';", TABLE_NAME, COLUMN_NAME_PROFILE_IMAGE, basePath + "/avatar_anonymous.png", COLUMN_NAME_AVATAR, "")
+        );
+    }
+
+
+    public static List<String> getAlterEntryForProfileUserFromAndValue() {
+        return Arrays.asList(
+                "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_VALUE + DbConstants.TEXT_TYPE + "  DEFAULT '';",
+                "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_USER_CREATED_IN + DbConstants.TEXT_TYPE + "  DEFAULT '';"
         );
     }
 
