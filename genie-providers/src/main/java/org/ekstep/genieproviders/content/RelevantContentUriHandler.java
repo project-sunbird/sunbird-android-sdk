@@ -59,7 +59,7 @@ public class RelevantContentUriHandler implements IUriHandler {
             Map data = GsonUtil.getGson().fromJson(selection, type);
 
             String currentContentIdentifier = data.get("contentIdentifier").toString();
-            List<Map> cdataListMap = (List<Map>) data.get("hierarchyInfo");
+            List<Map> cdataListMap = (List<Map>) data.get("cdata");
 
             GenieResponse genieResponse = null;
             if (cdataListMap != null && !cdataListMap.isEmpty()
