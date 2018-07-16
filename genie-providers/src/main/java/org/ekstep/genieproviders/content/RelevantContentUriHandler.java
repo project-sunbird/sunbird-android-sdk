@@ -15,6 +15,7 @@ import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.Content;
+import org.ekstep.genieservices.commons.bean.CorrelationData;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -22,6 +23,7 @@ import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -57,18 +59,18 @@ public class RelevantContentUriHandler implements IUriHandler {
             Map data = GsonUtil.getGson().fromJson(selection, type);
 
             String currentContentIdentifier = data.get("contentIdentifier").toString();
-            List<Map> hierarchyInfoListMap = (List<Map>) data.get("hierarchyInfo");
+            List<Map> cdataListMap = (List<Map>) data.get("hierarchyInfo");
 
             GenieResponse genieResponse = null;
-            if (hierarchyInfoListMap != null && !hierarchyInfoListMap.isEmpty()
+            if (cdataListMap != null && !cdataListMap.isEmpty()
                     && !StringUtil.isNullOrEmpty(currentContentIdentifier)) {
                 Map<String, Object> resultMap = new HashMap<>();
 
-                Type hierarchyInfoType = new TypeToken<List<HierarchyInfo>>() {
+                Type cdataType = new TypeToken<List<CorrelationData>>() {
                 }.getType();
 
-                String cdataJson = GsonUtil.getGson().toJson(hierarchyInfoListMap);
-                List<HierarchyInfo> hierarchyInfo = GsonUtil.getGson().fromJson(cdataJson, hierarchyInfoType);
+                String cdataJson = GsonUtil.getGson().toJson(cdataListMap);
+                List<CorrelationData> cdata = GsonUtil.getGson().fromJson(cdataJson, cdataType);
 
                 // Next Content
                 boolean next = false;
@@ -76,8 +78,13 @@ public class RelevantContentUriHandler implements IUriHandler {
                     next = (boolean) data.get("next");
                 }
                 if (next) {
-                    Content nextContent = genieService.getContentService().nextContent(hierarchyInfo, currentContentIdentifier).getResult();
-                    resultMap.put("nextContent", nextContent);
+                    Map<String, Object> nextMap = new HashMap<>();
+                    Content nextContent = genieService.getContentService().nextContent(createHierarchyInfo(cdata), currentContentIdentifier).getResult();
+                    nextMap.put("content", nextContent);
+                    if (nextContent != null) {
+                        nextMap.put("cdata", createcDataList(nextContent.getHierarchyInfo()));
+                    }
+                    resultMap.put("next", nextMap);
                 }
 
                 // Previous Content
@@ -86,8 +93,13 @@ public class RelevantContentUriHandler implements IUriHandler {
                     prev = (boolean) data.get("prev");
                 }
                 if (prev) {
-                    Content prevContent = genieService.getContentService().prevContent(hierarchyInfo, currentContentIdentifier).getResult();
-                    resultMap.put("prevContent", prevContent);
+                    Map<String, Object> prevMap = new HashMap<>();
+                    Content prevContent = genieService.getContentService().prevContent(createHierarchyInfo(cdata), currentContentIdentifier).getResult();
+                    prevMap.put("content", prevContent);
+                    if (prevContent != null) {
+                        prevMap.put("cdata", createcDataList(prevContent.getHierarchyInfo()));
+                    }
+                    resultMap.put("prev", prevMap);
                 }
 
                 genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
@@ -126,5 +138,25 @@ public class RelevantContentUriHandler implements IUriHandler {
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         return null;
+    }
+
+    private List<HierarchyInfo> createHierarchyInfo(List<CorrelationData> cdata) {
+        List<HierarchyInfo> hierarchyInfo = new ArrayList<>();
+        for (CorrelationData c : cdata) {
+            hierarchyInfo.add(new HierarchyInfo(c.getId(), c.getType()));
+        }
+        return hierarchyInfo;
+    }
+
+
+    private List<CorrelationData> createcDataList(List<HierarchyInfo> hierarchyInfo) {
+        List<CorrelationData> correlationDataList = new ArrayList<>();
+        if (hierarchyInfo != null) {
+            for (HierarchyInfo infoItem : hierarchyInfo) {
+                correlationDataList.add(new CorrelationData(infoItem.getIdentifier(), infoItem.getContentType()));
+            }
+        }
+
+        return correlationDataList;
     }
 }
