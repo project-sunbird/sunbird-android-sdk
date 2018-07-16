@@ -156,6 +156,10 @@ public interface ServiceConstants {
         String NO_PAGE_DATA_FOUND = "NO_PAGE_DATA_FOUND";
 
         String THRESHOLD_LIMIT_NOT_REACHED = "OFFLINE_SYNC_THRESHOLD_LIMIT_NOT_REACHED";
+
+        //GROUP
+        String INVALID_GROUP = "INVALID_GROUP";
+
     }
 
     interface ErrorMessage {
@@ -221,6 +225,11 @@ public interface ServiceConstants {
         String UNABLE_TO_FIND_PAGE_DATA = "Unable to find page data";
 
         String THRESHOLD_LIMIT_NOT_REACHED = "Offline Threshold limit not reached";
+
+        //Group
+        String INVALID_GROUP = "Invalid group";
+        String UNABLE_TO_CREATE_GROUP = "Unable to create group";
+
     }
 
     interface SuccessMessage {

@@ -1,9 +1,5 @@
 package org.ekstep.genieservices.commons.bean;
 
-import org.ekstep.genieservices.commons.utils.DateUtil;
-
-import java.util.Date;
-
 /**
  * This class holds all the data related to a group.
  */
@@ -13,12 +9,11 @@ public class Group {
     private String name;
     private String[] syllabus;
     private String[] grade;
-    private Date createdAt;
-    private String[] uids;
+    private Long createdAt;
+    private Long updatedAt;
 
     public Group(String name) {
         this.name = name;
-        this.createdAt = DateUtil.now();
     }
 
     public String getGid() {
@@ -53,19 +48,21 @@ public class Group {
         this.grade = grade;
     }
 
-    public Date getCreatedAt() {
+    public Long getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Long createdAt) {
         this.createdAt = createdAt;
     }
 
-    public String[] getUids() {
-        return uids;
+    public Long getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setUids(String[] uids) {
-        this.uids = uids;
+    public void setUpdatedAt(Long updatedAt) {
+        this.updatedAt = updatedAt;
     }
+
+
 }
