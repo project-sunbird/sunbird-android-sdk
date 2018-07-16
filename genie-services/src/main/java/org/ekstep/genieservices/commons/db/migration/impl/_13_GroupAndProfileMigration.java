@@ -16,8 +16,8 @@ public class _13_GroupAndProfileMigration extends Migration {
     private static final int TARGET_DB_VERSION = 18;
 
 
-    public _13_GroupAndProfileMigration(int migrationNumber, int targetDbVersion) {
-        super(migrationNumber, targetDbVersion);
+    public _13_GroupAndProfileMigration() {
+        super(MIGRATION_NUMBER, TARGET_DB_VERSION);
     }
 
     @Override
