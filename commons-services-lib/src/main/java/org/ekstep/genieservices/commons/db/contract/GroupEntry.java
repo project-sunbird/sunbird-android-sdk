@@ -25,7 +25,7 @@ public class GroupEntry implements BaseColumns {
                 COLUMN_NAME_SYLLABUS + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
                 COLUMN_NAME_GRADE + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
                 COLUMN_NAME_CREATED_AT + DbConstants.INT_TYPE + DbConstants.COMMA_SEP +
-                COLUMN_NAME_UPDATED_AT + DbConstants.INT_TYPE + DbConstants.COMMA_SEP +
+                COLUMN_NAME_UPDATED_AT + DbConstants.INT_TYPE +
                 " )";
     }
 
