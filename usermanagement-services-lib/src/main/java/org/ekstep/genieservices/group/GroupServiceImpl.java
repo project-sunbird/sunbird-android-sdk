@@ -16,8 +16,10 @@ import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.profile.db.model.GroupModel;
+import org.ekstep.genieservices.profile.db.model.GroupsModel;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -160,7 +162,20 @@ public class GroupServiceImpl extends BaseService implements IGroupService {
 
     @Override
     public GenieResponse<List<Group>> getAllGroup() {
-        return null;
+        String methodName = "getAllGroup@GroupServiceImpl";
+        Map<String, Object> params = new HashMap<>();
+        params.put("logLevel", "1");
+
+        GenieResponse<List<Group>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+
+        GroupsModel groupsModel = GroupsModel.find(mAppContext.getDBSession());
+        if (groupsModel == null) {
+            response.setResult(new ArrayList<Group>());
+        } else {
+            response.setResult(groupsModel.getGroupList());
+        }
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        return response;
     }
 
     @Override
@@ -198,11 +213,33 @@ public class GroupServiceImpl extends BaseService implements IGroupService {
 
     @Override
     public GenieResponse<Void> setCurrentGroup(String gid) {
+//        String methodName = "setCurrentGroup@GroupServiceImpl";
+//        Map<String, Object> params = new HashMap<>();
+//        params.put("gid", gid);
+//        params.put("logLevel", "2");
+//
+//        GenieResponse<Void> response;
+//
+//        GroupModel groupModel = GroupModel.findGroupById(mAppContext.getDBSession(), gid);
+//        if (groupModel == null) {
+//            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_GROUP, ServiceConstants.ErrorMessage.NO_GROUP_WITH_SPECIFIED_ID, TAG, Void.class);
+//            logGEError(response, "setCurrentGroup");
+//            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_SET_CURRENT_GROUP);
+//            return response;
+//        }
+//
+
         return null;
     }
 
     @Override
     public GenieResponse<Group> getCurrentGroup() {
+//        String methodName = "getCurrentGroup@GroupServiceImpl";
+//        Map<String, Object> params = new HashMap<>();
+//        params.put("logLevel", "1");
+
+
+
         return null;
     }
 

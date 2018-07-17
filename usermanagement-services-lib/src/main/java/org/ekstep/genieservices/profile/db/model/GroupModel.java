@@ -2,6 +2,7 @@ package org.ekstep.genieservices.profile.db.model;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.Group;
+import org.ekstep.genieservices.commons.db.contract.GroupEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
@@ -9,6 +10,9 @@ import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.commons.utils.StringUtil;
+
+import java.util.Locale;
 
 /**
  * profile
@@ -27,8 +31,7 @@ public class GroupModel implements IWritable, IReadable, IUpdatable, ICleanable 
     }
 
     public static GroupModel build(IDBSession dbSession, Group group) {
-        GroupModel groupModel = new GroupModel(dbSession, group);
-        return groupModel;
+        return new GroupModel(dbSession, group);
     }
 
     public static GroupModel findGroupById(IDBSession dbSession, String gid) {
@@ -64,37 +67,101 @@ public class GroupModel implements IWritable, IReadable, IUpdatable, ICleanable 
 
     @Override
     public IReadable read(IResultSet resultSet) {
-        return null;
+        if (resultSet != null && resultSet.moveToFirst()) {
+            readWithoutMoving(resultSet);
+        }
+        return this;
+    }
+
+    public void readWithoutMoving(IResultSet cursor) {
+        id = cursor.getLong(0);
+
+        //gid
+        mGroup.setGid(cursor.getString(cursor.getColumnIndex(GroupEntry.COLUMN_NAME_GID)));
+
+        //name
+        if (cursor.getColumnIndex(GroupEntry.COLUMN_NAME_GROUP_NAME) != -1) {
+            mGroup.setName(cursor.getString(cursor.getColumnIndex(GroupEntry.COLUMN_NAME_GROUP_NAME)));
+        }
+
+        //syllabus
+        if (cursor.getColumnIndex(GroupEntry.COLUMN_NAME_SYLLABUS) != -1) {
+            String syllabus = cursor.getString(cursor.getColumnIndex(GroupEntry.COLUMN_NAME_SYLLABUS));
+            if (!StringUtil.isNullOrEmpty(syllabus)) {
+                mGroup.setSyllabus(syllabus.split(","));
+            }
+
+        }
+
+        //grade
+        if (cursor.getColumnIndex(GroupEntry.COLUMN_NAME_GRADE) != -1) {
+            String grade = cursor.getString(cursor.getColumnIndex(GroupEntry.COLUMN_NAME_GRADE));
+            if (!StringUtil.isNullOrEmpty(grade)) {
+                mGroup.setGrade(grade.split(","));
+            }
+
+        }
+
+        //createdAt
+        if (cursor.getColumnIndex(GroupEntry.COLUMN_NAME_CREATED_AT) != -1) {
+            mGroup.setCreatedAt(cursor.getLong(cursor.getColumnIndex(GroupEntry.COLUMN_NAME_CREATED_AT)));
+        }
+
+        //updatedAt
+        if (cursor.getColumnIndex(GroupEntry.COLUMN_NAME_UPDATED_AT) != -1) {
+            mGroup.setUpdatedAt(cursor.getLong(cursor.getColumnIndex(GroupEntry.COLUMN_NAME_UPDATED_AT)));
+        }
+
     }
 
     @Override
     public String orderBy() {
-        return null;
+        return "";
     }
 
     @Override
     public String filterForRead() {
-        return null;
+        return String.format(Locale.US, "where uid = '%s'", mGroup.getGid());
     }
 
     @Override
     public String[] selectionArgsForFilter() {
-        return new String[0];
+        return null;
     }
 
     @Override
     public String limitBy() {
-        return null;
+        return "limit 1";
     }
 
     @Override
     public ContentValues getFieldsToUpdate() {
-        return null;
+        ContentValues contentValues = new ContentValues();
+        populateContentValues(contentValues);
+        return contentValues;
     }
+
+    private void populateContentValues(ContentValues contentValues) {
+        contentValues.put(GroupEntry.COLUMN_NAME_GID, mGroup.getGid());
+        contentValues.put(GroupEntry.COLUMN_NAME_GROUP_NAME, mGroup.getName());
+
+        if (mGroup.getSyllabus() != null) {
+            contentValues.put(GroupEntry.COLUMN_NAME_SYLLABUS, StringUtil.join(",", mGroup.getSyllabus()));
+        }
+
+        if (mGroup.getGrade() != null) {
+            contentValues.put(GroupEntry.COLUMN_NAME_GRADE, StringUtil.join(",", mGroup.getGrade()));
+        }
+
+        contentValues.put(GroupEntry.COLUMN_NAME_CREATED_AT, mGroup.getCreatedAt());
+        contentValues.put(GroupEntry.COLUMN_NAME_UPDATED_AT, mGroup.getUpdatedAt());
+    }
+
 
     @Override
     public String updateBy() {
-        return null;
+        return String.format(Locale.US, "%s = '%s'",
+                GroupEntry.COLUMN_NAME_GID, mGroup.getGid());
     }
 
     @Override
@@ -104,22 +171,23 @@ public class GroupModel implements IWritable, IReadable, IUpdatable, ICleanable 
 
     @Override
     public void updateId(long id) {
-
+        this.id = id;
     }
 
     @Override
     public String getTableName() {
-        return null;
+        return GroupEntry.TABLE_NAME;
     }
 
     @Override
     public void clean() {
-
+        id = -1L;
+        mGroup = null;
     }
 
     @Override
     public String selectionToClean() {
-        return null;
+        return String.format(Locale.US, "where %s = '%s'", GroupEntry.COLUMN_NAME_GID, mGroup.getGid());
     }
 
     @Override
