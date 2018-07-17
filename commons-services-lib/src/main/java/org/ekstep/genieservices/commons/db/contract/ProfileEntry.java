@@ -44,9 +44,7 @@ public abstract class ProfileEntry implements BaseColumns {
                 COLUMN_NAME_LANGUAGE + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
                 COLUMN_NAME_DAY + DbConstants.INT_TYPE + " NOT NULL DEFAULT -1" + DbConstants.COMMA_SEP +
                 COLUMN_NAME_MONTH + DbConstants.INT_TYPE + " NOT NULL DEFAULT -1" + DbConstants.COMMA_SEP +
-                COLUMN_NAME_IS_GROUP_USER + DbConstants.INT_TYPE + " NOT NULL DEFAULT 0" + DbConstants.COMMA_SEP +
-                COLUMN_VALUE + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
-                COLUMN_USER_CREATED_IN + DbConstants.TEXT_TYPE +
+                COLUMN_NAME_IS_GROUP_USER + DbConstants.INT_TYPE + " NOT NULL DEFAULT 0" +
                 " )";
     }
 
