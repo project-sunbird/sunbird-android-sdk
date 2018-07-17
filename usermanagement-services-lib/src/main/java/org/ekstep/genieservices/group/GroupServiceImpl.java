@@ -166,7 +166,34 @@ public class GroupServiceImpl extends BaseService implements IGroupService {
     @Override
     public GenieResponse<Void> deleteGroup(String gid) {
         // TODO: 13/7/18 Need to remove the group from mapping table as well
-        return null;
+
+        String methodName = "deleteGroup@GroupServiceImpl";
+        Map<String, Object> params = new HashMap<>();
+        params.put("gid", gid);
+        params.put("logLevel", "2");
+
+        GenieResponse<Void> response;
+        if (StringUtil.isNullOrEmpty(gid)) {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.GROUP_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_GROUP, TAG, Void.class);
+            logGEError(response, "update-user-group");
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_UPDATE_GROUP);
+            return response;
+        }
+
+        GroupModel groupDBModel = GroupModel.findGroupById(mAppContext.getDBSession(), gid);
+        if (groupDBModel != null) {
+            groupDBModel.delete();
+
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
+
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+            return response;
+        } else {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.GROUP_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_GROUP, TAG, Void.class);
+            logGEError(response, "update-user-group");
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_UPDATE_GROUP);
+            return response;
+        }
     }
 
     @Override
