@@ -121,7 +121,7 @@ public class GroupModel implements IWritable, IReadable, IUpdatable, ICleanable 
 
     @Override
     public String filterForRead() {
-        return String.format(Locale.US, "where uid = '%s'", mGroup.getGid());
+        return String.format(Locale.US, "where gid = '%s'", mGroup.getGid());
     }
 
     @Override
