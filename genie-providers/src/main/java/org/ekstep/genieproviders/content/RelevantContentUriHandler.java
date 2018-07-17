@@ -78,13 +78,13 @@ public class RelevantContentUriHandler implements IUriHandler {
                     next = (boolean) data.get("next");
                 }
                 if (next) {
-                    Map<String, Object> nextMap = new HashMap<>();
                     Content nextContent = genieService.getContentService().nextContent(createHierarchyInfo(cdata), currentContentIdentifier).getResult();
-                    nextMap.put("content", nextContent);
                     if (nextContent != null) {
+                        Map<String, Object> nextMap = new HashMap<>();
+                        nextMap.put("content", nextContent);
                         nextMap.put("cdata", createcDataList(nextContent.getHierarchyInfo()));
+                        resultMap.put("next", nextMap);
                     }
-                    resultMap.put("next", nextMap);
                 }
 
                 // Previous Content
@@ -93,17 +93,19 @@ public class RelevantContentUriHandler implements IUriHandler {
                     prev = (boolean) data.get("prev");
                 }
                 if (prev) {
-                    Map<String, Object> prevMap = new HashMap<>();
                     Content prevContent = genieService.getContentService().prevContent(createHierarchyInfo(cdata), currentContentIdentifier).getResult();
-                    prevMap.put("content", prevContent);
                     if (prevContent != null) {
+                        Map<String, Object> prevMap = new HashMap<>();
+                        prevMap.put("content", prevContent);
                         prevMap.put("cdata", createcDataList(prevContent.getHierarchyInfo()));
+                        resultMap.put("prev", prevMap);
                     }
-                    resultMap.put("prev", prevMap);
                 }
 
-                genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-                genieResponse.setResult(resultMap);
+                if (!resultMap.isEmpty()) {
+                    genieResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+                    genieResponse.setResult(resultMap);
+                }
             }
 
             if (genieResponse != null) {
