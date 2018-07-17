@@ -564,6 +564,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             List<String> parentChildRelation = new ArrayList<>();
             String key = null;
 
+            // Root content
             ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), hierarchyInfo.get(0).getIdentifier());
 
             Stack<ContentModel> stack = new Stack<>();
@@ -622,22 +623,33 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             currentIdentifiers += "/" + currentContentIdentifier;
 
             int indexOfCurrentContentIdentifier = contentsKeyList.indexOf(currentIdentifiers);
-            String nextContentIdentifier = null;
-            if (indexOfCurrentContentIdentifier > 0) {
-                nextContentIdentifier = contentsKeyList.get(indexOfCurrentContentIdentifier - 1);
+            String prevContentIdentifier = null;
+            if (indexOfCurrentContentIdentifier < (contentsKeyList.size() - 1)) {
+                prevContentIdentifier = contentsKeyList.get(indexOfCurrentContentIdentifier + 1);
             }
 
-            if (!StringUtil.isNullOrEmpty(nextContentIdentifier)) {
+            if (!StringUtil.isNullOrEmpty(prevContentIdentifier)) {
 
-                String nextContentIdentifierList[] = nextContentIdentifier.split("/");
-                int idCount = nextContentIdentifierList.length;
+                String prevContentIdentifierList[] = prevContentIdentifier.split("/");
+                int idCount = prevContentIdentifierList.length;
+                boolean isAllHierarchyContentFound = true;
                 for (int i = 0; i < (idCount - 1); i++) {
-                    ContentModel contentModelObj = ContentModel.find(mAppContext.getDBSession(), nextContentIdentifierList[i]);
-                    nextContentHierarchyList.add(new HierarchyInfo(contentModelObj.getIdentifier(), contentModelObj.getContentType()));
+                    ContentModel contentModelObj = ContentModel.find(mAppContext.getDBSession(), prevContentIdentifierList[i]);
+                    if (contentModelObj != null) {
+                        nextContentHierarchyList.add(new HierarchyInfo(contentModelObj.getIdentifier(), contentModelObj.getContentType()));
+                    } else {
+                        isAllHierarchyContentFound = false;
+                        break;
+                    }
                 }
-                ContentModel nextContentModel = ContentModel.find(mAppContext.getDBSession(), nextContentIdentifierList[idCount - 1]);
-                nextContent = ContentHandler.convertContentModelToBean(nextContentModel);
-                nextContent.setHierarchyInfo(nextContentHierarchyList);
+
+                if (isAllHierarchyContentFound) {
+                    ContentModel nextContentModel = ContentModel.find(mAppContext.getDBSession(), prevContentIdentifierList[idCount - 1]);
+                    if (nextContentModel != null) {
+                        nextContent = ContentHandler.convertContentModelToBean(nextContentModel);
+                        nextContent.setHierarchyInfo(nextContentHierarchyList);
+                    }
+                }
             }
         } catch (Exception e) {
             Logger.e(TAG, "" + e.getMessage());
@@ -663,6 +675,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             List<String> parentChildRelation = new ArrayList<>();
             String key = null;
 
+            // Root content
             ContentModel contentModel = ContentModel.find(mAppContext.getDBSession(), hierarchyInfo.get(0).getIdentifier());
 
             Stack<ContentModel> stack = new Stack<>();
@@ -730,13 +743,24 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
                 String nextContentIdentifierList[] = nextContentIdentifier.split("/");
                 int idCount = nextContentIdentifierList.length;
+                boolean isAllHierarchyContentFound = true;
                 for (int i = 0; i < (idCount - 1); i++) {
                     ContentModel contentModelObj = ContentModel.find(mAppContext.getDBSession(), nextContentIdentifierList[i]);
-                    nextContentHierarchyList.add(new HierarchyInfo(contentModelObj.getIdentifier(), contentModelObj.getContentType()));
+                    if (contentModelObj != null) {
+                        nextContentHierarchyList.add(new HierarchyInfo(contentModelObj.getIdentifier(), contentModelObj.getContentType()));
+                    } else {
+                        isAllHierarchyContentFound = false;
+                        break;
+                    }
                 }
-                ContentModel nextContentModel = ContentModel.find(mAppContext.getDBSession(), nextContentIdentifierList[idCount - 1]);
-                nextContent = ContentHandler.convertContentModelToBean(nextContentModel);
-                nextContent.setHierarchyInfo(nextContentHierarchyList);
+
+                if (isAllHierarchyContentFound) {
+                    ContentModel nextContentModel = ContentModel.find(mAppContext.getDBSession(), nextContentIdentifierList[idCount - 1]);
+                    if (nextContentModel != null) {
+                        nextContent = ContentHandler.convertContentModelToBean(nextContentModel);
+                        nextContent.setHierarchyInfo(nextContentHierarchyList);
+                    }
+                }
             }
         } catch (Exception e) {
             Logger.e(TAG, "" + e.getMessage());
