@@ -159,6 +159,7 @@ public interface ServiceConstants {
 
         //GROUP
         String INVALID_GROUP = "INVALID_GROUP";
+        String GROUP_NOT_FOUND = "GROUP_NOT_FOUND";
 
     }
 
@@ -229,6 +230,8 @@ public interface ServiceConstants {
         //Group
         String INVALID_GROUP = "Invalid group";
         String UNABLE_TO_CREATE_GROUP = "Unable to create group";
+        String UNABLE_TO_FIND_GROUP = "Unable to find group";
+        String UNABLE_TO_UPDATE_GROUP = "Unable to update group";
 
     }
 

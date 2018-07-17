@@ -100,6 +100,18 @@ public class GroupServiceImpl extends BaseService implements IGroupService {
         TelemetryLogger.log(audit.build());
     }
 
+//    private void logProfileAuditEvent(Group group, Group updatedGroup) {
+//
+//        Audit.Builder audit = new Audit.Builder();
+//        audit.currentState(updatedGroup == null ? ServiceConstants.Telemetry.AUDIT_CREATED : ServiceConstants.Telemetry.AUDIT_UPDATED)
+//                .environment(ServiceConstants.Telemetry.SDK_ENVIRONMENT)
+//                .updatedProperties(updatedGroup == null ? findAvailableProps(group) : findProfilePropDiff(group, updatedGroup))
+//                .objectType(ServiceConstants.Telemetry.OBJECT_TYPE_USER)
+//                .objectId(group.getGid())
+//                .actorType(Actor.TYPE_SYSTEM).actorId(mAppContext.getDeviceInfo().getDeviceID());
+//        TelemetryLogger.log(audit.build());
+//    }
+
 
     private void logGEError(GenieResponse response, String id) {
         Error.Builder error = new Error.Builder();
@@ -113,7 +125,37 @@ public class GroupServiceImpl extends BaseService implements IGroupService {
 
     @Override
     public GenieResponse<Group> updateGroup(Group group) {
-        return null;
+        String methodName = "updateGroup@GroupServiceImpl";
+        Map<String, Object> params = new HashMap<>();
+        params.put("logLevel", "2");
+
+        GenieResponse<Group> response;
+        if (group == null || StringUtil.isNullOrEmpty(group.getGid())) {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.GROUP_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_GROUP, TAG, Group.class);
+            logGEError(response, "update-user-group");
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_UPDATE_GROUP);
+            return response;
+        }
+
+        GroupModel groupDBModel = GroupModel.findGroupById(mAppContext.getDBSession(), group.getGid());
+        if (groupDBModel != null) {
+            GroupModel groupModel = GroupModel.build(mAppContext.getDBSession(), group);
+            groupModel.update();
+
+            // TODO: 16/7/18 Need to add telemetry part here
+//            logGroupAuditEvent();
+
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Group.class);
+            response.setResult(group);
+
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+            return response;
+        } else {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.GROUP_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_GROUP, TAG, Group.class);
+            logGEError(response, "update-user-group");
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_UPDATE_GROUP);
+            return response;
+        }
     }
 
     @Override
