@@ -87,7 +87,7 @@ public class GroupServiceImpl extends BaseService implements IGroupService {
         });
 
         GenieResponse<Group> successResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-        successResponse.setResult(GsonUtil.fromJson(groupModel.getGroup().toString(), Group.class));
+        successResponse.setResult(groupModel.getGroup());
         return successResponse;
     }
 
