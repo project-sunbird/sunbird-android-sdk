@@ -166,7 +166,11 @@ public class GroupModel implements IWritable, IReadable, IUpdatable, ICleanable 
 
     @Override
     public ContentValues getContentValues() {
-        return null;
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(GroupEntry.COLUMN_NAME_GID, mGroup.getGid());
+        populateContentValues(contentValues);
+
+        return contentValues;
     }
 
     @Override
