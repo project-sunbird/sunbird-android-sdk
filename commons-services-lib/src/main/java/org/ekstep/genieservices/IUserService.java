@@ -8,6 +8,7 @@ import org.ekstep.genieservices.commons.bean.ProfileExportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
+import org.ekstep.genieservices.commons.bean.ProfileRequest;
 import org.ekstep.genieservices.commons.bean.UserSession;
 
 import java.util.List;
@@ -172,5 +173,15 @@ public interface IUserService {
      * @return - {@link GenieResponse<ProfileExportResponse>}
      */
     GenieResponse<ProfileExportResponse> exportProfile(ProfileExportRequest profileExportRequest);
+
+
+    /**
+     *
+     * This api is used when you want to get only local or server users and from any specific group
+     *
+     * @param profileRequest
+     * @return
+     */
+    GenieResponse<List<Profile>> getAllUserProfile(ProfileRequest profileRequest);
 
 }

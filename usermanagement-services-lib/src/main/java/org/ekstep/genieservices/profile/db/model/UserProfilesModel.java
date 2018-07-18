@@ -19,13 +19,15 @@ public class UserProfilesModel implements IReadable {
 
     private IDBSession mDBSession;
     private List<Profile> mUserProfileList;
+    private String mFilterCondition;
 
-    private UserProfilesModel(IDBSession dbSession) {
+    private UserProfilesModel(IDBSession dbSession, String filterCondition) {
         this.mDBSession = dbSession;
+        this.mFilterCondition = filterCondition;
     }
 
     public static UserProfilesModel find(IDBSession dbSession) {
-        UserProfilesModel userProfilesModel = new UserProfilesModel(dbSession);
+        UserProfilesModel userProfilesModel = new UserProfilesModel(dbSession, "");
         dbSession.read(userProfilesModel);
         if (userProfilesModel.getProfileList() == null) {
             return null;
@@ -33,6 +35,17 @@ public class UserProfilesModel implements IReadable {
             return userProfilesModel;
         }
     }
+
+    public static UserProfilesModel find(IDBSession dbSession, String filterCondition) {
+        UserProfilesModel userProfilesModel = new UserProfilesModel(dbSession, filterCondition);
+        dbSession.read(userProfilesModel);
+        if (userProfilesModel.getProfileList() == null) {
+            return null;
+        } else {
+            return userProfilesModel;
+        }
+    }
+
 
     @Override
     public IReadable read(IResultSet resultSet) {
@@ -63,7 +76,7 @@ public class UserProfilesModel implements IReadable {
 
     @Override
     public String filterForRead() {
-        return "";
+        return mFilterCondition;
     }
 
     @Override

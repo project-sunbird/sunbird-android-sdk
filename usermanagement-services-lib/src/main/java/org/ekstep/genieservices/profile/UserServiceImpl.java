@@ -14,14 +14,17 @@ import org.ekstep.genieservices.commons.bean.ProfileExportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
+import org.ekstep.genieservices.commons.bean.ProfileRequest;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.enums.ContentAccessStatus;
+import org.ekstep.genieservices.commons.bean.enums.UserCreatedIn;
 import org.ekstep.genieservices.commons.bean.telemetry.Actor;
 import org.ekstep.genieservices.commons.bean.telemetry.Audit;
 import org.ekstep.genieservices.commons.bean.telemetry.End;
 import org.ekstep.genieservices.commons.bean.telemetry.Error;
 import org.ekstep.genieservices.commons.bean.telemetry.Start;
 import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
+import org.ekstep.genieservices.commons.db.contract.ProfileEntry;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
@@ -737,5 +740,48 @@ public class UserServiceImpl extends BaseService implements IUserService {
         return eparFile.getAbsolutePath();
     }
 
+    @Override
+    public GenieResponse<List<Profile>> getAllUserProfile(ProfileRequest profileRequest) {
+        String methodName = "getAllUserProfile@UserServiceImpl";
+        Map<String, Object> params = new HashMap<>();
+        params.put("logLevel", "1");
 
+        String localUserFilter = null;
+        String serverUserFilter = null;
+
+        if (profileRequest != null) {
+            //filter for local users
+            if (profileRequest.isLocal()) {
+                localUserFilter = String.format(Locale.US, "%s = '%s'", ProfileEntry.COLUMN_USER_CREATED_IN, UserCreatedIn.LOCAL);
+            }
+
+            //filter for server users
+            if (profileRequest.isServer()) {
+                serverUserFilter = String.format(Locale.US, "%s = '%s'", ProfileEntry.COLUMN_USER_CREATED_IN, UserCreatedIn.SERVER);
+            }
+
+            // TODO: 18/7/18 Check for the gid here, to be added as a filter
+
+        }
+
+        String filter = null;
+        if (!StringUtil.isNullOrEmpty(localUserFilter) && !StringUtil.isNullOrEmpty(serverUserFilter)) {
+            filter = String.format(Locale.US, " where (%s AND %s)", localUserFilter, serverUserFilter);
+        } else if (!StringUtil.isNullOrEmpty(localUserFilter)) {
+            filter = String.format(Locale.US, " where (%s)", localUserFilter);
+        } else if (!StringUtil.isNullOrEmpty(serverUserFilter)) {
+            filter = String.format(Locale.US, " where (%s)", serverUserFilter);
+        }
+
+        GenieResponse<List<Profile>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+
+        UserProfilesModel userProfilesModel = UserProfilesModel.find(mAppContext.getDBSession(), filter);
+        if (userProfilesModel == null) {
+            response.setResult(new ArrayList<Profile>());
+        } else {
+            response.setResult(userProfilesModel.getProfileList());
+        }
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        return response;
+    }
 }
