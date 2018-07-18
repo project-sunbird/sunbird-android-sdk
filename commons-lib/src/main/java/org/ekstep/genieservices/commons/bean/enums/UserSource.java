@@ -1,12 +1,12 @@
 package org.ekstep.genieservices.commons.bean.enums;
 
-public enum UserCreatedIn {
+public enum UserSource {
 
     SERVER("server"), LOCAL("local");
 
     private String value;
 
-    UserCreatedIn(String value) {
+    UserSource(String value) {
         this.value = value;
     }
 

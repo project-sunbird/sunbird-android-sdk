@@ -30,7 +30,7 @@ public abstract class ProfileEntry implements BaseColumns {
     public static final String COLUMN_NAME_GRADE = "grade";
     public static final String COLUMN_NAME_SYLLABUS = "syllabus";
     public static final String COLUMN_VALUE = "value";
-    public static final String COLUMN_USER_CREATED_IN = "user_created_in";
+    public static final String COLUMN_SOURCE = "source";
 
     public static final String getCreateEntry() {
         return "CREATE TABLE " + TABLE_NAME + " (" +
@@ -115,7 +115,7 @@ public abstract class ProfileEntry implements BaseColumns {
     public static List<String> getAlterEntryForProfileUserFromAndValue() {
         return Arrays.asList(
                 "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_VALUE + DbConstants.TEXT_TYPE + "  DEFAULT '';",
-                "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_USER_CREATED_IN + DbConstants.TEXT_TYPE + "  DEFAULT '';"
+                "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_SOURCE + DbConstants.TEXT_TYPE + "  DEFAULT '';"
         );
     }
 

@@ -4,7 +4,7 @@ package org.ekstep.genieservices.profile.db.model;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.enums.ProfileType;
-import org.ekstep.genieservices.commons.bean.enums.UserCreatedIn;
+import org.ekstep.genieservices.commons.bean.enums.UserSource;
 import org.ekstep.genieservices.commons.db.contract.ProfileEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
@@ -194,12 +194,12 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
         }
 
 
-        if (cursor.getColumnIndex(ProfileEntry.COLUMN_USER_CREATED_IN) != -1) {
-            String userCreatedIn = cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_USER_CREATED_IN));
-            if (userCreatedIn.equalsIgnoreCase("server")) {
-                profile.setUserCreatedIn(UserCreatedIn.SERVER);
-            } else if (userCreatedIn.equalsIgnoreCase("local")) {
-                profile.setUserCreatedIn(UserCreatedIn.LOCAL);
+        if (cursor.getColumnIndex(ProfileEntry.COLUMN_SOURCE) != -1) {
+            String source = cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_SOURCE));
+            if (source.equalsIgnoreCase("server")) {
+                profile.setSource(UserSource.SERVER);
+            } else if (source.equalsIgnoreCase("local")) {
+                profile.setSource(UserSource.LOCAL);
             }
         }
     }
@@ -277,8 +277,8 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
             contentValues.put(ProfileEntry.COLUMN_NAME_GRADE, StringUtil.join(",", profile.getGrade()));
         }
 
-        if (profile.getUserCreatedIn() != null) {
-            contentValues.put(ProfileEntry.COLUMN_USER_CREATED_IN, profile.getUserCreatedIn());
+        if (profile.getSource() != null) {
+            contentValues.put(ProfileEntry.COLUMN_SOURCE, profile.getSource());
         }
 
         contentValues.put(ProfileEntry.COLUMN_VALUE, GsonUtil.toJson(profile));

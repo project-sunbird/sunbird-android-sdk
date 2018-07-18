@@ -2,7 +2,7 @@ package org.ekstep.genieservices.commons.bean;
 
 import org.ekstep.genieservices.commons.IValidate;
 import org.ekstep.genieservices.commons.bean.enums.ProfileType;
-import org.ekstep.genieservices.commons.bean.enums.UserCreatedIn;
+import org.ekstep.genieservices.commons.bean.enums.UserSource;
 import org.ekstep.genieservices.commons.bean.validator.DateValidator;
 import org.ekstep.genieservices.commons.bean.validator.StringValidator;
 import org.ekstep.genieservices.commons.utils.DateUtil;
@@ -42,7 +42,7 @@ public class Profile implements Serializable, IValidate {
     private String[] subject;
     private String[] grade;
     private String[] syllabus;
-    private UserCreatedIn userCreatedIn;
+    private UserSource source;
 
     public Profile(String uid) {
         this.uid = uid;
@@ -213,12 +213,12 @@ public class Profile implements Serializable, IValidate {
         this.syllabus = syllabus;
     }
 
-    public UserCreatedIn getUserCreatedIn() {
-        return userCreatedIn;
+    public UserSource getSource() {
+        return source;
     }
 
-    public void setUserCreatedIn(UserCreatedIn userCreatedIn) {
-        this.userCreatedIn = userCreatedIn;
+    public void setSource(UserSource source) {
+        this.source = source;
     }
 
     public String toString() {

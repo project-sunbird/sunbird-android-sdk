@@ -2,7 +2,7 @@ package org.ekstep.genieservices.commons.db.migration.impl;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.Profile;
-import org.ekstep.genieservices.commons.bean.enums.UserCreatedIn;
+import org.ekstep.genieservices.commons.bean.enums.UserSource;
 import org.ekstep.genieservices.commons.db.contract.GroupEntry;
 import org.ekstep.genieservices.commons.db.contract.GroupProfileEntry;
 import org.ekstep.genieservices.commons.db.contract.ProfileEntry;
@@ -47,9 +47,9 @@ public class _13_GroupAndProfileMigration extends Migration {
             List<Profile> updatedProfileList = new ArrayList<>();
             for (Profile profile : userProfilesModel.getProfileList()) {
                 if (profile.getUid().equals(profile.getHandle())) {
-                    profile.setUserCreatedIn(UserCreatedIn.SERVER);
+                    profile.setSource(UserSource.SERVER);
                 } else {
-                    profile.setUserCreatedIn(UserCreatedIn.LOCAL);
+                    profile.setSource(UserSource.LOCAL);
                 }
 
 

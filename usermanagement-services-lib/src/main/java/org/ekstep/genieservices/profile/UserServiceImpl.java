@@ -17,7 +17,7 @@ import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.ProfileRequest;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.enums.ContentAccessStatus;
-import org.ekstep.genieservices.commons.bean.enums.UserCreatedIn;
+import org.ekstep.genieservices.commons.bean.enums.UserSource;
 import org.ekstep.genieservices.commons.bean.telemetry.Actor;
 import org.ekstep.genieservices.commons.bean.telemetry.Audit;
 import org.ekstep.genieservices.commons.bean.telemetry.End;
@@ -752,12 +752,12 @@ public class UserServiceImpl extends BaseService implements IUserService {
         if (profileRequest != null) {
             //filter for local users
             if (profileRequest.isLocal()) {
-                localUserFilter = String.format(Locale.US, "%s = '%s'", ProfileEntry.COLUMN_USER_CREATED_IN, UserCreatedIn.LOCAL);
+                localUserFilter = String.format(Locale.US, "%s = '%s'", ProfileEntry.COLUMN_SOURCE, UserSource.LOCAL);
             }
 
             //filter for server users
             if (profileRequest.isServer()) {
-                serverUserFilter = String.format(Locale.US, "%s = '%s'", ProfileEntry.COLUMN_USER_CREATED_IN, UserCreatedIn.SERVER);
+                serverUserFilter = String.format(Locale.US, "%s = '%s'", ProfileEntry.COLUMN_SOURCE, UserSource.SERVER);
             }
 
             // TODO: 18/7/18 Check for the gid here, to be added as a filter
