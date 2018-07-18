@@ -24,6 +24,7 @@ import org.ekstep.genieservices.commons.bean.telemetry.End;
 import org.ekstep.genieservices.commons.bean.telemetry.Error;
 import org.ekstep.genieservices.commons.bean.telemetry.Start;
 import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
+import org.ekstep.genieservices.commons.db.contract.GroupProfileEntry;
 import org.ekstep.genieservices.commons.db.contract.ProfileEntry;
 import org.ekstep.genieservices.commons.db.model.CustomReaderModel;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
@@ -748,6 +749,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
         String localUserFilter = null;
         String serverUserFilter = null;
+        String groupFilter = null;
 
         if (profileRequest != null) {
             //filter for local users
@@ -760,18 +762,29 @@ public class UserServiceImpl extends BaseService implements IUserService {
                 serverUserFilter = String.format(Locale.US, "%s = '%s'", ProfileEntry.COLUMN_SOURCE, UserSource.SERVER);
             }
 
-            // TODO: 18/7/18 Check for the gid here, to be added as a filter
+            //get the gids
+            if (!StringUtil.isNullOrEmpty(profileRequest.getGid())) {
+                groupFilter = String.format(Locale.US, "SELECT %s FROM %s WHERE %s = '%s'",
+                        GroupProfileEntry.COLUMN_NAME_UID, GroupProfileEntry.TABLE_NAME, GroupProfileEntry.COLUMN_NAME_GID, profileRequest.getGid());
+            }
 
         }
 
         String filter = null;
-        if (!StringUtil.isNullOrEmpty(localUserFilter) && !StringUtil.isNullOrEmpty(serverUserFilter)) {
+        if (!StringUtil.isNullOrEmpty(localUserFilter) && !StringUtil.isNullOrEmpty(serverUserFilter) && !StringUtil.isNullOrEmpty(groupFilter)) {
+            filter = String.format(Locale.US, " where %s OR %s AND %s IN (%s)", localUserFilter, serverUserFilter, ProfileEntry.COLUMN_NAME_UID, groupFilter);
+        } else if (!StringUtil.isNullOrEmpty(localUserFilter) && !StringUtil.isNullOrEmpty(groupFilter)) {
+            filter = String.format(Locale.US, " where %s AND %s IN (%s)", localUserFilter, ProfileEntry.COLUMN_NAME_UID, groupFilter);
+        } else if (!StringUtil.isNullOrEmpty(serverUserFilter) && !StringUtil.isNullOrEmpty(groupFilter)) {
+            filter = String.format(Locale.US, " where %s AND %s IN (%s)", serverUserFilter, ProfileEntry.COLUMN_NAME_UID, groupFilter);
+        } else if (!StringUtil.isNullOrEmpty(localUserFilter) && !StringUtil.isNullOrEmpty(serverUserFilter)) {
             filter = String.format(Locale.US, " where (%s OR %s)", localUserFilter, serverUserFilter);
         } else if (!StringUtil.isNullOrEmpty(localUserFilter)) {
             filter = String.format(Locale.US, " where (%s)", localUserFilter);
         } else if (!StringUtil.isNullOrEmpty(serverUserFilter)) {
             filter = String.format(Locale.US, " where (%s)", serverUserFilter);
         }
+
 
         GenieResponse<List<Profile>> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
 
