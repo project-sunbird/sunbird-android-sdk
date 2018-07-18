@@ -766,7 +766,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
         String filter = null;
         if (!StringUtil.isNullOrEmpty(localUserFilter) && !StringUtil.isNullOrEmpty(serverUserFilter)) {
-            filter = String.format(Locale.US, " where (%s AND %s)", localUserFilter, serverUserFilter);
+            filter = String.format(Locale.US, " where (%s OR %s)", localUserFilter, serverUserFilter);
         } else if (!StringUtil.isNullOrEmpty(localUserFilter)) {
             filter = String.format(Locale.US, " where (%s)", localUserFilter);
         } else if (!StringUtil.isNullOrEmpty(serverUserFilter)) {
