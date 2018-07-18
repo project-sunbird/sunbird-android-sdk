@@ -11,6 +11,7 @@ import org.ekstep.genieservices.commons.bean.ProfileExportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
+import org.ekstep.genieservices.commons.bean.ProfileRequest;
 import org.ekstep.genieservices.commons.bean.UserSession;
 
 import java.util.List;
@@ -274,6 +275,25 @@ public class UserService {
             @Override
             public GenieResponse<ProfileExportResponse> perform() {
                 return userService.exportProfile(profileExportRequest);
+            }
+        }, responseHandler);
+    }
+
+    /**
+     * This api is used to get all user profiles when you want to get only local or server users and from any specific group.
+     * <p>
+     * <p>On Successful creation of new profile, the response will return status as TRUE and with successful message
+     * <p>
+     * <p>On failing to get all user profiles, the response will have status as FALSE
+     * <p>
+     *
+     * @param responseHandler {@link IResponseHandler<List<Profile>>}
+     */
+    public void getAllUserProfile(final ProfileRequest profileRequest, IResponseHandler<List<Profile>> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<List<Profile>>() {
+            @Override
+            public GenieResponse<List<Profile>> perform() {
+                return userService.getAllUserProfile(profileRequest);
             }
         }, responseHandler);
     }
