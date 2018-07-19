@@ -7,9 +7,12 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
+import org.ekstep.genieservices.commons.db.contract.GroupEntry;
+import org.ekstep.genieservices.commons.db.contract.GroupProfileEntry;
 import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
 import org.ekstep.genieservices.commons.db.contract.LearnerSummaryEntry;
 import org.ekstep.genieservices.commons.db.contract.MetaEntry;
+import org.ekstep.genieservices.commons.db.contract.NoSqlEntry;
 import org.ekstep.genieservices.commons.db.contract.ProfileEntry;
 import org.ekstep.genieservices.commons.db.contract.UserEntry;
 import org.ekstep.genieservices.commons.db.model.CustomReadersModel;
@@ -46,6 +49,9 @@ public class CleanupExportedFile implements IChainable<ProfileExportResponse, Ex
 
         deleteUnwantedProfilesAndUsers(destinationDBSession, exportContext.getUserIds());
         deleteUnwantedProfileSummary(destinationDBSession, exportContext.getUserIds());
+        deleteUnwantedGroup(destinationDBSession, exportContext.getGroupIds());
+        deleteUnwantedGroupProfile(destinationDBSession, exportContext.getGroupIds());
+        keepAllFrameworkAndChannel(destinationDBSession);
 
         try {
             removeJournalFile(exportContext.getDestinationDBFilePath());
@@ -91,6 +97,9 @@ public class CleanupExportedFile implements IChainable<ProfileExportResponse, Ex
         tablesToExclude.add(ProfileEntry.TABLE_NAME);
         tablesToExclude.add(LearnerAssessmentsEntry.TABLE_NAME);
         tablesToExclude.add(LearnerSummaryEntry.TABLE_NAME);
+        tablesToExclude.add(GroupEntry.TABLE_NAME);
+        tablesToExclude.add(GroupProfileEntry.TABLE_NAME);
+        tablesToExclude.add(NoSqlEntry.TABLE_NAME);
 
         return tablesToExclude;
     }
@@ -153,6 +162,15 @@ public class CleanupExportedFile implements IChainable<ProfileExportResponse, Ex
                 return null;
             }
         });
+    }
+
+    private void deleteUnwantedGroup(IDBSession destinationDBSession, List<String> groupIds) {
+    }
+
+    private void deleteUnwantedGroupProfile(IDBSession destinationDBSession, List<String> groupIds) {
+    }
+
+    private void keepAllFrameworkAndChannel(IDBSession destinationDBSession) {
     }
 
     private void removeJournalFile(String destinationDBFilePath) throws Exception {

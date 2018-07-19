@@ -669,7 +669,8 @@ public class UserServiceImpl extends BaseService implements IUserService {
     public GenieResponse<ProfileImportResponse> importProfile(ProfileImportRequest profileImportRequest) {
         GenieResponse<ProfileImportResponse> response;
         if (!FileUtil.doesFileExists(profileImportRequest.getSourceFilePath())) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Profile import failed, file doesn't exists", TAG);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE,
+                    "Profile import failed, file doesn't exists", TAG);
             return response;
         }
 
@@ -685,7 +686,8 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
             return validateProfileMetadata.execute(mAppContext, importProfileContext);
         } else {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE, "Profile import failed, unsupported file extension", TAG);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_FILE,
+                    "Profile import failed, unsupported file extension", TAG);
             return response;
         }
     }
@@ -693,7 +695,8 @@ public class UserServiceImpl extends BaseService implements IUserService {
     @Override
     public GenieResponse<ProfileExportResponse> exportProfile(ProfileExportRequest profileExportRequest) {
         if (CollectionUtil.isNullOrEmpty(profileExportRequest.getUserIds())) {
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "There are no profile to export.", TAG);
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED,
+                    "There are no profile to export.", TAG);
         }
 
         File destinationFolder = new File(profileExportRequest.getDestinationFolder());
@@ -702,10 +705,12 @@ public class UserServiceImpl extends BaseService implements IUserService {
         String destinationDBFilePath = getEparFilePath(profileExportRequest.getUserIds(), destinationFolder);
 
         if (FileUtil.doesFileExists(destinationDBFilePath)) {
-            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED, "File already exists.", TAG);
+            return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED,
+                    "File already exists.", TAG);
         }
 
-        ExportProfileContext exportProfileContext = new ExportProfileContext(profileExportRequest.getUserIds(), profileExportRequest.getDestinationFolder(), destinationDBFilePath);
+        ExportProfileContext exportProfileContext = new ExportProfileContext(profileExportRequest.getUserIds(),
+                profileExportRequest.getGroupIds(), profileExportRequest.getDestinationFolder(), destinationDBFilePath);
         CopyDatabase copyDatabase = new CopyDatabase();
         copyDatabase.then(new CreateMetadata())
                 .then(new CleanupExportedFile())

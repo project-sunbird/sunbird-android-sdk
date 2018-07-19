@@ -11,18 +11,24 @@ import java.util.Map;
 public class ExportProfileContext {
 
     private List<String> userIds;
+    private List<String> groupIds;
     private String destinationFolder;
     private String destinationDBFilePath;
     private Map<String, Object> metadata;
 
-    public ExportProfileContext(List<String> userIds, String destinationFolder, String destinationDBFilePath) {
+    public ExportProfileContext(List<String> userIds, List<String> groupIds, String destinationFolder, String destinationDBFilePath) {
         this.userIds = userIds;
+        this.groupIds = groupIds;
         this.destinationFolder = destinationFolder;
         this.destinationDBFilePath = destinationDBFilePath;
     }
 
     public List<String> getUserIds() {
         return userIds;
+    }
+
+    public List<String> getGroupIds() {
+        return groupIds;
     }
 
     public String getDestinationFolder() {

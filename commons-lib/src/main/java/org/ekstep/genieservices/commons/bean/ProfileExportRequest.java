@@ -10,15 +10,21 @@ import java.util.List;
 public class ProfileExportRequest {
 
     private List<String> userIds;
+    private List<String> groupIds;
     private String destinationFolder;
 
-    private ProfileExportRequest(List<String> userIds, String destinationFolder) {
+    private ProfileExportRequest(List<String> userIds, List<String> groupIds, String destinationFolder) {
         this.userIds = userIds;
+        this.groupIds = groupIds;
         this.destinationFolder = destinationFolder;
     }
 
     public List<String> getUserIds() {
         return userIds;
+    }
+
+    public List<String> getGroupIds() {
+        return groupIds;
     }
 
     public String getDestinationFolder() {
@@ -27,6 +33,7 @@ public class ProfileExportRequest {
 
     public static class Builder {
         private List<String> userIds;
+        private List<String> groupIds;
         private String destinationFolder;
 
         /**
@@ -34,6 +41,14 @@ public class ProfileExportRequest {
          */
         public Builder exportUsers(List<String> userIds) {
             this.userIds = userIds;
+            return this;
+        }
+
+        /**
+         * List of group which needs to export.
+         */
+        public Builder exportGroups(List<String> groupIds) {
+            this.groupIds = groupIds;
             return this;
         }
 
@@ -52,7 +67,7 @@ public class ProfileExportRequest {
             if (StringUtil.isNullOrEmpty(destinationFolder)) {
                 throw new IllegalStateException("To folder required.");
             }
-            return new ProfileExportRequest(userIds, destinationFolder);
+            return new ProfileExportRequest(userIds, groupIds, destinationFolder);
         }
     }
 }
