@@ -4,6 +4,7 @@ import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.Group;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
@@ -16,11 +17,17 @@ import org.ekstep.genieservices.commons.db.contract.NoSqlEntry;
 import org.ekstep.genieservices.commons.db.contract.ProfileEntry;
 import org.ekstep.genieservices.commons.db.contract.UserEntry;
 import org.ekstep.genieservices.commons.db.model.CustomReadersModel;
+import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
+import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.importexport.bean.ExportProfileContext;
+import org.ekstep.genieservices.profile.db.model.GroupModel;
+import org.ekstep.genieservices.profile.db.model.GroupProfileModel;
+import org.ekstep.genieservices.profile.db.model.GroupProfilesModel;
+import org.ekstep.genieservices.profile.db.model.NoSqlModelListModel;
 import org.ekstep.genieservices.profile.db.model.UserModel;
 import org.ekstep.genieservices.profile.db.model.UserProfileModel;
 
@@ -50,7 +57,7 @@ public class CleanupExportedFile implements IChainable<ProfileExportResponse, Ex
         deleteUnwantedProfilesAndUsers(destinationDBSession, exportContext.getUserIds());
         deleteUnwantedProfileSummary(destinationDBSession, exportContext.getUserIds());
         deleteUnwantedGroup(destinationDBSession, exportContext.getGroupIds());
-        deleteUnwantedGroupProfile(destinationDBSession, exportContext.getGroupIds());
+        deleteUnwantedGroupProfileMapping(destinationDBSession, exportContext.getGroupIds());
         keepAllFrameworkAndChannel(destinationDBSession);
 
         try {
@@ -164,13 +171,59 @@ public class CleanupExportedFile implements IChainable<ProfileExportResponse, Ex
         });
     }
 
-    private void deleteUnwantedGroup(IDBSession destinationDBSession, List<String> groupIds) {
+    private void deleteUnwantedGroup(IDBSession dbSession, List<String> groupIds) {
+
+        if (!CollectionUtil.isNullOrEmpty(groupIds)) {
+            List<Group> groupsToRetain = new ArrayList<>();
+            for (String gid : groupIds) {
+                GroupModel groupModel = GroupModel.findGroupById(dbSession, gid);
+                if (groupModel != null) {
+                    groupsToRetain.add(groupModel.getGroup());
+                }
+            }
+
+            cleanTable(dbSession, GroupEntry.TABLE_NAME);
+
+            for (Group group : groupsToRetain) {
+                GroupModel groupModel = GroupModel.build(dbSession, group);
+                groupModel.save();
+            }
+        }
     }
 
-    private void deleteUnwantedGroupProfile(IDBSession destinationDBSession, List<String> groupIds) {
+    private void deleteUnwantedGroupProfileMapping(IDBSession dbSession, List<String> groupIds) {
+
+        if (!CollectionUtil.isNullOrEmpty(groupIds)) {
+            List<GroupProfileModel> groupProfileMappingsToRetain = new ArrayList<>();
+            for (String gid : groupIds) {
+                GroupProfilesModel groupProfilesModelModel = GroupProfilesModel.findByGid(dbSession, gid);
+                if (groupProfilesModelModel != null) {
+                    groupProfileMappingsToRetain.addAll(groupProfilesModelModel.getGroupProfileModelList());
+                }
+            }
+
+            cleanTable(dbSession, GroupProfileEntry.TABLE_NAME);
+
+            for (GroupProfileModel groupProfileModel : groupProfileMappingsToRetain) {
+                GroupProfileModel model = GroupProfileModel.build(dbSession, groupProfileModel.getGid(), groupProfileModel.getUid());
+                model.save();
+            }
+        }
     }
 
-    private void keepAllFrameworkAndChannel(IDBSession destinationDBSession) {
+    private void keepAllFrameworkAndChannel(IDBSession dbSession) {
+        String query = "SELECT *  FROM  no_sql WHERE key LIKE 'channel_details_key-%' OR key LIKE 'framework_details_key-%';";
+
+        NoSqlModelListModel noSqlModelListModel = NoSqlModelListModel.findWithCustomQuery(dbSession, query);
+
+        cleanTable(dbSession, NoSqlEntry.TABLE_NAME);
+
+        if (noSqlModelListModel != null) {
+            for (NoSqlModel noSqlModel : noSqlModelListModel.getNoSqlModelList()) {
+                NoSqlModel model = NoSqlModel.build(dbSession, noSqlModel.getKey(), noSqlModel.getValue());
+                model.save();
+            }
+        }
     }
 
     private void removeJournalFile(String destinationDBFilePath) throws Exception {

@@ -123,4 +123,12 @@ public class GroupProfileModel implements IWritable, IReadable, ICleanable {
         uid = resultSet.getString(resultSet.getColumnIndex(GroupProfileEntry.COLUMN_NAME_UID));
 //        epochTimestamp = resultSet.getLong(resultSet.getColumnIndex(GroupProfileEntry.COLUMN_NAME_EPOCH_TIMESTAMP));
     }
+
+    public String getGid() {
+        return gid;
+    }
+
+    public String getUid() {
+        return uid;
+    }
 }

@@ -25,6 +25,10 @@ public class NoSqlModel implements IWritable, IReadable, IUpdatable, ICleanable 
     private String mValue;
 
 
+    private NoSqlModel(IDBSession dbSession) {
+        this.mDBSession = dbSession;
+    }
+
     private NoSqlModel(IDBSession dbSession, String key) {
         this.mDBSession = dbSession;
         this.mKey = key;
@@ -36,6 +40,10 @@ public class NoSqlModel implements IWritable, IReadable, IUpdatable, ICleanable 
         this.mValue = value;
     }
 
+    public static NoSqlModel build(IDBSession dbSession) {
+        return new NoSqlModel(dbSession);
+    }
+
     public static NoSqlModel build(IDBSession dbSession, String key, String value) {
         return new NoSqlModel(dbSession, key, value);
     }
@@ -45,6 +53,17 @@ public class NoSqlModel implements IWritable, IReadable, IUpdatable, ICleanable 
         dbSession.read(noSqlModel);
         return noSqlModel.getValue() == null ? null : noSqlModel;
 
+    }
+
+    public static NoSqlModel findWithCustomQuery(IDBSession dbSession, String query) {
+        NoSqlModel noSqlModel = new NoSqlModel(dbSession, null);
+        dbSession.read(noSqlModel, query);
+
+        if (noSqlModel.getValue() == null) {
+            return null;
+        } else {
+            return noSqlModel;
+        }
     }
 
     @Override
@@ -132,7 +151,7 @@ public class NoSqlModel implements IWritable, IReadable, IUpdatable, ICleanable 
         mDBSession.clean(this);
     }
 
-    private void readWithoutMoving(IResultSet resultSet) {
+    public void readWithoutMoving(IResultSet resultSet) {
         id = resultSet.getLong(resultSet.getColumnIndex(BaseColumns._ID));
         mKey = resultSet.getString(resultSet.getColumnIndex(NoSqlEntry.COLUMN_NAME_KEY));
         mValue = resultSet.getString(resultSet.getColumnIndex(NoSqlEntry.COLUMN_NAME_VALUE));
