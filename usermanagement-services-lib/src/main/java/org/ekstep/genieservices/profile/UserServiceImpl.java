@@ -754,12 +754,12 @@ public class UserServiceImpl extends BaseService implements IUserService {
         if (profileRequest != null) {
             //filter for local users
             if (profileRequest.isLocal()) {
-                localUserFilter = String.format(Locale.US, "%s = '%s'", ProfileEntry.COLUMN_SOURCE, UserSource.LOCAL);
+                localUserFilter = String.format(Locale.US, "%s = '%s'", ProfileEntry.COLUMN_SOURCE, UserSource.LOCAL.getValue());
             }
 
             //filter for server users
             if (profileRequest.isServer()) {
-                serverUserFilter = String.format(Locale.US, "%s = '%s'", ProfileEntry.COLUMN_SOURCE, UserSource.SERVER);
+                serverUserFilter = String.format(Locale.US, "%s = '%s'", ProfileEntry.COLUMN_SOURCE, UserSource.SERVER.getValue());
             }
 
             //get the gids
