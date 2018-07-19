@@ -9,6 +9,7 @@ public class Group {
     private String name;
     private String[] syllabus;
     private String[] grade;
+    private int profilesCount;
     private Long createdAt;
     private Long updatedAt;
 
@@ -64,5 +65,12 @@ public class Group {
         this.updatedAt = updatedAt;
     }
 
+    public int getProfilesCount() {
+        return profilesCount;
+    }
+
+    public void setProfilesCount(int profilesCount) {
+        this.profilesCount = profilesCount;
+    }
 
 }
