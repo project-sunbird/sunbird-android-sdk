@@ -83,7 +83,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
 
     private String getFilterForLearnerAssessmentDetails(String qid, List<String> uids, String contentId, String hierarchyData) {
         String isQid = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_QID, qid);
-        String isUid = String.format(Locale.US, "%s IN '%s'", LearnerAssessmentsEntry.COLUMN_NAME_UID, StringUtil.join("','", uids));
+        String isUid = String.format(Locale.US, "%s IN ('%s')", LearnerAssessmentsEntry.COLUMN_NAME_UID, StringUtil.join("','", uids));
         String isContentId = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID, contentId);
         String isHData = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA, hierarchyData == null ? "" : hierarchyData);
 
