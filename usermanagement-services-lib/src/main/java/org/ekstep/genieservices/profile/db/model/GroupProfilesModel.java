@@ -35,6 +35,15 @@ public class GroupProfilesModel implements IReadable, ICleanable {
         this.onlyCount = onlyCount;
     }
 
+    public static GroupProfilesModel find(IDBSession dbSession) {
+        GroupProfilesModel groupProfilesModel = new GroupProfilesModel(dbSession, "");
+        dbSession.read(groupProfilesModel);
+        if (groupProfilesModel.getGroupProfileModelList() == null) {
+            return null;
+        } else {
+            return groupProfilesModel;
+        }
+    }
 
     public static GroupProfilesModel find(IDBSession dbSession, String filter) {
         GroupProfilesModel groupProfilesModel = new GroupProfilesModel(dbSession, filter);

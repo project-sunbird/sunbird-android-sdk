@@ -41,6 +41,9 @@ import org.ekstep.genieservices.profile.chained.export.CleanupExportedFile;
 import org.ekstep.genieservices.profile.chained.export.CopyDatabase;
 import org.ekstep.genieservices.profile.chained.export.CreateMetadata;
 import org.ekstep.genieservices.profile.chained.imports.AddGeTransferProfileImportEvent;
+import org.ekstep.genieservices.profile.chained.imports.TransportFrameworknChannel;
+import org.ekstep.genieservices.profile.chained.imports.TransportGroup;
+import org.ekstep.genieservices.profile.chained.imports.TransportGroupProfile;
 import org.ekstep.genieservices.profile.chained.imports.TransportProfiles;
 import org.ekstep.genieservices.profile.chained.imports.TransportSummarizer;
 import org.ekstep.genieservices.profile.chained.imports.TransportUser;
@@ -688,6 +691,9 @@ public class UserServiceImpl extends BaseService implements IUserService {
             ValidateProfileMetadata validateProfileMetadata = new ValidateProfileMetadata();
             validateProfileMetadata.then(new TransportProfiles())
                     .then(new TransportUser())
+                    .then(new TransportGroup())
+                    .then(new TransportGroupProfile())
+                    .then(new TransportFrameworknChannel())
                     .then(new TransportSummarizer())
                     .then(new UpdateImportedProfileMetadata())
                     .then(new AddGeTransferProfileImportEvent());
