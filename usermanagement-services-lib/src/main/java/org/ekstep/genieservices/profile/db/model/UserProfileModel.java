@@ -269,16 +269,14 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
 
         contentValues.put(ProfileEntry.COLUMN_NAME_PROFILE_IMAGE, profile.getProfileImage());
         contentValues.put(ProfileEntry.COLUMN_NAME_PROFILE_TYPE, profile.getProfileType());
+        contentValues.put(ProfileEntry.COLUMN_SOURCE, profile.getSource());
+
         if (profile.getSubject() != null) {
             contentValues.put(ProfileEntry.COLUMN_NAME_SUBJECT, StringUtil.join(",", profile.getSubject()));
         }
 
         if (profile.getGrade() != null) {
             contentValues.put(ProfileEntry.COLUMN_NAME_GRADE, StringUtil.join(",", profile.getGrade()));
-        }
-
-        if (profile.getSource() != null) {
-            contentValues.put(ProfileEntry.COLUMN_SOURCE, profile.getSource());
         }
 
         contentValues.put(ProfileEntry.COLUMN_VALUE, GsonUtil.toJson(profile));

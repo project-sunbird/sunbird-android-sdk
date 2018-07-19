@@ -213,8 +213,8 @@ public class Profile implements Serializable, IValidate {
         this.syllabus = syllabus;
     }
 
-    public UserSource getSource() {
-        return source;
+    public String getSource() {
+        return source != null ? source.getValue() : "";
     }
 
     public void setSource(UserSource source) {
