@@ -46,8 +46,8 @@ public class LearnerAssessmentSummaryModel implements IReadable {
 
     private static String getChildProgressQuery(List<String> uids) {
         return "select uid, content_id, count(qid), sum(correct), sum(time_spent), h_data from " +
-                LearnerAssessmentsEntry.TABLE_NAME + " where uid IN '" + StringUtil.join("','", uids) +
-                "' group by content_id ";
+                LearnerAssessmentsEntry.TABLE_NAME + " where uid IN ('" + StringUtil.join("','", uids) +
+                "') group by content_id ";
     }
 
     private static String getContentProgressQuery(String contentId) {
