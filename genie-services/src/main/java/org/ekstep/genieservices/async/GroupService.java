@@ -3,6 +3,7 @@ package org.ekstep.genieservices.async;
 import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.IGroupService;
 import org.ekstep.genieservices.commons.IResponseHandler;
+import org.ekstep.genieservices.commons.bean.AddUpdateProfilesRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Group;
 
@@ -130,6 +131,23 @@ public class GroupService {
             @Override
             public GenieResponse<Group> perform() {
                 return groupService.getCurrentGroup();
+            }
+        }, responseHandler);
+    }
+
+
+    /**
+     * This api adds or updates the GroupProfile with Profiles related to a group
+     *
+     *
+     * @param addUpdateProfilesRequest
+     * @param responseHandler
+     */
+    public void addUpdateProfilesToGroup(final AddUpdateProfilesRequest addUpdateProfilesRequest, IResponseHandler<Void> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return groupService.addUpdateProfilesToGroup(addUpdateProfilesRequest);
             }
         }, responseHandler);
     }

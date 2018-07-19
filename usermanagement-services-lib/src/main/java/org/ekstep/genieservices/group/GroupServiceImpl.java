@@ -5,6 +5,7 @@ import org.ekstep.genieservices.IGroupService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.bean.AddUpdateProfilesRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Group;
 import org.ekstep.genieservices.commons.bean.telemetry.Actor;
@@ -13,9 +14,10 @@ import org.ekstep.genieservices.commons.bean.telemetry.Error;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.commons.utils.DateUtil;
-import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.profile.db.model.GroupModel;
+import org.ekstep.genieservices.profile.db.model.GroupProfileModel;
+import org.ekstep.genieservices.profile.db.model.GroupProfilesModel;
 import org.ekstep.genieservices.profile.db.model.GroupsModel;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
@@ -134,7 +136,7 @@ public class GroupServiceImpl extends BaseService implements IGroupService {
         GenieResponse<Group> response;
         if (group == null || StringUtil.isNullOrEmpty(group.getGid())) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.GROUP_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_GROUP, TAG, Group.class);
-            logGEError(response, "update-user-group");
+            logGEError(response, "update-group");
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_UPDATE_GROUP);
             return response;
         }
@@ -154,7 +156,7 @@ public class GroupServiceImpl extends BaseService implements IGroupService {
             return response;
         } else {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.GROUP_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_GROUP, TAG, Group.class);
-            logGEError(response, "update-user-group");
+            logGEError(response, "delete-group");
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_UPDATE_GROUP);
             return response;
         }
@@ -180,8 +182,6 @@ public class GroupServiceImpl extends BaseService implements IGroupService {
 
     @Override
     public GenieResponse<Void> deleteGroup(String gid) {
-        // TODO: 13/7/18 Need to remove the group from mapping table as well
-
         String methodName = "deleteGroup@GroupServiceImpl";
         Map<String, Object> params = new HashMap<>();
         params.put("gid", gid);
@@ -190,7 +190,7 @@ public class GroupServiceImpl extends BaseService implements IGroupService {
         GenieResponse<Void> response;
         if (StringUtil.isNullOrEmpty(gid)) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.GROUP_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_GROUP, TAG, Void.class);
-            logGEError(response, "update-user-group");
+            logGEError(response, "delete-group");
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_UPDATE_GROUP);
             return response;
         }
@@ -199,13 +199,20 @@ public class GroupServiceImpl extends BaseService implements IGroupService {
         if (groupDBModel != null) {
             groupDBModel.delete();
 
+            //Deleting from the GroupProfilesModel, mapping between group and profile, when the group does not exist
+            //all its related mapping has to be removed
+            GroupProfilesModel groupProfilesModel = GroupProfilesModel.findByGid(mAppContext.getDBSession(), gid);
+            if (groupProfilesModel != null) {
+                groupProfilesModel.delete();
+            }
+
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
 
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
             return response;
         } else {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.GROUP_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_GROUP, TAG, Void.class);
-            logGEError(response, "update-user-group");
+            logGEError(response, "delete-group");
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_UPDATE_GROUP);
             return response;
         }
@@ -239,8 +246,50 @@ public class GroupServiceImpl extends BaseService implements IGroupService {
 //        params.put("logLevel", "1");
 
 
-
         return null;
     }
 
+
+    @Override
+    public GenieResponse<Void> addUpdateProfilesToGroup(AddUpdateProfilesRequest addUpdateProfilesRequest) {
+        String methodName = "deleteGroup@GroupServiceImpl";
+        Map<String, Object> params = new HashMap<>();
+        params.put("logLevel", "2");
+
+        GenieResponse<Void> response;
+
+        String groupId = addUpdateProfilesRequest.getGroupId();
+
+        //iterate on the list of users
+        GroupProfilesModel groupProfilesDBModel = GroupProfilesModel.findByGid(mAppContext.getDBSession(), groupId);
+        if (groupProfilesDBModel != null) {
+            //UPDATE THE DB
+            groupProfilesDBModel.delete();
+        }
+
+        saveUpdateGroup(addUpdateProfilesRequest);
+
+        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
+
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        return response;
+    }
+
+    private void saveUpdateGroup(AddUpdateProfilesRequest addUpdateProfilesRequest) {
+        List<String> uidList = addUpdateProfilesRequest.getUidList();
+        final String gid = addUpdateProfilesRequest.getGroupId();
+
+        for (String uid : uidList) {
+            final GroupProfileModel groupModel = GroupProfileModel.build(mAppContext.getDBSession(), gid, uid);
+
+            mAppContext.getDBSession().executeInTransaction(new IDBTransaction() {
+                @Override
+                public Void perform(IDBSession dbSession) {
+                    groupModel.save();
+                    logGroupAuditEvent(gid);
+                    return null;
+                }
+            });
+        }
+    }
 }

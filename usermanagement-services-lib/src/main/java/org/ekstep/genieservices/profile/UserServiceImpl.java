@@ -48,6 +48,7 @@ import org.ekstep.genieservices.profile.chained.imports.UpdateImportedProfileMet
 import org.ekstep.genieservices.profile.chained.imports.ValidateProfileMetadata;
 import org.ekstep.genieservices.profile.db.model.ContentAccessModel;
 import org.ekstep.genieservices.profile.db.model.ContentAccessesModel;
+import org.ekstep.genieservices.profile.db.model.GroupProfilesModel;
 import org.ekstep.genieservices.profile.db.model.UserModel;
 import org.ekstep.genieservices.profile.db.model.UserProfileModel;
 import org.ekstep.genieservices.profile.db.model.UserProfilesModel;
@@ -380,6 +381,8 @@ public class UserServiceImpl extends BaseService implements IUserService {
             }
         }
         final ContentAccessesModel accessesModel = ContentAccessesModel.findByUid(mAppContext.getDBSession(), uid);
+        final GroupProfilesModel groupProfilesModel = GroupProfilesModel.findByUid(mAppContext.getDBSession(), uid);
+
         final UserProfileModel userProfileModel = UserProfileModel.find(mAppContext.getDBSession(), uid);
         if (userProfileModel == null) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.PROFILE_NOT_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_PROFILE, TAG, Void.class);
@@ -397,6 +400,11 @@ public class UserServiceImpl extends BaseService implements IUserService {
                     if (accessesModel != null) {
                         accessesModel.delete();
                     }
+
+                    if (groupProfilesModel != null) {
+                        groupProfilesModel.delete();
+                    }
+
                     userProfileModel.delete();
 
                     userModel.delete();

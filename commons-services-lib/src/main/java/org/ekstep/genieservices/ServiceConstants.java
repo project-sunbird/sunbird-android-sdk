@@ -232,6 +232,7 @@ public interface ServiceConstants {
         String UNABLE_TO_CREATE_GROUP = "Unable to create group";
         String UNABLE_TO_FIND_GROUP = "Unable to find group";
         String UNABLE_TO_UPDATE_GROUP = "Unable to update group";
+        String UNABLE_TO_UPDATE_GROUP_USER = "Unable to update group or users";
         String NO_GROUP_WITH_SPECIFIED_ID = "There is no group with specified id exists";
         String UNABLE_TO_SET_CURRENT_GROUP = "Unable to set current group";
 

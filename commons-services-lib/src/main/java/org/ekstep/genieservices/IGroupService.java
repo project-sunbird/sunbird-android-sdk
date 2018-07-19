@@ -1,5 +1,6 @@
 package org.ekstep.genieservices;
 
+import org.ekstep.genieservices.commons.bean.AddUpdateProfilesRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Group;
 
@@ -82,5 +83,13 @@ public interface IGroupService {
      * @return {@link GenieResponse<Group>}
      */
     GenieResponse<Group> getCurrentGroup();
+
+    /**
+     * This api adds/updates all the profiles to the group.
+     *
+     * @param addUpdateProfilesRequest
+     * @return
+     */
+    GenieResponse<Void> addUpdateProfilesToGroup(AddUpdateProfilesRequest addUpdateProfilesRequest);
 
 }
