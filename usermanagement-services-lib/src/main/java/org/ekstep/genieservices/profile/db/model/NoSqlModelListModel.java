@@ -28,9 +28,19 @@ public class NoSqlModelListModel implements IReadable, ICleanable {
         this.filterCondition = filterCondition;
     }
 
-    public static NoSqlModelListModel findWithCustomQuery(IDBSession dbSession, String filter) {
-        NoSqlModelListModel noSqlModelListModel = new NoSqlModelListModel(dbSession, filter);
+    public static NoSqlModelListModel find(IDBSession dbSession) {
+        NoSqlModelListModel noSqlModelListModel = new NoSqlModelListModel(dbSession, "");
         dbSession.read(noSqlModelListModel);
+        if (noSqlModelListModel.getNoSqlModelList() == null) {
+            return null;
+        } else {
+            return noSqlModelListModel;
+        }
+    }
+
+    public static NoSqlModelListModel findWithCustomQuery(IDBSession dbSession, String filter) {
+        NoSqlModelListModel noSqlModelListModel = new NoSqlModelListModel(dbSession, "");
+        dbSession.read(noSqlModelListModel, filter);
 
         if (noSqlModelListModel.getNoSqlModelList() == null) {
             return null;
