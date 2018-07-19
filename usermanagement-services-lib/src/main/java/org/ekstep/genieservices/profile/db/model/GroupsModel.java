@@ -43,7 +43,12 @@ public class GroupsModel implements IReadable {
 
                 groupModel.readWithoutMoving(resultSet);
 
-                mGroupsList.add(groupModel.getGroup());
+                Group group = groupModel.getGroup();
+
+                int profilesCount = GroupProfilesModel.count(mDBSession, group.getGid());
+                group.setProfilesCount(profilesCount);
+
+                mGroupsList.add(group);
             } while (resultSet.moveToNext());
         }
 

@@ -22,10 +22,19 @@ public class GroupProfilesModel implements IReadable, ICleanable {
 
     private List<GroupProfileModel> groupProfileModelList;
 
+    private boolean onlyCount;
+    private int count;
+
     private GroupProfilesModel(IDBSession mDBSession, String filterCondition) {
         this.mDBSession = mDBSession;
         this.filterCondition = filterCondition;
     }
+
+    private GroupProfilesModel(IDBSession mDBSession, boolean onlyCount) {
+        this.mDBSession = mDBSession;
+        this.onlyCount = onlyCount;
+    }
+
 
     public static GroupProfilesModel find(IDBSession dbSession, String filter) {
         GroupProfilesModel groupProfilesModel = new GroupProfilesModel(dbSession, filter);
@@ -48,6 +57,13 @@ public class GroupProfilesModel implements IReadable, ICleanable {
         String filter = String.format(Locale.US, " where %s = '%s' ", GroupProfileEntry.COLUMN_NAME_UID, uid);
 
         return find(dbSession, filter);
+    }
+
+    public static int count(IDBSession dbSession, String gid) {
+        String query = String.format(Locale.US, "select * from %s where %s = '%s';", GroupProfileEntry.TABLE_NAME, GroupProfileEntry.COLUMN_NAME_GID, gid);
+        GroupProfilesModel model = new GroupProfilesModel(dbSession, true);
+        dbSession.read(model, query);
+        return model.count;
     }
 
     public Void delete() {
