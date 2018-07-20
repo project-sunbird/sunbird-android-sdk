@@ -20,8 +20,8 @@ public class GroupSessionModel {
         this.appContext = appContext;
     }
 
-    public static GroupSessionModel buildUserSession(AppContext appContext, String uid) {
-        GroupSessionModel groupSession = new GroupSessionModel(appContext, uid);
+    public static GroupSessionModel buildUserSession(AppContext appContext, String gid) {
+        GroupSessionModel groupSession = new GroupSessionModel(appContext, gid);
         return groupSession;
     }
 
@@ -45,7 +45,7 @@ public class GroupSessionModel {
     }
 
     public void endSession() {
-        //put the current user session to empty
+        //put the current group session to empty
         appContext.getKeyValueStore().putString(ServiceConstants.KEY_GROUP_SESSION, "");
 
     }

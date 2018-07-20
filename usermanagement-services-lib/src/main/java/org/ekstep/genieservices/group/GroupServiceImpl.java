@@ -282,13 +282,16 @@ public class GroupServiceImpl extends BaseService implements IGroupService {
         params.put("logLevel", "2");
 
         GenieResponse<Void> response;
-        GroupModel groupModel = GroupModel.findGroupById(mAppContext.getDBSession(), gid);
-        if (groupModel == null) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_GROUP, ServiceConstants.ErrorMessage.NO_GROUP_WITH_SPECIFIED_ID, TAG, Void.class);
-            logGEError(response, "setCurrentGroup");
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_SET_CURRENT_GROUP);
-            return response;
+        if (gid != null) {
+            GroupModel groupModel = GroupModel.findGroupById(mAppContext.getDBSession(), gid);
+            if (groupModel == null) {
+                response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_GROUP, ServiceConstants.ErrorMessage.NO_GROUP_WITH_SPECIFIED_ID, TAG, Void.class);
+                logGEError(response, "setCurrentGroup");
+                TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_SET_CURRENT_GROUP);
+                return response;
+            }
         }
+
 
         GroupSessionModel session = GroupSessionModel.findGroupSession(mAppContext);
         boolean sessionCreationRequired;
@@ -301,7 +304,13 @@ public class GroupServiceImpl extends BaseService implements IGroupService {
 
         if (sessionCreationRequired) {
             GroupSessionModel userSessionModel = GroupSessionModel.buildUserSession(mAppContext, gid);
-            userSessionModel.startSession();
+            if (gid != null) {
+                userSessionModel.startSession();
+            } else {
+                //if gid is null then its a user session so clear the group session
+                userSessionModel.endSession();
+            }
+
         }
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
