@@ -1,5 +1,7 @@
 package org.ekstep.genieservices;
 
+import org.ekstep.genieservices.commons.bean.AddUpdateGroupsRequest;
+import org.ekstep.genieservices.commons.bean.AddUpdateProfilesRequest;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -183,5 +185,13 @@ public interface IUserService {
      * @return
      */
     GenieResponse<List<Profile>> getAllUserProfile(ProfileRequest profileRequest);
+
+    /**
+     * This api adds/updates all the groups to profile.
+     *
+     * @param addUpdateGroupsRequest
+     * @return
+     */
+    GenieResponse<Void> addUpdateGroupsToProfile(AddUpdateGroupsRequest addUpdateGroupsRequest);
 
 }

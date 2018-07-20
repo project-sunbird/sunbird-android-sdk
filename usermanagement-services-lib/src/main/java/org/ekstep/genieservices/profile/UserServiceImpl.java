@@ -5,6 +5,7 @@ import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.bean.AddUpdateGroupsRequest;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentLearnerState;
@@ -815,5 +816,11 @@ public class UserServiceImpl extends BaseService implements IUserService {
         }
         TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;
+    }
+
+    @Override
+    public GenieResponse<Void> addUpdateGroupsToProfile(AddUpdateGroupsRequest addUpdateGroupsRequest) {
+        // TODO: 20/7/18 Yet to be implemented
+        return null;
     }
 }
