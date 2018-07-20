@@ -37,6 +37,9 @@ public class GroupServiceImpl extends BaseService implements IGroupService {
 
     private static final String TAG = GroupServiceImpl.class.getSimpleName();
 
+    // TODO: 20/7/18 SHOULD BE CHANGED AFTER MAKING THE CHANGES WRT SESSION
+    private Group dummyGroup = null;
+
     public GroupServiceImpl(AppContext appContext) {
         super(appContext);
     }
@@ -220,33 +223,43 @@ public class GroupServiceImpl extends BaseService implements IGroupService {
 
     @Override
     public GenieResponse<Void> setCurrentGroup(String gid) {
-//        String methodName = "setCurrentGroup@GroupServiceImpl";
-//        Map<String, Object> params = new HashMap<>();
-//        params.put("gid", gid);
-//        params.put("logLevel", "2");
-//
-//        GenieResponse<Void> response;
-//
-//        GroupModel groupModel = GroupModel.findGroupById(mAppContext.getDBSession(), gid);
-//        if (groupModel == null) {
-//            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_GROUP, ServiceConstants.ErrorMessage.NO_GROUP_WITH_SPECIFIED_ID, TAG, Void.class);
-//            logGEError(response, "setCurrentGroup");
-//            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_SET_CURRENT_GROUP);
-//            return response;
-//        }
-//
+        String methodName = "setCurrentGroup@GroupServiceImpl";
+        Map<String, Object> params = new HashMap<>();
+        params.put("gid", gid);
+        params.put("logLevel", "2");
 
-        return null;
+        GenieResponse<Void> response;
+
+        GroupModel groupModel = GroupModel.findGroupById(mAppContext.getDBSession(), gid);
+        if (groupModel == null) {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_GROUP, ServiceConstants.ErrorMessage.NO_GROUP_WITH_SPECIFIED_ID, TAG, Void.class);
+            logGEError(response, "setCurrentGroup");
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_SET_CURRENT_GROUP);
+            return response;
+        } else {
+            dummyGroup = groupModel.getGroup();
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
+            return response;
+        }
+
     }
 
     @Override
     public GenieResponse<Group> getCurrentGroup() {
-//        String methodName = "getCurrentGroup@GroupServiceImpl";
-//        Map<String, Object> params = new HashMap<>();
-//        params.put("logLevel", "1");
+        String methodName = "getCurrentGroup@GroupServiceImpl";
+        Map<String, Object> params = new HashMap<>();
+        params.put("logLevel", "1");
 
+        GenieResponse<Group> response;
+        if (dummyGroup == null) {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_GROUP, ServiceConstants.ErrorMessage.NO_GROUP_WITH_SPECIFIED_ID, TAG, Group.class);
+        } else {
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Group.class);
+            response.setResult(dummyGroup);
+        }
 
-        return null;
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        return response;
     }
 
 
