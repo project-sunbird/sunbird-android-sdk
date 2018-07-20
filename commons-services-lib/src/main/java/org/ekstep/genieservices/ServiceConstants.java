@@ -15,6 +15,7 @@ public interface ServiceConstants {
 
     /* Key Constants for all the key value store */
     String KEY_USER_SESSION = "session";
+    String KEY_GROUP_SESSION = "group_session";
 
     String VERSION = "version";
     String EXPORT_ID = "export_id";
@@ -99,7 +100,7 @@ public interface ServiceConstants {
         String AUDIT_CREATED = "Created";
         String AUDIT_UPDATED = "Updated";
         String AUDIT_DELETED = "Deleted";
-        String OBJECT_TYPE_PROFILE = "Profile";
+        String OBJECT_TYPE_GROUP = "Group";
         String OBJECT_TYPE_USER = "User";
         String CONTENT_PLAYER_PID = "contentplayer";
 

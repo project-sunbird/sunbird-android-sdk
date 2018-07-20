@@ -18,10 +18,12 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.profile.db.model.GroupModel;
 import org.ekstep.genieservices.profile.db.model.GroupProfileModel;
 import org.ekstep.genieservices.profile.db.model.GroupProfilesModel;
+import org.ekstep.genieservices.profile.db.model.GroupSessionModel;
 import org.ekstep.genieservices.profile.db.model.GroupsModel;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +44,37 @@ public class GroupServiceImpl extends BaseService implements IGroupService {
 
     public GroupServiceImpl(AppContext appContext) {
         super(appContext);
+    }
+
+    private static List<String> findGroupPropDiff(Group firstInstance, Group secondInstance) {
+        List<String> changedProps = new ArrayList<>();
+        try {
+            if (firstInstance != null && secondInstance != null) {
+                if ((firstInstance.getName() != null && !firstInstance.getName().equals(secondInstance.getName()))
+                        || (firstInstance.getName() == null && secondInstance.getName() != null)) {
+                    changedProps.add("name");
+                }
+
+                if ((firstInstance.getSyllabus() != null && !Arrays.equals(firstInstance.getSyllabus(), secondInstance.getSyllabus()))
+                        || (firstInstance.getSyllabus() == null && secondInstance.getSyllabus() != null)) {
+                    changedProps.add("syllabus");
+                }
+
+                if ((firstInstance.getCreatedAt() != null && !firstInstance.getCreatedAt().equals(secondInstance.getCreatedAt()))
+                        || (firstInstance.getCreatedAt() == null && secondInstance.getCreatedAt() != null)) {
+                    changedProps.add("createdAt");
+                }
+
+                if (firstInstance.getGrade() != null && (!Arrays.equals(firstInstance.getGrade(), secondInstance.getGrade()))
+                        || (firstInstance.getGrade() == null && secondInstance.getGrade() != null)) {
+                    changedProps.add("grade");
+                }
+            }
+        } catch (Exception e) {
+
+        }
+
+        return changedProps;
     }
 
     /**
@@ -96,29 +129,50 @@ public class GroupServiceImpl extends BaseService implements IGroupService {
         return successResponse;
     }
 
-
     private void logGroupAuditEvent(String uid) {
         Audit.Builder audit = new Audit.Builder();
         audit.currentState(ServiceConstants.Telemetry.AUDIT_CREATED)
                 .environment(ServiceConstants.Telemetry.SDK_ENVIRONMENT)
-                .objectType(ServiceConstants.Telemetry.OBJECT_TYPE_USER)
+                .objectType(ServiceConstants.Telemetry.OBJECT_TYPE_GROUP)
                 .objectId(uid)
                 .actorType(Actor.TYPE_SYSTEM).actorId(mAppContext.getDeviceInfo().getDeviceID());
         TelemetryLogger.log(audit.build());
     }
 
-//    private void logProfileAuditEvent(Group group, Group updatedGroup) {
-//
-//        Audit.Builder audit = new Audit.Builder();
-//        audit.currentState(updatedGroup == null ? ServiceConstants.Telemetry.AUDIT_CREATED : ServiceConstants.Telemetry.AUDIT_UPDATED)
-//                .environment(ServiceConstants.Telemetry.SDK_ENVIRONMENT)
-//                .updatedProperties(updatedGroup == null ? findAvailableProps(group) : findProfilePropDiff(group, updatedGroup))
-//                .objectType(ServiceConstants.Telemetry.OBJECT_TYPE_USER)
-//                .objectId(group.getGid())
-//                .actorType(Actor.TYPE_SYSTEM).actorId(mAppContext.getDeviceInfo().getDeviceID());
-//        TelemetryLogger.log(audit.build());
-//    }
+    private void logGroupAuditEvent(Group group, Group updatedGroup) {
 
+        Audit.Builder audit = new Audit.Builder();
+        audit.currentState(updatedGroup == null ? ServiceConstants.Telemetry.AUDIT_CREATED : ServiceConstants.Telemetry.AUDIT_UPDATED)
+                .environment(ServiceConstants.Telemetry.SDK_ENVIRONMENT)
+                .updatedProperties(updatedGroup == null ? findAvailableProps(group) : findGroupPropDiff(group, updatedGroup))
+                .objectType(ServiceConstants.Telemetry.OBJECT_TYPE_GROUP)
+                .objectId(group.getGid())
+                .actorType(Actor.TYPE_SYSTEM).actorId(mAppContext.getDeviceInfo().getDeviceID());
+        TelemetryLogger.log(audit.build());
+    }
+
+    public List<String> findAvailableProps(Group group) {
+        List<String> availableFields = new ArrayList<>();
+        if (group != null) {
+            if (!StringUtil.isNullOrEmpty(group.getName())) {
+                availableFields.add("name");
+            }
+
+            if (group.getSyllabus() != null) {
+                availableFields.add("syllabus");
+            }
+
+            if (group.getCreatedAt() != null) {
+                availableFields.add("createdAt");
+            }
+
+
+            if (group.getGrade() != null) {
+                availableFields.add("grade");
+            }
+        }
+        return availableFields;
+    }
 
     private void logGEError(GenieResponse response, String id) {
         Error.Builder error = new Error.Builder();
@@ -149,8 +203,7 @@ public class GroupServiceImpl extends BaseService implements IGroupService {
             GroupModel groupModel = GroupModel.build(mAppContext.getDBSession(), group);
             groupModel.update();
 
-            // TODO: 16/7/18 Need to add telemetry part here
-//            logGroupAuditEvent();
+            logGroupAuditEvent(groupDBModel.getGroup(), group);
 
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Group.class);
             response.setResult(group);
@@ -229,26 +282,31 @@ public class GroupServiceImpl extends BaseService implements IGroupService {
         params.put("logLevel", "2");
 
         GenieResponse<Void> response;
-
-        // TODO: 20/7/18 REWRITE EVERYTHING DISCUSS WITH SWAYANGJIT
-
-        if (StringUtil.isNullOrEmpty(gid)) {
-            dummyGroup = null;
-            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
-            return response;
-        }
-
         GroupModel groupModel = GroupModel.findGroupById(mAppContext.getDBSession(), gid);
         if (groupModel == null) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_GROUP, ServiceConstants.ErrorMessage.NO_GROUP_WITH_SPECIFIED_ID, TAG, Void.class);
             logGEError(response, "setCurrentGroup");
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_SET_CURRENT_GROUP);
             return response;
-        } else {
-            dummyGroup = groupModel.getGroup();
-            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
-            return response;
         }
+
+        GroupSessionModel session = GroupSessionModel.findGroupSession(mAppContext);
+        boolean sessionCreationRequired;
+        if (session == null) {
+            sessionCreationRequired = true;
+        } else {
+            session.endSession();
+            sessionCreationRequired = true;
+        }
+
+        if (sessionCreationRequired) {
+            GroupSessionModel userSessionModel = GroupSessionModel.buildUserSession(mAppContext, gid);
+            userSessionModel.startSession();
+        }
+
+        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        return response;
 
     }
 
@@ -256,16 +314,16 @@ public class GroupServiceImpl extends BaseService implements IGroupService {
     public GenieResponse<Group> getCurrentGroup() {
         String methodName = "getCurrentGroup@GroupServiceImpl";
         Map<String, Object> params = new HashMap<>();
-        params.put("logLevel", "1");
+        params.put("logLevel", "2");
 
-        GenieResponse<Group> response;
-        if (dummyGroup == null) {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_GROUP, ServiceConstants.ErrorMessage.NO_GROUP_WITH_SPECIFIED_ID, TAG, Group.class);
-        } else {
-            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Group.class);
-            response.setResult(dummyGroup);
+        GroupSessionModel groupSessionModel = GroupSessionModel.findGroupSession(mAppContext);
+        GenieResponse<Group> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        Group group = null;
+        if (groupSessionModel != null) {
+            GroupModel groupModel = GroupModel.findGroupById(mAppContext.getDBSession(), groupSessionModel.getGroupSessionBean().getGid());
+            group = groupModel.getGroup();
         }
-
+        response.setResult(group);
         TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;
     }
