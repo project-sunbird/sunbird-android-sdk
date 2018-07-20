@@ -230,6 +230,14 @@ public class GroupServiceImpl extends BaseService implements IGroupService {
 
         GenieResponse<Void> response;
 
+        // TODO: 20/7/18 REWRITE EVERYTHING DISCUSS WITH SWAYANGJIT
+
+        if (StringUtil.isNullOrEmpty(gid)) {
+            dummyGroup = null;
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, Void.class);
+            return response;
+        }
+
         GroupModel groupModel = GroupModel.findGroupById(mAppContext.getDBSession(), gid);
         if (groupModel == null) {
             response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.INVALID_GROUP, ServiceConstants.ErrorMessage.NO_GROUP_WITH_SPECIFIED_ID, TAG, Void.class);
