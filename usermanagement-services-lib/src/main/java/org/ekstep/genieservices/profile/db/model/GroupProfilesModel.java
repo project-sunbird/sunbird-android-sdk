@@ -69,7 +69,7 @@ public class GroupProfilesModel implements IReadable, ICleanable {
     }
 
     public static int count(IDBSession dbSession, String gid) {
-        String query = String.format(Locale.US, "select * from %s where %s = '%s';", GroupProfileEntry.TABLE_NAME, GroupProfileEntry.COLUMN_NAME_GID, gid);
+        String query = String.format(Locale.US, "select COUNT(*) from %s where %s = '%s';", GroupProfileEntry.TABLE_NAME, GroupProfileEntry.COLUMN_NAME_GID, gid);
         GroupProfilesModel model = new GroupProfilesModel(dbSession, true);
         dbSession.read(model, query);
         return model.count;
@@ -83,17 +83,20 @@ public class GroupProfilesModel implements IReadable, ICleanable {
     @Override
     public IReadable read(IResultSet resultSet) {
         if (resultSet != null && resultSet.moveToFirst()) {
-            groupProfileModelList = new ArrayList<>();
+            if (onlyCount) {
+                count = resultSet.getInt(0);
+            } else {
+                groupProfileModelList = new ArrayList<>();
 
-            do {
-                GroupProfileModel groupProfileModel = GroupProfileModel.build(mDBSession);
+                do {
+                    GroupProfileModel groupProfileModel = GroupProfileModel.build(mDBSession);
 
-                groupProfileModel.readWithoutMoving(resultSet);
+                    groupProfileModel.readWithoutMoving(resultSet);
 
-                groupProfileModelList.add(groupProfileModel);
-            } while (resultSet.moveToNext());
+                    groupProfileModelList.add(groupProfileModel);
+                } while (resultSet.moveToNext());
+            }
         }
-
         return this;
     }
 
