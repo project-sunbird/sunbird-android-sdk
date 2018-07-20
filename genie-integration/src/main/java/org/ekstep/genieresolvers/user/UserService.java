@@ -6,6 +6,7 @@ import org.ekstep.genieresolvers.BaseService;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.Profile;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -110,5 +111,20 @@ public class UserService extends BaseService {
     public void setUser(String userId, IResponseHandler<Map> responseHandler) {
         SetCurrentUserTask setCurrentUserTask = new SetCurrentUserTask(context, appQualifier, userId);
         createAndExecuteTask(responseHandler, setCurrentUserTask);
+    }
+
+    /**
+     * This api is used to get all user profiles when you want to get only local or server users and from any specific group.
+     * <p>
+     * <p>On Successful creation of new profile, the response will return status as TRUE and with successful message
+     * <p>
+     * <p>On failing to get all user profiles, the response will have status as FALSE
+     * <p>
+     *
+     * @param responseHandler {@link IResponseHandler< List <Profile>>}
+     */
+    public void getAllUserProfile(final String profileRequest, IResponseHandler<List<Profile>> responseHandler) {
+        GetAllProfilesTask getAllProfilesTask = new GetAllProfilesTask(context, appQualifier, profileRequest);
+        createAndExecuteTask(responseHandler, getAllProfilesTask);
     }
 }
