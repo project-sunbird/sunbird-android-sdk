@@ -10,6 +10,7 @@ import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentLearnerState;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.Group;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
@@ -52,6 +53,7 @@ import org.ekstep.genieservices.profile.chained.imports.UpdateImportedProfileMet
 import org.ekstep.genieservices.profile.chained.imports.ValidateProfileMetadata;
 import org.ekstep.genieservices.profile.db.model.ContentAccessModel;
 import org.ekstep.genieservices.profile.db.model.ContentAccessesModel;
+import org.ekstep.genieservices.profile.db.model.GroupModel;
 import org.ekstep.genieservices.profile.db.model.GroupProfilesModel;
 import org.ekstep.genieservices.profile.db.model.UserModel;
 import org.ekstep.genieservices.profile.db.model.UserProfileModel;
@@ -717,7 +719,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         File destinationFolder = new File(profileExportRequest.getDestinationFolder());
 
         // Read the first profile and get the destination DB file path
-        String destinationDBFilePath = getEparFilePath(profileExportRequest.getUserIds(), destinationFolder);
+        String destinationDBFilePath = getEparFilePath(profileExportRequest.getGroupIds(), profileExportRequest.getUserIds(), destinationFolder);
 
         if (FileUtil.doesFileExists(destinationDBFilePath)) {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.EXPORT_FAILED,
@@ -737,17 +739,29 @@ public class UserServiceImpl extends BaseService implements IUserService {
         return copyDatabase.execute(mAppContext, exportProfileContext);
     }
 
-    private String getEparFilePath(List<String> userIds, File destinationFolder) {
+    private String getEparFilePath(List<String> groupIds, List<String> userIds, File destinationFolder) {
         String fileName = "profile." + ServiceConstants.FileExtension.PROFILE;
+        String groupName = null;
+        if (!CollectionUtil.isNullOrEmpty(groupIds)) {
+            GroupModel groupModel = GroupModel.findGroupById(mAppContext.getDBSession(), groupIds.get(0));
+            Group group = groupModel.getGroup();
+            groupName = group.getName();
+        }
         UserProfileModel userProfileModel = UserProfileModel.find(mAppContext.getDBSession(), userIds.get(0));
         if (userProfileModel != null) {
             Profile firstProfile = userProfileModel.getProfile();
-            String name = firstProfile.getHandle();
+            String profileName = firstProfile.getHandle();
             String appendName = "";
-            if (userIds.size() > 1) {
-                appendName = String.format(Locale.US, "+%s", (userIds.size() - 1));
+            if (!StringUtil.isNullOrEmpty(groupName)) {
+                appendName = String.format(Locale.US, "+%s", ((groupIds.size() - 1) + (userIds.size())));
+                fileName = String.format(Locale.US, "%s%s." + ServiceConstants.FileExtension.PROFILE, groupName, appendName);
+            } else {
+                if (userIds.size() > 1) {
+                    appendName = String.format(Locale.US, "+%s", (userIds.size() - 1));
+                }
+                fileName = String.format(Locale.US, "%s%s." + ServiceConstants.FileExtension.PROFILE, profileName, appendName);
             }
-            fileName = String.format(Locale.US, "%s%s." + ServiceConstants.FileExtension.PROFILE, name, appendName);
+
         }
 
         File eparFile = FileUtil.getTempLocation(destinationFolder, fileName);
