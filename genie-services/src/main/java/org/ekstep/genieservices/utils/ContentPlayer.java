@@ -14,7 +14,7 @@ import org.ekstep.genieservices.commons.IPlayerConfig;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.CorrelationData;
-import org.ekstep.genieservices.commons.bean.Group;
+import org.ekstep.genieservices.commons.bean.GroupSession;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -121,11 +121,11 @@ public class ContentPlayer {
         pDataMap.put("pid", sContentPlayer.mAppContext.getParams().getString(IParams.Key.PRODUCER_UNIQUE_ID));
         contextMap.put("pdata", pDataMap);
 
-        Group group = sContentPlayer.mGroupService.getCurrentGroup().getResult();
+        GroupSession groupSession = sContentPlayer.mGroupService.getCurrentGroupSession().getResult();
         List<CorrelationData> correlationDataList = new ArrayList<>();
         String groupId = "";
-        if (group != null) {
-            groupId = group.getGid();
+        if (groupSession != null && groupSession.isValid()) {
+            groupId = groupSession.getGid();
             correlationDataList.add(createGroupcData(groupId));
         }
         contextMap.put("groupId", groupId);

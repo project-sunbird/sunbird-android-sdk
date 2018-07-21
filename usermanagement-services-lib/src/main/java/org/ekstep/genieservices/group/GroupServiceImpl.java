@@ -8,6 +8,7 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.AddUpdateProfilesRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Group;
+import org.ekstep.genieservices.commons.bean.GroupSession;
 import org.ekstep.genieservices.commons.bean.telemetry.Actor;
 import org.ekstep.genieservices.commons.bean.telemetry.Audit;
 import org.ekstep.genieservices.commons.bean.telemetry.Error;
@@ -38,9 +39,6 @@ import java.util.UUID;
 public class GroupServiceImpl extends BaseService implements IGroupService {
 
     private static final String TAG = GroupServiceImpl.class.getSimpleName();
-
-    // TODO: 20/7/18 SHOULD BE CHANGED AFTER MAKING THE CHANGES WRT SESSION
-    private Group dummyGroup = null;
 
     public GroupServiceImpl(AppContext appContext) {
         super(appContext);
@@ -333,6 +331,21 @@ public class GroupServiceImpl extends BaseService implements IGroupService {
             group = groupModel.getGroup();
         }
         response.setResult(group);
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        return response;
+    }
+
+    @Override
+    public GenieResponse<GroupSession> getCurrentGroupSession() {
+        String methodName = "getCurrentGroupSession@GroupServiceImpl";
+        Map<String, Object> params = new HashMap<>();
+        params.put("logLevel", "2");
+        GroupSessionModel groupSessionModel = GroupSessionModel.findGroupSession(mAppContext);
+
+        GenieResponse<GroupSession> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        if (groupSessionModel != null) {
+            response.setResult(groupSessionModel.getGroupSessionBean());
+        }
         TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;
     }

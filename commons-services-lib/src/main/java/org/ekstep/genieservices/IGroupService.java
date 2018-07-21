@@ -3,6 +3,7 @@ package org.ekstep.genieservices;
 import org.ekstep.genieservices.commons.bean.AddUpdateProfilesRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Group;
+import org.ekstep.genieservices.commons.bean.GroupSession;
 
 import java.util.List;
 
@@ -83,6 +84,16 @@ public interface IGroupService {
      * @return {@link GenieResponse<Group>}
      */
     GenieResponse<Group> getCurrentGroup();
+
+    /**
+     * This api gets the current active group session.
+     * <p>
+     * <p>On successful fetching the active group session, the response will return status as TRUE and with the active group session set in result.
+     *
+     * @return {@link GenieResponse<GroupSession >}
+     */
+    GenieResponse<GroupSession> getCurrentGroupSession();
+
 
     /**
      * This api adds/updates all the profiles to the group.

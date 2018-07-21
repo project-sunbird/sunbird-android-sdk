@@ -1,6 +1,7 @@
 package org.ekstep.genieservices.telemetry;
 
 import org.ekstep.genieservices.BaseService;
+import org.ekstep.genieservices.IGroupService;
 import org.ekstep.genieservices.ITelemetryService;
 import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.ServiceConstants;
@@ -8,6 +9,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.GroupSession;
 import org.ekstep.genieservices.commons.bean.TelemetryExportRequest;
 import org.ekstep.genieservices.commons.bean.TelemetryExportResponse;
 import org.ekstep.genieservices.commons.bean.TelemetryImportRequest;
@@ -58,10 +60,12 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
     private static final String GENIE_SERVICE_GID = "genieservice.android";
 
     private IUserService mUserService;
+    private IGroupService mGroupService;
 
-    public TelemetryServiceImpl(AppContext appContext, IUserService userService) {
+    public TelemetryServiceImpl(AppContext appContext, IUserService userService, IGroupService groupService) {
         super(appContext);
         this.mUserService = userService;
+        this.mGroupService = groupService;
     }
 
     @Override
@@ -333,27 +337,43 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
     }
 
 
-    private void patchPartnerTagsV3(Map<String, Object> context) {
+    private void patchCorrelationDataV3(Map<String, Object> context) {
         if (!context.containsKey("cdata")) {
             context.put("cdata", new ArrayList<Map<String, String>>());
         }
+        List<Map<String, String>> cDataList = (List<Map<String, String>>) context.get("cdata");
+
+        //Patch partner cdata
         String partnerId = mAppContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.KEY_ACTIVE_PARTNER_ID, "");
         if (!StringUtil.isNullOrEmpty(partnerId)) {
-            List<Map<String, String>> partnerTagList = (List<Map<String, String>>) context.get("cdata");
-
-            if (!containsPartnerId(partnerTagList, partnerId)) {
+            if (!containsValue(cDataList, partnerId)) {
                 Map<String, String> cdata = new HashMap<>();
                 cdata.put("type", "partner");
                 cdata.put("id", partnerId);
-                partnerTagList.add(cdata);
+                cDataList.add(cdata);
+            }
+        }
+
+        //Patch group cdata
+        GroupSession groupSession = null;
+        if (mGroupService != null) {
+            groupSession = mGroupService.getCurrentGroupSession().getResult();
+        }
+
+        if (groupSession != null && groupSession.isValid()) {
+            if (!containsValue(cDataList, partnerId)) {
+                Map<String, String> cdata = new HashMap<>();
+                cdata.put("type", "group");
+                cdata.put("id", groupSession.getGid());
+                cDataList.add(cdata);
             }
         }
     }
 
-    private boolean containsPartnerId(List<Map<String, String>> partnerTagList, String partnerId) {
-        for (int i = 0; i < partnerTagList.size(); i++) {
-            Map<String, String> map = partnerTagList.get(i);
-            if (map.containsValue(partnerId)) {
+    private boolean containsValue(List<Map<String, String>> mapList, String value) {
+        for (int i = 0; i < mapList.size(); i++) {
+            Map<String, String> map = mapList.get(i);
+            if (map.containsValue(value)) {
                 return true;
             }
         }
@@ -372,7 +392,7 @@ public class TelemetryServiceImpl extends BaseService implements ITelemetryServi
         }
         context.put("sid", isSessionValid(session) ? session.getSid() : "");
         context.put("did", mAppContext.getDeviceInfo().getDeviceID());
-        patchPartnerTagsV3(context);
+        patchCorrelationDataV3(context);
     }
 
     private void addActor(Map<String, Object> event, String uid) {
