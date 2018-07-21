@@ -8,6 +8,7 @@ import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.contract.MetaEntry;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.importexport.bean.ExportProfileContext;
 import org.ekstep.genieservices.importexport.db.model.MetadataModel;
@@ -38,7 +39,11 @@ public class CreateMetadata implements IChainable<ProfileExportResponse, ExportP
         metadata.put(ServiceConstants.DID, appContext.getDeviceInfo().getDeviceID());
         metadata.put(ServiceConstants.EXPORT_ID, UUID.randomUUID().toString());
         metadata.put(ServiceConstants.FILE_SIZE, new File(exportContext.getDestinationDBFilePath()).length());
-        metadata.put(ServiceConstants.PROFILES_COUNT, String.valueOf(exportContext.getUserIds().size()));
+        int groupCount = 0;
+        if (!CollectionUtil.isNullOrEmpty(exportContext.getGroupIds())) {
+            groupCount = exportContext.getGroupIds().size();
+        }
+        metadata.put(ServiceConstants.PROFILES_COUNT, String.valueOf(exportContext.getUserIds().size() + groupCount));
 
         destinationDBSession.execute(MetaEntry.getCreateEntry());
         for (String key : metadata.keySet()) {
