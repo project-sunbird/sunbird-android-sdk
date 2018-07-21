@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.widget.Toast;
 
 import org.ekstep.genieservices.GenieService;
+import org.ekstep.genieservices.IGroupService;
 import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
@@ -13,6 +14,7 @@ import org.ekstep.genieservices.commons.IPlayerConfig;
 import org.ekstep.genieservices.commons.bean.Content;
 import org.ekstep.genieservices.commons.bean.ContentData;
 import org.ekstep.genieservices.commons.bean.CorrelationData;
+import org.ekstep.genieservices.commons.bean.Group;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -37,6 +39,7 @@ public class ContentPlayer {
     private static ContentPlayer sContentPlayer;
     private AppContext mAppContext;
     private IUserService mUserService;
+    private IGroupService mGroupService;
     private String mQualifier;
     private IPlayerConfig playerConfig;
 
@@ -45,6 +48,7 @@ public class ContentPlayer {
         this.playerConfig = playerConfig;
         this.mAppContext = appContext;
         this.mUserService = GenieService.getService().getUserService();
+        this.mGroupService = GenieService.getService().getGroupService();
     }
 
     public static void init(AppContext appContext) {
@@ -117,7 +121,17 @@ public class ContentPlayer {
         pDataMap.put("pid", sContentPlayer.mAppContext.getParams().getString(IParams.Key.PRODUCER_UNIQUE_ID));
         contextMap.put("pdata", pDataMap);
 
-        contextMap.put("cdata", createcDataList(content.getHierarchyInfo()));
+        Group group = sContentPlayer.mGroupService.getCurrentGroup().getResult();
+        List<CorrelationData> correlationDataList = new ArrayList<>();
+        String groupId = "";
+        if (group != null) {
+            groupId = group.getGid();
+            correlationDataList.add(createGroupcData(groupId));
+        }
+        contextMap.put("groupId", groupId);
+
+        correlationDataList.addAll(createHierarchyInfocDataList(content.getHierarchyInfo()));
+        contextMap.put("cdata", correlationDataList);
 
         bundleMap.put("context", contextMap);
 
@@ -133,23 +147,8 @@ public class ContentPlayer {
         context.startActivity(intent);
     }
 
-    private static Map createHierarchyData(List<HierarchyInfo> hierarchyInfo) {
-        Map hierarchyData = new HashMap();
-        String id = "";
-        String identifierType = null;
-        for (HierarchyInfo infoItem : hierarchyInfo) {
-            if (identifierType == null) {
-                identifierType = infoItem.getContentType();
-            }
-            id += id.length() == 0 ? "" : "/";
-            id += infoItem.getIdentifier();
-        }
-        hierarchyData.put("id", id);
-        hierarchyData.put("type", identifierType);
-        return hierarchyData;
-    }
 
-    private static List<CorrelationData> createcDataList(List<HierarchyInfo> hierarchyInfo) {
+    private static List<CorrelationData> createHierarchyInfocDataList(List<HierarchyInfo> hierarchyInfo) {
         List<CorrelationData> correlationDataList = new ArrayList<>();
         if (hierarchyInfo != null) {
             for (HierarchyInfo infoItem : hierarchyInfo) {
@@ -158,5 +157,9 @@ public class ContentPlayer {
         }
 
         return correlationDataList;
+    }
+
+    private static CorrelationData createGroupcData(String groupId) {
+        return new CorrelationData(groupId, "group");
     }
 }
