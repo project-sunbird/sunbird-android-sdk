@@ -143,6 +143,7 @@ public class ContentPlayer {
         bundleMap.put("metadata", contentData);
         intent.putExtra("playerConfig", GsonUtil.toJson(bundleMap));
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         context.startActivity(intent);
     }
