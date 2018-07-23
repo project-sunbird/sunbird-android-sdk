@@ -3,6 +3,7 @@ package org.ekstep.genieservices;
 import org.ekstep.genieservices.commons.bean.AddUpdateProfilesRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Group;
+import org.ekstep.genieservices.commons.bean.GroupRequest;
 import org.ekstep.genieservices.commons.bean.GroupSession;
 
 import java.util.List;
@@ -45,7 +46,7 @@ public interface IGroupService {
      *
      * @return {@link GenieResponse<List<Group>>}
      */
-    GenieResponse<List<Group>> getAllGroup();
+    GenieResponse<List<Group>> getAllGroup(GroupRequest groupRequest);
 
     /**
      * This api is used to delete a existing group with a specific gid

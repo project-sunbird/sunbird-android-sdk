@@ -8,6 +8,7 @@ import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.AddUpdateProfilesRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Group;
+import org.ekstep.genieservices.commons.bean.GroupRequest;
 import org.ekstep.genieservices.commons.bean.GroupSession;
 import org.ekstep.genieservices.commons.bean.telemetry.Actor;
 import org.ekstep.genieservices.commons.bean.telemetry.Audit;
@@ -217,7 +218,7 @@ public class GroupServiceImpl extends BaseService implements IGroupService {
     }
 
     @Override
-    public GenieResponse<List<Group>> getAllGroup() {
+    public GenieResponse<List<Group>> getAllGroup(GroupRequest groupRequest) {
         String methodName = "getAllGroup@GroupServiceImpl";
         Map<String, Object> params = new HashMap<>();
         params.put("logLevel", "1");

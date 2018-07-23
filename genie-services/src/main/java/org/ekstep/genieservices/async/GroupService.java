@@ -6,6 +6,7 @@ import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.AddUpdateProfilesRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Group;
+import org.ekstep.genieservices.commons.bean.GroupRequest;
 
 import java.util.List;
 
@@ -63,13 +64,14 @@ public class GroupService {
     /**
      * This api returns the list of all groups.
      *
+     * @param groupRequest    {@link GroupRequest}
      * @param responseHandler {@link IResponseHandler<List<Group>>}
      */
-    public void getAllGroup(IResponseHandler<List<Group>> responseHandler) {
+    public void getAllGroup(final GroupRequest groupRequest, IResponseHandler<List<Group>> responseHandler) {
         ThreadPool.getInstance().execute(new IPerformable<List<Group>>() {
             @Override
             public GenieResponse<List<Group>> perform() {
-                return groupService.getAllGroup();
+                return groupService.getAllGroup(groupRequest);
             }
         }, responseHandler);
     }
@@ -138,7 +140,6 @@ public class GroupService {
 
     /**
      * This api adds or updates the GroupProfile with Profiles related to a group
-     *
      *
      * @param addUpdateProfilesRequest
      * @param responseHandler
