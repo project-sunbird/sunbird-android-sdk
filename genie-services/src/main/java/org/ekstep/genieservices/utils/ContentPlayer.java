@@ -130,7 +130,8 @@ public class ContentPlayer {
         }
         contextMap.put("groupId", groupId);
         Map<String, Object> deeplinkMap = new HashMap<>();
-        deeplinkMap.put("content-details", getStringResourceByName(context, "deeplink_base_url") + "://c/");
+        String deeplinkBasePath = getStringResourceByName(context, "deeplink_base_url");
+        deeplinkMap.put("content-details", deeplinkBasePath != null ? deeplinkBasePath : "ekstep" + "://c/");
         contextMap.put("deeplinks", deeplinkMap);
 
         correlationDataList.addAll(createHierarchyInfocDataList(content.getHierarchyInfo()));
