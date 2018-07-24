@@ -797,9 +797,9 @@ public class UserServiceImpl extends BaseService implements IUserService {
             }
 
             //get the gids
-            if (!StringUtil.isNullOrEmpty(profileRequest.getGid())) {
+            if (!StringUtil.isNullOrEmpty(profileRequest.getGroupId())) {
                 groupFilter = String.format(Locale.US, "SELECT %s FROM %s WHERE %s = '%s'",
-                        GroupProfileEntry.COLUMN_NAME_UID, GroupProfileEntry.TABLE_NAME, GroupProfileEntry.COLUMN_NAME_GID, profileRequest.getGid());
+                        GroupProfileEntry.COLUMN_NAME_UID, GroupProfileEntry.TABLE_NAME, GroupProfileEntry.COLUMN_NAME_GID, profileRequest.getGroupId());
             }
 
         }

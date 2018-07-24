@@ -8,12 +8,12 @@ public class ProfileRequest {
 
     private boolean local;
     private boolean server;
-    private String gid;
+    private String groupId;
 
-    private ProfileRequest(boolean local, boolean server, String gid) {
+    private ProfileRequest(boolean local, boolean server, String groupId) {
         this.local = local;
         this.server = server;
-        this.gid = gid;
+        this.groupId = groupId;
     }
 
     public boolean isLocal() {
@@ -24,15 +24,15 @@ public class ProfileRequest {
         return server;
     }
 
-    public String getGid() {
-        return gid;
+    public String getGroupId() {
+        return groupId;
     }
 
 
     public static class Builder {
         private boolean local = false;
         private boolean server = false;
-        private String gid;
+        private String groupId;
 
         /**
          * Call when local users are needed
@@ -63,7 +63,7 @@ public class ProfileRequest {
          * @return
          */
         public Builder forGroup(String groupId) {
-            this.gid = groupId;
+            this.groupId = groupId;
             return this;
         }
 
@@ -73,7 +73,7 @@ public class ProfileRequest {
                 throw new IllegalStateException("Select at least any one of the type of users");
             }
 
-            return new ProfileRequest(local, server, gid);
+            return new ProfileRequest(local, server, groupId);
         }
 
     }
