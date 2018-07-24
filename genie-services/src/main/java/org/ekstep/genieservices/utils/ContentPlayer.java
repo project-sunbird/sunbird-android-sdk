@@ -129,6 +129,9 @@ public class ContentPlayer {
             correlationDataList.add(createGroupcData(groupId));
         }
         contextMap.put("groupId", groupId);
+        Map<String, Object> deeplinkMap = new HashMap<>();
+        deeplinkMap.put("content-details", getStringResourceByName(context, "deeplink_base_url") + "://c/");
+        contextMap.put("deeplinks", deeplinkMap);
 
         correlationDataList.addAll(createHierarchyInfocDataList(content.getHierarchyInfo()));
         contextMap.put("cdata", correlationDataList);
@@ -162,5 +165,14 @@ public class ContentPlayer {
 
     private static CorrelationData createGroupcData(String groupId) {
         return new CorrelationData(groupId, "group");
+    }
+
+    private static String getStringResourceByName(Context context, String string) {
+        if (context == null) {
+            return null;
+        }
+        String packageName = context.getPackageName();
+        int resId = context.getResources().getIdentifier(string, "string", packageName);
+        return context.getString(resId);
     }
 }
