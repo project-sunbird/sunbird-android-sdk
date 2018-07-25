@@ -62,4 +62,12 @@ public interface ISummarizerService {
      */
     GenieResponse<List<Map<String, Object>>> getReportsByUser(SummaryRequest summaryRequest);
 
+    /**
+     * This api will give the list of users and the reports related to a particular content
+     *
+     * @param summaryRequest
+     * @return
+     */
+    GenieResponse<List<Map<String, Object>>> getReportByQuestions(SummaryRequest summaryRequest);
+
 }

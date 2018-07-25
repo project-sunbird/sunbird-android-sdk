@@ -57,7 +57,7 @@ public class LearnerAssessmentSummaryModel implements IReadable {
 
     public static LearnerAssessmentSummaryModel findReportsSummary(IDBSession idbSession, List<String> uids, String contentId, boolean forReports) {
         LearnerAssessmentSummaryModel learnerAssessmentSummaryModel = new LearnerAssessmentSummaryModel(idbSession, forReports);
-        idbSession.read(learnerAssessmentSummaryModel, getContentChildProgressQuery(uids, contentId));
+        idbSession.read(learnerAssessmentSummaryModel, getUserReportsQuery(uids, contentId));
         return learnerAssessmentSummaryModel;
     }
 
@@ -72,7 +72,7 @@ public class LearnerAssessmentSummaryModel implements IReadable {
                 LearnerAssessmentsEntry.TABLE_NAME + " where content_id = '" + contentId + "' group by uid";
     }
 
-    private static String getContentChildProgressQuery(List<String> uids, String contentId) {
+    private static String getUserReportsQuery(List<String> uids, String contentId) {
         String query = String.format(Locale.US, "SELECT sum(%s),sum(%s),la.%s,la.%s,la.%s,p.%s" +
                         " FROM  %s la " +
                         "LEFT JOIN " +

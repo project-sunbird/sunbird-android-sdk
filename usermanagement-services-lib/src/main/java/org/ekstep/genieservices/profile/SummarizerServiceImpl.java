@@ -46,7 +46,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         params.put("logLevel", "2");
 
         if (summaryRequest.getUids() != null) {
-            learnerAssessmentSummaryModel = LearnerAssessmentSummaryModel.findChildProgressSummary(mAppContext.getDBSession(), summaryRequest.getUids());
+            learnerAssessmentSummaryModel = LearnerAssessmentSummaryModel.findChildProgressSummary(mAppContext.getDBSession(), getStringWithQuoteList(summaryRequest.getUids()));
         } else if (summaryRequest.getContentId() != null) {
             learnerAssessmentSummaryModel = LearnerAssessmentSummaryModel.findContentProgressSummary(mAppContext.getDBSession(), summaryRequest.getContentId());
         }
@@ -85,7 +85,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
     @Override
     public GenieResponse<List<Map<String, Object>>> getReportsByUser(SummaryRequest summaryRequest) {
         GenieResponse<List<Map<String, Object>>> response;
-        String methodName = "getListOfReportsByUser@LearnerAssessmentsServiceImpl";
+        String methodName = "getReportsByUser@LearnerAssessmentsServiceImpl";
         Map<String, Object> params = new HashMap<>();
         params.put("logLevel", "2");
 
@@ -96,7 +96,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
             return response;
         }
 
-        LearnerAssessmentSummaryModel learnerAssessmentSummaryModel = LearnerAssessmentSummaryModel.findReportsSummary(mAppContext.getDBSession(), summaryRequest.getUids(), summaryRequest.getContentId(), true);
+        LearnerAssessmentSummaryModel learnerAssessmentSummaryModel = LearnerAssessmentSummaryModel.findReportsSummary(mAppContext.getDBSession(), getStringWithQuoteList(summaryRequest.getUids()), summaryRequest.getContentId(), true);
 
         if (learnerAssessmentSummaryModel == null) {
             response.setResult(new ArrayList<Map<String, Object>>());
@@ -105,11 +105,50 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         }
 
         return response;
+
+    }
+
+    @Override
+    public GenieResponse<List<Map<String, Object>>> getReportByQuestions(SummaryRequest summaryRequest) {
+        GenieResponse<List<Map<String, Object>>> response;
+        String methodName = "getReportByQuestions@LearnerAssessmentsServiceImpl";
+        Map<String, Object> params = new HashMap<>();
+        params.put("logLevel", "2");
+
+        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+
+        if (StringUtil.isNullOrEmpty(summaryRequest.getContentId()) || CollectionUtil.isNullOrEmpty(summaryRequest.getUids())) {
+            response.setResult(new ArrayList<Map<String, Object>>());
+            return response;
+        }
+
+        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.findQuestionsReportSummary(mAppContext.getDBSession(), summaryRequest.getContentId(), getStringWithQuoteList(summaryRequest.getUids()), true);
+
+        if (learnerAssessmentDetailsModel == null) {
+            response.setResult(new ArrayList<Map<String, Object>>());
+        } else {
+            response.setResult(learnerAssessmentDetailsModel.getReportsMap());
+        }
+
+        return response;
+    }
+
+    private List<String> getStringWithQuoteList(List<String> collection) {
+        ArrayList<String> stringWithCommaList = new ArrayList<>();
+
+        if (!CollectionUtil.isNullOrEmpty(collection)) {
+            for (String s : collection) {
+                stringWithCommaList.add("'" + s + "'");
+
+            }
+        }
+
+        return stringWithCommaList;
     }
 
     private String getFilterForLearnerAssessmentDetails(String qid, List<String> uids, String contentId, String hierarchyData) {
         String isQid = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_QID, qid);
-        String isUid = String.format(Locale.US, "%s IN ('%s')", LearnerAssessmentsEntry.COLUMN_NAME_UID, StringUtil.join("','", uids));
+        String isUid = String.format(Locale.US, "%s IN ('%s')", LearnerAssessmentsEntry.COLUMN_NAME_UID, StringUtil.join(",", getStringWithQuoteList(uids)));
         String isContentId = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID, contentId);
         String isHData = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA, hierarchyData == null ? "" : hierarchyData);
 

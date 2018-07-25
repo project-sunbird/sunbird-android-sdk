@@ -9,10 +9,13 @@ import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Created on 4/6/17.
@@ -38,6 +41,8 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
     private IDBSession dbSession;
     private List<LearnerAssessmentDetails> mAssessmentList;
     private String filter;
+    private List<Map<String, Object>> reportsMap;
+    private boolean forReports = false;
 
     private LearnerAssessmentDetailsModel(IDBSession dbSession, String filter) {
         this.dbSession = dbSession;
@@ -62,6 +67,12 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
         this.hierarchyData = learnerAssessmentDetails.getHierarchyData();
     }
 
+    public LearnerAssessmentDetailsModel(IDBSession dbSession, boolean forReports) {
+        reportsMap = new ArrayList<>();
+        this.dbSession = dbSession;
+        this.forReports = forReports;
+    }
+
     public static LearnerAssessmentDetailsModel build(IDBSession dbSession, LearnerAssessmentDetails learnerAssessmentDetails) {
         return new LearnerAssessmentDetailsModel(dbSession, learnerAssessmentDetails);
     }
@@ -77,18 +88,109 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
         }
     }
 
+    public static LearnerAssessmentDetailsModel findQuestionsReportSummary(IDBSession dbSession, String contentId, List<String> uids, boolean forReports) {
+        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = new LearnerAssessmentDetailsModel(dbSession, forReports);
+        dbSession.read(learnerAssessmentDetailsModel, getQuestionReportsQuery(uids, contentId));
+        return learnerAssessmentDetailsModel;
+    }
+
+    private static String getQuestionReportsQuery(List<String> uids, String contentId) {
+        String query = String.format(Locale.US, "SELECT *, sum(%s) as marks , count(%s) as count" +
+                        "FROM  %s " +
+                        "WHERE %s IN('%s') AND %s = '%s'  group by %s;",
+                LearnerAssessmentsEntry.COLUMN_NAME_SCORE,
+                LearnerAssessmentsEntry.COLUMN_NAME_Q_INDEX,
+                LearnerAssessmentsEntry.TABLE_NAME,
+                LearnerAssessmentsEntry.COLUMN_NAME_UID,
+                StringUtil.join(",", uids),
+                LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID,
+                contentId,
+                LearnerAssessmentsEntry.COLUMN_NAME_Q_INDEX);
+
+        return query;
+    }
+
     @Override
     public IReadable read(IResultSet resultSet) {
         if (resultSet != null && resultSet.moveToFirst()) {
             mAssessmentList = new ArrayList<>();
 
             do {
-                LearnerAssessmentDetails learnerAssessmentDetails = getLearnerAssessmentData(resultSet);
-                mAssessmentList.add(learnerAssessmentDetails);
+                if (!this.forReports) {
+                    LearnerAssessmentDetails learnerAssessmentDetails = getLearnerAssessmentData(resultSet);
+                    mAssessmentList.add(learnerAssessmentDetails);
+                } else {
+                    Map<String, Object> report = readReportsCursorData(resultSet);
+                    reportsMap.add(report);
+                }
             } while (resultSet.moveToNext());
         }
 
         return this;
+    }
+
+    private Map<String, Object> readReportsCursorData(IResultSet cursor) {
+        Map<String, Object> reportSummary = new HashMap<>();
+
+        reportSummary.put(LearnerAssessmentsEntry.COLUMN_NAME_UID, cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_UID)));
+
+        if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID) != -1) {
+            reportSummary.put(LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID, cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID)));
+        }
+
+        if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_QID) != -1) {
+            reportSummary.put(LearnerAssessmentsEntry.COLUMN_NAME_QID, cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_QID)));
+        }
+
+        if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_Q_INDEX) != -1) {
+            reportSummary.put(LearnerAssessmentsEntry.COLUMN_NAME_Q_INDEX, cursor.getDouble(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_Q_INDEX)));
+        }
+
+        if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_CORRECT) != -1) {
+            reportSummary.put(LearnerAssessmentsEntry.COLUMN_NAME_CORRECT, cursor.getInt(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_CORRECT)));
+        }
+
+        if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_SCORE) != -1) {
+            reportSummary.put(LearnerAssessmentsEntry.COLUMN_NAME_SCORE, cursor.getDouble(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_SCORE)));
+        }
+
+        if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_TIME_SPENT) != -1) {
+            reportSummary.put(LearnerAssessmentsEntry.COLUMN_NAME_TIME_SPENT, cursor.getDouble(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_TIME_SPENT)));
+        }
+
+        if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_RES) != -1) {
+            reportSummary.put(LearnerAssessmentsEntry.COLUMN_NAME_RES, cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_RES)));
+        }
+
+        if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_TIMESTAMP) != -1) {
+            reportSummary.put(LearnerAssessmentsEntry.COLUMN_NAME_TIMESTAMP, cursor.getLong(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_TIMESTAMP)));
+        }
+
+        if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_Q_DESC) != -1) {
+            reportSummary.put(LearnerAssessmentsEntry.COLUMN_NAME_Q_DESC, cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_Q_DESC)));
+        }
+
+        if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_Q_TITLE) != -1) {
+            reportSummary.put(LearnerAssessmentsEntry.COLUMN_NAME_Q_TITLE, cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_Q_TITLE)));
+        }
+
+        if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA) != -1) {
+            reportSummary.put(LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA, cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA)));
+        }
+
+        if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_MAX_SCORE) != -1) {
+            reportSummary.put(LearnerAssessmentsEntry.COLUMN_NAME_MAX_SCORE, cursor.getDouble(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_MAX_SCORE)));
+        }
+
+        //13 marks
+        int marks = cursor.getInt(13);
+        reportSummary.put("marks", marks);
+
+        //14 count
+        int count = cursor.getInt(14);
+        reportSummary.put("occurenceCount", count);
+
+        return reportSummary;
     }
 
     private LearnerAssessmentDetails getLearnerAssessmentData(IResultSet cursor) {
@@ -238,6 +340,13 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
 
     public List<LearnerAssessmentDetails> getAllAssessments() {
         return mAssessmentList;
+    }
+
+    public List<Map<String, Object>> getReportsMap() {
+        if (reportsMap == null) {
+            reportsMap = new ArrayList<>();
+        }
+        return reportsMap;
     }
 
 }

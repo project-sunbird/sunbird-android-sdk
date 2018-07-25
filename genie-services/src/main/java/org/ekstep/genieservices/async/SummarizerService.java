@@ -83,4 +83,22 @@ public class SummarizerService {
             }
         }, responseHandler);
     }
+
+
+    /**
+     * This api will give the list of questions and the reports related to a particular content and uid
+     *
+     * @param summaryRequest
+     * @param responseHandler
+     */
+    public void getReportByQuestions(final SummaryRequest summaryRequest, IResponseHandler<List<Map<String, Object>>> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<List<Map<String, Object>>>() {
+            @Override
+            public GenieResponse<List<Map<String, Object>>> perform() {
+                return summarizerService.getReportByQuestions(summaryRequest);
+            }
+        }, responseHandler);
+    }
+
+
 }
