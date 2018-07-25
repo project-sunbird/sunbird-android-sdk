@@ -122,7 +122,9 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
             return response;
         }
 
-        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.findQuestionsReportSummary(mAppContext.getDBSession(), summaryRequest.getContentId(), getStringWithQuoteList(summaryRequest.getUids()), true);
+        List<String> quotedUIds = getStringWithQuoteList(summaryRequest.getUids());
+
+        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.findQuestionsReportSummary(mAppContext.getDBSession(), summaryRequest.getContentId(), quotedUIds, true);
 
         if (learnerAssessmentDetailsModel == null) {
             response.setResult(new ArrayList<Map<String, Object>>());
