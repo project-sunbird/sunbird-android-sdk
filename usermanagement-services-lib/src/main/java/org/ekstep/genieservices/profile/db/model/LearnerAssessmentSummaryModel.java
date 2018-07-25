@@ -76,7 +76,7 @@ public class LearnerAssessmentSummaryModel implements IReadable {
         String query = String.format(Locale.US, "SELECT sum(%s),sum(%s),la.%s,la.%s,la.%s,p.%s" +
                         " FROM  %s la " +
                         "LEFT JOIN " +
-                        "%s p ON la.%s = p.%s where la.%s IN('%s') AND la.%s = '%s' ORDER BY la.%s;",
+                        "%s p ON la.%s = p.%s where la.%s IN(%s) AND la.%s = '%s' ORDER BY la.%s;",
                 LearnerAssessmentsEntry.COLUMN_NAME_TIME_SPENT,
                 LearnerAssessmentsEntry.COLUMN_NAME_CORRECT,
                 LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA,
