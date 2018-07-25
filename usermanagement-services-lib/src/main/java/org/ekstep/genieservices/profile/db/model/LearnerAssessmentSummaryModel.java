@@ -2,13 +2,17 @@ package org.ekstep.genieservices.profile.db.model;
 
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentSummary;
 import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
+import org.ekstep.genieservices.commons.db.contract.ProfileEntry;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Created on 5/6/17.
@@ -25,11 +29,18 @@ public class LearnerAssessmentSummaryModel implements IReadable {
     private Double totalTimespent;
     private String hierarchyData;
     private List<LearnerAssessmentSummary> assessmentMap;
+    private List<Map<String, Object>> reportsMap;
+    private boolean forReports = false;
 
     private LearnerAssessmentSummaryModel(IDBSession dbSession) {
         assessmentMap = new ArrayList<>();
         this.dbSession = dbSession;
+    }
 
+    private LearnerAssessmentSummaryModel(IDBSession dbSession, boolean forReports) {
+        reportsMap = new ArrayList<>();
+        this.dbSession = dbSession;
+        this.forReports = forReports;
     }
 
     public static LearnerAssessmentSummaryModel findChildProgressSummary(IDBSession idbSession, List<String> uids) {
@@ -44,6 +55,12 @@ public class LearnerAssessmentSummaryModel implements IReadable {
         return learnerAssessmentSummaryModel;
     }
 
+    public static LearnerAssessmentSummaryModel findReportsSummary(IDBSession idbSession, List<String> uids, String contentId, boolean forReports) {
+        LearnerAssessmentSummaryModel learnerAssessmentSummaryModel = new LearnerAssessmentSummaryModel(idbSession, forReports);
+        idbSession.read(learnerAssessmentSummaryModel, getContentChildProgressQuery(uids, contentId));
+        return learnerAssessmentSummaryModel;
+    }
+
     private static String getChildProgressQuery(List<String> uids) {
         return "select uid, content_id, count(qid), sum(correct), sum(time_spent), h_data from " +
                 LearnerAssessmentsEntry.TABLE_NAME + " where uid IN ('" + StringUtil.join("','", uids) +
@@ -55,12 +72,41 @@ public class LearnerAssessmentSummaryModel implements IReadable {
                 LearnerAssessmentsEntry.TABLE_NAME + " where content_id = '" + contentId + "' group by uid";
     }
 
+    private static String getContentChildProgressQuery(List<String> uids, String contentId) {
+        String query = String.format(Locale.US, "SELECT sum(%s),sum(%s),la.%s,la.%s,la.%s,p.%s" +
+                        " FROM  %s la " +
+                        "LEFT JOIN " +
+                        "%s p ON la.%s = p.%s where la.%s IN('%s') AND la.%s = '%s' ORDER BY la.%s;",
+                LearnerAssessmentsEntry.COLUMN_NAME_TIME_SPENT,
+                LearnerAssessmentsEntry.COLUMN_NAME_CORRECT,
+                LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA,
+                LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID,
+                LearnerAssessmentsEntry.COLUMN_NAME_UID,
+                ProfileEntry.COLUMN_NAME_HANDLE,
+                LearnerAssessmentsEntry.TABLE_NAME,
+                ProfileEntry.TABLE_NAME,
+                LearnerAssessmentsEntry.COLUMN_NAME_UID,
+                ProfileEntry.COLUMN_NAME_UID,
+                LearnerAssessmentsEntry.COLUMN_NAME_UID,
+                StringUtil.join(",", uids),
+                LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID,
+                contentId,
+                LearnerAssessmentsEntry.COLUMN_NAME_UID);
+
+        return query;
+    }
+
     @Override
     public IReadable read(IResultSet cursor) {
         if (cursor != null && cursor.moveToFirst()) {
             do {
-                LearnerAssessmentSummary learnerAssessmentSummary = readCursorData(cursor);
-                assessmentMap.add(learnerAssessmentSummary);
+                if (!this.forReports) {
+                    LearnerAssessmentSummary learnerAssessmentSummary = readCursorData(cursor);
+                    assessmentMap.add(learnerAssessmentSummary);
+                } else {
+                    Map<String, Object> report = readReportsCursorData(cursor);
+                    reportsMap.add(report);
+                }
             } while (cursor.moveToNext());
         }
         return this;
@@ -89,6 +135,31 @@ public class LearnerAssessmentSummaryModel implements IReadable {
 
         return learnerAssessmentSummary;
     }
+
+    private Map<String, Object> readReportsCursorData(IResultSet cursor) {
+        Map<String, Object> reportSummary = new HashMap<>();
+
+        int totalTimeSpent = cursor.getInt(0);
+        reportSummary.put("totalTimespent", totalTimeSpent);
+
+        int score = cursor.getInt(1);
+        reportSummary.put("score", score);
+
+        String hData = cursor.getString(2);
+        reportSummary.put("hData", hData);
+
+        String contentId = cursor.getString(3);
+        reportSummary.put("contentId", contentId);
+
+        String uid = cursor.getString(4);
+        reportSummary.put("uid", uid);
+
+        String userName = cursor.getString(5);
+        reportSummary.put("userName", userName);
+
+        return reportSummary;
+    }
+
 
     @Override
     public String getTableName() {
@@ -120,6 +191,13 @@ public class LearnerAssessmentSummaryModel implements IReadable {
             assessmentMap = new ArrayList<>();
         }
         return assessmentMap;
+    }
+
+    public List<Map<String, Object>> getReportsMap() {
+        if (reportsMap == null) {
+            reportsMap = new ArrayList<>();
+        }
+        return reportsMap;
     }
 
 }

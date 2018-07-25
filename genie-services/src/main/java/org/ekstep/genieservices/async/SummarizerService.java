@@ -9,6 +9,7 @@ import org.ekstep.genieservices.commons.bean.LearnerAssessmentSummary;
 import org.ekstep.genieservices.commons.bean.SummaryRequest;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class provides all the required APIs to  perform summarizer related
@@ -32,7 +33,7 @@ public class SummarizerService {
      * On failing to fetch the data, the response will return status as FALSE with the following error.
      * <p>PROCESSING_ERROR
      *
-     * @param summaryRequest - {@link SummaryRequest}
+     * @param summaryRequest  - {@link SummaryRequest}
      * @param responseHandler -{@link IResponseHandler<List<LearnerAssessmentSummary>>}
      */
     public void getSummary(final SummaryRequest summaryRequest, IResponseHandler<List<LearnerAssessmentSummary>> responseHandler) {
@@ -56,7 +57,7 @@ public class SummarizerService {
      * On failing to fetch the data, the response will return status as FALSE with the following error.
      * <p>PROCESSING_ERROR
      *
-     * @param summaryRequest - {@link SummaryRequest}
+     * @param summaryRequest  - {@link SummaryRequest}
      * @param responseHandler - {@link IResponseHandler<List<LearnerAssessmentDetails>>}
      */
     public void getLearnerAssessmentDetails(final SummaryRequest summaryRequest, IResponseHandler<List<LearnerAssessmentDetails>> responseHandler) {
@@ -64,6 +65,21 @@ public class SummarizerService {
             @Override
             public GenieResponse<List<LearnerAssessmentDetails>> perform() {
                 return summarizerService.getLearnerAssessmentDetails(summaryRequest);
+            }
+        }, responseHandler);
+    }
+
+    /**
+     * This api will give the list of users and the reports related to a particular content
+     *
+     * @param summaryRequest
+     * @param responseHandler
+     */
+    public void getReportsByUser(final SummaryRequest summaryRequest, IResponseHandler<List<Map<String, Object>>> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<List<Map<String, Object>>>() {
+            @Override
+            public GenieResponse<List<Map<String, Object>>> perform() {
+                return summarizerService.getReportsByUser(summaryRequest);
             }
         }, responseHandler);
     }

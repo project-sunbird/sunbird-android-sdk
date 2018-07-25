@@ -13,6 +13,7 @@ import org.ekstep.genieservices.commons.bean.LearnerContentSummaryDetails;
 import org.ekstep.genieservices.commons.bean.SummaryRequest;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;
 import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
+import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.profile.db.model.LearnerAssessmentDetailsModel;
@@ -76,6 +77,31 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
             response.setResult(new ArrayList<LearnerAssessmentDetails>());
         } else {
             response.setResult(learnerAssessmentDetailsModel.getAllAssessments());
+        }
+
+        return response;
+    }
+
+    @Override
+    public GenieResponse<List<Map<String, Object>>> getReportsByUser(SummaryRequest summaryRequest) {
+        GenieResponse<List<Map<String, Object>>> response;
+        String methodName = "getListOfReportsByUser@LearnerAssessmentsServiceImpl";
+        Map<String, Object> params = new HashMap<>();
+        params.put("logLevel", "2");
+
+        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+
+        if (StringUtil.isNullOrEmpty(summaryRequest.getContentId()) || CollectionUtil.isNullOrEmpty(summaryRequest.getUids())) {
+            response.setResult(new ArrayList<Map<String, Object>>());
+            return response;
+        }
+
+        LearnerAssessmentSummaryModel learnerAssessmentSummaryModel = LearnerAssessmentSummaryModel.findReportsSummary(mAppContext.getDBSession(), summaryRequest.getUids(), summaryRequest.getContentId(), true);
+
+        if (learnerAssessmentSummaryModel == null) {
+            response.setResult(new ArrayList<Map<String, Object>>());
+        } else {
+            response.setResult(learnerAssessmentSummaryModel.getReportsMap());
         }
 
         return response;
