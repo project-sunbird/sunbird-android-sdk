@@ -238,12 +238,12 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
             reportSummary.put(LearnerAssessmentsEntry.COLUMN_NAME_MAX_SCORE, cursor.getDouble(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_MAX_SCORE)));
         }
 
-        //13 marks
-        int marks = cursor.getInt(13);
+        //14 marks
+        int marks = cursor.getInt(14);
         reportSummary.put("marks", marks);
 
-        //14 count
-        int count = cursor.getInt(14);
+        //15 count
+        int count = cursor.getInt(15);
         reportSummary.put("occurenceCount", count);
 
         return reportSummary;
