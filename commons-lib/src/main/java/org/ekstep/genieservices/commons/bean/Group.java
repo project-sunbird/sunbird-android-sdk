@@ -1,5 +1,7 @@
 package org.ekstep.genieservices.commons.bean;
 
+import java.util.Map;
+
 /**
  * This class holds all the data related to a group.
  */
@@ -9,6 +11,7 @@ public class Group {
     private String name;
     private String[] syllabus;
     private String[] grade;
+    private Map<String, Object> gradeValueMap;
     private int profilesCount;
     private Long createdAt;
     private Long updatedAt;
@@ -47,6 +50,14 @@ public class Group {
 
     public void setGrade(String[] grade) {
         this.grade = grade;
+    }
+
+    public Map<String, Object> getGradeValueMap() {
+        return gradeValueMap;
+    }
+
+    public void setGradeValueMap(Map<String, Object> gradeValueMap) {
+        this.gradeValueMap = gradeValueMap;
     }
 
     public Long getCreatedAt() {

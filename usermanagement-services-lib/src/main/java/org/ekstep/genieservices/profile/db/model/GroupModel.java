@@ -10,9 +10,11 @@ import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * profile
@@ -90,7 +92,6 @@ public class GroupModel implements IWritable, IReadable, IUpdatable, ICleanable 
             if (!StringUtil.isNullOrEmpty(syllabus)) {
                 mGroup.setSyllabus(syllabus.split(","));
             }
-
         }
 
         //grade
@@ -99,7 +100,13 @@ public class GroupModel implements IWritable, IReadable, IUpdatable, ICleanable 
             if (!StringUtil.isNullOrEmpty(grade)) {
                 mGroup.setGrade(grade.split(","));
             }
+        }
 
+        if (cursor.getColumnIndex(GroupEntry.COLUMN_NAME_GRADE_VALUE) != -1) {
+            String gradeValue = cursor.getString(cursor.getColumnIndex(GroupEntry.COLUMN_NAME_GRADE_VALUE));
+            if (!StringUtil.isNullOrEmpty(gradeValue)) {
+                mGroup.setGradeValueMap(GsonUtil.fromJson(gradeValue, Map.class));
+            }
         }
 
         //createdAt
@@ -151,6 +158,10 @@ public class GroupModel implements IWritable, IReadable, IUpdatable, ICleanable 
 
         if (mGroup.getGrade() != null) {
             contentValues.put(GroupEntry.COLUMN_NAME_GRADE, StringUtil.join(",", mGroup.getGrade()));
+        }
+
+        if (mGroup.getGradeValueMap() != null && !mGroup.getGradeValueMap().isEmpty()) {
+            contentValues.put(GroupEntry.COLUMN_NAME_GRADE_VALUE, GsonUtil.toJson(mGroup.getGradeValueMap()));
         }
 
         contentValues.put(GroupEntry.COLUMN_NAME_CREATED_AT, mGroup.getCreatedAt());
