@@ -70,4 +70,11 @@ public interface ISummarizerService {
      */
     GenieResponse<List<Map<String, Object>>> getReportByQuestions(SummaryRequest summaryRequest);
 
+    /**
+     * This api will give the details of a question
+     *
+     * @param summaryRequest
+     * @return
+     */
+    GenieResponse<List<Map<String, Object>>> getDetailsPerQuestion(SummaryRequest summaryRequest);
 }

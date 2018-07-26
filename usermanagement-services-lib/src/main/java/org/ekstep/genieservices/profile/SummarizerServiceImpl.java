@@ -98,7 +98,8 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
 
         List<String> quotedUIds = getStringWithQuoteList(summaryRequest.getUids());
 
-        LearnerAssessmentSummaryModel learnerAssessmentSummaryModel = LearnerAssessmentSummaryModel.findReportsSummary(mAppContext.getDBSession(), quotedUIds, summaryRequest.getContentId(), true);
+        LearnerAssessmentSummaryModel learnerAssessmentSummaryModel = LearnerAssessmentSummaryModel.findReportsSummary(mAppContext.getDBSession(),
+                quotedUIds, summaryRequest.getContentId(), true);
 
         if (learnerAssessmentSummaryModel == null) {
             response.setResult(new ArrayList<Map<String, Object>>());
@@ -108,6 +109,35 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
 
         return response;
 
+    }
+
+    @Override
+    public GenieResponse<List<Map<String, Object>>> getDetailsPerQuestion(SummaryRequest summaryRequest) {
+        GenieResponse<List<Map<String, Object>>> response;
+        String methodName = "getDetailsPerQuestion@LearnerAssessmentsServiceImpl";
+        Map<String, Object> params = new HashMap<>();
+        params.put("logLevel", "2");
+
+        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+
+        if (StringUtil.isNullOrEmpty(summaryRequest.getContentId()) || CollectionUtil.isNullOrEmpty(summaryRequest.getUids())
+                || StringUtil.isNullOrEmpty(summaryRequest.getQuestionId())) {
+            response.setResult(new ArrayList<Map<String, Object>>());
+            return response;
+        }
+
+        List<String> quotedUIds = getStringWithQuoteList(summaryRequest.getUids());
+
+        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.findQuestionDetails(mAppContext.getDBSession(),
+                quotedUIds, summaryRequest.getContentId(), summaryRequest.getQuestionId(), LearnerAssessmentDetailsModel.FOR_QUESTION_DETAILS);
+
+        if (learnerAssessmentDetailsModel == null) {
+            response.setResult(new ArrayList<Map<String, Object>>());
+        } else {
+            response.setResult(learnerAssessmentDetailsModel.getReportsMap());
+        }
+
+        return response;
     }
 
     @Override
@@ -126,7 +156,8 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
 
         List<String> quotedUIds = getStringWithQuoteList(summaryRequest.getUids());
 
-        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.findQuestionsReportSummary(mAppContext.getDBSession(), summaryRequest.getContentId(), quotedUIds, true);
+        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.findQuestionsReportSummary(mAppContext.getDBSession(),
+                summaryRequest.getContentId(), quotedUIds, LearnerAssessmentDetailsModel.FOR_QUESTIONS_REPORT);
 
         if (learnerAssessmentDetailsModel == null) {
             response.setResult(new ArrayList<Map<String, Object>>());
