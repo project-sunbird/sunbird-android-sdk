@@ -18,6 +18,7 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 
 public class UserProfileModel implements IWritable, IReadable, IUpdatable, ICleanable {
 
@@ -193,6 +194,12 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
             }
         }
 
+        if (cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_GRADE_VALUE) != -1) {
+            String gradeValue = cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_NAME_GRADE_VALUE));
+            if (!StringUtil.isNullOrEmpty(gradeValue)) {
+                profile.setGradeValueMap(GsonUtil.fromJson(gradeValue, Map.class));
+            }
+        }
 
         if (cursor.getColumnIndex(ProfileEntry.COLUMN_SOURCE) != -1) {
             String source = cursor.getString(cursor.getColumnIndex(ProfileEntry.COLUMN_SOURCE));
@@ -277,6 +284,10 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
 
         if (profile.getGrade() != null) {
             contentValues.put(ProfileEntry.COLUMN_NAME_GRADE, StringUtil.join(",", profile.getGrade()));
+        }
+
+        if (profile.getGradeValueMap() != null && !profile.getGradeValueMap().isEmpty()) {
+            contentValues.put(ProfileEntry.COLUMN_NAME_GRADE_VALUE, GsonUtil.toJson(profile.getGradeValueMap()));
         }
 
         contentValues.put(ProfileEntry.COLUMN_VALUE, GsonUtil.toJson(profile));

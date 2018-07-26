@@ -23,7 +23,6 @@ public class _13_GroupAndProfileMigration extends Migration {
     private static final int MIGRATION_NUMBER = 13;
     private static final int TARGET_DB_VERSION = 18;
 
-
     public _13_GroupAndProfileMigration() {
         super(MIGRATION_NUMBER, TARGET_DB_VERSION);
     }
@@ -34,7 +33,7 @@ public class _13_GroupAndProfileMigration extends Migration {
         appContext.getDBSession().execute(GroupProfileEntry.getCreateEntry());
 
         List<String> alterQueries = ProfileEntry.getAlterEntryForProfileUserFromAndValue();
-        for (String query: alterQueries) {
+        for (String query : alterQueries) {
             appContext.getDBSession().execute(query);
         }
 
@@ -51,7 +50,6 @@ public class _13_GroupAndProfileMigration extends Migration {
                 } else {
                     profile.setSource(UserSource.LOCAL);
                 }
-
 
                 updatedProfileList.add(profile);
             }
