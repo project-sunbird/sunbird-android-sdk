@@ -14,6 +14,7 @@ public class GroupEntry implements BaseColumns {
     public static final String COLUMN_NAME_GROUP_NAME = "name";
     public static final String COLUMN_NAME_SYLLABUS = "syllabus";
     public static final String COLUMN_NAME_GRADE = "grade";
+    public static final String COLUMN_NAME_GRADE_VALUE = "grade_value";
     public static final String COLUMN_NAME_CREATED_AT = "created_at";
     public static final String COLUMN_NAME_UPDATED_AT = "updated_at";
 
@@ -24,6 +25,7 @@ public class GroupEntry implements BaseColumns {
                 COLUMN_NAME_GROUP_NAME + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
                 COLUMN_NAME_SYLLABUS + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
                 COLUMN_NAME_GRADE + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
+                COLUMN_NAME_GRADE_VALUE + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
                 COLUMN_NAME_CREATED_AT + DbConstants.INT_TYPE + DbConstants.COMMA_SEP +
                 COLUMN_NAME_UPDATED_AT + DbConstants.INT_TYPE +
                 " )";

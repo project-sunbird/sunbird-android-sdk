@@ -41,6 +41,7 @@ public class Profile implements Serializable, IValidate {
     private ProfileType profileType;
     private String[] subject;
     private String[] grade;
+    private Map<String, Object> gradeValueMap;
     private String[] syllabus;
     private UserSource source;
 
@@ -203,6 +204,14 @@ public class Profile implements Serializable, IValidate {
 
     public void setGrade(String[] grade) {
         this.grade = grade;
+    }
+
+    public Map<String, Object> getGradeValueMap() {
+        return gradeValueMap;
+    }
+
+    public void setGradeValueMap(Map<String, Object> gradeValueMap) {
+        this.gradeValueMap = gradeValueMap;
     }
 
     public String[] getSyllabus() {
