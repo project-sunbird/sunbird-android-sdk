@@ -24,6 +24,10 @@ import java.util.Map;
 
 public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpdatable {
 
+    //Need to passed when finding for the model
+    public static final int FOR_SUMMARIZER = 1;
+    public static final int FOR_QUESTIONS_REPORT = 2;
+    public static final int FOR_QUESTION_DETAILS = 3;
     private Long id = -1L;
     private String uid;
     private String contentId;
@@ -42,7 +46,8 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
     private List<LearnerAssessmentDetails> mAssessmentList;
     private String filter;
     private List<Map<String, Object>> reportsMap;
-    private boolean forReports = false;
+    private int forReports = 1;
+
 
     private LearnerAssessmentDetailsModel(IDBSession dbSession, String filter) {
         this.dbSession = dbSession;
@@ -67,7 +72,7 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
         this.hierarchyData = learnerAssessmentDetails.getHierarchyData();
     }
 
-    public LearnerAssessmentDetailsModel(IDBSession dbSession, boolean forReports) {
+    public LearnerAssessmentDetailsModel(IDBSession dbSession, int forReports) {
         reportsMap = new ArrayList<>();
         this.dbSession = dbSession;
         this.forReports = forReports;
@@ -88,16 +93,40 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
         }
     }
 
-    public static LearnerAssessmentDetailsModel findQuestionsReportSummary(IDBSession dbSession, String contentId, List<String> uids, boolean forReports) {
+    public static LearnerAssessmentDetailsModel findQuestionsReportSummary(IDBSession dbSession, String contentId, List<String> uids, int forReports) {
         LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = new LearnerAssessmentDetailsModel(dbSession, forReports);
         dbSession.read(learnerAssessmentDetailsModel, getQuestionReportsQuery(uids, contentId));
         return learnerAssessmentDetailsModel;
     }
 
+    public static LearnerAssessmentDetailsModel findQuestionDetails(IDBSession dbSession, List<String> uids, String contentId, String qId, int forReports) {
+        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = new LearnerAssessmentDetailsModel(dbSession, forReports);
+        dbSession.read(learnerAssessmentDetailsModel, getQuestionDetailsQuery(uids, contentId, qId));
+        return learnerAssessmentDetailsModel;
+    }
+
+    private static String getQuestionDetailsQuery(List<String> uids, String contentId, String qId) {
+
+        return String.format(Locale.US, "SELECT %s, %s as time , %s as result, %s as max_score" +
+                        "FROM  %s " +
+                        "WHERE %s IN(%s) AND %s = '%s' AND %s = '%s';",
+                LearnerAssessmentsEntry.COLUMN_NAME_UID,
+                LearnerAssessmentsEntry.COLUMN_NAME_TIME_SPENT,
+                LearnerAssessmentsEntry.COLUMN_NAME_CORRECT,
+                LearnerAssessmentsEntry.COLUMN_NAME_MAX_SCORE,
+                LearnerAssessmentsEntry.TABLE_NAME,
+                LearnerAssessmentsEntry.COLUMN_NAME_UID,
+                StringUtil.join(",", uids),
+                LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID,
+                contentId,
+                LearnerAssessmentsEntry.COLUMN_NAME_QID,
+                qId);
+    }
+
     private static String getQuestionReportsQuery(List<String> uids, String contentId) {
         String query = String.format(Locale.US, "SELECT *, sum(%s) as marks , count(%s) as count " +
                         "FROM  %s " +
-                        "WHERE %s IN('%s') AND %s = '%s'  group by %s;",
+                        "WHERE %s IN(%s) AND %s = '%s'  group by %s;",
                 LearnerAssessmentsEntry.COLUMN_NAME_SCORE,
                 LearnerAssessmentsEntry.COLUMN_NAME_Q_INDEX,
                 LearnerAssessmentsEntry.TABLE_NAME,
@@ -116,12 +145,21 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
             mAssessmentList = new ArrayList<>();
 
             do {
-                if (!this.forReports) {
-                    LearnerAssessmentDetails learnerAssessmentDetails = getLearnerAssessmentData(resultSet);
-                    mAssessmentList.add(learnerAssessmentDetails);
-                } else {
-                    Map<String, Object> report = readReportsCursorData(resultSet);
-                    reportsMap.add(report);
+
+                switch (forReports) {
+                    case FOR_SUMMARIZER:
+                        LearnerAssessmentDetails learnerAssessmentDetails = getLearnerAssessmentData(resultSet);
+                        mAssessmentList.add(learnerAssessmentDetails);
+                        break;
+                    case FOR_QUESTIONS_REPORT:
+                        Map<String, Object> questionsReport = readQuestionsReportsCursorData(resultSet);
+                        reportsMap.add(questionsReport);
+                        break;
+                    case FOR_QUESTION_DETAILS:
+                        Map<String, Object> questionDetailReport = readQuestionDetailReportsCursorData(resultSet);
+                        reportsMap.add(questionDetailReport);
+                        break;
+
                 }
             } while (resultSet.moveToNext());
         }
@@ -129,7 +167,25 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
         return this;
     }
 
-    private Map<String, Object> readReportsCursorData(IResultSet cursor) {
+    private Map<String, Object> readQuestionDetailReportsCursorData(IResultSet cursor) {
+        Map<String, Object> reportSummary = new HashMap<>();
+
+        String uid = cursor.getString(0);
+        reportSummary.put("uid", uid);
+
+        int time = cursor.getInt(1);
+        reportSummary.put("time", time);
+
+        int result = cursor.getInt(2);
+        reportSummary.put("result", result);
+
+        int maxScore = cursor.getInt(3);
+        reportSummary.put("maxScore", maxScore);
+
+        return reportSummary;
+    }
+
+    private Map<String, Object> readQuestionsReportsCursorData(IResultSet cursor) {
         Map<String, Object> reportSummary = new HashMap<>();
 
         reportSummary.put(LearnerAssessmentsEntry.COLUMN_NAME_UID, cursor.getString(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_UID)));

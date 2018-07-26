@@ -100,5 +100,20 @@ public class SummarizerService {
         }, responseHandler);
     }
 
+    /**
+     * This api will give the details of the question attempted
+     *
+     * @param summaryRequest
+     * @param responseHandler
+     */
+    public void getDetailsPerQuestion(final SummaryRequest summaryRequest, IResponseHandler<List<Map<String, Object>>> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<List<Map<String, Object>>>() {
+            @Override
+            public GenieResponse<List<Map<String, Object>>> perform() {
+                return summarizerService.getDetailsPerQuestion(summaryRequest);
+            }
+        }, responseHandler);
+    }
+
 
 }

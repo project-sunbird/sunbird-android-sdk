@@ -5,18 +5,19 @@ import java.util.List;
 
 /**
  * This class accepts uids, contentId and hierarchyInfo when requesting for learner summary details.
- *
  */
 public class SummaryRequest {
 
+    private String qId;
     private List<String> uids;
     private String contentId;
     private String hierarchyData;
 
-    private SummaryRequest(List<String> uids, String contentId, String hierarchyData) {
+    private SummaryRequest(List<String> uids, String contentId, String hierarchyData, String qId) {
         this.uids = uids;
         this.contentId = contentId;
         this.hierarchyData = hierarchyData;
+        this.qId = qId;
     }
 
     public List<String> getUids() {
@@ -31,7 +32,12 @@ public class SummaryRequest {
         return hierarchyData;
     }
 
+    public String getQuestionId() {
+        return qId;
+    }
+
     public static class Builder {
+        private String qId;
         private List<String> uids;
         private String contentId;
         private String hierarchyData;
@@ -72,8 +78,16 @@ public class SummaryRequest {
             return this;
         }
 
+        /**
+         * Question Id need to be passed when the details about question are to be fetched
+         */
+        public Builder questionId(String questionId) {
+            this.qId = questionId;
+            return this;
+        }
+
         public SummaryRequest build() {
-            return new SummaryRequest(uids, contentId, hierarchyData);
+            return new SummaryRequest(uids, contentId, hierarchyData, qId);
         }
     }
 
