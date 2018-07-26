@@ -97,7 +97,7 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
     private static String getQuestionReportsQuery(List<String> uids, String contentId) {
         String query = String.format(Locale.US, "SELECT *, sum(%s) as marks , count(%s) as count " +
                         "FROM  %s " +
-                        "WHERE %s IN('%s') AND %s = '%s'  group by %s;",
+                        "WHERE %s IN(%s) AND %s = '%s'  group by %s;",
                 LearnerAssessmentsEntry.COLUMN_NAME_SCORE,
                 LearnerAssessmentsEntry.COLUMN_NAME_Q_INDEX,
                 LearnerAssessmentsEntry.TABLE_NAME,
