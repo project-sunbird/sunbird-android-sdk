@@ -107,7 +107,7 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
 
     private static String getQuestionDetailsQuery(List<String> uids, String contentId, String qId) {
 
-        return String.format(Locale.US, "SELECT %s, %s as time , %s as result, %s as max_score" +
+        return String.format(Locale.US, "SELECT %s, %s as time , %s as result, %s as max_score " +
                         "FROM  %s " +
                         "WHERE %s IN(%s) AND %s = '%s' AND %s = '%s';",
                 LearnerAssessmentsEntry.COLUMN_NAME_UID,
