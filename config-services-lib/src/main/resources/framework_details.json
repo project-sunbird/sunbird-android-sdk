@@ -163,6 +163,124 @@
                     "status": "Live"
                 },
                 {
+                  "identifier": "ncf_medium",
+                  "code": "medium",
+                  "terms": [
+                    {
+                      "identifier": "ncf_medium_english",
+                      "code": "english",
+                      "name": "English",
+                      "description": "",
+                      "index": 1,
+                      "category": "medium",
+                      "status": "Live"
+                    },
+                    {
+                      "identifier": "ncf_medium_hindi",
+                      "code": "hindi",
+                      "name": "Hindi",
+                      "description": "",
+                      "index": 2,
+                      "category": "medium",
+                      "status": "Live"
+                    },
+                    {
+                      "identifier": "ncf_medium_oriya",
+                      "code": "oriya",
+                      "name": "Odia",
+                      "description": "Odia",
+                      "index": 3,
+                      "category": "medium",
+                      "status": "Live"
+                    },
+                    {
+                      "identifier": "ncf_medium_telugu",
+                      "code": "telugu",
+                      "name": "Telugu",
+                      "description": "",
+                      "index": 4,
+                      "category": "medium",
+                      "status": "Live"
+                    },
+                    {
+                      "identifier": "ncf_medium_kannada",
+                      "code": "kannada",
+                      "name": "Kannada",
+                      "description": "",
+                      "index": 5,
+                      "category": "medium",
+                      "status": "Live"
+                    },
+                    {
+                      "identifier": "ncf_medium_marathi",
+                      "code": "marathi",
+                      "name": "Marathi",
+                      "description": "",
+                      "index": 6,
+                      "category": "medium",
+                      "status": "Live"
+                    },
+                    {
+                      "identifier": "ncf_medium_assamese",
+                      "code": "assamese",
+                      "name": "Assamese",
+                      "description": "",
+                      "index": 7,
+                      "category": "medium",
+                      "status": "Live"
+                    },
+                    {
+                      "identifier": "ncf_medium_bengali",
+                      "code": "bengali",
+                      "name": "Bengali",
+                      "description": "",
+                      "index": 8,
+                      "category": "medium",
+                      "status": "Live"
+                    },
+                    {
+                      "identifier": "ncf_medium_gujarati",
+                      "code": "gujarati",
+                      "name": "Gujarati",
+                      "description": "",
+                      "index": 9,
+                      "category": "medium",
+                      "status": "Live"
+                    },
+                    {
+                      "identifier": "ncf_medium_tamil",
+                      "code": "tamil",
+                      "name": "Tamil",
+                      "description": "",
+                      "index": 10,
+                      "category": "medium",
+                      "status": "Live"
+                    },
+                    {
+                      "identifier": "ncf_medium_urdu",
+                      "code": "urdu",
+                      "name": "Urdu",
+                      "description": "",
+                      "index": 11,
+                      "category": "medium",
+                      "status": "Live"
+                    },
+                    {
+                      "identifier": "ncf_medium_other",
+                      "code": "other",
+                      "name": "Other",
+                      "description": "",
+                      "index": 12,
+                      "category": "medium",
+                      "status": "Live"
+                    }
+                  ],
+                  "name": "Medium",
+                  "description": "",
+                  "index": 4,
+                  "status": "Live"
+                },
+              {
                     "identifier": "ncf_gradelevel",
                     "code": "gradeLevel",
                     "terms": [
@@ -801,124 +919,6 @@
                     "name": "Subject",
                     "description": "",
                     "index": 3,
-                    "status": "Live"
-                },
-                {
-                    "identifier": "ncf_medium",
-                    "code": "medium",
-                    "terms": [
-                        {
-                            "identifier": "ncf_medium_english",
-                            "code": "english",
-                            "name": "English",
-                            "description": "",
-                            "index": 1,
-                            "category": "medium",
-                            "status": "Live"
-                        },
-                        {
-                            "identifier": "ncf_medium_hindi",
-                            "code": "hindi",
-                            "name": "Hindi",
-                            "description": "",
-                            "index": 2,
-                            "category": "medium",
-                            "status": "Live"
-                        },
-                        {
-                            "identifier": "ncf_medium_oriya",
-                            "code": "oriya",
-                            "name": "Odia",
-                            "description": "Odia",
-                            "index": 3,
-                            "category": "medium",
-                            "status": "Live"
-                        },
-                        {
-                            "identifier": "ncf_medium_telugu",
-                            "code": "telugu",
-                            "name": "Telugu",
-                            "description": "",
-                            "index": 4,
-                            "category": "medium",
-                            "status": "Live"
-                        },
-                        {
-                            "identifier": "ncf_medium_kannada",
-                            "code": "kannada",
-                            "name": "Kannada",
-                            "description": "",
-                            "index": 5,
-                            "category": "medium",
-                            "status": "Live"
-                        },
-                        {
-                            "identifier": "ncf_medium_marathi",
-                            "code": "marathi",
-                            "name": "Marathi",
-                            "description": "",
-                            "index": 6,
-                            "category": "medium",
-                            "status": "Live"
-                        },
-                        {
-                            "identifier": "ncf_medium_assamese",
-                            "code": "assamese",
-                            "name": "Assamese",
-                            "description": "",
-                            "index": 7,
-                            "category": "medium",
-                            "status": "Live"
-                        },
-                        {
-                            "identifier": "ncf_medium_bengali",
-                            "code": "bengali",
-                            "name": "Bengali",
-                            "description": "",
-                            "index": 8,
-                            "category": "medium",
-                            "status": "Live"
-                        },
-                        {
-                            "identifier": "ncf_medium_gujarati",
-                            "code": "gujarati",
-                            "name": "Gujarati",
-                            "description": "",
-                            "index": 9,
-                            "category": "medium",
-                            "status": "Live"
-                        },
-                        {
-                            "identifier": "ncf_medium_tamil",
-                            "code": "tamil",
-                            "name": "Tamil",
-                            "description": "",
-                            "index": 10,
-                            "category": "medium",
-                            "status": "Live"
-                        },
-                        {
-                            "identifier": "ncf_medium_urdu",
-                            "code": "urdu",
-                            "name": "Urdu",
-                            "description": "",
-                            "index": 11,
-                            "category": "medium",
-                            "status": "Live"
-                        },
-                        {
-                            "identifier": "ncf_medium_other",
-                            "code": "other",
-                            "name": "Other",
-                            "description": "",
-                            "index": 12,
-                            "category": "medium",
-                            "status": "Live"
-                        }
-                    ],
-                    "name": "Medium",
-                    "description": "",
-                    "index": 4,
                     "status": "Live"
                 }
             ],
