@@ -134,7 +134,7 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
                 StringUtil.join(",", uids),
                 LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID,
                 contentId,
-                LearnerAssessmentsEntry.COLUMN_NAME_Q_INDEX);
+                LearnerAssessmentsEntry.COLUMN_NAME_QID);
 
         return query;
     }
