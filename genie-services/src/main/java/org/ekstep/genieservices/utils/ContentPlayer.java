@@ -123,12 +123,11 @@ public class ContentPlayer {
 
         GroupSession groupSession = sContentPlayer.mGroupService.getCurrentGroupSession().getResult();
         List<CorrelationData> correlationDataList = new ArrayList<>();
-        String groupId = "";
+        String groupId = null;
         if (groupSession != null && groupSession.isValid()) {
             groupId = groupSession.getGid();
             correlationDataList.add(createGroupcData(groupId));
         }
-        contextMap.put("groupId", groupId);
         Map<String, Object> deeplinkMap = new HashMap<>();
         String deeplinkBasePath = getStringResourceByName(context, "deeplink_base_url");
         deeplinkMap.put("content-details", deeplinkBasePath != null ? deeplinkBasePath : "ekstep" + "://c/");
@@ -145,6 +144,12 @@ public class ContentPlayer {
         }
 
         bundleMap.put("metadata", contentData);
+        Map<String, Object> appContext = new HashMap<>();
+        appContext.put("local", true);
+        appContext.put("server", false);
+        appContext.put("groupId", groupId);
+
+        bundleMap.put("appContext", appContext);
         intent.putExtra("playerConfig", GsonUtil.toJson(bundleMap));
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
