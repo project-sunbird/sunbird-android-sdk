@@ -22,7 +22,7 @@ public class FrameworkDetailsAPI extends BaseAPI {
         super(appContext,
                 String.format(Locale.US, "%s/%s/%s",
                         appContext.getParams().getString(IParams.Key.FRAMEWORK_SERVICE_BASE_URL),
-                        ENDPOINT, frameworkId),
+                        ENDPOINT, frameworkId + "?categories=board,gradeLevel,subject,medium"),
                 TAG);
     }
 
