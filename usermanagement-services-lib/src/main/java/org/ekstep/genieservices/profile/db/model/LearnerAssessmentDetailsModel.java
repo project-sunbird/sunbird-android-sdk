@@ -124,11 +124,12 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
     }
 
     private static String getQuestionReportsQuery(List<String> uids, String contentId) {
-        String query = String.format(Locale.US, "SELECT *, sum(%s) as marks , count(%s) as count " +
+        String query = String.format(Locale.US, "SELECT *, sum(%s) as marks , count(%s) as count,sum(%s) maxscore " +
                         "FROM  %s " +
                         "WHERE %s IN(%s) AND %s = '%s'  group by %s;",
                 LearnerAssessmentsEntry.COLUMN_NAME_SCORE,
                 LearnerAssessmentsEntry.COLUMN_NAME_Q_INDEX,
+                LearnerAssessmentsEntry.COLUMN_NAME_MAX_SCORE,
                 LearnerAssessmentsEntry.TABLE_NAME,
                 LearnerAssessmentsEntry.COLUMN_NAME_UID,
                 StringUtil.join(",", uids),
@@ -245,6 +246,9 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
         //15 count
         int count = cursor.getInt(15);
         reportSummary.put("occurenceCount", count);
+
+        int sum_max_score = cursor.getInt(16);
+        reportSummary.put("sum_max_score", count);
 
         return reportSummary;
     }
