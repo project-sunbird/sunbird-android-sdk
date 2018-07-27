@@ -20,7 +20,8 @@ public class ProfileUriHandlerFactory {
         return Arrays.asList(
                 new CurrentUserUriHandler(AUTHORITY, context, selection, selectionArgs, genieService),
                 new SetUserUriHandler(AUTHORITY, context, selection, selectionArgs, genieService),
-                new GetAllUsersUriHandler(AUTHORITY, context, selection, selectionArgs, genieService)
+                new GetAllUsersUriHandler(AUTHORITY, context, selection, selectionArgs, genieService),
+                new GetAllProfilesUriHandler(AUTHORITY, context, selection, selectionArgs, genieService)
         );
     }
 }
