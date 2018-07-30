@@ -66,7 +66,7 @@ public class RelevantContentUriHandler implements IUriHandler {
                     && !StringUtil.isNullOrEmpty(currentContentIdentifier)) {
                 Map<String, Object> resultMap = new HashMap<>();
 
-                Type cdataType = new TypeToken<List<CorrelationData>>() {
+                Type cdataType = new TypeToken<List<HierarchyInfo>>() {
                 }.getType();
 
                 String hierarchyInfoJson = GsonUtil.getGson().toJson(hierarchyInfoMap);
