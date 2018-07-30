@@ -103,7 +103,7 @@ public class ContentPlayer {
         contextMap.put("appQualifier", sContentPlayer.mQualifier);
         contextMap.put("tags", TelemetryTagCache.activeTags(sContentPlayer.mAppContext));
         contextMap.put("rollup", rollup != null ? rollup : "");
-        contextMap.put("basepath", content.getBasePath());
+        contextMap.put("basePath", content.getBasePath());
         contextMap.put("mode", "play");
         contextMap.put("contentId", content.getIdentifier());
         contextMap.put("sid", sid != null ? sid : "");
@@ -141,7 +141,7 @@ public class ContentPlayer {
             bundleMap.put("config", configMap);
         }
 
-        bundleMap.put("metadata", contentData);
+        bundleMap.put("metadata", content);
         Map<String, Object> appContext = new HashMap<>();
         appContext.put("local", true);
         appContext.put("server", false);
