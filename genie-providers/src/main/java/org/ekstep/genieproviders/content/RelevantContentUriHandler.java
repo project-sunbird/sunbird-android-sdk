@@ -59,18 +59,18 @@ public class RelevantContentUriHandler implements IUriHandler {
             Map data = GsonUtil.getGson().fromJson(selection, type);
 
             String currentContentIdentifier = data.get("contentIdentifier").toString();
-            List<Map> cdataListMap = (List<Map>) data.get("cdata");
+            List<Map> hierarchyInfoMap = (List<Map>) data.get("hierarchyInfo");
 
             GenieResponse genieResponse = null;
-            if (cdataListMap != null && !cdataListMap.isEmpty()
+            if (hierarchyInfoMap != null && !hierarchyInfoMap.isEmpty()
                     && !StringUtil.isNullOrEmpty(currentContentIdentifier)) {
                 Map<String, Object> resultMap = new HashMap<>();
 
                 Type cdataType = new TypeToken<List<CorrelationData>>() {
                 }.getType();
 
-                String cdataJson = GsonUtil.getGson().toJson(cdataListMap);
-                List<CorrelationData> cdata = GsonUtil.getGson().fromJson(cdataJson, cdataType);
+                String hierarchyInfoJson = GsonUtil.getGson().toJson(hierarchyInfoMap);
+                List<HierarchyInfo> hierarchyInfo = GsonUtil.getGson().fromJson(hierarchyInfoJson, cdataType);
 
                 // Next Content
                 boolean next = false;
@@ -78,11 +78,11 @@ public class RelevantContentUriHandler implements IUriHandler {
                     next = (boolean) data.get("next");
                 }
                 if (next) {
-                    Content nextContent = genieService.getContentService().nextContent(createHierarchyInfo(cdata), currentContentIdentifier).getResult();
+                    Content nextContent = genieService.getContentService().nextContent(hierarchyInfo, currentContentIdentifier).getResult();
                     if (nextContent != null) {
                         Map<String, Object> nextMap = new HashMap<>();
                         nextMap.put("content", nextContent);
-                        nextMap.put("cdata", createcDataList(nextContent.getHierarchyInfo()));
+//                        nextMap.put("cdata", createcDataList(nextContent.getHierarchyInfo()));
                         resultMap.put("next", nextMap);
                     }
                 }
@@ -93,11 +93,11 @@ public class RelevantContentUriHandler implements IUriHandler {
                     prev = (boolean) data.get("prev");
                 }
                 if (prev) {
-                    Content prevContent = genieService.getContentService().prevContent(createHierarchyInfo(cdata), currentContentIdentifier).getResult();
+                    Content prevContent = genieService.getContentService().prevContent(hierarchyInfo, currentContentIdentifier).getResult();
                     if (prevContent != null) {
                         Map<String, Object> prevMap = new HashMap<>();
                         prevMap.put("content", prevContent);
-                        prevMap.put("cdata", createcDataList(prevContent.getHierarchyInfo()));
+//                        prevMap.put("cdata", createcDataList(prevContent.getHierarchyInfo()));
                         resultMap.put("prev", prevMap);
                     }
                 }

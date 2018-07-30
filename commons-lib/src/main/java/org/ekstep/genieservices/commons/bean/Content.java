@@ -1,5 +1,7 @@
 package org.ekstep.genieservices.commons.bean;
 
+import org.ekstep.genieservices.commons.bean.telemetry.Rollup;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -23,6 +25,7 @@ public class Content implements Serializable {
     private List<HierarchyInfo> hierarchyInfo;
     private Long sizeOnDevice;
     private Long lastUsedTime;
+    private Rollup rollup;
 
     public String getIdentifier() {
         return identifier;
@@ -142,5 +145,13 @@ public class Content implements Serializable {
 
     public void setLastUsedTime(Long lastUsedTime) {
         this.lastUsedTime = lastUsedTime;
+    }
+
+    public Rollup getRollup() {
+        return rollup;
+    }
+
+    public void setRollup(Rollup rollup) {
+        this.rollup = rollup;
     }
 }

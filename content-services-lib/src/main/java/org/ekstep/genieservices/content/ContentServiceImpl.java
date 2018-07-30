@@ -56,6 +56,7 @@ import org.ekstep.genieservices.commons.bean.enums.DownloadAction;
 import org.ekstep.genieservices.commons.bean.enums.InteractionType;
 import org.ekstep.genieservices.commons.bean.enums.ScanStorageStatus;
 import org.ekstep.genieservices.commons.bean.telemetry.Interact;
+import org.ekstep.genieservices.commons.bean.telemetry.Rollup;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
@@ -100,6 +101,7 @@ import org.ekstep.genieservices.content.network.FlagContentAPI;
 import org.ekstep.genieservices.content.network.RecommendedContentAPI;
 import org.ekstep.genieservices.content.network.RelatedContentAPI;
 import org.ekstep.genieservices.eventbus.EventBus;
+import org.ekstep.genieservices.telemetry.TelemetryHandler;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.io.File;
@@ -557,8 +559,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         params.put("contentIdentifiers", GsonUtil.toJson(hierarchyInfo));
         params.put("logLevel", "2");
 
-        List<HierarchyInfo> nextContentHierarchyList = new ArrayList<>();
-        Content nextContent = null;
+        List<HierarchyInfo> prevContentHierarchyList = new ArrayList<>();
+        Content prevContent = null;
         try {
             List<String> contentsKeyList = new ArrayList<>();
             List<String> parentChildRelation = new ArrayList<>();
@@ -636,7 +638,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 for (int i = 0; i < (idCount - 1); i++) {
                     ContentModel contentModelObj = ContentModel.find(mAppContext.getDBSession(), prevContentIdentifierList[i]);
                     if (contentModelObj != null) {
-                        nextContentHierarchyList.add(new HierarchyInfo(contentModelObj.getIdentifier(), contentModelObj.getContentType()));
+                        prevContentHierarchyList.add(new HierarchyInfo(contentModelObj.getIdentifier(), contentModelObj.getContentType()));
                     } else {
                         isAllHierarchyContentFound = false;
                         break;
@@ -644,10 +646,12 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 }
 
                 if (isAllHierarchyContentFound) {
-                    ContentModel nextContentModel = ContentModel.find(mAppContext.getDBSession(), prevContentIdentifierList[idCount - 1]);
-                    if (nextContentModel != null) {
-                        nextContent = ContentHandler.convertContentModelToBean(nextContentModel);
-                        nextContent.setHierarchyInfo(nextContentHierarchyList);
+                    ContentModel prevContentModel = ContentModel.find(mAppContext.getDBSession(), prevContentIdentifierList[idCount - 1]);
+                    if (prevContentModel != null) {
+                        prevContent = ContentHandler.convertContentModelToBean(prevContentModel);
+                        prevContent.setHierarchyInfo(prevContentHierarchyList);
+                        Rollup rollup = TelemetryHandler.getRollup(prevContent.getIdentifier(), prevContent.getHierarchyInfo());
+                        prevContent.setRollup(rollup);
                     }
                 }
             }
@@ -656,7 +660,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         }
 
         GenieResponse<Content> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-        response.setResult(nextContent);
+        response.setResult(prevContent);
         TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;
     }
@@ -759,6 +763,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                     if (nextContentModel != null) {
                         nextContent = ContentHandler.convertContentModelToBean(nextContentModel);
                         nextContent.setHierarchyInfo(nextContentHierarchyList);
+                        Rollup rollup = TelemetryHandler.getRollup(nextContent.getIdentifier(), nextContent.getHierarchyInfo());
+                        nextContent.setRollup(rollup);
                     }
                 }
             }

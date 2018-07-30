@@ -17,10 +17,12 @@ import org.ekstep.genieservices.commons.bean.CorrelationData;
 import org.ekstep.genieservices.commons.bean.GroupSession;
 import org.ekstep.genieservices.commons.bean.HierarchyInfo;
 import org.ekstep.genieservices.commons.bean.UserSession;
+import org.ekstep.genieservices.commons.bean.telemetry.Rollup;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.ReflectionUtil;
 import org.ekstep.genieservices.tag.cache.TelemetryTagCache;
+import org.ekstep.genieservices.telemetry.TelemetryHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -102,7 +104,7 @@ public class ContentPlayer {
         contextMap.put("languageInfo", languageInfoMap != null ? GsonUtil.toJson(languageInfoMap) : "");
         contextMap.put("appQualifier", sContentPlayer.mQualifier);
         contextMap.put("tags", TelemetryTagCache.activeTags(sContentPlayer.mAppContext));
-        contextMap.put("rollup", rollup != null ? rollup : "");
+//        contextMap.put("rollup", rollup != null ? rollup : "");
         contextMap.put("basePath", content.getBasePath());
         contextMap.put("mode", "play");
         contextMap.put("contentId", content.getIdentifier());
@@ -131,7 +133,7 @@ public class ContentPlayer {
         String deeplinkBasePath = getStringResourceByName(context, "deeplink_base_url");
         contextMap.put("deeplinkBasepath", deeplinkBasePath != null ? deeplinkBasePath + "://" : "ekstep://");
 
-        correlationDataList.addAll(createHierarchyInfocDataList(content.getHierarchyInfo()));
+//        correlationDataList.addAll(createHierarchyInfocDataList(content.getHierarchyInfo()));
         contextMap.put("cdata", correlationDataList);
 
         bundleMap.put("context", contextMap);
@@ -141,6 +143,8 @@ public class ContentPlayer {
             bundleMap.put("config", configMap);
         }
 
+        Rollup rollup1 = TelemetryHandler.getRollup(content.getIdentifier(), content.getHierarchyInfo());
+        content.setRollup(rollup1);
         bundleMap.put("metadata", content);
         Map<String, Object> appContext = new HashMap<>();
         appContext.put("local", true);
