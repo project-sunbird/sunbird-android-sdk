@@ -11,9 +11,11 @@ import org.ekstep.genieproviders.IUriHandler;
 import org.ekstep.genieproviders.util.Constants;
 import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.bean.GenericEvent;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
+import org.ekstep.genieservices.eventbus.EventBus;
 
 import java.util.Locale;
 
@@ -40,6 +42,7 @@ public class SetUserUriHandler implements IUriHandler {
         if (genieService != null && selection != null) {
             Logger.i(TAG, "User Id - " + selection);
             cursor = getMatrixCursor();
+            EventBus.postEvent(new GenericEvent("logout"));
             GenieResponse genieResponse = genieService.getUserService().setCurrentUser(selection);
 
             if (genieResponse != null) {
