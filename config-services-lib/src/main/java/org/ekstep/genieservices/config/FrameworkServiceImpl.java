@@ -128,7 +128,6 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         params.put("request", GsonUtil.toJson(frameworkDetailsRequest));
         params.put("logLevel", "2");
 
-        GenieResponse<Framework> response;
         String responseBody = null;
 
         String frameworkId;
@@ -140,47 +139,41 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
 
         String expirationKey = FrameworkConstants.PreferenceKey.FRAMEWORK_DETAILS_API_EXPIRATION_KEY + "-" + frameworkId;
         long expirationTime = getLongFromKeyValueStore(expirationKey);
+
         if (expirationTime == 0) {
-            if (frameworkDetailsRequest.isDefaultFrameworkDetails()) {  //  && !frameworkDetailsRequest.isRefreshFrameworkDetails()
+            if (frameworkDetailsRequest.isDefaultFrameworkDetails()) {
                 responseBody = FileUtil.readFileFromClasspath(FrameworkConstants.ResourceFile.FRAMEWORK_DETAILS_JSON_FILE);
             } else {
                 GenieResponse frameworkDetailsAPIResponse = getFrameworkDetailsFromServer(frameworkId);
                 if (frameworkDetailsAPIResponse.getStatus()) {
-                    responseBody = frameworkDetailsAPIResponse.getResult().toString();
-                } else {
-                    List<String> errorMessages = frameworkDetailsAPIResponse.getErrorMessages();
-                    String errorMessage = null;
-                    if (!CollectionUtil.isNullOrEmpty(errorMessages)) {
-                        errorMessage = errorMessages.get(0);
-                    }
-                    response = GenieResponseBuilder.getErrorResponse(frameworkDetailsAPIResponse.getError(), errorMessage, TAG);
-                    TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
-
-                    return response;
+                    String responseBodyFromNetwork = frameworkDetailsAPIResponse.getResult().toString();
+                    responseBody = responseBodyFromNetwork;
+                    saveExpirationTime(responseBodyFromNetwork);
                 }
-            }
-        } else if (hasExpired(expirationTime)) {
-            GenieResponse frameworkDetailsAPIResponse = getFrameworkDetailsFromServer(frameworkId);
-            if (frameworkDetailsAPIResponse.getStatus()) {
-                responseBody = frameworkDetailsAPIResponse.getResult().toString();
-            } else {
-                List<String> errorMessages = frameworkDetailsAPIResponse.getErrorMessages();
-                String errorMessage = null;
-                if (!CollectionUtil.isNullOrEmpty(errorMessages)) {
-                    errorMessage = errorMessages.get(0);
-                }
-                response = GenieResponseBuilder.getErrorResponse(frameworkDetailsAPIResponse.getError(), errorMessage, TAG);
-                TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
-
-                return response;
             }
         } else {
-            NoSqlModel frameworkDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), DB_KEY_FRAMEWORK_DETAILS + frameworkId);
+            NoSqlModel frameworkDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(),
+                    DB_KEY_FRAMEWORK_DETAILS + frameworkId);
             if (frameworkDetailsInDb != null) {
                 responseBody = frameworkDetailsInDb.getValue();
             }
+            if (mAppContext.getConnectionInfo().isConnected()
+                    && hasExpired(expirationTime)) {
+                GenieResponse frameworkDetailsAPIResponse = getFrameworkDetailsFromServer(frameworkId);
+                if (frameworkDetailsAPIResponse.getStatus()) {
+                    String responseBodyFromNetwork = frameworkDetailsAPIResponse.getResult().toString();
+                    saveExpirationTime(responseBodyFromNetwork);
+                }
+            }
         }
 
+        return prepareGenieResponse(responseBody, methodName, params);
+    }
+
+    private GenieResponse<Framework> prepareGenieResponse(String responseBody,
+                                                          String methodName,
+                                                          Map<String, Object> params) {
+        GenieResponse<Framework> response;
         if (responseBody != null) {
             Framework frameworkDetails = new Framework(responseBody);
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
@@ -191,7 +184,6 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_FRAMEWORK_DETAILS);
 
         }
-
         return response;
     }
 
@@ -235,12 +227,8 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         LinkedTreeMap map = GsonUtil.fromJson(responseBody, LinkedTreeMap.class);
         Map resultMap = ((LinkedTreeMap) map.get("result"));
         if (resultMap != null) {
-            Double ttl = (Double) resultMap.get("ttl");
             LinkedTreeMap frameworkMap = (LinkedTreeMap) resultMap.get("framework");
             String frameworkId = (String) frameworkMap.get("identifier");
-
-            String expirationKey = FrameworkConstants.PreferenceKey.FRAMEWORK_DETAILS_API_EXPIRATION_KEY + "-" + frameworkId;
-            saveDataExpirationTime(ttl, expirationKey);
             String key = DB_KEY_FRAMEWORK_DETAILS + frameworkId;
             NoSqlModel frameworkDetails = NoSqlModel.build(mAppContext.getDBSession(), key, responseBody);
             NoSqlModel frameworkDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
@@ -252,6 +240,19 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         }
 
         return GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+    }
+
+    private void saveExpirationTime(String responseBody) {
+        LinkedTreeMap map = GsonUtil.fromJson(responseBody, LinkedTreeMap.class);
+        Map resultMap = ((LinkedTreeMap) map.get("result"));
+        if (resultMap != null) {
+            Double ttl = (Double) resultMap.get("ttl");
+            LinkedTreeMap frameworkMap = (LinkedTreeMap) resultMap.get("framework");
+            String frameworkId = (String) frameworkMap.get("identifier");
+
+            String expirationKey = FrameworkConstants.PreferenceKey.FRAMEWORK_DETAILS_API_EXPIRATION_KEY + "-" + frameworkId;
+            saveDataExpirationTime(ttl, expirationKey);
+        }
     }
 
 }
