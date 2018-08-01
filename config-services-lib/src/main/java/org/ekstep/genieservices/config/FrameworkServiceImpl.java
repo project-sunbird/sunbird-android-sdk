@@ -140,10 +140,26 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         String expirationKey = FrameworkConstants.PreferenceKey.FRAMEWORK_DETAILS_API_EXPIRATION_KEY + "-" + frameworkId;
         long expirationTime = getLongFromKeyValueStore(expirationKey);
 
+        NoSqlModel frameworkDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(),
+                DB_KEY_FRAMEWORK_DETAILS + frameworkId);
+
+        //no expiration time in shared preferences
         if (expirationTime == 0) {
+
+            //return default framework
             if (frameworkDetailsRequest.isDefaultFrameworkDetails()) {
                 responseBody = FileUtil.readFileFromClasspath(FrameworkConstants.ResourceFile.FRAMEWORK_DETAILS_JSON_FILE);
-            } else {
+            }
+
+            //this framework is imported
+            else if (frameworkDetailsInDb != null) {
+                String key = DB_KEY_FRAMEWORK_DETAILS + frameworkId;
+                saveDataExpirationTime(DEFAULT_TTL, key);
+                responseBody = frameworkDetailsInDb.getValue();
+            }
+
+            //make api call to fetch other than default
+            else {
                 GenieResponse frameworkDetailsAPIResponse = getFrameworkDetailsFromServer(frameworkId);
                 if (frameworkDetailsAPIResponse.getStatus()) {
                     String responseBodyFromNetwork = frameworkDetailsAPIResponse.getResult().toString();
@@ -152,11 +168,14 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
                 }
             }
         } else {
-            NoSqlModel frameworkDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(),
-                    DB_KEY_FRAMEWORK_DETAILS + frameworkId);
+
+            //get from db including default
             if (frameworkDetailsInDb != null) {
                 responseBody = frameworkDetailsInDb.getValue();
             }
+
+            //make a silent call to update in db only if network in available
+            // and the ttl is expired
             if (mAppContext.getConnectionInfo().isConnected()
                     && hasExpired(expirationTime)) {
                 GenieResponse frameworkDetailsAPIResponse = getFrameworkDetailsFromServer(frameworkId);
