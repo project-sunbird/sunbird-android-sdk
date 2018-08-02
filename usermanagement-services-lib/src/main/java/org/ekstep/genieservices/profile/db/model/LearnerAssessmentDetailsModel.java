@@ -48,7 +48,7 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
     private List<LearnerAssessmentDetails> mAssessmentList;
     private String filter;
     private List<Map<String, Object>> reportsMapList;
-    private Map<Integer, Integer> accuracyMap;
+    private Map<Double, Integer> accuracyMap;
     private int forReports = 1;
 
 
@@ -204,7 +204,7 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
     }
 
     private void readAccuracyReportCursorData(IResultSet cursor) {
-        int qIndex = cursor.getInt(0);
+        double qIndex = cursor.getDouble(0);
         int correct_count = cursor.getInt(1);
 
         accuracyMap.put(qIndex, correct_count);
@@ -451,7 +451,7 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
         return reportsMapList;
     }
 
-    public Map<Integer, Integer> getAccuracyReportMap() {
+    public Map<Double, Integer> getAccuracyReportMap() {
         if (accuracyMap == null) {
             accuracyMap = new HashMap<>();
         }
