@@ -28,6 +28,8 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
     public static final int FOR_SUMMARIZER = 1;
     public static final int FOR_QUESTIONS_REPORT = 2;
     public static final int FOR_QUESTION_DETAILS = 3;
+    public static final int FOR_ACCURACY_REPORT = 4;
+
     private Long id = -1L;
     private String uid;
     private String contentId;
@@ -45,7 +47,8 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
     private IDBSession dbSession;
     private List<LearnerAssessmentDetails> mAssessmentList;
     private String filter;
-    private List<Map<String, Object>> reportsMap;
+    private List<Map<String, Object>> reportsMapList;
+    private Map<Integer, Integer> accuracyMap;
     private int forReports = 1;
 
 
@@ -73,7 +76,12 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
     }
 
     public LearnerAssessmentDetailsModel(IDBSession dbSession, int forReports) {
-        reportsMap = new ArrayList<>();
+        if (forReports == FOR_ACCURACY_REPORT) {
+            accuracyMap = new HashMap<>();
+        } else {
+            reportsMapList = new ArrayList<>();
+        }
+
         this.dbSession = dbSession;
         this.forReports = forReports;
     }
@@ -93,6 +101,12 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
         }
     }
 
+    public static LearnerAssessmentDetailsModel findForQuestionAccuracy(IDBSession dbSession, String contentId, List<String> uids, int forReports) {
+        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = new LearnerAssessmentDetailsModel(dbSession, forReports);
+        dbSession.read(learnerAssessmentDetailsModel, getAccuracyReportsQuery(uids, contentId));
+        return learnerAssessmentDetailsModel;
+    }
+
     public static LearnerAssessmentDetailsModel findQuestionsReportSummary(IDBSession dbSession, String contentId, List<String> uids, int forReports) {
         LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = new LearnerAssessmentDetailsModel(dbSession, forReports);
         dbSession.read(learnerAssessmentDetailsModel, getQuestionReportsQuery(uids, contentId));
@@ -103,6 +117,24 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
         LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = new LearnerAssessmentDetailsModel(dbSession, forReports);
         dbSession.read(learnerAssessmentDetailsModel, getQuestionDetailsQuery(uids, contentId, qId));
         return learnerAssessmentDetailsModel;
+    }
+
+    private static String getAccuracyReportsQuery(List<String> uids, String contentId) {
+
+        String query = String.format(Locale.US, "SELECT %s, count(*) as users_count " +
+                        "FROM  %s " +
+                        "WHERE %s IN(%s) AND %s = '%s' AND %s > 0 " +
+                        "group by %s;",
+                LearnerAssessmentsEntry.COLUMN_NAME_Q_INDEX,
+                LearnerAssessmentsEntry.TABLE_NAME,
+                LearnerAssessmentsEntry.COLUMN_NAME_UID,
+                StringUtil.join(",", uids),
+                LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID,
+                contentId,
+                LearnerAssessmentsEntry.COLUMN_NAME_CORRECT,
+                LearnerAssessmentsEntry.COLUMN_NAME_QID);
+
+        return query;
     }
 
     private static String getQuestionDetailsQuery(List<String> uids, String contentId, String qId) {
@@ -154,11 +186,14 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
                         break;
                     case FOR_QUESTIONS_REPORT:
                         Map<String, Object> questionsReport = readQuestionsReportsCursorData(resultSet);
-                        reportsMap.add(questionsReport);
+                        reportsMapList.add(questionsReport);
                         break;
                     case FOR_QUESTION_DETAILS:
                         Map<String, Object> questionDetailReport = readQuestionDetailReportsCursorData(resultSet);
-                        reportsMap.add(questionDetailReport);
+                        reportsMapList.add(questionDetailReport);
+                        break;
+                    case FOR_ACCURACY_REPORT:
+                        readAccuracyReportCursorData(resultSet);
                         break;
 
                 }
@@ -166,6 +201,13 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
         }
 
         return this;
+    }
+
+    private void readAccuracyReportCursorData(IResultSet cursor) {
+        int qIndex = cursor.getInt(0);
+        int correct_count = cursor.getInt(1);
+
+        accuracyMap.put(qIndex, correct_count);
     }
 
     private Map<String, Object> readQuestionDetailReportsCursorData(IResultSet cursor) {
@@ -402,11 +444,18 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
         return mAssessmentList;
     }
 
-    public List<Map<String, Object>> getReportsMap() {
-        if (reportsMap == null) {
-            reportsMap = new ArrayList<>();
+    public List<Map<String, Object>> getReportsMapList() {
+        if (reportsMapList == null) {
+            reportsMapList = new ArrayList<>();
         }
-        return reportsMap;
+        return reportsMapList;
+    }
+
+    public Map<Integer, Integer> getAccuracyReportMap() {
+        if (accuracyMap == null) {
+            accuracyMap = new HashMap<>();
+        }
+        return accuracyMap;
     }
 
 }

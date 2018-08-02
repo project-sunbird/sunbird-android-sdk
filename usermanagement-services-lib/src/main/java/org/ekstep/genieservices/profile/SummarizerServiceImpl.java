@@ -134,7 +134,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         if (learnerAssessmentDetailsModel == null) {
             response.setResult(new ArrayList<Map<String, Object>>());
         } else {
-            response.setResult(learnerAssessmentDetailsModel.getReportsMap());
+            response.setResult(learnerAssessmentDetailsModel.getReportsMapList());
         }
 
         return response;
@@ -162,7 +162,31 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         if (learnerAssessmentDetailsModel == null) {
             response.setResult(new ArrayList<Map<String, Object>>());
         } else {
-            response.setResult(learnerAssessmentDetailsModel.getReportsMap());
+            LearnerAssessmentDetailsModel learnerAssessmentDetailsModel1 = LearnerAssessmentDetailsModel.findForQuestionAccuracy(mAppContext.getDBSession(),
+                    summaryRequest.getContentId(), quotedUIds, LearnerAssessmentDetailsModel.FOR_ACCURACY_REPORT);
+
+            List<Map<String, Object>> questionReportMapList = learnerAssessmentDetailsModel.getReportsMapList();
+
+            if (learnerAssessmentDetailsModel1 == null) {
+                response.setResult(questionReportMapList);
+            } else {
+                Map<Integer, Integer> accuracyReport = learnerAssessmentDetailsModel1.getAccuracyReportMap();
+
+                if (accuracyReport == null) {
+                    response.setResult(questionReportMapList);
+                } else {
+
+                    for (Map<String, Object> questionReport : questionReportMapList) {
+                        int qIndex = (int) questionReport.get(LearnerAssessmentsEntry.COLUMN_NAME_Q_INDEX);
+
+                        if (accuracyReport.containsKey(qIndex)) {
+                            questionReport.put("correct_users_count", accuracyReport.get(qIndex));
+                        }
+                    }
+
+                    response.setResult(questionReportMapList);
+                }
+            }
         }
 
         return response;
