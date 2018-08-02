@@ -177,7 +177,7 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
                 } else {
 
                     for (Map<String, Object> questionReport : questionReportMapList) {
-                        int qIndex = (int) questionReport.get(LearnerAssessmentsEntry.COLUMN_NAME_Q_INDEX);
+                        double qIndex = (double) questionReport.get(LearnerAssessmentsEntry.COLUMN_NAME_Q_INDEX);
 
                         if (accuracyReport.containsKey(qIndex)) {
                             questionReport.put("correct_users_count", accuracyReport.get(qIndex));
