@@ -101,7 +101,7 @@ public class GenieService {
             AppContext<Context> appContext = AndroidAppContext.buildAppContext(context, packageName);
             Logger.init(new AndroidLogger());
 
-            TelemetryLogger.init(new TelemetryServiceImpl(appContext, new UserServiceImpl(appContext), new GroupServiceImpl(appContext)));
+            TelemetryLogger.init(new TelemetryServiceImpl(appContext, new UserServiceImpl(appContext, new UserProfileServiceImpl(appContext, null)), new GroupServiceImpl(appContext)));
             //initializing event bus for Telemetry
             SummaryListener.init(appContext);
             sService = new GenieService(appContext);
@@ -148,7 +148,7 @@ public class GenieService {
      */
     public IUserService getUserService() {
         if (mUserService == null) {
-            mUserService = new UserServiceImpl(mAppContext);
+            mUserService = new UserServiceImpl(mAppContext, getUserProfileService());
         }
         return mUserService;
     }

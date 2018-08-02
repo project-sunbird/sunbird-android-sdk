@@ -1,6 +1,7 @@
 package org.ekstep.genieservices.profile;
 
 import org.ekstep.genieservices.BaseService;
+import org.ekstep.genieservices.IUserProfileService;
 import org.ekstep.genieservices.IUserService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
@@ -17,6 +18,8 @@ import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
 import org.ekstep.genieservices.commons.bean.ProfileImportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.bean.ProfileRequest;
+import org.ekstep.genieservices.commons.bean.UserProfile;
+import org.ekstep.genieservices.commons.bean.UserProfileDetailsRequest;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.enums.ContentAccessStatus;
 import org.ekstep.genieservices.commons.bean.enums.UserSource;
@@ -78,9 +81,11 @@ import java.util.UUID;
 public class UserServiceImpl extends BaseService implements IUserService {
 
     private static final String TAG = UserServiceImpl.class.getSimpleName();
+    private IUserProfileService mUserProfileService;
 
-    public UserServiceImpl(AppContext appContext) {
+    public UserServiceImpl(AppContext appContext, IUserProfileService userProfileService) {
         super(appContext);
+        this.mUserProfileService = userProfileService;
     }
 
     private static List<String> findProfilePropDiff(Profile firstInstance, Profile secondInstance) {
@@ -543,10 +548,24 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
         UserProfileModel userProfileModel = UserProfileModel.find(mAppContext.getDBSession(), userSessionModel.getUserSessionBean().getUid());
         Profile profile;
+
         if (userProfileModel == null) {
+
             profile = new Profile(userSessionModel.getUserSessionBean().getUid());
+
         } else {
             profile = userProfileModel.getProfile();
+        }
+
+
+        // This will add Logged in User information
+        UserProfileDetailsRequest.Builder builder = new UserProfileDetailsRequest.Builder().forUser(profile.getUid());
+        UserProfile userProfile = mUserProfileService.getUserProfileDetails(builder.build()).getResult();
+        if (userProfile != null) {
+            Map map = GsonUtil.fromJson(userProfile.getUserProfile(), Map.class);
+            String firstName = String.valueOf(map.get("firstName"));
+            String lastName = String.valueOf(map.get("lastName"));
+            profile.setHandle((!StringUtil.isNullOrEmpty(firstName) ? firstName : "") + " " + (!StringUtil.isNullOrEmpty(lastName) ? lastName : ""));
         }
 
         GenieResponse<Profile> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
