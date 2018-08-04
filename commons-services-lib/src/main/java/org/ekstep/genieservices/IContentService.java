@@ -29,6 +29,7 @@ import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.ScanStorageRequest;
 import org.ekstep.genieservices.commons.bean.ScanStorageResponse;
+import org.ekstep.genieservices.commons.bean.SummarizerContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.SunbirdContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.SunbirdContentSearchResult;
 import org.ekstep.genieservices.commons.bean.SwitchContentResponse;
@@ -364,4 +365,15 @@ public interface IContentService {
      * @return {@link GenieResponse<Void>}
      */
     GenieResponse<Void> flagContent(FlagContentRequest flagContentRequest);
+
+    /**
+     * This api is used to get all the contents.
+     * <p>
+     * <p>
+     * Response status will always be TRUE with {@link List<Content>} set in the result.
+     *
+     * @param criteria - {@link ContentFilterCriteria}
+     * @return {@link GenieResponse<List<Content>>}
+     */
+    GenieResponse<List<Content>> getLocalContents(SummarizerContentFilterCriteria criteria);
 }

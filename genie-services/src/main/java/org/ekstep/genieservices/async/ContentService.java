@@ -35,6 +35,7 @@ import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.ScanStorageRequest;
 import org.ekstep.genieservices.commons.bean.ScanStorageResponse;
+import org.ekstep.genieservices.commons.bean.SummarizerContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.SunbirdContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.SunbirdContentSearchResult;
 import org.ekstep.genieservices.commons.bean.SwitchContentResponse;
@@ -545,6 +546,25 @@ public class ContentService {
                 return contentService.flagContent(flagContentRequest);
             }
         });
+    }
+
+    /**
+     * This api is used to get all the contents.
+     * <p>
+     * <p>
+     * Response status will always be TRUE with {@link List<Content>} set in the result.
+     *
+     * @param criteria        - {@link ContentFilterCriteria}
+     * @param responseHandler - {@link IResponseHandler<List<Content>>}
+     */
+    public void getLocalContents(final SummarizerContentFilterCriteria criteria,
+                                 IResponseHandler<List<Content>> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<List<Content>>() {
+            @Override
+            public GenieResponse<List<Content>> perform() {
+                return contentService.getLocalContents(criteria);
+            }
+        }, responseHandler);
     }
 
 }

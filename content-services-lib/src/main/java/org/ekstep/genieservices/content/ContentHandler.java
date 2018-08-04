@@ -29,6 +29,7 @@ import org.ekstep.genieservices.commons.bean.MasterData;
 import org.ekstep.genieservices.commons.bean.MasterDataValues;
 import org.ekstep.genieservices.commons.bean.RecommendedContentRequest;
 import org.ekstep.genieservices.commons.bean.RelatedContentRequest;
+import org.ekstep.genieservices.commons.bean.SummarizerContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.SunbirdContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.UserSession;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
@@ -636,6 +637,65 @@ public class ContentHandler {
 
         List<ContentModel> contentModelListInDB;
         ContentsModel contentsModel = ContentsModel.find(dbSession, filter);
+        if (contentsModel != null) {
+            contentModelListInDB = contentsModel.getContentModelList();
+        } else {
+            contentModelListInDB = new ArrayList<>();
+        }
+
+        return contentModelListInDB;
+    }
+
+    public static List<ContentModel> getLocalContents(IDBSession dbSession, SummarizerContentFilterCriteria criteria) {
+        if (criteria == null) {
+            criteria = new SummarizerContentFilterCriteria.Builder().build();
+        }
+
+        List<String> uids = criteria.getUid();
+        String[] contentTypes = criteria.getContentTypes();
+        String contentTypesStr = StringUtil.join("','", contentTypes);
+
+
+        String contentTypeFilter = String.format(Locale.US, "c.%s in ('%s')", ContentEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr.toLowerCase());
+        String artifactAvailabilityFilter = String.format(Locale.US, "c.%s = '%s'", ContentEntry.COLUMN_NAME_CONTENT_STATE, ContentConstants.State.ARTIFACT_AVAILABLE);
+
+        String filter = String.format(Locale.US, " %s AND %s", artifactAvailabilityFilter, contentTypeFilter);
+
+
+        String whereClause = String.format(Locale.US, "WHERE (%s)", filter);
+
+        StringBuilder orderBy = new StringBuilder();
+        int i = 0;
+        for (ContentSortCriteria sortCriteria : criteria.getSortCriteria()) {
+            if (sortCriteria != null) {
+                if ("lastUsedOn".equals(sortCriteria.getSortAttribute()) && uids != null) {
+                    if (i > 0) {
+                        orderBy.append(",");
+                    } else {
+                        orderBy.append("ORDER BY");
+                    }
+                    orderBy.append(String.format(Locale.US, " ca.%s %s", ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP, sortCriteria.getSortOrder().getValue()));
+                    i++;
+                }
+            }
+        }
+
+        String query;
+        if (uids != null) {
+            query = String.format(Locale.US, "SELECT c.*, ca.%s FROM  %s c LEFT JOIN %s ca ON c.%s = ca.%s AND ca.%s IN (%s) %s %s;",
+                    ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP,
+                    ContentEntry.TABLE_NAME, ContentAccessEntry.TABLE_NAME,
+                    ContentEntry.COLUMN_NAME_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER,
+                    ContentAccessEntry.COLUMN_NAME_UID, StringUtil.getStringWithQuoteList(uids),
+                    whereClause, orderBy.toString());
+        } else {
+            query = String.format(Locale.US, "SELECT c.* FROM  %s c %s %s;",
+                    ContentEntry.TABLE_NAME,
+                    whereClause, orderBy.toString());
+        }
+
+        List<ContentModel> contentModelListInDB;
+        ContentsModel contentsModel = ContentsModel.findWithCustomQuery(dbSession, query);
         if (contentsModel != null) {
             contentModelListInDB = contentsModel.getContentModelList();
         } else {

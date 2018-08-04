@@ -47,6 +47,7 @@ import org.ekstep.genieservices.commons.bean.RelatedContentResult;
 import org.ekstep.genieservices.commons.bean.ScanStorageRequest;
 import org.ekstep.genieservices.commons.bean.ScanStorageResponse;
 import org.ekstep.genieservices.commons.bean.Session;
+import org.ekstep.genieservices.commons.bean.SummarizerContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.SunbirdContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.SunbirdContentSearchResult;
 import org.ekstep.genieservices.commons.bean.SwitchContentResponse;
@@ -235,6 +236,29 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             if (criteria != null && criteria.attachContentAccess()) {
                 c.setContentAccess(ContentHandler.getContentAccess(userService, c.getIdentifier(), criteria.getUid()));
             }
+            contentList.add(c);
+        }
+
+        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        response.setResult(contentList);
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        return response;
+    }
+
+    @Override
+    public GenieResponse<List<Content>> getLocalContents(SummarizerContentFilterCriteria criteria) {
+        String methodName = "getAllLocalContent@ContentServiceImpl";
+        Map<String, Object> params = new HashMap<>();
+        params.put("criteria", GsonUtil.toJson(criteria));
+        params.put("logLevel", "2");
+        GenieResponse<List<Content>> response;
+
+        List<ContentModel> contentModelListInDB = ContentHandler.getLocalContents(mAppContext.getDBSession(), criteria);
+
+        List<Content> contentList = new ArrayList<>();
+        for (ContentModel contentModel : contentModelListInDB) {
+            Content c = ContentHandler.convertContentModelToBean(contentModel);
+
             contentList.add(c);
         }
 
