@@ -103,8 +103,8 @@ public class SummarizerContentFilterCriteria {
             }
             if (CollectionUtil.isNullOrEmpty(sortCriteria)) {
                 sortCriteria = new ArrayList<>();
-                sortCriteria.add(new ContentSortCriteria("lastUsedOn", SortOrder.DESC));
-                sortCriteria.add(new ContentSortCriteria("localLastUpdatedOn", SortOrder.DESC));
+                sortCriteria.add(new ContentSortCriteria("lastUsedOn", SortOrder.ASC));
+                sortCriteria.add(new ContentSortCriteria("localLastUpdatedOn", SortOrder.ASC));
             }
             return new SummarizerContentFilterCriteria(uids, contentTypes,
                     attachFeedback, attachContentAccess, sortCriteria);
