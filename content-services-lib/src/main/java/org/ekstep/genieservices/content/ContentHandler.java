@@ -686,7 +686,7 @@ public class ContentHandler {
                     ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP,
                     ContentEntry.TABLE_NAME, ContentAccessEntry.TABLE_NAME,
                     ContentEntry.COLUMN_NAME_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER,
-                    ContentAccessEntry.COLUMN_NAME_UID, StringUtil.getStringWithQuoteList(uids),
+                    ContentAccessEntry.COLUMN_NAME_UID, StringUtil.join(",", StringUtil.getStringWithQuoteList(uids)),
                     whereClause, orderBy.toString());
         } else {
             query = String.format(Locale.US, "SELECT c.* FROM  %s c %s %s;",
