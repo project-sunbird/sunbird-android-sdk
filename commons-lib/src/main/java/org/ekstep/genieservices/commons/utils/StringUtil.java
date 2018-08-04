@@ -1,5 +1,8 @@
 package org.ekstep.genieservices.commons.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created on 18/4/17.
  *
@@ -71,5 +74,18 @@ public class StringUtil {
         }
 
         return null;
+    }
+
+    public static List<String> getStringWithQuoteList(List<String> collection) {
+        ArrayList<String> stringWithCommaList = new ArrayList<>();
+
+        if (!CollectionUtil.isNullOrEmpty(collection)) {
+            for (String s : collection) {
+                stringWithCommaList.add("'" + s + "'");
+
+            }
+        }
+
+        return stringWithCommaList;
     }
 }
