@@ -11,7 +11,6 @@ import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentLearnerState;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
-import org.ekstep.genieservices.commons.bean.Group;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
@@ -56,7 +55,6 @@ import org.ekstep.genieservices.profile.chained.imports.UpdateImportedProfileMet
 import org.ekstep.genieservices.profile.chained.imports.ValidateProfileMetadata;
 import org.ekstep.genieservices.profile.db.model.ContentAccessModel;
 import org.ekstep.genieservices.profile.db.model.ContentAccessesModel;
-import org.ekstep.genieservices.profile.db.model.GroupModel;
 import org.ekstep.genieservices.profile.db.model.GroupProfilesModel;
 import org.ekstep.genieservices.profile.db.model.UserModel;
 import org.ekstep.genieservices.profile.db.model.UserProfileModel;
@@ -67,6 +65,7 @@ import org.ekstep.genieservices.telemetry.TelemetryLogger;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -82,6 +81,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
     private static final String TAG = UserServiceImpl.class.getSimpleName();
     private IUserProfileService mUserProfileService;
+    public static final String DATE_FORMAT = "yyyyMMddhhmmss";
 
     public UserServiceImpl(AppContext appContext, IUserProfileService userProfileService) {
         super(appContext);
@@ -759,30 +759,30 @@ public class UserServiceImpl extends BaseService implements IUserService {
     }
 
     private String getEparFilePath(List<String> groupIds, List<String> userIds, File destinationFolder) {
-        String fileName = "profile." + ServiceConstants.FileExtension.PROFILE;
-        String groupName = null;
-        if (!CollectionUtil.isNullOrEmpty(groupIds)) {
-            GroupModel groupModel = GroupModel.findGroupById(mAppContext.getDBSession(), groupIds.get(0));
-            Group group = groupModel.getGroup();
-            groupName = group.getName();
-        }
-        UserProfileModel userProfileModel = UserProfileModel.find(mAppContext.getDBSession(), userIds.get(0));
-        if (userProfileModel != null) {
-            Profile firstProfile = userProfileModel.getProfile();
-            String profileName = firstProfile.getHandle();
-            String appendName = "";
-            if (!StringUtil.isNullOrEmpty(groupName)) {
-                appendName = String.format(Locale.US, "+%s", ((groupIds.size() - 1) + (userIds.size())));
-                fileName = String.format(Locale.US, "%s%s." + ServiceConstants.FileExtension.PROFILE, groupName, appendName);
-            } else {
-                if (userIds.size() > 1) {
-                    appendName = String.format(Locale.US, "+%s", (userIds.size() - 1));
-                }
-                fileName = String.format(Locale.US, "%s%s." + ServiceConstants.FileExtension.PROFILE, profileName, appendName);
-            }
-
-        }
-
+//        String fileName = "profile." + ServiceConstants.FileExtension.PROFILE;
+//        String groupName = null;
+//        if (!CollectionUtil.isNullOrEmpty(groupIds)) {
+//            GroupModel groupModel = GroupModel.findGroupById(mAppContext.getDBSession(), groupIds.get(0));
+//            Group group = groupModel.getGroup();
+//            groupName = group.getName();
+//        }
+//        UserProfileModel userProfileModel = UserProfileModel.find(mAppContext.getDBSession(), userIds.get(0));
+//        if (userProfileModel != null) {
+//            Profile firstProfile = userProfileModel.getProfile();
+//            String profileName = firstProfile.getHandle();
+//            String appendName = "";
+//            if (!StringUtil.isNullOrEmpty(groupName)) {
+//                appendName = String.format(Locale.US, "+%s", ((groupIds.size() - 1) + (userIds.size())));
+//                fileName = String.format(Locale.US, "%s%s." + ServiceConstants.FileExtension.PROFILE, groupName, appendName);
+//            } else {
+//                if (userIds.size() > 1) {
+//                    appendName = String.format(Locale.US, "+%s", (userIds.size() - 1));
+//                }
+//                fileName = String.format(Locale.US, "%s%s." + ServiceConstants.FileExtension.PROFILE, profileName, appendName);
+//            }
+//
+//        }
+        String fileName = "profiles_" + DateUtil.format(new Date().getTime(), DATE_FORMAT) + "." + ServiceConstants.FileExtension.PROFILE;
         File eparFile = FileUtil.getTempLocation(destinationFolder, fileName);
         if (eparFile.exists()) {
             try {
