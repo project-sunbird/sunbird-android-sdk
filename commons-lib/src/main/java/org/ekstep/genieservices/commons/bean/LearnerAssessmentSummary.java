@@ -13,6 +13,7 @@ public class LearnerAssessmentSummary implements Serializable {
     private int correctAnswers;
     private Double totalTimespent;
     private String hierarchyData;
+    private int totalMaxScore;
 
     public String getUid() {
         return uid;
@@ -60,5 +61,13 @@ public class LearnerAssessmentSummary implements Serializable {
 
     public void setHierarchyData(String hierarchyData) {
         this.hierarchyData = hierarchyData;
+    }
+
+    public int getTotalMaxScore() {
+        return totalMaxScore;
+    }
+
+    public void setTotalMaxScore(int totalMaxScore) {
+        this.totalMaxScore = totalMaxScore;
     }
 }
