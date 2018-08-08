@@ -27,8 +27,8 @@ public class TransportGroup implements IChainable<ProfileImportResponse, ImportP
     @Override
     public GenieResponse<ProfileImportResponse> execute(AppContext appContext, ImportProfileContext importContext) {
         IDBSession externalDBSession = appContext.getExternalDBSession(importContext.getSourceDBFilePath());
-        int imported = 0;
-        int failed = 0;
+        int imported = importContext != null ? importContext.getImported() : 0;
+        int failed = importContext != null ? importContext.getFailed() : 0;
 
         // Read from imported DB
         GroupsModel groupsModel = GroupsModel.find(externalDBSession);
