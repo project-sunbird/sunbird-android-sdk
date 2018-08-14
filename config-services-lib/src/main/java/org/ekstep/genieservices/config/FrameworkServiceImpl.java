@@ -14,7 +14,6 @@ import org.ekstep.genieservices.commons.bean.Framework;
 import org.ekstep.genieservices.commons.bean.FrameworkDetailsRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
-import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
 import org.ekstep.genieservices.commons.utils.FileUtil;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
@@ -24,7 +23,6 @@ import org.ekstep.genieservices.config.network.FrameworkDetailsAPI;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -140,15 +138,25 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         String expirationKey = FrameworkConstants.PreferenceKey.FRAMEWORK_DETAILS_API_EXPIRATION_KEY + "-" + frameworkId;
         long expirationTime = getLongFromKeyValueStore(expirationKey);
 
-        NoSqlModel frameworkDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(),
-                DB_KEY_FRAMEWORK_DETAILS + frameworkId);
+        NoSqlModel frameworkDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), DB_KEY_FRAMEWORK_DETAILS + frameworkId);
 
         //no expiration time in shared preferences
         if (expirationTime == 0) {
 
+            boolean callAPI = true;
             //return default framework
             if (frameworkDetailsRequest.isDefaultFrameworkDetails()) {
                 responseBody = FileUtil.readFileFromClasspath(FrameworkConstants.ResourceFile.FRAMEWORK_DETAILS_JSON_FILE);
+
+                LinkedTreeMap map = GsonUtil.fromJson(responseBody, LinkedTreeMap.class);
+                Map resultMap = ((LinkedTreeMap) map.get("result"));
+                if (resultMap != null) {
+                    LinkedTreeMap frameworkMap = (LinkedTreeMap) resultMap.get("framework");
+                    String defaultFrameworkId = (String) frameworkMap.get("identifier");
+                    if (defaultFrameworkId.equalsIgnoreCase(frameworkId)) {
+                        callAPI = false;
+                    }
+                }
             }
 
             //this framework is imported
@@ -156,10 +164,11 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
                 String key = DB_KEY_FRAMEWORK_DETAILS + frameworkId;
                 saveDataExpirationTime(DEFAULT_TTL, key);
                 responseBody = frameworkDetailsInDb.getValue();
+                callAPI = false;
             }
 
             //make api call to fetch other than default
-            else {
+            if (callAPI) {
                 GenieResponse frameworkDetailsAPIResponse = getFrameworkDetailsFromServer(frameworkId);
                 if (frameworkDetailsAPIResponse.getStatus()) {
                     String responseBodyFromNetwork = frameworkDetailsAPIResponse.getResult().toString();
@@ -176,11 +185,11 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
 
             //make a silent call to update in db only if network in available
             // and the ttl is expired
-            if (mAppContext.getConnectionInfo().isConnected()
-                    && hasExpired(expirationTime)) {
+            if (mAppContext.getConnectionInfo().isConnected() && hasExpired(expirationTime)) {
                 GenieResponse frameworkDetailsAPIResponse = getFrameworkDetailsFromServer(frameworkId);
                 if (frameworkDetailsAPIResponse.getStatus()) {
                     String responseBodyFromNetwork = frameworkDetailsAPIResponse.getResult().toString();
+                    responseBody = responseBodyFromNetwork;
                     saveExpirationTime(responseBodyFromNetwork);
                 }
             }
