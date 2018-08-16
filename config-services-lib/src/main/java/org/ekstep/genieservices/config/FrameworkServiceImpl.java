@@ -166,6 +166,10 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
             frameworkId = frameworkDetailsRequest.getFrameworkId();
         }
 
+        if (StringUtil.isNullOrEmpty(frameworkId)) {
+            return prepareGenieResponse(responseBody, methodName, params);
+        }
+
         String expirationKey = FrameworkConstants.PreferenceKey.FRAMEWORK_DETAILS_API_EXPIRATION_KEY + "-" + frameworkId;
         long expirationTime = getLongFromKeyValueStore(expirationKey);
 
@@ -238,8 +242,10 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
             response.setResult(frameworkDetails);
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         } else {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_FRAMEWORK_DETAILS_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_FRAMEWORK_DETAILS, TAG);
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_FRAMEWORK_DETAILS);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_FRAMEWORK_DETAILS_FOUND,
+                    ServiceConstants.ErrorMessage.UNABLE_TO_FIND_FRAMEWORK_DETAILS, TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params,
+                    ServiceConstants.ErrorMessage.UNABLE_TO_FIND_FRAMEWORK_DETAILS);
 
         }
         return response;
@@ -255,8 +261,12 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
                 .forChannel(mAppContext.getParams().getString(IParams.Key.CHANNEL_ID))
                 .build();
         GenieResponse<Channel> channelDetailsResponse = getChannelDetails(channelDetailsRequest);
-        Channel channelDetails = channelDetailsResponse.getResult();
-        return channelDetails.getDefaultFramework();
+        if (channelDetailsResponse.getStatus()) {
+            Channel channelDetails = channelDetailsResponse.getResult();
+            return channelDetails.getDefaultFramework();
+        } else {
+            return null;
+        }
     }
 
     private boolean hasExpired(long expirationTime) {
