@@ -434,8 +434,8 @@ public class ContentHandler {
                         existingContentModel.update();
 
 
-                        ContentData serverContentData = GsonUtil.fromJson(GsonUtil.toJson(contentData), ContentData.class);
-                        ContentData localContentData = GsonUtil.fromJson(GsonUtil.toJson(existingContentModel.getLocalData()), ContentData.class);
+                        ContentData serverContentData = GsonUtil.fromJson(contentDetailsAPIResponse.getResult().toString(), ContentData.class);
+                        ContentData localContentData = GsonUtil.fromJson(existingContentModel.getLocalData(), ContentData.class);
 
                         if (isUpdateAvailable(serverContentData, localContentData)) {
                             //Fire the event saying an update is available for the identifier
