@@ -22,6 +22,7 @@ import org.ekstep.genieservices.commons.bean.ContentListingSection;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchFilter;
 import org.ekstep.genieservices.commons.bean.ContentSortCriteria;
+import org.ekstep.genieservices.commons.bean.ContentUpdateAvailable;
 import org.ekstep.genieservices.commons.bean.FilterValue;
 import org.ekstep.genieservices.commons.bean.FlagContentRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -49,6 +50,7 @@ import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.db.model.ContentsModel;
 import org.ekstep.genieservices.content.network.ContentDetailsAPI;
 import org.ekstep.genieservices.content.network.ContentListingAPI;
+import org.ekstep.genieservices.eventbus.EventBus;
 
 import java.io.File;
 import java.io.IOException;
@@ -430,6 +432,15 @@ public class ContentHandler {
                         existingContentModel.setServerLastUpdatedOn(serverLastUpdatedOn(contentData));
                         existingContentModel.setAudience(readAudience(contentData));
                         existingContentModel.update();
+
+
+                        ContentData serverContentData = GsonUtil.fromJson(GsonUtil.toJson(contentData), ContentData.class);
+                        ContentData localContentData = GsonUtil.fromJson(GsonUtil.toJson(existingContentModel.getLocalData()), ContentData.class);
+
+                        if (isUpdateAvailable(serverContentData, localContentData)) {
+                            //Fire the event saying an update is available for the identifier
+                            EventBus.postEvent(new ContentUpdateAvailable(contentIdentifier));
+                        }
                     }
                 }
             }
