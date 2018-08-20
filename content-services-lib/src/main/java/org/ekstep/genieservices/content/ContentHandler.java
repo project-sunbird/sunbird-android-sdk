@@ -433,13 +433,15 @@ public class ContentHandler {
                         existingContentModel.setAudience(readAudience(contentData));
                         existingContentModel.update();
 
+                        if (!StringUtil.isNullOrEmpty(contentDetailsAPIResponse.getResult().toString()) &&
+                                !StringUtil.isNullOrEmpty(existingContentModel.getLocalData())) {
+                            ContentData serverContentData = GsonUtil.fromJson(GsonUtil.toJson(contentData), ContentData.class);
+                            ContentData localContentData = GsonUtil.fromJson(existingContentModel.getLocalData(), ContentData.class);
 
-                        ContentData serverContentData = GsonUtil.fromJson(contentDetailsAPIResponse.getResult().toString(), ContentData.class);
-                        ContentData localContentData = GsonUtil.fromJson(existingContentModel.getLocalData(), ContentData.class);
-
-                        if (isUpdateAvailable(serverContentData, localContentData)) {
-                            //Fire the event saying an update is available for the identifier
-                            EventBus.postEvent(new ContentUpdateAvailable(contentIdentifier));
+                            if (isUpdateAvailable(serverContentData, localContentData)) {
+                                //Fire the event saying an update is available for the identifier
+                                EventBus.postEvent(new ContentUpdateAvailable(contentIdentifier));
+                            }
                         }
                     }
                 }
