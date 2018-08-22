@@ -12,11 +12,14 @@ public class FrameworkDetailsRequest {
     private String frameworkId;
     private boolean refreshFrameworkDetails;
     private boolean defaultFrameworkDetails;
+    private String defaultFrameworkPath;
 
-    private FrameworkDetailsRequest(String frameworkId, boolean refreshFrameworkDetails, boolean defaultFrameworkDetails) {
+    private FrameworkDetailsRequest(String frameworkId, boolean refreshFrameworkDetails,
+                                    boolean defaultFrameworkDetails, String defaultFrameworkPath) {
         this.frameworkId = frameworkId;
         this.refreshFrameworkDetails = refreshFrameworkDetails;
         this.defaultFrameworkDetails = defaultFrameworkDetails;
+        this.defaultFrameworkPath = defaultFrameworkPath;
     }
 
     public String getFrameworkId() {
@@ -31,11 +34,16 @@ public class FrameworkDetailsRequest {
         return defaultFrameworkDetails;
     }
 
+    public String getDefaultFrameworkPath() {
+        return defaultFrameworkPath;
+    }
+
     public static class Builder {
 
         private String frameworkId;
         private boolean refreshFrameworkDetails;
         private boolean defaultFrameworkDetails;
+        private String defaultFrameworkPath;
 
         public Builder forFramework(String frameworkId) {
             if (StringUtil.isNullOrEmpty(frameworkId)) {
@@ -58,6 +66,15 @@ public class FrameworkDetailsRequest {
             return this;
         }
 
+        public Builder defaultFrameworkPath(String defaultFrameworkPath) {
+            if (StringUtil.isNullOrEmpty(defaultFrameworkPath)) {
+                throw new IllegalArgumentException("defaultFrameworkPath should not be null or empty.");
+            }
+
+            this.defaultFrameworkPath = defaultFrameworkPath;
+            return this;
+        }
+
         public FrameworkDetailsRequest build() {
             if (!defaultFrameworkDetails) {
                 if (StringUtil.isNullOrEmpty(frameworkId)) {
@@ -65,7 +82,8 @@ public class FrameworkDetailsRequest {
                 }
             }
 
-            return new FrameworkDetailsRequest(frameworkId, refreshFrameworkDetails, defaultFrameworkDetails);
+            return new FrameworkDetailsRequest(frameworkId, refreshFrameworkDetails,
+                    defaultFrameworkDetails, defaultFrameworkPath);
         }
     }
 }

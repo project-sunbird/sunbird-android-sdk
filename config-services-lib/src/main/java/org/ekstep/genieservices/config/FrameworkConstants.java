@@ -8,7 +8,6 @@ package org.ekstep.genieservices.config;
 public interface FrameworkConstants {
 
     interface ResourceFile {
-        String FRAMEWORK_DETAILS_JSON_FILE = "framework_details.json";
         String CHANNEL_DETAILS_JSON_FILE = "channel_details.json";
     }
 

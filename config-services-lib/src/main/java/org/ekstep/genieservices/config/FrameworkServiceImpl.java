@@ -107,8 +107,10 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
             response.setResult(channelDetails);
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         } else {
-            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_CHANNEL_DETAILS_FOUND, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_CHANNEL_DETAILS, TAG);
-            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, ServiceConstants.ErrorMessage.UNABLE_TO_FIND_CHANNEL_DETAILS);
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_CHANNEL_DETAILS_FOUND,
+                    ServiceConstants.ErrorMessage.UNABLE_TO_FIND_CHANNEL_DETAILS, TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params,
+                    ServiceConstants.ErrorMessage.UNABLE_TO_FIND_CHANNEL_DETAILS);
         }
         return response;
     }
@@ -126,6 +128,7 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
             String expirationKey = FrameworkConstants.PreferenceKey.CHANNEL_DETAILS_API_EXPIRATION_KEY + "-" + channelId;
             saveDataExpirationTime(ttl, expirationKey);
             String key = DB_KEY_CHANNEL_DETAILS + channelId;
+
             NoSqlModel channelDetails = NoSqlModel.build(mAppContext.getDBSession(), key, response);
             NoSqlModel channelDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
             if (channelDetailsInDb != null) {
@@ -181,7 +184,7 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
             boolean callAPI = true;
             //return default framework
             if (frameworkDetailsRequest.isDefaultFrameworkDetails()) {
-                responseBody = FileUtil.readFileFromClasspath(FrameworkConstants.ResourceFile.FRAMEWORK_DETAILS_JSON_FILE);
+                responseBody = FileUtil.readFileFromClasspath(frameworkDetailsRequest.getDefaultFrameworkPath());
 
                 LinkedTreeMap map = GsonUtil.fromJson(responseBody, LinkedTreeMap.class);
                 Map resultMap = ((LinkedTreeMap) map.get("result"));
@@ -232,9 +235,7 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         return prepareGenieResponse(responseBody, methodName, params);
     }
 
-    private GenieResponse<Framework> prepareGenieResponse(String responseBody,
-                                                          String methodName,
-                                                          Map<String, Object> params) {
+    private GenieResponse<Framework> prepareGenieResponse(String responseBody, String methodName, Map<String, Object> params) {
         GenieResponse<Framework> response;
         if (responseBody != null) {
             Framework frameworkDetails = new Framework(responseBody);
@@ -260,6 +261,7 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         ChannelDetailsRequest channelDetailsRequest = new ChannelDetailsRequest.Builder()
                 .forChannel(mAppContext.getParams().getString(IParams.Key.CHANNEL_ID))
                 .build();
+
         GenieResponse<Channel> channelDetailsResponse = getChannelDetails(channelDetailsRequest);
         if (channelDetailsResponse.getStatus()) {
             Channel channelDetails = channelDetailsResponse.getResult();
@@ -298,6 +300,7 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
             LinkedTreeMap frameworkMap = (LinkedTreeMap) resultMap.get("framework");
             String frameworkId = (String) frameworkMap.get("identifier");
             String key = DB_KEY_FRAMEWORK_DETAILS + frameworkId;
+
             NoSqlModel frameworkDetails = NoSqlModel.build(mAppContext.getDBSession(), key, responseBody);
             NoSqlModel frameworkDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
             if (frameworkDetailsInDb != null) {
