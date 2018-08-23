@@ -12,8 +12,8 @@
     "responseCode": "OK",
     "result": {
         "channel": {
-            "identifier": "505c7c48ac6dc1edc9b08f21db5a571d",
-            "code": "505c7c48ac6dc1edc9b08f21db5a571d",
+            "identifier": "b00bc992ef25f1a9a8d63291e20efc8d",
+            "code": "b00bc992ef25f1a9a8d63291e20efc8d",
             "consumerId": "0aa13c48-dda0-4259-9007-c795dacd7b9c",
             "appId": "ekstep_portal",
             "channel": "in.ekstep",
