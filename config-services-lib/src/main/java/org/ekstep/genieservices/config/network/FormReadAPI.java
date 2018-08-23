@@ -2,7 +2,6 @@ package org.ekstep.genieservices.config.network;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IParams;
-import org.ekstep.genieservices.commons.bean.FormRequest;
 import org.ekstep.genieservices.commons.network.SunbirdBaseAPI;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
@@ -20,16 +19,16 @@ public class FormReadAPI extends SunbirdBaseAPI {
 
     private static final String ENDPOINT = "form/read";
 
-    private FormRequest formRequest;
+    private Map<String, Object> requestMap;
 
-    public FormReadAPI(AppContext appContext, FormRequest formRequest) {
+    public FormReadAPI(AppContext appContext, Map<String, Object> requestMap) {
         super(appContext,
                 String.format(Locale.US, "%s/%s",
                         appContext.getParams().getString(IParams.Key.FORM_SERVICE_BASE_URL),
                         ENDPOINT),
                 TAG);
 
-        this.formRequest = formRequest;
+        this.requestMap = requestMap;
     }
 
     @Override
@@ -40,7 +39,7 @@ public class FormReadAPI extends SunbirdBaseAPI {
     @Override
     protected String createRequestData() {
         Map<String, Object> request = new HashMap<>();
-        request.put("request", formRequest);
+        request.put("request", requestMap);
         return GsonUtil.toJson(request);
     }
 }

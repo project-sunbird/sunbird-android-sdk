@@ -212,7 +212,7 @@ public class CleanupExportedFile implements IChainable<ProfileExportResponse, Ex
     }
 
     private void keepAllFrameworkAndChannel(IDBSession dbSession) {
-        String query = "SELECT *  FROM  no_sql WHERE key LIKE 'channel_details_key-%' OR key LIKE 'framework_details_key-%' OR key LIKE 'syllabusInfo-%' ;";
+        String query = "SELECT *  FROM  no_sql WHERE key LIKE 'channel_details_key-%' OR key LIKE 'framework_details_key-%' OR key LIKE 'form-%' ;";
 
         NoSqlModelListModel noSqlModelListModel = NoSqlModelListModel.findWithCustomQuery(dbSession, query);
 

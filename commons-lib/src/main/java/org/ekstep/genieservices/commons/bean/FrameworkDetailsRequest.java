@@ -82,6 +82,10 @@ public class FrameworkDetailsRequest {
                 }
             }
 
+            if (StringUtil.isNullOrEmpty(defaultFrameworkPath)) {
+                throw new IllegalStateException("defaultFrameworkPath required.");
+            }
+
             return new FrameworkDetailsRequest(frameworkId, refreshFrameworkDetails,
                     defaultFrameworkDetails, defaultFrameworkPath);
         }

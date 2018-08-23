@@ -12,13 +12,18 @@ public class FormRequest {
     private String action;
     private String rootOrgId;
     private String framework;
+    private String defaultFormPath;
+    private Double defaultTtl;  // In hours
 
-    private FormRequest(String type, String subType, String action, String rootOrgId, String framework) {
+    private FormRequest(String type, String subType, String action, String rootOrgId, String framework,
+                        String defaultFormPath, Double defaultTtl) {
         this.type = type;
         this.subType = subType;
         this.action = action;
         this.rootOrgId = rootOrgId;
         this.framework = framework;
+        this.defaultFormPath = defaultFormPath;
+        this.defaultTtl = defaultTtl;
     }
 
     public String getType() {
@@ -39,6 +44,14 @@ public class FormRequest {
 
     public String getFramework() {
         return framework;
+    }
+
+    public String getDefaultFormPath() {
+        return defaultFormPath;
+    }
+
+    public Double getDefaultTtl() {
+        return defaultTtl;
     }
 
     @Override
@@ -75,6 +88,12 @@ public class FormRequest {
         private String action;
         private String rootOrgId;
         private String framework;
+        private String defaultFormPath;
+        private Double defaultTtl;
+
+        public Builder() {
+            this.defaultTtl = 3d;
+        }
 
         public Builder type(String type) {
             if (StringUtil.isNullOrEmpty(type)) {
@@ -105,12 +124,24 @@ public class FormRequest {
             return this;
         }
 
-
         public Builder framework(String framework) {
             this.framework = framework;
             return this;
         }
 
+        public Builder defaultFormPath(String defaultFormPath) {
+            if (StringUtil.isNullOrEmpty(defaultFormPath)) {
+                throw new IllegalArgumentException("defaultFormPath should not be null or empty.");
+            }
+
+            this.defaultFormPath = defaultFormPath;
+            return this;
+        }
+
+        public Builder defaultTtl(Double defaultTtl) {
+            this.defaultTtl = defaultTtl;
+            return this;
+        }
 
         public FormRequest build() {
             if (StringUtil.isNullOrEmpty(type)) {
@@ -124,7 +155,12 @@ public class FormRequest {
             if (StringUtil.isNullOrEmpty(action)) {
                 throw new IllegalStateException("action required.");
             }
-            return new FormRequest(type, subType, action, rootOrgId, framework);
+
+            if (StringUtil.isNullOrEmpty(defaultFormPath)) {
+                throw new IllegalStateException("defaultFormPath required.");
+            }
+
+            return new FormRequest(type, subType, action, rootOrgId, framework, defaultFormPath, defaultTtl);
         }
     }
 }
