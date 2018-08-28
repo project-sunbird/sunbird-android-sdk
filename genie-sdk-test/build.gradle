@@ -1,0 +1,69 @@
+apply plugin: 'com.android.application'
+apply from: 'jacoco.gradle'
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.3"
+
+    defaultConfig {
+        applicationId "org.ekstep.geniesdktest"
+        minSdkVersion 16
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        buildConfigField 'String', 'TELEMETRY_BASE_URL', '"http://localhost:33456"'
+        buildConfigField 'String', 'LANGUAGE_PLATFORM_BASE_URL', '"https://qa.ekstep.in/api/language/v3"'
+        buildConfigField 'String', 'TERMS_BASE_URL', '"http://localhost:33456"'
+        buildConfigField 'String', 'CONFIG_BASE_URL', '"http://localhost:33456"'
+        buildConfigField 'String', 'SEARCH_BASE_URL', '"http://localhost:33456"'
+        buildConfigField 'String', 'CONTENT_LISTING_BASE_URL', '"http://localhost:33456"'
+        buildConfigField 'String', 'CONTENT_BASE_URL', '"http://localhost:33456"'
+        buildConfigField 'String', 'APIGATEWAY_BASE_URL', '"https://qa.ekstep.in/api/api-manager/v1"'
+        buildConfigField 'String', 'PRODUCER_ID', '"genie"'
+        buildConfigField 'String', 'CHANNEL_ID', '"in.ekstep"'
+        buildConfigField 'String', 'LOG_LEVEL', '"INFO"'
+        buildConfigField 'String', 'QUALIFIER', '"org.ekstep.genie.qa"'
+        buildConfigField 'String', 'PROFILE_CONFIG', '"org.ekstep.genie.base.ProfileConfig"'
+        buildConfigField 'String', 'PLAYER_CONFIG', '"org.ekstep.genie.util.geniesdk.PlayerConfig"'
+        buildConfigField 'String', 'MOBILE_APP_CONSUMER', '"mobile_device"'
+        buildConfigField 'String', 'MOBILE_APP_KEY', '"genie-6.4"'
+        buildConfigField 'String', 'MOBILE_APP_SECRET', '"2de97457fad846d5a60f7ac20773b6f4"'
+
+    }
+    dexOptions {
+        javaMaxHeapSize "8g"
+    }
+
+    buildTypes {
+        debug {
+            testCoverageEnabled true
+            multiDexEnabled true
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:23.4.0'
+    compile "com.google.android.gms:play-services-location:$rootProject.ext.playServiceVersion"
+    compile "com.google.code.gson:gson:$rootProject.ext.gsonVersion"
+    compile "joda-time:joda-time:$rootProject.ext.jodaTimeVersion"
+    compile "org.greenrobot:eventbus:$rootProject.ext.eventbusVersion"
+    compile 'com.facebook.stetho:stetho:1.5.0'
+    compile 'com.facebook.stetho:stetho-okhttp3:1.5.0'
+    androidTestCompile 'com.jayway.awaitility:awaitility:1.7.0'
+    compile 'com.android.support:multidex:1.0.1'
+    androidTestCompile 'com.squareup.okhttp3:mockwebserver:3.8.1',{
+        exclude group: 'com.squareup.okio', module: 'okio'
+        exclude group: 'com.squareup.okhttp3', module: 'okhttp'
+    }
+    testCompile 'junit:junit:4.12'
+}

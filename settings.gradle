@@ -1,0 +1,1 @@
+include ':commons-lib', ':commons-services-lib', ':config-services-lib', ':content-services-lib', ':genie-integration', ':genie-providers', ':genie-services', ':notification-services-lib', ':partner-services-lib', ':usermanagement-services-lib'

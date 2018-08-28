@@ -1,0 +1,258 @@
+{
+  "id":"ekstep.ekstep.config.ordinals.list",
+  "ver":"1.0",
+  "ts":"2016-07-07T06:47:33ZZ",
+  "params":{
+    "resmsgid":"1c6be95b-7bdb-4d07-908b-08d45d18d8f9",
+    "msgid":null,
+    "err":null,
+    "status":"successful",
+    "errmsg":null
+  },
+  "responseCode":"OK",
+  "result":{
+    "ordinals":{
+      "os":[
+        "All",
+        "Android",
+        "iOS",
+        "Windows"
+      ],
+      "visibility":[
+        "Default",
+        "Parent"
+      ],
+      "mimeType":[
+        "application/vnd.ekstep.ecml-archive",
+        "application/vnd.ekstep.html-archive",
+        "application/vnd.android.package-archive",
+        "application/vnd.ekstep.content-archive",
+        "application/vnd.ekstep.content-collection",
+        "application/octet-stream",
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/tiff",
+        "image/bmp",
+        "image/gif",
+        "image/svg+xml",
+        "video/avi",
+        "video/mpeg",
+        "video/quicktime",
+        "video/3gpp",
+        "video/mpeg",
+        "video/mp4",
+        "video/ogg",
+        "video/webm",
+        "audio/mp3",
+        "audio/mp4",
+        "audio/mpeg",
+        "audio/ogg",
+        "audio/webm",
+        "audio/x-wav"
+      ],
+      "mediaType":[
+        "content",
+        "collection",
+        "image",
+        "video",
+        "audio",
+        "voice",
+        "ecml",
+        "document",
+        "pdf",
+        "text",
+        "other"
+      ],
+      "idealScreenSize":[
+        "small",
+        "normal",
+        "large",
+        "xlarge",
+        "other"
+      ],
+      "idealScreenDensity":[
+        "ldpi",
+        "mdpi",
+        "hdpi",
+        "xhdpi",
+        "xxhdpi",
+        "xxxhdpi"
+      ],
+      "resources":[
+        "Speaker",
+        "Touch",
+        "Microphone",
+        "GPS",
+        "Motion Sensor",
+        "Compass"
+      ],
+      "license":[
+        "Against DRM license",
+        "Creative Commons Attribution (CC BY)",
+        "Creative Commons Attribution-ShareAlike (CC BY-SA)",
+        "Creative Commons Zero (CC0)",
+        "Free Art License",
+        "Open Audio License",
+        "Open Game License",
+        "Other"
+      ],
+      "language":[
+        "English",
+        "Hindi",
+        "Assamese",
+        "Bengali",
+        "Gujarati",
+        "Kannada",
+        "Malayalam",
+        "Marathi",
+        "Nepali",
+        "Oriya",
+        "Punjabi",
+        "Tamil",
+        "Telugu",
+        "Urdu",
+        "Other"
+      ],
+      "ageGroup":[
+        "<5",
+        "5-6",
+        "6-7",
+        "7-8",
+        "8-10",
+        ">10",
+        "Other"
+      ],
+      "gradeLevel":[
+        "Kindergarten",
+        "Grade 1",
+        "Grade 2",
+        "Grade 3",
+        "Grade 4",
+        "Grade 5",
+        "Other"
+      ],
+      "interactivityLevel":[
+        "High",
+        "Medium",
+        "Low"
+      ],
+      "curriculum":[
+        "NCERT",
+        "CBSE",
+        "ICSE",
+        "State Curriculum",
+        "Other"
+      ],
+      "contentType":[
+        "Story",
+        "Worksheet",
+        "Game",
+        "Simulation",
+        "Puzzle",
+        "Diagnostic",
+        "Collection",
+        "Asset",
+        "Template"
+      ],
+      "templateType":[
+        "story",
+        "worksheet",
+        "mcq",
+        "ftb",
+        "mtf",
+        "recognition",
+        "activity",
+        "widget",
+        "other"
+      ],
+      "genre":[
+        "Picture Books",
+        "Chapter Books",
+        "Flash Cards",
+        "Serial Books",
+        "Alphabet Books",
+        "Folktales",
+        "Fiction",
+        "Non-Fiction",
+        "Poems/Rhymes",
+        "Plays",
+        "Comics",
+        "Words"
+      ],
+      "theme":[
+        "History",
+        "Adventure",
+        "Mystery",
+        "Science",
+        "Nature",
+        "Art",
+        "Music",
+        "Funny",
+        "Family",
+        "Life Skills",
+        "Scary",
+        "School Stories",
+        "Holidays",
+        "Hobby",
+        "Geography",
+        "Rural",
+        "Urban"
+      ],
+      "scaffolding":[
+        "Tutorial",
+        "Help",
+        "Practice"
+      ],
+      "feedback":[
+        "Right/Wrong",
+        "Reflection",
+        "Guidance",
+        "Learn from Mistakes",
+        "Adaptive Feedback",
+        "Interrupts",
+        "Rich Feedback"
+      ],
+      "feedbackType":[
+        "Audio",
+        "Visual",
+        "Textual",
+        "Tactile"
+      ],
+      "teachingMode":[
+        "Abstract",
+        "Concrete",
+        "Pictorial"
+      ],
+      "skills":[
+        "Listening",
+        "Speaking",
+        "Reading",
+        "Writing",
+        "Touch",
+        "Gestures",
+        "Draw"
+      ],
+      "domain":[
+        "numeracy",
+        "literacy"
+      ],
+      "status":[
+        "Draft",
+        "Review",
+        "Redraft",
+        "Flagged",
+        "Live",
+        "Retired",
+        "Mock"
+      ],
+      "optStatus":[
+        "Pending",
+        "Processing",
+        "Error",
+        "Complete"
+      ]
+    },
+    "ttl":24.0
+  }
+}

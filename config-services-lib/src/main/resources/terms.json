@@ -1,0 +1,1274 @@
+{
+  "id": "listTerms_v3",
+  "ver": "2.0",
+  "ts": "2018-05-17T11:56:08ZZ",
+  "params": {
+    "resmsgid": "1b9a3460-6422-4aab-b4cf-0a78f756db4a",
+    "msgid": null,
+    "err": null,
+    "status": "successful",
+    "errmsg": null
+  },
+  "responseCode": "OK",
+  "result": {
+    "gradeLevel": {
+      "label": "Grade Level",
+      "value": "gradeLevel",
+      "language": "en",
+      "description": "Grade Level of the child",
+      "values": [
+        {
+          "label": "KG",
+          "value": "0",
+          "telemetry": "0",
+          "description": "",
+          "search": {
+            "filters": {
+              "gradeLevel": [
+                "KG"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Class 1",
+          "value": "1",
+          "telemetry": "1",
+          "description": "",
+          "search": {
+            "filters": {
+              "gradeLevel": [
+                "Class 1"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Class 2",
+          "value": "2",
+          "telemetry": "2",
+          "description": "",
+          "search": {
+            "filters": {
+              "gradeLevel": [
+                "Class 2"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Class 3",
+          "value": "3",
+          "telemetry": "3",
+          "description": "",
+          "search": {
+            "filters": {
+              "gradeLevel": [
+                "Class 3"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Class 4",
+          "value": "4",
+          "telemetry": "4",
+          "description": "",
+          "search": {
+            "filters": {
+              "gradeLevel": [
+                "Class 4"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Class 5",
+          "value": "5",
+          "telemetry": "5",
+          "description": "",
+          "search": {
+            "filters": {
+              "gradeLevel": [
+                "Class 5"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Class 6",
+          "value": "6",
+          "telemetry": "6",
+          "description": "",
+          "search": {
+            "filters": {
+              "gradeLevel": [
+                "Class 6"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Class 7",
+          "value": "7",
+          "telemetry": "7",
+          "description": "",
+          "search": {
+            "filters": {
+              "gradeLevel": [
+                "Class 7"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Class 8",
+          "value": "8",
+          "telemetry": "8",
+          "description": "",
+          "search": {
+            "filters": {
+              "gradeLevel": [
+                "Class 8"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Class 9",
+          "value": "9",
+          "telemetry": "9",
+          "description": "",
+          "search": {
+            "filters": {
+              "gradeLevel": [
+                "Class 9"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Class 10",
+          "value": "10",
+          "telemetry": "10",
+          "description": "",
+          "search": {
+            "filters": {
+              "gradeLevel": [
+                "Class 10"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Class 11",
+          "value": "11",
+          "telemetry": "11",
+          "description": "",
+          "search": {
+            "filters": {
+              "gradeLevel": [
+                "Class 11"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Class 12",
+          "value": "12",
+          "telemetry": "12",
+          "description": "",
+          "search": {
+            "filters": {
+              "gradeLevel": [
+                "Class 12"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Other",
+          "value": "-1",
+          "telemetry": "-1",
+          "description": "",
+          "search": {
+            "filters": {
+
+            }
+          }
+        }
+      ]
+    },
+    "audience": {
+      "label": "audience",
+      "value": "audience",
+      "language": "en",
+      "description": "Purpose of the content",
+      "values": [
+        {
+          "label": "Learner",
+          "value": "learner",
+          "telemetry": "learner",
+          "description": "",
+          "search": {
+            "filters": {
+              "audience": [
+                "learner"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Instructor",
+          "value": "instructor",
+          "telemetry": "instructor",
+          "description": "",
+          "search": {
+            "filters": {
+              "audience": [
+                "instructor"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "subject": {
+      "label": "Subject",
+      "value": "subject",
+      "language": "en",
+      "description": "Subject of the content",
+      "values": [
+        {
+          "label": "English",
+          "value": "English",
+          "telemetry": "English",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "English"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Hindi",
+          "value": "Hindi",
+          "telemetry": "Hindi",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Hindi"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Assamese",
+          "value": "Assamese",
+          "telemetry": "Assamese",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Assamese"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Bengali",
+          "value": "Bengali",
+          "telemetry": "Bengali",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Bengali"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Gujarati",
+          "value": "Gujarati",
+          "telemetry": "Gujarati",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Gujarati"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Kannada",
+          "value": "Kannada",
+          "telemetry": "Kannada",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Kannada"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Malayalam",
+          "value": "Malayalam",
+          "telemetry": "Malayalam",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Malayalam"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Marathi",
+          "value": "Marathi",
+          "telemetry": "Marathi",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Marathi"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Nepali",
+          "value": "Nepali",
+          "telemetry": "Nepali",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Nepali"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Odia",
+          "value": "Odia",
+          "telemetry": "Odia",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Odia"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Punjabi",
+          "value": "Punjabi",
+          "telemetry": "Punjabi",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Punjabi"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Tamil",
+          "value": "Tamil",
+          "telemetry": "Tamil",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Tamil"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Telugu",
+          "value": "Telugu",
+          "telemetry": "Telugu",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Telugu"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Urdu",
+          "value": "Urdu",
+          "telemetry": "Urdu",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Urdu"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Biology",
+          "value": "Biology",
+          "telemetry": "Biology",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Biology"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Chemistry",
+          "value": "Chemistry",
+          "telemetry": "Chemistry",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Chemistry"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Physics",
+          "value": "Physics",
+          "telemetry": "Physics",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Physics"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Mathematics",
+          "value": "Mathematics",
+          "telemetry": "Mathematics",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Mathematics"
+              ]
+            }
+          }
+        },
+        {
+          "label": "EvS",
+          "value": "EvS",
+          "telemetry": "EvS",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "EvS"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Geography",
+          "value": "Geography",
+          "telemetry": "Geography",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Geography"
+              ]
+            }
+          }
+        },
+        {
+          "label": "History",
+          "value": "History",
+          "telemetry": "History",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "History"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Political Science",
+          "value": "Political Science",
+          "telemetry": "Political Science",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Political Science"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Economics",
+          "value": "Economics",
+          "telemetry": "Economics",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Economics"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Sanskrit",
+          "value": "Sanskrit",
+          "telemetry": "Sanskrit",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Sanskrit"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "channel": {
+      "label": "Channel",
+      "value": "channel",
+      "language": "en",
+      "description": "List of partner channels",
+      "values": [
+        {
+          "label": "APSSDC",
+          "value": "AP_1",
+          "telemetry": "AP_1",
+          "description": "",
+          "search": {
+            "filters": {
+              "tags": [
+                "APSSDC"
+              ]
+            }
+          }
+        },
+        {
+          "label": "GPF",
+          "value": "GP_1",
+          "telemetry": "GP_1",
+          "description": "",
+          "search": {
+            "filters": {
+              "tags": [
+                "GPF"
+              ]
+            }
+          }
+        },
+        {
+          "label": "AKSHARA-ESL",
+          "value": "AKSHARA-ESL",
+          "telemetry": "AKSHARA-ESL",
+          "description": "",
+          "search": {
+            "filters": {
+              "tags": [
+                "AKSHARA-ESL"
+              ]
+            }
+          }
+        },
+        {
+          "label": "LFW",
+          "value": "LFW_1",
+          "telemetry": "LFW_1",
+          "description": "",
+          "search": {
+            "filters": {
+              "tags": [
+                "LFW"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "medium": {
+      "label": "Medium",
+      "value": "medium",
+      "language": "en",
+      "description": "Medium of instruction",
+      "values": [
+        {
+          "label": "English",
+          "value": "English",
+          "telemetry": "English",
+          "description": "",
+          "search": {
+            "filters": {
+              "medium": [
+                "English"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Hindi",
+          "value": "Hindi",
+          "telemetry": "Hindi",
+          "description": "",
+          "search": {
+            "filters": {
+              "medium": [
+                "Hindi"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Assamese",
+          "value": "Assamese",
+          "telemetry": "Assamese",
+          "description": "",
+          "search": {
+            "filters": {
+              "medium": [
+                "Assamese"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Bengali",
+          "value": "Bengali",
+          "telemetry": "Bengali",
+          "description": "",
+          "search": {
+            "filters": {
+              "medium": [
+                "Bengali"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Gujarati",
+          "value": "Gujarati",
+          "telemetry": "Gujarati",
+          "description": "",
+          "search": {
+            "filters": {
+              "medium": [
+                "Gujarati"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Kannada",
+          "value": "Kannada",
+          "telemetry": "Kannada",
+          "description": "",
+          "search": {
+            "filters": {
+              "medium": [
+                "Kannada"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Malayalam",
+          "value": "Malayalam",
+          "telemetry": "Malayalam",
+          "description": "",
+          "search": {
+            "filters": {
+              "subject": [
+                "Malayalam"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Marathi",
+          "value": "Marathi",
+          "telemetry": "Marathi",
+          "description": "",
+          "search": {
+            "filters": {
+              "medium": [
+                "Marathi"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Nepali",
+          "value": "Nepali",
+          "telemetry": "Nepali",
+          "description": "",
+          "search": {
+            "filters": {
+              "medium": [
+                "Nepali"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Odia",
+          "value": "Odia",
+          "telemetry": "Odia",
+          "description": "",
+          "search": {
+            "filters": {
+              "medium": [
+                "Odia"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Punjabi",
+          "value": "Punjabi",
+          "telemetry": "Punjabi",
+          "description": "",
+          "search": {
+            "filters": {
+              "medium": [
+                "Punjabi"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Tamil",
+          "value": "Tamil",
+          "telemetry": "Tamil",
+          "description": "",
+          "search": {
+            "filters": {
+              "medium": [
+                "Tamil"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Telugu",
+          "value": "Telugu",
+          "telemetry": "Telugu",
+          "description": "",
+          "search": {
+            "filters": {
+              "medium": [
+                "Telugu"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Urdu",
+          "value": "Urdu",
+          "telemetry": "Urdu",
+          "description": "",
+          "search": {
+            "filters": {
+              "medium": [
+                "Urdu"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Other",
+          "value": "Other",
+          "telemetry": "",
+          "description": "",
+          "search": {
+
+          }
+        }
+      ]
+    },
+    "ageGroup": {
+      "label": "Age Group",
+      "value": "ageGroup",
+      "language": "en",
+      "description": "Age Group of the child",
+      "values": [
+        {
+          "label": "<5 Years",
+          "value": "0",
+          "telemetry": "0",
+          "description": "",
+          "search": {
+            "filters": {
+              "ageGroup": [
+                "<5"
+              ]
+            }
+          }
+        },
+        {
+          "label": "5 Years",
+          "value": "5",
+          "telemetry": "5",
+          "description": "",
+          "search": {
+            "filters": {
+              "ageGroup": [
+                "5-6"
+              ]
+            }
+          }
+        },
+        {
+          "label": "6 Years",
+          "value": "6",
+          "telemetry": "6",
+          "description": "",
+          "search": {
+            "filters": {
+              "ageGroup": [
+                "6-7"
+              ]
+            }
+          }
+        },
+        {
+          "label": "7-8 Years",
+          "value": "7",
+          "telemetry": "7",
+          "description": "",
+          "search": {
+            "filters": {
+              "ageGroup": [
+                "7-8"
+              ]
+            }
+          }
+        },
+        {
+          "label": "8-10 Years",
+          "value": "8",
+          "telemetry": "8",
+          "description": "",
+          "search": {
+            "filters": {
+              "ageGroup": [
+                "8-10"
+              ]
+            }
+          }
+        },
+        {
+          "label": ">10 Years",
+          "value": "10",
+          "telemetry": "10",
+          "description": "",
+          "search": {
+            "filters": {
+              "ageGroup": [
+                ">10"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Others",
+          "value": "-1",
+          "telemetry": "-1",
+          "description": "",
+          "search": {
+            "filters": {
+
+            }
+          }
+        }
+      ]
+    },
+    "config": {
+      "label": "Genie config",
+      "value": "config",
+      "language": "en",
+      "description": "Genie configurations",
+      "values": [
+        {
+          "label": "facets",
+          "value": "contentType,domain,ageGroup,language,gradeLevel"
+        },
+        {
+          "label": "contentType",
+          "value": "Story,Worksheet,Game,Collection,TextBook,Resource"
+        },
+        {
+          "label": "exclPragma",
+          "value": "external,ads"
+        }
+      ]
+    },
+    "ttl": 24,
+    "board": {
+      "label": "Board",
+      "value": "board",
+      "language": "en",
+      "description": "Curriculum",
+      "values": [
+        {
+          "label": "NCERT",
+          "value": "NCERT",
+          "telemetry": "NCERT",
+          "description": "",
+          "search": {
+            "filters": {
+              "board": [
+                "NCERT"
+              ]
+            }
+          }
+        },
+        {
+          "label": "CBSE",
+          "value": "CBSE",
+          "telemetry": "CBSE",
+          "description": "",
+          "search": {
+            "filters": {
+              "board": [
+                "CBSE"
+              ]
+            }
+          }
+        },
+        {
+          "label": "ICSE",
+          "value": "ICSE",
+          "telemetry": "ICSE",
+          "description": "",
+          "search": {
+            "filters": {
+              "board": [
+                "ICSE"
+              ]
+            }
+          }
+        },
+        {
+          "label": "State (Uttar Pradesh)",
+          "value": "State (Uttar Pradesh)",
+          "telemetry": "State (Uttar Pradesh)",
+          "description": "",
+          "search": {
+            "filters": {
+              "board": [
+                "State (Uttar Pradesh)"
+              ]
+            }
+          }
+        },
+        {
+          "label": "State (Andhra Pradesh)",
+          "value": "State (Andhra Pradesh)",
+          "telemetry": "State (Andhra Pradesh)",
+          "description": "",
+          "search": {
+            "filters": {
+              "board": [
+                "State (Andhra Pradesh)"
+              ]
+            }
+          }
+        },
+        {
+          "label": "State (Tamil Nadu)",
+          "value": "State (Tamil Nadu)",
+          "telemetry": "State (Tamil Nadu)",
+          "description": "",
+          "search": {
+            "filters": {
+              "board": [
+                "State (Tamil Nadu)"
+              ]
+            }
+          }
+        },
+        {
+          "label": "NCTE",
+          "value": "NCTE",
+          "telemetry": "NCTE",
+          "description": "",
+          "search": {
+            "filters": {
+              "board": [
+                "NCTE"
+              ]
+            }
+          }
+        },
+        {
+          "label": "State (Maharashtra)",
+          "value": "State (Maharashtra)",
+          "telemetry": "State (Maharashtra)",
+          "description": "",
+          "search": {
+            "filters": {
+              "board": [
+                "State (Maharashtra)"
+              ]
+            }
+          }
+        },
+        {
+          "label": "State (Rajasthan)",
+          "value": "State (Rajasthan)",
+          "telemetry": "State (Rajasthan)",
+          "description": "",
+          "search": {
+            "filters": {
+              "board": [
+                "State (Rajasthan)"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Other",
+          "value": "Other",
+          "telemetry": "",
+          "description": "",
+          "search": {
+            "filters": {
+            }
+          }
+        }
+      ]
+    },
+    "age": {
+      "label": "Age",
+      "value": "age",
+      "language": "en",
+      "description": "Age list for user profiles",
+      "values": [
+        {
+          "label": "5 Years",
+          "value": "5",
+          "telemetry": "5",
+          "description": "",
+          "search": {
+            "filters": {
+              "ageGroup": [
+                "<5",
+                "5-6"
+              ]
+            }
+          }
+        },
+        {
+          "label": "6 Years",
+          "value": "6",
+          "telemetry": "6",
+          "description": "",
+          "search": {
+            "filters": {
+              "ageGroup": [
+                "5-6",
+                "6-7"
+              ]
+            }
+          }
+        },
+        {
+          "label": "7 Years",
+          "value": "7",
+          "telemetry": "7",
+          "description": "",
+          "search": {
+            "filters": {
+              "ageGroup": [
+                "6-7",
+                "7-8"
+              ]
+            }
+          }
+        },
+        {
+          "label": "8 Years",
+          "value": "8",
+          "telemetry": "8",
+          "description": "",
+          "search": {
+            "filters": {
+              "ageGroup": [
+                "7-8",
+                "8-10"
+              ]
+            }
+          }
+        },
+        {
+          "label": "9 Years",
+          "value": "9",
+          "telemetry": "9",
+          "description": "",
+          "search": {
+            "filters": {
+              "ageGroup": [
+                "8-10"
+              ]
+            }
+          }
+        },
+        {
+          "label": "10 Years",
+          "value": "10",
+          "telemetry": "10",
+          "description": "",
+          "search": {
+            "filters": {
+              "ageGroup": [
+                "8-10",
+                ">10"
+              ]
+            }
+          }
+        },
+        {
+          "label": "11 Years",
+          "value": "11",
+          "telemetry": "11",
+          "description": "",
+          "search": {
+            "filters": {
+              "ageGroup": [
+                ">10"
+              ]
+            }
+          }
+        },
+        {
+          "label": "12 Years",
+          "value": "12",
+          "telemetry": "12",
+          "description": "",
+          "search": {
+            "filters": {
+              "ageGroup": [
+                ">10"
+              ]
+            }
+          }
+        },
+        {
+          "label": "13 Years",
+          "value": "13",
+          "telemetry": "13",
+          "description": "",
+          "search": {
+            "filters": {
+              "ageGroup": [
+                ">10"
+              ]
+            }
+          }
+        },
+        {
+          "label": "14 Years",
+          "value": "14",
+          "telemetry": "14",
+          "description": "",
+          "search": {
+            "filters": {
+              "ageGroup": [
+                ">10"
+              ]
+            }
+          }
+        },
+        {
+          "label": "15 Years",
+          "value": "15",
+          "telemetry": "15",
+          "description": "",
+          "search": {
+            "filters": {
+              "ageGroup": [
+                ">10"
+              ]
+            }
+          }
+        },
+        {
+          "label": "16 Years",
+          "value": "16",
+          "telemetry": "16",
+          "description": "",
+          "search": {
+            "filters": {
+              "ageGroup": [
+                ">10"
+              ]
+            }
+          }
+        },
+        {
+          "label": "17 Years",
+          "value": "17",
+          "telemetry": "17",
+          "description": "",
+          "search": {
+            "filters": {
+              "ageGroup": [
+                ">10"
+              ]
+            }
+          }
+        },
+        {
+          "label": "18 Years",
+          "value": "18",
+          "telemetry": "18",
+          "description": "",
+          "search": {
+            "filters": {
+              "ageGroup": [
+                ">10"
+              ]
+            }
+          }
+        },
+        {
+          "label": "Other",
+          "value": "-1",
+          "telemetry": "-1",
+          "description": "",
+          "search": {
+            "filters": {
+            }
+          }
+        }
+      ]
+    }
+  }
+}
