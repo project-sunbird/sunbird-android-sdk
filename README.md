@@ -1,1 +1,1 @@
-# Genie-Sdk
+# Sunbird Android SDK
