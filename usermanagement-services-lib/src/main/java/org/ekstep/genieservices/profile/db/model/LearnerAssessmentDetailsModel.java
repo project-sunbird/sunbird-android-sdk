@@ -136,7 +136,7 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
         String query = String.format(Locale.US, "SELECT *, lcs.%s " +
                         " FROM  %s la " +
                         "LEFT JOIN %s lcs ON (la.%s = lcs.%s AND la.%s = lcs.%s) " +
-                        "where la.%s IN(%s) AND la.%s = '%s' GROUP BY la.%s;",
+                        "where la.%s IN(%s) AND la.%s = '%s';",
                 LearnerSummaryEntry.COLUMN_NAME_TOTAL_TS,
                 LearnerAssessmentsEntry.TABLE_NAME,
                 LearnerSummaryEntry.TABLE_NAME,
@@ -147,8 +147,7 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
                 LearnerAssessmentsEntry.COLUMN_NAME_UID,
                 StringUtil.join(",", quotedUIds),
                 LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID,
-                contentId,
-                LearnerAssessmentsEntry.COLUMN_NAME_UID);
+                contentId);
 
         return query;
     }
