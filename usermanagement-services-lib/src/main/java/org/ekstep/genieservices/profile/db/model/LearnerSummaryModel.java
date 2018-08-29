@@ -9,6 +9,7 @@ import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.util.Locale;
 
@@ -160,8 +161,16 @@ public class LearnerSummaryModel implements IReadable, IWritable, IUpdatable {
 
     @Override
     public String filterForRead() {
-        return String.format(Locale.US, "where %s = ? AND %s = ? AND %s = ? ", LearnerSummaryEntry.COLUMN_NAME_UID, LearnerSummaryEntry.COLUMN_NAME_CONTENT_ID,
-                LearnerSummaryEntry.COLUMN_NAME_HIERARCHY_DATA);
+        String filter;
+        if (StringUtil.isNullOrEmpty(this.hierarchyData)) {
+            filter = String.format(Locale.US, "where %s = ? AND %s = ? AND %s IS NULL ", LearnerSummaryEntry.COLUMN_NAME_UID, LearnerSummaryEntry.COLUMN_NAME_CONTENT_ID,
+                    LearnerSummaryEntry.COLUMN_NAME_HIERARCHY_DATA);
+        } else {
+            filter = String.format(Locale.US, "where %s = ? AND %s = ? AND %s = ? ", LearnerSummaryEntry.COLUMN_NAME_UID, LearnerSummaryEntry.COLUMN_NAME_CONTENT_ID,
+                    LearnerSummaryEntry.COLUMN_NAME_HIERARCHY_DATA);
+        }
+
+        return filter;
     }
 
     @Override
