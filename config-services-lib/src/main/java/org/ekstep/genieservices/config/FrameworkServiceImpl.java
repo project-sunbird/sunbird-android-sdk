@@ -59,26 +59,27 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
 
         if (channelDetailsInDb == null) {
             String responseBody = FileUtil.readFileFromClasspath(channelDetailsRequest.getFilePath());
-            GenieResponse channelDetailsAPIResponse;
+            GenieResponse channelDetailsAPIResponse = null;
             if (StringUtil.isNullOrEmpty(responseBody)) {
                 channelDetailsAPIResponse = getChannelDetailsFromServer(channelDetailsRequest.getChannelId());
                 if (channelDetailsAPIResponse.getStatus()) {
                     responseBody = channelDetailsAPIResponse.getResult().toString();
                 }
-
-                if (!StringUtil.isNullOrEmpty(responseBody)) {
-                    saveChannelDetails(responseBody, channelDetailsRequest.getChannelId());
-                } else {
-                    List<String> errorMessages = channelDetailsAPIResponse.getErrorMessages();
-                    String errorMessage = null;
-                    if (!CollectionUtil.isNullOrEmpty(errorMessages)) {
-                        errorMessage = errorMessages.get(0);
-                    }
-                    response = GenieResponseBuilder.getErrorResponse(channelDetailsAPIResponse.getError(), errorMessage, TAG);
-                    TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
-                    return response;
-                }
             }
+
+            if (!StringUtil.isNullOrEmpty(responseBody)) {
+                saveChannelDetails(responseBody, channelDetailsRequest.getChannelId());
+            } else {
+                List<String> errorMessages = channelDetailsAPIResponse.getErrorMessages();
+                String errorMessage = null;
+                if (!CollectionUtil.isNullOrEmpty(errorMessages)) {
+                    errorMessage = errorMessages.get(0);
+                }
+                response = GenieResponseBuilder.getErrorResponse(channelDetailsAPIResponse.getError(), errorMessage, TAG);
+                TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
+                return response;
+            }
+
         } else if (hasExpired(expirationTime)) {
             refreshChannelDetails(channelDetailsRequest.getChannelId());
         }
