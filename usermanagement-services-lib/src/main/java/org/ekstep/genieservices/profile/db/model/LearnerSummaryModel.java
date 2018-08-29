@@ -145,12 +145,12 @@ public class LearnerSummaryModel implements IReadable, IWritable, IUpdatable {
     public String updateBy() {
         String filter;
         if (StringUtil.isNullOrEmpty(this.hierarchyData)) {
-            filter = String.format(Locale.US, "where %s = '%s' AND %s = '%s' AND %s IS NULL",
+            filter = String.format(Locale.US, "%s = '%s' AND %s = '%s' AND %s IS NULL",
                     LearnerSummaryEntry.COLUMN_NAME_UID, this.uid,
                     LearnerSummaryEntry.COLUMN_NAME_CONTENT_ID, this.contentId,
                     LearnerSummaryEntry.COLUMN_NAME_HIERARCHY_DATA);
         } else {
-            filter = String.format(Locale.US, "where %s = '%s' AND %s = '%s' AND %s = '%s'",
+            filter = String.format(Locale.US, "%s = '%s' AND %s = '%s' AND %s = '%s'",
                     LearnerSummaryEntry.COLUMN_NAME_UID, this.uid,
                     LearnerSummaryEntry.COLUMN_NAME_CONTENT_ID, this.contentId,
                     LearnerSummaryEntry.COLUMN_NAME_HIERARCHY_DATA, this.hierarchyData);
