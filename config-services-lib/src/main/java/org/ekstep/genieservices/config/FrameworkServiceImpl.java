@@ -7,7 +7,6 @@ import org.ekstep.genieservices.IFrameworkService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
-import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.bean.Channel;
 import org.ekstep.genieservices.commons.bean.ChannelDetailsRequest;
 import org.ekstep.genieservices.commons.bean.Framework;
@@ -169,7 +168,7 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
                 responseBody = frameworkDetailsInDb.getValue();
                 callAPI = false;
             } else {
-                responseBody = FileUtil.readFileFromClasspath(frameworkDetailsRequest.getDefaultFrameworkPath());
+                responseBody = FileUtil.readFileFromClasspath(frameworkDetailsRequest.getFilePath());
 
                 LinkedTreeMap map = GsonUtil.fromJson(responseBody, LinkedTreeMap.class);
                 Map resultMap = ((LinkedTreeMap) map.get("result"));
@@ -227,25 +226,6 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
                     ServiceConstants.ErrorMessage.UNABLE_TO_FIND_FRAMEWORK_DETAILS);
         }
         return response;
-    }
-
-    /**
-     * get default framework details
-     *
-     * @return
-     */
-    private String getDefaultFrameworkDetails() {
-        ChannelDetailsRequest channelDetailsRequest = new ChannelDetailsRequest.Builder()
-                .forChannel(mAppContext.getParams().getString(IParams.Key.CHANNEL_ID))
-                .build();
-
-        GenieResponse<Channel> channelDetailsResponse = getChannelDetails(channelDetailsRequest);
-        if (channelDetailsResponse.getStatus()) {
-            Channel channelDetails = channelDetailsResponse.getResult();
-            return channelDetails.getDefaultFramework();
-        } else {
-            return null;
-        }
     }
 
     private boolean hasExpired(long expirationTime) {

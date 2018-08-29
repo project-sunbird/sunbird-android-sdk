@@ -11,13 +11,12 @@ public class FrameworkDetailsRequest {
 
     private String frameworkId;
     private boolean refreshFrameworkDetails;
-    private String defaultFrameworkPath;
+    private String filePath;
 
-    private FrameworkDetailsRequest(String frameworkId, boolean refreshFrameworkDetails,
-                                    String defaultFrameworkPath) {
+    private FrameworkDetailsRequest(String frameworkId, boolean refreshFrameworkDetails, String filePath) {
         this.frameworkId = frameworkId;
         this.refreshFrameworkDetails = refreshFrameworkDetails;
-        this.defaultFrameworkPath = defaultFrameworkPath;
+        this.filePath = filePath;
     }
 
     public String getFrameworkId() {
@@ -28,15 +27,15 @@ public class FrameworkDetailsRequest {
         return refreshFrameworkDetails;
     }
 
-    public String getDefaultFrameworkPath() {
-        return defaultFrameworkPath;
+    public String getFilePath() {
+        return filePath;
     }
 
     public static class Builder {
 
         private String frameworkId;
         private boolean refreshFrameworkDetails;
-        private String defaultFrameworkPath;
+        private String filePath;
 
         public Builder forFramework(String frameworkId) {
             if (StringUtil.isNullOrEmpty(frameworkId)) {
@@ -54,12 +53,12 @@ public class FrameworkDetailsRequest {
             return this;
         }
 
-        public Builder defaultFrameworkPath(String defaultFrameworkPath) {
-            if (StringUtil.isNullOrEmpty(defaultFrameworkPath)) {
-                throw new IllegalArgumentException("defaultFrameworkPath should not be null or empty.");
+        public Builder fromFilePath(String filePath) {
+            if (StringUtil.isNullOrEmpty(filePath)) {
+                throw new IllegalArgumentException("filePath should not be null or empty.");
             }
 
-            this.defaultFrameworkPath = defaultFrameworkPath;
+            this.filePath = filePath;
             return this;
         }
 
@@ -68,11 +67,11 @@ public class FrameworkDetailsRequest {
                 throw new IllegalStateException("frameworkId required.");
             }
 
-            if (StringUtil.isNullOrEmpty(defaultFrameworkPath)) {
-                throw new IllegalStateException("defaultFrameworkPath required.");
+            if (StringUtil.isNullOrEmpty(filePath)) {
+                throw new IllegalStateException("filePath required.");
             }
 
-            return new FrameworkDetailsRequest(frameworkId, refreshFrameworkDetails, defaultFrameworkPath);
+            return new FrameworkDetailsRequest(frameworkId, refreshFrameworkDetails, filePath);
         }
     }
 }
