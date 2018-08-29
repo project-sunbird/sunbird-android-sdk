@@ -283,9 +283,11 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
             learnerSummaryModel.save();
 
         } else {
-            if (learnerSummaryModelInDB.getTimespent() != null) {
+            if (learnerContentSummaryDetails.getTimespent() != null) {
                 learnerContentSummaryDetails.setSessions(learnerSummaryModelInDB.getSessions() + 1);
-                learnerContentSummaryDetails.setTotalts(learnerSummaryModelInDB.getTotalts() + learnerSummaryModelInDB.getTimespent());
+                //NOTE - We do not add the total time spent from previously stored value because we need to update only the latest value
+                //but not the cummulative added value
+                learnerContentSummaryDetails.setTotalts(learnerContentSummaryDetails.getTimespent());
                 learnerContentSummaryDetails.setAvgts(learnerSummaryModelInDB.getTotalts() / learnerSummaryModelInDB.getSessions());
                 learnerContentSummaryDetails.setLastUpdated(learnerSummaryModelInDB.getTimestamp());
                 //update with new details
