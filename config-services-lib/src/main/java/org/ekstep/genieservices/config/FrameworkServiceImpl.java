@@ -171,13 +171,15 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
             } else {
                 responseBody = FileUtil.readFileFromClasspath(frameworkDetailsRequest.getFilePath());
 
-                LinkedTreeMap map = GsonUtil.fromJson(responseBody, LinkedTreeMap.class);
-                Map resultMap = ((LinkedTreeMap) map.get("result"));
-                if (resultMap != null) {
-                    LinkedTreeMap frameworkMap = (LinkedTreeMap) resultMap.get("framework");
-                    String defaultFrameworkId = (String) frameworkMap.get("identifier");
-                    if (defaultFrameworkId.equalsIgnoreCase(frameworkDetailsRequest.getFrameworkId())) {
-                        callAPI = false;
+                if (StringUtil.isNullOrEmpty(responseBody)) {
+                    LinkedTreeMap map = GsonUtil.fromJson(responseBody, LinkedTreeMap.class);
+                    Map resultMap = ((LinkedTreeMap) map.get("result"));
+                    if (resultMap != null) {
+                        LinkedTreeMap frameworkMap = (LinkedTreeMap) resultMap.get("framework");
+                        String defaultFrameworkId = (String) frameworkMap.get("identifier");
+                        if (defaultFrameworkId.equalsIgnoreCase(frameworkDetailsRequest.getFrameworkId())) {
+                            callAPI = false;
+                        }
                     }
                 }
             }
