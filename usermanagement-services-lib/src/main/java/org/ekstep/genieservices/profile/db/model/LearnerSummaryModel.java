@@ -163,11 +163,15 @@ public class LearnerSummaryModel implements IReadable, IWritable, IUpdatable {
     public String filterForRead() {
         String filter;
         if (StringUtil.isNullOrEmpty(this.hierarchyData)) {
-            filter = String.format(Locale.US, "where %s = ? AND %s = ? AND %s IS NULL ", LearnerSummaryEntry.COLUMN_NAME_UID, LearnerSummaryEntry.COLUMN_NAME_CONTENT_ID,
+            filter = String.format(Locale.US, "where %s = '%s' AND %s = '%s' AND %s IS NULL",
+                    LearnerSummaryEntry.COLUMN_NAME_UID, this.uid,
+                    LearnerSummaryEntry.COLUMN_NAME_CONTENT_ID, this.contentId,
                     LearnerSummaryEntry.COLUMN_NAME_HIERARCHY_DATA);
         } else {
-            filter = String.format(Locale.US, "where %s = ? AND %s = ? AND %s = ? ", LearnerSummaryEntry.COLUMN_NAME_UID, LearnerSummaryEntry.COLUMN_NAME_CONTENT_ID,
-                    LearnerSummaryEntry.COLUMN_NAME_HIERARCHY_DATA);
+            filter = String.format(Locale.US, "where %s = '%s' AND %s = '%s' AND %s = '%s'",
+                    LearnerSummaryEntry.COLUMN_NAME_UID, this.uid,
+                    LearnerSummaryEntry.COLUMN_NAME_CONTENT_ID, this.contentId,
+                    LearnerSummaryEntry.COLUMN_NAME_HIERARCHY_DATA, this.hierarchyData);
         }
 
         return filter;
@@ -175,7 +179,7 @@ public class LearnerSummaryModel implements IReadable, IWritable, IUpdatable {
 
     @Override
     public String[] selectionArgsForFilter() {
-        return new String[]{this.uid, this.contentId, this.hierarchyData};
+        return null;
     }
 
     @Override
