@@ -59,25 +59,23 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
 
         if (channelDetailsInDb == null) {
             String responseBody = FileUtil.readFileFromClasspath(channelDetailsRequest.getFilePath());
+
             GenieResponse channelDetailsAPIResponse = null;
             if (StringUtil.isNullOrEmpty(responseBody)) {
                 channelDetailsAPIResponse = getChannelDetailsFromServer(channelDetailsRequest.getChannelId());
                 if (channelDetailsAPIResponse.getStatus()) {
                     responseBody = channelDetailsAPIResponse.getResult().toString();
+                    saveChannelDetails(responseBody, channelDetailsRequest.getChannelId());
+                } else {
+                    List<String> errorMessages = channelDetailsAPIResponse.getErrorMessages();
+                    String errorMessage = null;
+                    if (!CollectionUtil.isNullOrEmpty(errorMessages)) {
+                        errorMessage = errorMessages.get(0);
+                    }
+                    response = GenieResponseBuilder.getErrorResponse(channelDetailsAPIResponse.getError(), errorMessage, TAG);
+                    TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
+                    return response;
                 }
-            }
-
-            if (!StringUtil.isNullOrEmpty(responseBody)) {
-                saveChannelDetails(responseBody, channelDetailsRequest.getChannelId());
-            } else {
-                List<String> errorMessages = channelDetailsAPIResponse.getErrorMessages();
-                String errorMessage = null;
-                if (!CollectionUtil.isNullOrEmpty(errorMessages)) {
-                    errorMessage = errorMessages.get(0);
-                }
-                response = GenieResponseBuilder.getErrorResponse(channelDetailsAPIResponse.getError(), errorMessage, TAG);
-                TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
-                return response;
             }
 
         } else if (hasExpired(expirationTime)) {
@@ -151,7 +149,8 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         params.put("request", GsonUtil.toJson(frameworkDetailsRequest));
         params.put("logLevel", "2");
 
-        String responseBody = null;
+        GenieResponse<Framework> response;
+        String responseBody;
 
         String key = DB_KEY_FRAMEWORK_DETAILS + frameworkDetailsRequest.getFrameworkId();
         String expirationKey = FrameworkConstants.PreferenceKey.FRAMEWORK_DETAILS_API_EXPIRATION_KEY + "-" + frameworkDetailsRequest.getFrameworkId();
@@ -160,45 +159,30 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         NoSqlModel frameworkDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
 
         //no expiration time in shared preferences
-        if (expirationTime == 0) {
-            boolean callAPI = true;
+        if (frameworkDetailsInDb == null) {
+            responseBody = FileUtil.readFileFromClasspath(frameworkDetailsRequest.getFilePath());
 
-            //this framework is imported
-            if (frameworkDetailsInDb != null) {
-                saveDataExpirationTime(DEFAULT_TTL, expirationKey);
-                responseBody = frameworkDetailsInDb.getValue();
-                callAPI = false;
-            } else {
-                responseBody = FileUtil.readFileFromClasspath(frameworkDetailsRequest.getFilePath());
-
-                if (StringUtil.isNullOrEmpty(responseBody)) {
-                    LinkedTreeMap map = GsonUtil.fromJson(responseBody, LinkedTreeMap.class);
-                    Map resultMap = ((LinkedTreeMap) map.get("result"));
-                    if (resultMap != null) {
-                        LinkedTreeMap frameworkMap = (LinkedTreeMap) resultMap.get("framework");
-                        String defaultFrameworkId = (String) frameworkMap.get("identifier");
-                        if (defaultFrameworkId.equalsIgnoreCase(frameworkDetailsRequest.getFrameworkId())) {
-                            callAPI = false;
-                        }
-                    }
-                }
-            }
-
-            //make api call to fetch other than default
-            if (callAPI) {
-                GenieResponse frameworkDetailsAPIResponse = getFrameworkDetailsFromServer(frameworkDetailsRequest.getFrameworkId());
+            GenieResponse frameworkDetailsAPIResponse;
+            if (StringUtil.isNullOrEmpty(responseBody)) {
+                frameworkDetailsAPIResponse = getFrameworkDetailsFromServer(frameworkDetailsRequest.getFrameworkId());
                 if (frameworkDetailsAPIResponse.getStatus()) {
                     String responseBodyFromNetwork = frameworkDetailsAPIResponse.getResult().toString();
                     responseBody = responseBodyFromNetwork;
                     saveFrameworkExpirationTime(responseBodyFromNetwork);
+                } else {
+                    List<String> errorMessages = frameworkDetailsAPIResponse.getErrorMessages();
+                    String errorMessage = null;
+                    if (!CollectionUtil.isNullOrEmpty(errorMessages)) {
+                        errorMessage = errorMessages.get(0);
+                    }
+                    response = GenieResponseBuilder.getErrorResponse(frameworkDetailsAPIResponse.getError(), errorMessage, TAG);
+                    TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
+                    return response;
                 }
             }
         } else {
-
             //get from db including default
-            if (frameworkDetailsInDb != null) {
-                responseBody = frameworkDetailsInDb.getValue();
-            }
+            responseBody = frameworkDetailsInDb.getValue();
 
             //make a silent call to update in db only if network in available
             // and the ttl is expired
@@ -212,12 +196,7 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
             }
         }
 
-        return prepareGenieResponse(responseBody, methodName, params);
-    }
-
-    private GenieResponse<Framework> prepareGenieResponse(String responseBody, String methodName, Map<String, Object> params) {
-        GenieResponse<Framework> response;
-        if (responseBody != null) {
+        if (!StringUtil.isNullOrEmpty(responseBody)) {
             Framework frameworkDetails = new Framework(responseBody);
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
             response.setResult(frameworkDetails);
