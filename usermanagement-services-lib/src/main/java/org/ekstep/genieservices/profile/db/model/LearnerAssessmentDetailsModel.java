@@ -3,6 +3,7 @@ package org.ekstep.genieservices.profile.db.model;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentDetails;
 import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
+import org.ekstep.genieservices.commons.db.contract.LearnerSummaryEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
@@ -101,6 +102,17 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
         }
     }
 
+    public static LearnerAssessmentDetailsModel findDetailReport(IDBSession dbSession, List<String> quotedUIds, String contentId, int forDetailReport) {
+        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = new LearnerAssessmentDetailsModel(dbSession, forDetailReport);
+        dbSession.read(learnerAssessmentDetailsModel , getDetailReportsQuery(quotedUIds, contentId));
+
+        if (learnerAssessmentDetailsModel.mAssessmentList == null) {
+            return null;
+        } else {
+            return learnerAssessmentDetailsModel;
+        }
+    }
+
     public static LearnerAssessmentDetailsModel findForQuestionAccuracy(IDBSession dbSession, String contentId, List<String> uids, int forReports) {
         LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = new LearnerAssessmentDetailsModel(dbSession, forReports);
         dbSession.read(learnerAssessmentDetailsModel, getAccuracyReportsQuery(uids, contentId));
@@ -117,6 +129,28 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
         LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = new LearnerAssessmentDetailsModel(dbSession, forReports);
         dbSession.read(learnerAssessmentDetailsModel, getQuestionDetailsQuery(uids, contentId, qId));
         return learnerAssessmentDetailsModel;
+    }
+
+    private static String getDetailReportsQuery(List<String> quotedUIds, String contentId) {
+
+        String query = String.format(Locale.US, "SELECT *, lcs.%s " +
+                        " FROM  %s la " +
+                        "LEFT JOIN %s lcs ON (%s = %s AND %s = %s) " +
+                        "where la.%s IN(%s) AND la.%s = '%s' GROUP BY la.%s;",
+                LearnerSummaryEntry.COLUMN_NAME_TOTAL_TS,
+                LearnerAssessmentsEntry.TABLE_NAME,
+                LearnerSummaryEntry.TABLE_NAME,
+                LearnerSummaryEntry.COLUMN_NAME_UID,
+                LearnerAssessmentsEntry.COLUMN_NAME_UID,
+                LearnerSummaryEntry.COLUMN_NAME_CONTENT_ID,
+                LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID,
+                LearnerAssessmentsEntry.COLUMN_NAME_UID,
+                StringUtil.join(",", quotedUIds),
+                LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID,
+                contentId,
+                LearnerAssessmentsEntry.COLUMN_NAME_UID);
+
+        return query;
     }
 
     private static String getAccuracyReportsQuery(List<String> uids, String contentId) {
@@ -346,6 +380,10 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
 
         if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_MAX_SCORE) != -1) {
             learnerAssessmentDetails.setMaxScore(cursor.getDouble(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_MAX_SCORE)));
+        }
+
+        if (cursor.getColumnIndex(LearnerSummaryEntry.COLUMN_NAME_TOTAL_TS) != -1) {
+            learnerAssessmentDetails.setTotal_ts(cursor.getDouble(cursor.getColumnIndex(LearnerSummaryEntry.COLUMN_NAME_TOTAL_TS)));
         }
 
         return learnerAssessmentDetails;

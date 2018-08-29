@@ -69,9 +69,11 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         Map<String, Object> params = new HashMap<>();
         params.put("logLevel", "2");
 
-        String filter = getFilterForLearnerAssessmentDetails(null, summaryRequest.getUids(), summaryRequest.getContentId(), summaryRequest.getHierarchyData());
+        List<String> quotedUIds = getStringWithQuoteList(summaryRequest.getUids());
 
-        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.find(mAppContext.getDBSession(), filter);
+        String contentId = summaryRequest.getContentId();
+
+        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.findDetailReport(mAppContext.getDBSession(), quotedUIds, contentId, LearnerAssessmentDetailsModel.FOR_SUMMARIZER);
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         if (learnerAssessmentDetailsModel == null) {
             response.setResult(new ArrayList<LearnerAssessmentDetails>());

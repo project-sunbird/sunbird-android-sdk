@@ -2,6 +2,7 @@ package org.ekstep.genieservices.profile.db.model;
 
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentSummary;
 import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
+import org.ekstep.genieservices.commons.db.contract.LearnerSummaryEntry;
 import org.ekstep.genieservices.commons.db.contract.ProfileEntry;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
@@ -74,17 +75,23 @@ public class LearnerAssessmentSummaryModel implements IReadable {
     }
 
     private static String getUserReportsQuery(List<String> uids, String contentId) {
-        String query = String.format(Locale.US, "SELECT sum(%s),sum(%s),la.%s,la.%s,la.%s,p.%s" +
+        String query = String.format(Locale.US, "SELECT lcs.%s,sum(%s),la.%s,la.%s,la.%s,p.%s " +
                         " FROM  %s la " +
-                        "LEFT JOIN " +
-                        "%s p ON la.%s = p.%s where la.%s IN(%s) AND la.%s = '%s' GROUP BY la.%s;",
-                LearnerAssessmentsEntry.COLUMN_NAME_TIME_SPENT,
+                        "LEFT JOIN %s lcs ON (%s = %s AND %s = %s) " +
+                        "LEFT JOIN %s p ON la.%s = p.%s " +
+                        "where la.%s IN(%s) AND la.%s = '%s' GROUP BY la.%s;",
+                LearnerSummaryEntry.COLUMN_NAME_TOTAL_TS,
                 LearnerAssessmentsEntry.COLUMN_NAME_CORRECT,
                 LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA,
                 LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID,
                 LearnerAssessmentsEntry.COLUMN_NAME_UID,
                 ProfileEntry.COLUMN_NAME_HANDLE,
                 LearnerAssessmentsEntry.TABLE_NAME,
+                LearnerSummaryEntry.TABLE_NAME,
+                LearnerSummaryEntry.COLUMN_NAME_UID,
+                LearnerAssessmentsEntry.COLUMN_NAME_UID,
+                LearnerSummaryEntry.COLUMN_NAME_CONTENT_ID,
+                LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID,
                 ProfileEntry.TABLE_NAME,
                 LearnerAssessmentsEntry.COLUMN_NAME_UID,
                 ProfileEntry.COLUMN_NAME_UID,

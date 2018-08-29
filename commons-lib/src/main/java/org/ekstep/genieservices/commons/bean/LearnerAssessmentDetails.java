@@ -20,6 +20,7 @@ public class LearnerAssessmentDetails {
     private String qtitle;
     private Double maxScore;
     private String hierarchyData;
+    private Double total_ts;
 
     public Double getMaxScore() {
         return maxScore;
@@ -132,4 +133,14 @@ public class LearnerAssessmentDetails {
     public void setQtitle(String qtitle) {
         this.qtitle = qtitle;
     }
+
+    public Double getTotal_ts() {
+        return total_ts;
+    }
+
+    public void setTotal_ts(Double total_ts) {
+        this.total_ts = total_ts;
+    }
+
+
 }
