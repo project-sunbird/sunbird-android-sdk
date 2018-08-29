@@ -77,7 +77,7 @@ public class LearnerAssessmentSummaryModel implements IReadable {
     private static String getUserReportsQuery(List<String> uids, String contentId) {
         String query = String.format(Locale.US, "SELECT lcs.%s,sum(%s),la.%s,la.%s,la.%s,p.%s " +
                         " FROM  %s la " +
-                        "LEFT JOIN %s lcs ON (%s = %s AND %s = %s) " +
+                        "LEFT JOIN %s lcs ON (la.%s = lcs.%s AND la.%s = lcs.%s) " +
                         "LEFT JOIN %s p ON la.%s = p.%s " +
                         "where la.%s IN(%s) AND la.%s = '%s' GROUP BY la.%s;",
                 LearnerSummaryEntry.COLUMN_NAME_TOTAL_TS,

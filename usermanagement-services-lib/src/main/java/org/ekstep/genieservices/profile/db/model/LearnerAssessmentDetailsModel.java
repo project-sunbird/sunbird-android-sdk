@@ -135,7 +135,7 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
 
         String query = String.format(Locale.US, "SELECT *, lcs.%s " +
                         " FROM  %s la " +
-                        "LEFT JOIN %s lcs ON (%s = %s AND %s = %s) " +
+                        "LEFT JOIN %s lcs ON (la.%s = lcs.%s AND la.%s = lcs.%s) " +
                         "where la.%s IN(%s) AND la.%s = '%s' GROUP BY la.%s;",
                 LearnerSummaryEntry.COLUMN_NAME_TOTAL_TS,
                 LearnerAssessmentsEntry.TABLE_NAME,
