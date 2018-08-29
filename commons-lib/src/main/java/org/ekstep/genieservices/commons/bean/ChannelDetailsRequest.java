@@ -11,12 +11,12 @@ public class ChannelDetailsRequest {
 
     private String channelId;
     private boolean refreshChannelDetails;
-    private String defaultChannelPath;
+    private String filePath;
 
-    private ChannelDetailsRequest(String channelId, boolean refreshChannelDetails, String defaultChannelPath) {
+    private ChannelDetailsRequest(String channelId, boolean refreshChannelDetails, String filePath) {
         this.channelId = channelId;
         this.refreshChannelDetails = refreshChannelDetails;
-        this.defaultChannelPath = defaultChannelPath;
+        this.filePath = filePath;
     }
 
     public String getChannelId() {
@@ -27,15 +27,15 @@ public class ChannelDetailsRequest {
         return refreshChannelDetails;
     }
 
-    public String getDefaultChannelPath() {
-        return defaultChannelPath;
+    public String getFilePath() {
+        return filePath;
     }
 
     public static class Builder {
 
         private String channelId;
         private boolean refreshChannelDetails;
-        private String defaultChannelPath;
+        private String filePath;
 
         public Builder forChannel(String channelId) {
             if (StringUtil.isNullOrEmpty(channelId)) {
@@ -53,12 +53,12 @@ public class ChannelDetailsRequest {
             return this;
         }
 
-        public Builder defaultChannelPath(String defaultChannelPath) {
-            if (StringUtil.isNullOrEmpty(defaultChannelPath)) {
-                throw new IllegalArgumentException("defaultChannelPath should not be null or empty.");
+        public Builder fromFilePath(String filePath) {
+            if (StringUtil.isNullOrEmpty(filePath)) {
+                throw new IllegalArgumentException("filePath should not be null or empty.");
             }
 
-            this.defaultChannelPath = defaultChannelPath;
+            this.filePath = filePath;
             return this;
         }
 
@@ -67,11 +67,11 @@ public class ChannelDetailsRequest {
                 throw new IllegalStateException("channelId required.");
             }
 
-            if (StringUtil.isNullOrEmpty(defaultChannelPath)) {
+            if (StringUtil.isNullOrEmpty(filePath)) {
                 throw new IllegalStateException("defaultChannelPath required.");
             }
 
-            return new ChannelDetailsRequest(channelId, refreshChannelDetails, defaultChannelPath);
+            return new ChannelDetailsRequest(channelId, refreshChannelDetails, filePath);
         }
     }
 }

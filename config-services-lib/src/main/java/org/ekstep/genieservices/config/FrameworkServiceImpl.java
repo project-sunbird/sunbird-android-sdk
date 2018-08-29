@@ -59,7 +59,7 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         NoSqlModel channelDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
 
         if (channelDetailsInDb == null) {
-            String responseBody = FileUtil.readFileFromClasspath(channelDetailsRequest.getDefaultChannelPath());
+            String responseBody = FileUtil.readFileFromClasspath(channelDetailsRequest.getFilePath());
             GenieResponse channelDetailsAPIResponse;
             if (StringUtil.isNullOrEmpty(responseBody)) {
                 channelDetailsAPIResponse = getChannelDetailsFromServer(channelDetailsRequest.getChannelId());
