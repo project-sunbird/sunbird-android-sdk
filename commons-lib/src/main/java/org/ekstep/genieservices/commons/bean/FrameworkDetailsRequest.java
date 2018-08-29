@@ -11,14 +11,12 @@ public class FrameworkDetailsRequest {
 
     private String frameworkId;
     private boolean refreshFrameworkDetails;
-    private boolean defaultFrameworkDetails;
     private String defaultFrameworkPath;
 
     private FrameworkDetailsRequest(String frameworkId, boolean refreshFrameworkDetails,
-                                    boolean defaultFrameworkDetails, String defaultFrameworkPath) {
+                                    String defaultFrameworkPath) {
         this.frameworkId = frameworkId;
         this.refreshFrameworkDetails = refreshFrameworkDetails;
-        this.defaultFrameworkDetails = defaultFrameworkDetails;
         this.defaultFrameworkPath = defaultFrameworkPath;
     }
 
@@ -30,10 +28,6 @@ public class FrameworkDetailsRequest {
         return refreshFrameworkDetails;
     }
 
-    public boolean isDefaultFrameworkDetails() {
-        return defaultFrameworkDetails;
-    }
-
     public String getDefaultFrameworkPath() {
         return defaultFrameworkPath;
     }
@@ -42,7 +36,6 @@ public class FrameworkDetailsRequest {
 
         private String frameworkId;
         private boolean refreshFrameworkDetails;
-        private boolean defaultFrameworkDetails;
         private String defaultFrameworkPath;
 
         public Builder forFramework(String frameworkId) {
@@ -50,11 +43,6 @@ public class FrameworkDetailsRequest {
                 throw new IllegalArgumentException("frameworkId should not be null or empty.");
             }
             this.frameworkId = frameworkId;
-            return this;
-        }
-
-        public Builder defaultFrameworkDetails() {
-            this.defaultFrameworkDetails = true;
             return this;
         }
 
@@ -76,18 +64,15 @@ public class FrameworkDetailsRequest {
         }
 
         public FrameworkDetailsRequest build() {
-            if (!defaultFrameworkDetails) {
-                if (StringUtil.isNullOrEmpty(frameworkId)) {
-                    throw new IllegalStateException("frameworkId required.");
-                }
+            if (StringUtil.isNullOrEmpty(frameworkId)) {
+                throw new IllegalStateException("frameworkId required.");
             }
 
             if (StringUtil.isNullOrEmpty(defaultFrameworkPath)) {
                 throw new IllegalStateException("defaultFrameworkPath required.");
             }
 
-            return new FrameworkDetailsRequest(frameworkId, refreshFrameworkDetails,
-                    defaultFrameworkDetails, defaultFrameworkPath);
+            return new FrameworkDetailsRequest(frameworkId, refreshFrameworkDetails, defaultFrameworkPath);
         }
     }
 }

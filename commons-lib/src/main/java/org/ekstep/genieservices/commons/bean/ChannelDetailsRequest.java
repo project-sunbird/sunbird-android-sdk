@@ -11,10 +11,12 @@ public class ChannelDetailsRequest {
 
     private String channelId;
     private boolean refreshChannelDetails;
+    private String defaultChannelPath;
 
-    private ChannelDetailsRequest(String channelId, boolean refreshChannelDetails) {
+    private ChannelDetailsRequest(String channelId, boolean refreshChannelDetails, String defaultChannelPath) {
         this.channelId = channelId;
         this.refreshChannelDetails = refreshChannelDetails;
+        this.defaultChannelPath = defaultChannelPath;
     }
 
     public String getChannelId() {
@@ -25,10 +27,15 @@ public class ChannelDetailsRequest {
         return refreshChannelDetails;
     }
 
+    public String getDefaultChannelPath() {
+        return defaultChannelPath;
+    }
+
     public static class Builder {
 
         private String channelId;
         private boolean refreshChannelDetails;
+        private String defaultChannelPath;
 
         public Builder forChannel(String channelId) {
             if (StringUtil.isNullOrEmpty(channelId)) {
@@ -46,12 +53,25 @@ public class ChannelDetailsRequest {
             return this;
         }
 
+        public Builder defaultChannelPath(String defaultChannelPath) {
+            if (StringUtil.isNullOrEmpty(defaultChannelPath)) {
+                throw new IllegalArgumentException("defaultChannelPath should not be null or empty.");
+            }
+
+            this.defaultChannelPath = defaultChannelPath;
+            return this;
+        }
+
         public ChannelDetailsRequest build() {
             if (StringUtil.isNullOrEmpty(channelId)) {
                 throw new IllegalStateException("channelId required.");
             }
 
-            return new ChannelDetailsRequest(channelId, refreshChannelDetails);
+            if (StringUtil.isNullOrEmpty(defaultChannelPath)) {
+                throw new IllegalStateException("defaultChannelPath required.");
+            }
+
+            return new ChannelDetailsRequest(channelId, refreshChannelDetails, defaultChannelPath);
         }
     }
 }

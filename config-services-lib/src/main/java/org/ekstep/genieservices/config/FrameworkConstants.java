@@ -7,10 +7,6 @@ package org.ekstep.genieservices.config;
  */
 public interface FrameworkConstants {
 
-    interface ResourceFile {
-        String CHANNEL_DETAILS_JSON_FILE = "channel_details.json";
-    }
-
     interface PreferenceKey {
         String FRAMEWORK_DETAILS_API_EXPIRATION_KEY = "FRAMEWORK_DETAILS_API_EXPIRATION_KEY";
         String CHANNEL_DETAILS_API_EXPIRATION_KEY = "CHANNEL_DETAILS_API_EXPIRATION_KEY";
