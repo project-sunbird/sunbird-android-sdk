@@ -60,12 +60,11 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         if (channelDetailsInDb == null) {
             String responseBody = FileUtil.readFileFromClasspath(channelDetailsRequest.getFilePath());
 
-            GenieResponse channelDetailsAPIResponse = null;
+            GenieResponse channelDetailsAPIResponse;
             if (StringUtil.isNullOrEmpty(responseBody)) {
                 channelDetailsAPIResponse = getChannelDetailsFromServer(channelDetailsRequest.getChannelId());
                 if (channelDetailsAPIResponse.getStatus()) {
                     responseBody = channelDetailsAPIResponse.getResult().toString();
-                    saveChannelDetails(responseBody, channelDetailsRequest.getChannelId());
                 } else {
                     List<String> errorMessages = channelDetailsAPIResponse.getErrorMessages();
                     String errorMessage = null;
@@ -77,6 +76,8 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
                     return response;
                 }
             }
+
+            saveChannelDetails(responseBody, channelDetailsRequest.getChannelId());
 
         } else if (hasExpired(expirationTime)) {
             refreshChannelDetails(channelDetailsRequest.getChannelId());
