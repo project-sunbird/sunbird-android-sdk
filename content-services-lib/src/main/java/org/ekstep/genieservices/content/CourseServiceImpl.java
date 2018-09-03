@@ -198,13 +198,16 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
         params.put("logLevel", "2");
         String methodName = "getCourseBatches@CourseServiceImpl";
 
+        Map<String, Object> requestMap = getCourseBatchesRequest(courseBatchesRequest);
+
+
         GenieResponse<CourseBatchesResponse> response = isValidAuthSession(methodName, params);
         if (response != null) {
             return response;
         }
 
         GenieResponse courseBatchesAPIResponse = CourseHandler.fetchCourseBatchesFromServer(mAppContext,
-                authSession.getSessionData(), courseBatchesRequest);
+                authSession.getSessionData(), requestMap);
 
         if (courseBatchesAPIResponse.getStatus()) {
             LinkedTreeMap map = GsonUtil.fromJson(courseBatchesAPIResponse.getResult().toString(), LinkedTreeMap.class);
@@ -264,6 +267,28 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
         }
 
         return response;
+    }
+
+    private Map<String, Object> getCourseBatchesRequest(CourseBatchesRequest courseBatchesRequest) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("filters", getCourseBatchFilters(courseBatchesRequest));
+        requestMap.put("sort_by", getBatchSortCriteria(courseBatchesRequest));
+        return requestMap;
+    }
+
+    private Map<String, Object> getBatchSortCriteria(CourseBatchesRequest courseBatchesRequest) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("createdDate", courseBatchesRequest.getSortBy());
+        return requestMap;
+
+    }
+
+    private Map<String, Object> getCourseBatchFilters(CourseBatchesRequest courseBatchesRequest) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("status", courseBatchesRequest.getStatus());
+        requestMap.put("courseId", courseBatchesRequest.getCourseId());
+        requestMap.put("enrollmentType", courseBatchesRequest.getEnrollmentType());
+        return requestMap;
     }
 
     @Override

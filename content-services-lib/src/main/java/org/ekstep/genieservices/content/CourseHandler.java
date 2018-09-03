@@ -1,7 +1,6 @@
 package org.ekstep.genieservices.content;
 
 import org.ekstep.genieservices.commons.AppContext;
-import org.ekstep.genieservices.commons.bean.CourseBatchesRequest;
 import org.ekstep.genieservices.commons.bean.EnrollCourseRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.Session;
@@ -15,7 +14,6 @@ import org.ekstep.genieservices.content.network.EnrolledCoursesAPI;
 import org.ekstep.genieservices.content.network.UpdateContentStateAPI;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,19 +104,10 @@ public class CourseHandler {
     }
 
     public static GenieResponse fetchCourseBatchesFromServer(AppContext appContext, Session sessionData,
-                                                             CourseBatchesRequest courseBatchesRequest) {
+                                                             Map<String, Object> courseBatchesRequest) {
         CourseBatchesAPI courseBatchesAPI = new CourseBatchesAPI(appContext, getCustomHeaders(sessionData),
-                getCourseBatchesRequest(courseBatchesRequest));
+                courseBatchesRequest);
         return courseBatchesAPI.post();
-    }
-
-    private static Map<String, Object> getCourseBatchesRequest(CourseBatchesRequest courseBatchesRequest) {
-        Map<String, Object> filterMap = new HashMap<>();
-        filterMap.put("courseId", Arrays.asList(courseBatchesRequest.getCourseIds()));
-
-        Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("filters", filterMap);
-        return requestMap;
     }
 
     public static GenieResponse fetchBatchDetailsFromServer(AppContext appContext, Session sessionData,
