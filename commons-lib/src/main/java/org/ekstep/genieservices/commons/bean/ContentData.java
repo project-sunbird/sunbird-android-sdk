@@ -56,6 +56,7 @@ public class ContentData implements Serializable {
     private List<String> attributions;
     private List<String> dialcodes;
     private List<String> childNodes;
+    private String previewUrl;
 
     public ContentData() {
     }
@@ -268,6 +269,14 @@ public class ContentData implements Serializable {
 
     public void setChildNodes(List<String> childNodes) {
         this.childNodes = childNodes;
+    }
+
+    public String getPreviewUrl() {
+        return previewUrl;
+    }
+
+    public void setPreviewUrl(String previewUrl) {
+        this.previewUrl = previewUrl;
     }
 
     @Override
