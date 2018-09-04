@@ -17,11 +17,11 @@ public class CourseBatchesRequest {
     private String enrollmentType;
     private String sortBy;
 
-    public CourseBatchesRequest(String courseId, CourseBatchStatus status, CourseEnrollmentType enrollmentType, SortOrder sortOrder) {
+    public CourseBatchesRequest(String courseId, String status, String enrollmentType, String sortOrder) {
         this.courseId = courseId;
-        this.status = status.getValue();
-        this.enrollmentType = enrollmentType.getValue();
-        this.sortBy = sortOrder.getValue();
+        this.status = status;
+        this.enrollmentType = enrollmentType;
+        this.sortBy = sortOrder;
     }
 
     public String getCourseId() {
@@ -42,9 +42,9 @@ public class CourseBatchesRequest {
 
     public static class Builder {
         private String courseId;
-        private CourseBatchStatus status;
-        private CourseEnrollmentType enrollmentType;
-        private SortOrder sort_by;
+        private String status;
+        private String enrollmentType;
+        private String sort_by;
 
         public Builder forCourse(String courseId) {
             if (StringUtil.isNullOrEmpty(courseId)) {
@@ -56,17 +56,17 @@ public class CourseBatchesRequest {
         }
 
         public Builder withStatus(CourseBatchStatus status) {
-            this.status = status;
+            this.status = status.getValue();
             return this;
         }
 
         public Builder forEnrollmentType(CourseEnrollmentType enrollmentType) {
-            this.enrollmentType = enrollmentType;
+            this.enrollmentType = enrollmentType.getValue();
             return this;
         }
 
         public Builder sortBy(SortOrder sortBy) {
-            this.sort_by = sortBy;
+            this.sort_by = sortBy.getValue();
             return this;
         }
 
