@@ -67,10 +67,6 @@ public class ChannelDetailsRequest {
                 throw new IllegalStateException("channelId required.");
             }
 
-            if (StringUtil.isNullOrEmpty(filePath)) {
-                throw new IllegalStateException("defaultChannelPath required.");
-            }
-
             return new ChannelDetailsRequest(channelId, refreshChannelDetails, filePath);
         }
     }

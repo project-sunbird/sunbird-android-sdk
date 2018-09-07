@@ -67,10 +67,6 @@ public class FrameworkDetailsRequest {
                 throw new IllegalStateException("frameworkId required.");
             }
 
-            if (StringUtil.isNullOrEmpty(filePath)) {
-                throw new IllegalStateException("filePath required.");
-            }
-
             return new FrameworkDetailsRequest(frameworkId, refreshFrameworkDetails, filePath);
         }
     }

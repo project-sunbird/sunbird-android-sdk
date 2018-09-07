@@ -58,7 +58,10 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         NoSqlModel channelDetailsInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
 
         if (channelDetailsInDb == null) {
-            String responseBody = FileUtil.readFileFromClasspath(channelDetailsRequest.getFilePath());
+            String responseBody = null;
+            if (!StringUtil.isNullOrEmpty(channelDetailsRequest.getFilePath())) {
+                responseBody = FileUtil.readFileFromClasspath(channelDetailsRequest.getFilePath());
+            }
 
             GenieResponse channelDetailsAPIResponse;
             if (StringUtil.isNullOrEmpty(responseBody)) {
@@ -151,7 +154,7 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
         params.put("logLevel", "2");
 
         GenieResponse<Framework> response;
-        String responseBody;
+        String responseBody = null;
 
         String key = DB_KEY_FRAMEWORK_DETAILS + frameworkDetailsRequest.getFrameworkId();
         String expirationKey = FrameworkConstants.PreferenceKey.FRAMEWORK_DETAILS_API_EXPIRATION_KEY + "-" + frameworkDetailsRequest.getFrameworkId();
@@ -161,7 +164,9 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
 
         //no expiration time in shared preferences
         if (frameworkDetailsInDb == null) {
-            responseBody = FileUtil.readFileFromClasspath(frameworkDetailsRequest.getFilePath());
+            if (!StringUtil.isNullOrEmpty(frameworkDetailsRequest.getFilePath())) {
+                responseBody = FileUtil.readFileFromClasspath(frameworkDetailsRequest.getFilePath());
+            }
 
             GenieResponse frameworkDetailsAPIResponse;
             if (StringUtil.isNullOrEmpty(responseBody)) {

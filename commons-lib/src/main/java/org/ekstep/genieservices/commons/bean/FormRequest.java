@@ -12,17 +12,17 @@ public class FormRequest {
     private String action;
     private String rootOrgId;
     private String framework;
-    private String defaultFormPath;
+    private String filePath;
     private Double defaultTtl;  // In hours
 
     private FormRequest(String type, String subType, String action, String rootOrgId, String framework,
-                        String defaultFormPath, Double defaultTtl) {
+                        String filePath, Double defaultTtl) {
         this.type = type;
         this.subType = subType;
         this.action = action;
         this.rootOrgId = rootOrgId;
         this.framework = framework;
-        this.defaultFormPath = defaultFormPath;
+        this.filePath = filePath;
         this.defaultTtl = defaultTtl;
     }
 
@@ -46,8 +46,8 @@ public class FormRequest {
         return framework;
     }
 
-    public String getDefaultFormPath() {
-        return defaultFormPath;
+    public String getFilePath() {
+        return filePath;
     }
 
     public Double getDefaultTtl() {
@@ -88,7 +88,7 @@ public class FormRequest {
         private String action;
         private String rootOrgId;
         private String framework;
-        private String defaultFormPath;
+        private String filePath;
         private Double defaultTtl;
 
         public Builder() {
@@ -129,12 +129,12 @@ public class FormRequest {
             return this;
         }
 
-        public Builder defaultFormPath(String defaultFormPath) {
-            if (StringUtil.isNullOrEmpty(defaultFormPath)) {
-                throw new IllegalArgumentException("defaultFormPath should not be null or empty.");
+        public Builder fromFilePath(String filePath) {
+            if (StringUtil.isNullOrEmpty(filePath)) {
+                throw new IllegalArgumentException("filePath should not be null or empty.");
             }
 
-            this.defaultFormPath = defaultFormPath;
+            this.filePath = filePath;
             return this;
         }
 
@@ -156,11 +156,7 @@ public class FormRequest {
                 throw new IllegalStateException("action required.");
             }
 
-            if (StringUtil.isNullOrEmpty(defaultFormPath)) {
-                throw new IllegalStateException("defaultFormPath required.");
-            }
-
-            return new FormRequest(type, subType, action, rootOrgId, framework, defaultFormPath, defaultTtl);
+            return new FormRequest(type, subType, action, rootOrgId, framework, filePath, defaultTtl);
         }
     }
 }
