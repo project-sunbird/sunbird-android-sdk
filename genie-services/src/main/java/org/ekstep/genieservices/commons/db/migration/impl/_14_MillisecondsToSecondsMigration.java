@@ -35,7 +35,7 @@ public class _14_MillisecondsToSecondsMigration extends Migration {
                 learnerContentSummaryDetails.setContentId(l.getContentId());
                 learnerContentSummaryDetails.setAvgts(l.getAvgts());
                 learnerContentSummaryDetails.setSessions(l.getSessions());
-                learnerContentSummaryDetails.setTotalts(l.getTotalts() / 1000);
+                learnerContentSummaryDetails.setTotalts((double) Math.round(l.getTotalts() / 1000));
                 learnerContentSummaryDetails.setTimespent(l.getTimespent());
                 learnerContentSummaryDetails.setTimestamp(l.getTimestamp());
                 learnerContentSummaryDetails.setHierarchyData(l.getHierarchyData());
