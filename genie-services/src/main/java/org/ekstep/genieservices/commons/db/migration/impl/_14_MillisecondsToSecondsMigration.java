@@ -30,7 +30,16 @@ public class _14_MillisecondsToSecondsMigration extends Migration {
         if (learnerSummaryEventsModel != null) {
             for (LearnerSummaryModel l : learnerSummaryEventsModel.getAllLearnerSummaryModelList()) {
                 LearnerContentSummaryDetails learnerContentSummaryDetails = new LearnerContentSummaryDetails();
+
+                learnerContentSummaryDetails.setUid(l.getUid());
+                learnerContentSummaryDetails.setContentId(l.getContentId());
+                learnerContentSummaryDetails.setAvgts(l.getAvgts());
+                learnerContentSummaryDetails.setSessions(l.getSessions());
                 learnerContentSummaryDetails.setTotalts(l.getTotalts() / 1000);
+                learnerContentSummaryDetails.setTimespent(l.getTimespent());
+                learnerContentSummaryDetails.setTimestamp(l.getTimestamp());
+                learnerContentSummaryDetails.setHierarchyData(l.getHierarchyData());
+                learnerContentSummaryDetails.setLastUpdated(l.getLastUpdated());
 
                 LearnerSummaryModel learnerSummaryModel = LearnerSummaryModel.build(appContext.getDBSession(), learnerContentSummaryDetails);
                 learnerSummaryModel.update();
