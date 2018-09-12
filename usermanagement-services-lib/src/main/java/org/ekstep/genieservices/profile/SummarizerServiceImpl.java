@@ -365,7 +365,10 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         LearnerSummaryModel learnerSummaryModel = LearnerSummaryModel.find(mAppContext.getDBSession(), uid, contentId, "");
 
         //filter for assessment details
-        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.find(mAppContext.getDBSession(), uid, contentId);
+        String filter = String.format(Locale.US, " where %s = '%s' AND %s = '%s'",
+                LearnerAssessmentsEntry.COLUMN_NAME_UID, uid, LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID, contentId);
+
+        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.find(mAppContext.getDBSession(), filter, uid, contentId);
 
         if (learnerSummaryModel != null) {
             learnerSummaryModel.delete();

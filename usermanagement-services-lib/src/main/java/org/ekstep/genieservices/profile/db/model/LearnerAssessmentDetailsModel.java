@@ -59,8 +59,9 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
         this.filter = filter;
     }
 
-    private LearnerAssessmentDetailsModel(IDBSession dbSession, String uid, String contentId) {
+    private LearnerAssessmentDetailsModel(IDBSession dbSession, String filter, String uid, String contentId) {
         this.dbSession = dbSession;
+        this.filter = filter;
         this.uid = uid;
         this.contentId = contentId;
     }
@@ -109,8 +110,8 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
         }
     }
 
-    public static LearnerAssessmentDetailsModel find(IDBSession dbSession, String uid, String contentId) {
-        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = new LearnerAssessmentDetailsModel(dbSession, uid, contentId);
+    public static LearnerAssessmentDetailsModel find(IDBSession dbSession, String filter, String uid, String contentId) {
+        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = new LearnerAssessmentDetailsModel(dbSession, filter, uid, contentId);
         dbSession.read(learnerAssessmentDetailsModel);
 
         if (learnerAssessmentDetailsModel.mAssessmentList == null) {
