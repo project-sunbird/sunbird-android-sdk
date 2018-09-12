@@ -5,6 +5,7 @@ import org.ekstep.genieservices.commons.bean.LearnerAssessmentDetails;
 import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
 import org.ekstep.genieservices.commons.db.contract.LearnerSummaryEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
+import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IUpdatable;
@@ -23,7 +24,7 @@ import java.util.Map;
  * shriharsh
  */
 
-public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpdatable {
+public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpdatable, ICleanable {
 
     //Need to passed when finding for the model
     public static final int FOR_SUMMARIZER = 1;
@@ -104,7 +105,7 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
 
     public static LearnerAssessmentDetailsModel findDetailReport(IDBSession dbSession, List<String> quotedUIds, String contentId, int forDetailReport) {
         LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = new LearnerAssessmentDetailsModel(dbSession, forDetailReport);
-        dbSession.read(learnerAssessmentDetailsModel , getDetailReportsQuery(quotedUIds, contentId));
+        dbSession.read(learnerAssessmentDetailsModel, getDetailReportsQuery(quotedUIds, contentId));
 
         if (learnerAssessmentDetailsModel.mAssessmentList == null) {
             return null;
@@ -434,6 +435,24 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
         return LearnerAssessmentsEntry.TABLE_NAME;
     }
 
+    public Void delete() {
+        dbSession.clean(this);
+        return null;
+    }
+
+    @Override
+    public void clean() {
+        this.id = -1L;
+        this.uid = null;
+        this.contentId = null;
+    }
+
+    @Override
+    public String selectionToClean() {
+        return String.format(Locale.US, " where %s = '%s' AND %s = '%s'",
+                LearnerAssessmentsEntry.COLUMN_NAME_UID, this.uid, LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID, this.contentId);
+    }
+
     @Override
     public String updateBy() {
         String isQid = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_QID, qid);
@@ -494,5 +513,4 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
         }
         return accuracyMap;
     }
-
 }

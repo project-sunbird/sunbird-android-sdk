@@ -354,4 +354,28 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         return learnerAssessmentDetails;
     }
 
+    /**
+     * This method deletes all the previous details related to contentId and uid, whenever the new START event and new ASSESS is received
+     *
+     * @param uid
+     * @param contentId
+     */
+    public void deletePreviousAssessmentDetails(String uid, String contentId) {
+
+        LearnerSummaryModel learnerSummaryModel = LearnerSummaryModel.find(mAppContext.getDBSession(), uid, contentId, "");
+
+        //filter for assessment details
+        String filter = getFilterForLearnerAssessmentDetails("", uid, contentId, "");
+        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.find(mAppContext.getDBSession(), filter);
+
+        if (learnerSummaryModel != null) {
+            learnerSummaryModel.delete();
+        }
+
+        if (learnerAssessmentDetailsModel != null) {
+            learnerAssessmentDetailsModel.delete();
+        }
+
+
+    }
 }

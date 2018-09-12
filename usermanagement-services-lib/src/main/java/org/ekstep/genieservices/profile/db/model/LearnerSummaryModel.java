@@ -4,6 +4,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.LearnerContentSummaryDetails;
 import org.ekstep.genieservices.commons.db.contract.LearnerSummaryEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
+import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IUpdatable;
@@ -18,7 +19,7 @@ import java.util.Locale;
  * shriharsh
  */
 
-public class LearnerSummaryModel implements IReadable, IWritable, IUpdatable {
+public class LearnerSummaryModel implements IReadable, IWritable, IUpdatable, ICleanable {
     private Long id = -1L;
     private IDBSession dbSession;
 
@@ -84,6 +85,11 @@ public class LearnerSummaryModel implements IReadable, IWritable, IUpdatable {
         dbSession.update(this);
     }
 
+    public Void delete() {
+        dbSession.clean(this);
+        return null;
+    }
+
     @Override
     public IReadable read(IResultSet cursor) {
         if (cursor != null) {
@@ -139,6 +145,19 @@ public class LearnerSummaryModel implements IReadable, IWritable, IUpdatable {
     @Override
     public String getTableName() {
         return LearnerSummaryEntry.TABLE_NAME;
+    }
+
+    @Override
+    public void clean() {
+        this.id = -1L;
+        this.uid = null;
+        this.contentId = null;
+    }
+
+    @Override
+    public String selectionToClean() {
+        return String.format(Locale.US, " where %s = '%s' AND %s = '%s'",
+                LearnerSummaryEntry.COLUMN_NAME_UID, this.uid, LearnerSummaryEntry.COLUMN_NAME_CONTENT_ID, this.contentId);
     }
 
     @Override
