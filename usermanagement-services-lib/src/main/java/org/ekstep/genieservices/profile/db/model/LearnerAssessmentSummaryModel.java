@@ -30,6 +30,7 @@ public class LearnerAssessmentSummaryModel implements IReadable {
     private Double totalTimespent;
     private String hierarchyData;
     private Integer totalMaxScore;
+    private Integer totalScore;
     private List<LearnerAssessmentSummary> assessmentMap;
     private List<Map<String, Object>> reportsMap;
     private boolean forReports = false;
@@ -64,7 +65,7 @@ public class LearnerAssessmentSummaryModel implements IReadable {
     }
 
     private static String getChildProgressQuery(List<String> uids) {
-        return "select uid, content_id, count(qid), sum(correct), sum(time_spent), h_data , sum(max_score) from " +
+        return "select uid, content_id, count(qid), sum(correct), sum(time_spent), h_data , sum(max_score) , sum(score) from " +
                 LearnerAssessmentsEntry.TABLE_NAME + " where uid IN (" + StringUtil.join(",", uids) +
                 ") group by content_id ";
     }
@@ -142,6 +143,9 @@ public class LearnerAssessmentSummaryModel implements IReadable {
 
         this.totalMaxScore = cursor.getInt(6);
         learnerAssessmentSummary.setTotalMaxScore(this.totalMaxScore);
+
+        this.totalScore = cursor.getInt(7);
+        learnerAssessmentSummary.setTotalScore(this.totalScore);
 
 
         return learnerAssessmentSummary;

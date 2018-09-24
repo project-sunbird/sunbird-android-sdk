@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 /**
  * This class holds the details about assessment summary of a learner.
- *
  */
 public class LearnerAssessmentSummary implements Serializable {
     private String uid;
@@ -14,6 +13,7 @@ public class LearnerAssessmentSummary implements Serializable {
     private Double totalTimespent;
     private String hierarchyData;
     private int totalMaxScore;
+    private int totalScore;
 
     public String getUid() {
         return uid;
@@ -69,5 +69,13 @@ public class LearnerAssessmentSummary implements Serializable {
 
     public void setTotalMaxScore(int totalMaxScore) {
         this.totalMaxScore = totalMaxScore;
+    }
+
+    public int getTotalScore() {
+        return totalScore;
+    }
+
+    public void setTotalScore(int totalScore) {
+        this.totalScore = totalScore;
     }
 }
