@@ -862,16 +862,54 @@ public class UserServiceImpl extends BaseService implements IUserService {
     public GenieResponse<Profile> getProfile(GetProfileRequest getProfileRequest) {
         GenieResponse<Profile> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
 
+        String localUserFilter = null;
+        String serverUserFilter = null;
+
+        if (getProfileRequest != null) {
+            //filter for local users
+            if (getProfileRequest.isLocal()) {
+                localUserFilter = String.format(Locale.US, "%s = '%s'", ProfileEntry.COLUMN_SOURCE, UserSource.LOCAL.getValue());
+            }
+
+            //filter for server users
+            if (getProfileRequest.isServer()) {
+                serverUserFilter = String.format(Locale.US, "%s = '%s'", ProfileEntry.COLUMN_SOURCE, UserSource.SERVER.getValue());
+            }
+        }
+
+        String filter = null;
+        if (!StringUtil.isNullOrEmpty(localUserFilter) && !StringUtil.isNullOrEmpty(serverUserFilter)) {
+            filter = String.format(Locale.US, " where %s OR %s", localUserFilter, serverUserFilter);
+        } else if (!StringUtil.isNullOrEmpty(localUserFilter)) {
+            filter = String.format(Locale.US, " where %s", localUserFilter);
+        } else if (!StringUtil.isNullOrEmpty(serverUserFilter)) {
+            filter = String.format(Locale.US, " where %s", serverUserFilter);
+        }
+
         if (getProfileRequest.isLatestCreatedProfile()) {
-            UserProfilesModel userProfilesModel = UserProfilesModel.find(mAppContext.getDBSession(), true);
+            UserProfilesModel userProfilesModel;
+
+            if (StringUtil.isNullOrEmpty(filter)) {
+                userProfilesModel = UserProfilesModel.find(mAppContext.getDBSession(), "", true);
+            } else {
+                userProfilesModel = UserProfilesModel.find(mAppContext.getDBSession(), filter, true);
+            }
 
             if (userProfilesModel != null) {
                 response.setResult(userProfilesModel.getProfileList().get(0));
             }
         } else {
-            UserProfileModel userProfileModel = UserProfileModel.find(mAppContext.getDBSession(), getProfileRequest.getUid());
+            String filterWithUid = null;
 
-            if(userProfileModel != null){
+            if (StringUtil.isNullOrEmpty(filter)) {
+                filterWithUid = String.format(Locale.US, " where %s = '%s'", ProfileEntry.COLUMN_NAME_UID, getProfileRequest.getUid());
+            } else {
+                filterWithUid = String.format(Locale.US, " where %s AND %s = '%s'", filter, ProfileEntry.COLUMN_NAME_UID, getProfileRequest.getUid());
+            }
+
+            UserProfileModel userProfileModel = UserProfileModel.find(mAppContext.getDBSession(), getProfileRequest.getUid(), filterWithUid);
+
+            if (userProfileModel != null) {
                 response.setResult(userProfileModel.getProfile());
             }
 

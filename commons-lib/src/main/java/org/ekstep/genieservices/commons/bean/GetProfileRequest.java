@@ -93,10 +93,6 @@ public class GetProfileRequest {
                 throw new IllegalStateException("You must request either latest created profile or any specific user");
             }
 
-            if (!this.local && !this.server) {
-                throw new IllegalStateException("Select at least any one of the type of users");
-            }
-
             if(!StringUtil.isNullOrEmpty(uid) && latestCreatedProfile){
                 throw new IllegalStateException("You can request to get the latest created profile or any specific user, but not both at the same time.");
             }

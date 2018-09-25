@@ -25,6 +25,7 @@ public class UserProfilesModel implements IReadable {
     private UserProfilesModel(IDBSession dbSession, String filterCondition, boolean isLatestCreated) {
         this.mDBSession = dbSession;
         this.mFilterCondition = filterCondition;
+        this.isLatestCreated = isLatestCreated;
     }
 
     public static UserProfilesModel find(IDBSession dbSession) {
@@ -37,8 +38,8 @@ public class UserProfilesModel implements IReadable {
         }
     }
 
-    public static UserProfilesModel find(IDBSession dbSession, boolean isLatestCreated) {
-        UserProfilesModel userProfilesModel = new UserProfilesModel(dbSession, "", isLatestCreated);
+    public static UserProfilesModel find(IDBSession dbSession, String filterCondition, boolean isLatestCreated) {
+        UserProfilesModel userProfilesModel = new UserProfilesModel(dbSession, filterCondition, isLatestCreated);
         dbSession.read(userProfilesModel);
         if (userProfilesModel.getProfileList() == null) {
             return null;

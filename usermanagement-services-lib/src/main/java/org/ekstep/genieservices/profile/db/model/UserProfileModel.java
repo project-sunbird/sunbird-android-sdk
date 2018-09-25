@@ -25,20 +25,34 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
     private long id = -1;
     private Profile profile;
     private IDBSession dbSession;
+    private String filterCondition;
 
-    private UserProfileModel(IDBSession dbSession, Profile profile) {
+    private UserProfileModel(IDBSession dbSession, Profile profile, String filterCondition) {
         this.profile = profile;
         this.dbSession = dbSession;
+        this.filterCondition = filterCondition;
     }
 
     public static UserProfileModel build(IDBSession dbSession, Profile profile) {
-        UserProfileModel profileModel = new UserProfileModel(dbSession, profile);
+        UserProfileModel profileModel = new UserProfileModel(dbSession, profile, "");
         return profileModel;
     }
 
     public static UserProfileModel find(IDBSession dbSession, String uid) {
         Profile profile = new Profile(uid);
-        UserProfileModel profileModel = new UserProfileModel(dbSession, profile);
+        UserProfileModel profileModel = new UserProfileModel(dbSession, profile, "");
+        dbSession.read(profileModel);
+        //check if the profile was found and return null if the profile was not found
+        if (StringUtil.isNullOrEmpty(profileModel.profile.getHandle())) {
+            return null;
+        } else {
+            return profileModel;
+        }
+    }
+
+    public static UserProfileModel find(IDBSession dbSession, String uid, String filterCondition) {
+        Profile profile = new Profile(uid);
+        UserProfileModel profileModel = new UserProfileModel(dbSession, profile, filterCondition);
         dbSession.read(profileModel);
         //check if the profile was found and return null if the profile was not found
         if (StringUtil.isNullOrEmpty(profileModel.profile.getHandle())) {
@@ -218,6 +232,11 @@ public class UserProfileModel implements IWritable, IReadable, IUpdatable, IClea
 
     @Override
     public String filterForRead() {
+
+        if (!StringUtil.isNullOrEmpty(this.filterCondition)) {
+            return this.filterCondition;
+        }
+
         return String.format(Locale.US, "where uid = '%s'", profile.getUid());
     }
 
