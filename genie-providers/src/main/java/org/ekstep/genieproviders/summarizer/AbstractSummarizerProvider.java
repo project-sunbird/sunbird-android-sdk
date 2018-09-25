@@ -54,18 +54,21 @@ public abstract class AbstractSummarizerProvider extends BaseContentProvider {
 
             if (genieResponse != null && genieResponse.getStatus()) {
                 List<LearnerAssessmentDetails> learnerAssessmentDetailsList = (List<LearnerAssessmentDetails>) genieResponse.getResult();
-                int totalQuestions = 0;
-                int totalCorrect = 0;
-                Map<String, Integer> resultMap = new HashMap<>();
+                double totalMaxScore = 0;
+                double totalScore = 0;
+                Map<String, Double> resultMap = new HashMap<>();
                 if (learnerAssessmentDetailsList != null && learnerAssessmentDetailsList.size() > 0) {
-                    totalQuestions = learnerAssessmentDetailsList.size();
                     for (LearnerAssessmentDetails learnerAssessmentDetails : learnerAssessmentDetailsList) {
-                        totalCorrect = totalCorrect + learnerAssessmentDetails.getCorrect();
+
+                        //Changed this because we decided to send totalMaxScore and totalScore, otherwise sending the totalCorect would not work correct
+                        //in case of partial scoring
+                        totalMaxScore = totalMaxScore + learnerAssessmentDetails.getMaxScore();
+                        totalScore = totalScore + learnerAssessmentDetails.getScore();
                     }
                 }
 
-                resultMap.put("total_correct", totalCorrect);
-                resultMap.put("total_questions", totalQuestions);
+                resultMap.put("total_correct", totalScore);
+                resultMap.put("total_questions", totalMaxScore);
 
                 GenieResponse successResponse = GenieResponseBuilder.getSuccessResponse("Successful");
                 successResponse.setResult(resultMap);
