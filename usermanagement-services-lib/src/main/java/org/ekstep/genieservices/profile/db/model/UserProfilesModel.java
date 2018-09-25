@@ -20,14 +20,25 @@ public class UserProfilesModel implements IReadable {
     private IDBSession mDBSession;
     private List<Profile> mUserProfileList;
     private String mFilterCondition;
+    private boolean isLatestCreated = false;
 
-    private UserProfilesModel(IDBSession dbSession, String filterCondition) {
+    private UserProfilesModel(IDBSession dbSession, String filterCondition, boolean isLatestCreated) {
         this.mDBSession = dbSession;
         this.mFilterCondition = filterCondition;
     }
 
     public static UserProfilesModel find(IDBSession dbSession) {
-        UserProfilesModel userProfilesModel = new UserProfilesModel(dbSession, "");
+        UserProfilesModel userProfilesModel = new UserProfilesModel(dbSession, "", false);
+        dbSession.read(userProfilesModel);
+        if (userProfilesModel.getProfileList() == null) {
+            return null;
+        } else {
+            return userProfilesModel;
+        }
+    }
+
+    public static UserProfilesModel find(IDBSession dbSession, boolean isLatestCreated) {
+        UserProfilesModel userProfilesModel = new UserProfilesModel(dbSession, "", isLatestCreated);
         dbSession.read(userProfilesModel);
         if (userProfilesModel.getProfileList() == null) {
             return null;
@@ -37,7 +48,7 @@ public class UserProfilesModel implements IReadable {
     }
 
     public static UserProfilesModel find(IDBSession dbSession, String filterCondition) {
-        UserProfilesModel userProfilesModel = new UserProfilesModel(dbSession, filterCondition);
+        UserProfilesModel userProfilesModel = new UserProfilesModel(dbSession, filterCondition, false);
         dbSession.read(userProfilesModel);
         if (userProfilesModel.getProfileList() == null) {
             return null;
@@ -71,6 +82,11 @@ public class UserProfilesModel implements IReadable {
 
     @Override
     public String orderBy() {
+
+        if (isLatestCreated) {
+            return String.format(Locale.US, "order by %s desc", ProfileEntry.COLUMN_NAME_CREATED_AT);
+        }
+
         return String.format(Locale.US, "order by %s asc", ProfileEntry.COLUMN_NAME_HANDLE);
     }
 

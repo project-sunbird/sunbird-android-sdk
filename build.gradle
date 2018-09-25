@@ -21,11 +21,11 @@ allprojects {
 
 ext {
     minSdkVersion = 16
-    targetSdkVersion = 26
-    compileSdkVersion = 26
-    buildToolsVersion = '26.0.3'
-    supportLibraryVersion = '26.1.0'
-    playServiceVersion = '15.0.1'
+    targetSdkVersion = 23
+    compileSdkVersion = 23
+    buildToolsVersion = '23.0.3'
+    supportLibraryVersion = '23.4.0'
+    playServiceVersion = '9.4.0'
     eventbusVersion = '3.1.1'
     okhttpVersion = '3.9.1'
     gsonVersion = '2.8.2'

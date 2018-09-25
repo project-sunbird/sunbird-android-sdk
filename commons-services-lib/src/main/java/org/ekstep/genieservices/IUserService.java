@@ -1,10 +1,10 @@
 package org.ekstep.genieservices;
 
 import org.ekstep.genieservices.commons.bean.AddUpdateGroupsRequest;
-import org.ekstep.genieservices.commons.bean.AddUpdateProfilesRequest;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.GetProfileRequest;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
@@ -178,7 +178,6 @@ public interface IUserService {
 
 
     /**
-     *
      * This api is used when you want to get only local or server users and from any specific group
      *
      * @param profileRequest
@@ -193,5 +192,16 @@ public interface IUserService {
      * @return
      */
     GenieResponse<Void> addUpdateGroupsToProfile(AddUpdateGroupsRequest addUpdateGroupsRequest);
+
+    /**
+     * This api gets the specific user or the latest created user.
+     * <p>
+     * <p>On successful fetching the required user, the response will return status as TRUE and with the required profile set in result.
+     * <p>
+     * <p>Their would be a fialure case when the specific userId is not present
+     *
+     * @return {@link GenieResponse<Profile>}
+     */
+    GenieResponse<Profile> getProfile(GetProfileRequest getProfileRequest);
 
 }

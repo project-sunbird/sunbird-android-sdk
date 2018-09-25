@@ -11,6 +11,7 @@ import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentLearnerState;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.GetProfileRequest;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
@@ -79,9 +80,9 @@ import java.util.UUID;
  */
 public class UserServiceImpl extends BaseService implements IUserService {
 
+    public static final String DATE_FORMAT = "yyyyMMddhhmmss";
     private static final String TAG = UserServiceImpl.class.getSimpleName();
     private IUserProfileService mUserProfileService;
-    public static final String DATE_FORMAT = "yyyyMMddhhmmss";
 
     public UserServiceImpl(AppContext appContext, IUserProfileService userProfileService) {
         super(appContext);
@@ -855,5 +856,27 @@ public class UserServiceImpl extends BaseService implements IUserService {
     public GenieResponse<Void> addUpdateGroupsToProfile(AddUpdateGroupsRequest addUpdateGroupsRequest) {
         // TODO: 20/7/18 Yet to be implemented
         return null;
+    }
+
+    @Override
+    public GenieResponse<Profile> getProfile(GetProfileRequest getProfileRequest) {
+        GenieResponse<Profile> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+
+        if (getProfileRequest.isLatestCreatedProfile()) {
+            UserProfilesModel userProfilesModel = UserProfilesModel.find(mAppContext.getDBSession(), true);
+
+            if (userProfilesModel != null) {
+                response.setResult(userProfilesModel.getProfileList().get(0));
+            }
+        } else {
+            UserProfileModel userProfileModel = UserProfileModel.find(mAppContext.getDBSession(), getProfileRequest.getUid());
+
+            if(userProfileModel != null){
+                response.setResult(userProfileModel.getProfile());
+            }
+
+        }
+
+        return response;
     }
 }
