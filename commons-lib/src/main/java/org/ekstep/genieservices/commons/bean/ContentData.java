@@ -57,6 +57,7 @@ public class ContentData implements Serializable {
     private List<String> dialcodes;
     private List<String> childNodes;
     private String previewUrl;
+    private String framework;
 
     public ContentData() {
     }
@@ -277,6 +278,10 @@ public class ContentData implements Serializable {
 
     public void setPreviewUrl(String previewUrl) {
         this.previewUrl = previewUrl;
+    }
+
+    public String getFramework() {
+        return framework;
     }
 
     @Override
