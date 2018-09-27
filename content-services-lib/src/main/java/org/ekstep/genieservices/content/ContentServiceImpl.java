@@ -930,9 +930,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         Set<String> contentIds = contentImportMap.keySet();
 
         ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, ContentHandler.getSearchRequest(mAppContext, contentIds, importRequest.getContentStatusArray()));
-        GenieResponse apiResponse = contentSearchAPI.post();
-        if (apiResponse.getStatus()) {
-            String body = apiResponse.getResult().toString();
+        GenieResponse contentSearchAPIResponse = contentSearchAPI.post();
+        if (contentSearchAPIResponse.getStatus()) {
+            String body = contentSearchAPIResponse.getResult().toString();
 
             LinkedTreeMap map = GsonUtil.fromJson(body, LinkedTreeMap.class);
             LinkedTreeMap result = (LinkedTreeMap) map.get("result");
@@ -983,15 +983,23 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                     downloadService.enqueue(downloadRequestArray);
                 }
             }
-        }
 
-        for (String contentId : contentIds) {
-            contentImportResponseList.add(new ContentImportResponse(contentId, ContentImportStatus.NOT_FOUND));
-        }
+            for (String contentId : contentIds) {
+                contentImportResponseList.add(new ContentImportResponse(contentId, ContentImportStatus.NOT_FOUND));
+            }
 
-        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-        response.setResult(contentImportResponseList);
-        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+            response.setResult(contentImportResponseList);
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        } else {
+            List<String> errorMessages = contentSearchAPIResponse.getErrorMessages();
+            String errorMessage = null;
+            if (!CollectionUtil.isNullOrEmpty(errorMessages)) {
+                errorMessage = errorMessages.get(0);
+            }
+            response = GenieResponseBuilder.getErrorResponse(contentSearchAPIResponse.getError(), errorMessage, TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
+        }
 
         return response;
     }
