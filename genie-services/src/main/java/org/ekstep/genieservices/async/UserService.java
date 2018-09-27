@@ -272,12 +272,12 @@ public class UserService {
      * @param responseHandler      - {@link IResponseHandler<ProfileExportResponse>}
      */
     public void exportProfile(final ProfileExportRequest profileExportRequest, IResponseHandler<ProfileExportResponse> responseHandler) {
-        ThreadPool.getInstance().execute(new IPerformable<ProfileExportResponse>() {
+        new AsyncHandler<ProfileExportResponse>(responseHandler).execute(new IPerformable<ProfileExportResponse>() {
             @Override
             public GenieResponse<ProfileExportResponse> perform() {
                 return userService.exportProfile(profileExportRequest);
             }
-        }, responseHandler);
+        });
     }
 
     /**
