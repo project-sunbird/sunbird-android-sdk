@@ -13,6 +13,7 @@ import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -397,7 +398,8 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
         }
 
         if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_MAX_SCORE) != -1) {
-            learnerAssessmentDetails.setMaxScore(cursor.getDouble(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_MAX_SCORE)));
+            DecimalFormat df = new DecimalFormat(".##");
+            learnerAssessmentDetails.setMaxScore(Double.valueOf(df.format(cursor.getDouble(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_MAX_SCORE)))));
         }
 
         if (cursor.getColumnIndex(LearnerSummaryEntry.COLUMN_NAME_TOTAL_TS) != -1) {
