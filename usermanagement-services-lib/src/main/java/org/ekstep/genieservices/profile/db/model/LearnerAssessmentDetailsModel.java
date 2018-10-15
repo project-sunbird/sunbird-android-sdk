@@ -370,7 +370,8 @@ public class LearnerAssessmentDetailsModel implements IReadable, IWritable, IUpd
         }
 
         if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_SCORE) != -1) {
-            learnerAssessmentDetails.setScore(cursor.getDouble(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_SCORE)));
+            DecimalFormat df = new DecimalFormat(".##");
+            learnerAssessmentDetails.setScore(Double.valueOf(df.format(cursor.getDouble(cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_SCORE)))));
         }
 
         if (cursor.getColumnIndex(LearnerAssessmentsEntry.COLUMN_NAME_TIME_SPENT) != -1) {

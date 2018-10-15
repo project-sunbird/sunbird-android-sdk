@@ -9,6 +9,7 @@ import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,8 +30,8 @@ public class LearnerAssessmentSummaryModel implements IReadable {
     private Integer correctAnswers;
     private Double totalTimespent;
     private String hierarchyData;
-    private Integer totalMaxScore;
-    private Integer totalScore;
+    private Double totalMaxScore;
+    private Double totalScore;
     private List<LearnerAssessmentSummary> assessmentMap;
     private List<Map<String, Object>> reportsMap;
     private boolean forReports = false;
@@ -123,6 +124,8 @@ public class LearnerAssessmentSummaryModel implements IReadable {
 
     private LearnerAssessmentSummary readCursorData(IResultSet cursor) {
         LearnerAssessmentSummary learnerAssessmentSummary = new LearnerAssessmentSummary();
+        DecimalFormat df = new DecimalFormat(".##");
+
         this.uid = cursor.getString(0);
         learnerAssessmentSummary.setUid(this.uid);
 
@@ -141,12 +144,11 @@ public class LearnerAssessmentSummaryModel implements IReadable {
         this.hierarchyData = cursor.getString(5);
         learnerAssessmentSummary.setHierarchyData(this.hierarchyData);
 
-        this.totalMaxScore = cursor.getInt(6);
-        learnerAssessmentSummary.setTotalMaxScore(this.totalMaxScore);
+        this.totalMaxScore = cursor.getDouble(6);
+        learnerAssessmentSummary.setTotalMaxScore(Double.valueOf(df.format(totalMaxScore)));
 
-        this.totalScore = cursor.getInt(7);
-        learnerAssessmentSummary.setTotalScore(this.totalScore);
-
+        this.totalScore = cursor.getDouble(7);
+        learnerAssessmentSummary.setTotalScore(Double.valueOf(df.format(totalScore)));
 
         return learnerAssessmentSummary;
     }

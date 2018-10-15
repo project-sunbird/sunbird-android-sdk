@@ -12,8 +12,8 @@ public class LearnerAssessmentSummary implements Serializable {
     private int correctAnswers;
     private Double totalTimespent;
     private String hierarchyData;
-    private int totalMaxScore;
-    private int totalScore;
+    private Double totalMaxScore;
+    private Double totalScore;
 
     public String getUid() {
         return uid;
@@ -63,19 +63,19 @@ public class LearnerAssessmentSummary implements Serializable {
         this.hierarchyData = hierarchyData;
     }
 
-    public int getTotalMaxScore() {
+    public Double getTotalMaxScore() {
         return totalMaxScore;
     }
 
-    public void setTotalMaxScore(int totalMaxScore) {
+    public void setTotalMaxScore(Double totalMaxScore) {
         this.totalMaxScore = totalMaxScore;
     }
 
-    public int getTotalScore() {
+    public Double getTotalScore() {
         return totalScore;
     }
 
-    public void setTotalScore(int totalScore) {
+    public void setTotalScore(Double totalScore) {
         this.totalScore = totalScore;
     }
 }
