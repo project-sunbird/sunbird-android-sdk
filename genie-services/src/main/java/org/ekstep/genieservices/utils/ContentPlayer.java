@@ -140,10 +140,11 @@ public class ContentPlayer {
 
         Map<String, Object> configMap = (Map<String, Object>) intent.getSerializableExtra("config");
         if (configMap != null) {
-            bundleMap.put("config", configMap);
             if (extraInfo != null && extraInfo.containsKey("streaming")) {
-                bundleMap.put("streaming", extraInfo.get("streaming"));
+                configMap.put("streaming", extraInfo.get("streaming"));
             }
+            bundleMap.put("config", configMap);
+
         }
 
         Rollup rollup1 = TelemetryHandler.getRollup(content.getIdentifier(), content.getHierarchyInfo());
