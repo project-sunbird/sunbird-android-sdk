@@ -76,7 +76,50 @@ public class CourseHandler {
         return updateContentStateAPI.patch();
     }
 
+    public static GenieResponse updateContentStateListInServer(AppContext appContext, Session sessionData,
+                                                               Map<String, List<UpdateContentStateRequest>> updateContentStateListRequest) {
+        GenieResponse genieResponse = null;
+
+        for (Map.Entry<String, List<UpdateContentStateRequest>> requestMap : updateContentStateListRequest.entrySet()) {
+
+            UpdateContentStateAPI updateContentStateAPI = new UpdateContentStateAPI(appContext, getCustomHeaders(sessionData),
+                    getUpdateContentStateListRequest(requestMap.getKey(), requestMap.getValue()));
+
+            genieResponse = updateContentStateAPI.patch();
+
+            if (!genieResponse.getStatus()) {
+                break;
+            }
+        }
+
+        return genieResponse;
+    }
+
+    private static Map<String, Object> getUpdateContentStateListRequest(String userId, List<UpdateContentStateRequest> updateContentStateListRequest) {
+        List<Map<String, Object>> contents = new ArrayList<>();
+
+        for (UpdateContentStateRequest updateContentStateRequest : updateContentStateListRequest) {
+            contents.add(getRequestMap(updateContentStateRequest));
+        }
+
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("userId", userId);
+        requestMap.put("contents", contents);
+        return requestMap;
+    }
+
+
     private static Map<String, Object> getUpdateContentStateRequest(UpdateContentStateRequest updateContentStateRequest) {
+        List<Map<String, Object>> contents = new ArrayList<>();
+        contents.add(getRequestMap(updateContentStateRequest));
+
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("userId", updateContentStateRequest.getUserId());
+        requestMap.put("contents", contents);
+        return requestMap;
+    }
+
+    private static Map<String, Object> getRequestMap(UpdateContentStateRequest updateContentStateRequest) {
         Map<String, Object> contentMap = new HashMap<>();
         contentMap.put("contentId", updateContentStateRequest.getContentId());
         contentMap.put("courseId", updateContentStateRequest.getCourseId());
@@ -93,14 +136,7 @@ public class CourseHandler {
         if (!StringUtil.isNullOrEmpty(updateContentStateRequest.getScore())) {
             contentMap.put("score", updateContentStateRequest.getScore());
         }
-
-        List<Map<String, Object>> contents = new ArrayList<>();
-        contents.add(contentMap);
-
-        Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("userId", updateContentStateRequest.getUserId());
-        requestMap.put("contents", contents);
-        return requestMap;
+        return contentMap;
     }
 
     public static GenieResponse fetchCourseBatchesFromServer(AppContext appContext, Session sessionData,

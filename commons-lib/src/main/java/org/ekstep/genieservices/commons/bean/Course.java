@@ -90,6 +90,10 @@ public class Course {
         return progress;
     }
 
+    public void setProgress(int progress) {
+        this.progress = progress;
+    }
+
     public String getId() {
         return id;
     }

@@ -1,10 +1,9 @@
-package org.ekstep.genieservices.profile.db.model;
+package org.ekstep.genieservices.commons.db.model;
 
 import org.ekstep.genieservices.commons.db.contract.NoSqlEntry;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
-import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 
 import java.util.ArrayList;
@@ -38,9 +37,9 @@ public class NoSqlModelListModel implements IReadable, ICleanable {
         }
     }
 
-    public static NoSqlModelListModel findWithCustomQuery(IDBSession dbSession, String filter) {
+    public static NoSqlModelListModel findWithCustomQuery(IDBSession dbSession, String query) {
         NoSqlModelListModel noSqlModelListModel = new NoSqlModelListModel(dbSession, "");
-        dbSession.read(noSqlModelListModel, filter);
+        dbSession.read(noSqlModelListModel, query);
 
         if (noSqlModelListModel.getNoSqlModelList() == null) {
             return null;
@@ -49,6 +48,16 @@ public class NoSqlModelListModel implements IReadable, ICleanable {
         }
     }
 
+    public static NoSqlModelListModel findWithFilter(IDBSession dbSession, String filterCondition) {
+        NoSqlModelListModel noSqlModelListModel = new NoSqlModelListModel(dbSession, filterCondition);
+        dbSession.read(noSqlModelListModel);
+
+        if (noSqlModelListModel.getNoSqlModelList() == null) {
+            return null;
+        } else {
+            return noSqlModelListModel;
+        }
+    }
 
     public Void delete() {
         mDBSession.clean(this);

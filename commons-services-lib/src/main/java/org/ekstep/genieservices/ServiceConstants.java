@@ -64,6 +64,9 @@ public interface ServiceConstants {
 
         //Scan Storage
         String KEY_LAST_MODIFIED = "last_modified";
+
+        //content state available for update
+        String UPDATE_CONTENT_STATE = "update_content_state";
     }
 
     interface Partner {

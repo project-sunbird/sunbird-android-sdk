@@ -7,10 +7,10 @@ import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ProfileImportResponse;
 import org.ekstep.genieservices.commons.chained.IChainable;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
+import org.ekstep.genieservices.commons.db.model.NoSqlModelListModel;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.importexport.bean.ImportProfileContext;
-import org.ekstep.genieservices.profile.db.model.NoSqlModelListModel;
 
 /**
  * Created on 7/19/2018.
