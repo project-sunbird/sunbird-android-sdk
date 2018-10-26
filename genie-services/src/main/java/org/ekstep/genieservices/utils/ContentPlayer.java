@@ -69,7 +69,7 @@ public class ContentPlayer {
         }
     }
 
-    public static void play(Context context, Content content, Map<String, String> rollup) {
+    public static void play(Context context, Content content, Map<String, Object> extraInfo) {
         ContentData contentData = content.getContentData();
         if (sContentPlayer.mQualifier == null) {
             Toast.makeText(context, "App qualifier not found", Toast.LENGTH_SHORT).show();
@@ -141,6 +141,9 @@ public class ContentPlayer {
         Map<String, Object> configMap = (Map<String, Object>) intent.getSerializableExtra("config");
         if (configMap != null) {
             bundleMap.put("config", configMap);
+            if (extraInfo != null && extraInfo.containsKey("streaming")) {
+                bundleMap.put("streaming", extraInfo.get("streaming"));
+            }
         }
 
         Rollup rollup1 = TelemetryHandler.getRollup(content.getIdentifier(), content.getHierarchyInfo());
