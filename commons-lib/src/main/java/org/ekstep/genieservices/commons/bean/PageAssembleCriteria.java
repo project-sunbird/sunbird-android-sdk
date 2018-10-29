@@ -96,6 +96,11 @@ public class PageAssembleCriteria {
             return this;
         }
 
+        public Builder dialcodes(String dialcodes) {
+            pageAssembleCriteria.filters.setDialcodes(dialcodes);
+            return this;
+        }
+
         public PageAssembleCriteria build() throws IllegalStateException {
             if (!pageAssembleCriteria.isValid()) {
                 throw new IllegalStateException();

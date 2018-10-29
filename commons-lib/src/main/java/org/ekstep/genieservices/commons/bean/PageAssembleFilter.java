@@ -23,6 +23,7 @@ public class PageAssembleFilter {
     private String[] contentType;
     private String[] domain;
     private Map<String, Integer> compatibilityLevel;
+    private String dialcodes;
 
     public String[] getSubject() {
         return subject;
@@ -112,6 +113,14 @@ public class PageAssembleFilter {
         this.compatibilityLevel = compatibilityLevel;
     }
 
+    public String getDialcodes() {
+        return dialcodes;
+    }
+
+    public void setDialcodes(String dialcodes) {
+        this.dialcodes = dialcodes;
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -164,6 +173,10 @@ public class PageAssembleFilter {
         if (!CollectionUtil.isEmpty(domain)) {
             Arrays.sort(domain);
             builder.append(StringUtil.join(",", domain));
+        }
+
+        if (!StringUtil.isNullOrEmpty(dialcodes)) {
+            builder.append(dialcodes);
         }
 
         return builder.toString();
