@@ -215,12 +215,16 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
                         List<UpdateContentStateRequest> updateContentStateRequests = userContentStateMap.get(userId);
 
                         for (UpdateContentStateRequest updateContentStateRequest : updateContentStateRequests) {
+                            int newProgress = 0;
                             for (Course course : courseList) {
                                 if (course.getCourseId().equalsIgnoreCase(updateContentStateRequest.getCourseId())) {
-                                    Course updatedCourse = course;
+                                    newProgress++;
+                                }
 
-                                    //update the progress
-                                    int newProgress = course.getProgress() + 1;
+                                Course updatedCourse = course;
+                                //only when the newProgress is greater than the current progress available in the course list, we need to update
+                                //otherwise every time pull to refresh is called, progress will be updated, even when the user has not made any progress
+                                if(newProgress > course.getProgress()){
                                     updatedCourse.setProgress(newProgress);
 
                                     //remove old course
