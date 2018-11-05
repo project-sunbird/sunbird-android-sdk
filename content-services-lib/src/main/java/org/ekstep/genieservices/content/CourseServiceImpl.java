@@ -11,6 +11,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.Batch;
 import org.ekstep.genieservices.commons.bean.BatchDetailsRequest;
+import org.ekstep.genieservices.commons.bean.ContentStateResponse;
 import org.ekstep.genieservices.commons.bean.Course;
 import org.ekstep.genieservices.commons.bean.CourseBatchesRequest;
 import org.ekstep.genieservices.commons.bean.CourseBatchesResponse;
@@ -18,6 +19,7 @@ import org.ekstep.genieservices.commons.bean.EnrollCourseRequest;
 import org.ekstep.genieservices.commons.bean.EnrolledCoursesRequest;
 import org.ekstep.genieservices.commons.bean.EnrolledCoursesResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.GetContentStateRequest;
 import org.ekstep.genieservices.commons.bean.Session;
 import org.ekstep.genieservices.commons.bean.UpdateContentStateRequest;
 import org.ekstep.genieservices.commons.bean.UserSearchCriteria;
@@ -50,6 +52,7 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
     private static final String TAG = CourseServiceImpl.class.getSimpleName();
 
     private static final String GET_ENROLLED_COURSES_KEY_PREFIX = "enrolledCourses";
+    private static final String GET_CONTENT_STATE_KEY_PREFIX = "getContentState";
     private static final String UPDATE_CONTENT_STATE_KEY_PREFIX = "contentState";
     private static final String KEY_FIRST_NAME = "firstName";
     private static final String KEY_LAST_NAME = "lastName";
@@ -92,7 +95,6 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
         if (mAppContext.getKeyValueStore().getBoolean(ServiceConstants.PreferenceKey.UPDATE_CONTENT_STATE, false)) {
             StringBuilder stringBuilder = new StringBuilder();
 
-            //update all the content states first
             String query = stringBuilder.append(String.format(Locale.US, "Select * from %s where %s like '%%%s%%'", NoSqlEntry.TABLE_NAME, NoSqlEntry.COLUMN_NAME_KEY, UPDATE_CONTENT_STATE_KEY_PREFIX)).toString();
             NoSqlModelListModel noSqlModelListModel = NoSqlModelListModel.findWithCustomQuery(mAppContext.getDBSession(), query);
 
@@ -482,6 +484,63 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
         }
 
+        return response;
+    }
+
+    @Override
+    public GenieResponse<ContentStateResponse> getContentState(GetContentStateRequest contentStateRequest) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("request", GsonUtil.toJson(contentStateRequest));
+        params.put("logLevel", "2");
+        String methodName = "contentStateRequest@CourseServiceImpl";
+
+        GenieResponse<ContentStateResponse> response = isValidAuthSession(methodName, params);
+        if (response != null) {
+            return response;
+        }
+
+
+        String key = GET_CONTENT_STATE_KEY_PREFIX + contentStateRequest.getUserId() + contentStateRequest.getCourseIds().get(0);
+
+        NoSqlModel contentStateInDB = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
+        if (contentStateInDB == null) {
+            GenieResponse contentStateAPIResponse = CourseHandler.fetchContentStateFromServer(mAppContext,
+                    authSession.getSessionData(), contentStateRequest);
+
+            if (contentStateAPIResponse.getStatus()) {
+                String body = contentStateAPIResponse.getResult().toString();
+                contentStateInDB = NoSqlModel.build(mAppContext.getDBSession(), key, body);
+                contentStateInDB.save();
+            } else {
+                List<String> errorMessages = contentStateAPIResponse.getErrorMessages();
+                String errorMessage = null;
+                if (!CollectionUtil.isNullOrEmpty(errorMessages)) {
+                    errorMessage = errorMessages.get(0);
+                }
+                response = GenieResponseBuilder.getErrorResponse(contentStateAPIResponse.getError(), errorMessage, TAG);
+                TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
+                return response;
+            }
+        } else if (contentStateRequest.isReturnRefreshedContentStates()) {
+            GenieResponse contentStateAPIResponse = CourseHandler.fetchContentStateFromServer(mAppContext,
+                    authSession.getSessionData(), contentStateRequest);
+
+            if (contentStateAPIResponse.getStatus()) {
+                String jsonResponse = contentStateAPIResponse.getResult().toString();
+                if (!StringUtil.isNullOrEmpty(jsonResponse)) {
+                    contentStateInDB.setValue(jsonResponse);
+                    contentStateInDB.update();
+                }
+            }
+        }
+
+        LinkedTreeMap map = GsonUtil.fromJson(contentStateInDB.getValue(), LinkedTreeMap.class);
+        String result = GsonUtil.toJson(map.get("result"));
+        ContentStateResponse contentStateResponse = GsonUtil.fromJson(result, ContentStateResponse.class);
+        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        response.setResult(contentStateResponse);
+
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;
     }
 }

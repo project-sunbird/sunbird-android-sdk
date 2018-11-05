@@ -5,12 +5,14 @@ import org.ekstep.genieservices.ICourseService;
 import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.Batch;
 import org.ekstep.genieservices.commons.bean.BatchDetailsRequest;
+import org.ekstep.genieservices.commons.bean.ContentStateResponse;
 import org.ekstep.genieservices.commons.bean.CourseBatchesRequest;
 import org.ekstep.genieservices.commons.bean.CourseBatchesResponse;
 import org.ekstep.genieservices.commons.bean.EnrollCourseRequest;
 import org.ekstep.genieservices.commons.bean.EnrolledCoursesRequest;
 import org.ekstep.genieservices.commons.bean.EnrolledCoursesResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.GetContentStateRequest;
 import org.ekstep.genieservices.commons.bean.UpdateContentStateRequest;
 
 /**
@@ -89,6 +91,21 @@ public class CourseService {
             @Override
             public GenieResponse<Batch> perform() {
                 return courseService.getBatchDetails(batchDetailsRequest);
+            }
+        }, responseHandler);
+    }
+
+    /**
+     * This api is used to get the state of content within a course for a particular batch
+     *
+     * @param contentStateRequest
+     * @return
+     */
+    public void getContentState(final GetContentStateRequest contentStateRequest, IResponseHandler<ContentStateResponse> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<ContentStateResponse>() {
+            @Override
+            public GenieResponse<ContentStateResponse> perform() {
+                return courseService.getContentState(contentStateRequest);
             }
         }, responseHandler);
     }

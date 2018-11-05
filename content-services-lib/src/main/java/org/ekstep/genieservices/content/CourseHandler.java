@@ -3,11 +3,13 @@ package org.ekstep.genieservices.content;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.EnrollCourseRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.GetContentStateRequest;
 import org.ekstep.genieservices.commons.bean.Session;
 import org.ekstep.genieservices.commons.bean.UpdateContentStateRequest;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.network.BatchDetailsAPI;
+import org.ekstep.genieservices.content.network.ContentStateAPI;
 import org.ekstep.genieservices.content.network.CourseBatchesAPI;
 import org.ekstep.genieservices.content.network.EnrolCourseAPI;
 import org.ekstep.genieservices.content.network.EnrolledCoursesAPI;
@@ -150,5 +152,20 @@ public class CourseHandler {
                                                             String batchId) {
         BatchDetailsAPI batchDetailsAPI = new BatchDetailsAPI(appContext, getCustomHeaders(sessionData), batchId);
         return batchDetailsAPI.get();
+    }
+
+    public static GenieResponse fetchContentStateFromServer(AppContext appContext, Session sessionData, GetContentStateRequest contentStateRequest) {
+        ContentStateAPI enrolCourseAPI = new ContentStateAPI(appContext, getCustomHeaders(sessionData),
+                getCourseContentStateRequest(contentStateRequest));
+        return enrolCourseAPI.post();
+    }
+
+    private static Map<String, Object> getCourseContentStateRequest(GetContentStateRequest contentStateRequest) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("userId", contentStateRequest.getUserId());
+        requestMap.put("courseIds", contentStateRequest.getCourseIds());
+        requestMap.put("contentIds", contentStateRequest.getContentIds());
+        requestMap.put("batchId", contentStateRequest.getBatchId());
+        return requestMap;
     }
 }
