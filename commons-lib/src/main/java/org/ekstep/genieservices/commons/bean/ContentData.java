@@ -58,6 +58,8 @@ public class ContentData implements Serializable {
     private List<String> childNodes;
     private String previewUrl;
     private String framework;
+    private String creators;
+    private String contributors;
 
     public ContentData() {
     }
@@ -282,6 +284,22 @@ public class ContentData implements Serializable {
 
     public String getFramework() {
         return framework;
+    }
+
+    public String getCreators() {
+        return creators;
+    }
+
+    public void setCreators(String creators) {
+        this.creators = creators;
+    }
+
+    public String getContributors() {
+        return contributors;
+    }
+
+    public void setContributors(String contributors) {
+        this.contributors = contributors;
     }
 
     @Override
