@@ -1127,6 +1127,8 @@ public class ContentHandler {
         requestMap.put("offset", criteria.getOffset());
         requestMap.put("limit", criteria.getLimit());
         requestMap.put("mode", criteria.getMode());
+        requestMap.put("framework", criteria.getFramework());
+        requestMap.put("languageCode", criteria.getLanguageCode());
 
         if (!CollectionUtil.isEmpty(criteria.getExists())) {
             requestMap.put("exists", Arrays.asList(criteria.getExists()));

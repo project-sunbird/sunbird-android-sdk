@@ -4,6 +4,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.network.BaseAPI;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
+import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -23,6 +24,7 @@ public class ContentSearchAPI extends BaseAPI {
     private Map<String, Object> requestMap;
 
     public ContentSearchAPI(AppContext appContext, Map<String, Object> requestMap) {
+
         super(appContext,
                 String.format(Locale.US, "%s/%s",
                         appContext.getParams().getString(IParams.Key.SEARCH_BASE_URL),
@@ -31,6 +33,18 @@ public class ContentSearchAPI extends BaseAPI {
 
         this.requestMap = requestMap;
     }
+
+    public ContentSearchAPI(AppContext appContext, Map<String, Object> requestMap, String framework, String langCode) {
+
+        super(appContext,
+                String.format(Locale.US, "%s/%s%s",
+                        appContext.getParams().getString(IParams.Key.SEARCH_BASE_URL),
+                        ENDPOINT, "?framework=" + framework + "&lang=" + langCode),
+                TAG);
+
+        this.requestMap = requestMap;
+    }
+
 
     @Override
     protected Map<String, String> getRequestHeaders() {
@@ -44,5 +58,12 @@ public class ContentSearchAPI extends BaseAPI {
         Map<String, Object> request = new HashMap<>();
         request.put("request", requestMap);
         return GsonUtil.toJson(request);
+    }
+
+    private String getFrameworknLangCode(String framework, String langCode) {
+        if (!StringUtil.isNullOrEmpty(framework) && !StringUtil.isNullOrEmpty(langCode)) {
+            return "?framework=" + framework + "&lang=" + langCode;
+        }
+        return "";
     }
 }
