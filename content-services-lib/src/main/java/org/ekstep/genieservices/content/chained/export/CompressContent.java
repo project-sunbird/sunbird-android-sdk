@@ -69,7 +69,7 @@ public class CompressContent implements IChainable<ContentExportResponse, Export
                         skippDirectoriesName.add(contentModel.getIdentifier());
 
                         List<String> skippFilesName = new ArrayList<>();
-                        skippFilesName.add(FileUtil.MANIFEST_FILE_NAME);
+                        skippFilesName.add(contentModel.getIdentifier() + "/" + FileUtil.MANIFEST_FILE_NAME);
 
                         Compress.zip(path, payload, skippDirectoriesName, skippFilesName);
                     }
