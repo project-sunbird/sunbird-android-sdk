@@ -2,6 +2,9 @@ package org.ekstep.genieservices.commons.bean;
 
 import org.ekstep.genieservices.commons.utils.GsonUtil;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Created on 6/3/18.
  *
@@ -29,6 +32,15 @@ public class Course {
     private String lastReadContentId;
     private String courseId;
     private int status;
+    private Set<String> contentsPlayedOffline = new HashSet<>();
+
+    public Set<String> getContentsPlayedOffline() {
+        return contentsPlayedOffline;
+    }
+
+    public void setContentPlayedOffline(String contentPlayedOffline) {
+        this.contentsPlayedOffline.add(contentPlayedOffline);
+    }
 
     public String getDateTime() {
         return dateTime;

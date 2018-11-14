@@ -11,6 +11,7 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.Batch;
 import org.ekstep.genieservices.commons.bean.BatchDetailsRequest;
+import org.ekstep.genieservices.commons.bean.ContentState;
 import org.ekstep.genieservices.commons.bean.ContentStateResponse;
 import org.ekstep.genieservices.commons.bean.Course;
 import org.ekstep.genieservices.commons.bean.CourseBatchesRequest;
@@ -53,7 +54,7 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
 
     private static final String GET_ENROLLED_COURSES_KEY_PREFIX = "enrolledCourses";
     private static final String GET_CONTENT_STATE_KEY_PREFIX = "getContentState";
-    private static final String UPDATE_CONTENT_STATE_KEY_PREFIX = "contentState";
+    private static final String UPDATE_CONTENT_STATE_KEY_PREFIX = "updateContentState";
     private static final String KEY_FIRST_NAME = "firstName";
     private static final String KEY_LAST_NAME = "lastName";
     private static final String KEY_IDENTIFIER = "identifier";
@@ -116,7 +117,7 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
                 }
 
                 //update the content state to server
-                updateContentState(userContentStateMap, enrolledCoursesRequest.getUserId());
+                updateContentState(userContentStateMap);
             }
         }
 
@@ -166,7 +167,7 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
         return response;
     }
 
-    private GenieResponse<Void> updateContentState(Map<String, List<UpdateContentStateRequest>> userContentStateMap, String userId) {
+    private GenieResponse<Void> updateContentState(Map<String, List<UpdateContentStateRequest>> userContentStateMap) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(userContentStateMap));
         params.put("logLevel", "2");
@@ -196,63 +197,6 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
 
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
-        } else {
-            //updating the course state for enrolled courses
-            String key = GET_ENROLLED_COURSES_KEY_PREFIX + userId;
-            NoSqlModel enrolledCoursesInDB = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
-
-            if (enrolledCoursesInDB != null) {
-                GenieResponse genieResponse = GsonUtil.fromJson(enrolledCoursesInDB.getValue(), GenieResponse.class);
-
-                LinkedTreeMap map = GsonUtil.fromJson(enrolledCoursesInDB.getValue(), LinkedTreeMap.class);
-                String result = GsonUtil.toJson(map.get("result"));
-                EnrolledCoursesResponse enrolledCoursesResponse = GsonUtil.fromJson(result, EnrolledCoursesResponse.class);
-
-                if (enrolledCoursesResponse != null && enrolledCoursesResponse.getCourses() != null && enrolledCoursesResponse.getCourses().size() > 0) {
-                    List<Course> courseList = enrolledCoursesResponse.getCourses();
-                    List<Course> newCourseList = new ArrayList<>(courseList);
-
-                    //check if the userContentStateMap contains that userId
-                    if (userContentStateMap.containsKey(userId)) {
-                        List<UpdateContentStateRequest> updateContentStateRequests = userContentStateMap.get(userId);
-
-                        for (UpdateContentStateRequest updateContentStateRequest : updateContentStateRequests) {
-                            int newProgress = 0;
-                            for (Course course : courseList) {
-                                if (course.getCourseId().equalsIgnoreCase(updateContentStateRequest.getCourseId())) {
-                                    newProgress++;
-                                }
-
-                                Course updatedCourse = course;
-                                //only when the newProgress is greater than the current progress available in the course list, we need to update
-                                //otherwise every time pull to refresh is called, progress will be updated, even when the user has not made any progress
-                                if(newProgress > course.getProgress()){
-                                    updatedCourse.setProgress(newProgress);
-
-                                    //remove old course
-                                    newCourseList.remove(course);
-
-                                    //add new course
-                                    newCourseList.add(updatedCourse);
-                                }
-                            }
-                        }
-                    }
-
-                    if (newCourseList.size() > 0) {
-                        //update the enrolled course response
-                        enrolledCoursesResponse.setCourses(newCourseList);
-
-                        //set it to the genie response
-                        genieResponse.setResult(enrolledCoursesResponse);
-
-                        //update the NoSQL db
-                        enrolledCoursesInDB.setValue(GsonUtil.toJson(genieResponse));
-                        enrolledCoursesInDB.update();
-                    }
-                }
-            }
-
         }
 
         return response;
@@ -338,6 +282,56 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
 
                     //store the preference in flag
                     mAppContext.getKeyValueStore().putBoolean(ServiceConstants.PreferenceKey.UPDATE_CONTENT_STATE, true);
+
+                    //updating the course state for enrolled courses
+                    String enrolledCoursesKey = GET_ENROLLED_COURSES_KEY_PREFIX + updateContentStateRequest.getUserId();
+                    NoSqlModel enrolledCoursesInDB = NoSqlModel.findByKey(mAppContext.getDBSession(), enrolledCoursesKey);
+
+                    if (enrolledCoursesInDB != null) {
+                        GenieResponse genieResponse = GsonUtil.fromJson(enrolledCoursesInDB.getValue(), GenieResponse.class);
+
+                        LinkedTreeMap map = GsonUtil.fromJson(enrolledCoursesInDB.getValue(), LinkedTreeMap.class);
+                        String result = GsonUtil.toJson(map.get("result"));
+                        EnrolledCoursesResponse enrolledCoursesResponse = GsonUtil.fromJson(result, EnrolledCoursesResponse.class);
+
+                        if (enrolledCoursesResponse != null && enrolledCoursesResponse.getCourses() != null && enrolledCoursesResponse.getCourses().size() > 0) {
+                            List<Course> courseList = enrolledCoursesResponse.getCourses();
+                            List<Course> newCourseList = new ArrayList<>(courseList);
+
+                            for (Course course : courseList) {
+                                if (course.getCourseId().equalsIgnoreCase(updateContentStateRequest.getCourseId())) {
+
+                                    if (course.getContentsPlayedOffline().size() == 0 ||
+                                            (course.getContentsPlayedOffline().size() > 0 && !course.getContentsPlayedOffline().contains(updateContentStateRequest.getContentId()))) {
+                                        int newProgress = course.getProgress() + 1;
+
+                                        Course updatedCourse = course;
+                                        updatedCourse.setContentPlayedOffline(updateContentStateRequest.getContentId());
+                                        updatedCourse.setProgress(newProgress);
+
+                                        //remove old course
+                                        newCourseList.remove(course);
+
+                                        //add new course
+                                        newCourseList.add(updatedCourse);
+                                    }
+
+                                }
+                            }
+
+                            if (newCourseList.size() > 0) {
+                                //update the enrolled course response
+                                enrolledCoursesResponse.setCourses(newCourseList);
+
+                                //set it to the genie response
+                                genieResponse.setResult(enrolledCoursesResponse);
+
+                                //update the NoSQL db
+                                enrolledCoursesInDB.setValue(GsonUtil.toJson(genieResponse));
+                                enrolledCoursesInDB.update();
+                            }
+                        }
+                    }
                 }
             }
 
@@ -537,10 +531,64 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
         LinkedTreeMap map = GsonUtil.fromJson(contentStateInDB.getValue(), LinkedTreeMap.class);
         String result = GsonUtil.toJson(map.get("result"));
         ContentStateResponse contentStateResponse = GsonUtil.fromJson(result, ContentStateResponse.class);
+
+        //update the contentsPlayedOffline in Course, only for those contents whose status is 2
+        updateEnrolledCourse(contentStateRequest.getUserId(), contentStateRequest.getCourseIds().get(0), contentStateResponse);
+
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(contentStateResponse);
 
         TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         return response;
+    }
+
+    private void updateEnrolledCourse(String userId, String courseId, ContentStateResponse contentStateResponse) {
+        //updating the course state for enrolled courses
+        String enrolledCoursesKey = GET_ENROLLED_COURSES_KEY_PREFIX + userId;
+        NoSqlModel enrolledCoursesInDB = NoSqlModel.findByKey(mAppContext.getDBSession(), enrolledCoursesKey);
+
+        if (enrolledCoursesInDB != null) {
+            GenieResponse genieResponse = GsonUtil.fromJson(enrolledCoursesInDB.getValue(), GenieResponse.class);
+
+            LinkedTreeMap map = GsonUtil.fromJson(enrolledCoursesInDB.getValue(), LinkedTreeMap.class);
+            String result = GsonUtil.toJson(map.get("result"));
+            EnrolledCoursesResponse enrolledCoursesResponse = GsonUtil.fromJson(result, EnrolledCoursesResponse.class);
+
+            if (enrolledCoursesResponse != null && enrolledCoursesResponse.getCourses() != null && enrolledCoursesResponse.getCourses().size() > 0) {
+                List<Course> courseList = enrolledCoursesResponse.getCourses();
+                List<Course> newCourseList = new ArrayList<>(courseList);
+
+                for (Course course : courseList) {
+                    if (course.getCourseId().equalsIgnoreCase(courseId)) {
+
+                        Course updatedCourse = course;
+
+                        for (ContentState contentState : contentStateResponse.getContentList()) {
+                            if (contentState.getStatus() == 2)
+                                updatedCourse.setContentPlayedOffline(contentState.getContentId());
+                        }
+
+                        //remove old course
+                        newCourseList.remove(course);
+
+                        //add new course
+                        newCourseList.add(updatedCourse);
+
+                    }
+                }
+
+                if (newCourseList.size() > 0) {
+                    //update the enrolled course response
+                    enrolledCoursesResponse.setCourses(newCourseList);
+
+                    //set it to the genie response
+                    genieResponse.setResult(enrolledCoursesResponse);
+
+                    //update the NoSQL db
+                    enrolledCoursesInDB.setValue(GsonUtil.toJson(genieResponse));
+                    enrolledCoursesInDB.update();
+                }
+            }
+        }
     }
 }
