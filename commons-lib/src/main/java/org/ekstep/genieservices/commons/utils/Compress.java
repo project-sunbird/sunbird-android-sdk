@@ -61,8 +61,17 @@ public class Compress {
                     continue;
                 }
                 if (!CollectionUtil.isNullOrEmpty(skippFilesName)
-                        && skippFilesName.contains(file.getName())) {
-                    continue;
+                        && !StringUtil.isNullOrEmpty(file.getPath())) {
+                    boolean skip = false;
+                    for (String fileName : skippFilesName) {
+                        if (file.getPath().contains(fileName)) {
+                            skip = true;
+                            break;
+                        }
+                    }
+                    if (skip) {
+                        continue;
+                    }
                 }
 
                 if (file.isDirectory()) {
