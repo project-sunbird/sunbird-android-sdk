@@ -198,6 +198,7 @@ public class UserProfileHandler {
         requestMap.put("education", updateUserInfoRequest.getEducation());
         requestMap.put("jobProfile", updateUserInfoRequest.getJobProfile());
         requestMap.put("address", updateUserInfoRequest.getAddress());
+        requestMap.put("framework", updateUserInfoRequest.getFramework());
         return requestMap;
     }
 
