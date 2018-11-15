@@ -59,6 +59,7 @@ public class BuildParams implements IParams {
         setParam(Key.CONTENT_LISTING_BASE_URL);
         setParam(Key.CONTENT_BASE_URL);
         setParam(Key.USER_SERVICE_BASE_URL);
+        setParam(Key.USER_SERVICE_BASE_URL_V2);
         setParam(Key.DATA_SERVICE_BASE_URL);
         setParam(Key.ORG_SERVICE_BASE_URL);
         setParam(Key.COURSE_SERVICE_BASE_URL);
@@ -124,6 +125,7 @@ public class BuildParams implements IParams {
         setParam(params, Key.CONTENT_LISTING_BASE_URL);
         setParam(params, Key.CONTENT_BASE_URL);
         setParam(params, Key.USER_SERVICE_BASE_URL);
+        setParam(params, Key.USER_SERVICE_BASE_URL_V2);
         setParam(params, Key.DATA_SERVICE_BASE_URL);
         setParam(params, Key.ORG_SERVICE_BASE_URL);
         setParam(params, Key.COURSE_SERVICE_BASE_URL);
