@@ -1535,6 +1535,7 @@ public class ContentHandler {
             if (!StringUtil.isNullOrEmpty(facetName)) {
                 filter.setName(facetName);
                 filter.setValues(values);
+                filter.setValues(values);
 
                 // Set the filter
                 facetFilters.add(filter);
@@ -1620,6 +1621,7 @@ public class ContentHandler {
 
         for (Map<String, Object> valueMap : facetValues) {
             String name = (String) valueMap.get("name");
+            String translations = (String) valueMap.get("translations");
             int index = indexOf(facetOrder, name);
 
             boolean applied = false;
@@ -1630,6 +1632,7 @@ public class ContentHandler {
             FilterValue filterValue = new FilterValue();
             filterValue.setName(name);
             filterValue.setApply(applied);
+            filterValue.setTranslations(translations);
             if (valueMap.containsKey("count")) {
                 Double count = (Double) valueMap.get("count");
                 filterValue.setCount(count.intValue());
