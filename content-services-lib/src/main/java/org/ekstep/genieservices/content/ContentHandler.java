@@ -1535,7 +1535,6 @@ public class ContentHandler {
             if (!StringUtil.isNullOrEmpty(facetName)) {
                 filter.setName(facetName);
                 filter.setValues(values);
-                filter.setValues(values);
 
                 // Set the filter
                 facetFilters.add(filter);

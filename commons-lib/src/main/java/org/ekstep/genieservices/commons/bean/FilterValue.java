@@ -11,6 +11,7 @@ public class FilterValue implements Serializable {
     private String name;
     private int count;
     private boolean apply;
+    private String translations;
 
     public String getName() {
         return name;
@@ -34,5 +35,13 @@ public class FilterValue implements Serializable {
 
     public void setApply(boolean apply) {
         this.apply = apply;
+    }
+
+    public String getTranslations() {
+        return translations;
+    }
+
+    public void setTranslations(String translations) {
+        this.translations = translations;
     }
 }
