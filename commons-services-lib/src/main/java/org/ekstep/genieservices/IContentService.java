@@ -12,6 +12,7 @@ import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
+import org.ekstep.genieservices.commons.bean.ContentMarkerRequest;
 import org.ekstep.genieservices.commons.bean.ContentMoveRequest;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
@@ -376,4 +377,6 @@ public interface IContentService {
      * @return {@link GenieResponse<List<Content>>}
      */
     GenieResponse<List<Content>> getLocalContents(SummarizerContentFilterCriteria criteria);
+
+    GenieResponse<Void> setContentMarker(ContentMarkerRequest contentMarkerRequest);
 }

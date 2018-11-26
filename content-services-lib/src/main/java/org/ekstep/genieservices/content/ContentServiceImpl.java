@@ -28,6 +28,7 @@ import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
+import org.ekstep.genieservices.commons.bean.ContentMarkerRequest;
 import org.ekstep.genieservices.commons.bean.ContentMoveRequest;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
@@ -96,6 +97,7 @@ import org.ekstep.genieservices.content.chained.move.UpdateSourceContentPathInDB
 import org.ekstep.genieservices.content.chained.move.ValidateDestinationContent;
 import org.ekstep.genieservices.content.chained.move.ValidateDestinationFolder;
 import org.ekstep.genieservices.content.db.model.ContentListingModel;
+import org.ekstep.genieservices.content.db.model.ContentMarkerModel;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.network.ContentSearchAPI;
 import org.ekstep.genieservices.content.network.FlagContentAPI;
@@ -1469,6 +1471,46 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             response = GenieResponseBuilder.getErrorResponse(genieResponse.getError(), genieResponse.getMessage(), TAG);
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, response.getMessage());
         }
+
+        return response;
+    }
+
+    @Override
+    public GenieResponse<Void> setContentMarker(ContentMarkerRequest contentMarkerRequest) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("request", GsonUtil.toJson(contentMarkerRequest));
+        params.put("logLevel", "2");
+        String methodName = "setContentMarker@ContentServiceImpl";
+
+        ContentMarkerModel contentMarkerModelInDB = ContentMarkerModel.find(mAppContext.getDBSession(),
+                contentMarkerRequest.getUid(), contentMarkerRequest.getContentId());
+
+
+        int marker = 1 << contentMarkerRequest.getMarker();
+        String visibility = ContentHandler.readVisibility(GsonUtil.fromJson(contentMarkerRequest.getData(), Map.class));
+        ContentMarkerModel contentMarkerModel = ContentMarkerModel.build(mAppContext.getDBSession(),
+                contentMarkerRequest.getUid(), contentMarkerRequest.getContentId(), contentMarkerRequest.getData(),
+                marker, visibility);
+
+        if (contentMarkerModelInDB == null) {
+            contentMarkerModel.save();
+        } else {
+            if (ContentConstants.Visibility.DEFAULT.equals(contentMarkerModelInDB.getVisibility())) {
+                contentMarkerModel.setVisibility(contentMarkerModelInDB.getVisibility());
+            }
+
+            if ((contentMarkerModelInDB.getMarker() & marker) == marker) {
+                marker = (~marker) & contentMarkerModelInDB.getMarker();
+            } else {
+                marker = marker | contentMarkerModelInDB.getMarker();
+            }
+            contentMarkerModel.setMarker(marker);
+
+            contentMarkerModel.update();
+        }
+
+        GenieResponse<Void> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
 
         return response;
     }

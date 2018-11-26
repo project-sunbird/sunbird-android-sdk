@@ -18,6 +18,7 @@ import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
+import org.ekstep.genieservices.commons.bean.ContentMarkerRequest;
 import org.ekstep.genieservices.commons.bean.ContentMoveRequest;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
@@ -563,6 +564,16 @@ public class ContentService {
             @Override
             public GenieResponse<List<Content>> perform() {
                 return contentService.getLocalContents(criteria);
+            }
+        }, responseHandler);
+    }
+
+    public void setContentMarker(final ContentMarkerRequest contentMarkerRequest,
+                                 IResponseHandler<Void> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return contentService.setContentMarker(contentMarkerRequest);
             }
         }, responseHandler);
     }
