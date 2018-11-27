@@ -1499,7 +1499,8 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                 contentMarkerModel.setVisibility(contentMarkerModelInDB.getVisibility());
             }
 
-            if ((contentMarkerModelInDB.getMarker() & marker) == marker) {
+            if ((contentMarkerModelInDB.getMarker() & marker) == marker
+                    && !contentMarkerRequest.isMarked()) {
                 marker = (~marker) & contentMarkerModelInDB.getMarker();
             } else {
                 marker = marker | contentMarkerModelInDB.getMarker();

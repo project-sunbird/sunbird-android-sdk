@@ -9,12 +9,14 @@ public class ContentMarkerRequest {
     private String uid;
     private String data;
     private int marker;
+    private boolean isMarked;
 
-    private ContentMarkerRequest(String contentId, String uid, String data, int marker) {
+    private ContentMarkerRequest(String contentId, String uid, String data, int marker, boolean isMarked) {
         this.contentId = contentId;
         this.uid = uid;
         this.data = data;
         this.marker = marker;
+        this.isMarked = isMarked;
     }
 
     public String getContentId() {
@@ -33,11 +35,16 @@ public class ContentMarkerRequest {
         return marker;
     }
 
+    public boolean isMarked() {
+        return isMarked;
+    }
+
     public static class Builder {
         private String contentId;
         private String uid;
         private String data;
         private int marker;
+        private boolean isMarked;
 
         public Builder forContent(String contentId) {
             if (StringUtil.isNullOrEmpty(contentId)) {
@@ -65,6 +72,7 @@ public class ContentMarkerRequest {
 
         public Builder setMarker(MarkerType marker) {
             this.marker = marker.getValue();
+            this.isMarked = true;
             return this;
         }
 
@@ -84,7 +92,7 @@ public class ContentMarkerRequest {
                 throw new IllegalStateException("data required.");
             }
 
-            return new ContentMarkerRequest(contentId, uid, data, marker);
+            return new ContentMarkerRequest(contentId, uid, data, marker, isMarked);
         }
     }
 }
