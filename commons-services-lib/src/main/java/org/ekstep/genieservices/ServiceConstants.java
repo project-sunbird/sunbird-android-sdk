@@ -67,6 +67,8 @@ public interface ServiceConstants {
 
         //content state available for update
         String UPDATE_CONTENT_STATE = "update_content_state";
+
+        String LAST_SYNCED_TIME_STAMP_DEVICE_REGISTER = "last_synced_time_device_regeister";
     }
 
     interface Partner {

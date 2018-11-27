@@ -78,6 +78,7 @@ public class BuildParams implements IParams {
         setParam(ServiceConstants.Params.OAUTH_SESSION);
         setParam(ServiceConstants.Params.PLAYER_CONFIG);
         setParam(Key.ANNOUNCEMENT_BASE_URL);
+        setParam(Key.DEVICE_REGISTER_BASE_URL);
         put(Key.LOG_LEVEL, LogLevel.getLogLevel(BuildConfigUtil.getBuildConfigValue(packageName, Key.LOG_LEVEL)).getLevel());
 
         initCompatibilityLevel(packageName);
@@ -135,6 +136,7 @@ public class BuildParams implements IParams {
         setParam(params, Key.FORM_SERVICE_BASE_URL);
         setParam(params, Key.DIALCODE_SERVICE_BASE_URL);
         setParam(params, Key.APIGATEWAY_BASE_URL);
+        setParam(params, Key.DEVICE_REGISTER_BASE_URL);
         setParam(params, Key.API_USER);
         setParam(params, Key.API_PASS);
         setParam(params, Key.MOBILE_APP_SECRET);
