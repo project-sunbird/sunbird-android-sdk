@@ -26,6 +26,8 @@ import java.util.Map;
 public class SyncServiceImpl extends BaseService implements ISyncService {
 
     private static final String TAG = TelemetryServiceImpl.class.getSimpleName();
+    private static final int REGISTER_API_SUCCESS_TTL = 24 * DateUtil.MILLISECONDS_IN_AN_HOUR;
+    private static final int REGISTER_API_FAILURE_TTL = 1 * DateUtil.MILLISECONDS_IN_AN_HOUR;
     private ITelemetryService mTelemetryService;
 
     public SyncServiceImpl(AppContext appContext, ITelemetryService telemetryService) {
@@ -108,13 +110,14 @@ public class SyncServiceImpl extends BaseService implements ISyncService {
         return requestMap;
     }
 
-    private GenieResponse registerDevice() {
+    private void registerDevice() {
         DeviceRegisterAPI deviceRegisterAPI = new DeviceRegisterAPI(mAppContext, getDeviceRegisterRequest(), mAppContext.getDeviceInfo().getDeviceID());
         GenieResponse response = deviceRegisterAPI.post();
-        if (response.getStatus()) {
-            mAppContext.getKeyValueStore().putLong(ServiceConstants.PreferenceKey.LAST_SYNCED_TIME_STAMP_DEVICE_REGISTER, DateUtil.getEpochTime() + 24 * DateUtil.MILLISECONDS_IN_AN_HOUR);
+        if (response != null) {
+            mAppContext.getKeyValueStore().putLong(ServiceConstants.PreferenceKey.LAST_SYNCED_TIME_STAMP_DEVICE_REGISTER,
+                    DateUtil.getEpochTime() + (response.getStatus() ? REGISTER_API_SUCCESS_TTL : REGISTER_API_FAILURE_TTL));
         }
-        return response;
+
     }
 
 
