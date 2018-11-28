@@ -21,9 +21,9 @@ public class ContentMarkerModel implements IWritable, IUpdatable, IReadable, ICl
     private String identifier;
     private String uid;
     private String data;
-    private String visibility;
+    private String extraInfoJson;
     private int marker;
-    private Long epochTimestamp;
+//    private Long epochTimestamp;
 
     private ContentMarkerModel(IDBSession dbSession) {
         this.mDBSession = dbSession;
@@ -36,13 +36,13 @@ public class ContentMarkerModel implements IWritable, IUpdatable, IReadable, ICl
     }
 
     private ContentMarkerModel(IDBSession dbSession, String uid, String identifier, String data,
-                               int marker, String visibility) {
+                               int marker, String extraInfoJson) {
         this.mDBSession = dbSession;
         this.uid = uid;
         this.identifier = identifier;
         this.data = data;
         this.marker = marker;
-        this.visibility = visibility;
+        this.extraInfoJson = extraInfoJson;
     }
 
     public static ContentMarkerModel build(IDBSession dbSession) {
@@ -50,8 +50,8 @@ public class ContentMarkerModel implements IWritable, IUpdatable, IReadable, ICl
     }
 
     public static ContentMarkerModel build(IDBSession dbSession, String uid, String identifier,
-                                           String data, int marker, String visibility) {
-        return new ContentMarkerModel(dbSession, uid, identifier, data, marker, visibility);
+                                           String data, int marker, String extraInfoJson) {
+        return new ContentMarkerModel(dbSession, uid, identifier, data, marker, extraInfoJson);
     }
 
     public static ContentMarkerModel find(IDBSession dbSession, String uid, String identifier) {
@@ -82,7 +82,7 @@ public class ContentMarkerModel implements IWritable, IUpdatable, IReadable, ICl
         with(contentValues, ContentMarkerEntry.COLUMN_NAME_CONTENT_IDENTIFIER, identifier);
         with(contentValues, ContentMarkerEntry.COLUMN_NAME_UID, uid);
         with(contentValues, ContentMarkerEntry.COLUMN_NAME_DATA, data);
-        with(contentValues, ContentMarkerEntry.COLUMN_NAME_VISIBILITY, visibility);
+        with(contentValues, ContentMarkerEntry.COLUMN_NAME_EXTRA_INFO, extraInfoJson);
         with(contentValues, ContentMarkerEntry.COLUMN_NAME_MARKER, marker);
         with(contentValues, ContentMarkerEntry.COLUMN_NAME_EPOCH_TIMESTAMP, DateUtil.getEpochTime());
 
@@ -99,7 +99,7 @@ public class ContentMarkerModel implements IWritable, IUpdatable, IReadable, ICl
         ContentValues contentValues = new ContentValues();
 
         with(contentValues, ContentMarkerEntry.COLUMN_NAME_DATA, data);
-        with(contentValues, ContentMarkerEntry.COLUMN_NAME_VISIBILITY, visibility);
+        with(contentValues, ContentMarkerEntry.COLUMN_NAME_EXTRA_INFO, extraInfoJson);
         with(contentValues, ContentMarkerEntry.COLUMN_NAME_MARKER, marker);
         with(contentValues, ContentMarkerEntry.COLUMN_NAME_EPOCH_TIMESTAMP, DateUtil.getEpochTime());
 
@@ -167,9 +167,9 @@ public class ContentMarkerModel implements IWritable, IUpdatable, IReadable, ICl
         identifier = resultSet.getString(resultSet.getColumnIndex(ContentMarkerEntry.COLUMN_NAME_CONTENT_IDENTIFIER));
         uid = resultSet.getString(resultSet.getColumnIndex(ContentMarkerEntry.COLUMN_NAME_UID));
         data = resultSet.getString(resultSet.getColumnIndex(ContentMarkerEntry.COLUMN_NAME_DATA));
-        visibility = resultSet.getString(resultSet.getColumnIndex(ContentMarkerEntry.COLUMN_NAME_VISIBILITY));
+        extraInfoJson = resultSet.getString(resultSet.getColumnIndex(ContentMarkerEntry.COLUMN_NAME_EXTRA_INFO));
         marker = resultSet.getInt(resultSet.getColumnIndex(ContentMarkerEntry.COLUMN_NAME_MARKER));
-        epochTimestamp = resultSet.getLong(resultSet.getColumnIndex(ContentMarkerEntry.COLUMN_NAME_EPOCH_TIMESTAMP));
+//        epochTimestamp = resultSet.getLong(resultSet.getColumnIndex(ContentMarkerEntry.COLUMN_NAME_EPOCH_TIMESTAMP));
     }
 
     private void with(ContentValues contentValues, String key, String value) {
@@ -186,12 +186,8 @@ public class ContentMarkerModel implements IWritable, IUpdatable, IReadable, ICl
         contentValues.put(key, value);
     }
 
-    public String getVisibility() {
-        return visibility;
-    }
-
-    public void setVisibility(String visibility) {
-        this.visibility = visibility;
+    public String getExtraInfoJson() {
+        return extraInfoJson;
     }
 
     public int getMarker() {

@@ -1487,18 +1487,17 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
 
         int marker = 1 << contentMarkerRequest.getMarker();
-        String visibility = ContentHandler.readVisibility(GsonUtil.fromJson(contentMarkerRequest.getData(), Map.class));
+        String extraInfoJson = null;
+        if (contentMarkerRequest.getExtraInfoMap() != null && !contentMarkerRequest.getExtraInfoMap().isEmpty()) {
+            extraInfoJson = GsonUtil.toJson(contentMarkerRequest.getExtraInfoMap());
+        }
         ContentMarkerModel contentMarkerModel = ContentMarkerModel.build(mAppContext.getDBSession(),
                 contentMarkerRequest.getUid(), contentMarkerRequest.getContentId(), contentMarkerRequest.getData(),
-                marker, visibility);
+                marker, extraInfoJson);
 
         if (contentMarkerModelInDB == null) {
             contentMarkerModel.save();
         } else {
-            if (ContentConstants.Visibility.DEFAULT.equals(contentMarkerModelInDB.getVisibility())) {
-                contentMarkerModel.setVisibility(contentMarkerModelInDB.getVisibility());
-            }
-
             if ((contentMarkerModelInDB.getMarker() & marker) == marker
                     && !contentMarkerRequest.isMarked()) {
                 marker = (~marker) & contentMarkerModelInDB.getMarker();

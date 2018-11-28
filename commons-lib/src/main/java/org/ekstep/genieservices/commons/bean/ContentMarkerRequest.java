@@ -3,18 +3,23 @@ package org.ekstep.genieservices.commons.bean;
 import org.ekstep.genieservices.commons.bean.enums.MarkerType;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
+import java.util.Map;
+
 public class ContentMarkerRequest {
 
     private String contentId;
     private String uid;
     private String data;
+    private Map<String, Object> extraInfoMap;
     private int marker;
     private boolean isMarked;
 
-    private ContentMarkerRequest(String contentId, String uid, String data, int marker, boolean isMarked) {
+    private ContentMarkerRequest(String contentId, String uid, String data,
+                                 Map<String, Object> extraInfoMap, int marker, boolean isMarked) {
         this.contentId = contentId;
         this.uid = uid;
         this.data = data;
+        this.extraInfoMap = extraInfoMap;
         this.marker = marker;
         this.isMarked = isMarked;
     }
@@ -31,6 +36,10 @@ public class ContentMarkerRequest {
         return data;
     }
 
+    public Map<String, Object> getExtraInfoMap() {
+        return extraInfoMap;
+    }
+
     public int getMarker() {
         return marker;
     }
@@ -43,6 +52,7 @@ public class ContentMarkerRequest {
         private String contentId;
         private String uid;
         private String data;
+        private Map<String, Object> extraInfoMap;
         private int marker;
         private boolean isMarked;
 
@@ -70,6 +80,11 @@ public class ContentMarkerRequest {
             return this;
         }
 
+        public Builder extraInfo(Map<String, Object> extraInfoMap) {
+            this.extraInfoMap = extraInfoMap;
+            return this;
+        }
+
         public Builder setMarker(MarkerType marker) {
             this.marker = marker.getValue();
             this.isMarked = true;
@@ -92,7 +107,7 @@ public class ContentMarkerRequest {
                 throw new IllegalStateException("data required.");
             }
 
-            return new ContentMarkerRequest(contentId, uid, data, marker, isMarked);
+            return new ContentMarkerRequest(contentId, uid, data, extraInfoMap, marker, isMarked);
         }
     }
 }

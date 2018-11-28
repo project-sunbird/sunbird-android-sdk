@@ -15,7 +15,7 @@ public abstract class ContentMarkerEntry implements BaseColumns {
     public static final String COLUMN_NAME_CONTENT_IDENTIFIER = "identifier";
     public static final String COLUMN_NAME_EPOCH_TIMESTAMP = "epoch_timestamp";
     public static final String COLUMN_NAME_DATA = "data";
-    public static final String COLUMN_NAME_VISIBILITY = "visibility";
+    public static final String COLUMN_NAME_EXTRA_INFO = "extra_info";
     public static final String COLUMN_NAME_MARKER = "marker";
 
     public static final String getCreateEntry() {
@@ -25,7 +25,7 @@ public abstract class ContentMarkerEntry implements BaseColumns {
                 COLUMN_NAME_CONTENT_IDENTIFIER + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
                 COLUMN_NAME_EPOCH_TIMESTAMP + DbConstants.INT_TYPE + DbConstants.COMMA_SEP +
                 COLUMN_NAME_DATA + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
-                COLUMN_NAME_VISIBILITY + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
+                COLUMN_NAME_EXTRA_INFO + DbConstants.TEXT_TYPE + DbConstants.COMMA_SEP +
                 COLUMN_NAME_MARKER + DbConstants.INT_TYPE +
                 " )";
     }
