@@ -9,6 +9,7 @@ import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.commons.utils.DateUtil;
 
 import java.util.Locale;
 
@@ -83,7 +84,7 @@ public class ContentMarkerModel implements IWritable, IUpdatable, IReadable, ICl
         with(contentValues, ContentMarkerEntry.COLUMN_NAME_DATA, data);
         with(contentValues, ContentMarkerEntry.COLUMN_NAME_VISIBILITY, visibility);
         with(contentValues, ContentMarkerEntry.COLUMN_NAME_MARKER, marker);
-        with(contentValues, ContentMarkerEntry.COLUMN_NAME_EPOCH_TIMESTAMP, epochTimestamp);
+        with(contentValues, ContentMarkerEntry.COLUMN_NAME_EPOCH_TIMESTAMP, DateUtil.getEpochTime());
 
         return contentValues;
     }
@@ -97,12 +98,10 @@ public class ContentMarkerModel implements IWritable, IUpdatable, IReadable, ICl
     public ContentValues getFieldsToUpdate() {
         ContentValues contentValues = new ContentValues();
 
-//        with(contentValues, ContentMarkerEntry.COLUMN_NAME_CONTENT_IDENTIFIER, identifier);
-//        with(contentValues, ContentMarkerEntry.COLUMN_NAME_UID, uid);
         with(contentValues, ContentMarkerEntry.COLUMN_NAME_DATA, data);
         with(contentValues, ContentMarkerEntry.COLUMN_NAME_VISIBILITY, visibility);
         with(contentValues, ContentMarkerEntry.COLUMN_NAME_MARKER, marker);
-        with(contentValues, ContentMarkerEntry.COLUMN_NAME_EPOCH_TIMESTAMP, epochTimestamp);
+        with(contentValues, ContentMarkerEntry.COLUMN_NAME_EPOCH_TIMESTAMP, DateUtil.getEpochTime());
 
         return contentValues;
     }
