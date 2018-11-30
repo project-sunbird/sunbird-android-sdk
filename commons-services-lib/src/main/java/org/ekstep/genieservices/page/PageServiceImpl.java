@@ -100,7 +100,11 @@ public class PageServiceImpl extends BaseService implements IPageService {
     }
 
     private String getKeyForDB(PageAssembleCriteria pageAssembleCriteria) {
-        return KEY_PAGE_ASSEMBLE + pageAssembleCriteria.getName() + pageAssembleCriteria.getMode() + pageAssembleCriteria.getFilters().toString();
+        return KEY_PAGE_ASSEMBLE
+                + mAppContext.getParams().getString(IParams.Key.PAGE_SERVICE_BASE_URL)
+                + pageAssembleCriteria.getName()
+                + pageAssembleCriteria.getMode()
+                + pageAssembleCriteria.getFilters().toString();
     }
 
     private boolean hasExpired(long expirationTime) {
