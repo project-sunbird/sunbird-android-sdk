@@ -60,6 +60,7 @@ public class ContentData implements Serializable {
     private String framework;
     private String creators;
     private String contributors;
+    private String streamingUrl;
 
     public ContentData() {
     }
@@ -300,6 +301,14 @@ public class ContentData implements Serializable {
 
     public void setContributors(String contributors) {
         this.contributors = contributors;
+    }
+
+    public String getStreamingUrl() {
+        return streamingUrl;
+    }
+
+    public void setStreamingUrl(String streamingUrl) {
+        this.streamingUrl = streamingUrl;
     }
 
     @Override
