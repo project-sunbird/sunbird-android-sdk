@@ -32,7 +32,7 @@ public class DeviceInfo implements IDeviceInfo {
         DeviceSpecification deviceSpec = new DeviceSpecification();
         deviceSpec.setOs("Android " + org.ekstep.genieservices.utils.DeviceSpec.getOSVersion());
         deviceSpec.setMake(org.ekstep.genieservices.utils.DeviceSpec.getDeviceName());
-        deviceSpec.setId(org.ekstep.genieservices.utils.DeviceSpec.getAndroidId(context));
+        deviceSpec.setId(getDeviceID());
 
         String internalMemory = DeviceSpec.bytesToHuman(DeviceSpec.getTotalInternalMemorySize());
         if (!TextUtils.isEmpty(internalMemory)) {
