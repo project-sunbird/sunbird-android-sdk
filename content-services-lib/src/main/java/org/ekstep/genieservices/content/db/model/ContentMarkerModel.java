@@ -29,10 +29,11 @@ public class ContentMarkerModel implements IWritable, IUpdatable, IReadable, ICl
         this.mDBSession = dbSession;
     }
 
-    private ContentMarkerModel(IDBSession dbSession, String uid, String identifier) {
+    private ContentMarkerModel(IDBSession dbSession, String uid, String identifier, int marker) {
         this.mDBSession = dbSession;
         this.uid = uid;
         this.identifier = identifier;
+        this.marker = marker;
     }
 
     private ContentMarkerModel(IDBSession dbSession, String uid, String identifier, String data,
@@ -54,8 +55,8 @@ public class ContentMarkerModel implements IWritable, IUpdatable, IReadable, ICl
         return new ContentMarkerModel(dbSession, uid, identifier, data, marker, extraInfoJson);
     }
 
-    public static ContentMarkerModel find(IDBSession dbSession, String uid, String identifier) {
-        ContentMarkerModel contentMarkerModel = new ContentMarkerModel(dbSession, uid, identifier);
+    public static ContentMarkerModel find(IDBSession dbSession, String uid, String identifier, int marker) {
+        ContentMarkerModel contentMarkerModel = new ContentMarkerModel(dbSession, uid, identifier, marker);
         dbSession.read(contentMarkerModel);
 
         if (contentMarkerModel.id == -1L) {
@@ -126,8 +127,18 @@ public class ContentMarkerModel implements IWritable, IUpdatable, IReadable, ICl
 
     @Override
     public String selectionToClean() {
-        return String.format(Locale.US, "where %s = %s AND %s = %s",
-                ContentMarkerEntry.COLUMN_NAME_UID, ContentMarkerEntry.COLUMN_NAME_CONTENT_IDENTIFIER, uid, identifier);
+        return String.format(Locale.US, "where %s = '%s' AND %s = '%s' AND %s = '%s'",
+                ContentMarkerEntry.COLUMN_NAME_UID, uid,
+                ContentMarkerEntry.COLUMN_NAME_CONTENT_IDENTIFIER, identifier,
+                ContentMarkerEntry.COLUMN_NAME_MARKER, marker);
+    }
+
+    @Override
+    public String updateBy() {
+        return String.format(Locale.US, "%s = '%s' AND %s = '%s' AND %s = '%s'",
+                ContentMarkerEntry.COLUMN_NAME_UID, uid,
+                ContentMarkerEntry.COLUMN_NAME_CONTENT_IDENTIFIER, identifier,
+                ContentMarkerEntry.COLUMN_NAME_MARKER, marker);
     }
 
     @Override
@@ -137,24 +148,20 @@ public class ContentMarkerModel implements IWritable, IUpdatable, IReadable, ICl
 
     @Override
     public String filterForRead() {
-        return String.format(Locale.US, "where %s = ? AND %s = ?",
-                ContentMarkerEntry.COLUMN_NAME_UID, ContentMarkerEntry.COLUMN_NAME_CONTENT_IDENTIFIER);
+        return String.format(Locale.US, "where %s = ? AND %s = ? AND %s = ?",
+                ContentMarkerEntry.COLUMN_NAME_UID,
+                ContentMarkerEntry.COLUMN_NAME_CONTENT_IDENTIFIER,
+                ContentMarkerEntry.COLUMN_NAME_MARKER);
     }
 
     @Override
     public String[] selectionArgsForFilter() {
-        return new String[]{uid, identifier};
+        return new String[]{uid, identifier, "" + marker};
     }
 
     @Override
     public String limitBy() {
         return "limit 1";
-    }
-
-    @Override
-    public String updateBy() {
-        return String.format(Locale.US, "%s = '%s' AND %s = '%s'",
-                ContentMarkerEntry.COLUMN_NAME_UID, uid, ContentMarkerEntry.COLUMN_NAME_CONTENT_IDENTIFIER, identifier);
     }
 
     @Override

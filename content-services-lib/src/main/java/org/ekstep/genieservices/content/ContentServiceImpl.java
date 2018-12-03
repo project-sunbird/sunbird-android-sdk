@@ -238,6 +238,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             if (criteria != null && criteria.attachContentAccess()) {
                 c.setContentAccess(ContentHandler.getContentAccess(userService, c.getIdentifier(), criteria.getUid()));
             }
+//            if (criteria != null && criteria.attachContentMarker()) {
+//                c.setContentMarker(ContentHandler.getContentMarker(c.getIdentifier(), criteria.getUid()));
+//            }
             contentList.add(c);
         }
 
@@ -1483,30 +1486,25 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         String methodName = "setContentMarker@ContentServiceImpl";
 
         ContentMarkerModel contentMarkerModelInDB = ContentMarkerModel.find(mAppContext.getDBSession(),
-                contentMarkerRequest.getUid(), contentMarkerRequest.getContentId());
+                contentMarkerRequest.getUid(), contentMarkerRequest.getContentId(), contentMarkerRequest.getMarker());
 
 
-        int marker = 1 << contentMarkerRequest.getMarker();
         String extraInfoJson = null;
         if (contentMarkerRequest.getExtraInfoMap() != null && !contentMarkerRequest.getExtraInfoMap().isEmpty()) {
             extraInfoJson = GsonUtil.toJson(contentMarkerRequest.getExtraInfoMap());
         }
         ContentMarkerModel contentMarkerModel = ContentMarkerModel.build(mAppContext.getDBSession(),
                 contentMarkerRequest.getUid(), contentMarkerRequest.getContentId(), contentMarkerRequest.getData(),
-                marker, extraInfoJson);
+                contentMarkerRequest.getMarker(), extraInfoJson);
 
         if (contentMarkerModelInDB == null) {
             contentMarkerModel.save();
         } else {
-            if ((contentMarkerModelInDB.getMarker() & marker) == marker
-                    && !contentMarkerRequest.isMarked()) {
-                marker = (~marker) & contentMarkerModelInDB.getMarker();
+            if (contentMarkerRequest.isMarked()) {
+                contentMarkerModel.update();
             } else {
-                marker = marker | contentMarkerModelInDB.getMarker();
+                contentMarkerModel.clean();
             }
-            contentMarkerModel.setMarker(marker);
-
-            contentMarkerModel.update();
         }
 
         GenieResponse<Void> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
