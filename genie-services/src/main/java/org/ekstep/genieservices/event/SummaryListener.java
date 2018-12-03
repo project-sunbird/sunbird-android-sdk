@@ -1,4 +1,4 @@
-package org.ekstep.genieservices.profile.event;
+package org.ekstep.genieservices.event;
 
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.telemetry.Telemetry;

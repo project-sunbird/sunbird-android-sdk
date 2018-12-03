@@ -220,6 +220,18 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
         if (enrolCourseAPIResponse.getStatus()) {
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
 
+            //wipe the details of course context
+            mAppContext.getKeyValueStore().putString(ServiceConstants.PreferenceKey.SUNBIRD_CONTENT_CONTEXT, "");
+
+            //add the course details to map
+            Map<String, String> courseContext = new HashMap<>();
+            courseContext.put("userId", enrollCourseRequest.getUserId());
+            courseContext.put("courseId", enrollCourseRequest.getCourseId());
+            courseContext.put("batchId", enrollCourseRequest.getBatchId());
+
+            //store the newly enrolled course in the preference
+            mAppContext.getKeyValueStore().putString(ServiceConstants.PreferenceKey.SUNBIRD_CONTENT_CONTEXT, GsonUtil.toJson(courseContext));
+
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         } else {
             List<String> errorMessages = enrolCourseAPIResponse.getErrorMessages();

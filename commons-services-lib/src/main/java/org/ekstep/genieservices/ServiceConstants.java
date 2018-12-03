@@ -69,6 +69,8 @@ public interface ServiceConstants {
         String UPDATE_CONTENT_STATE = "update_content_state";
 
         String LAST_SYNCED_TIME_STAMP_DEVICE_REGISTER = "last_synced_time_device_regeister";
+
+        String SUNBIRD_CONTENT_CONTEXT = "sunbirdcontent_context";
     }
 
     interface Partner {
