@@ -238,9 +238,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             if (criteria != null && criteria.attachContentAccess()) {
                 c.setContentAccess(ContentHandler.getContentAccess(userService, c.getIdentifier(), criteria.getUid()));
             }
-//            if (criteria != null && criteria.attachContentMarker()) {
-//                c.setContentMarker(ContentHandler.getContentMarker(c.getIdentifier(), criteria.getUid()));
-//            }
+            if (criteria != null && criteria.attachContentMarker()) {
+                c.setContentMarker(ContentHandler.getContentMarker(mAppContext, c.getIdentifier(), criteria.getUid()));
+            }
             contentList.add(c);
         }
 

@@ -193,6 +193,18 @@ public class ContentMarkerModel implements IWritable, IUpdatable, IReadable, ICl
         contentValues.put(key, value);
     }
 
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public String getData() {
+        return data;
+    }
+
     public String getExtraInfoJson() {
         return extraInfoJson;
     }

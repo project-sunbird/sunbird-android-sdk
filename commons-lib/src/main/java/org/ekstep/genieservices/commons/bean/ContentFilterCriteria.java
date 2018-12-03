@@ -19,10 +19,14 @@ public class ContentFilterCriteria {
     private String[] exclPragma;
     private boolean attachFeedback;
     private boolean attachContentAccess;
+    private boolean attachContentMarker;
     private List<ContentSortCriteria> sortCriteria;
+    private boolean recentlyViewed;
 
     private ContentFilterCriteria(String uid, String[] contentTypes, String[] audience, String[] pragma, String[] exclPragma,
-                                  boolean attachFeedback, boolean attachContentAccess, List<ContentSortCriteria> sortCriteria) {
+                                  boolean attachFeedback, boolean attachContentAccess, boolean attachContentMarker,
+                                  List<ContentSortCriteria> sortCriteria,
+                                  boolean recentlyViewed) {
         this.uid = uid;
         this.contentTypes = contentTypes;
         this.audience = audience;
@@ -30,7 +34,9 @@ public class ContentFilterCriteria {
         this.exclPragma = exclPragma;
         this.attachFeedback = attachFeedback;
         this.attachContentAccess = attachContentAccess;
+        this.attachContentMarker = attachContentMarker;
         this.sortCriteria = sortCriteria;
+        this.recentlyViewed = recentlyViewed;
     }
 
     public String getUid() {
@@ -61,8 +67,16 @@ public class ContentFilterCriteria {
         return attachContentAccess;
     }
 
+    public boolean attachContentMarker() {
+        return attachContentMarker;
+    }
+
     public List<ContentSortCriteria> getSortCriteria() {
         return sortCriteria;
+    }
+
+    public boolean isRecentlyViewed() {
+        return recentlyViewed;
     }
 
     @Override
@@ -78,7 +92,9 @@ public class ContentFilterCriteria {
         private String[] exclPragma;
         private boolean attachFeedback;
         private boolean attachContentAccess;
+        private boolean attachContentMarker;
         private List<ContentSortCriteria> sortCriteria;
+        private boolean recentlyViewed;
 
         /**
          * User id to get the content in order to access by that user.
@@ -135,10 +151,26 @@ public class ContentFilterCriteria {
         }
 
         /**
+         * Call it if you want content marker by given uid.
+         */
+        public Builder withContentMarker() {
+            this.attachContentMarker = true;
+            return this;
+        }
+
+        /**
          * List of sort criteria {@link ContentSortCriteria}.
          */
         public Builder sort(List<ContentSortCriteria> sortCriteria) {
             this.sortCriteria = sortCriteria;
+            return this;
+        }
+
+        /**
+         * Call it if you want recently viewed content.
+         */
+        public Builder recentlyViewed() {
+            this.recentlyViewed = true;
             return this;
         }
 
@@ -152,7 +184,8 @@ public class ContentFilterCriteria {
                 sortCriteria.add(new ContentSortCriteria("localLastUpdatedOn", SortOrder.DESC));
             }
             return new ContentFilterCriteria(uid, contentTypes, audience, pragma, exclPragma,
-                    attachFeedback, attachContentAccess, sortCriteria);
+                    attachFeedback, attachContentAccess, attachContentMarker, sortCriteria,
+                    recentlyViewed);
         }
     }
 }

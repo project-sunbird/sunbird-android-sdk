@@ -19,6 +19,7 @@ import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingSection;
+import org.ekstep.genieservices.commons.bean.ContentMarker;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchFilter;
 import org.ekstep.genieservices.commons.bean.ContentSortCriteria;
@@ -38,6 +39,7 @@ import org.ekstep.genieservices.commons.bean.enums.SearchType;
 import org.ekstep.genieservices.commons.bean.enums.SortOrder;
 import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.contract.ContentEntry;
+import org.ekstep.genieservices.commons.db.contract.ContentMarkerEntry;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
@@ -46,6 +48,8 @@ import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.db.model.ContentListingModel;
+import org.ekstep.genieservices.content.db.model.ContentMarkerModel;
+import org.ekstep.genieservices.content.db.model.ContentMarkersModel;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.db.model.ContentsModel;
 import org.ekstep.genieservices.content.network.ContentDetailsAPI;
@@ -519,6 +523,54 @@ public class ContentHandler {
             return userService.getAllContentAccess(builder.build()).getResult();
         }
         return null;
+    }
+
+    public static List<ContentMarker> getContentMarker(AppContext appContext, String contentIdentifier, String uid) {
+        String contentFilter = null;
+        String userFilter = null;
+
+
+        if (!StringUtil.isNullOrEmpty(contentIdentifier)) {
+            contentFilter = String.format(Locale.US, "%s = '%s'",
+                    ContentMarkerEntry.COLUMN_NAME_CONTENT_IDENTIFIER, contentIdentifier);
+        }
+
+        if (!StringUtil.isNullOrEmpty(uid)) {
+            userFilter = String.format(Locale.US, "%s = '%s'",
+                    ContentMarkerEntry.COLUMN_NAME_UID, uid);
+        }
+
+        String filter = null;
+        if (!StringUtil.isNullOrEmpty(contentFilter) && !StringUtil.isNullOrEmpty(userFilter)) {
+            filter = String.format(Locale.US, " where (%s AND %s)", contentFilter, userFilter);
+        } else if (!StringUtil.isNullOrEmpty(contentFilter)) {
+            filter = String.format(Locale.US, " where (%s)", contentFilter);
+        } else if (!StringUtil.isNullOrEmpty(userFilter)) {
+            filter = String.format(Locale.US, " where (%s)", userFilter);
+        }
+
+        ContentMarkersModel contentMarkersModel = null;
+        if (filter != null) {
+            contentMarkersModel = ContentMarkersModel.find(appContext.getDBSession(), filter);
+        }
+
+        List<ContentMarker> contentMarkerList = new ArrayList<>();
+        if (contentMarkersModel != null) {
+            for (ContentMarkerModel contentMarkerModel : contentMarkersModel.getContentMarkerModelList()) {
+                ContentMarker contentMarker = new ContentMarker();
+                contentMarker.setContentId(contentMarkerModel.getIdentifier());
+                contentMarker.setUid(contentMarkerModel.getUid());
+                contentMarker.setMarker(contentMarkerModel.getMarker());
+                if (!StringUtil.isNullOrEmpty(contentMarkerModel.getExtraInfoJson())) {
+                    Map extraInfoMap = GsonUtil.fromJson(contentMarkerModel.getExtraInfoJson(), HashMap.class);
+                    contentMarker.setExtraInfoMap(extraInfoMap);
+                }
+
+                contentMarkerList.add(contentMarker);
+            }
+        }
+
+        return contentMarkerList;
     }
 
     private static boolean isUpdateAvailable(ContentData serverData, ContentData localData) {

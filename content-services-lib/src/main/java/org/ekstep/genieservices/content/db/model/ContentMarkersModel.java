@@ -1,6 +1,7 @@
 package org.ekstep.genieservices.content.db.model;
 
 import org.ekstep.genieservices.commons.db.contract.ContentMarkerEntry;
+import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
@@ -9,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class ContentMarkersModel implements IReadable {
+public class ContentMarkersModel implements IReadable, ICleanable {
 
     private IDBSession mDBSession;
     private String filterCondition;
@@ -43,6 +44,11 @@ public class ContentMarkersModel implements IReadable {
         }
     }
 
+    public Void delete() {
+        mDBSession.clean(this);
+        return null;
+    }
+
     @Override
     public IReadable read(IResultSet resultSet) {
         if (resultSet != null && resultSet.moveToFirst()) {
@@ -66,6 +72,16 @@ public class ContentMarkersModel implements IReadable {
     }
 
     @Override
+    public void clean() {
+        contentMarkerModelList = null;
+    }
+
+    @Override
+    public String selectionToClean() {
+        return filterCondition;
+    }
+
+    @Override
     public String orderBy() {
         return String.format(Locale.US, " order by %s desc", ContentMarkerEntry.COLUMN_NAME_EPOCH_TIMESTAMP);
     }
@@ -85,7 +101,7 @@ public class ContentMarkersModel implements IReadable {
         return "";
     }
 
-    private List<ContentMarkerModel> getContentMarkerModelList() {
+    public List<ContentMarkerModel> getContentMarkerModelList() {
         return contentMarkerModelList;
     }
 }
