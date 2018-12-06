@@ -3,6 +3,7 @@ package org.ekstep.genieservices.content.db.model;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.contract.ContentEntry;
+import org.ekstep.genieservices.commons.db.contract.ContentMarkerEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
 import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
@@ -11,6 +12,7 @@ import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.DateUtil;
+import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.util.Locale;
 
@@ -245,6 +247,10 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
 
         if (resultSet.getColumnIndex(ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP) != -1) {
             lastUsedTime = resultSet.getLong(resultSet.getColumnIndex(ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP));
+        }
+        if (resultSet.getColumnIndex(ContentMarkerEntry.COLUMN_NAME_DATA) != -1
+                && StringUtil.isNullOrEmpty(localData)) {
+            localData = resultSet.getString(resultSet.getColumnIndex(ContentMarkerEntry.COLUMN_NAME_DATA));
         }
     }
 
