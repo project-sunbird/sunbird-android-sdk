@@ -668,22 +668,43 @@ public class ContentHandler {
             }
         }
 
-        String query;
-        if (uid != null) {
-            query = String.format(Locale.US, "SELECT c.*, ca.%s FROM  %s c LEFT JOIN %s ca ON c.%s = ca.%s AND ca.%s = '%s' %s %s;",
-                    ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP,
-                    ContentEntry.TABLE_NAME, ContentAccessEntry.TABLE_NAME,
-                    ContentEntry.COLUMN_NAME_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER,
-                    ContentAccessEntry.COLUMN_NAME_UID, uid,
-                    whereClause, orderBy.toString());
+        String query = null;
+
+        if (criteria.isRecentlyViewed()) {
+            if (uid != null) {
+                query = String.format(Locale.US, "SELECT c.*, cm.%s FROM  %s cm LEFT JOIN %s ca ON cm.%s = ca.%s AND cm.%s = '%s' LEFT JOIN %s c ON c.%s = cm.%s %s;",
+                        ContentMarkerEntry.COLUMN_NAME_DATA,
+                        ContentMarkerEntry.TABLE_NAME,
+                        ContentAccessEntry.TABLE_NAME,
+                        ContentMarkerEntry.COLUMN_NAME_CONTENT_IDENTIFIER,
+                        ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER,
+                        ContentMarkerEntry.COLUMN_NAME_UID,
+                        uid,
+                        ContentEntry.TABLE_NAME,
+                        ContentEntry.COLUMN_NAME_IDENTIFIER,
+                        ContentMarkerEntry.COLUMN_NAME_CONTENT_IDENTIFIER,
+                        orderBy.toString());
+            }
         } else {
-            query = String.format(Locale.US, "SELECT c.* FROM  %s c %s %s;",
-                    ContentEntry.TABLE_NAME,
-                    whereClause, orderBy.toString());
+            if (uid != null) {
+                query = String.format(Locale.US, "SELECT c.*, ca.%s FROM  %s c LEFT JOIN %s ca ON c.%s = ca.%s AND ca.%s = '%s' %s %s;",
+                        ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP,
+                        ContentEntry.TABLE_NAME, ContentAccessEntry.TABLE_NAME,
+                        ContentEntry.COLUMN_NAME_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER,
+                        ContentAccessEntry.COLUMN_NAME_UID, uid,
+                        whereClause, orderBy.toString());
+            } else {
+                query = String.format(Locale.US, "SELECT c.* FROM  %s c %s %s;",
+                        ContentEntry.TABLE_NAME,
+                        whereClause, orderBy.toString());
+            }
         }
 
         List<ContentModel> contentModelListInDB;
-        ContentsModel contentsModel = ContentsModel.findWithCustomQuery(dbSession, query);
+        ContentsModel contentsModel = null;
+        if (query != null) {
+            contentsModel = ContentsModel.findWithCustomQuery(dbSession, query);
+        }
         if (contentsModel != null) {
             contentModelListInDB = contentsModel.getContentModelList();
         } else {
