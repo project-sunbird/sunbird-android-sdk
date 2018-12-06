@@ -672,17 +672,23 @@ public class ContentHandler {
 
         if (criteria.isRecentlyViewed()) {
             if (uid != null) {
-                query = String.format(Locale.US, "SELECT c.*, cm.%s FROM  %s cm LEFT JOIN %s ca ON cm.%s = ca.%s AND cm.%s = '%s' LEFT JOIN %s c ON c.%s = cm.%s %s;",
+                // TODO
+//                filter = String.format(Locale.US, "%s AND %s AND %s", artifactAvailabilityFilter, contentTypeFilter);
+
+                contentTypeFilter = String.format(Locale.US, "ca.%s in ('%s')", ContentAccessEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr.toLowerCase());
+                filter = String.format(Locale.US, "ca.%s = '%s' AND %s", ContentAccessEntry.COLUMN_NAME_UID, uid, contentTypeFilter);
+                whereClause = String.format(Locale.US, "WHERE (%s)", filter);
+                query = String.format(Locale.US, "SELECT c.*, ca.%s, cm.%s FROM  %s ca LEFT JOIN %s cm ON cm.%s = ca.%s LEFT JOIN %s c ON c.%s = ca.%s %s %s;",
+                        ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP,
                         ContentMarkerEntry.COLUMN_NAME_DATA,
-                        ContentMarkerEntry.TABLE_NAME,
                         ContentAccessEntry.TABLE_NAME,
+                        ContentMarkerEntry.TABLE_NAME,
                         ContentMarkerEntry.COLUMN_NAME_CONTENT_IDENTIFIER,
                         ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER,
-                        ContentMarkerEntry.COLUMN_NAME_UID,
-                        uid,
                         ContentEntry.TABLE_NAME,
                         ContentEntry.COLUMN_NAME_IDENTIFIER,
-                        ContentMarkerEntry.COLUMN_NAME_CONTENT_IDENTIFIER,
+                        ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER,
+                        whereClause,
                         orderBy.toString());
             }
         } else {

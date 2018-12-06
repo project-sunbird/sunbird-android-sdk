@@ -393,6 +393,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
             }
         }
         final ContentAccessesModel accessesModel = ContentAccessesModel.findByUid(mAppContext.getDBSession(), uid);
+//  TODO:      final ContentMarkersModel accessesModel = ContentAccessesModel.findByUid(mAppContext.getDBSession(), uid);
         final GroupProfilesModel groupProfilesModel = GroupProfilesModel.findByUid(mAppContext.getDBSession(), uid);
 
         final UserProfileModel userProfileModel = UserProfileModel.find(mAppContext.getDBSession(), uid);
@@ -683,7 +684,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         ContentAccessModel contentAccessModelInDb = ContentAccessModel.find(mAppContext.getDBSession(), uid, contentAccess.getContentId());
         if (contentAccessModelInDb == null) {
             ContentAccessModel contentAccessModel = ContentAccessModel.build(mAppContext.getDBSession(),
-                    uid, contentAccess.getContentId(), contentLearnerState);
+                    uid, contentAccess.getContentId(), contentAccess.getContentType(), contentLearnerState);
             contentAccessModel.setStatus(ContentAccessStatus.PLAYED.getValue());
 
             contentAccessModel.save();
