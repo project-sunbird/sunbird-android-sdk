@@ -12,9 +12,12 @@ import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.DateUtil;
+import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
+import org.ekstep.genieservices.content.ContentHandler;
 
 import java.util.Locale;
+import java.util.Map;
 
 import static java.lang.String.valueOf;
 
@@ -248,9 +251,26 @@ public class ContentModel implements IWritable, IUpdatable, IReadable, ICleanabl
         if (resultSet.getColumnIndex(ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP) != -1) {
             lastUsedTime = resultSet.getLong(resultSet.getColumnIndex(ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP));
         }
-        if (resultSet.getColumnIndex(ContentMarkerEntry.COLUMN_NAME_DATA) != -1
-                && StringUtil.isNullOrEmpty(localData)) {
-            localData = resultSet.getString(resultSet.getColumnIndex(ContentMarkerEntry.COLUMN_NAME_DATA));
+        if (resultSet.getColumnIndex(ContentMarkerEntry.COLUMN_NAME_DATA) != -1) {
+            if (StringUtil.isNullOrEmpty(localData)) {
+                localData = resultSet.getString(resultSet.getColumnIndex(ContentMarkerEntry.COLUMN_NAME_DATA));
+            }
+            if (!StringUtil.isNullOrEmpty(localData)) {
+                Map contentData = GsonUtil.fromJson(localData, Map.class);
+
+                if (StringUtil.isNullOrEmpty(identifier)) {
+                    identifier = ContentHandler.readIdentifier(contentData);
+                }
+                if (StringUtil.isNullOrEmpty(mimeType)) {
+                    mimeType = ContentHandler.readMimeType(contentData);
+                }
+                if (StringUtil.isNullOrEmpty(visibility)) {
+                    visibility = ContentHandler.readVisibility(contentData);
+                }
+                if (StringUtil.isNullOrEmpty(contentType)) {
+                    contentType = ContentHandler.readContentType(contentData);
+                }
+            }
         }
     }
 
