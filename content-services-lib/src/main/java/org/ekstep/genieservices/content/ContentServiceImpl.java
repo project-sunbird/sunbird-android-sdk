@@ -98,6 +98,7 @@ import org.ekstep.genieservices.content.chained.move.ValidateDestinationContent;
 import org.ekstep.genieservices.content.chained.move.ValidateDestinationFolder;
 import org.ekstep.genieservices.content.db.model.ContentListingModel;
 import org.ekstep.genieservices.content.db.model.ContentMarkerModel;
+import org.ekstep.genieservices.content.db.model.ContentMarkersModel;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.network.ContentSearchAPI;
 import org.ekstep.genieservices.content.network.FlagContentAPI;
@@ -266,6 +267,17 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
             contentList.add(c);
         }
+        ContentMarkersModel contentMarkersModel = ContentMarkersModel.find(mAppContext.getDBSession(), "");
+        if (contentMarkersModel != null) {
+            for (ContentMarkerModel contentMarkerModel : contentMarkersModel.getContentMarkerModelList()) {
+                Content content = new Content();
+                ContentData contentData = GsonUtil.fromJson(contentMarkerModel.getData(), ContentData.class);
+                content.setIdentifier(contentData.getIdentifier());
+                content.setContentData(contentData);
+                contentList.add(content);
+            }
+        }
+
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(contentList);
