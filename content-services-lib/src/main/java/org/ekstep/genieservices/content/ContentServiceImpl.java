@@ -202,8 +202,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         Content content = ContentHandler.convertContentModelToBean(contentModelInDB);
 
+        String uid = null;
         if (content.isAvailableLocally()) {
-            String uid = ContentHandler.getCurrentUserId(userService);
+            uid = ContentHandler.getCurrentUserId(userService);
             if (contentDetailsRequest.isAttachFeedback()) {
                 content.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, content.getIdentifier(), uid));
             }
@@ -211,10 +212,13 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             if (contentDetailsRequest.isAttachContentAccess()) {
                 content.setContentAccess(ContentHandler.getContentAccess(userService, content.getIdentifier(), uid));
             }
+        }
 
-            if (contentDetailsRequest.isAttachContentMarker()) {
-                content.setContentMarker(ContentHandler.getContentMarker(mAppContext, content.getIdentifier(), uid));
+        if (contentDetailsRequest.isAttachContentMarker()) {
+            if (StringUtil.isNullOrEmpty(uid)) {
+                uid = ContentHandler.getCurrentUserId(userService);
             }
+            content.setContentMarker(ContentHandler.getContentMarker(mAppContext, content.getIdentifier(), uid));
         }
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
