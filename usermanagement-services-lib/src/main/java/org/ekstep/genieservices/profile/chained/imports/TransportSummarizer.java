@@ -67,7 +67,15 @@ public class TransportSummarizer implements IChainable<ProfileImportResponse, Im
             if (importedLearnerAssessmentDetailsModel != null) {
                 for (LearnerAssessmentDetails learnerAssessmentDetails : importedLearnerAssessmentDetailsModel.getAllAssessments()) {
                     LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.build(appContext.getDBSession(), learnerAssessmentDetails);
-                    learnerAssessmentDetailsModel.save();
+
+                    String filter = getFilterForLearnerAssessmentDetails(learnerAssessmentDetails.getQid(), learnerAssessmentDetails.getUid(), learnerAssessmentDetails.getContentId(), learnerAssessmentDetails.getHierarchyData());
+
+                    //check if the learner assessment already exists
+                    if (LearnerAssessmentDetailsModel.find(appContext.getDBSession(), filter) == null) {
+                        learnerAssessmentDetailsModel.save();
+                    } else {
+                        learnerAssessmentDetailsModel.update();
+                    }
                 }
             }
 
@@ -87,7 +95,15 @@ public class TransportSummarizer implements IChainable<ProfileImportResponse, Im
                     learnerContentSummaryDetails.setLastUpdated(l.getLastUpdated());
 
                     LearnerSummaryModel learnerSummaryModel = LearnerSummaryModel.build(appContext.getDBSession(), learnerContentSummaryDetails);
-                    learnerSummaryModel.save();
+
+                    LearnerSummaryModel learnerSummaryModelInDB = LearnerSummaryModel.find(appContext.getDBSession(), learnerContentSummaryDetails.getUid(), learnerContentSummaryDetails.getContentId(),
+                            learnerContentSummaryDetails.getHierarchyData() == null ? "" : learnerContentSummaryDetails.getHierarchyData());
+
+                    if (learnerSummaryModelInDB == null) {
+                        learnerSummaryModel.save();
+                    } else {
+                        learnerSummaryModel.update();
+                    }
                 }
             }
         }
@@ -97,6 +113,21 @@ public class TransportSummarizer implements IChainable<ProfileImportResponse, Im
         } else {
             return GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.IMPORT_FAILED, "Import profile failed.", TAG);
         }
+    }
+
+    private String getFilterForLearnerAssessmentDetails(String qid, String uid, String contentId, String hierarchyData) {
+        String isQid = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_QID, qid);
+        String isUid = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_UID, uid);
+        String isContentId = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID, contentId);
+        String isHData = String.format(Locale.US, "%s = '%s'", LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA, hierarchyData == null ? "" : hierarchyData);
+
+        String filter;
+        if (StringUtil.isNullOrEmpty(qid)) {
+            filter = String.format(Locale.US, "where %s AND %s AND %s", isUid, isContentId, isHData);
+        } else {
+            filter = String.format(Locale.US, "where %s AND %s AND %s AND %s", isUid, isContentId, isHData, isQid);
+        }
+        return filter;
     }
 
     @Override
