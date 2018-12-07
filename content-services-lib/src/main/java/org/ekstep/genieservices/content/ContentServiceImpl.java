@@ -211,6 +211,10 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             if (contentDetailsRequest.isAttachContentAccess()) {
                 content.setContentAccess(ContentHandler.getContentAccess(userService, content.getIdentifier(), uid));
             }
+
+            if (contentDetailsRequest.isAttachContentMarker()) {
+                content.setContentMarker(ContentHandler.getContentMarker(mAppContext, content.getIdentifier(), uid));
+            }
         }
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
