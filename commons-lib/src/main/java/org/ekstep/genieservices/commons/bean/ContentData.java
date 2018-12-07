@@ -141,6 +141,14 @@ public class ContentData implements Serializable {
         return me_averageRating;
     }
 
+    public void setTotalRatings(String totalRatings) {
+        this.me_totalRatings = totalRatings;
+    }
+
+    public void setAverageRating(String averageRating) {
+        this.me_averageRating = averageRating;
+    }
+
     public String getTotalDownloads() {
         return me_totalDownloads;
     }

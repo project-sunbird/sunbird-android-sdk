@@ -463,8 +463,25 @@ public class ContentHandler {
         }
         if (contentModel.getServerData() != null) {
             serverData = GsonUtil.fromJson(contentModel.getServerData(), ContentData.class);
+
             if (localData == null || !isAvailableLocally(contentModel.getContentState())) {
                 content.setContentData(serverData);
+            } else {
+                if (StringUtil.isNullOrEmpty(localData.getStreamingUrl())) {
+                    localData.setStreamingUrl(serverData.getStreamingUrl());
+                }
+
+                if (StringUtil.isNullOrEmpty(localData.getPreviewUrl())) {
+                    localData.setPreviewUrl(serverData.getPreviewUrl());
+                }
+
+                if (StringUtil.isNullOrEmpty(localData.getTotalRatings())) {
+                    localData.setTotalRatings(serverData.getTotalRatings());
+                }
+
+                if (StringUtil.isNullOrEmpty(localData.getAverageRating())) {
+                    localData.setAverageRating(serverData.getAverageRating());
+                }
             }
         }
 
