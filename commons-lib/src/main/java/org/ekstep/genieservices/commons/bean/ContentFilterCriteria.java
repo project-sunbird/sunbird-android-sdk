@@ -22,11 +22,12 @@ public class ContentFilterCriteria {
     private boolean attachContentMarker;
     private List<ContentSortCriteria> sortCriteria;
     private boolean recentlyViewed;
+    private boolean downloadedOnly;
 
     private ContentFilterCriteria(String uid, String[] contentTypes, String[] audience, String[] pragma, String[] exclPragma,
                                   boolean attachFeedback, boolean attachContentAccess, boolean attachContentMarker,
                                   List<ContentSortCriteria> sortCriteria,
-                                  boolean recentlyViewed) {
+                                  boolean recentlyViewed, boolean downloadedOnly) {
         this.uid = uid;
         this.contentTypes = contentTypes;
         this.audience = audience;
@@ -37,6 +38,7 @@ public class ContentFilterCriteria {
         this.attachContentMarker = attachContentMarker;
         this.sortCriteria = sortCriteria;
         this.recentlyViewed = recentlyViewed;
+        this.downloadedOnly = downloadedOnly;
     }
 
     public String getUid() {
@@ -79,6 +81,10 @@ public class ContentFilterCriteria {
         return recentlyViewed;
     }
 
+    public boolean isDownloadedOnly() {
+        return downloadedOnly;
+    }
+
     @Override
     public String toString() {
         return GsonUtil.toJson(this);
@@ -95,6 +101,7 @@ public class ContentFilterCriteria {
         private boolean attachContentMarker;
         private List<ContentSortCriteria> sortCriteria;
         private boolean recentlyViewed;
+        private boolean downloadedOnly;
 
         /**
          * User id to get the content in order to access by that user.
@@ -174,6 +181,14 @@ public class ContentFilterCriteria {
             return this;
         }
 
+        /**
+         * Call it if you want downloaded content.
+         */
+        public Builder downloadedOnly() {
+            this.downloadedOnly = true;
+            return this;
+        }
+
         public ContentFilterCriteria build() {
             if (contentTypes == null || contentTypes.length == 0) {
                 contentTypes = new String[]{"Story", "Worksheet", "Game", "Collection", "TextBook"};
@@ -185,7 +200,7 @@ public class ContentFilterCriteria {
             }
             return new ContentFilterCriteria(uid, contentTypes, audience, pragma, exclPragma,
                     attachFeedback, attachContentAccess, attachContentMarker, sortCriteria,
-                    recentlyViewed);
+                    recentlyViewed, downloadedOnly);
         }
     }
 }

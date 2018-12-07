@@ -463,7 +463,7 @@ public class ContentHandler {
         }
         if (contentModel.getServerData() != null) {
             serverData = GsonUtil.fromJson(contentModel.getServerData(), ContentData.class);
-            if (localData == null) {
+            if (localData == null || !isAvailableLocally(contentModel.getContentState())) {
                 content.setContentData(serverData);
             }
         }
@@ -672,11 +672,16 @@ public class ContentHandler {
 
         if (criteria.isRecentlyViewed()) {
             if (uid != null) {
-                // TODO
-//                filter = String.format(Locale.US, "%s AND %s AND %s", artifactAvailabilityFilter, contentTypeFilter);
+                contentTypeFilter = String.format(Locale.US, "ca.%s in ('%s')",
+                        ContentAccessEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr.toLowerCase());
+                if (criteria.isDownloadedOnly()) {
+                    filter = String.format(Locale.US, "ca.%s = '%s' AND %s AND %s",
+                            ContentAccessEntry.COLUMN_NAME_UID, uid, contentTypeFilter, artifactAvailabilityFilter);
+                } else {
+                    filter = String.format(Locale.US, "ca.%s = '%s' AND %s",
+                            ContentAccessEntry.COLUMN_NAME_UID, uid, contentTypeFilter);
+                }
 
-                contentTypeFilter = String.format(Locale.US, "ca.%s in ('%s')", ContentAccessEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr.toLowerCase());
-                filter = String.format(Locale.US, "ca.%s = '%s' AND %s", ContentAccessEntry.COLUMN_NAME_UID, uid, contentTypeFilter);
                 whereClause = String.format(Locale.US, "WHERE (%s)", filter);
                 query = String.format(Locale.US, "SELECT c.*, ca.%s, cm.%s FROM  %s ca LEFT JOIN %s cm ON cm.%s = ca.%s LEFT JOIN %s c ON c.%s = ca.%s %s %s;",
                         ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP,
