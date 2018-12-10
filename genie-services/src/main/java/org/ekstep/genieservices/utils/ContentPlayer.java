@@ -153,11 +153,6 @@ public class ContentPlayer {
         Rollup rollup1 = TelemetryHandler.getRollup(content.getIdentifier(), content.getHierarchyInfo());
         content.setRollup(rollup1);
 
-
-        if (content.getContentData().getStreamingUrl() == null) {
-            content.getContentData().setStreamingUrl(content.getContentData().getPreviewUrl());
-        }
-
         if (content.isAvailableLocally()) {
             content.getContentData().setStreamingUrl(content.getBasePath());
             content.getContentData().setPreviewUrl(content.getBasePath());
