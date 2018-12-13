@@ -13,6 +13,7 @@ import org.ekstep.genieservices.commons.bean.EnrolledCoursesRequest;
 import org.ekstep.genieservices.commons.bean.EnrolledCoursesResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.GetContentStateRequest;
+import org.ekstep.genieservices.commons.bean.UnenrollCourseRequest;
 import org.ekstep.genieservices.commons.bean.UpdateContentStateRequest;
 
 /**
@@ -59,14 +60,14 @@ public class CourseService {
     /**
      * This api is used to unenroll the course.
      *
-     * @param enrollCourseRequest - {@link EnrollCourseRequest}
-     * @param responseHandler     - {@link IResponseHandler <Void>}
+     * @param unenrollCourseRequest - {@link UnenrollCourseRequest}
+     * @param responseHandler       - {@link IResponseHandler <Void>}
      */
-    public void unenrollCourse(final EnrollCourseRequest enrollCourseRequest, IResponseHandler<Void> responseHandler) {
+    public void unenrollCourse(final UnenrollCourseRequest unenrollCourseRequest, IResponseHandler<Void> responseHandler) {
         ThreadPool.getInstance().execute(new IPerformable<Void>() {
             @Override
             public GenieResponse<Void> perform() {
-                return courseService.unenrollCourse(enrollCourseRequest);
+                return courseService.unenrollCourse(unenrollCourseRequest);
             }
         }, responseHandler);
     }

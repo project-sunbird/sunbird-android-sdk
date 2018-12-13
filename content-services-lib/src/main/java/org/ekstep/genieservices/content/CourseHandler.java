@@ -5,6 +5,7 @@ import org.ekstep.genieservices.commons.bean.EnrollCourseRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.GetContentStateRequest;
 import org.ekstep.genieservices.commons.bean.Session;
+import org.ekstep.genieservices.commons.bean.UnenrollCourseRequest;
 import org.ekstep.genieservices.commons.bean.UpdateContentStateRequest;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.StringUtil;
@@ -72,17 +73,17 @@ public class CourseHandler {
         return requestMap;
     }
 
-    public static GenieResponse unenrolCourseInServer(AppContext appContext, Session sessionData, EnrollCourseRequest enrollCourseRequest) {
+    public static GenieResponse unenrolCourseInServer(AppContext appContext, Session sessionData, UnenrollCourseRequest unenrollCourseRequest) {
         UnenrollCourseAPI unenrollCourseAPI = new UnenrollCourseAPI(appContext, getCustomHeaders(sessionData),
-                getUnenrolCourseRequest(enrollCourseRequest));
+                getUnenrolCourseRequest(unenrollCourseRequest));
         return unenrollCourseAPI.post();
     }
 
-    private static Map<String, Object> getUnenrolCourseRequest(EnrollCourseRequest enrollCourseRequest) {
+    private static Map<String, Object> getUnenrolCourseRequest(UnenrollCourseRequest unenrollCourseRequest) {
         Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("userIds", Collections.singletonList(enrollCourseRequest.getUserId()));
-        requestMap.put("courseId", enrollCourseRequest.getCourseId());
-        requestMap.put("batchId", enrollCourseRequest.getBatchId());
+        requestMap.put("userIds", Collections.singletonList(unenrollCourseRequest.getUserId()));
+        requestMap.put("courseId", unenrollCourseRequest.getCourseId());
+        requestMap.put("batchId", unenrollCourseRequest.getBatchId());
         return requestMap;
     }
 

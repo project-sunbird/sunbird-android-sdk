@@ -26,6 +26,7 @@ import org.ekstep.genieservices.commons.bean.EnrolledCoursesResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.GetContentStateRequest;
 import org.ekstep.genieservices.commons.bean.Session;
+import org.ekstep.genieservices.commons.bean.UnenrollCourseRequest;
 import org.ekstep.genieservices.commons.bean.UpdateContentStateRequest;
 import org.ekstep.genieservices.commons.bean.UserSearchCriteria;
 import org.ekstep.genieservices.commons.bean.UserSearchResult;
@@ -352,9 +353,9 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
     }
 
     @Override
-    public GenieResponse<Void> unenrollCourse(EnrollCourseRequest enrollCourseRequest) {
+    public GenieResponse<Void> unenrollCourse(UnenrollCourseRequest unenrollCourseRequest) {
         Map<String, Object> params = new HashMap<>();
-        params.put("request", GsonUtil.toJson(enrollCourseRequest));
+        params.put("request", GsonUtil.toJson(unenrollCourseRequest));
         params.put("logLevel", "2");
         String methodName = "unenrollCourse@CourseServiceImpl";
 
@@ -364,7 +365,7 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
         }
 
         GenieResponse unenrolCourseAPIResponse = CourseHandler.unenrolCourseInServer(mAppContext, authSession.getSessionData(),
-                enrollCourseRequest);
+                unenrollCourseRequest);
 
         if (unenrolCourseAPIResponse.getStatus()) {
             response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
