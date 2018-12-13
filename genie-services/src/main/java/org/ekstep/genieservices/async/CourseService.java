@@ -57,6 +57,21 @@ public class CourseService {
     }
 
     /**
+     * This api is used to unenroll the course.
+     *
+     * @param enrollCourseRequest - {@link EnrollCourseRequest}
+     * @param responseHandler     - {@link IResponseHandler <Void>}
+     */
+    public void unenrollCourse(final EnrollCourseRequest enrollCourseRequest, IResponseHandler<Void> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return courseService.unenrollCourse(enrollCourseRequest);
+            }
+        }, responseHandler);
+    }
+
+    /**
      * This api is used to update the content state of course.
      *
      * @param updateContentStateRequest - {@link UpdateContentStateRequest}

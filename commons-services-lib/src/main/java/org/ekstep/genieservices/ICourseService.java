@@ -34,6 +34,14 @@ public interface ICourseService {
     GenieResponse<Void> enrollCourse(EnrollCourseRequest enrollCourseRequest);
 
     /**
+     * This api is used to un-enroll the course.
+     *
+     * @param enrollCourseRequest {@link EnrollCourseRequest}
+     * @return
+     */
+    GenieResponse<Void> unenrollCourse(EnrollCourseRequest enrollCourseRequest);
+
+    /**
      * This api is used to update the content state of course.
      *
      * @param updateContentStateRequest {@link UpdateContentStateRequest}

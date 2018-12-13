@@ -352,6 +352,38 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
     }
 
     @Override
+    public GenieResponse<Void> unenrollCourse(EnrollCourseRequest enrollCourseRequest) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("request", GsonUtil.toJson(enrollCourseRequest));
+        params.put("logLevel", "2");
+        String methodName = "unenrollCourse@CourseServiceImpl";
+
+        GenieResponse<Void> response = isValidAuthSession(methodName, params);
+        if (response != null) {
+            return response;
+        }
+
+        GenieResponse unenrolCourseAPIResponse = CourseHandler.unenrolCourseInServer(mAppContext, authSession.getSessionData(),
+                enrollCourseRequest);
+
+        if (unenrolCourseAPIResponse.getStatus()) {
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        } else {
+            List<String> errorMessages = unenrolCourseAPIResponse.getErrorMessages();
+            String errorMessage = null;
+            if (!CollectionUtil.isNullOrEmpty(errorMessages)) {
+                errorMessage = errorMessages.get(0);
+            }
+            response = GenieResponseBuilder.getErrorResponse(unenrolCourseAPIResponse.getError(), errorMessage, TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
+        }
+
+        return response;
+    }
+
+    @Override
     public GenieResponse<Void> updateContentState(UpdateContentStateRequest updateContentStateRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(updateContentStateRequest));
