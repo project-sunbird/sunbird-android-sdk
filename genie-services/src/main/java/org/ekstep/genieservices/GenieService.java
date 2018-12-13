@@ -197,7 +197,7 @@ public class GenieService {
      */
     public ICourseService getCourseService() {
         if (mCourseService == null) {
-            mCourseService = new CourseServiceImpl(mAppContext, getAuthSession(), getUserProfileService());
+            mCourseService = new CourseServiceImpl(mAppContext, getAuthSession(), getUserProfileService(), getContentService());
         }
 
         return mCourseService;

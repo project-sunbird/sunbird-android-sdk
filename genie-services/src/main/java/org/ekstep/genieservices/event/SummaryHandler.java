@@ -90,9 +90,7 @@ public class SummaryHandler {
             GenieResponse<Void> response = courseService.updateContentState(getUpdateContentStateRequest(userId, courseId, batchId, contentId, 2, 100));
 
             //fire an event to be handled on mobile side to call the getEnrolledCourses again if the update was successful
-            if (response.getStatus()) {
-                EventBus.postEvent(new GenericEvent(COURSE_STATUS_UPDATED_SUCCESSFULLY));
-            }
+            EventBus.postEvent(new GenericEvent(COURSE_STATUS_UPDATED_SUCCESSFULLY));
         }
     }
 
