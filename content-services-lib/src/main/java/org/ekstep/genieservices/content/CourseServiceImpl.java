@@ -30,6 +30,7 @@ import org.ekstep.genieservices.commons.bean.UnenrollCourseRequest;
 import org.ekstep.genieservices.commons.bean.UpdateContentStateRequest;
 import org.ekstep.genieservices.commons.bean.UserSearchCriteria;
 import org.ekstep.genieservices.commons.bean.UserSearchResult;
+import org.ekstep.genieservices.commons.bean.enums.CourseBatchStatus;
 import org.ekstep.genieservices.commons.db.contract.NoSqlEntry;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.db.model.NoSqlModelListModel;
@@ -586,7 +587,18 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
 
     private Map<String, Object> getCourseBatchFilters(CourseBatchesRequest courseBatchesRequest) {
         Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("status", courseBatchesRequest.getStatus());
+
+        CourseBatchStatus[] courseBatchStatuses = courseBatchesRequest.getStatus();
+
+        if (courseBatchStatuses != null && courseBatchStatuses.length > 0) {
+            String[] status = new String[courseBatchesRequest.getStatus().length];
+
+            for (int i = 0; i < courseBatchesRequest.getStatus().length; i++) {
+                status[i] = courseBatchStatuses[i].getValue();
+            }
+
+            requestMap.put("status", status);
+        }
         requestMap.put("courseId", courseBatchesRequest.getCourseId());
         requestMap.put("enrollmentType", courseBatchesRequest.getEnrollmentType());
         return requestMap;
@@ -704,7 +716,8 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
         return leafNodeCount;
     }
 
-    private void updateEnrolledCourse(String userId, String courseId, ContentStateResponse contentStateResponse) {
+    private void updateEnrolledCourse(String userId, String courseId, ContentStateResponse
+            contentStateResponse) {
         //updating the course state for enrolled courses
         String enrolledCoursesKey = GET_ENROLLED_COURSES_KEY_PREFIX + userId;
         NoSqlModel enrolledCoursesInDB = NoSqlModel.findByKey(mAppContext.getDBSession(), enrolledCoursesKey);
