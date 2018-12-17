@@ -14,16 +14,16 @@ import java.util.Map;
  *
  * @author anil
  */
-public class UnenrollCourseAPI extends SunbirdBaseAPI {
+public class UnenrolCourseAPI extends SunbirdBaseAPI {
 
-    private static final String TAG = UnenrollCourseAPI.class.getSimpleName();
+    private static final String TAG = UnenrolCourseAPI.class.getSimpleName();
 
-    private static final String ENDPOINT = "unenroll";
+    private static final String ENDPOINT = "unenrol";
 
     private Map<String, String> headers;
     private Map<String, Object> requestMap;
 
-    public UnenrollCourseAPI(AppContext appContext, Map<String, String> customHeaders, Map<String, Object> requestMap) {
+    public UnenrolCourseAPI(AppContext appContext, Map<String, String> customHeaders, Map<String, Object> requestMap) {
         super(appContext,
                 String.format(Locale.US, "%s/%s",
                         appContext.getParams().getString(IParams.Key.COURSE_SERVICE_BASE_URL),

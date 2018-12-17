@@ -10,7 +10,7 @@ import org.ekstep.genieservices.commons.bean.EnrolledCoursesRequest;
 import org.ekstep.genieservices.commons.bean.EnrolledCoursesResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.GetContentStateRequest;
-import org.ekstep.genieservices.commons.bean.UnenrollCourseRequest;
+import org.ekstep.genieservices.commons.bean.UnenrolCourseRequest;
 import org.ekstep.genieservices.commons.bean.UpdateContentStateRequest;
 
 /**
@@ -37,10 +37,10 @@ public interface ICourseService {
     /**
      * This api is used to un-enroll the course.
      *
-     * @param unenrollCourseRequest {@link UnenrollCourseRequest}
+     * @param unenrolCourseRequest {@link UnenrolCourseRequest}
      * @return
      */
-    GenieResponse<Void> unenrollCourse(UnenrollCourseRequest unenrollCourseRequest);
+    GenieResponse<Void> unenrolCourse(UnenrolCourseRequest unenrolCourseRequest);
 
     /**
      * This api is used to update the content state of course.
