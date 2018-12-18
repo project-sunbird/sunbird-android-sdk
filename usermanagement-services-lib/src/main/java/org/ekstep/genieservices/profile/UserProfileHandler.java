@@ -1,6 +1,7 @@
 package org.ekstep.genieservices.profile;
 
 import org.ekstep.genieservices.commons.AppContext;
+import org.ekstep.genieservices.commons.bean.AcceptTermsAndConditionsRequest;
 import org.ekstep.genieservices.commons.bean.EndorseOrAddSkillRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.ProfileVisibilityRequest;
@@ -10,6 +11,7 @@ import org.ekstep.genieservices.commons.bean.UploadFileRequest;
 import org.ekstep.genieservices.commons.bean.UserSearchCriteria;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.StringUtil;
+import org.ekstep.genieservices.profile.network.AcceptTermsAndConditionsAPI;
 import org.ekstep.genieservices.profile.network.EndorseOrAddSkillAPI;
 import org.ekstep.genieservices.profile.network.FileUploadAPI;
 import org.ekstep.genieservices.profile.network.ProfileSkillsAPI;
@@ -202,4 +204,17 @@ public class UserProfileHandler {
         return requestMap;
     }
 
+    public static GenieResponse acceptTermsAndConditions(AppContext appContext, Session sessionData,
+                                                         AcceptTermsAndConditionsRequest acceptTermsAndConditionsRequest) {
+        AcceptTermsAndConditionsAPI acceptTermsAndConditionsAPI = new AcceptTermsAndConditionsAPI(appContext, getCustomHeaders(sessionData),
+                getAcceptTermsAndConditionsRequestMap(acceptTermsAndConditionsRequest));
+        return acceptTermsAndConditionsAPI.post();
+    }
+
+    private static Map<String, Object> getAcceptTermsAndConditionsRequestMap(AcceptTermsAndConditionsRequest acceptTermsAndConditionsRequest) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("version", acceptTermsAndConditionsRequest.getVersion());
+
+        return requestMap;
+    }
 }
