@@ -12,6 +12,8 @@ import java.util.List;
  */
 public class ContentFilterCriteria {
 
+    private static final int DEFAULT_LIMIT = 100;
+
     private String uid;
     private String[] contentTypes;
     private String[] audience;
@@ -23,11 +25,12 @@ public class ContentFilterCriteria {
     private List<ContentSortCriteria> sortCriteria;
     private boolean recentlyViewed;
     private boolean downloadedOnly;
+    private long limit;
 
     private ContentFilterCriteria(String uid, String[] contentTypes, String[] audience, String[] pragma, String[] exclPragma,
                                   boolean attachFeedback, boolean attachContentAccess, boolean attachContentMarker,
                                   List<ContentSortCriteria> sortCriteria,
-                                  boolean recentlyViewed, boolean downloadedOnly) {
+                                  boolean recentlyViewed, boolean downloadedOnly, long limit) {
         this.uid = uid;
         this.contentTypes = contentTypes;
         this.audience = audience;
@@ -39,6 +42,7 @@ public class ContentFilterCriteria {
         this.sortCriteria = sortCriteria;
         this.recentlyViewed = recentlyViewed;
         this.downloadedOnly = downloadedOnly;
+        this.limit = limit;
     }
 
     public String getUid() {
@@ -85,6 +89,10 @@ public class ContentFilterCriteria {
         return downloadedOnly;
     }
 
+    public long getLimit() {
+        return limit;
+    }
+
     @Override
     public String toString() {
         return GsonUtil.toJson(this);
@@ -102,6 +110,11 @@ public class ContentFilterCriteria {
         private List<ContentSortCriteria> sortCriteria;
         private boolean recentlyViewed;
         private boolean downloadedOnly;
+        private long limit;
+
+        public Builder() {
+            this.limit = DEFAULT_LIMIT;
+        }
 
         /**
          * User id to get the content in order to access by that user.
@@ -189,6 +202,14 @@ public class ContentFilterCriteria {
             return this;
         }
 
+        /**
+         * Search results limit.
+         */
+        public Builder limit(long limit) {
+            this.limit = limit;
+            return this;
+        }
+
         public ContentFilterCriteria build() {
             if (contentTypes == null || contentTypes.length == 0) {
                 contentTypes = new String[]{"Story", "Worksheet", "Game", "Collection", "TextBook"};
@@ -200,7 +221,7 @@ public class ContentFilterCriteria {
             }
             return new ContentFilterCriteria(uid, contentTypes, audience, pragma, exclPragma,
                     attachFeedback, attachContentAccess, attachContentMarker, sortCriteria,
-                    recentlyViewed, downloadedOnly);
+                    recentlyViewed, downloadedOnly, limit);
         }
     }
 }

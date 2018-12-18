@@ -700,7 +700,7 @@ public class ContentHandler {
                 }
 
                 whereClause = String.format(Locale.US, "WHERE (%s)", filter);
-                query = String.format(Locale.US, "SELECT c.*, ca.%s, cm.%s FROM  %s ca LEFT JOIN %s cm ON cm.%s = ca.%s LEFT JOIN %s c ON c.%s = ca.%s %s %s;",
+                query = String.format(Locale.US, "SELECT c.*, ca.%s, cm.%s FROM  %s ca LEFT JOIN %s cm ON cm.%s = ca.%s LEFT JOIN %s c ON c.%s = ca.%s %s %s LIMIT %d;",
                         ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP,
                         ContentMarkerEntry.COLUMN_NAME_DATA,
                         ContentAccessEntry.TABLE_NAME,
@@ -711,7 +711,8 @@ public class ContentHandler {
                         ContentEntry.COLUMN_NAME_IDENTIFIER,
                         ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER,
                         whereClause,
-                        orderBy.toString());
+                        orderBy.toString(),
+                        criteria.getLimit());
             }
         } else {
             if (uid != null) {
