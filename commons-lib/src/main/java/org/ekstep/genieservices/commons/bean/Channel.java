@@ -16,7 +16,7 @@ public class Channel {
     private String consumerId;
     private String channel;
     private String description;
-    private List<SuggestedFramework> suggested_frameworks;
+    private List<LinkedFramework> frameworks;
     private String createdOn;
     private String versionKey;
     private String appId;
@@ -45,8 +45,8 @@ public class Channel {
         return description;
     }
 
-    public List<SuggestedFramework> getSuggestedFrameworks() {
-        return suggested_frameworks;
+    public List<LinkedFramework> getFrameworks() {
+        return frameworks;
     }
 
     public String getCreatedOn() {
