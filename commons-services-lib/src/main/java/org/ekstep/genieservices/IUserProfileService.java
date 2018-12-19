@@ -1,5 +1,6 @@
 package org.ekstep.genieservices;
 
+import org.ekstep.genieservices.commons.bean.AcceptTermsAndConditionsRequest;
 import org.ekstep.genieservices.commons.bean.EndorseOrAddSkillRequest;
 import org.ekstep.genieservices.commons.bean.FileUploadResult;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -35,5 +36,7 @@ public interface IUserProfileService {
     GenieResponse<FileUploadResult> uploadFile(UploadFileRequest uploadFileRequest);
 
     GenieResponse<Void> updateUserInfo(UpdateUserInfoRequest updateUserInfoRequest);
+
+    GenieResponse<Void> acceptTermsAndConditions(AcceptTermsAndConditionsRequest acceptTermsAndConditionsRequest);
 
 }

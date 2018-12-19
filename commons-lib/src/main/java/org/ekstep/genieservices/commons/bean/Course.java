@@ -50,6 +50,10 @@ public class Course {
         return identifier;
     }
 
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
+
     public int getLastReadContentStatus() {
         return lastReadContentStatus;
     }
@@ -70,8 +74,16 @@ public class Course {
         return contentId;
     }
 
+    public void setContentId(String contentId) {
+        this.contentId = contentId;
+    }
+
     public boolean isActive() {
         return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     public String getDescription() {
@@ -82,20 +94,40 @@ public class Course {
         return courseLogoUrl;
     }
 
+    public void setCourseLogoUrl(String courseLogoUrl) {
+        this.courseLogoUrl = courseLogoUrl;
+    }
+
     public String getBatchId() {
         return batchId;
+    }
+
+    public void setBatchId(String batchId) {
+        this.batchId = batchId;
     }
 
     public String getUserId() {
         return userId;
     }
 
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
     public String getCourseName() {
         return courseName;
     }
 
+    public void setCourseName(String courseName) {
+        this.courseName = courseName;
+    }
+
     public int getLeafNodesCount() {
         return leafNodesCount;
+    }
+
+    public void setLeafNodesCount(int leafNodesCount) {
+        this.leafNodesCount = leafNodesCount;
     }
 
     public int getProgress() {
@@ -110,6 +142,10 @@ public class Course {
         return id;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getTocUrl() {
         return tocUrl;
     }
@@ -120,6 +156,10 @@ public class Course {
 
     public String getCourseId() {
         return courseId;
+    }
+
+    public void setCourseId(String courseId) {
+        this.courseId = courseId;
     }
 
     public int getStatus() {

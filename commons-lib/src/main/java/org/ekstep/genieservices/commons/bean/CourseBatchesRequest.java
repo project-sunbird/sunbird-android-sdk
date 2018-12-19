@@ -13,11 +13,11 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
 public class CourseBatchesRequest {
 
     private String courseId;
-    private String status;
+    private CourseBatchStatus[] status;
     private String enrollmentType;
     private String sortBy;
 
-    public CourseBatchesRequest(String courseId, String status, String enrollmentType, String sortOrder) {
+    public CourseBatchesRequest(String courseId, CourseBatchStatus[] status, String enrollmentType, String sortOrder) {
         this.courseId = courseId;
         this.status = status;
         this.enrollmentType = enrollmentType;
@@ -28,7 +28,7 @@ public class CourseBatchesRequest {
         return courseId;
     }
 
-    public String getStatus() {
+    public CourseBatchStatus[] getStatus() {
         return status;
     }
 
@@ -42,7 +42,7 @@ public class CourseBatchesRequest {
 
     public static class Builder {
         private String courseId;
-        private String status;
+        private CourseBatchStatus[] status;
         private String enrollmentType;
         private String sort_by;
 
@@ -55,8 +55,8 @@ public class CourseBatchesRequest {
             return this;
         }
 
-        public Builder withStatus(CourseBatchStatus status) {
-            this.status = status.getValue();
+        public Builder withStatus(CourseBatchStatus[] status) {
+            this.status = status;
             return this;
         }
 

@@ -61,6 +61,16 @@ public class PageAssembleCriteria {
             return this;
         }
 
+        public Builder purpose(String[] purpose) {
+            pageAssembleCriteria.filters.setPurpose(purpose);
+            return this;
+        }
+
+        public Builder channel(String[] channel) {
+            pageAssembleCriteria.filters.setChannel(channel);
+            return this;
+        }
+
         public Builder subject(String[] subject) {
             pageAssembleCriteria.filters.setSubject(subject);
             return this;

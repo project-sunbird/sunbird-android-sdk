@@ -5,6 +5,7 @@ import org.ekstep.genieservices.commons.bean.EnrollCourseRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.GetContentStateRequest;
 import org.ekstep.genieservices.commons.bean.Session;
+import org.ekstep.genieservices.commons.bean.UnenrolCourseRequest;
 import org.ekstep.genieservices.commons.bean.UpdateContentStateRequest;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.StringUtil;
@@ -13,6 +14,7 @@ import org.ekstep.genieservices.content.network.ContentStateAPI;
 import org.ekstep.genieservices.content.network.CourseBatchesAPI;
 import org.ekstep.genieservices.content.network.EnrolCourseAPI;
 import org.ekstep.genieservices.content.network.EnrolledCoursesAPI;
+import org.ekstep.genieservices.content.network.UnenrolCourseAPI;
 import org.ekstep.genieservices.content.network.UpdateContentStateAPI;
 
 import java.util.ArrayList;
@@ -67,6 +69,20 @@ public class CourseHandler {
         requestMap.put("contentId", enrollCourseRequest.getContentId());
         requestMap.put("courseId", enrollCourseRequest.getCourseId());
         requestMap.put("batchId", enrollCourseRequest.getBatchId());
+        return requestMap;
+    }
+
+    public static GenieResponse unenrolCourseInServer(AppContext appContext, Session sessionData, UnenrolCourseRequest unenrolCourseRequest) {
+        UnenrolCourseAPI unenrollCourseAPI = new UnenrolCourseAPI(appContext, getCustomHeaders(sessionData),
+                getUnenrolCourseRequest(unenrolCourseRequest));
+        return unenrollCourseAPI.post();
+    }
+
+    private static Map<String, Object> getUnenrolCourseRequest(UnenrolCourseRequest unenrolCourseRequest) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("userId", unenrolCourseRequest.getUserId());
+        requestMap.put("courseId", unenrolCourseRequest.getCourseId());
+        requestMap.put("batchId", unenrolCourseRequest.getBatchId());
         return requestMap;
     }
 

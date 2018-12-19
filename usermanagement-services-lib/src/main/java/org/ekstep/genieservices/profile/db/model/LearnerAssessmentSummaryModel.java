@@ -83,7 +83,7 @@ public class LearnerAssessmentSummaryModel implements IReadable {
                         "LEFT JOIN %s p ON la.%s = p.%s " +
                         "where la.%s IN(%s) AND la.%s = '%s' GROUP BY la.%s;",
                 LearnerSummaryEntry.COLUMN_NAME_TOTAL_TS,
-                LearnerAssessmentsEntry.COLUMN_NAME_CORRECT,
+                LearnerAssessmentsEntry.COLUMN_NAME_SCORE,
                 LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA,
                 LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID,
                 LearnerAssessmentsEntry.COLUMN_NAME_UID,
@@ -154,13 +154,14 @@ public class LearnerAssessmentSummaryModel implements IReadable {
     }
 
     private Map<String, Object> readReportsCursorData(IResultSet cursor) {
+        DecimalFormat df = new DecimalFormat(".##");
         Map<String, Object> reportSummary = new HashMap<>();
 
         int totalTimeSpent = cursor.getInt(0);
         reportSummary.put("totalTimespent", totalTimeSpent);
 
-        int score = cursor.getInt(1);
-        reportSummary.put("score", score);
+        double score = cursor.getDouble(1);
+        reportSummary.put("score", Double.valueOf(df.format(score)));
 
         String hData = cursor.getString(2);
         reportSummary.put("hData", hData);

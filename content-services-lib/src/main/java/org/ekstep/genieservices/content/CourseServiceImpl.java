@@ -4,6 +4,7 @@ import com.google.gson.internal.LinkedTreeMap;
 
 import org.ekstep.genieservices.BaseService;
 import org.ekstep.genieservices.IAuthSession;
+import org.ekstep.genieservices.IContentService;
 import org.ekstep.genieservices.ICourseService;
 import org.ekstep.genieservices.IUserProfileService;
 import org.ekstep.genieservices.ServiceConstants;
@@ -11,6 +12,9 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
 import org.ekstep.genieservices.commons.bean.Batch;
 import org.ekstep.genieservices.commons.bean.BatchDetailsRequest;
+import org.ekstep.genieservices.commons.bean.ChildContentRequest;
+import org.ekstep.genieservices.commons.bean.Content;
+import org.ekstep.genieservices.commons.bean.ContentDetailsRequest;
 import org.ekstep.genieservices.commons.bean.ContentState;
 import org.ekstep.genieservices.commons.bean.ContentStateResponse;
 import org.ekstep.genieservices.commons.bean.Course;
@@ -22,9 +26,11 @@ import org.ekstep.genieservices.commons.bean.EnrolledCoursesResponse;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.GetContentStateRequest;
 import org.ekstep.genieservices.commons.bean.Session;
+import org.ekstep.genieservices.commons.bean.UnenrolCourseRequest;
 import org.ekstep.genieservices.commons.bean.UpdateContentStateRequest;
 import org.ekstep.genieservices.commons.bean.UserSearchCriteria;
 import org.ekstep.genieservices.commons.bean.UserSearchResult;
+import org.ekstep.genieservices.commons.bean.enums.CourseBatchStatus;
 import org.ekstep.genieservices.commons.db.contract.NoSqlEntry;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.db.model.NoSqlModelListModel;
@@ -61,11 +67,15 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
 
     private IAuthSession<Session> authSession;
     private IUserProfileService userProfileService;
+    private IContentService contentService;
+    private int leafNodeCount = 0;
 
-    public CourseServiceImpl(AppContext appContext, IAuthSession<Session> authSession, IUserProfileService userProfileService) {
+
+    public CourseServiceImpl(AppContext appContext, IAuthSession<Session> authSession, IUserProfileService userProfileService, IContentService contentService) {
         super(appContext);
         this.authSession = authSession;
         this.userProfileService = userProfileService;
+        this.contentService = contentService;
     }
 
     private <T> GenieResponse<T> isValidAuthSession(String methodName, Map<String, Object> params) {
@@ -204,6 +214,7 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
 
     @Override
     public GenieResponse<Void> enrollCourse(EnrollCourseRequest enrollCourseRequest) {
+        leafNodeCount = 0;
         Map<String, Object> params = new HashMap<>();
         params.put("request", GsonUtil.toJson(enrollCourseRequest));
         params.put("logLevel", "2");
@@ -232,6 +243,8 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
             //store the newly enrolled course in the preference
             mAppContext.getKeyValueStore().putString(ServiceConstants.PreferenceKey.SUNBIRD_CONTENT_CONTEXT, GsonUtil.toJson(courseContext));
 
+            addNewlyEnrolledCourseToGetEnrolledCourses(enrollCourseRequest);
+
             TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
         } else {
             List<String> errorMessages = enrolCourseAPIResponse.getErrorMessages();
@@ -240,6 +253,132 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
                 errorMessage = errorMessages.get(0);
             }
             response = GenieResponseBuilder.getErrorResponse(enrolCourseAPIResponse.getError(), errorMessage, TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
+        }
+
+        return response;
+    }
+
+    private void addNewlyEnrolledCourseToGetEnrolledCourses(EnrollCourseRequest enrollCourseRequest) {
+        //get all the enrolled courses
+        EnrolledCoursesResponse enrolledCoursesResponse = null;
+        GenieResponse genieResponse = null;
+        String key = GET_ENROLLED_COURSES_KEY_PREFIX + enrollCourseRequest.getUserId();
+        NoSqlModel enrolledCoursesInDB = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
+        if (enrolledCoursesInDB == null) {
+            Course newlyEnrolledCourse = getNewlyAddedCourse(enrollCourseRequest);
+
+            List<Course> courses = new ArrayList<>();
+            //add to the courses
+            courses.add(newlyEnrolledCourse);
+
+            //create dummy EnrolledCoursesResponse
+            EnrolledCoursesResponse dummyEnrolledCoursesResponse = new EnrolledCoursesResponse();
+            dummyEnrolledCoursesResponse.setCourses(courses);
+
+            GenieResponse<EnrolledCoursesResponse> tempEnrolledCoursesResponse = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE, EnrolledCoursesResponse.class);
+            tempEnrolledCoursesResponse.setResult(dummyEnrolledCoursesResponse);
+
+            // Save to DB
+            String body = tempEnrolledCoursesResponse.getResult().toString();
+            enrolledCoursesInDB = NoSqlModel.build(mAppContext.getDBSession(), key, body);
+            enrolledCoursesInDB.save();
+        } else {
+            genieResponse = GsonUtil.fromJson(enrolledCoursesInDB.getValue(), GenieResponse.class);
+            LinkedTreeMap map = GsonUtil.fromJson(enrolledCoursesInDB.getValue(), LinkedTreeMap.class);
+            String result = GsonUtil.toJson(map.get("result"));
+            enrolledCoursesResponse = GsonUtil.fromJson(result, EnrolledCoursesResponse.class);
+        }
+
+        if (enrolledCoursesResponse != null && enrolledCoursesResponse.getCourses() != null && enrolledCoursesResponse.getCourses().size() > 0) {
+            boolean isCoursePresent = false;
+            //check if the enrolled courses already contains the course
+            for (Course course : enrolledCoursesResponse.getCourses()) {
+                if (course.getCourseId().equalsIgnoreCase(enrollCourseRequest.getCourseId())) {
+                    isCoursePresent = true;
+                }
+
+            }
+
+            if (!isCoursePresent) {
+                Course newlyEnrolledCourse = getNewlyAddedCourse(enrollCourseRequest);
+
+                List<Course> courseList = enrolledCoursesResponse.getCourses();
+
+                //manipulate the enrolledCoursesList here and update the db
+                courseList.add(newlyEnrolledCourse);
+
+                //update this new course list to DB
+                enrolledCoursesResponse.setCourses(courseList);
+
+                //set it to the genie response
+                genieResponse.setResult(enrolledCoursesResponse);
+
+                //update the NoSQL db
+                enrolledCoursesInDB.setValue(GsonUtil.toJson(genieResponse));
+                enrolledCoursesInDB.update();
+            }
+        }
+    }
+
+    private Course getNewlyAddedCourse(EnrollCourseRequest enrollCourseRequest) {
+        int leafCount = 0;
+        ChildContentRequest.Builder childContentRequestBuilder = new ChildContentRequest.Builder().forContent(enrollCourseRequest.getCourseId());
+        GenieResponse<Content> childContents = this.contentService.getChildContents(childContentRequestBuilder.build());
+
+        if (childContents.getStatus() && childContents.getResult() != null)
+            leafCount = getLeafNodeCount(childContents.getResult());
+
+
+        //get the content details of the course
+        ContentDetailsRequest.Builder contentDetailsBuilder = new ContentDetailsRequest.Builder().forContent(enrollCourseRequest.getCourseId());
+        GenieResponse<Content> contentDetails = this.contentService.getContentDetails(contentDetailsBuilder.build());
+
+        //create a new course
+        Course newlyEnrolledCourse = new Course();
+        newlyEnrolledCourse.setProgress(0);
+        newlyEnrolledCourse.setUserId(enrollCourseRequest.getUserId());
+        newlyEnrolledCourse.setBatchId(enrollCourseRequest.getBatchId());
+        newlyEnrolledCourse.setCourseId(enrollCourseRequest.getCourseId());
+        newlyEnrolledCourse.setContentId(enrollCourseRequest.getCourseId());
+        newlyEnrolledCourse.setLeafNodesCount(leafCount);
+        newlyEnrolledCourse.setActive(true);
+        if (contentDetails != null && contentDetails.getResult() != null) {
+            newlyEnrolledCourse.setCourseName(contentDetails.getResult().getContentData().getName());
+            String baseUrl = contentDetails.getResult().getBasePath();
+            String imageUrl = contentDetails.getResult().getContentData().getAppIcon();
+            String logo = baseUrl + "/" + imageUrl;
+            newlyEnrolledCourse.setCourseLogoUrl(logo);
+        }
+        return newlyEnrolledCourse;
+    }
+
+    @Override
+    public GenieResponse<Void> unenrolCourse(UnenrolCourseRequest unenrolCourseRequest) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("request", GsonUtil.toJson(unenrolCourseRequest));
+        params.put("logLevel", "2");
+        String methodName = "unenrolCourse@CourseServiceImpl";
+
+        GenieResponse<Void> response = isValidAuthSession(methodName, params);
+        if (response != null) {
+            return response;
+        }
+
+        GenieResponse unenrolCourseAPIResponse = CourseHandler.unenrolCourseInServer(mAppContext, authSession.getSessionData(),
+                unenrolCourseRequest);
+
+        if (unenrolCourseAPIResponse.getStatus()) {
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        } else {
+            List<String> errorMessages = unenrolCourseAPIResponse.getErrorMessages();
+            String errorMessage = null;
+            if (!CollectionUtil.isNullOrEmpty(errorMessages)) {
+                errorMessage = errorMessages.get(0);
+            }
+            response = GenieResponseBuilder.getErrorResponse(unenrolCourseAPIResponse.getError(), errorMessage, TAG);
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
         }
 
@@ -448,7 +587,18 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
 
     private Map<String, Object> getCourseBatchFilters(CourseBatchesRequest courseBatchesRequest) {
         Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("status", courseBatchesRequest.getStatus());
+
+        CourseBatchStatus[] courseBatchStatuses = courseBatchesRequest.getStatus();
+
+        if (courseBatchStatuses != null && courseBatchStatuses.length > 0) {
+            String[] status = new String[courseBatchesRequest.getStatus().length];
+
+            for (int i = 0; i < courseBatchesRequest.getStatus().length; i++) {
+                status[i] = courseBatchStatuses[i].getValue();
+            }
+
+            requestMap.put("status", status);
+        }
         requestMap.put("courseId", courseBatchesRequest.getCourseId());
         requestMap.put("enrollmentType", courseBatchesRequest.getEnrollmentType());
         return requestMap;
@@ -554,7 +704,20 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
         return response;
     }
 
-    private void updateEnrolledCourse(String userId, String courseId, ContentStateResponse contentStateResponse) {
+    private int getLeafNodeCount(Content content) {
+        if (content.getChildren() == null) {
+            leafNodeCount++;
+        } else {
+            for (Content childContent : content.getChildren()) {
+                getLeafNodeCount(childContent);
+            }
+        }
+
+        return leafNodeCount;
+    }
+
+    private void updateEnrolledCourse(String userId, String courseId, ContentStateResponse
+            contentStateResponse) {
         //updating the course state for enrolled courses
         String enrolledCoursesKey = GET_ENROLLED_COURSES_KEY_PREFIX + userId;
         NoSqlModel enrolledCoursesInDB = NoSqlModel.findByKey(mAppContext.getDBSession(), enrolledCoursesKey);
