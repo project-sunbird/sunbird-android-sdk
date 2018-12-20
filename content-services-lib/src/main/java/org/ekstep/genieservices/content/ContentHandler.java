@@ -2065,7 +2065,7 @@ public class ContentHandler {
                     builder.contentTypes(contentType.toArray(new String[contentType.size()]));
                 }
 
-                builder.impliedFilters(mapFilterValues(filtersMap));
+                builder.impliedFilters(mapFilterValues(filtersMap, builder));
             }
 
             if (searchMap.containsKey("facets")) {
