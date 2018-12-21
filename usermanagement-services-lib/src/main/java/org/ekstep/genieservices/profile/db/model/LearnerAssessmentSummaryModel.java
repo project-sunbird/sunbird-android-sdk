@@ -77,7 +77,7 @@ public class LearnerAssessmentSummaryModel implements IReadable {
     }
 
     private static String getUserReportsQuery(List<String> uids, String contentId) {
-        String query = String.format(Locale.US, "SELECT lcs.%s,sum(%s),la.%s,la.%s,la.%s,p.%s " +
+        String query = String.format(Locale.US, "SELECT lcs.%s,sum(%s),la.%s,la.%s,la.%s,p.%s,la.%s " +
                         " FROM  %s la " +
                         "LEFT JOIN %s lcs ON (la.%s = lcs.%s AND la.%s = lcs.%s) " +
                         "LEFT JOIN %s p ON la.%s = p.%s " +
@@ -88,6 +88,7 @@ public class LearnerAssessmentSummaryModel implements IReadable {
                 LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID,
                 LearnerAssessmentsEntry.COLUMN_NAME_UID,
                 ProfileEntry.COLUMN_NAME_HANDLE,
+                LearnerAssessmentsEntry.COLUMN_NAME_TIME_SPENT,
                 LearnerAssessmentsEntry.TABLE_NAME,
                 LearnerSummaryEntry.TABLE_NAME,
                 LearnerSummaryEntry.COLUMN_NAME_UID,
@@ -174,6 +175,9 @@ public class LearnerAssessmentSummaryModel implements IReadable {
 
         String userName = cursor.getString(5);
         reportSummary.put("userName", userName);
+
+        int timeSpent = cursor.getInt(6);
+        reportSummary.put("timespent", timeSpent);
 
         return reportSummary;
     }
