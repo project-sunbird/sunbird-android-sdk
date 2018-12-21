@@ -8,6 +8,8 @@ import org.ekstep.genieservices.commons.bean.ChannelDetailsRequest;
 import org.ekstep.genieservices.commons.bean.Framework;
 import org.ekstep.genieservices.commons.bean.FrameworkDetailsRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.SystemSetting;
+import org.ekstep.genieservices.commons.bean.SystemSettingRequest;
 import org.ekstep.genieservices.commons.bean.enums.MasterDataType;
 
 /**
@@ -71,7 +73,7 @@ public class FrameworkService {
      * On failing, the response will return status as FALSE with the following error.
      * <p>NO_DATA_FOUND
      *
-     * @param responseBody          -{@link String}
+     * @param responseBody    -{@link String}
      * @param responseHandler - {@link IResponseHandler<Void>}
      */
     public void persistFrameworkDetails(final String responseBody, IResponseHandler<Void> responseHandler) {
@@ -79,6 +81,26 @@ public class FrameworkService {
             @Override
             public GenieResponse<Void> perform() {
                 return frameworkService.persistFrameworkDetails(responseBody);
+            }
+        }, responseHandler);
+    }
+
+    /**
+     * This api is used to get the system settings by id.
+     * <p>
+     * On successful, the response will return status as TRUE with system setting.
+     * <p>
+     * On failing, the response will return status as FALSE with the following error.
+     * <p>NO_DATA_FOUND
+     *
+     * @param systemSettingRequest -{@link SystemSettingRequest}
+     * @param responseHandler      - {@link IResponseHandler<SystemSetting>}
+     */
+    public void getSystemSetting(final SystemSettingRequest systemSettingRequest, IResponseHandler<SystemSetting> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<SystemSetting>() {
+            @Override
+            public GenieResponse<SystemSetting> perform() {
+                return frameworkService.getSystemSetting(systemSettingRequest);
             }
         }, responseHandler);
     }
