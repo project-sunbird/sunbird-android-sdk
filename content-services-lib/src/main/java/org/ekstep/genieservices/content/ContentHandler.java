@@ -482,6 +482,7 @@ public class ContentHandler {
                 if (StringUtil.isNullOrEmpty(localData.getAverageRating())) {
                     localData.setAverageRating(serverData.getAverageRating());
                 }
+                content.setContentData(localData);
             }
         }
 
