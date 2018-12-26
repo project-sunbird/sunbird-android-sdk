@@ -5,7 +5,7 @@ import org.ekstep.genieservices.commons.bean.EnrollCourseRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
 import org.ekstep.genieservices.commons.bean.GetContentStateRequest;
 import org.ekstep.genieservices.commons.bean.Session;
-import org.ekstep.genieservices.commons.bean.UnenrollCourseRequest;
+import org.ekstep.genieservices.commons.bean.UnenrolCourseRequest;
 import org.ekstep.genieservices.commons.bean.UpdateContentStateRequest;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.StringUtil;
@@ -14,11 +14,10 @@ import org.ekstep.genieservices.content.network.ContentStateAPI;
 import org.ekstep.genieservices.content.network.CourseBatchesAPI;
 import org.ekstep.genieservices.content.network.EnrolCourseAPI;
 import org.ekstep.genieservices.content.network.EnrolledCoursesAPI;
-import org.ekstep.genieservices.content.network.UnenrollCourseAPI;
+import org.ekstep.genieservices.content.network.UnenrolCourseAPI;
 import org.ekstep.genieservices.content.network.UpdateContentStateAPI;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,17 +72,17 @@ public class CourseHandler {
         return requestMap;
     }
 
-    public static GenieResponse unenrolCourseInServer(AppContext appContext, Session sessionData, UnenrollCourseRequest unenrollCourseRequest) {
-        UnenrollCourseAPI unenrollCourseAPI = new UnenrollCourseAPI(appContext, getCustomHeaders(sessionData),
-                getUnenrolCourseRequest(unenrollCourseRequest));
+    public static GenieResponse unenrolCourseInServer(AppContext appContext, Session sessionData, UnenrolCourseRequest unenrolCourseRequest) {
+        UnenrolCourseAPI unenrollCourseAPI = new UnenrolCourseAPI(appContext, getCustomHeaders(sessionData),
+                getUnenrolCourseRequest(unenrolCourseRequest));
         return unenrollCourseAPI.post();
     }
 
-    private static Map<String, Object> getUnenrolCourseRequest(UnenrollCourseRequest unenrollCourseRequest) {
+    private static Map<String, Object> getUnenrolCourseRequest(UnenrolCourseRequest unenrolCourseRequest) {
         Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("userIds", Collections.singletonList(unenrollCourseRequest.getUserId()));
-        requestMap.put("courseId", unenrollCourseRequest.getCourseId());
-        requestMap.put("batchId", unenrollCourseRequest.getBatchId());
+        requestMap.put("userId", unenrolCourseRequest.getUserId());
+        requestMap.put("courseId", unenrolCourseRequest.getCourseId());
+        requestMap.put("batchId", unenrolCourseRequest.getBatchId());
         return requestMap;
     }
 

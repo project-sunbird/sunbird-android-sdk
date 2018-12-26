@@ -12,6 +12,8 @@ import org.ekstep.genieservices.commons.bean.ChannelDetailsRequest;
 import org.ekstep.genieservices.commons.bean.Framework;
 import org.ekstep.genieservices.commons.bean.FrameworkDetailsRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.SystemSetting;
+import org.ekstep.genieservices.commons.bean.SystemSettingRequest;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
@@ -20,6 +22,7 @@ import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.config.network.ChannelDetailsAPI;
 import org.ekstep.genieservices.config.network.FrameworkDetailsAPI;
+import org.ekstep.genieservices.config.network.SystemSettingAPI;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
 
 import java.util.HashMap;
@@ -36,6 +39,8 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
     private static final String TAG = FrameworkServiceImpl.class.getSimpleName();
     private static final String DB_KEY_CHANNEL_DETAILS = "channel_details_key-";
     private static final String DB_KEY_FRAMEWORK_DETAILS = "framework_details_key-";
+    private static final String DB_KEY_SYSTEM_SETTING = "system_setting_key-";
+    private static final String SYSTEM_SETTING_API_EXPIRATION_KEY = "SYSTEM_SETTING_API_EXPIRATION_KEY";
     private static final Double DEFAULT_TTL = 1d;   // In hours
 
     public FrameworkServiceImpl(AppContext appContext) {
@@ -269,6 +274,110 @@ public class FrameworkServiceImpl extends BaseService implements IFrameworkServi
             String expirationKey = FrameworkConstants.PreferenceKey.FRAMEWORK_DETAILS_API_EXPIRATION_KEY + "-" + frameworkId;
             saveDataExpirationTime(ttl, expirationKey);
         }
+    }
+
+    @Override
+    public GenieResponse<SystemSetting> getSystemSetting(SystemSettingRequest systemSettingRequest) {
+        String methodName = "getSystemSetting@FrameworkServiceImpl";
+        Map<String, Object> params = new HashMap<>();
+        params.put("request", GsonUtil.toJson(systemSettingRequest));
+        params.put("logLevel", "2");
+
+        GenieResponse<SystemSetting> response;
+
+        String key = DB_KEY_SYSTEM_SETTING + systemSettingRequest.getId();
+        String expirationKey = SYSTEM_SETTING_API_EXPIRATION_KEY + "-" + systemSettingRequest.getId();
+        long expirationTime = getLongFromKeyValueStore(expirationKey);
+
+        NoSqlModel systemSettingInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
+
+        if (systemSettingInDb == null) {
+            String responseBody = null;
+            if (!StringUtil.isNullOrEmpty(systemSettingRequest.getFilePath())) {
+                responseBody = FileUtil.readFileFromClasspath(systemSettingRequest.getFilePath());
+            }
+
+            GenieResponse systemSettingAPIResponse;
+            if (StringUtil.isNullOrEmpty(responseBody)) {
+                systemSettingAPIResponse = getSystemSettingFromServer(systemSettingRequest.getId());
+                if (systemSettingAPIResponse.getStatus()) {
+                    responseBody = systemSettingAPIResponse.getResult().toString();
+                } else {
+                    List<String> errorMessages = systemSettingAPIResponse.getErrorMessages();
+                    String errorMessage = null;
+                    if (!CollectionUtil.isNullOrEmpty(errorMessages)) {
+                        errorMessage = errorMessages.get(0);
+                    }
+                    response = GenieResponseBuilder.getErrorResponse(systemSettingAPIResponse.getError(), errorMessage, TAG);
+                    TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
+                    return response;
+                }
+            }
+
+            saveSystemSetting(responseBody, systemSettingRequest.getId());
+
+        } else if (hasExpired(expirationTime)) {
+            refreshSystemSetting(systemSettingRequest.getId());
+        }
+
+        systemSettingInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
+        SystemSetting systemSetting = null;
+        if (systemSettingInDb != null) {
+            LinkedTreeMap map = GsonUtil.fromJson(systemSettingInDb.getValue(), LinkedTreeMap.class);
+            LinkedTreeMap result = (LinkedTreeMap) map.get("result");
+            String systemSettingResponse = GsonUtil.toJson(result.get("response"));
+            systemSetting = GsonUtil.fromJson(systemSettingResponse, SystemSetting.class);
+        }
+
+        if (systemSetting != null) {
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+            response.setResult(systemSetting);
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        } else {
+            response = GenieResponseBuilder.getErrorResponse(ServiceConstants.ErrorCode.NO_SYSTEM_SETTING_FOUND,
+                    ServiceConstants.ErrorMessage.UNABLE_TO_FIND_SYSTEM_SETTING, TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params,
+                    ServiceConstants.ErrorMessage.UNABLE_TO_FIND_SYSTEM_SETTING);
+        }
+        return response;
+    }
+
+    private GenieResponse getSystemSettingFromServer(String id) {
+        SystemSettingAPI systemSettingAPI = new SystemSettingAPI(mAppContext, id);
+        return systemSettingAPI.get();
+    }
+
+    private void saveSystemSetting(String response, String id) {
+        LinkedTreeMap map = GsonUtil.fromJson(response, LinkedTreeMap.class);
+        LinkedTreeMap result = (LinkedTreeMap) map.get("result");
+        if (result != null) {
+            Double ttl = (Double) result.get("ttl");
+            String expirationKey = SYSTEM_SETTING_API_EXPIRATION_KEY + "-" + id;
+            saveDataExpirationTime(ttl, expirationKey);
+
+            String key = DB_KEY_SYSTEM_SETTING + id;
+            NoSqlModel systemSetting = NoSqlModel.build(mAppContext.getDBSession(), key, response);
+            NoSqlModel systemSettingInDb = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
+            if (systemSettingInDb != null) {
+                systemSetting.update();
+            } else {
+                systemSetting.save();
+            }
+        }
+    }
+
+    private void refreshSystemSetting(final String id) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                SystemSettingAPI systemSettingAPI = new SystemSettingAPI(mAppContext, id);
+                GenieResponse genieResponse = systemSettingAPI.get();
+                if (genieResponse.getStatus()) {
+                    String body = genieResponse.getResult().toString();
+                    saveSystemSetting(body, id);
+                }
+            }
+        }).start();
     }
 
 }

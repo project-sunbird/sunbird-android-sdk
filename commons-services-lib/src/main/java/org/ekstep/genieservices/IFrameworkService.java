@@ -5,6 +5,8 @@ import org.ekstep.genieservices.commons.bean.ChannelDetailsRequest;
 import org.ekstep.genieservices.commons.bean.Framework;
 import org.ekstep.genieservices.commons.bean.FrameworkDetailsRequest;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.SystemSetting;
+import org.ekstep.genieservices.commons.bean.SystemSettingRequest;
 
 /**
  * This is the interface with all the required APIs to get framework specific data.
@@ -16,4 +18,6 @@ public interface IFrameworkService {
     GenieResponse<Framework> getFrameworkDetails(FrameworkDetailsRequest frameworkDetailsRequest);
 
     GenieResponse<Void> persistFrameworkDetails(String responseBody);
+
+    GenieResponse<SystemSetting> getSystemSetting(SystemSettingRequest systemSettingRequest);
 }

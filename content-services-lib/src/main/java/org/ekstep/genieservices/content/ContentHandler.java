@@ -700,7 +700,7 @@ public class ContentHandler {
                 }
 
                 whereClause = String.format(Locale.US, "WHERE (%s)", filter);
-                query = String.format(Locale.US, "SELECT c.*, ca.%s, cm.%s FROM  %s ca LEFT JOIN %s cm ON cm.%s = ca.%s LEFT JOIN %s c ON c.%s = ca.%s %s %s;",
+                query = String.format(Locale.US, "SELECT c.*, ca.%s, cm.%s FROM  %s ca LEFT JOIN %s cm ON cm.%s = ca.%s LEFT JOIN %s c ON c.%s = ca.%s %s %s LIMIT %d;",
                         ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP,
                         ContentMarkerEntry.COLUMN_NAME_DATA,
                         ContentAccessEntry.TABLE_NAME,
@@ -711,7 +711,8 @@ public class ContentHandler {
                         ContentEntry.COLUMN_NAME_IDENTIFIER,
                         ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER,
                         whereClause,
-                        orderBy.toString());
+                        orderBy.toString(),
+                        criteria.getLimit());
             }
         } else {
             if (uid != null) {
@@ -1228,8 +1229,6 @@ public class ContentHandler {
         requestMap.put("offset", criteria.getOffset());
         requestMap.put("limit", criteria.getLimit());
         requestMap.put("mode", criteria.getMode());
-        requestMap.put("framework", criteria.getFramework());
-        requestMap.put("languageCode", criteria.getLanguageCode());
 
         if (!CollectionUtil.isEmpty(criteria.getExists())) {
             requestMap.put("exists", Arrays.asList(criteria.getExists()));
@@ -1486,6 +1485,12 @@ public class ContentHandler {
             }
         }
 
+        if (!CollectionUtil.isNullOrEmpty(criteria.getImpliedFiltersMap())) {
+            for (Map<String, Object> impliedFilterMap : criteria.getImpliedFiltersMap()) {
+                filterMap.putAll(impliedFilterMap);
+            }
+        }
+
         if (!filterMap.containsKey("contentType")) {
             filterMap.put("contentType", Arrays.asList(criteria.getContentTypes()));
         }
@@ -1711,7 +1716,7 @@ public class ContentHandler {
             appliedFilterMap.remove(facetName);
         }
         filterBuilder.facetFilters(facetFilters);
-        filterBuilder.impliedFilters(mapFilterValues(appliedFilterMap));
+        filterBuilder.impliedFilters(mapFilterValues(appliedFilterMap, filterBuilder));
         return filterBuilder.build();
     }
 
@@ -2060,7 +2065,7 @@ public class ContentHandler {
                     builder.contentTypes(contentType.toArray(new String[contentType.size()]));
                 }
 
-                builder.impliedFilters(mapFilterValues(filtersMap));
+                builder.impliedFilters(mapFilterValues(filtersMap, builder));
             }
 
             if (searchMap.containsKey("facets")) {
@@ -2108,6 +2113,51 @@ public class ContentHandler {
                 }
             }
         }
+        return filters;
+    }
+
+    private static List<ContentSearchFilter> mapFilterValues(Map filtersMap, SunbirdContentSearchCriteria.FilterBuilder filterBuilder) {
+        List<ContentSearchFilter> filters = new ArrayList<>();
+        List<Map<String, Object>> impliedFiltersMap = new ArrayList<>();
+
+        if (filtersMap != null && !filtersMap.isEmpty()) {
+            Iterator it = filtersMap.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                String key = pair.getKey().toString();
+                Object value = pair.getValue();
+
+                if (value instanceof List) {
+                    List<FilterValue> values = new ArrayList<>();
+                    List<String> valueList = (List<String>) value;
+                    for (String v : valueList) {
+                        FilterValue filterValue = new FilterValue();
+                        filterValue.setName(v);
+                        filterValue.setApply(true);
+
+                        values.add(filterValue);
+                    }
+
+                    ContentSearchFilter contentSearchFilter = new ContentSearchFilter();
+                    contentSearchFilter.setName(key);
+                    contentSearchFilter.setValues(values);
+
+                    filters.add(contentSearchFilter);
+                } else {
+//                  TODO: No change required here. Best of genie will be removed soon and so we don't have to handle the genieScore.
+//                  TODO: Also compatibility level gets auto added into every search.
+//                  key.equals("compatibilityLevel") && key.equals("genieScore")
+//                  String[] stringArray = mFilterMap.get(values.getName());
+//                  filterSet.addAll(Arrays.asList(stringArray));
+
+                    Map<String, Object> filterMap = new HashMap<>();
+                    filterMap.put(key, value);
+                    impliedFiltersMap.add(filterMap);
+                }
+            }
+        }
+
+        filterBuilder.impliedFiltersMap(impliedFiltersMap);
         return filters;
     }
 

@@ -10,21 +10,15 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
 public class ChannelDetailsRequest {
 
     private String channelId;
-    private boolean refreshChannelDetails;
     private String filePath;
 
-    private ChannelDetailsRequest(String channelId, boolean refreshChannelDetails, String filePath) {
+    private ChannelDetailsRequest(String channelId, String filePath) {
         this.channelId = channelId;
-        this.refreshChannelDetails = refreshChannelDetails;
         this.filePath = filePath;
     }
 
     public String getChannelId() {
         return channelId;
-    }
-
-    public boolean isRefreshChannelDetails() {
-        return refreshChannelDetails;
     }
 
     public String getFilePath() {
@@ -34,7 +28,6 @@ public class ChannelDetailsRequest {
     public static class Builder {
 
         private String channelId;
-        private boolean refreshChannelDetails;
         private String filePath;
 
         public Builder forChannel(String channelId) {
@@ -42,14 +35,6 @@ public class ChannelDetailsRequest {
                 throw new IllegalArgumentException("channelId should not be null or empty.");
             }
             this.channelId = channelId;
-            return this;
-        }
-
-        /**
-         * The channel details are refreshed from the server only if this flag is set.
-         */
-        public Builder refreshChannelDetailsFromServer() {
-            this.refreshChannelDetails = true;
             return this;
         }
 
@@ -67,7 +52,7 @@ public class ChannelDetailsRequest {
                 throw new IllegalStateException("channelId required.");
             }
 
-            return new ChannelDetailsRequest(channelId, refreshChannelDetails, filePath);
+            return new ChannelDetailsRequest(channelId, filePath);
         }
     }
 }

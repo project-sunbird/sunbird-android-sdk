@@ -4,7 +4,6 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.IParams;
 import org.ekstep.genieservices.commons.network.BaseAPI;
 import org.ekstep.genieservices.commons.utils.GsonUtil;
-import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -45,7 +44,6 @@ public class ContentSearchAPI extends BaseAPI {
         this.requestMap = requestMap;
     }
 
-
     @Override
     protected Map<String, String> getRequestHeaders() {
         Map<String, String> headers = new HashMap<>();
@@ -60,10 +58,4 @@ public class ContentSearchAPI extends BaseAPI {
         return GsonUtil.toJson(request);
     }
 
-    private String getFrameworknLangCode(String framework, String langCode) {
-        if (!StringUtil.isNullOrEmpty(framework) && !StringUtil.isNullOrEmpty(langCode)) {
-            return "?framework=" + framework + "&lang=" + langCode;
-        }
-        return "";
-    }
 }
