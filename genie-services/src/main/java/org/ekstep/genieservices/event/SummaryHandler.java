@@ -43,31 +43,42 @@ public class SummaryHandler {
         }
 
         if ("START".equals(event.getEid()) && checkPdata(event.getContext().getPdata())) {
-            if (contentContextMap != null) {
+            //For first time or new enrolled courses contentContextMap will be empty, we have fetch it again
+            getContentContextMap(appContext);
+
+            if (contentContextMap != null && !contentContextMap.isEmpty()) {
                 callUpdateContentStateAPI(event, event.getEid());
             }
 
             processOEStart(event, appContext);
         } else if ("START".equals(event.getEid()) && checkIsCourse(event)) {
-            String contentContext = appContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.SUNBIRD_CONTENT_CONTEXT, "");
-
-            if (!StringUtil.isNullOrEmpty(contentContext)) {
-                contentContextMap = GsonUtil.fromJson(contentContext, Map.class);
-            }
+            getContentContextMap(appContext);
         } else if ("ASSESS".equals(event.getEid()) && checkPdata(event.getContext().getPdata())) {
             processOEAssess(event, appContext);
         } else if ("END".equals(event.getEid()) && checkIsCourse(event)) {
-            if (contentContextMap != null) {
-                //update content state to empty
-                contentContextMap = null;
-                appContext.getKeyValueStore().putString(ServiceConstants.PreferenceKey.SUNBIRD_CONTENT_CONTEXT, "");
-            }
+            setContentContextToEmpty(appContext);
         } else if ("END".equals(event.getEid()) && checkPdata(event.getContext().getPdata())) {
             if (contentContextMap != null) {
                 callUpdateContentStateAPI(event, event.getEid());
             }
 
             processOEEnd(event, appContext);
+        }
+    }
+
+    private static void setContentContextToEmpty(AppContext appContext) {
+        if (contentContextMap != null) {
+            //update content state to empty
+            contentContextMap = null;
+            appContext.getKeyValueStore().putString(ServiceConstants.PreferenceKey.SUNBIRD_CONTENT_CONTEXT, "");
+        }
+    }
+
+    private static void getContentContextMap(AppContext appContext) {
+        String contentContext = appContext.getKeyValueStore().getString(ServiceConstants.PreferenceKey.SUNBIRD_CONTENT_CONTEXT, "");
+
+        if (!StringUtil.isNullOrEmpty(contentContext)) {
+            contentContextMap = GsonUtil.fromJson(contentContext, Map.class);
         }
     }
 
@@ -89,7 +100,7 @@ public class SummaryHandler {
             //update content state to  2 and progress to 100
             GenieResponse<Void> response = courseService.updateContentState(getUpdateContentStateRequest(userId, courseId, batchId, contentId, 2, 100));
 
-            //fire an event to be handled on mobile side to call the getEnrolledCourses again if the update was successful
+            //fire an event to be handled on mobile side to call the getEnrolledCourses and show the latest progress that was manipulated
             EventBus.postEvent(new GenericEvent(COURSE_STATUS_UPDATED_SUCCESSFULLY));
         }
     }
@@ -121,13 +132,17 @@ public class SummaryHandler {
         GenieResponse<ContentStateResponse> contentStateResponse = courseService.getContentState(getContentStateRequest);
         List<ContentState> contentStateList = contentStateResponse.getResult().getContentList();
 
-        for (ContentState contentState : contentStateList) {
-            if (contentState.getContentId().equalsIgnoreCase(contentId)) {
-                return contentState.getStatus();
+        if (contentStateList != null && contentStateList.size() > 0) {
+            for (ContentState contentState : contentStateList) {
+                if (contentState.getContentId().equalsIgnoreCase(contentId)) {
+                    return contentState.getStatus();
+                }
             }
-        }
 
-        return 0;
+            return 0;
+        } else {
+            return 0;
+        }
     }
 
     private static void processOEStart(Telemetry event, AppContext appContext) {
