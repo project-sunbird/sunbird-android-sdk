@@ -734,6 +734,20 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
                     //update the contentsPlayedOffline in Course, only for those contents whose status is 2
                     contentStateResponse = updateEnrolledCourse(contentStateRequest.getUserId(), contentStateRequest.getCourseIds().get(0), contentStateInDB);
                 }
+            } else {
+                if (contentStateInDB != null) {
+                    contentStateResponse = getLocalContentStateResponse(contentStateInDB);
+                } else {
+                    List<String> errorMessages = contentStateAPIResponse.getErrorMessages();
+                    String errorMessage = null;
+                    if (!CollectionUtil.isNullOrEmpty(errorMessages)) {
+                        errorMessage = errorMessages.get(0);
+                    }
+
+                    response = GenieResponseBuilder.getErrorResponse(contentStateAPIResponse.getError(), errorMessage, TAG);
+                    TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
+                    return response;
+                }
             }
         } else {
             contentStateResponse = getLocalContentStateResponse(contentStateInDB);
