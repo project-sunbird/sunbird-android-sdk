@@ -147,7 +147,6 @@ public class ContentPlayer {
 
         Map<String, Object> configMap = (Map<String, Object>) intent.getSerializableExtra("config");
         if (configMap != null) {
-            configMap.put("whitelistUrls", getWhiteListUrls());
             bundleMap.put("config", configMap);
         }
 
@@ -171,18 +170,6 @@ public class ContentPlayer {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         context.startActivity(intent);
-    }
-
-    private static List<String> getWhiteListUrls() {
-        String whiteListUrls = sContentPlayer.mAppContext.getParams().getString(IParams.Key.WHITELIST_URL);
-        String[] whiteListArray = whiteListUrls.split(",");
-        List<String> whiteListUrlList = new ArrayList<>();
-        if (whiteListArray != null) {
-            for (String url : whiteListArray) {
-                whiteListUrlList.add(url);
-            }
-        }
-        return whiteListUrlList;
     }
 
 

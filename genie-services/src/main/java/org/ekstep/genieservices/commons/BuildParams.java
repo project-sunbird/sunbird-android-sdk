@@ -79,7 +79,6 @@ public class BuildParams implements IParams {
         setParam(ServiceConstants.Params.PLAYER_CONFIG);
         setParam(Key.ANNOUNCEMENT_BASE_URL);
         setParam(Key.DEVICE_REGISTER_BASE_URL);
-        setParam(Key.WHITELIST_URL);
         put(Key.LOG_LEVEL, LogLevel.getLogLevel(BuildConfigUtil.getBuildConfigValue(packageName, Key.LOG_LEVEL)).getLevel());
 
         initCompatibilityLevel(packageName);
@@ -145,7 +144,6 @@ public class BuildParams implements IParams {
         setParam(params, Key.MOBILE_APP_CONSUMER);
         setParam(params, Key.OAUTH_SERVICE_IMPLEMENTATION);
         setParam(params, ServiceConstants.Params.PLAYER_CONFIG);
-        setParam(params, Key.WHITELIST_URL);
 
         if (!StringUtil.isNullOrEmpty(params.getString(Key.LOG_LEVEL))) {
             put(Key.LOG_LEVEL, LogLevel.getLogLevel(params.getString(Key.LOG_LEVEL)).getLevel());

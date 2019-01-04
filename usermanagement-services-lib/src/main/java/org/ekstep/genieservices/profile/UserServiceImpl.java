@@ -566,8 +566,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         if (userProfile != null) {
             Map map = GsonUtil.fromJson(userProfile.getUserProfile(), Map.class);
             String firstName = String.valueOf(map.get("firstName"));
-            String lastName = String.valueOf(map.get("lastName"));
-            profile.setHandle((!StringUtil.isNullOrEmpty(firstName) ? firstName : "") + " " + (!StringUtil.isNullOrEmpty(lastName) ? lastName : ""));
+            profile.setHandle((!StringUtil.isNullOrEmpty(firstName) ? firstName : "") + " " + (map.get("lastName") != null ? String.valueOf(map.get("lastName")) : ""));
         }
 
         GenieResponse<Profile> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
