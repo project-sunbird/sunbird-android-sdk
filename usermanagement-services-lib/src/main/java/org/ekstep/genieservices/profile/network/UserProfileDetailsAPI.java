@@ -25,7 +25,7 @@ public class UserProfileDetailsAPI extends SunbirdBaseAPI {
                                  String userId, String queryParams) {
         super(appContext,
                 String.format(Locale.US, "%s/%s/%s?%s",
-                        appContext.getParams().getString(IParams.Key.USER_SERVICE_BASE_URL),
+                        appContext.getParams().getString(IParams.Key.USER_SERVICE_BASE_URL_V2),
                         SERVICE_ENDPOINTS,
                         userId,
                         queryParams),

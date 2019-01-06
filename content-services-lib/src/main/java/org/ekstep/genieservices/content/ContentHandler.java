@@ -19,6 +19,7 @@ import org.ekstep.genieservices.commons.bean.ContentFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
 import org.ekstep.genieservices.commons.bean.ContentListingSection;
+import org.ekstep.genieservices.commons.bean.ContentMarker;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchFilter;
 import org.ekstep.genieservices.commons.bean.ContentSortCriteria;
@@ -38,6 +39,7 @@ import org.ekstep.genieservices.commons.bean.enums.SearchType;
 import org.ekstep.genieservices.commons.bean.enums.SortOrder;
 import org.ekstep.genieservices.commons.db.contract.ContentAccessEntry;
 import org.ekstep.genieservices.commons.db.contract.ContentEntry;
+import org.ekstep.genieservices.commons.db.contract.ContentMarkerEntry;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
 import org.ekstep.genieservices.commons.utils.DateUtil;
@@ -46,6 +48,8 @@ import org.ekstep.genieservices.commons.utils.GsonUtil;
 import org.ekstep.genieservices.commons.utils.Logger;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 import org.ekstep.genieservices.content.db.model.ContentListingModel;
+import org.ekstep.genieservices.content.db.model.ContentMarkerModel;
+import org.ekstep.genieservices.content.db.model.ContentMarkersModel;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.db.model.ContentsModel;
 import org.ekstep.genieservices.content.network.ContentDetailsAPI;
@@ -459,8 +463,26 @@ public class ContentHandler {
         }
         if (contentModel.getServerData() != null) {
             serverData = GsonUtil.fromJson(contentModel.getServerData(), ContentData.class);
-            if (localData == null) {
+
+            if (localData == null || !isAvailableLocally(contentModel.getContentState())) {
                 content.setContentData(serverData);
+            } else {
+                if (StringUtil.isNullOrEmpty(localData.getStreamingUrl())) {
+                    localData.setStreamingUrl(serverData.getStreamingUrl());
+                }
+
+                if (StringUtil.isNullOrEmpty(localData.getPreviewUrl())) {
+                    localData.setPreviewUrl(serverData.getPreviewUrl());
+                }
+
+                if (StringUtil.isNullOrEmpty(localData.getTotalRatings())) {
+                    localData.setTotalRatings(serverData.getTotalRatings());
+                }
+
+                if (StringUtil.isNullOrEmpty(localData.getAverageRating())) {
+                    localData.setAverageRating(serverData.getAverageRating());
+                }
+                content.setContentData(localData);
             }
         }
 
@@ -519,6 +541,54 @@ public class ContentHandler {
             return userService.getAllContentAccess(builder.build()).getResult();
         }
         return null;
+    }
+
+    public static List<ContentMarker> getContentMarker(AppContext appContext, String contentIdentifier, String uid) {
+        String contentFilter = null;
+        String userFilter = null;
+
+
+        if (!StringUtil.isNullOrEmpty(contentIdentifier)) {
+            contentFilter = String.format(Locale.US, "%s = '%s'",
+                    ContentMarkerEntry.COLUMN_NAME_CONTENT_IDENTIFIER, contentIdentifier);
+        }
+
+        if (!StringUtil.isNullOrEmpty(uid)) {
+            userFilter = String.format(Locale.US, "%s = '%s'",
+                    ContentMarkerEntry.COLUMN_NAME_UID, uid);
+        }
+
+        String filter = null;
+        if (!StringUtil.isNullOrEmpty(contentFilter) && !StringUtil.isNullOrEmpty(userFilter)) {
+            filter = String.format(Locale.US, " where (%s AND %s)", contentFilter, userFilter);
+        } else if (!StringUtil.isNullOrEmpty(contentFilter)) {
+            filter = String.format(Locale.US, " where (%s)", contentFilter);
+        } else if (!StringUtil.isNullOrEmpty(userFilter)) {
+            filter = String.format(Locale.US, " where (%s)", userFilter);
+        }
+
+        ContentMarkersModel contentMarkersModel = null;
+        if (filter != null) {
+            contentMarkersModel = ContentMarkersModel.find(appContext.getDBSession(), filter);
+        }
+
+        List<ContentMarker> contentMarkerList = new ArrayList<>();
+        if (contentMarkersModel != null) {
+            for (ContentMarkerModel contentMarkerModel : contentMarkersModel.getContentMarkerModelList()) {
+                ContentMarker contentMarker = new ContentMarker();
+                contentMarker.setContentId(contentMarkerModel.getIdentifier());
+                contentMarker.setUid(contentMarkerModel.getUid());
+                contentMarker.setMarker(contentMarkerModel.getMarker());
+                if (!StringUtil.isNullOrEmpty(contentMarkerModel.getExtraInfoJson())) {
+                    Map extraInfoMap = GsonUtil.fromJson(contentMarkerModel.getExtraInfoJson(), HashMap.class);
+                    contentMarker.setExtraInfoMap(extraInfoMap);
+                }
+
+                contentMarkerList.add(contentMarker);
+            }
+        }
+
+        return contentMarkerList;
     }
 
     private static boolean isUpdateAvailable(ContentData serverData, ContentData localData) {
@@ -616,22 +686,55 @@ public class ContentHandler {
             }
         }
 
-        String query;
-        if (uid != null) {
-            query = String.format(Locale.US, "SELECT c.*, ca.%s FROM  %s c LEFT JOIN %s ca ON c.%s = ca.%s AND ca.%s = '%s' %s %s;",
-                    ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP,
-                    ContentEntry.TABLE_NAME, ContentAccessEntry.TABLE_NAME,
-                    ContentEntry.COLUMN_NAME_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER,
-                    ContentAccessEntry.COLUMN_NAME_UID, uid,
-                    whereClause, orderBy.toString());
+        String query = null;
+
+        if (criteria.isRecentlyViewed()) {
+            if (uid != null) {
+                contentTypeFilter = String.format(Locale.US, "ca.%s in ('%s')",
+                        ContentAccessEntry.COLUMN_NAME_CONTENT_TYPE, contentTypesStr.toLowerCase());
+                if (criteria.isDownloadedOnly()) {
+                    filter = String.format(Locale.US, "ca.%s = '%s' AND %s AND %s",
+                            ContentAccessEntry.COLUMN_NAME_UID, uid, contentTypeFilter, artifactAvailabilityFilter);
+                } else {
+                    filter = String.format(Locale.US, "ca.%s = '%s' AND %s",
+                            ContentAccessEntry.COLUMN_NAME_UID, uid, contentTypeFilter);
+                }
+
+                whereClause = String.format(Locale.US, "WHERE (%s)", filter);
+                query = String.format(Locale.US, "SELECT c.*, ca.%s, cm.%s FROM  %s ca LEFT JOIN %s cm ON cm.%s = ca.%s LEFT JOIN %s c ON c.%s = ca.%s %s %s LIMIT %d;",
+                        ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP,
+                        ContentMarkerEntry.COLUMN_NAME_DATA,
+                        ContentAccessEntry.TABLE_NAME,
+                        ContentMarkerEntry.TABLE_NAME,
+                        ContentMarkerEntry.COLUMN_NAME_CONTENT_IDENTIFIER,
+                        ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER,
+                        ContentEntry.TABLE_NAME,
+                        ContentEntry.COLUMN_NAME_IDENTIFIER,
+                        ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER,
+                        whereClause,
+                        orderBy.toString(),
+                        criteria.getLimit());
+            }
         } else {
-            query = String.format(Locale.US, "SELECT c.* FROM  %s c %s %s;",
-                    ContentEntry.TABLE_NAME,
-                    whereClause, orderBy.toString());
+            if (uid != null) {
+                query = String.format(Locale.US, "SELECT c.*, ca.%s FROM  %s c LEFT JOIN %s ca ON c.%s = ca.%s AND ca.%s = '%s' %s %s;",
+                        ContentAccessEntry.COLUMN_NAME_EPOCH_TIMESTAMP,
+                        ContentEntry.TABLE_NAME, ContentAccessEntry.TABLE_NAME,
+                        ContentEntry.COLUMN_NAME_IDENTIFIER, ContentAccessEntry.COLUMN_NAME_CONTENT_IDENTIFIER,
+                        ContentAccessEntry.COLUMN_NAME_UID, uid,
+                        whereClause, orderBy.toString());
+            } else {
+                query = String.format(Locale.US, "SELECT c.* FROM  %s c %s %s;",
+                        ContentEntry.TABLE_NAME,
+                        whereClause, orderBy.toString());
+            }
         }
 
         List<ContentModel> contentModelListInDB;
-        ContentsModel contentsModel = ContentsModel.findWithCustomQuery(dbSession, query);
+        ContentsModel contentsModel = null;
+        if (query != null) {
+            contentsModel = ContentsModel.findWithCustomQuery(dbSession, query);
+        }
         if (contentsModel != null) {
             contentModelListInDB = contentsModel.getContentModelList();
         } else {
@@ -1383,6 +1486,12 @@ public class ContentHandler {
             }
         }
 
+        if (!CollectionUtil.isNullOrEmpty(criteria.getImpliedFiltersMap())) {
+            for (Map<String, Object> impliedFilterMap : criteria.getImpliedFiltersMap()) {
+                filterMap.putAll(impliedFilterMap);
+            }
+        }
+
         if (!filterMap.containsKey("contentType")) {
             filterMap.put("contentType", Arrays.asList(criteria.getContentTypes()));
         }
@@ -1608,7 +1717,7 @@ public class ContentHandler {
             appliedFilterMap.remove(facetName);
         }
         filterBuilder.facetFilters(facetFilters);
-        filterBuilder.impliedFilters(mapFilterValues(appliedFilterMap));
+        filterBuilder.impliedFilters(mapFilterValues(appliedFilterMap, filterBuilder));
         return filterBuilder.build();
     }
 
@@ -1618,6 +1727,7 @@ public class ContentHandler {
 
         for (Map<String, Object> valueMap : facetValues) {
             String name = (String) valueMap.get("name");
+            String translations = (String) valueMap.get("translations");
             int index = indexOf(facetOrder, name);
 
             boolean applied = false;
@@ -1628,6 +1738,7 @@ public class ContentHandler {
             FilterValue filterValue = new FilterValue();
             filterValue.setName(name);
             filterValue.setApply(applied);
+            filterValue.setTranslations(translations);
             if (valueMap.containsKey("count")) {
                 Double count = (Double) valueMap.get("count");
                 filterValue.setCount(count.intValue());
@@ -1955,7 +2066,7 @@ public class ContentHandler {
                     builder.contentTypes(contentType.toArray(new String[contentType.size()]));
                 }
 
-                builder.impliedFilters(mapFilterValues(filtersMap));
+                builder.impliedFilters(mapFilterValues(filtersMap, builder));
             }
 
             if (searchMap.containsKey("facets")) {
@@ -2003,6 +2114,51 @@ public class ContentHandler {
                 }
             }
         }
+        return filters;
+    }
+
+    private static List<ContentSearchFilter> mapFilterValues(Map filtersMap, SunbirdContentSearchCriteria.FilterBuilder filterBuilder) {
+        List<ContentSearchFilter> filters = new ArrayList<>();
+        List<Map<String, Object>> impliedFiltersMap = new ArrayList<>();
+
+        if (filtersMap != null && !filtersMap.isEmpty()) {
+            Iterator it = filtersMap.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                String key = pair.getKey().toString();
+                Object value = pair.getValue();
+
+                if (value instanceof List) {
+                    List<FilterValue> values = new ArrayList<>();
+                    List<String> valueList = (List<String>) value;
+                    for (String v : valueList) {
+                        FilterValue filterValue = new FilterValue();
+                        filterValue.setName(v);
+                        filterValue.setApply(true);
+
+                        values.add(filterValue);
+                    }
+
+                    ContentSearchFilter contentSearchFilter = new ContentSearchFilter();
+                    contentSearchFilter.setName(key);
+                    contentSearchFilter.setValues(values);
+
+                    filters.add(contentSearchFilter);
+                } else {
+//                  TODO: No change required here. Best of genie will be removed soon and so we don't have to handle the genieScore.
+//                  TODO: Also compatibility level gets auto added into every search.
+//                  key.equals("compatibilityLevel") && key.equals("genieScore")
+//                  String[] stringArray = mFilterMap.get(values.getName());
+//                  filterSet.addAll(Arrays.asList(stringArray));
+
+                    Map<String, Object> filterMap = new HashMap<>();
+                    filterMap.put(key, value);
+                    impliedFiltersMap.add(filterMap);
+                }
+            }
+        }
+
+        filterBuilder.impliedFiltersMap(impliedFiltersMap);
         return filters;
     }
 

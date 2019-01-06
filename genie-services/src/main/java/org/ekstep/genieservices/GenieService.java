@@ -25,6 +25,7 @@ import org.ekstep.genieservices.content.ContentFeedbackServiceImpl;
 import org.ekstep.genieservices.content.ContentServiceImpl;
 import org.ekstep.genieservices.content.CourseServiceImpl;
 import org.ekstep.genieservices.content.LanguageServiceImpl;
+import org.ekstep.genieservices.event.SummaryListener;
 import org.ekstep.genieservices.group.GroupServiceImpl;
 import org.ekstep.genieservices.notification.AnnouncementServiceImpl;
 import org.ekstep.genieservices.notification.NotificationServiceImpl;
@@ -33,7 +34,6 @@ import org.ekstep.genieservices.partner.PartnerServiceImpl;
 import org.ekstep.genieservices.profile.SummarizerServiceImpl;
 import org.ekstep.genieservices.profile.UserProfileServiceImpl;
 import org.ekstep.genieservices.profile.UserServiceImpl;
-import org.ekstep.genieservices.profile.event.SummaryListener;
 import org.ekstep.genieservices.tag.TagServiceImpl;
 import org.ekstep.genieservices.telemetry.SyncServiceImpl;
 import org.ekstep.genieservices.telemetry.TelemetryLogger;
@@ -106,6 +106,9 @@ public class GenieService {
             SummaryListener.init(appContext);
             sService = new GenieService(appContext);
             ContentPlayer.init(appContext);
+
+            //wipe the details of course context
+            appContext.getKeyValueStore().putString(ServiceConstants.PreferenceKey.SUNBIRD_CONTENT_CONTEXT, "");
         }
 
         sAsyncService = GenieAsyncService.init(sService);
@@ -194,7 +197,7 @@ public class GenieService {
      */
     public ICourseService getCourseService() {
         if (mCourseService == null) {
-            mCourseService = new CourseServiceImpl(mAppContext, getAuthSession(), getUserProfileService());
+            mCourseService = new CourseServiceImpl(mAppContext, getAuthSession(), getUserProfileService(), getContentService());
         }
 
         return mCourseService;

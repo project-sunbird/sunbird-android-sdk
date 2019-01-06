@@ -64,6 +64,13 @@ public interface ServiceConstants {
 
         //Scan Storage
         String KEY_LAST_MODIFIED = "last_modified";
+
+        //content state available for update
+        String UPDATE_CONTENT_STATE = "update_content_state";
+
+        String LAST_SYNCED_TIME_STAMP_DEVICE_REGISTER = "last_synced_time_device_regeister";
+
+        String SUNBIRD_CONTENT_CONTEXT = "sunbirdcontent_context";
     }
 
     interface Partner {
@@ -145,6 +152,7 @@ public interface ServiceConstants {
         //Framework
         String NO_CHANNEL_DETAILS_FOUND = "NO_CHANNEL_DETAILS_FOUND";
         String NO_FRAMEWORK_DETAILS_FOUND = "NO_FRAMEWORK_DETAILS_FOUND";
+        String NO_SYSTEM_SETTING_FOUND = "NO_SYSTEM_SETTING_FOUND";
 
         //Announcement
         String UPDATE_ANNOUNCEMENT_FAILED = "UPDATE_ANNOUNCEMENT_FAILED";
@@ -218,6 +226,7 @@ public interface ServiceConstants {
         //Framework
         String UNABLE_TO_FIND_CHANNEL_DETAILS = "Unable to find channel details";
         String UNABLE_TO_FIND_FRAMEWORK_DETAILS = "Unable to find framework details";
+        String UNABLE_TO_FIND_SYSTEM_SETTING = "Unable to find system setting";
         String UNABLE_TO_UPDATE_ANNOUNCEMENT = "Unable to update announcement";
         String UNABLE_TO_FIND_FORM = "Unable to find form";
         String UNABLE_TO_FIND_FORM_DATA = "Unable to find form data";

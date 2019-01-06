@@ -69,9 +69,11 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         Map<String, Object> params = new HashMap<>();
         params.put("logLevel", "2");
 
-        String filter = getFilterForLearnerAssessmentDetails(null, summaryRequest.getUids(), summaryRequest.getContentId(), summaryRequest.getHierarchyData());
+        List<String> quotedUIds = getStringWithQuoteList(summaryRequest.getUids());
 
-        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.find(mAppContext.getDBSession(), filter);
+        String contentId = summaryRequest.getContentId();
+
+        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.findDetailReport(mAppContext.getDBSession(), quotedUIds, contentId, LearnerAssessmentDetailsModel.FOR_SUMMARIZER);
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         if (learnerAssessmentDetailsModel == null) {
             response.setResult(new ArrayList<LearnerAssessmentDetails>());
@@ -281,9 +283,11 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
             learnerSummaryModel.save();
 
         } else {
-            if (learnerSummaryModelInDB.getTimespent() != null) {
+            if (learnerContentSummaryDetails.getTimespent() != null) {
                 learnerContentSummaryDetails.setSessions(learnerSummaryModelInDB.getSessions() + 1);
-                learnerContentSummaryDetails.setTotalts(learnerSummaryModelInDB.getTotalts() + learnerSummaryModelInDB.getTimespent());
+                //NOTE - We do not add the total time spent from previously stored value because we need to update only the latest value
+                //but not the cummulative added value
+                learnerContentSummaryDetails.setTotalts(learnerContentSummaryDetails.getTimespent());
                 learnerContentSummaryDetails.setAvgts(learnerSummaryModelInDB.getTotalts() / learnerSummaryModelInDB.getSessions());
                 learnerContentSummaryDetails.setLastUpdated(learnerSummaryModelInDB.getTimestamp());
                 //update with new details
@@ -350,4 +354,30 @@ public class SummarizerServiceImpl extends BaseService implements ISummarizerSer
         return learnerAssessmentDetails;
     }
 
+    /**
+     * This method deletes all the previous details related to contentId and uid, whenever the new START event and new ASSESS is received
+     *
+     * @param uid
+     * @param contentId
+     */
+    public void deletePreviousAssessmentDetails(String uid, String contentId) {
+
+        LearnerSummaryModel learnerSummaryModel = LearnerSummaryModel.find(mAppContext.getDBSession(), uid, contentId, "");
+
+        //filter for assessment details
+        String filter = String.format(Locale.US, " where %s = '%s' AND %s = '%s'",
+                LearnerAssessmentsEntry.COLUMN_NAME_UID, uid, LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID, contentId);
+
+        LearnerAssessmentDetailsModel learnerAssessmentDetailsModel = LearnerAssessmentDetailsModel.find(mAppContext.getDBSession(), filter, uid, contentId);
+
+        if (learnerSummaryModel != null) {
+            learnerSummaryModel.delete();
+        }
+
+        if (learnerAssessmentDetailsModel != null) {
+            learnerAssessmentDetailsModel.delete();
+        }
+
+
+    }
 }

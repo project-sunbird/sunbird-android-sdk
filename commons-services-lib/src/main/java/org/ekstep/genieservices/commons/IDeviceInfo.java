@@ -1,5 +1,7 @@
 package org.ekstep.genieservices.commons;
 
+import org.ekstep.genieservices.commons.bean.telemetry.DeviceSpecification;
+
 /**
  * Created on 24/4/17.
  *
@@ -9,5 +11,7 @@ package org.ekstep.genieservices.commons;
 public interface IDeviceInfo {
 
     String getDeviceID();
+
+    DeviceSpecification getDeviceDetails();
 
 }

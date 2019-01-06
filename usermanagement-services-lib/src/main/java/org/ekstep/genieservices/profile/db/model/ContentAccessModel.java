@@ -39,8 +39,9 @@ public class ContentAccessModel implements IWritable, IReadable, IUpdatable {
         this.identifier = identifier;
     }
 
-    private ContentAccessModel(IDBSession dbSession, String uid, String identifier, String learnerStateJson) {
+    private ContentAccessModel(IDBSession dbSession, String uid, String identifier, String contentType, String learnerStateJson) {
         this(dbSession, uid, identifier);
+        this.contentType = contentType;
         this.learnerStateJson = learnerStateJson;
     }
 
@@ -59,8 +60,8 @@ public class ContentAccessModel implements IWritable, IReadable, IUpdatable {
         return contentAccess;
     }
 
-    public static ContentAccessModel build(IDBSession dbSession, String uid, String identifier, String learnerStateJson) {
-        ContentAccessModel contentAccess = new ContentAccessModel(dbSession, uid, identifier, learnerStateJson);
+    public static ContentAccessModel build(IDBSession dbSession, String uid, String identifier, String contentType, String learnerStateJson) {
+        ContentAccessModel contentAccess = new ContentAccessModel(dbSession, uid, identifier, contentType, learnerStateJson);
         return contentAccess;
     }
 

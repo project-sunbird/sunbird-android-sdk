@@ -4,6 +4,7 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created on 3/23/18.
@@ -29,11 +30,13 @@ public class UpdateUserInfoRequest {
     private List<UserEducation> education;
     private List<UserJobProfile> jobProfile;
     private List<UserAddress> address;
+    private Map<String, Object> framework;
 
     private UpdateUserInfoRequest(String userId, String firstName, String lastName, String[] language,
                                   String phone, boolean phoneVerified, String profileSummary, String[] subject, String gender,
                                   String dob, String[] grade, String location, String avatar, List<UserWebPages> webPages,
-                                  List<UserEducation> education, List<UserJobProfile> jobProfile, List<UserAddress> address) {
+                                  List<UserEducation> education, List<UserJobProfile> jobProfile, List<UserAddress> address,
+                                  Map<String, Object> framework) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -51,6 +54,7 @@ public class UpdateUserInfoRequest {
         this.education = education;
         this.jobProfile = jobProfile;
         this.address = address;
+        this.framework = framework;
     }
 
     public String getUserId() {
@@ -121,6 +125,10 @@ public class UpdateUserInfoRequest {
         return address;
     }
 
+    public Map<String, Object> getFramework() {
+        return framework;
+    }
+
     public static class Builder {
 
         private String userId;
@@ -140,6 +148,7 @@ public class UpdateUserInfoRequest {
         private List<UserEducation> education;
         private List<UserJobProfile> jobProfile;
         private List<UserAddress> address;
+        private Map<String, Object> framework;
 
         public Builder forUser(String userId) {
             if (StringUtil.isNullOrEmpty(userId)) {
@@ -280,6 +289,11 @@ public class UpdateUserInfoRequest {
             return this;
         }
 
+        public Builder frameworkData(Map<String, Object> data) {
+            this.framework = data;
+            return this;
+        }
+
 
         public UpdateUserInfoRequest build() {
             if (StringUtil.isNullOrEmpty(userId)) {
@@ -292,7 +306,7 @@ public class UpdateUserInfoRequest {
 
             return new UpdateUserInfoRequest(userId, firstName, lastName, language, phone, phoneVerified,
                     profileSummary, subject, gender, dob, grade, location, avatar, webPages,
-                    education, jobProfile, address);
+                    education, jobProfile, address, framework);
         }
     }
 }

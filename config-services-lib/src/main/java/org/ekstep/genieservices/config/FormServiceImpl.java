@@ -47,7 +47,11 @@ public class FormServiceImpl extends BaseService implements IFormService {
         NoSqlModel formInDB = NoSqlModel.findByKey(mAppContext.getDBSession(), key);
 
         if (formInDB == null) {
-            String responseBody = FileUtil.readFileFromClasspath(formRequest.getDefaultFormPath());
+            String responseBody = null;
+            if (!StringUtil.isNullOrEmpty(formRequest.getFilePath())) {
+                responseBody = FileUtil.readFileFromClasspath(formRequest.getFilePath());
+            }
+
             GenieResponse formReadAPIResponse = null;
             if (StringUtil.isNullOrEmpty(responseBody)) {
                 formReadAPIResponse = invokeAPI(formRequest);

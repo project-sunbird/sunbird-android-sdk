@@ -28,6 +28,7 @@ import org.ekstep.genieservices.commons.bean.ContentImportRequest;
 import org.ekstep.genieservices.commons.bean.ContentImportResponse;
 import org.ekstep.genieservices.commons.bean.ContentListing;
 import org.ekstep.genieservices.commons.bean.ContentListingCriteria;
+import org.ekstep.genieservices.commons.bean.ContentMarkerRequest;
 import org.ekstep.genieservices.commons.bean.ContentMoveRequest;
 import org.ekstep.genieservices.commons.bean.ContentSearchCriteria;
 import org.ekstep.genieservices.commons.bean.ContentSearchResult;
@@ -96,6 +97,8 @@ import org.ekstep.genieservices.content.chained.move.UpdateSourceContentPathInDB
 import org.ekstep.genieservices.content.chained.move.ValidateDestinationContent;
 import org.ekstep.genieservices.content.chained.move.ValidateDestinationFolder;
 import org.ekstep.genieservices.content.db.model.ContentListingModel;
+import org.ekstep.genieservices.content.db.model.ContentMarkerModel;
+import org.ekstep.genieservices.content.db.model.ContentMarkersModel;
 import org.ekstep.genieservices.content.db.model.ContentModel;
 import org.ekstep.genieservices.content.network.ContentSearchAPI;
 import org.ekstep.genieservices.content.network.FlagContentAPI;
@@ -199,8 +202,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
         Content content = ContentHandler.convertContentModelToBean(contentModelInDB);
 
+        String uid = null;
         if (content.isAvailableLocally()) {
-            String uid = ContentHandler.getCurrentUserId(userService);
+            uid = ContentHandler.getCurrentUserId(userService);
             if (contentDetailsRequest.isAttachFeedback()) {
                 content.setContentFeedback(ContentHandler.getContentFeedback(contentFeedbackService, content.getIdentifier(), uid));
             }
@@ -208,6 +212,13 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             if (contentDetailsRequest.isAttachContentAccess()) {
                 content.setContentAccess(ContentHandler.getContentAccess(userService, content.getIdentifier(), uid));
             }
+        }
+
+        if (contentDetailsRequest.isAttachContentMarker()) {
+            if (StringUtil.isNullOrEmpty(uid)) {
+                uid = ContentHandler.getCurrentUserId(userService);
+            }
+            content.setContentMarker(ContentHandler.getContentMarker(mAppContext, content.getIdentifier(), uid));
         }
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
@@ -236,6 +247,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             if (criteria != null && criteria.attachContentAccess()) {
                 c.setContentAccess(ContentHandler.getContentAccess(userService, c.getIdentifier(), criteria.getUid()));
             }
+            if (criteria != null && criteria.attachContentMarker()) {
+                c.setContentMarker(ContentHandler.getContentMarker(mAppContext, c.getIdentifier(), criteria.getUid()));
+            }
             contentList.add(c);
         }
 
@@ -261,6 +275,17 @@ public class ContentServiceImpl extends BaseService implements IContentService {
 
             contentList.add(c);
         }
+        ContentMarkersModel contentMarkersModel = ContentMarkersModel.find(mAppContext.getDBSession(), "");
+        if (contentMarkersModel != null) {
+            for (ContentMarkerModel contentMarkerModel : contentMarkersModel.getContentMarkerModelList()) {
+                Content content = new Content();
+                ContentData contentData = GsonUtil.fromJson(contentMarkerModel.getData(), ContentData.class);
+                content.setIdentifier(contentData.getIdentifier());
+                content.setContentData(contentData);
+                contentList.add(content);
+            }
+        }
+
 
         response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
         response.setResult(contentList);
@@ -930,9 +955,9 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         Set<String> contentIds = contentImportMap.keySet();
 
         ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, ContentHandler.getSearchRequest(mAppContext, contentIds, importRequest.getContentStatusArray()));
-        GenieResponse apiResponse = contentSearchAPI.post();
-        if (apiResponse.getStatus()) {
-            String body = apiResponse.getResult().toString();
+        GenieResponse contentSearchAPIResponse = contentSearchAPI.post();
+        if (contentSearchAPIResponse.getStatus()) {
+            String body = contentSearchAPIResponse.getResult().toString();
 
             LinkedTreeMap map = GsonUtil.fromJson(body, LinkedTreeMap.class);
             LinkedTreeMap result = (LinkedTreeMap) map.get("result");
@@ -983,15 +1008,23 @@ public class ContentServiceImpl extends BaseService implements IContentService {
                     downloadService.enqueue(downloadRequestArray);
                 }
             }
-        }
 
-        for (String contentId : contentIds) {
-            contentImportResponseList.add(new ContentImportResponse(contentId, ContentImportStatus.NOT_FOUND));
-        }
+            for (String contentId : contentIds) {
+                contentImportResponseList.add(new ContentImportResponse(contentId, ContentImportStatus.NOT_FOUND));
+            }
 
-        response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
-        response.setResult(contentImportResponseList);
-        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+            response.setResult(contentImportResponseList);
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        } else {
+            List<String> errorMessages = contentSearchAPIResponse.getErrorMessages();
+            String errorMessage = null;
+            if (!CollectionUtil.isNullOrEmpty(errorMessages)) {
+                errorMessage = errorMessages.get(0);
+            }
+            response = GenieResponseBuilder.getErrorResponse(contentSearchAPIResponse.getError(), errorMessage, TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
+        }
 
         return response;
     }
@@ -1367,7 +1400,7 @@ public class ContentServiceImpl extends BaseService implements IContentService {
         } else {
             Map<String, Object> requestMap = ContentHandler.getSearchContentRequest(mAppContext, configService, contentSearchCriteria);
 
-            ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, requestMap);
+            ContentSearchAPI contentSearchAPI = new ContentSearchAPI(mAppContext, requestMap, String.valueOf(requestMap.get("framework")), String.valueOf(requestMap.get("languageCode")));
             GenieResponse apiResponse = contentSearchAPI.post();
             if (apiResponse.getStatus()) {
                 String body = apiResponse.getResult().toString();
@@ -1461,6 +1494,41 @@ public class ContentServiceImpl extends BaseService implements IContentService {
             response = GenieResponseBuilder.getErrorResponse(genieResponse.getError(), genieResponse.getMessage(), TAG);
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, response.getMessage());
         }
+
+        return response;
+    }
+
+    @Override
+    public GenieResponse<Void> setContentMarker(ContentMarkerRequest contentMarkerRequest) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("request", GsonUtil.toJson(contentMarkerRequest));
+        params.put("logLevel", "2");
+        String methodName = "setContentMarker@ContentServiceImpl";
+
+        ContentMarkerModel contentMarkerModelInDB = ContentMarkerModel.find(mAppContext.getDBSession(),
+                contentMarkerRequest.getUid(), contentMarkerRequest.getContentId(), contentMarkerRequest.getMarker());
+
+
+        String extraInfoJson = null;
+        if (contentMarkerRequest.getExtraInfoMap() != null && !contentMarkerRequest.getExtraInfoMap().isEmpty()) {
+            extraInfoJson = GsonUtil.toJson(contentMarkerRequest.getExtraInfoMap());
+        }
+        ContentMarkerModel contentMarkerModel = ContentMarkerModel.build(mAppContext.getDBSession(),
+                contentMarkerRequest.getUid(), contentMarkerRequest.getContentId(), contentMarkerRequest.getData(),
+                contentMarkerRequest.getMarker(), extraInfoJson);
+
+        if (contentMarkerModelInDB == null) {
+            contentMarkerModel.save();
+        } else {
+            if (contentMarkerRequest.isMarked()) {
+                contentMarkerModel.update();
+            } else {
+                contentMarkerModel.clean();
+            }
+        }
+
+        GenieResponse<Void> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+        TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
 
         return response;
     }

@@ -6,6 +6,7 @@ import org.ekstep.genieservices.commons.IResponseHandler;
 import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.GetProfileRequest;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
@@ -271,12 +272,12 @@ public class UserService {
      * @param responseHandler      - {@link IResponseHandler<ProfileExportResponse>}
      */
     public void exportProfile(final ProfileExportRequest profileExportRequest, IResponseHandler<ProfileExportResponse> responseHandler) {
-        ThreadPool.getInstance().execute(new IPerformable<ProfileExportResponse>() {
+        new AsyncHandler<ProfileExportResponse>(responseHandler).execute(new IPerformable<ProfileExportResponse>() {
             @Override
             public GenieResponse<ProfileExportResponse> perform() {
                 return userService.exportProfile(profileExportRequest);
             }
-        }, responseHandler);
+        });
     }
 
     /**
@@ -294,6 +295,25 @@ public class UserService {
             @Override
             public GenieResponse<List<Profile>> perform() {
                 return userService.getAllUserProfile(profileRequest);
+            }
+        }, responseHandler);
+    }
+
+    /**
+     * This api gets the specific user or the latest created user.
+     * <p>
+     * On successful fetching the required user, the response will return status as TRUE and with the required profile set in result.
+     * <p>
+     * Their would be a fialure case when the specific userId is not present
+     *
+     * @param getProfileRequest
+     * @param responseHandler
+     */
+    public void getProfile(final GetProfileRequest getProfileRequest, IResponseHandler<Profile> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<Profile>() {
+            @Override
+            public GenieResponse<Profile> perform() {
+                return userService.getProfile(getProfileRequest);
             }
         }, responseHandler);
     }

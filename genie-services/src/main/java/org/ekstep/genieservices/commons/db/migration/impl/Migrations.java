@@ -27,6 +27,8 @@ public abstract class Migrations {
         migrations.add(new _11_PragmanProfileMigration());
         migrations.add(new _12_ProfileSyllabusMigration());
         migrations.add(new _13_GroupAndProfileMigration());
+        migrations.add(new _14_MillisecondsToSecondsMigration());
+        migrations.add(new _15_ContentMarkerMigration());
 
         Collections.sort(migrations);
 

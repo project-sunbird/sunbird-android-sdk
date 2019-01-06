@@ -2,12 +2,14 @@ package org.ekstep.genieservices.profile.db.model;
 
 import org.ekstep.genieservices.commons.bean.LearnerAssessmentSummary;
 import org.ekstep.genieservices.commons.db.contract.LearnerAssessmentsEntry;
+import org.ekstep.genieservices.commons.db.contract.LearnerSummaryEntry;
 import org.ekstep.genieservices.commons.db.contract.ProfileEntry;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.utils.StringUtil;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +30,8 @@ public class LearnerAssessmentSummaryModel implements IReadable {
     private Integer correctAnswers;
     private Double totalTimespent;
     private String hierarchyData;
-    private Integer totalMaxScore;
+    private Double totalMaxScore;
+    private Double totalScore;
     private List<LearnerAssessmentSummary> assessmentMap;
     private List<Map<String, Object>> reportsMap;
     private boolean forReports = false;
@@ -63,7 +66,7 @@ public class LearnerAssessmentSummaryModel implements IReadable {
     }
 
     private static String getChildProgressQuery(List<String> uids) {
-        return "select uid, content_id, count(qid), sum(correct), sum(time_spent), h_data , sum(max_score) from " +
+        return "select uid, content_id, count(qid), sum(correct), sum(time_spent), h_data , sum(max_score) , sum(score) from " +
                 LearnerAssessmentsEntry.TABLE_NAME + " where uid IN (" + StringUtil.join(",", uids) +
                 ") group by content_id ";
     }
@@ -74,17 +77,24 @@ public class LearnerAssessmentSummaryModel implements IReadable {
     }
 
     private static String getUserReportsQuery(List<String> uids, String contentId) {
-        String query = String.format(Locale.US, "SELECT sum(%s),sum(%s),la.%s,la.%s,la.%s,p.%s" +
+        String query = String.format(Locale.US, "SELECT lcs.%s,sum(%s),la.%s,la.%s,la.%s,p.%s,la.%s " +
                         " FROM  %s la " +
-                        "LEFT JOIN " +
-                        "%s p ON la.%s = p.%s where la.%s IN(%s) AND la.%s = '%s' GROUP BY la.%s;",
-                LearnerAssessmentsEntry.COLUMN_NAME_TIME_SPENT,
-                LearnerAssessmentsEntry.COLUMN_NAME_CORRECT,
+                        "LEFT JOIN %s lcs ON (la.%s = lcs.%s AND la.%s = lcs.%s) " +
+                        "LEFT JOIN %s p ON la.%s = p.%s " +
+                        "where la.%s IN(%s) AND la.%s = '%s' GROUP BY la.%s;",
+                LearnerSummaryEntry.COLUMN_NAME_TOTAL_TS,
+                LearnerAssessmentsEntry.COLUMN_NAME_SCORE,
                 LearnerAssessmentsEntry.COLUMN_NAME_HIERARCHY_DATA,
                 LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID,
                 LearnerAssessmentsEntry.COLUMN_NAME_UID,
                 ProfileEntry.COLUMN_NAME_HANDLE,
+                LearnerAssessmentsEntry.COLUMN_NAME_TIME_SPENT,
                 LearnerAssessmentsEntry.TABLE_NAME,
+                LearnerSummaryEntry.TABLE_NAME,
+                LearnerSummaryEntry.COLUMN_NAME_UID,
+                LearnerAssessmentsEntry.COLUMN_NAME_UID,
+                LearnerSummaryEntry.COLUMN_NAME_CONTENT_ID,
+                LearnerAssessmentsEntry.COLUMN_NAME_CONTENT_ID,
                 ProfileEntry.TABLE_NAME,
                 LearnerAssessmentsEntry.COLUMN_NAME_UID,
                 ProfileEntry.COLUMN_NAME_UID,
@@ -115,6 +125,8 @@ public class LearnerAssessmentSummaryModel implements IReadable {
 
     private LearnerAssessmentSummary readCursorData(IResultSet cursor) {
         LearnerAssessmentSummary learnerAssessmentSummary = new LearnerAssessmentSummary();
+        DecimalFormat df = new DecimalFormat(".##");
+
         this.uid = cursor.getString(0);
         learnerAssessmentSummary.setUid(this.uid);
 
@@ -133,21 +145,24 @@ public class LearnerAssessmentSummaryModel implements IReadable {
         this.hierarchyData = cursor.getString(5);
         learnerAssessmentSummary.setHierarchyData(this.hierarchyData);
 
-        this.totalMaxScore = cursor.getInt(6);
-        learnerAssessmentSummary.setTotalMaxScore(this.totalMaxScore);
+        this.totalMaxScore = cursor.getDouble(6);
+        learnerAssessmentSummary.setTotalMaxScore(Double.valueOf(df.format(totalMaxScore)));
 
+        this.totalScore = cursor.getDouble(7);
+        learnerAssessmentSummary.setTotalScore(Double.valueOf(df.format(totalScore)));
 
         return learnerAssessmentSummary;
     }
 
     private Map<String, Object> readReportsCursorData(IResultSet cursor) {
+        DecimalFormat df = new DecimalFormat(".##");
         Map<String, Object> reportSummary = new HashMap<>();
 
         int totalTimeSpent = cursor.getInt(0);
         reportSummary.put("totalTimespent", totalTimeSpent);
 
-        int score = cursor.getInt(1);
-        reportSummary.put("score", score);
+        double score = cursor.getDouble(1);
+        reportSummary.put("score", Double.valueOf(df.format(score)));
 
         String hData = cursor.getString(2);
         reportSummary.put("hData", hData);
@@ -160,6 +175,9 @@ public class LearnerAssessmentSummaryModel implements IReadable {
 
         String userName = cursor.getString(5);
         reportSummary.put("userName", userName);
+
+        int timeSpent = cursor.getInt(6);
+        reportSummary.put("timespent", timeSpent);
 
         return reportSummary;
     }

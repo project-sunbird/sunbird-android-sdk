@@ -11,6 +11,7 @@ import org.ekstep.genieservices.commons.bean.ContentAccess;
 import org.ekstep.genieservices.commons.bean.ContentAccessFilterCriteria;
 import org.ekstep.genieservices.commons.bean.ContentLearnerState;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
+import org.ekstep.genieservices.commons.bean.GetProfileRequest;
 import org.ekstep.genieservices.commons.bean.Profile;
 import org.ekstep.genieservices.commons.bean.ProfileExportRequest;
 import org.ekstep.genieservices.commons.bean.ProfileExportResponse;
@@ -79,9 +80,9 @@ import java.util.UUID;
  */
 public class UserServiceImpl extends BaseService implements IUserService {
 
+    public static final String DATE_FORMAT = "yyyyMMddhhmmss";
     private static final String TAG = UserServiceImpl.class.getSimpleName();
     private IUserProfileService mUserProfileService;
-    public static final String DATE_FORMAT = "yyyyMMddhhmmss";
 
     public UserServiceImpl(AppContext appContext, IUserProfileService userProfileService) {
         super(appContext);
@@ -392,6 +393,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
             }
         }
         final ContentAccessesModel accessesModel = ContentAccessesModel.findByUid(mAppContext.getDBSession(), uid);
+//  TODO:      final ContentMarkersModel accessesModel = ContentAccessesModel.findByUid(mAppContext.getDBSession(), uid);
         final GroupProfilesModel groupProfilesModel = GroupProfilesModel.findByUid(mAppContext.getDBSession(), uid);
 
         final UserProfileModel userProfileModel = UserProfileModel.find(mAppContext.getDBSession(), uid);
@@ -564,8 +566,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         if (userProfile != null) {
             Map map = GsonUtil.fromJson(userProfile.getUserProfile(), Map.class);
             String firstName = String.valueOf(map.get("firstName"));
-            String lastName = String.valueOf(map.get("lastName"));
-            profile.setHandle((!StringUtil.isNullOrEmpty(firstName) ? firstName : "") + " " + (!StringUtil.isNullOrEmpty(lastName) ? lastName : ""));
+            profile.setHandle((!StringUtil.isNullOrEmpty(firstName) ? firstName : "") + " " + (map.get("lastName") != null ? String.valueOf(map.get("lastName")) : ""));
         }
 
         GenieResponse<Profile> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
@@ -682,7 +683,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
         ContentAccessModel contentAccessModelInDb = ContentAccessModel.find(mAppContext.getDBSession(), uid, contentAccess.getContentId());
         if (contentAccessModelInDb == null) {
             ContentAccessModel contentAccessModel = ContentAccessModel.build(mAppContext.getDBSession(),
-                    uid, contentAccess.getContentId(), contentLearnerState);
+                    uid, contentAccess.getContentId(), contentAccess.getContentType(), contentLearnerState);
             contentAccessModel.setStatus(ContentAccessStatus.PLAYED.getValue());
 
             contentAccessModel.save();
@@ -855,5 +856,65 @@ public class UserServiceImpl extends BaseService implements IUserService {
     public GenieResponse<Void> addUpdateGroupsToProfile(AddUpdateGroupsRequest addUpdateGroupsRequest) {
         // TODO: 20/7/18 Yet to be implemented
         return null;
+    }
+
+    @Override
+    public GenieResponse<Profile> getProfile(GetProfileRequest getProfileRequest) {
+        GenieResponse<Profile> response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+
+        String localUserFilter = null;
+        String serverUserFilter = null;
+
+        if (getProfileRequest != null) {
+            //filter for local users
+            if (getProfileRequest.isLocal()) {
+                localUserFilter = String.format(Locale.US, "%s = '%s'", ProfileEntry.COLUMN_SOURCE, UserSource.LOCAL.getValue());
+            }
+
+            //filter for server users
+            if (getProfileRequest.isServer()) {
+                serverUserFilter = String.format(Locale.US, "%s = '%s'", ProfileEntry.COLUMN_SOURCE, UserSource.SERVER.getValue());
+            }
+        }
+
+        String filter = null;
+        if (!StringUtil.isNullOrEmpty(localUserFilter) && !StringUtil.isNullOrEmpty(serverUserFilter)) {
+            filter = String.format(Locale.US, " where %s OR %s", localUserFilter, serverUserFilter);
+        } else if (!StringUtil.isNullOrEmpty(localUserFilter)) {
+            filter = String.format(Locale.US, " where %s", localUserFilter);
+        } else if (!StringUtil.isNullOrEmpty(serverUserFilter)) {
+            filter = String.format(Locale.US, " where %s", serverUserFilter);
+        }
+
+        if (getProfileRequest.isLatestCreatedProfile()) {
+            UserProfilesModel userProfilesModel;
+
+            if (StringUtil.isNullOrEmpty(filter)) {
+                userProfilesModel = UserProfilesModel.find(mAppContext.getDBSession(), "", true);
+            } else {
+                userProfilesModel = UserProfilesModel.find(mAppContext.getDBSession(), filter, true);
+            }
+
+            if (userProfilesModel != null) {
+                response.setResult(userProfilesModel.getProfileList().get(0));
+            }
+        } else {
+            String filterWithUid = null;
+
+            if (StringUtil.isNullOrEmpty(filter)) {
+                filterWithUid = String.format(Locale.US, " where %s = '%s'", ProfileEntry.COLUMN_NAME_UID, getProfileRequest.getUid());
+            } else {
+                filterWithUid = String.format(Locale.US, " where %s AND %s = '%s'", filter, ProfileEntry.COLUMN_NAME_UID, getProfileRequest.getUid());
+            }
+
+            UserProfileModel userProfileModel = UserProfileModel.find(mAppContext.getDBSession(), getProfileRequest.getUid(), filterWithUid);
+
+            if (userProfileModel != null) {
+                response.setResult(userProfileModel.getProfile());
+            }
+
+        }
+
+        return response;
     }
 }

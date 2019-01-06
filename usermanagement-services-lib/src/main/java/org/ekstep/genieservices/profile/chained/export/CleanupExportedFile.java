@@ -18,6 +18,7 @@ import org.ekstep.genieservices.commons.db.contract.ProfileEntry;
 import org.ekstep.genieservices.commons.db.contract.UserEntry;
 import org.ekstep.genieservices.commons.db.model.CustomReadersModel;
 import org.ekstep.genieservices.commons.db.model.NoSqlModel;
+import org.ekstep.genieservices.commons.db.model.NoSqlModelListModel;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
 import org.ekstep.genieservices.commons.db.operations.IDBTransaction;
 import org.ekstep.genieservices.commons.utils.CollectionUtil;
@@ -27,7 +28,6 @@ import org.ekstep.genieservices.importexport.bean.ExportProfileContext;
 import org.ekstep.genieservices.profile.db.model.GroupModel;
 import org.ekstep.genieservices.profile.db.model.GroupProfileModel;
 import org.ekstep.genieservices.profile.db.model.GroupProfilesModel;
-import org.ekstep.genieservices.profile.db.model.NoSqlModelListModel;
 import org.ekstep.genieservices.profile.db.model.UserModel;
 import org.ekstep.genieservices.profile.db.model.UserProfileModel;
 

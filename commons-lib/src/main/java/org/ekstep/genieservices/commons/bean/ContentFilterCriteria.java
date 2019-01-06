@@ -12,6 +12,8 @@ import java.util.List;
  */
 public class ContentFilterCriteria {
 
+    private static final int DEFAULT_LIMIT = 100;
+
     private String uid;
     private String[] contentTypes;
     private String[] audience;
@@ -19,10 +21,16 @@ public class ContentFilterCriteria {
     private String[] exclPragma;
     private boolean attachFeedback;
     private boolean attachContentAccess;
+    private boolean attachContentMarker;
     private List<ContentSortCriteria> sortCriteria;
+    private boolean recentlyViewed;
+    private boolean downloadedOnly;
+    private long limit;
 
     private ContentFilterCriteria(String uid, String[] contentTypes, String[] audience, String[] pragma, String[] exclPragma,
-                                  boolean attachFeedback, boolean attachContentAccess, List<ContentSortCriteria> sortCriteria) {
+                                  boolean attachFeedback, boolean attachContentAccess, boolean attachContentMarker,
+                                  List<ContentSortCriteria> sortCriteria,
+                                  boolean recentlyViewed, boolean downloadedOnly, long limit) {
         this.uid = uid;
         this.contentTypes = contentTypes;
         this.audience = audience;
@@ -30,7 +38,11 @@ public class ContentFilterCriteria {
         this.exclPragma = exclPragma;
         this.attachFeedback = attachFeedback;
         this.attachContentAccess = attachContentAccess;
+        this.attachContentMarker = attachContentMarker;
         this.sortCriteria = sortCriteria;
+        this.recentlyViewed = recentlyViewed;
+        this.downloadedOnly = downloadedOnly;
+        this.limit = limit;
     }
 
     public String getUid() {
@@ -61,8 +73,24 @@ public class ContentFilterCriteria {
         return attachContentAccess;
     }
 
+    public boolean attachContentMarker() {
+        return attachContentMarker;
+    }
+
     public List<ContentSortCriteria> getSortCriteria() {
         return sortCriteria;
+    }
+
+    public boolean isRecentlyViewed() {
+        return recentlyViewed;
+    }
+
+    public boolean isDownloadedOnly() {
+        return downloadedOnly;
+    }
+
+    public long getLimit() {
+        return limit;
     }
 
     @Override
@@ -78,7 +106,15 @@ public class ContentFilterCriteria {
         private String[] exclPragma;
         private boolean attachFeedback;
         private boolean attachContentAccess;
+        private boolean attachContentMarker;
         private List<ContentSortCriteria> sortCriteria;
+        private boolean recentlyViewed;
+        private boolean downloadedOnly;
+        private long limit;
+
+        public Builder() {
+            this.limit = DEFAULT_LIMIT;
+        }
 
         /**
          * User id to get the content in order to access by that user.
@@ -135,10 +171,42 @@ public class ContentFilterCriteria {
         }
 
         /**
+         * Call it if you want content marker by given uid.
+         */
+        public Builder withContentMarker() {
+            this.attachContentMarker = true;
+            return this;
+        }
+
+        /**
          * List of sort criteria {@link ContentSortCriteria}.
          */
         public Builder sort(List<ContentSortCriteria> sortCriteria) {
             this.sortCriteria = sortCriteria;
+            return this;
+        }
+
+        /**
+         * Call it if you want recently viewed content.
+         */
+        public Builder recentlyViewed() {
+            this.recentlyViewed = true;
+            return this;
+        }
+
+        /**
+         * Call it if you want downloaded content.
+         */
+        public Builder downloadedOnly() {
+            this.downloadedOnly = true;
+            return this;
+        }
+
+        /**
+         * Search results limit.
+         */
+        public Builder limit(long limit) {
+            this.limit = limit;
             return this;
         }
 
@@ -152,7 +220,8 @@ public class ContentFilterCriteria {
                 sortCriteria.add(new ContentSortCriteria("localLastUpdatedOn", SortOrder.DESC));
             }
             return new ContentFilterCriteria(uid, contentTypes, audience, pragma, exclPragma,
-                    attachFeedback, attachContentAccess, sortCriteria);
+                    attachFeedback, attachContentAccess, attachContentMarker, sortCriteria,
+                    recentlyViewed, downloadedOnly, limit);
         }
     }
 }

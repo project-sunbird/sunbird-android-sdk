@@ -4,6 +4,7 @@ import org.ekstep.genieservices.commons.bean.enums.SearchType;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class accepts query string, {@link List<ContentSearchFilter>}, age, grade, medium, board, audience array, channel array, sort criteria, limit and mode for searching a content with all
@@ -25,6 +26,7 @@ public class SunbirdContentSearchCriteria implements Serializable {
     private String[] createdBy;
     private String[] audience;
     private String[] channel;
+    private String[] purpose;
     private String[] pragma;
     private String[] exclPragma;
     private String[] contentStatusArray;
@@ -36,17 +38,21 @@ public class SunbirdContentSearchCriteria implements Serializable {
     private boolean offlineSearch;
     private List<ContentSearchFilter> facetFilters;
     private List<ContentSearchFilter> impliedFilters;
+    private List<Map<String, Object>> impliedFiltersMap;
     private List<ContentSortCriteria> sortCriteria;
     // 1 - indicates search, 2 - filter
     private SearchType searchType;
+    private String framework;
+    private String languageCode;
 
     private SunbirdContentSearchCriteria(String query, String[] exists, long offset, long limit, String mode, int age,
                                          String[] grade, String[] medium, String[] board,
-                                         String[] createdBy, String[] audience, String[] channel,
+                                         String[] createdBy, String[] audience, String[] channel, String[] purpose,
                                          String[] pragma, String[] exclPragma,
                                          String[] contentStatusArray, String[] facets, String[] contentTypes,
                                          String[] keywords, String[] dialCodes, String[] language,
-                                         boolean offlineSearch, List<ContentSortCriteria> sortCriteria, SearchType searchType) {
+                                         boolean offlineSearch, List<ContentSortCriteria> sortCriteria, SearchType searchType, String framework,
+                                         String languageCode) {
         this.query = query;
         this.exists = exists;
         this.offset = offset;
@@ -59,6 +65,7 @@ public class SunbirdContentSearchCriteria implements Serializable {
         this.createdBy = createdBy;
         this.audience = audience;
         this.channel = channel;
+        this.purpose = purpose;
         this.pragma = pragma;
         this.exclPragma = exclPragma;
         this.contentStatusArray = contentStatusArray;
@@ -70,11 +77,15 @@ public class SunbirdContentSearchCriteria implements Serializable {
         this.offlineSearch = offlineSearch;
         this.sortCriteria = sortCriteria;
         this.searchType = searchType;
+        this.framework = framework;
+        this.languageCode = languageCode;
     }
 
     private SunbirdContentSearchCriteria(String query, String[] exists, long offset, long limit, String mode, String[] facets, String[] contentTypes,
-                                         List<ContentSearchFilter> facetFilters, List<ContentSearchFilter> impliedFilters,
-                                         List<ContentSortCriteria> sortCriteria, SearchType searchType) {
+                                         List<ContentSearchFilter> facetFilters,
+                                         List<ContentSearchFilter> impliedFilters, List<Map<String, Object>> impliedFiltersMap,
+                                         List<ContentSortCriteria> sortCriteria, SearchType searchType, String framework,
+                                         String languageCode) {
         this.query = query;
         this.exists = exists;
         this.offset = offset;
@@ -84,8 +95,11 @@ public class SunbirdContentSearchCriteria implements Serializable {
         this.contentTypes = contentTypes;
         this.facetFilters = facetFilters;
         this.impliedFilters = impliedFilters;
+        this.impliedFiltersMap = impliedFiltersMap;
         this.sortCriteria = sortCriteria;
         this.searchType = searchType;
+        this.framework = framework;
+        this.languageCode = languageCode;
     }
 
     public String getQuery() {
@@ -136,6 +150,10 @@ public class SunbirdContentSearchCriteria implements Serializable {
         return channel;
     }
 
+    public String[] getPurpose() {
+        return purpose;
+    }
+
     public String[] getPragma() {
         return pragma;
     }
@@ -180,12 +198,24 @@ public class SunbirdContentSearchCriteria implements Serializable {
         return impliedFilters;
     }
 
+    public List<Map<String, Object>> getImpliedFiltersMap() {
+        return impliedFiltersMap;
+    }
+
     public List<ContentSortCriteria> getSortCriteria() {
         return sortCriteria;
     }
 
     public SearchType getSearchType() {
         return searchType;
+    }
+
+    public String getFramework() {
+        return framework;
+    }
+
+    public String getLanguageCode() {
+        return languageCode;
     }
 
     public static class SearchBuilder {
@@ -202,6 +232,7 @@ public class SunbirdContentSearchCriteria implements Serializable {
         private String[] createdBy;
         private String[] audience;
         private String[] channel;
+        private String[] purpose;
         private String[] pragma;
         private String[] exclPragma;
         private String[] contentStatusArray;
@@ -212,6 +243,8 @@ public class SunbirdContentSearchCriteria implements Serializable {
         private String[] language;
         private boolean offlineSearch;
         private List<ContentSortCriteria> sortCriteria;
+        private String framework;
+        private String languageCode;
 
         public SearchBuilder() {
             this.query = "";
@@ -322,6 +355,14 @@ public class SunbirdContentSearchCriteria implements Serializable {
         }
 
         /**
+         * Array of purpose.
+         */
+        public SearchBuilder purpose(String[] purpose) {
+            this.purpose = purpose;
+            return this;
+        }
+
+        /**
          * Array of pragma. i.e. "external", "ads".
          */
         public SearchBuilder pragma(String[] pragma) {
@@ -381,14 +422,24 @@ public class SunbirdContentSearchCriteria implements Serializable {
             return this;
         }
 
+        public SearchBuilder framework(String framework) {
+            this.framework = framework;
+            return this;
+        }
+
+        public SearchBuilder languageCode(String code) {
+            this.languageCode = code;
+            return this;
+        }
+
         public SunbirdContentSearchCriteria build() {
             if (contentStatusArray == null || contentStatusArray.length == 0) {
                 this.contentStatusArray = new String[]{"Live"};
             }
 
             return new SunbirdContentSearchCriteria(query, exists, offset, limit, mode, age, grade, medium, board, createdBy,
-                    audience, channel, pragma, exclPragma, contentStatusArray, facets, contentTypes,
-                    keywords, dialCodes, language, offlineSearch, sortCriteria, SearchType.SEARCH);
+                    audience, channel, purpose, pragma, exclPragma, contentStatusArray, facets, contentTypes,
+                    keywords, dialCodes, language, offlineSearch, sortCriteria, SearchType.SEARCH, framework, languageCode);
         }
     }
 
@@ -404,7 +455,10 @@ public class SunbirdContentSearchCriteria implements Serializable {
         private String[] contentTypes;
         private List<ContentSearchFilter> facetFilters;
         private List<ContentSearchFilter> impliedFilters;
+        private List<Map<String, Object>> impliedFiltersMap;
         private List<ContentSortCriteria> sortCriteria;
+        private String framework;
+        private String languageCode;
 
         public FilterBuilder() {
             this.query = "";
@@ -452,6 +506,11 @@ public class SunbirdContentSearchCriteria implements Serializable {
             return this;
         }
 
+        public FilterBuilder impliedFiltersMap(List<Map<String, Object>> impliedFiltersMap) {
+            this.impliedFiltersMap = impliedFiltersMap;
+            return this;
+        }
+
         public FilterBuilder facetFilters(List<ContentSearchFilter> facetFilters) {
             this.facetFilters = facetFilters;
             return this;
@@ -472,9 +531,19 @@ public class SunbirdContentSearchCriteria implements Serializable {
             return this;
         }
 
+        public FilterBuilder framework(String framework) {
+            this.framework = framework;
+            return this;
+        }
+
+        public FilterBuilder languageCode(String code) {
+            this.languageCode = code;
+            return this;
+        }
+
         public SunbirdContentSearchCriteria build() {
             return new SunbirdContentSearchCriteria(query, exists, offset, limit, mode, facets, contentTypes,
-                    facetFilters, impliedFilters, sortCriteria, SearchType.FILTER);
+                    facetFilters, impliedFilters, impliedFiltersMap, sortCriteria, SearchType.FILTER, framework, languageCode);
         }
     }
 }

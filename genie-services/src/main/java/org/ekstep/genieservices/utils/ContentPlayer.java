@@ -69,7 +69,7 @@ public class ContentPlayer {
         }
     }
 
-    public static void play(Context context, Content content, Map<String, String> rollup) {
+    public static void play(Context context, Content content, Map<String, Object> extraInfo) {
         ContentData contentData = content.getContentData();
         if (sContentPlayer.mQualifier == null) {
             Toast.makeText(context, "App qualifier not found", Toast.LENGTH_SHORT).show();
@@ -130,10 +130,17 @@ public class ContentPlayer {
             groupId = groupSession.getGid();
             correlationDataList.add(createGroupcData(groupId));
         }
+
         String deeplinkBasePath = getStringResourceByName(context, "deeplink_base_url");
         contextMap.put("deeplinkBasePath", deeplinkBasePath != null ? deeplinkBasePath + "://" : "ekstep://");
+        CorrelationData cData;
+        if (extraInfo != null && extraInfo.containsKey("streaming")) {
+            cData = new CorrelationData("streaming", "PlayerLaunch");
+        } else {
+            cData = new CorrelationData("offline", "PlayerLaunch");
+        }
+        correlationDataList.add(cData);
 
-//        correlationDataList.addAll(createHierarchyInfocDataList(content.getHierarchyInfo()));
         contextMap.put("cdata", correlationDataList);
 
         bundleMap.put("context", contextMap);
@@ -145,6 +152,12 @@ public class ContentPlayer {
 
         Rollup rollup1 = TelemetryHandler.getRollup(content.getIdentifier(), content.getHierarchyInfo());
         content.setRollup(rollup1);
+
+        if (content.isAvailableLocally()) {
+            content.getContentData().setStreamingUrl(content.getBasePath());
+            content.getContentData().setPreviewUrl(content.getBasePath());
+        }
+
         bundleMap.put("metadata", content);
         Map<String, Object> appContext = new HashMap<>();
         appContext.put("local", true);

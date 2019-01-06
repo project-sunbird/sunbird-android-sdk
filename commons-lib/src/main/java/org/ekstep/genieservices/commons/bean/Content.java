@@ -21,6 +21,7 @@ public class Content implements Serializable {
     private boolean isUpdateAvailable;
     private List<ContentFeedback> contentFeedback;
     private List<ContentAccess> contentAccess;
+    private List<ContentMarker> contentMarker;
     private List<Content> children;
     private List<HierarchyInfo> hierarchyInfo;
     private Long sizeOnDevice;
@@ -113,6 +114,14 @@ public class Content implements Serializable {
 
     public void setContentAccess(List<ContentAccess> contentAccess) {
         this.contentAccess = contentAccess;
+    }
+
+    public List<ContentMarker> getContentMarker() {
+        return contentMarker;
+    }
+
+    public void setContentMarker(List<ContentMarker> contentMarker) {
+        this.contentMarker = contentMarker;
     }
 
     public List<Content> getChildren() {

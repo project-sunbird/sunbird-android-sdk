@@ -61,6 +61,16 @@ public class PageAssembleCriteria {
             return this;
         }
 
+        public Builder purpose(String[] purpose) {
+            pageAssembleCriteria.filters.setPurpose(purpose);
+            return this;
+        }
+
+        public Builder channel(String[] channel) {
+            pageAssembleCriteria.filters.setChannel(channel);
+            return this;
+        }
+
         public Builder subject(String[] subject) {
             pageAssembleCriteria.filters.setSubject(subject);
             return this;
@@ -93,6 +103,11 @@ public class PageAssembleCriteria {
 
         public Builder concepts(String[] concepts) {
             pageAssembleCriteria.filters.setConcepts(concepts);
+            return this;
+        }
+
+        public Builder dialcodes(String dialcodes) {
+            pageAssembleCriteria.filters.setDialcodes(dialcodes);
             return this;
         }
 

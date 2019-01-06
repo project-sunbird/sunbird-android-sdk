@@ -17,6 +17,10 @@ public class EnrolledCoursesResponse {
         return courses;
     }
 
+    public void setCourses(List<Course> courses) {
+        this.courses = courses;
+    }
+
     @Override
     public String toString() {
         return GsonUtil.toJson(this);

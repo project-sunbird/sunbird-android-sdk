@@ -4,11 +4,13 @@ import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.bean.LearnerContentSummaryDetails;
 import org.ekstep.genieservices.commons.db.contract.LearnerSummaryEntry;
 import org.ekstep.genieservices.commons.db.core.ContentValues;
+import org.ekstep.genieservices.commons.db.core.ICleanable;
 import org.ekstep.genieservices.commons.db.core.IReadable;
 import org.ekstep.genieservices.commons.db.core.IResultSet;
 import org.ekstep.genieservices.commons.db.core.IUpdatable;
 import org.ekstep.genieservices.commons.db.core.IWritable;
 import org.ekstep.genieservices.commons.db.operations.IDBSession;
+import org.ekstep.genieservices.commons.utils.StringUtil;
 
 import java.util.Locale;
 
@@ -17,7 +19,7 @@ import java.util.Locale;
  * shriharsh
  */
 
-public class LearnerSummaryModel implements IReadable, IWritable, IUpdatable {
+public class LearnerSummaryModel implements IReadable, IWritable, IUpdatable, ICleanable {
     private Long id = -1L;
     private IDBSession dbSession;
 
@@ -83,6 +85,11 @@ public class LearnerSummaryModel implements IReadable, IWritable, IUpdatable {
         dbSession.update(this);
     }
 
+    public Void delete() {
+        dbSession.clean(this);
+        return null;
+    }
+
     @Override
     public IReadable read(IResultSet cursor) {
         if (cursor != null) {
@@ -141,11 +148,34 @@ public class LearnerSummaryModel implements IReadable, IWritable, IUpdatable {
     }
 
     @Override
+    public void clean() {
+        this.id = -1L;
+        this.uid = null;
+        this.contentId = null;
+    }
+
+    @Override
+    public String selectionToClean() {
+        return String.format(Locale.US, " where %s = '%s' AND %s = '%s'",
+                LearnerSummaryEntry.COLUMN_NAME_UID, this.uid, LearnerSummaryEntry.COLUMN_NAME_CONTENT_ID, this.contentId);
+    }
+
+    @Override
     public String updateBy() {
-        return String.format(Locale.US, "%s = '%s' AND %s = '%s' AND %s = '%s' ",
-                LearnerSummaryEntry.COLUMN_NAME_UID, uid,
-                LearnerSummaryEntry.COLUMN_NAME_CONTENT_ID, contentId,
-                LearnerSummaryEntry.COLUMN_NAME_HIERARCHY_DATA, hierarchyData);
+        String filter;
+        if (StringUtil.isNullOrEmpty(this.hierarchyData)) {
+            filter = String.format(Locale.US, "%s = '%s' AND %s = '%s' AND %s IS NULL",
+                    LearnerSummaryEntry.COLUMN_NAME_UID, this.uid,
+                    LearnerSummaryEntry.COLUMN_NAME_CONTENT_ID, this.contentId,
+                    LearnerSummaryEntry.COLUMN_NAME_HIERARCHY_DATA);
+        } else {
+            filter = String.format(Locale.US, "%s = '%s' AND %s = '%s' AND %s = '%s'",
+                    LearnerSummaryEntry.COLUMN_NAME_UID, this.uid,
+                    LearnerSummaryEntry.COLUMN_NAME_CONTENT_ID, this.contentId,
+                    LearnerSummaryEntry.COLUMN_NAME_HIERARCHY_DATA, this.hierarchyData);
+        }
+
+        return filter;
     }
 
     @Override
@@ -160,13 +190,25 @@ public class LearnerSummaryModel implements IReadable, IWritable, IUpdatable {
 
     @Override
     public String filterForRead() {
-        return String.format(Locale.US, "where %s = ? AND %s = ? AND %s = ? ", LearnerSummaryEntry.COLUMN_NAME_UID, LearnerSummaryEntry.COLUMN_NAME_CONTENT_ID,
-                LearnerSummaryEntry.COLUMN_NAME_HIERARCHY_DATA);
+        String filter;
+        if (StringUtil.isNullOrEmpty(this.hierarchyData)) {
+            filter = String.format(Locale.US, "where %s = '%s' AND %s = '%s' AND %s IS NULL",
+                    LearnerSummaryEntry.COLUMN_NAME_UID, this.uid,
+                    LearnerSummaryEntry.COLUMN_NAME_CONTENT_ID, this.contentId,
+                    LearnerSummaryEntry.COLUMN_NAME_HIERARCHY_DATA);
+        } else {
+            filter = String.format(Locale.US, "where %s = '%s' AND %s = '%s' AND %s = '%s'",
+                    LearnerSummaryEntry.COLUMN_NAME_UID, this.uid,
+                    LearnerSummaryEntry.COLUMN_NAME_CONTENT_ID, this.contentId,
+                    LearnerSummaryEntry.COLUMN_NAME_HIERARCHY_DATA, this.hierarchyData);
+        }
+
+        return filter;
     }
 
     @Override
     public String[] selectionArgsForFilter() {
-        return new String[]{this.uid, this.contentId, this.hierarchyData};
+        return null;
     }
 
     @Override

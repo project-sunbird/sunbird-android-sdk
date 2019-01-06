@@ -23,10 +23,22 @@ public class ContentSearchAPI extends BaseAPI {
     private Map<String, Object> requestMap;
 
     public ContentSearchAPI(AppContext appContext, Map<String, Object> requestMap) {
+
         super(appContext,
                 String.format(Locale.US, "%s/%s",
                         appContext.getParams().getString(IParams.Key.SEARCH_BASE_URL),
                         ENDPOINT),
+                TAG);
+
+        this.requestMap = requestMap;
+    }
+
+    public ContentSearchAPI(AppContext appContext, Map<String, Object> requestMap, String framework, String langCode) {
+
+        super(appContext,
+                String.format(Locale.US, "%s/%s%s",
+                        appContext.getParams().getString(IParams.Key.SEARCH_BASE_URL),
+                        ENDPOINT, "?framework=" + framework + "&lang=" + langCode),
                 TAG);
 
         this.requestMap = requestMap;
@@ -45,4 +57,5 @@ public class ContentSearchAPI extends BaseAPI {
         request.put("request", requestMap);
         return GsonUtil.toJson(request);
     }
+
 }

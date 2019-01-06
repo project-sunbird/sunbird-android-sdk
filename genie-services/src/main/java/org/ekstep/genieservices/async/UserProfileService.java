@@ -3,6 +3,7 @@ package org.ekstep.genieservices.async;
 import org.ekstep.genieservices.GenieService;
 import org.ekstep.genieservices.IUserProfileService;
 import org.ekstep.genieservices.commons.IResponseHandler;
+import org.ekstep.genieservices.commons.bean.AcceptTermsAndConditionsRequest;
 import org.ekstep.genieservices.commons.bean.EndorseOrAddSkillRequest;
 import org.ekstep.genieservices.commons.bean.FileUploadResult;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -77,7 +78,7 @@ public class UserProfileService {
     /*
      * This api is used search user
      *
-             * @param userSearchCriteria - {@link UserSearchCriteria}
+     * @param userSearchCriteria - {@link UserSearchCriteria}
      * @param responseHandler   - {@link IResponseHandler<TenantInfo>}
      */
     public void searchUser(final UserSearchCriteria userSearchCriteria, IResponseHandler<UserSearchResult> responseHandler) {
@@ -145,6 +146,21 @@ public class UserProfileService {
             @Override
             public GenieResponse<Void> perform() {
                 return userProfileService.updateUserInfo(updateUserInfoRequest);
+            }
+        }, responseHandler);
+    }
+
+    /**
+     * This api is used to update user info
+     *
+     * @param acceptTermsAndConditionsRequest {@link AcceptTermsAndConditionsRequest}
+     * @param responseHandler
+     */
+    public void acceptTermsAndConditions(final AcceptTermsAndConditionsRequest acceptTermsAndConditionsRequest, IResponseHandler<Void> responseHandler) {
+        ThreadPool.getInstance().execute(new IPerformable<Void>() {
+            @Override
+            public GenieResponse<Void> perform() {
+                return userProfileService.acceptTermsAndConditions(acceptTermsAndConditionsRequest);
             }
         }, responseHandler);
     }

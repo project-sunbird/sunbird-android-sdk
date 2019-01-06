@@ -11,7 +11,7 @@ import java.util.List;
 public class GSDBContext implements IDBContext {
 
     // Please don't make any changes in the class, except DATABASE_VERSION value.
-    private static final int DATABASE_VERSION = 18;
+    private static final int DATABASE_VERSION = 20;
     private static final String DATABASE_NAME = "GenieServices.db";
 
     @Override

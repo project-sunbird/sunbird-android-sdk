@@ -4,19 +4,21 @@ import org.ekstep.genieservices.commons.utils.StringUtil;
 
 /**
  * This class accepts contentId,attachFeedback and attachContentAccess while building the request, and is used when requesting content details.
- *
  */
 public class ContentDetailsRequest {
 
     private String contentId;
     private boolean attachFeedback;
     private boolean attachContentAccess;
+    private boolean attachContentMarker;
     private boolean refreshContentDetails;
 
-    private ContentDetailsRequest(String contentId, boolean attachFeedback, boolean attachContentAccess, boolean refreshContentDetails) {
+    private ContentDetailsRequest(String contentId, boolean attachFeedback, boolean attachContentAccess,
+                                  boolean attachContentMarker, boolean refreshContentDetails) {
         this.contentId = contentId;
         this.attachFeedback = attachFeedback;
         this.attachContentAccess = attachContentAccess;
+        this.attachContentMarker = attachContentMarker;
         this.refreshContentDetails = refreshContentDetails;
     }
 
@@ -32,6 +34,10 @@ public class ContentDetailsRequest {
         return attachContentAccess;
     }
 
+    public boolean isAttachContentMarker() {
+        return attachContentMarker;
+    }
+
     public boolean isRefreshContentDetails() {
         return refreshContentDetails;
     }
@@ -40,6 +46,7 @@ public class ContentDetailsRequest {
         private String contentId;
         private boolean attachFeedback;
         private boolean attachContentAccess;
+        private boolean attachContentMarker;
         private boolean refreshContentDetails;
 
         public Builder forContent(String contentId) {
@@ -67,6 +74,14 @@ public class ContentDetailsRequest {
         }
 
         /**
+         * If want content access history by given uid.
+         */
+        public Builder withContentMarker() {
+            this.attachContentMarker = true;
+            return this;
+        }
+
+        /**
          * The content details are refreshed from the server only if this flag is set.
          */
         public Builder refreshContentDetailsFromServer() {
@@ -78,7 +93,8 @@ public class ContentDetailsRequest {
             if (StringUtil.isNullOrEmpty(contentId)) {
                 throw new IllegalStateException("contentId required.");
             }
-            return new ContentDetailsRequest(contentId, attachFeedback, attachContentAccess, refreshContentDetails);
+            return new ContentDetailsRequest(contentId, attachFeedback, attachContentAccess,
+                    attachContentMarker, refreshContentDetails);
         }
     }
 }

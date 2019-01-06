@@ -8,6 +8,7 @@ import org.ekstep.genieservices.IUserProfileService;
 import org.ekstep.genieservices.ServiceConstants;
 import org.ekstep.genieservices.commons.AppContext;
 import org.ekstep.genieservices.commons.GenieResponseBuilder;
+import org.ekstep.genieservices.commons.bean.AcceptTermsAndConditionsRequest;
 import org.ekstep.genieservices.commons.bean.EndorseOrAddSkillRequest;
 import org.ekstep.genieservices.commons.bean.FileUploadResult;
 import org.ekstep.genieservices.commons.bean.GenieResponse;
@@ -355,6 +356,38 @@ public class UserProfileServiceImpl extends BaseService implements IUserProfileS
                 errorMessage = errorMessages.get(0);
             }
             response = GenieResponseBuilder.getErrorResponse(updateUserInfoAPIResponse.getError(), errorMessage, TAG);
+            TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
+        }
+
+        return response;
+    }
+
+    @Override
+    public GenieResponse<Void> acceptTermsAndConditions(AcceptTermsAndConditionsRequest acceptTermsAndConditionsRequest) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("request", GsonUtil.toJson(acceptTermsAndConditionsRequest));
+        params.put("logLevel", "2");
+        String methodName = "acceptTermsAndConditions@UserProfileServiceImpl";
+
+        GenieResponse<Void> response = isValidAuthSession(methodName, params);
+        if (response != null) {
+            return response;
+        }
+
+        GenieResponse acceptTermsAndConditionsAPIResponse = UserProfileHandler.acceptTermsAndConditions(mAppContext,
+                authSession.getSessionData(), acceptTermsAndConditionsRequest);
+
+        if (acceptTermsAndConditionsAPIResponse.getStatus()) {
+            response = GenieResponseBuilder.getSuccessResponse(ServiceConstants.SUCCESS_RESPONSE);
+
+            TelemetryLogger.logSuccess(mAppContext, response, TAG, methodName, params);
+        } else {
+            List<String> errorMessages = acceptTermsAndConditionsAPIResponse.getErrorMessages();
+            String errorMessage = null;
+            if (!CollectionUtil.isNullOrEmpty(errorMessages)) {
+                errorMessage = errorMessages.get(0);
+            }
+            response = GenieResponseBuilder.getErrorResponse(acceptTermsAndConditionsAPIResponse.getError(), errorMessage, TAG);
             TelemetryLogger.logFailure(mAppContext, response, TAG, methodName, params, errorMessage);
         }
 

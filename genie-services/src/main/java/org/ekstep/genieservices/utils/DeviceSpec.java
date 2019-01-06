@@ -22,6 +22,7 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by swayangjit on 25/5/17.
@@ -327,6 +328,30 @@ public class DeviceSpec {
 
         return sb.toString().replace(System.getProperty("line.separator"), " ").replace("Processor	:", "");
     }
+
+    public static String bytesToHuman(long size) {
+        long Kb = 1 * 1024;
+        long Mb = Kb * 1024;
+        long Gb = Mb * 1024;
+        long Tb = Gb * 1024;
+        long Pb = Tb * 1024;
+        long Eb = Pb * 1024;
+
+        if (size < Kb) return floatForm(size) + "";
+        if (size >= Kb && size < Mb) return floatForm((double) size / Kb) + "";
+        if (size >= Mb && size < Gb) return floatForm((double) size / Mb) + "";
+        if (size >= Gb && size < Tb) return floatForm((double) size / Gb) + "";
+        if (size >= Tb && size < Pb) return floatForm((double) size / Tb) + "";
+        if (size >= Pb && size < Eb) return floatForm((double) size / Pb) + "";
+        if (size >= Eb) return floatForm((double) size / Eb) + "";
+
+        return "0.00";
+    }
+
+    public static String floatForm(double d) {
+        return String.format(Locale.US, "%.2f", d);
+    }
+
 
 
 }

@@ -56,6 +56,11 @@ public class ContentData implements Serializable {
     private List<String> attributions;
     private List<String> dialcodes;
     private List<String> childNodes;
+    private String previewUrl;
+    private String framework;
+    private String creators;
+    private String contributors;
+    private String streamingUrl;
 
     public ContentData() {
     }
@@ -134,6 +139,14 @@ public class ContentData implements Serializable {
 
     public String getAverageRating() {
         return me_averageRating;
+    }
+
+    public void setTotalRatings(String totalRatings) {
+        this.me_totalRatings = totalRatings;
+    }
+
+    public void setAverageRating(String averageRating) {
+        this.me_averageRating = averageRating;
     }
 
     public String getTotalDownloads() {
@@ -268,6 +281,42 @@ public class ContentData implements Serializable {
 
     public void setChildNodes(List<String> childNodes) {
         this.childNodes = childNodes;
+    }
+
+    public String getPreviewUrl() {
+        return previewUrl;
+    }
+
+    public void setPreviewUrl(String previewUrl) {
+        this.previewUrl = previewUrl;
+    }
+
+    public String getFramework() {
+        return framework;
+    }
+
+    public String getCreators() {
+        return creators;
+    }
+
+    public void setCreators(String creators) {
+        this.creators = creators;
+    }
+
+    public String getContributors() {
+        return contributors;
+    }
+
+    public void setContributors(String contributors) {
+        this.contributors = contributors;
+    }
+
+    public String getStreamingUrl() {
+        return streamingUrl;
+    }
+
+    public void setStreamingUrl(String streamingUrl) {
+        this.streamingUrl = streamingUrl;
     }
 
     @Override
